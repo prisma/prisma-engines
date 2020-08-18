@@ -25,83 +25,82 @@ pub async fn m2m<'a, 'b>(
         }
     };
 
-    let ids = if parent_ids.is_empty() {
-        vec![]
+    if parent_ids.is_empty() {
+        Ok(ManyRecords::new(
+            query.selected_fields.names().map(|n| n.to_string()).collect(),
+        ))
     } else {
-        tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?
-    };
+        let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
 
-    let child_model_id = query.parent_field.related_model().primary_identifier();
+        let child_model_id = query.parent_field.related_model().primary_identifier();
 
-    let child_ids: Vec<Vec<PrismaValue>> = ids
-        .iter()
-        .map(|ri| {
-            let proj = child_model_id.assimilate(ri.1.clone());
-            proj.map(|ri| ri.values().collect::<Vec<_>>())
-        })
-        .collect::<std::result::Result<Vec<_>, _>>()?;
+        let child_ids: Vec<Vec<PrismaValue>> = ids
+            .iter()
+            .map(|ri| {
+                let proj = child_model_id.assimilate(ri.1.clone());
+                proj.map(|ri| ri.values().collect::<Vec<_>>())
+            })
+            .collect::<std::result::Result<Vec<_>, _>>()?;
 
-    let mut args = query.args.clone();
-    let filter = child_link_id.is_in(child_ids);
+        let mut args = query.args.clone();
+        let filter = child_link_id.is_in(child_ids);
 
-    args.filter = match args.filter {
-        Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-        None => Some(filter),
-    };
-
-    let mut scalars = if ids.is_empty() {
-        ManyRecords::new(query.selected_fields.names().map(|n| n.to_string()).collect())
-    } else {
-        tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-            .await?
-    };
-
-    // Child id to parent ids
-    let mut id_map: HashMap<RecordProjection, Vec<RecordProjection>> = HashMap::new();
-
-    for (parent_id, child_id) in ids {
-        match id_map.get_mut(&child_id) {
-            Some(v) => v.push(parent_id),
-            None => {
-                id_map.insert(child_id, vec![parent_id]);
-            }
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
         };
-    }
 
-    let fields = &scalars.field_names;
-    let mut additional_records: Vec<(usize, Vec<Record>)> = vec![];
+        let mut scalars = tx
+            .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+            .await?;
 
-    for (index, record) in scalars.records.iter_mut().enumerate() {
-        let record_id = record.projection(fields, &child_model_id)?;
-        let mut parent_ids = id_map.remove(&record_id).expect("1");
-        let first = parent_ids.pop().expect("2");
+        // Child id to parent ids
+        let mut id_map: HashMap<RecordProjection, Vec<RecordProjection>> = HashMap::new();
 
-        record.parent_id = Some(first);
-
-        let mut more_records = vec![];
-
-        for parent_id in parent_ids {
-            let mut record = record.clone();
-
-            record.parent_id = Some(parent_id);
-            more_records.push(record);
+        for (parent_id, child_id) in ids {
+            match id_map.get_mut(&child_id) {
+                Some(v) => v.push(parent_id),
+                None => {
+                    id_map.insert(child_id, vec![parent_id]);
+                }
+            };
         }
 
-        if !more_records.is_empty() {
-            additional_records.push((index + 1, more_records));
+        let fields = &scalars.field_names;
+        let mut additional_records: Vec<(usize, Vec<Record>)> = vec![];
+
+        for (index, record) in scalars.records.iter_mut().enumerate() {
+            let record_id = record.projection(fields, &child_model_id)?;
+            let mut parent_ids = id_map.remove(&record_id).expect("1");
+            let first = parent_ids.pop().expect("2");
+
+            record.parent_id = Some(first);
+
+            let mut more_records = vec![];
+
+            for parent_id in parent_ids {
+                let mut record = record.clone();
+
+                record.parent_id = Some(parent_id);
+                more_records.push(record);
+            }
+
+            if !more_records.is_empty() {
+                additional_records.push((index + 1, more_records));
+            }
         }
-    }
 
-    // Start to insert in the back to keep other indices valid.
-    additional_records.reverse();
+        // Start to insert in the back to keep other indices valid.
+        additional_records.reverse();
 
-    for (index, records) in additional_records {
-        for (offset, record) in records.into_iter().enumerate() {
-            scalars.records.insert(index + offset, record);
+        for (index, records) in additional_records {
+            for (offset, record) in records.into_iter().enumerate() {
+                scalars.records.insert(index + offset, record);
+            }
         }
-    }
 
-    Ok(processor.apply(scalars))
+        Ok(processor.apply(scalars))
+    }
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
