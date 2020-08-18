@@ -189,7 +189,6 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     //family top
-    //lonely top
     //  Start:    5 roundtrip
     //  Current:  5 roundtrip
     val family = server.query(
