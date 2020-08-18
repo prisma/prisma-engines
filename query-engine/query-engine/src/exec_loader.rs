@@ -45,7 +45,7 @@ async fn sqlite(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecu
     let db_name = path.file_stem().unwrap().to_str().unwrap().to_owned(); // Safe due to previous validations.
 
     trace!("Loaded SQLite connector.");
-    Ok((db_name, sql_executor("sqlite", sqlite, false)))
+    Ok((db_name, sql_executor(sqlite, false)))
 }
 
 #[cfg(feature = "sql")]
@@ -68,7 +68,7 @@ async fn postgres(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
         .unwrap_or(false);
 
     trace!("Loaded Postgres connector.");
-    Ok((db_name, sql_executor("postgres", psql, force_transactions)))
+    Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
 #[cfg(feature = "sql")]
@@ -86,7 +86,7 @@ async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
     let db_name = db_name.next().expect(err_str).to_owned();
 
     trace!("Loaded MySQL connector.");
-    Ok((db_name, sql_executor("mysql", mysql, false)))
+    Ok((db_name, sql_executor(mysql, false)))
 }
 
 #[cfg(all(feature = "sql", feature = "mssql"))]
@@ -111,21 +111,13 @@ async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
     let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
 
     trace!("Loaded SQL Server connector.");
-    Ok((db_name, sql_executor("mssql", mssql, false)))
+    Ok((db_name, sql_executor(mssql, false)))
 }
 
 #[cfg(feature = "sql")]
-fn sql_executor<T>(
-    primary_connector: &'static str,
-    connector: T,
-    force_transactions: bool,
-) -> Box<dyn QueryExecutor + Send + Sync + 'static>
+fn sql_executor<T>(connector: T, force_transactions: bool) -> Box<dyn QueryExecutor + Send + Sync + 'static>
 where
     T: Connector + Send + Sync + 'static,
 {
-    Box::new(InterpretingExecutor::new(
-        connector,
-        primary_connector,
-        force_transactions,
-    ))
+    Box::new(InterpretingExecutor::new(connector, force_transactions))
 }

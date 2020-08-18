@@ -12,6 +12,7 @@ pub use interpreting_executor::*;
 
 use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef};
 use async_trait::async_trait;
+use connector::Connector;
 
 #[async_trait]
 pub trait QueryExecutor {
@@ -26,5 +27,5 @@ pub trait QueryExecutor {
         query_schema: QuerySchemaRef,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
 
-    fn primary_connector(&self) -> &'static str;
+    fn primary_connector(&self) -> &dyn Connector;
 }

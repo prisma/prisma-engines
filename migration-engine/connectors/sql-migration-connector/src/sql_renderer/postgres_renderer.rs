@@ -4,6 +4,7 @@ use crate::{
     expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
+    AlterEnum,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -15,6 +16,113 @@ use std::borrow::Cow;
 impl SqlRenderer for PostgresFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
+    }
+
+    fn render_alter_enum(
+        &self,
+        alter_enum: &AlterEnum,
+        differ: &SqlSchemaDiffer<'_>,
+        schema_name: &str,
+    ) -> anyhow::Result<Vec<String>> {
+        if alter_enum.dropped_variants.is_empty() {
+            let stmts: Vec<String> = alter_enum
+                .created_variants
+                .iter()
+                .map(|created_value| {
+                    format!(
+                        "ALTER TYPE {enum_name} ADD VALUE {value}",
+                        enum_name = Quoted::postgres_ident(&alter_enum.name),
+                        value = Quoted::postgres_string(created_value)
+                    )
+                })
+                .collect();
+
+            return Ok(stmts);
+        }
+
+        let new_enum = differ
+            .next
+            .get_enum(&alter_enum.name)
+            .ok_or_else(|| anyhow::anyhow!("Enum `{}` not found in target schema.", alter_enum.name))?;
+
+        let mut stmts = Vec::with_capacity(10);
+
+        let tmp_name = format!("{}_new", &new_enum.name);
+        let tmp_old_name = format!("{}_old", &alter_enum.name);
+
+        stmts.push("Begin".to_string());
+
+        // create the new enum with tmp name
+        {
+            let create_new_enum = format!(
+                "CREATE TYPE {enum_name} AS ENUM ({variants})",
+                enum_name = Quoted::postgres_ident(&tmp_name),
+                variants = new_enum.values.iter().map(Quoted::postgres_string).join(", ")
+            );
+
+            stmts.push(create_new_enum);
+        }
+
+        // alter type of the current columns to new, with a cast
+        {
+            let affected_columns = walk_columns(differ.next).filter(|column| match &column.column_type().family {
+                ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str() => true,
+                _ => false,
+            });
+
+            for column in affected_columns {
+                let sql = format!(
+                    "ALTER TABLE {schema_name}.{table_name} \
+                            ALTER COLUMN {column_name} DROP DEFAULT,
+                            ALTER COLUMN {column_name} TYPE {tmp_name} \
+                                USING ({column_name}::text::{tmp_name}),
+                            ALTER COLUMN {column_name} SET DEFAULT {new_enum_default}",
+                    schema_name = Quoted::postgres_ident(schema_name),
+                    table_name = Quoted::postgres_ident(column.table().name()),
+                    column_name = Quoted::postgres_ident(column.name()),
+                    tmp_name = Quoted::postgres_ident(&tmp_name),
+                    new_enum_default = Quoted::postgres_string(new_enum.values.first().unwrap()),
+                );
+
+                stmts.push(sql);
+            }
+        }
+
+        // rename old enum
+        {
+            let sql = format!(
+                "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
+                enum_name = Quoted::postgres_ident(&alter_enum.name),
+                tmp_old_name = Quoted::postgres_ident(&tmp_old_name)
+            );
+
+            stmts.push(sql);
+        }
+
+        // rename new enum
+        {
+            let sql = format!(
+                "ALTER TYPE {tmp_name} RENAME TO {enum_name}",
+                tmp_name = Quoted::postgres_ident(&tmp_name),
+                enum_name = Quoted::postgres_ident(&new_enum.name)
+            );
+
+            stmts.push(sql)
+        }
+
+        // drop old enum
+        {
+            let sql = format!(
+                "DROP TYPE {tmp_old_name}",
+                tmp_old_name = Quoted::postgres_ident(&tmp_old_name),
+            );
+
+            stmts.push(sql)
+        }
+
+        stmts.push("Commit".to_string());
+
+        Ok(stmts)
     }
 
     fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {

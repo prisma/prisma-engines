@@ -2,6 +2,8 @@ use sql_schema_describer::walkers::*;
 use sql_schema_describer::*;
 use std::fmt::{Display, Write as _};
 
+pub(super) const SQL_INDENTATION: &'static str = "    ";
+
 #[derive(Debug)]
 pub(crate) enum Quoted<T> {
     Double(T),
@@ -71,7 +73,7 @@ where
 
 pub(crate) fn render_nullability(column: &ColumnWalker<'_>) -> &'static str {
     if column.is_required() {
-        "NOT NULL"
+        " NOT NULL"
     } else {
         ""
     }

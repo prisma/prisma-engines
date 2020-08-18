@@ -1,3 +1,4 @@
+use connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
 use query_core::{schema_builder, BuildMode, QuerySchema};
 use serial_test::serial;
@@ -127,5 +128,8 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
     let internal_dm_template = DatamodelConverter::convert(&dm);
     let internal_ref = internal_dm_template.build("db".to_owned());
 
-    (schema_builder::build(internal_ref, BuildMode::Modern, false), dm)
+    (
+        schema_builder::build(internal_ref, BuildMode::Modern, false, ConnectorCapabilities::default()),
+        dm,
+    )
 }

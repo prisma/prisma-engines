@@ -1629,7 +1629,7 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
     let box_table = schema.table_bang("Box");
 
     let expected_indexes = &[Index {
-        name: "Box_cat_id".into(),
+        name: "Box_cat_id_unique".into(),
         columns: vec!["cat_id".into()],
         tpe: IndexType::Unique,
     }];

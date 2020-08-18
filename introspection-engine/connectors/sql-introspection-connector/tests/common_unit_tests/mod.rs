@@ -1157,15 +1157,15 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     let expected_dm = if sql_family.is_mysql() {
         r#"
         model User {
-            id                      Int     @default(autoincrement()) @id
-            Event_EventToUser       Event[]
+            id                           Int     @default(autoincrement()) @id
+            Event_EventToUser            Event[]
             Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
         }
 
         model Event {
-            id                      Int    @default(autoincrement()) @id
-            hostId                  Int
-            User_EventToUser        User   @relation(fields: [hostId], references: [id])
+            id                           Int    @default(autoincrement()) @id
+            hostId                       Int
+            User_EventToUser             User   @relation(fields: [hostId], references: [id])
             User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
 
             @@index([hostId], name: "hostId")
@@ -1174,15 +1174,15 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     } else {
         r#"
         model User {
-            id                      Int     @default(autoincrement()) @id
-            Event_EventToUser       Event[]
+            id                           Int     @default(autoincrement()) @id
+            Event_EventToUser            Event[]
             Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
         }
 
         model Event {
-            id                      Int    @default(autoincrement()) @id
-            hostId                  Int
-            User_EventToUser        User   @relation(fields: [hostId], references: [id])
+            id                           Int    @default(autoincrement()) @id
+            hostId                       Int
+            User_EventToUser             User   @relation(fields: [hostId], references: [id])
             User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
         }
         "#
@@ -1190,10 +1190,72 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
 
     // Align formatting
     let expected_dm =
-        datamodel::render_datamodel_to_string(&datamodel::parse_datamodel(&expected_dm).unwrap()).unwrap();
+        datamodel::render_schema_ast_to_string(&datamodel::parse_schema_ast(&expected_dm).unwrap()).unwrap();
 
     let mut introspected_dm = calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false)?.data_model;
     introspected_dm.models.sort_by(|a, b| b.name.cmp(&a.name));
+
+    let introspected_dm_string = datamodel::render_datamodel_to_string(&introspected_dm).unwrap();
+
+    println!("{}", introspected_dm_string);
+
+    assert_eq!(introspected_dm_string, expected_dm);
+
+    Ok(())
+}
+
+// MySQL is ignored because barrel can't produce valid SQL there at the moment.
+#[test_each_connector(ignore("mysql"))]
+async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |table| {
+                table.add_column("id", barrel::types::primary());
+            });
+
+            migration.create_table("_Friendship", |table| {
+                table.add_column("A", barrel::types::foreign("User", vec!["id"]));
+                table.add_column("B", barrel::types::foreign("User", vec!["id"]));
+                table.add_index(
+                    "_FriendShip_AB_unique",
+                    barrel::types::index(vec!["A", "B"]).unique(true),
+                );
+                table.add_index("_FriendShip_B_index", barrel::types::index(vec!["B"]));
+            });
+
+            migration.create_table("_Frenemyship", |table| {
+                table.add_column("A", barrel::types::foreign("User", vec!["id"]));
+                table.add_column("B", barrel::types::foreign("User", vec!["id"]));
+                table.add_index(
+                    "_Frenemyship_AB_unique",
+                    barrel::types::index(vec!["A", "B"]).unique(true),
+                );
+                table.add_index("_Frenemyship_B_index", barrel::types::index(vec!["B"]));
+            });
+        })
+        .await;
+
+    let schema = api.describe_schema().await?;
+
+    let expected_dm = r#"
+    model User {
+        User_A_Frenemyship User[] @relation("Frenemyship")
+        User_A_Friendship  User[] @relation("Friendship")
+        User_B_Frenemyship User[] @relation("Frenemyship")
+        User_B_Friendship  User[] @relation("Friendship")
+        id                 Int    @default(autoincrement()) @id
+    }
+    "#;
+
+    // Align formatting
+    let expected_dm =
+        datamodel::render_schema_ast_to_string(&datamodel::parse_schema_ast(&expected_dm).unwrap()).unwrap();
+
+    let mut introspected_dm = calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false)?.data_model;
+    introspected_dm.models.sort_by(|a, b| b.name.cmp(&a.name));
+    for model in &mut introspected_dm.models {
+        model.fields.sort_by(|a, b| a.name().cmp(b.name()));
+    }
 
     let introspected_dm_string = datamodel::render_datamodel_to_string(&introspected_dm).unwrap();
 

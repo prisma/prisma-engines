@@ -4,6 +4,7 @@ use crate::{
     flavour::{SqlFlavour, SqliteFlavour},
     sql_database_step_applier::render_create_index,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
+    AlterEnum,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -14,6 +15,15 @@ use std::borrow::Cow;
 impl SqlRenderer for SqliteFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::Double(name)
+    }
+
+    fn render_alter_enum(
+        &self,
+        _alter_enum: &AlterEnum,
+        _differ: &SqlSchemaDiffer<'_>,
+        _schema_name: &str,
+    ) -> anyhow::Result<Vec<String>> {
+        unreachable!("render_alter_enum on sqlite")
     }
 
     fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
@@ -32,7 +42,8 @@ impl SqlRenderer for SqliteFlavour {
         };
 
         format!(
-            "{column_name} {tpe_str} {nullability_str}{default_str}{auto_increment}",
+            "{indentation}{column_name} {tpe_str}{nullability_str}{default_str}{auto_increment}",
+            indentation = SQL_INDENTATION,
             column_name = column_name,
             tpe_str = tpe_str,
             nullability_str = nullability_str,
@@ -102,7 +113,7 @@ impl SqlRenderer for SqliteFlavour {
             let mut rendered_fks = String::new();
 
             while let Some(fk) = fks.next() {
-                writeln!(
+                write!(
                     rendered_fks,
                     "FOREIGN KEY ({constrained_columns}) {references}{comma}",
                     constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
@@ -111,7 +122,7 @@ impl SqlRenderer for SqliteFlavour {
                 )?;
             }
 
-            format!(",\n{fks}", fks = rendered_fks)
+            format!(",\n\n{fks}", fks = rendered_fks)
         } else {
             String::new()
         };
