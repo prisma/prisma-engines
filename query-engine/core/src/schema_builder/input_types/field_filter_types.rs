@@ -146,7 +146,7 @@ fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = 
 
         let field = input_field(
             "mode",
-            InputType::Enum(enum_type),
+            InputType::Opt(Box::new(InputType::Enum(enum_type))),
             Some(DefaultValue::Single(PrismaValue::Enum("default".to_owned()))),
         );
 
