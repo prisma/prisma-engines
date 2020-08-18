@@ -94,8 +94,6 @@ use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
     dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
 };
-use crate::configuration::preview_features::PreviewFeatures;
-use std::borrow::Borrow;
 
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
@@ -251,10 +249,9 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> Result<(), error::ErrorCollection> {
-    let sources = config.datasources.as_slice();
-    let mut lowered = LowerDmlToAst::new(sources.first()).lower(datamodel)?;
+    let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel)?;
 
-    DatasourceSerializer::add_sources_to_ast(sources, &mut lowered);
+    DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
 
     render_schema_ast_to(stream, &lowered, 2);

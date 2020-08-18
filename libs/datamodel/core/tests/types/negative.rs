@@ -144,7 +144,7 @@ fn should_fail_on_native_type_with_unknown_type() {
 
         model Blog {
             id     Int    @id
-            bigInt Int    @pg.Numeric(3, 4)
+            bigInt Int    @pg.Numerical(3, 4)
             foobar String @pg.VarChar(5)
         }
     "#;
@@ -152,8 +152,8 @@ fn should_fail_on_native_type_with_unknown_type() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "Native type Numeric is not supported for postgresql connector.",
-        ast::Span::new(222, 238),
+        "Native type Numerical is not supported for postgresql connector.",
+        ast::Span::new(222, 240),
     ));
 }
 

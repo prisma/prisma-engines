@@ -1,17 +1,18 @@
 use super::super::directives::AllDirectives;
+use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
 use crate::error::ErrorCollection;
 use crate::FieldType::NativeType;
 use crate::{ast, dml, Datasource};
 
-pub struct LowerDmlToAst {
+pub struct LowerDmlToAst<'a> {
     directives: AllDirectives,
-    datasource: Option<&'static Datasource>,
+    datasource: Option<&'a Datasource>,
 }
 
-impl LowerDmlToAst {
+impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new(datasource: Option<&'static Datasource>) -> Self {
+    pub fn new(datasource: Option<&'a Datasource>) -> Self {
         Self {
             directives: AllDirectives::new(),
             datasource,
@@ -86,25 +87,23 @@ impl LowerDmlToAst {
     }
 
     pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
-        println!("{:?}", field);
-        /*let (is_native_type_field: bool, native_directive: Option<ast::Directive>) = if let dml::Field::ScalarField(sf) = field {
-            let rr = self.datasource.unwrap();
-            if let NativeType(prismaT, nativeT) = sf.clone().field_type {
-                if rr.has_preview_feature("nativeTypes") {
-                    let name = format!("{}.{}", rr.name, sf.name);
+        let mut directives = self.directives.field.serialize(field, datamodel)?;
+        if let (dml::Field::ScalarField(sf), Some(datasource)) = (field, self.datasource) {
+            if let NativeType(_prisma_tpe, native_tpe) = sf.clone().field_type {
+                if datasource.has_preview_feature("nativeTypes") {
+                    let new_directive_name = format!("{}.{}", datasource.name, native_tpe.name);
+                    // lower native type arguments
+                    let mut arguments = vec![];
+                    for arg in native_tpe.args {
+                        arguments.push(ast::Argument::new_unnamed(ast::Expression::NumericValue(
+                            arg.to_string(),
+                            Span::empty(),
+                        )));
+                    }
+                    directives.push(ast::Directive::new(new_directive_name.as_str(), arguments));
                 }
-                println!("datamodel: {:?}", datamodel);
-                (true, ast::Directive::new(name, vec![]))
             }
-        } else {
-            (false, None)
-        };*/
-        let is_native_type_field = true;
-        let directives: Vec<ast::Directive> = if is_native_type_field {
-            vec![ast::Directive::new("test", vec![])]
-        } else {
-            self.directives.field.serialize(field, datamodel)?
-        };
+        }
 
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),

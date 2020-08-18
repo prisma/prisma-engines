@@ -13,7 +13,6 @@ pub enum ScalarType {
     Bytes,
     Decimal,
     Duration,
-    Interval,
 }
 
 impl ScalarType {
@@ -29,7 +28,6 @@ impl ScalarType {
             "Bytes" => Ok(ScalarType::Bytes),
             "Decimal" => Ok(ScalarType::Decimal),
             "Duration" => Ok(ScalarType::Duration),
-            "Interval" => Ok(ScalarType::Interval),
             _ => Err(format!("type {} is not a known scalar type.", s)),
         }
     }
@@ -48,7 +46,6 @@ impl ToString for ScalarType {
             ScalarType::Bytes => String::from("Bytes"),
             ScalarType::Decimal => String::from("Decimal"),
             ScalarType::Duration => String::from("Duration"),
-            ScalarType::Interval => String::from("Interval"),
         }
     }
 }

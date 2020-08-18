@@ -68,7 +68,7 @@ impl PostgresDatamodelConnector {
         let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, ScalarType::DateTime);
         let time_with_timezone =
             NativeTypeConstructor::with_args(TIME_WITH_TIMEZONE_TYPE_NAME, 1, ScalarType::DateTime);
-        let interval = NativeTypeConstructor::with_args(INTERVAL_TYPE_NAME, 1, ScalarType::Interval);
+        let interval = NativeTypeConstructor::with_args(INTERVAL_TYPE_NAME, 1, ScalarType::Duration);
         let boolean = NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, ScalarType::Boolean);
         let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, ScalarType::String);
         let varbit = NativeTypeConstructor::with_args(VAR_BIT_TYPE_NAME, 1, ScalarType::String);

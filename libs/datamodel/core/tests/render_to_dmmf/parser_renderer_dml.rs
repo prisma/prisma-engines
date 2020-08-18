@@ -160,23 +160,15 @@ model Blog {
 }
 "#;
 
-    let expected = r#"model Blog {
-  id     Int    @id
-  bigInt Int    @pg.BigInt
-  foobar String @pg.VarChar(12)
-}
-"#;
-
     let dml = parse(input);
 
     println!("{:?}", dml);
 
-    let config = datamodel::parse_configuration(input_with_experimental).unwrap();
+    let config = datamodel::parse_configuration(input).unwrap();
     let dml = parse(input);
     let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config).unwrap();
 
-
-    assert_eq!(rendered, expected);
+    assert_eq!(rendered, input);
 }
 
 #[test]

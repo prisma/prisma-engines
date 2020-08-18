@@ -147,6 +147,10 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::List(value_vec) => {
             serde_json::Value::Array(value_vec.iter().map(|pv| prisma_value_to_serde(pv)).collect())
         }
+        PrismaValue::XML(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::Bytes(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::Duration(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::Decimal(val) => serde_json::Value::String(val.to_string()),
     }
 }
 
