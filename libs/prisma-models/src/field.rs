@@ -67,6 +67,10 @@ pub enum TypeIdentifier {
     DateTime,
     UUID,
     Int,
+    XML,
+    Duration,
+    Bytes,
+    Decimal,
 }
 
 impl From<TypeIdentifier> for TypeHint {
@@ -80,6 +84,10 @@ impl From<TypeIdentifier> for TypeHint {
             TypeIdentifier::DateTime => TypeHint::DateTime,
             TypeIdentifier::UUID => TypeHint::UUID,
             TypeIdentifier::Int => TypeHint::Int,
+            TypeIdentifier::Bytes => TypeHint::Bytes,
+            TypeIdentifier::Duration => TypeHint::Duration,
+            TypeIdentifier::XML => TypeHint::XML,
+            TypeIdentifier::Decimal => TypeHint::Decimal,
         }
     }
 }
@@ -186,6 +194,10 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Boolean => Self::Boolean,
             ScalarType::DateTime => Self::DateTime,
             ScalarType::Json => Self::Json,
+            ScalarType::XML => Self::XML,
+            ScalarType::Decimal => Self::Decimal,
+            ScalarType::Duration => Self::Duration,
+            ScalarType::Bytes => Self::Bytes,
         }
     }
 }

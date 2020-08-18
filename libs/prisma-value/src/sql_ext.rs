@@ -83,7 +83,14 @@ impl<'a> From<PrismaValue> for Value<'a> {
                 TypeHint::Array => Value::Array(None),
                 TypeHint::Char | TypeHint::Unknown => Value::Char(None),
                 TypeHint::Bytes => Value::Bytes(None),
+                TypeHint::Decimal => Value::Decimal(None), // todo these types do not exist in quaint?
+                TypeHint::XML => Value::XML(None),
+                TypeHint::Duration => Value::Duration(None),
             },
+            PrismaValue::Bytes(b) => b.into(),
+            PrismaValue::Duration(d) => d.into(),
+            PrismaValue::Decimal(d) => d.into(),
+            PrismaValue::XML(x) => x.into(),
         }
     }
 }

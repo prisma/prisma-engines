@@ -30,6 +30,9 @@ pub enum TypeHint {
     Char,
     Bytes,
     Unknown,
+    Duration,
+    XML,
+    Decimal,
 }
 
 #[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
