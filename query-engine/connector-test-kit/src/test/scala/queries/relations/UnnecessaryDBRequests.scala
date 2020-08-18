@@ -216,6 +216,6 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
   // what about 1:1
   // the unnecessary second level request for one2many is still generated
   // relation{id} extra request for id
-  // fetching related id when resolving m2m (its already in the relationtable)
+  // fetching related id when resolving m2m (its already in the relation table)
   //
 }
