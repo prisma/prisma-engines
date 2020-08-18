@@ -102,10 +102,6 @@ impl ManyRecords {
     pub fn reverse(&mut self) {
         self.records.reverse();
     }
-
-    pub fn is_empty(&self) -> bool {
-        self.records.is_empty()
-    }
 }
 
 #[derive(Debug, Default, Clone)]

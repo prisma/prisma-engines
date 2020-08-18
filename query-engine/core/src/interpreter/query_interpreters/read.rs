@@ -76,9 +76,6 @@ fn read_many<'a, 'b>(
     let fut = async move {
         println!("Read many: {:?}", query.args.filter);
 
-        // let scalars = if query.args.returns_nothing() {
-        //     ManyRecords::new(query.selected_fields.names().map(|n| n.to_string()).collect())
-        // } else
         let scalars = if query.args.distinct.is_some() || query.args.contains_unstable_cursor() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
