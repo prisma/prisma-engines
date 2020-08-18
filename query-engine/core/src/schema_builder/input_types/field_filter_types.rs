@@ -1,5 +1,5 @@
 use super::*;
-use connector::ConnectorCapability;
+use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
 /// Builds filter type for the given model field.

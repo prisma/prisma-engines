@@ -20,6 +20,7 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::AutoIncrementMultipleAllowed,
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
+            ConnectorCapability::InsensitiveFilters,
         ];
 
         let bigint = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, ScalarType::Int);

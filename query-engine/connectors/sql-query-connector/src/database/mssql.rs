@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use connector_interface::{
     self as connector,
     error::{ConnectorError, ErrorKind},
-    Connection, Connector, ConnectorCapabilities,
+    Connection, Connector,
 };
 use datamodel::Datasource;
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
@@ -46,10 +46,6 @@ impl Connector for Mssql {
             Ok(Box::new(conn) as Box<dyn Connection>)
         })
         .await
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        ConnectorCapabilities::default()
     }
 
     fn name(&self) -> String {
