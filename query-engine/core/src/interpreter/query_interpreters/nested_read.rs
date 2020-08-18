@@ -25,7 +25,12 @@ pub async fn m2m<'a, 'b>(
         }
     };
 
-    let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
+    let ids = if parent_ids.is_empty() {
+        vec![]
+    } else {
+        tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?
+    };
+
     let child_model_id = query.parent_field.related_model().primary_identifier();
 
     let child_ids: Vec<Vec<PrismaValue>> = ids
@@ -44,9 +49,12 @@ pub async fn m2m<'a, 'b>(
         None => Some(filter),
     };
 
-    let mut scalars = tx
-        .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-        .await?;
+    let mut scalars = if ids.is_empty() {
+        ManyRecords::new(query.selected_fields.names().map(|n| n.to_string()).collect())
+    } else {
+        tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+            .await?
+    };
 
     // Child id to parent ids
     let mut id_map: HashMap<RecordProjection, Vec<RecordProjection>> = HashMap::new();
@@ -121,7 +129,7 @@ pub async fn one2m<'a, 'b>(
         }
     };
 
-    println!("{:?}", joined_projections);
+    println!("Joined Projection: {:?}", joined_projections);
 
     // Maps the identifying link values to all primary IDs they are tied to.
     // Only the values are hashed for easier comparison.
