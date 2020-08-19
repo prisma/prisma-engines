@@ -220,10 +220,12 @@ impl<'a> LiftAstToDml<'a> {
                     .filter(|dir| dir.name.name.starts_with(&prefix))
                     .collect_vec();
 
+                let type_specification = type_specifications.first();
+
                 if type_specifications.len() > 1 {
                     return Err(DatamodelError::new_duplicate_directive_error(
                         &prefix,
-                        type_specifications.first().unwrap().span,
+                        type_specification.unwrap().span,
                     ));
                 }
 
@@ -232,7 +234,7 @@ impl<'a> LiftAstToDml<'a> {
                     .map(|dir| dir.name.name.trim_start_matches(&prefix));
 
                 // convert arguments to u32 if possible
-                let number_args = type_specifications.first().map(|dir| dir.arguments.clone());
+                let number_args = type_specification.map(|dir| dir.arguments.clone());
                 let args = if let Some(number) = number_args {
                     let p = number
                         .iter()
@@ -256,7 +258,7 @@ impl<'a> LiftAstToDml<'a> {
                                 connector_name: connector_string.clone(),
                             })
                             .to_string(),
-                            type_specifications.first().unwrap().span,
+                            type_specification.unwrap().span,
                         ));
                     };
 
