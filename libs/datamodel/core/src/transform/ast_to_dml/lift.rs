@@ -229,8 +229,7 @@ impl<'a> LiftAstToDml<'a> {
                     ));
                 }
 
-                let name = type_specifications
-                    .first()
+                let name = type_specification
                     .map(|dir| dir.name.name.trim_start_matches(&prefix));
 
                 // convert arguments to u32 if possible
@@ -276,7 +275,7 @@ impl<'a> LiftAstToDml<'a> {
                             x,
                             native_type_constructor._number_of_args,
                             length,
-                            type_specifications.first().unwrap().span,
+                            type_specification.unwrap().span,
                         ));
                     }
 
@@ -290,7 +289,7 @@ impl<'a> LiftAstToDml<'a> {
                                 expected_type: compatable_prisma_scalar_type.to_string(),
                             })
                             .to_string(),
-                            type_specifications.first().unwrap().span,
+                            type_specification.unwrap().span,
                         ));
                     }
 
@@ -298,7 +297,7 @@ impl<'a> LiftAstToDml<'a> {
                     if parse_native_type_result.is_err() {
                         return Err(DatamodelError::new_connector_error(
                             &parse_native_type_result.err().unwrap().to_string(),
-                            type_specifications.first().unwrap().span,
+                            type_specification.unwrap().span,
                         ));
                     }
                     let field_type = dml::FieldType::NativeType(scalar_type, parse_native_type_result.unwrap());
