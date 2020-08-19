@@ -206,11 +206,6 @@ impl<'a> LiftAstToDml<'a> {
                     &self.source.unwrap().active_provider,
                     &self.source.unwrap().active_connector,
                 );
-                let mut connectors: HashMap<&str, Box<dyn Connector>> = HashMap::new();
-                connectors.insert("postgresql", Box::new(SqlDatamodelConnectors::postgres()));
-                connectors.insert("mysql", Box::new(SqlDatamodelConnectors::mysql()));
-                connectors.insert("sqlite", Box::new(SqlDatamodelConnectors::sqlite()));
-                connectors.insert("mssql", Box::new(SqlDatamodelConnectors::mssql()));
 
                 let prefix = format!("{}{}", datasource_name, ".");
 
