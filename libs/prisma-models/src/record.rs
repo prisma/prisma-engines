@@ -43,6 +43,12 @@ impl ManyRecords {
             field_names,
         }
     }
+    pub fn empty(selected_fields: &ModelProjection) -> Self {
+        Self {
+            records: Vec::new(),
+            field_names: selected_fields.names().map(|n| n.to_string()).collect(),
+        }
+    }
 
     pub fn order_by(&mut self, order_bys: &[OrderBy]) {
         let field_indices: HashMap<&str, usize> = self

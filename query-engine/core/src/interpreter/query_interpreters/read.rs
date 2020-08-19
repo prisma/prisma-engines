@@ -175,13 +175,18 @@ fn process_nested<'a, 'b>(
     let fut = async move {
         println!("Process nested: {:?}", parent_result);
 
-        let mut results = Vec::with_capacity(nested.len());
+        let results = if matches!(parent_result, Some(parent_records) if parent_records.records.is_empty()) {
+            vec![]
+        } else {
+            let mut nested_results = Vec::with_capacity(nested.len());
 
-        for query in nested {
-            let result = execute(tx, query, parent_result).await?;
-            results.push(result);
-        }
+            for query in nested {
+                let result = execute(tx, query, parent_result).await?;
+                nested_results.push(result);
+            }
 
+            nested_results
+        };
         Ok(results)
     };
 
