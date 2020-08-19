@@ -1,4 +1,3 @@
-use core::option::Option::Some;
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
