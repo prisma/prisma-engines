@@ -272,27 +272,18 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::MediumText => (MEDIUM_TEXT_TYPE_NAME, vec![]),
             MySqlType::LongText => (LONG_TEXT_TYPE_NAME, vec![]),
             MySqlType::Date => (DATE_TYPE_NAME, vec![]),
-            MySqlType::Time(x) => {
-                if x.is_none() {
-                    (TIME_TYPE_NAME, vec![])
-                } else {
-                    (TIME_TYPE_NAME, vec![x.unwrap()])
-                }
-            }
-            MySqlType::DateTime(x) => {
-                if x.is_none() {
-                    (DATETIME_TYPE_NAME, vec![])
-                } else {
-                    (DATETIME_TYPE_NAME, vec![x.unwrap()])
-                }
-            }
-            MySqlType::Timestamp(x) => {
-                if x.is_none() {
-                    (TIMESTAMP_TYPE_NAME, vec![])
-                } else {
-                    (TIMESTAMP_TYPE_NAME, vec![x.unwrap()])
-                }
-            }
+            MySqlType::Time(x) => match x {
+                Some(arg) => (TIME_TYPE_NAME, vec![arg]),
+                None => (TIME_TYPE_NAME, vec![]),
+            },
+            MySqlType::DateTime(x) => match x {
+                Some(arg) => (DATETIME_TYPE_NAME, vec![arg]),
+                None => (DATETIME_TYPE_NAME, vec![]),
+            },
+            MySqlType::Timestamp(x) => match x {
+                Some(arg) => (TIMESTAMP_TYPE_NAME, vec![arg]),
+                None => (TIMESTAMP_TYPE_NAME, vec![]),
+            },
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
         };
