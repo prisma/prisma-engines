@@ -42,16 +42,12 @@ pub enum PrismaValue {
     Boolean(bool),
     Enum(String),
     Int(i64),
-    Bytes(String),
-    Duration(String),
-    Decimal(String),
 
     #[serde(serialize_with = "serialize_null")]
     Null(TypeHint),
     Uuid(Uuid),
     List(PrismaListValue),
     Json(String),
-    XML(String),
 
     #[serde(serialize_with = "serialize_date")]
     DateTime(DateTime<Utc>),
@@ -182,10 +178,6 @@ impl fmt::Display for PrismaValue {
                 let as_string = format!("{:?}", x);
                 as_string.fmt(f)
             }
-            PrismaValue::XML(x) => x.fmt(f),
-            PrismaValue::Duration(x) => x.fmt(f),
-            PrismaValue::Bytes(x) => x.fmt(f),
-            PrismaValue::Decimal(x) => x.fmt(f),
         }
     }
 }

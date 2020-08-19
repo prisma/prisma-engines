@@ -1,6 +1,5 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
-use datamodel_connector::scalars::ScalarType::XML;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
 use native_types::{NativeType, PostgresType};
 

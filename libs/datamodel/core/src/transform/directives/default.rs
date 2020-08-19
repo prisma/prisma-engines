@@ -88,9 +88,5 @@ pub fn lower_prisma_value(pv: &PrismaValue) -> ast::Expression {
             vec.iter().map(|pv| lower_prisma_value(pv)).collect(),
             ast::Span::empty(),
         ),
-        PrismaValue::Duration(value) => ast::Expression::ConstantValue(value.clone(), ast::Span::empty()),
-        PrismaValue::Bytes(value) => ast::Expression::StringValue(value.to_string(), ast::Span::empty()),
-        PrismaValue::Decimal(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-        PrismaValue::XML(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
     }
 }
