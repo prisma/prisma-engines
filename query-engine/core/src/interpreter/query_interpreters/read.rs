@@ -176,6 +176,8 @@ fn process_nested<'a, 'b>(
         println!("Process nested: {:?}", parent_result);
 
         let results = if matches!(parent_result, Some(parent_records) if parent_records.records.is_empty()) {
+            //this catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,
+            // we do not need to do roundtrips which is why the nested_reads contain additional logic
             vec![]
         } else {
             let mut nested_results = Vec::with_capacity(nested.len());

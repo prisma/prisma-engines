@@ -52,6 +52,18 @@ pub async fn m2m<'a, 'b>(
         None => Some(filter),
     };
 
+    // Todo
+    // another request can be avoided if:
+    // there is no existing filter
+    // the selection set is the child_link_id
+    // let mut scalars = if args.filter.is_none() && child_link_id == &query.selected_fields {
+    //     let field_names : Vec<String> = query.selected_fields.fields().map(|f| f.name).collect();
+    //     ManyRecords{ records: , field_names: field_names}
+    // } else {
+    //     tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+    //         .await?
+    // };
+
     let mut scalars = tx
         .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
         .await?;
@@ -121,7 +133,7 @@ pub async fn one2m<'a, 'b>(
     println!("one2m: {:?}", parent_result);
 
     // Primary ID to link ID
-    let joined_projections = match parent_projections {
+    let joined_projections = match parent_projections.clone() {
         Some(projections) => projections,
         None => {
             let extractor = parent_model_id.clone().merge(parent_link_id.clone());
@@ -164,17 +176,30 @@ pub async fn one2m<'a, 'b>(
         return Ok(ManyRecords::empty(selected_fields));
     }
 
-    let filter = child_link_id.is_in(uniq_projections);
-    let mut args = query_args;
+    // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
+    let mut scalars = if query_args.filter.is_none() && &child_link_id == selected_fields {
+        let field_names: Vec<String> = selected_fields.fields().map(|f| f.name().to_string()).collect();
 
-    args.filter = match args.filter {
-        Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-        None => Some(filter),
+        let records = uniq_projections
+            .iter()
+            .map(|v| Record {
+                values: v.clone(),
+                parent_id: None,
+            })
+            .collect();
+
+        ManyRecords { records, field_names }
+    } else {
+        let filter = child_link_id.is_in(uniq_projections);
+        let mut args = query_args;
+
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
+        };
+        tx.get_many_records(&parent_field.related_model(), args, selected_fields)
+            .await?
     };
-
-    let mut scalars = tx
-        .get_many_records(&parent_field.related_model(), args, selected_fields)
-        .await?;
 
     // Inlining is done on the parent, this means that we need to write the primary parent ID
     // into the child records that we retrieved. The matching is done based on the parent link values.

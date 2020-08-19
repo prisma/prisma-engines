@@ -127,9 +127,28 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
 
     no.toString() should be("{\"data\":{\"tops\":[]}}")
 
+    //two levels
+    //  Start:    3 roundtrip
+    //  Current:  1 roundtrip
+    val two_levels = server.query(
+      """
+        |query {
+        |  tops(where: { id: { equals: "family_top" }}){
+        |     id,
+        |     middle{
+        |       id
+        |   }
+        |  }
+        |}
+      """,
+      project
+    )
+
+    two_levels.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":{\"id\":\"middle\"}}]}}")
+
   }
 
-  "Many to Many relations" should "not create unnecessary roundtrips" in {
+  "Many to Many relations" should "not create unnecessary round trips" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Top {
@@ -254,5 +273,24 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
 
     no.toString() should be("{\"data\":{\"tops\":[]}}")
 
+    //two levels
+    //  Start:    3 roundtrip
+    //  Current:  3 roundtrip
+    //  Goal:     2 roundtrip
+    val two_levels = server.query(
+      """
+        |query {
+        |  tops(where: { id: { equals: "family_top" }}){
+        |     id,
+        |     middle{
+        |       id
+        |   }
+        |  }
+        |}
+      """,
+      project
+    )
+
+    two_levels.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":[{\"id\":\"middle\"}]}]}}")
   }
 }
