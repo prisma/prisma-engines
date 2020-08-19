@@ -275,8 +275,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
 
     //two levels
     //  Start:    3 roundtrip
-    //  Current:  3 roundtrip
-    //  Goal:     2 roundtrip
+    //  Current:  2 roundtrip
     val two_levels = server.query(
       """
         |query {

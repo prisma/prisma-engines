@@ -45,7 +45,8 @@ pub async fn m2m<'a, 'b>(
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
     // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
-    let mut scalars = if query.args.filter.is_none() && child_link_id == query.selected_fields {
+    println!("{:?}", query.args);
+    let mut scalars = if query.args.do_nothing() && child_link_id == query.selected_fields {
         ManyRecords::from_projection(child_ids, &query.selected_fields)
     } else {
         let mut args = query.args.clone();
@@ -124,7 +125,7 @@ pub async fn one2m<'a, 'b>(
     println!("one2m: {:?}", parent_result);
 
     // Primary ID to link ID
-    let joined_projections = match parent_projections.clone() {
+    let joined_projections = match parent_projections {
         Some(projections) => projections,
         None => {
             let extractor = parent_model_id.clone().merge(parent_link_id.clone());
@@ -168,7 +169,7 @@ pub async fn one2m<'a, 'b>(
     }
 
     // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
-    let mut scalars = if query_args.filter.is_none() && &child_link_id == selected_fields {
+    let mut scalars = if query_args.do_nothing() && &child_link_id == selected_fields {
         ManyRecords::from_projection(uniq_projections, selected_fields)
     } else {
         let filter = child_link_id.is_in(uniq_projections);
