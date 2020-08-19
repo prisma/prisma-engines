@@ -229,8 +229,7 @@ impl<'a> LiftAstToDml<'a> {
                     ));
                 }
 
-                let name = type_specification
-                    .map(|dir| dir.name.name.trim_start_matches(&prefix));
+                let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
 
                 // convert arguments to u32 if possible
                 let number_args = type_specification.map(|dir| dir.arguments.clone());
@@ -294,14 +293,17 @@ impl<'a> LiftAstToDml<'a> {
                     }
 
                     let parse_native_type_result = connector.parse_native_type(x, args);
-                    if parse_native_type_result.is_err() {
-                        return Err(DatamodelError::new_connector_error(
-                            &parse_native_type_result.err().unwrap().to_string(),
-                            type_specification.unwrap().span,
-                        ));
+                    match parse_native_type_result {
+                        Err(connector_error) => {
+                            return Err(DatamodelError::new_connector_error(
+                                &connector_error.to_string(),
+                                type_specification.unwrap().span,
+                            ))
+                        }
+                        Ok(parsed_native_type) => {
+                            Ok((dml::FieldType::NativeType(scalar_type, parsed_native_type), vec![]))
+                        }
                     }
-                    let field_type = dml::FieldType::NativeType(scalar_type, parse_native_type_result.unwrap());
-                    Ok((field_type, vec![]))
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
