@@ -260,26 +260,8 @@ impl<'a> LiftAstToDml<'a> {
                         ));
                     };
 
-                    let native_type_constructor = connector
-                        .available_native_type_constructors()
-                        .iter()
-                        .find(|c| c.name.as_str() == x)
-                        .unwrap();
-                    let length = args.iter().count();
-
-                    if constructor._number_of_args != length
-                        && native_type_constructor._number_of_optional_args != length
-                    {
-                        return Err(DatamodelError::new_argument_count_missmatch_error(
-                            x,
-                            native_type_constructor._number_of_args,
-                            length,
-                            type_specification.unwrap().span,
-                        ));
-                    }
-
                     // check for compatability with scalar type
-                    let compatable_prisma_scalar_type = native_type_constructor.prisma_type;
+                    let compatable_prisma_scalar_type = constructor.prisma_type;
                     if compatable_prisma_scalar_type != scalar_type {
                         return Err(DatamodelError::new_connector_error(
                             &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
