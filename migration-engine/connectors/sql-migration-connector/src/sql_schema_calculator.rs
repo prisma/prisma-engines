@@ -347,6 +347,7 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
         ScalarType::String => sql::ColumnType::pure(sql::ColumnTypeFamily::String, column_arity),
         ScalarType::DateTime => sql::ColumnType::pure(sql::ColumnTypeFamily::DateTime, column_arity),
         ScalarType::Json => sql::ColumnType::pure(sql::ColumnTypeFamily::Json, column_arity),
+        _ => todo!(),
     }
 }
 
