@@ -146,6 +146,32 @@ model User {
 }
 
 #[test]
+fn test_parser_renderer_native_types_via_dml() {
+    let input = r#"datasource pg {
+  provider        = "postgresql"
+  url             = "postgresql://"
+  previewFeatures = ["nativeTypes"]
+}
+
+model Blog {
+  id     Int    @id
+  bigInt Int    @pg.BigInt
+  foobar String @pg.VarChar(12)
+}
+"#;
+
+    let dml = parse(input);
+
+    println!("{:?}", dml);
+
+    let config = datamodel::parse_configuration(input).unwrap();
+    let dml = parse(input);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config).unwrap();
+
+    assert_eq!(rendered, input);
+}
+
+#[test]
 fn preview_features_roundtrip() {
     // we keep the support for `experimentalFeatures` for backwards compatibility reasons
     let input_with_experimental = r#"generator client {

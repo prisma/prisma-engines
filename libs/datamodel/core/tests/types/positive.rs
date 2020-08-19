@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::{dml::ScalarType, DefaultValue, ValueGenerator};
-use native_types::PostgresType;
+use native_types::{MySqlType, PostgresType};
 use prisma_value::PrismaValue;
 
 #[test]
@@ -103,14 +103,13 @@ fn should_be_able_to_define_custom_enum_types() {
         .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from("USER"))));
 }
 
-// TODO carmen: enable this test once the feature flags are implemented
 #[test]
-#[ignore]
-fn should_handle_type_specifications() {
+fn should_handle_type_specifications_on_postgres() {
     let dml = r#"
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -126,11 +125,42 @@ fn should_handle_type_specifications() {
 
     let sft = user_model.assert_has_scalar_field("bigInt").assert_native_type();
 
-    let postgrestype: PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgrestype, PostgresType::BigInt);
+    let postgres_type: PostgresType = sft.deserialize_native_type();
+    assert_eq!(postgres_type, PostgresType::BigInt);
 
     let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
 
-    let postgrestype: PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgrestype, PostgresType::VarChar(26));
+    let postgres_type: PostgresType = sft.deserialize_native_type();
+    assert_eq!(postgres_type, PostgresType::VarChar(26));
+}
+
+#[test]
+fn should_handle_type_specifications_on_mysql() {
+    let dml = r#"
+        datasource mys {
+          provider = "mysql"
+          url = "mysql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id       Int      @id
+            smallInt Int      @mys.SmallInt
+            foobar   DateTime @mys.Datetime(26)
+        }
+    "#;
+
+    let datamodel = parse(dml);
+
+    let user_model = datamodel.assert_has_model("Blog");
+
+    let sft = user_model.assert_has_scalar_field("smallInt").assert_native_type();
+
+    let mysql_type: MySqlType = sft.deserialize_native_type();
+    assert_eq!(mysql_type, MySqlType::SmallInt);
+
+    let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
+
+    let mysql_type: MySqlType = sft.deserialize_native_type();
+    assert_eq!(mysql_type, MySqlType::DateTime(Option::from(26)));
 }

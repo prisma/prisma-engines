@@ -8,7 +8,7 @@ impl DatasourceSerializer {
         let mut tops: Vec<ast::Top> = Vec::new();
 
         for source in sources {
-            tops.push(ast::Top::Source(Self::source_to_ast(&source)))
+            tops.push(ast::Top::Source(Self::lower_datasource(&source)))
         }
 
         // Prepend sources.
@@ -17,7 +17,7 @@ impl DatasourceSerializer {
         ast_datamodel.tops = tops;
     }
 
-    fn source_to_ast(source: &Datasource) -> ast::SourceConfig {
+    fn lower_datasource(source: &Datasource) -> ast::SourceConfig {
         let mut arguments: Vec<ast::Argument> = Vec::new();
 
         arguments.push(ast::Argument::new_string("provider", &source.active_provider));
@@ -29,6 +29,16 @@ impl DatasourceSerializer {
             None => {
                 arguments.push(ast::Argument::new_string("url", &source.url.value));
             }
+        }
+
+        if !&source.preview_features.is_empty() {
+            let features: Vec<ast::Expression> = source
+                .preview_features
+                .iter()
+                .map(|f| ast::Expression::StringValue(f.to_owned(), ast::Span::empty()))
+                .collect::<Vec<ast::Expression>>();
+
+            arguments.push(ast::Argument::new_array("previewFeatures", features));
         }
 
         ast::SourceConfig {

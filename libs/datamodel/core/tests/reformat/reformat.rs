@@ -389,6 +389,26 @@ fn reformatting_an_invalid_generator_block_must_work() {
 }
 
 #[test]
+fn reformatting_a_model_with_native_type_definitions_must_work() {
+    let input = r#"datasource pg {
+  provider        = "postgres"
+  url             = "postgresql://"
+  previewFeatures = ["nativeTypes"]
+}
+
+model Blog {
+  id     Int    @id
+  bigInt Int    @pg.BigInt
+  foobar String @pg.VarChar(12)
+}
+"#;
+
+    let expected = input;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn incomplete_field_definitions_in_a_model_must_not_get_removed() {
     // incomplete field definitions are handled in a special way in the grammar to allow nice errors. See `nice_error.rs:nice_error_missing_type`
     // Hence the block level catch does not apply here. So we must test this specifically.

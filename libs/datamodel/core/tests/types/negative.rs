@@ -108,3 +108,103 @@ fn should_fail_on_custom_related_types() {
         ast::Span::new(25, 29),
     ));
 }
+
+#[test]
+fn should_fail_on_native_type_with_invalid_number_of_arguments() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+            foobar String @pg.VarChar()
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_argument_count_missmatch_error(
+        "VarChar",
+        1,
+        0,
+        ast::Span::new(259, 271),
+    ));
+}
+
+#[test]
+fn should_fail_on_native_type_with_unknown_type() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.Numerical(3, 4)
+            foobar String @pg.VarChar(5)
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type Numerical is not supported for postgresql connector.",
+        ast::Span::new(222, 240),
+    ));
+}
+
+#[test]
+fn should_fail_on_native_type_with_incompatible_type() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+            foobar Boolean @pg.VarChar(5)
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type VarChar is not compatible with declared field type Boolean, expected field type String.",
+        ast::Span::new(260, 273),
+    ));
+}
+
+#[test]
+fn should_fail_on_native_type_with_invalid_arguments() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+            foobar String @pg.VarChar(a)
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_type_mismatch_error(
+        "numeric",
+        "literal",
+        "a",
+        ast::Span::new(270, 271),
+    ));
+}

@@ -90,6 +90,9 @@ pub enum DatamodelError {
     LegacyParserError { message: String, span: Span },
 
     #[error("{}", message)]
+    ConnectorError {message: String, span: Span },
+
+    #[error("{}", message)]
     FunctionalEvaluationError { message: String, span: Span },
 
     #[error("Environment variable not found: {}.", var_name)]
@@ -303,6 +306,13 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_connector_error(message: &str, span: Span) -> DatamodelError {
+        DatamodelError::ConnectorError {
+            message: String::from(message),
+            span,
+        }
+    }
+
     pub fn new_parser_error(expected: &Vec<&'static str>, span: Span) -> DatamodelError {
         DatamodelError::ParserError { expected: expected.clone(), expected_str: expected.join(", "), span }
     }
@@ -383,6 +393,7 @@ impl DatamodelError {
             DatamodelError::FieldValidationError {span , ..} => *span,
             DatamodelError::SourceValidationError {span, ..} => *span,
             DatamodelError::EnumValidationError {span, ..} => *span,
+            DatamodelError::ConnectorError { span, .. } => *span,
         }
     }
     pub fn description(&self) -> String {

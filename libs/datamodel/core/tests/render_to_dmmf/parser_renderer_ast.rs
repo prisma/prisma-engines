@@ -114,6 +114,24 @@ model Author {
 }
 
 #[test]
+fn test_parser_renderer_native_types_via_ast() {
+    let input = r#"datasource pg {
+  provider        = "postgresql"
+  url             = "postgresql://"
+  previewFeatures = ["nativeTypes"]
+}
+
+model Blog {
+  id     Int    @id
+  bigInt Int    @pg.BigInt
+  foobar String @pg.VarChar(12)
+}
+"#;
+
+    assert_rendered(input, input);
+}
+
+#[test]
 fn test_parser_renderer_sources_via_ast() {
     let input = r#"datasource pg1 {
   provider = "Postgres"

@@ -1,16 +1,21 @@
 use super::super::directives::AllDirectives;
+use crate::ast::Span;
+use crate::configuration::preview_features::PreviewFeatures;
 use crate::error::ErrorCollection;
-use crate::{ast, dml};
+use crate::FieldType::NativeType;
+use crate::{ast, dml, Datasource};
 
-pub struct LowerDmlToAst {
+pub struct LowerDmlToAst<'a> {
     directives: AllDirectives,
+    datasource: Option<&'a Datasource>,
 }
 
-impl LowerDmlToAst {
+impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new() -> Self {
+    pub fn new(datasource: Option<&'a Datasource>) -> Self {
         Self {
             directives: AllDirectives::new(),
+            datasource,
         }
     }
 
@@ -82,10 +87,28 @@ impl LowerDmlToAst {
     }
 
     pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
+        let mut directives = self.directives.field.serialize(field, datamodel)?;
+        if let (dml::Field::ScalarField(sf), Some(datasource)) = (field, self.datasource) {
+            if let NativeType(_prisma_tpe, native_tpe) = sf.clone().field_type {
+                if datasource.has_preview_feature("nativeTypes") {
+                    let new_directive_name = format!("{}.{}", datasource.name, native_tpe.name);
+                    // lower native type arguments
+                    let mut arguments = vec![];
+                    for arg in native_tpe.args {
+                        arguments.push(ast::Argument::new_unnamed(ast::Expression::NumericValue(
+                            arg.to_string(),
+                            Span::empty(),
+                        )));
+                    }
+                    directives.push(ast::Directive::new(new_directive_name.as_str(), arguments));
+                }
+            }
+        }
+
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),
             arity: self.lower_field_arity(field.arity()),
-            directives: self.directives.field.serialize(field, datamodel)?,
+            directives,
             field_type: self.lower_type(&field.field_type()),
             documentation: field
                 .documentation()
@@ -113,7 +136,7 @@ impl LowerDmlToAst {
             dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Unsupported(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Relation(rel) => ast::Identifier::new(&rel.to),
-            _ => unimplemented!("Connector specific types are not supported atm."),
+            dml::FieldType::NativeType(prisma_tpe, _native_tpe) => ast::Identifier::new(&prisma_tpe.to_string()),
         }
     }
 }

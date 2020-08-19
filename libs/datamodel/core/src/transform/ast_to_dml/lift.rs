@@ -1,12 +1,13 @@
 use super::super::directives::AllDirectives;
+use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
     Field, FieldType, ScalarType,
 };
-use datamodel_connector::Connector;
-use sql_datamodel_connector::SqlDatamodelConnectors;
+use datamodel_connector::error::{ConnectorError, ErrorKind};
+use itertools::Itertools;
 
 /// Helper for lifting a datamodel.
 ///
@@ -17,9 +18,6 @@ pub struct LiftAstToDml<'a> {
     directives: AllDirectives,
     source: Option<&'a configuration::Datasource>,
 }
-
-// TODO carmen: feature flags of the Datasource must be used instead
-const USE_CONNECTORS_FOR_CUSTOM_TYPES: bool = false; // FEATURE FLAG
 
 impl<'a> LiftAstToDml<'a> {
     /// Creates a new instance, with all builtin directives and
@@ -194,25 +192,104 @@ impl<'a> LiftAstToDml<'a> {
     ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
-        if let Ok(scalar_type) = ScalarType::from_str(type_name) {
-            if USE_CONNECTORS_FOR_CUSTOM_TYPES {
-                let pg_connector = SqlDatamodelConnectors::postgres();
-                let pg_type_specification = ast_field.directives.iter().find(|dir| dir.name.name.starts_with("pg.")); // we use find because there should be at max 1.
-                let name = pg_type_specification.map(|dir| dir.name.name.trim_start_matches("pg."));
-                let args = pg_type_specification
-                    .map(|dir| {
-                        let args = dir
-                            .arguments
-                            .iter()
-                            .map(|arg| ValueValidator::new(&arg.value).as_int().unwrap() as u32)
-                            .collect();
-                        args
-                    })
-                    .unwrap_or(vec![]);
+        let (supports_native_types, datasource_name) = match self.source {
+            Some(source) => (source.has_preview_feature("nativeTypes"), source.name.as_str()),
+            _ => (false, ""),
+        };
 
-                if let Some(x) = name.and_then(|ts| pg_connector.parse_native_type(&ts, args)) {
-                    let field_type = dml::FieldType::NativeType(scalar_type, x);
-                    Ok((field_type, vec![]))
+        if let Ok(scalar_type) = ScalarType::from_str(type_name) {
+            if supports_native_types {
+                let (connector_string, connector) = (
+                    &self.source.unwrap().active_provider,
+                    &self.source.unwrap().active_connector,
+                );
+
+                let prefix = format!("{}{}", datasource_name, ".");
+
+                let type_specifications = ast_field
+                    .directives
+                    .iter()
+                    .filter(|dir| dir.name.name.starts_with(&prefix))
+                    .collect_vec();
+
+                let type_specification = type_specifications.first();
+
+                if type_specifications.len() > 1 {
+                    return Err(DatamodelError::new_duplicate_directive_error(
+                        &prefix,
+                        type_specification.unwrap().span,
+                    ));
+                }
+
+                let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
+
+                // convert arguments to u32 if possible
+                let number_args = type_specification.map(|dir| dir.arguments.clone());
+                let args = if let Some(number) = number_args {
+                    let p = number
+                        .iter()
+                        .map(|arg| ValueValidator::new(&arg.value).as_int())
+                        .collect_vec();
+                    if let Some(error) = p.iter().find(|arg| arg.is_err()) {
+                        return Err(error.clone().err().unwrap());
+                    }
+                    p.iter().map(|arg| *arg.as_ref().unwrap() as u32).collect_vec()
+                } else {
+                    vec![]
+                };
+
+                if let Some(x) = name {
+                    let constructor = if let Some(cons) = connector.find_native_type_constructor(x) {
+                        cons
+                    } else {
+                        return Err(DatamodelError::new_connector_error(
+                            &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                                native_type: x.parse().unwrap(),
+                                connector_name: connector_string.clone(),
+                            })
+                            .to_string(),
+                            type_specification.unwrap().span,
+                        ));
+                    };
+
+                    let number_of_args = args.iter().count();
+                    if number_of_args < constructor._number_of_args
+                        || number_of_args > constructor._number_of_args + constructor._number_of_optional_args
+                    {
+                        return Err(DatamodelError::new_argument_count_missmatch_error(
+                            x,
+                            constructor._number_of_args,
+                            number_of_args,
+                            type_specification.unwrap().span,
+                        ));
+                    }
+
+                    // check for compatability with scalar type
+                    let compatable_prisma_scalar_type = constructor.prisma_type;
+                    if compatable_prisma_scalar_type != scalar_type {
+                        return Err(DatamodelError::new_connector_error(
+                            &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
+                                native_type: x.parse().unwrap(),
+                                field_type: scalar_type.to_string(),
+                                expected_type: compatable_prisma_scalar_type.to_string(),
+                            })
+                            .to_string(),
+                            type_specification.unwrap().span,
+                        ));
+                    }
+
+                    let parse_native_type_result = connector.parse_native_type(x, args);
+                    match parse_native_type_result {
+                        Err(connector_error) => {
+                            return Err(DatamodelError::new_connector_error(
+                                &connector_error.to_string(),
+                                type_specification.unwrap().span,
+                            ))
+                        }
+                        Ok(parsed_native_type) => {
+                            Ok((dml::FieldType::NativeType(scalar_type, parsed_native_type), vec![]))
+                        }
+                    }
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }

@@ -27,7 +27,7 @@ impl<'a> Reformatter<'a> {
     fn find_all_missing_fields(schema_string: &str) -> Result<Vec<MissingField>, crate::error::ErrorCollection> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new();
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
         for model in datamodel.models() {
@@ -53,7 +53,7 @@ impl<'a> Reformatter<'a> {
     ) -> Result<Vec<MissingFieldDirective>, crate::error::ErrorCollection> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new();
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut missing_field_directives = Vec::new();
         for model in datamodel.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();

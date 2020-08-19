@@ -10,6 +10,8 @@ use crate::error::{DatamodelError, ErrorCollection};
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
 
+const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
+
 /// Is responsible for loading and validating Datasources defined in an AST.
 pub struct DatasourceLoader {
     source_definitions: Vec<Box<dyn DatasourceProvider>>,
@@ -25,7 +27,7 @@ impl DatasourceLoader {
     /// Loads all datasources from the provided schema AST.
     /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
     /// - `datasource_url_overrides`: datasource URLs are not parsed and overridden with the provided ones.
-    pub fn load_sources(
+    pub fn load_datasources_from_ast(
         &self,
         ast_schema: &ast::SchemaAst,
         ignore_datasource_urls: bool,
@@ -35,7 +37,7 @@ impl DatasourceLoader {
         let mut errors = ErrorCollection::new();
 
         for src in &ast_schema.sources() {
-            match self.load_source(&src, ignore_datasource_urls, &datasource_url_overrides) {
+            match self.lift_datasource(&src, ignore_datasource_urls, &datasource_url_overrides) {
                 Ok(loaded_src) => sources.push(loaded_src),
                 // Lift error to source.
                 Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
@@ -62,7 +64,7 @@ impl DatasourceLoader {
         }
     }
 
-    fn load_source(
+    fn lift_datasource(
         &self,
         ast_source: &ast::SourceConfig,
         ignore_datasource_urls: bool,
@@ -126,6 +128,12 @@ impl DatasourceLoader {
             ));
         }
 
+        let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
+        let preview_features = match preview_features_arg.ok() {
+            Some(x) => x.as_array().to_str_vec()?,
+            None => Vec::new(),
+        };
+
         let documentation = ast_source.documentation.clone().map(|comment| comment.text);
         let url = StringFromEnvVar {
             from_env_var: env_var_for_url,
@@ -172,6 +180,7 @@ impl DatasourceLoader {
                 documentation: documentation.clone(),
                 combined_connector,
                 active_connector: first_successful_provider.connector(),
+                preview_features,
             })
         } else {
             Err(errors.into_iter().next().unwrap().err().unwrap())

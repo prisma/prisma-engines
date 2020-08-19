@@ -202,7 +202,7 @@ fn load_sources(
     datasource_url_overrides: Vec<(String, String)>,
 ) -> Result<Vec<Datasource>, error::ErrorCollection> {
     let source_loader = DatasourceLoader::new();
-    source_loader.load_sources(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
+    source_loader.load_datasources_from_ast(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
 }
 
 //
@@ -228,7 +228,7 @@ pub fn render_datamodel_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
 ) -> Result<(), error::ErrorCollection> {
-    let lowered = LowerDmlToAst::new().lower(datamodel)?;
+    let lowered = LowerDmlToAst::new(None).lower(datamodel)?;
     render_schema_ast_to(stream, &lowered, 2);
     Ok(())
 }
@@ -249,7 +249,7 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> Result<(), error::ErrorCollection> {
-    let mut lowered = LowerDmlToAst::new().lower(datamodel)?;
+    let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel)?;
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
