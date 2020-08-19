@@ -202,10 +202,10 @@ impl<'a> LiftAstToDml<'a> {
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             if supports_native_types {
-                let (connector_string, connector) = match self.source {
-                    Some(source) => (&source.active_provider, &source.active_connector),
-                    None => panic!(""),
-                };
+                let (connector_string, connector) = (
+                    &self.source.unwrap().active_provider,
+                    &self.source.unwrap().active_connector,
+                );
                 let mut connectors: HashMap<&str, Box<dyn Connector>> = HashMap::new();
                 connectors.insert("postgresql", Box::new(SqlDatamodelConnectors::postgres()));
                 connectors.insert("mysql", Box::new(SqlDatamodelConnectors::mysql()));
