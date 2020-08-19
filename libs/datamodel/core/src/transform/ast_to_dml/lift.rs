@@ -7,10 +7,7 @@ use crate::{
     Field, FieldType, ScalarType,
 };
 use datamodel_connector::error::{ConnectorError, ErrorKind};
-use datamodel_connector::Connector;
 use itertools::Itertools;
-use sql_datamodel_connector::SqlDatamodelConnectors;
-use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
 ///
@@ -255,14 +252,14 @@ impl<'a> LiftAstToDml<'a> {
                         ));
                     };
 
-                    let length = args.iter().count();
-                    if !(constructor._number_of_args == length
-                        || constructor._number_of_optional_args + constructor._number_of_args != length)
+                    let number_of_args = args.iter().count();
+                    if number_of_args < constructor._number_of_args
+                        || number_of_args > constructor._number_of_args + constructor._number_of_optional_args
                     {
                         return Err(DatamodelError::new_argument_count_missmatch_error(
                             x,
                             constructor._number_of_args,
-                            lengt,
+                            number_of_args,
                             type_specification.unwrap().span,
                         ));
                     }

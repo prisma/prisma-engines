@@ -127,8 +127,10 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type VarChar takes 1 arguments, but received 0.",
+    error.assert_is(DatamodelError::new_argument_count_missmatch_error(
+        "VarChar",
+        1,
+        0,
         ast::Span::new(259, 271),
     ));
 }
