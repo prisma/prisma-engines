@@ -135,22 +135,22 @@ impl Connector for MySqlDatamodelConnector {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
                     MySqlType::Decimal(*first_arg as u8, *second_arg as u8)
                 } else {
-                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
-                        native_type: DECIMAL_TYPE_NAME.parse().unwrap(),
-                        required_count: 2,
-                        given_count: args.len(),
-                    }));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(
+                        DECIMAL_TYPE_NAME,
+                        2,
+                        args.len(),
+                    ));
                 }
             }
             NUMERIC_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
                     MySqlType::Numeric(*first_arg as u8, *second_arg as u8)
                 } else {
-                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
-                        native_type: NUMERIC_TYPE_NAME.parse().unwrap(),
-                        required_count: 2,
-                        given_count: args.len(),
-                    }));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(
+                        NUMERIC_TYPE_NAME,
+                        2,
+                        args.len(),
+                    ));
                 }
             }
             FLOAT_TYPE_NAME => MySqlType::Float,
@@ -159,55 +159,47 @@ impl Connector for MySqlDatamodelConnector {
                 if let Some(arg) = args.first() {
                     MySqlType::Bit(*arg)
                 } else {
-                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
-                        native_type: BIT_TYPE_NAME.parse().unwrap(),
-                        required_count: 1,
-                        given_count: 0,
-                    }));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
                 }
             }
             CHAR_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     MySqlType::Char(*arg)
                 } else {
-                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
-                        native_type: CHAR_TYPE_NAME.parse().unwrap(),
-                        required_count: 1,
-                        given_count: 0,
-                    }));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
                 }
             }
             VAR_CHAR_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     MySqlType::VarChar(*arg)
                 } else {
-                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
-                        native_type: VAR_CHAR_TYPE_NAME.parse().unwrap(),
-                        required_count: 1,
-                        given_count: 0,
-                    }));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(
+                        VAR_CHAR_TYPE_NAME,
+                        1,
+                        0,
+                    ));
                 }
             }
             BINARY_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     MySqlType::Binary(*arg)
                 } else {
-                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
-                        native_type: BINARY_TYPE_NAME.parse().unwrap(),
-                        required_count: 1,
-                        given_count: 0,
-                    }));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(
+                        BINARY_TYPE_NAME,
+                        1,
+                        0,
+                    ));
                 }
             }
             VAR_BINARY_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     MySqlType::VarBinary(*arg)
                 } else {
-                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
-                        native_type: VAR_BINARY_TYPE_NAME.parse().unwrap(),
-                        required_count: 1,
-                        given_count: 0,
-                    }));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(
+                        VAR_BINARY_TYPE_NAME,
+                        1,
+                        0,
+                    ));
                 }
             }
             TINY_BLOB_TYPE_NAME => MySqlType::TinyBlob,

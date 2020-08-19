@@ -11,6 +11,18 @@ impl ConnectorError {
     pub fn from_kind(kind: ErrorKind) -> Self {
         ConnectorError { kind }
     }
+
+    pub fn new_argument_count_mismatch_error(
+        native_type: &str,
+        required_count: usize,
+        given_count: usize,
+    ) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+            native_type: String::from(native_type),
+            required_count,
+            given_count,
+        })
+    }
 }
 
 #[derive(Debug, Error)]

@@ -30,10 +30,4 @@ impl PreviewFeatures for Option<&Generator> {
             _ => panic!(""),
         }
     }
-    fn has_preview_feature(&self, feature: &str) -> bool {
-        match self {
-            Some(gen) => gen.has_preview_feature(feature),
-            None => false,
-        }
-    }
 }
