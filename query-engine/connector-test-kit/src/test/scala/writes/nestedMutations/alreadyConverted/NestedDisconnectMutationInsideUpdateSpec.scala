@@ -443,7 +443,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    }
         |  }){
         |    ${t.parent.selection}
-        |    childrenOpt{
+        |    childrenOpt(orderBy: { id: asc }){
         |       ${t.child.selection}
         |    }
         |  }
@@ -465,7 +465,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |      connect: [$child1Identifier]
         |    }
         |  }){
-        |    childrenOpt{
+        |    childrenOpt(orderBy: { id: asc }){
         |       ${t.child.selection}
         |    }
         |  }
