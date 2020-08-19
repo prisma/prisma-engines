@@ -357,3 +357,35 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn existing_enums_are_picked_up(api: &TestApi) -> TestResult {
+    let sql = r#"
+        CREATE TYPE "Genre" AS ENUM ('SKA', 'PUNK');
+
+        CREATE TABLE "prisma-tests"."Band" (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            genre "Genre" NOT NULL
+        );
+    "#;
+
+    api.database().raw_cmd(sql).await?;
+
+    let dm = r#"
+        enum Genre {
+            SKA
+            PUNK
+        }
+
+        model Band {
+            id Int @id @default(autoincrement())
+            name String
+            genre Genre
+        }
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
