@@ -43,9 +43,23 @@ impl ManyRecords {
             field_names,
         }
     }
+
     pub fn empty(selected_fields: &ModelProjection) -> Self {
         Self {
             records: Vec::new(),
+            field_names: selected_fields.names().map(|n| n.to_string()).collect(),
+        }
+    }
+
+    pub fn from_projection(projection: Vec<Vec<PrismaValue>>, selected_fields: &ModelProjection) -> Self {
+        Self {
+            records: projection
+                .into_iter()
+                .map(|v| Record {
+                    values: v,
+                    parent_id: None,
+                })
+                .collect(),
             field_names: selected_fields.names().map(|n| n.to_string()).collect(),
         }
     }
