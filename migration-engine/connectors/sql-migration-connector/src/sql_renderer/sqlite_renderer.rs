@@ -4,7 +4,7 @@ use crate::{
     flavour::{SqlFlavour, SqliteFlavour},
     sql_database_step_applier::render_create_index,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
-    AlterEnum,
+    AlterEnum, AlterIndex, CreateIndex, DropIndex,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -24,6 +24,25 @@ impl SqlRenderer for SqliteFlavour {
         _schema_name: &str,
     ) -> anyhow::Result<Vec<String>> {
         unreachable!("render_alter_enum on sqlite")
+    }
+
+    fn render_alter_index(
+        &self,
+        _alter_index: &AlterIndex,
+        _database_info: &DatabaseInfo,
+        _current_schema: &SqlSchema,
+    ) -> anyhow::Result<Vec<String>> {
+        unreachable!("render_alter_index on sqlite")
+    }
+
+    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String {
+        render_create_index(
+            self,
+            database_info.connection_info().schema_name(),
+            &create_index.table,
+            &create_index.index,
+            self.sql_family(),
+        )
     }
 
     fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
@@ -138,6 +157,13 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_drop_enum(&self, _drop_enum: &crate::DropEnum) -> Vec<String> {
         Vec::new()
+    }
+
+    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String {
+        format!(
+            "DROP INDEX {}",
+            self.quote_with_schema(database_info.connection_info().schema_name(), &drop_index.name)
+        )
     }
 
     fn render_redefine_tables(

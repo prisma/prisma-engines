@@ -3,8 +3,9 @@ use crate::{
     database_info::DatabaseInfo,
     expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
+    sql_database_step_applier::render_create_index,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
-    AlterEnum,
+    AlterEnum, AlterIndex, CreateIndex, DropIndex,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -123,6 +124,19 @@ impl SqlRenderer for PostgresFlavour {
         stmts.push("Commit".to_string());
 
         Ok(stmts)
+    }
+
+    fn render_alter_index(
+        &self,
+        alter_index: &AlterIndex,
+        _database_info: &DatabaseInfo,
+        _current_schema: &SqlSchema,
+    ) -> anyhow::Result<Vec<String>> {
+        Ok(vec![format!(
+            "ALTER INDEX {} RENAME TO {}",
+            self.quote_with_schema(&self.0.schema(), &alter_index.index_name),
+            self.quote(&alter_index.index_new_name)
+        )])
     }
 
     fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
@@ -274,6 +288,16 @@ impl SqlRenderer for PostgresFlavour {
         vec![sql]
     }
 
+    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String {
+        render_create_index(
+            self,
+            database_info.connection_info().schema_name(),
+            &create_index.table,
+            &create_index.index,
+            database_info.sql_family(),
+        )
+    }
+
     fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String> {
         let columns: String = table
             .columns()
@@ -303,6 +327,13 @@ impl SqlRenderer for PostgresFlavour {
         );
 
         vec![sql]
+    }
+
+    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String {
+        format!(
+            "DROP INDEX {}",
+            self.quote_with_schema(database_info.connection_info().schema_name(), &drop_index.name)
+        )
     }
 
     fn render_redefine_tables(

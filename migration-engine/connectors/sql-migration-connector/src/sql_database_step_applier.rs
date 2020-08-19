@@ -294,86 +294,13 @@ fn render_raw_sql(
 
             Ok(statements)
         }
-        SqlMigrationStep::CreateIndex(CreateIndex {
-            table,
-            index,
-            caused_by_create_table: _,
-        }) => Ok(vec![render_create_index(
-            renderer,
-            database_info.connection_info().schema_name(),
-            table,
-            index,
-            database_info.sql_family(),
-        )]),
-        SqlMigrationStep::DropIndex(DropIndex { table, name }) => match sql_family {
-            SqlFamily::Mysql => Ok(vec![format!(
-                "DROP INDEX {} ON {}",
-                renderer.quote(&name),
-                renderer.quote_with_schema(&schema_name, &table),
-            )]),
-            SqlFamily::Postgres | SqlFamily::Sqlite => Ok(vec![format!(
-                "DROP INDEX {}",
-                renderer.quote_with_schema(&schema_name, &name)
-            )]),
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
-        },
-        SqlMigrationStep::AlterIndex(AlterIndex {
-            table,
-            index_name,
-            index_new_name,
-        }) => match sql_family {
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
-            SqlFamily::Mysql => {
-                // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
-                if database_info.is_mariadb() || database_info.is_mysql_5_6() {
-                    let old_index = current_schema
-                        .table(table)
-                        .map_err(|_| {
-                            anyhow::anyhow!(
-                                "Invariant violation: could not find table `{}` in current schema.",
-                                table
-                            )
-                        })?
-                        .indices
-                        .iter()
-                        .find(|idx| idx.name.as_str() == index_name)
-                        .ok_or_else(|| {
-                            anyhow::anyhow!(
-                                "Invariant violation: could not find index `{}` on table `{}` in current schema.",
-                                index_name,
-                                table
-                            )
-                        })?;
-                    let mut new_index = old_index.clone();
-                    new_index.name = index_new_name.clone();
-
-                    // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
-                    Ok(vec![
-                        render_create_index(
-                            renderer,
-                            database_info.connection_info().schema_name(),
-                            table,
-                            &new_index,
-                            sql_family,
-                        ),
-                        mysql_drop_index(renderer, &schema_name, table, index_name)?,
-                    ])
-                } else {
-                    Ok(vec![format!(
-                        "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
-                        table_name = renderer.quote_with_schema(&schema_name, &table),
-                        index_name = renderer.quote(index_name),
-                        index_new_name = renderer.quote(index_new_name)
-                    )])
-                }
-            }
-            SqlFamily::Postgres => Ok(vec![format!(
-                "ALTER INDEX {} RENAME TO {}",
-                renderer.quote_with_schema(&schema_name, index_name),
-                renderer.quote(index_new_name)
-            )]),
-            SqlFamily::Sqlite => unimplemented!("Index renaming on SQLite."),
-        },
+        SqlMigrationStep::CreateIndex(create_index) => {
+            Ok(vec![renderer.render_create_index(create_index, database_info)])
+        }
+        SqlMigrationStep::DropIndex(drop_index) => Ok(vec![renderer.render_drop_index(drop_index, database_info)]),
+        SqlMigrationStep::AlterIndex(alter_index) => {
+            renderer.render_alter_index(alter_index, database_info, current_schema)
+        }
     }
 }
 
@@ -406,19 +333,6 @@ pub(crate) fn render_create_index(
         table_reference = table_reference,
         columns = columns.join(", ")
     )
-}
-
-fn mysql_drop_index(
-    renderer: &dyn SqlFlavour,
-    schema_name: &str,
-    table_name: &str,
-    index_name: &str,
-) -> Result<String, std::fmt::Error> {
-    Ok(format!(
-        "DROP INDEX {} ON {}",
-        renderer.quote(index_name),
-        renderer.quote_with_schema(schema_name, table_name)
-    ))
 }
 
 fn safe_alter_column(

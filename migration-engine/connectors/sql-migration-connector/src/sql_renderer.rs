@@ -8,7 +8,7 @@ pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 use crate::{
     database_info::DatabaseInfo,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
-    AlterEnum, CreateEnum, DropEnum,
+    AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex,
 };
 use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::*;
@@ -43,14 +43,28 @@ pub(crate) trait SqlRenderer {
     /// the column.
     fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn>;
 
+    /// Render an `AlterIndex` step.
+    fn render_alter_index(
+        &self,
+        alter_index: &AlterIndex,
+        database_info: &DatabaseInfo,
+        current_schema: &SqlSchema,
+    ) -> anyhow::Result<Vec<String>>;
+
     /// Render a `CreateEnum` step.
     fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String>;
+
+    /// Render a `CreateIndex` step.
+    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String;
 
     /// Render a `CreateTable` step.
     fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String>;
 
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
+
+    /// Render a `DropIndex` step.
+    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String;
 
     /// Render a `RedefineTables` step.
     fn render_redefine_tables(
