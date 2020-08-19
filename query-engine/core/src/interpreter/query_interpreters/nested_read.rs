@@ -30,6 +30,8 @@ pub async fn m2m<'a, 'b>(
         return Ok(ManyRecords::empty(&query.selected_fields));
     }
     let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
+
+    println!("M2M id pairs: {:?}", ids);
     if ids.is_empty() {
         return Ok(ManyRecords::empty(&query.selected_fields));
     }
@@ -44,8 +46,8 @@ pub async fn m2m<'a, 'b>(
         })
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
+    println!("M2M args {:?}", query.args.do_nothing());
     // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
-    println!("{:?}", query.args);
     let mut scalars = if query.args.do_nothing() && child_link_id == query.selected_fields {
         ManyRecords::from_projection(child_ids, &query.selected_fields)
     } else {
