@@ -255,6 +255,18 @@ impl<'a> LiftAstToDml<'a> {
                         ));
                     };
 
+                    let length = args.iter().count();
+                    if !(constructor._number_of_args == length
+                        || constructor._number_of_optional_args + constructor._number_of_args != length)
+                    {
+                        return Err(DatamodelError::new_argument_count_missmatch_error(
+                            x,
+                            constructor._number_of_args,
+                            lengt,
+                            type_specification.unwrap().span,
+                        ));
+                    }
+
                     // check for compatability with scalar type
                     let compatable_prisma_scalar_type = constructor.prisma_type;
                     if compatable_prisma_scalar_type != scalar_type {
