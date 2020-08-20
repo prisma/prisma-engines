@@ -96,7 +96,7 @@ trait PlayJsonExtensions extends JsonUtils {
   }
 
   implicit class PlayJsonAssertionsExtension(json: JsValue) {
-    def assertSuccessfulResponse(dataContains: String): Unit = {
+    def assertSuccessfulResponse(dataContains: String = ""): Unit = {
       require(
         requirement = !hasErrors,
         message = s"The query had to result in a success but it returned errors. Here's the response: \n $json"

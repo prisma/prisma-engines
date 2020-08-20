@@ -33,18 +33,16 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
   def query_with_log(
       query: String,
       project: Project,
-      dataContains: String = "",
-      legacy: Boolean = true,
-      batchSize: Int = 5000,
   ): (JsValue, Vector[String]) = {
+    Logger.setDefaultFormatter(SimpleLogFormatter)
+    Logger.setDefaultLogLevel(LogLevel.apply("info"))
+
     val result = queryBinaryCLI(
       request = createSingleQuery(query),
       project = project,
-      legacy = legacy,
-      batchSize = batchSize,
       log_level = "info"
     )
-    result._1.assertSuccessfulResponse(dataContains)
+    result._1.assertSuccessfulResponse()
     result
   }
 
