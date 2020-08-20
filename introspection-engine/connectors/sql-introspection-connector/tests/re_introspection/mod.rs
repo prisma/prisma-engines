@@ -936,3 +936,72 @@ async fn re_introspecting_virtual_cuid_default(api: &TestApi) {
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_comments(api: &TestApi) {
+    let barrel = api.barrel();
+    let sql = format!("CREATE Type a as ENUM ( 'A')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+            });
+
+            migration.create_table("User2", |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            /// A really helpful comment about the model
+            model User {
+               /// A really helpful comment about the field
+               id        String    @id @default(cuid())
+            }
+            
+            model User2 {
+               id        String    @id @default(uuid())
+            }
+            
+            /// A really helpful comment about the enum
+            enum a{
+               /// A really helpful comment about the enum value
+               A
+            }
+            
+            /// just floating around here
+        "#;
+
+    let final_dm = r#"
+            /// A really helpful comment about the model
+            model User {
+               /// A really helpful comment about the field
+               id        String    @id @default(cuid())
+            }
+            
+            model User2 {
+               id        String    @id @default(uuid())
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+            
+            /// A really helpful comment about the enum
+            enum a{
+               /// A really helpful comment about the enum value
+               A
+            }
+            
+            /// just floating around here       
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}
