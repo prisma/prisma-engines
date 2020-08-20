@@ -11,14 +11,20 @@ pub fn parse(
 ) -> QueryGraphBuilderResult<Filter> {
     let filter = match filter_key {
         "not" => {
-            let inner_object: ParsedInputMap = input.try_into()?;
+            match input {
+                // support for syntax { scalarField: { not: null } }
+                ParsedInputValue::Single(value @ PrismaValue::Null(_)) => field.not_equals(value),
+                _ => {
+                    let inner_object: ParsedInputMap = input.try_into()?;
 
-            let filters = inner_object
-                .into_iter()
-                .map(|(k, v)| parse(&k, field, v, !reverse))
-                .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+                    let filters = inner_object
+                        .into_iter()
+                        .map(|(k, v)| parse(&k, field, v, !reverse))
+                        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
-            Filter::and(filters)
+                    Filter::and(filters)
+                }
+            }
         }
 
         "in" => {
