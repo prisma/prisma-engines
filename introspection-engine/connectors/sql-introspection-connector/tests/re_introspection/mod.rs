@@ -980,7 +980,7 @@ async fn re_introspecting_comments(api: &TestApi) {
         "#;
 
     let final_dm = r#"
-                /// A really helpful comment about the model
+            /// A really helpful comment about the model
             model User {
                /// A really helpful comment about the field
                id        String    @id @default(cuid())

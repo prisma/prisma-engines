@@ -86,6 +86,13 @@ impl Field {
         }
     }
 
+    pub fn set_documentation(&mut self, documentation: Option<String>) {
+        match self {
+            Field::ScalarField(sf) => sf.documentation = documentation,
+            Field::RelationField(rf) => rf.documentation = documentation,
+        }
+    }
+
     pub fn is_commented_out(&self) -> bool {
         match self {
             Field::ScalarField(sf) => sf.is_commented_out,

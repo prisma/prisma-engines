@@ -82,6 +82,11 @@ impl Datamodel {
         self.find_model(&self.find_related_field_bang(&field).relation_info.to)
     }
 
+    /// Finds a mutable field reference by a model and field name.
+    pub fn find_field_mut(&mut self, model: &str, field: &str) -> &mut Field {
+        self.find_model_mut(model).find_field_mut(field)
+    }
+
     /// Finds a mutable scalar field reference by a model and field name.
     pub fn find_scalar_field_mut(&mut self, model: &str, field: &str) -> &mut ScalarField {
         // This uses the memory location of field for equality.
