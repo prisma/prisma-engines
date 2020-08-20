@@ -85,7 +85,7 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
 
     fields.push(input_field(
         "not",
-        InputType::opt(InputType::object(scalar_filter_type(ctx, sf, true))),
+        InputType::opt(InputType::null(InputType::object(scalar_filter_type(ctx, sf, true)))),
         None,
     ));
 
