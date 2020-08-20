@@ -3,9 +3,13 @@
 //! detail of the SQL connector.
 
 use crate::{
-    catch, connect, database_info::DatabaseInfo, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
-    sql_renderer::SqlRenderer, sql_schema_differ::SqlSchemaDifferFlavour, CheckDatabaseInfoResult, SqlError, SqlResult,
-    SystemDatabase,
+    catch, connect,
+    database_info::DatabaseInfo,
+    error::{CheckDatabaseInfoResult, SystemDatabase},
+    sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
+    sql_renderer::SqlRenderer,
+    sql_schema_differ::SqlSchemaDifferFlavour,
+    SqlError, SqlResult,
 };
 use futures::future::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult};

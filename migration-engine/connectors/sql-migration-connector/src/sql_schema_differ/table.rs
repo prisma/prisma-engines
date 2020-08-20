@@ -28,6 +28,15 @@ impl<'schema> TableDiffer<'schema> {
             })
     }
 
+    pub(crate) fn diff_column(&self, column_name: &str) -> Option<ColumnDiffer<'schema>> {
+        Some(ColumnDiffer {
+            flavour: self.flavour,
+            database_info: self.database_info,
+            previous: self.previous.column(column_name)?,
+            next: self.next.column(column_name)?,
+        })
+    }
+
     pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
         self.previous_columns().filter(move |previous_column| {
             self.next_columns()

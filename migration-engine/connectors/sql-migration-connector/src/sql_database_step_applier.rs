@@ -1,8 +1,9 @@
 use crate::*;
-use sql_renderer::{IteratorJoin, Quoted, RenderedAlterColumn};
-use sql_schema_describer::walkers::{find_column, ColumnWalker, SqlSchemaExt};
+use sql_migration::{AddForeignKey, CreateTable, DropForeignKey, DropTable, SqlMigrationStep};
+use sql_renderer::{IteratorJoin, Quoted};
+use sql_schema_describer::walkers::SqlSchemaExt;
 use sql_schema_describer::{Index, IndexType, SqlSchema};
-use sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer};
+use sql_schema_differ::SqlSchemaDiffer;
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
 use SqlFlavour;
@@ -198,101 +199,8 @@ fn render_raw_sql(
             SqlFamily::Mssql => todo!("Greetings from Redmond"),
         },
 
-        SqlMigrationStep::AlterTable(AlterTable { table, changes }) => {
-            let mut lines = Vec::new();
-            let mut before_statements = Vec::new();
-            let mut after_statements = Vec::new();
-
-            for change in changes {
-                match change {
-                    TableChange::DropPrimaryKey { constraint_name } => match renderer.sql_family() {
-                        SqlFamily::Mysql => lines.push("DROP PRIMARY KEY".to_owned()),
-                        SqlFamily::Postgres => lines.push(format!(
-                            "DROP CONSTRAINT {}",
-                            Quoted::postgres_ident(
-                                constraint_name
-                                    .as_ref()
-                                    .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
-                            )
-                        )),
-                        _ => (),
-                    },
-                    TableChange::AddPrimaryKey { columns } => lines.push(format!(
-                        "ADD PRIMARY KEY ({})",
-                        columns.iter().map(|colname| renderer.quote(colname)).join(", ")
-                    )),
-                    TableChange::AddColumn(AddColumn { column }) => {
-                        let column = ColumnWalker {
-                            table,
-                            schema: next_schema,
-                            column,
-                        };
-                        let col_sql = renderer.render_column(&schema_name, column, true);
-                        lines.push(format!("ADD COLUMN {}", col_sql));
-                    }
-                    TableChange::DropColumn(DropColumn { name }) => {
-                        let name = renderer.quote(&name);
-                        lines.push(format!("DROP COLUMN {}", name));
-                    }
-                    TableChange::AlterColumn(AlterColumn { name, column }) => {
-                        match safe_alter_column(
-                            renderer,
-                            current_schema.table_walker(&table.name).unwrap().column(&name).unwrap(),
-                            find_column(next_schema, &table.name, &column.name)
-                                .expect("Invariant violation: could not find column referred to in AlterColumn."),
-                            &database_info,
-                            renderer,
-                        ) {
-                            Some(RenderedAlterColumn {
-                                alter_columns,
-                                before,
-                                after,
-                            }) => {
-                                for statement in alter_columns {
-                                    lines.push(statement);
-                                }
-
-                                if let Some(before) = before {
-                                    before_statements.push(before);
-                                }
-
-                                if let Some(after) = after {
-                                    after_statements.push(after);
-                                }
-                            }
-                            None => {
-                                let name = renderer.quote(&name);
-                                lines.push(format!("DROP COLUMN {}", name));
-                                let column = ColumnWalker {
-                                    schema: next_schema,
-                                    table,
-                                    column,
-                                };
-                                let col_sql = renderer.render_column(&schema_name, column, true);
-                                lines.push(format!("ADD COLUMN {}", col_sql));
-                            }
-                        }
-                    }
-                };
-            }
-
-            if lines.is_empty() {
-                return Ok(Vec::new());
-            }
-
-            let alter_table = format!(
-                "ALTER TABLE {} {}",
-                renderer.quote_with_schema(&schema_name, &table.name),
-                lines.join(",\n")
-            );
-
-            let statements = before_statements
-                .into_iter()
-                .chain(std::iter::once(alter_table))
-                .chain(after_statements.into_iter())
-                .collect();
-
-            Ok(statements)
+        SqlMigrationStep::AlterTable(alter_table) => {
+            Ok(renderer.render_alter_table(alter_table, database_info, &differ))
         }
         SqlMigrationStep::CreateIndex(create_index) => {
             Ok(vec![renderer.render_create_index(create_index, database_info)])
@@ -333,21 +241,4 @@ pub(crate) fn render_create_index(
         table_reference = table_reference,
         columns = columns.join(", ")
     )
-}
-
-fn safe_alter_column(
-    renderer: &dyn SqlFlavour,
-    previous_column: ColumnWalker<'_>,
-    next_column: ColumnWalker<'_>,
-    database_info: &DatabaseInfo,
-    flavour: &dyn SqlFlavour,
-) -> Option<RenderedAlterColumn> {
-    let differ = ColumnDiffer {
-        previous: previous_column,
-        next: next_column,
-        database_info,
-        flavour,
-    };
-
-    renderer.render_alter_column(&differ)
 }

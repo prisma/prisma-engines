@@ -1,11 +1,11 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
     sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
+    sql_migration::expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     sql_schema_differ::ColumnDiffer,
 };
 use sql_schema_describer::{ColumnArity, DefaultValue};

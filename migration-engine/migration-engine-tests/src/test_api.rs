@@ -24,7 +24,7 @@ use migration_core::{
     commands::ApplyMigrationInput,
 };
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
-use sql_migration_connector::MIGRATION_TABLE_NAME;
+use sql_migration_connector::{sql_migration::SqlMigration, SqlMigrationConnector, MIGRATION_TABLE_NAME};
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
@@ -35,7 +35,7 @@ pub struct TestApi {
     /// More precise than SqlFamily.
     connector_name: &'static str,
     database: Arc<dyn Queryable + Send + Sync + 'static>,
-    api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
+    api: MigrationApi<SqlMigrationConnector, SqlMigration>,
     connection_info: ConnectionInfo,
 }
 

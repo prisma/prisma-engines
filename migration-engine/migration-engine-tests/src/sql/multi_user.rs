@@ -9,6 +9,7 @@ use futures::{future::Ready, FutureExt, TryFutureExt};
 use git_repo::GitRepo;
 use migration_connector::{Migration, MigrationConnector};
 use migration_core::{api::MigrationApi, commands::MigrationStepsResultOutput};
+use sql_migration_connector::{sql_migration::SqlMigration, SqlMigrationConnector};
 use std::{
     io::{Read as _, Write as _},
     path::{Path, PathBuf},
@@ -87,7 +88,7 @@ pub struct User<'a> {
     migrations_folder: PathBuf,
     schema_path: PathBuf,
     git_repo: GitRepo,
-    engine: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
+    engine: MigrationApi<SqlMigrationConnector, SqlMigration>,
 }
 
 impl<'a> User<'a> {
@@ -397,10 +398,7 @@ fn user_engine<'b>(
     db_name: String,
     url: String,
     provider: &'static str,
-) -> BoxFut<
-    'b,
-    anyhow::Result<MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>>,
-> {
+) -> BoxFut<'b, anyhow::Result<MigrationApi<SqlMigrationConnector, SqlMigration>>> {
     let fut = async move {
         let connector = match provider {
             "mysql" => mysql_migration_connector(&url).await,

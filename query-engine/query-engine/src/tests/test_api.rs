@@ -13,7 +13,7 @@ use quaint::{
     connector::ConnectionInfo,
     visitor::{self, Visitor},
 };
-use sql_migration_connector::SqlMigrationConnector;
+use sql_migration_connector::{sql_migration::SqlMigration, SqlMigrationConnector};
 use std::sync::Arc;
 use test_setup::*;
 
@@ -38,7 +38,7 @@ impl QueryEngine {
 
 pub struct TestApi {
     connection_info: ConnectionInfo,
-    migration_api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
+    migration_api: MigrationApi<SqlMigrationConnector, SqlMigration>,
     config: String,
 }
 

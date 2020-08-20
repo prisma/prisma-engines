@@ -16,7 +16,7 @@ use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
-use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
+use sql_migration_connector::sql_migration::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
 
 #[test_each_connector]
@@ -2400,6 +2400,35 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
 
     api.assert_schema().await?.assert_table("model1", |table| {
         table.assert_pk(|pk| pk.assert_columns(&["a", "b", "c"]))
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(log = "sql_schema_describer=info,debug")]
+async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    let dm2 = r#"
+        model Cat {
+            id   Int @id
+            name String?
+            age  Int?
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table
+            .assert_column("name", |col| col.assert_is_nullable())?
+            .assert_column("age", |col| col.assert_is_nullable())
     })?;
 
     Ok(())

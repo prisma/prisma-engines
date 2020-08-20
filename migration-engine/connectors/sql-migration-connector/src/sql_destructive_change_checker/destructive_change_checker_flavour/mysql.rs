@@ -1,11 +1,11 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
     flavour::MysqlFlavour,
     sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
+    sql_migration::expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
     sql_schema_differ::ColumnDiffer,
 };
 

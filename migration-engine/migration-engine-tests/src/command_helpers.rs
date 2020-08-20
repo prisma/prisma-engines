@@ -1,5 +1,5 @@
 use migration_core::commands::*;
-use sql_migration_connector::SqlMigrationStep;
+use sql_migration_connector::sql_migration::SqlMigrationStep;
 use sql_schema_describer::*;
 
 #[derive(Debug)]

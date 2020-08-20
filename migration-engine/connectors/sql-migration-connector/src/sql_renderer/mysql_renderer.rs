@@ -1,11 +1,13 @@
 use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
-    expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
     flavour::{MysqlFlavour, SqlFlavour},
     sql_database_step_applier::render_create_index,
+    sql_migration::{
+        expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
+        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex,
+    },
     sql_schema_differ::{ColumnChanges, ColumnDiffer, SqlSchemaDiffer},
-    AlterEnum, AlterIndex, CreateIndex, DropIndex,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -190,7 +192,7 @@ impl SqlRenderer for MysqlFlavour {
         })
     }
 
-    fn render_create_enum(&self, _create_enum: &crate::CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _create_enum: &CreateEnum) -> Vec<String> {
         Vec::new() // enums are defined on each column that uses them on MySQL
     }
 
@@ -256,7 +258,7 @@ impl SqlRenderer for MysqlFlavour {
         ))
     }
 
-    fn render_drop_enum(&self, _drop_enum: &crate::DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
         Vec::new()
     }
 
