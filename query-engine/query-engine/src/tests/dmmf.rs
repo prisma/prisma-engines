@@ -188,7 +188,7 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
     feature_flags::initialize(&vec![String::from("all")]).unwrap();
 
     let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string).unwrap();
-    let config = datamodel::parse_configuration(datamodel_string).unwrap();
+    let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
     let capabilities = match config.datasources.first() {
         Some(ds) => ds.capabilities(),
         None => ConnectorCapabilities::empty(),
