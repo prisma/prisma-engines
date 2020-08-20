@@ -371,9 +371,6 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       )
       val otherChild = t.child.whereMulti(otherParentResult, "data.createParent.childrenOpt")(1)
 
-      println("Identifiers")
-      println(parentResult)
-      println(otherParentResult)
       server.queryThatMustFail(
         s"""
          |mutation {

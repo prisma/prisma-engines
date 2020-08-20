@@ -14,8 +14,6 @@ pub async fn m2m<'a, 'b>(
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
 
-    println!("m2m: {:?}", parent_result);
-
     // We know that in a m2m scenario, we always require the ID of the parent, nothing else.
     let parent_ids = match query.parent_projections {
         Some(ref links) => links.clone(),
@@ -31,7 +29,6 @@ pub async fn m2m<'a, 'b>(
     }
     let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
 
-    println!("M2M id pairs: {:?}", ids);
     if ids.is_empty() {
         return Ok(ManyRecords::empty(&query.selected_fields));
     }
@@ -46,7 +43,6 @@ pub async fn m2m<'a, 'b>(
         })
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
-    println!("M2M args {:?}", query.args.do_nothing());
     // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
     let mut scalars = if query.args.do_nothing() && child_link_id == query.selected_fields {
         ManyRecords::from_projection(child_ids, &query.selected_fields)
@@ -123,8 +119,6 @@ pub async fn one2m<'a, 'b>(
     let parent_model_id = parent_field.model().primary_identifier();
     let parent_link_id = parent_field.linking_fields();
     let child_link_id = parent_field.related_field().linking_fields();
-
-    println!("one2m: {:?}", parent_result);
 
     // Primary ID to link ID
     let joined_projections = match parent_projections {

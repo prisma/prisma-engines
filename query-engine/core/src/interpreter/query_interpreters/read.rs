@@ -30,7 +30,6 @@ fn read_one<'conn, 'tx>(
     let fut = async move {
         let model = query.model;
         let model_id = model.primary_identifier();
-        println!("Read One: {:?}", &query.filter);
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
         let scalars = tx.get_single_record(&model, &filter, &query.selected_fields).await?;
 
@@ -74,8 +73,6 @@ fn read_many<'a, 'b>(
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        println!("Read many: {:?}", query.args.filter);
-
         let scalars = if query.args.distinct.is_some() || query.args.contains_unstable_cursor() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
@@ -111,8 +108,6 @@ fn read_related<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        println!("Read related: {:?}", parent_result);
-
         let relation = query.parent_field.relation();
         let is_m2m = relation.is_many_to_many();
         let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
@@ -134,9 +129,6 @@ fn read_related<'a, 'b>(
 
         let model = query.parent_field.related_model();
         let model_id = model.primary_identifier();
-
-        println!("Read related scalars: {:?}", scalars);
-
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
@@ -173,8 +165,6 @@ fn process_nested<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
-        println!("Process nested: {:?}", parent_result);
-
         let results = if matches!(parent_result, Some(parent_records) if parent_records.records.is_empty()) {
             //this catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,
             // we do not need to do roundtrips which is why the nested_reads contain additional logic
