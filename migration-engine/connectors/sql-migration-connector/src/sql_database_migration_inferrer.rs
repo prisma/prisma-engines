@@ -3,6 +3,7 @@ use crate::{sql_schema_calculator::SqlSchemaCalculator, sql_schema_differ::SqlSc
 use datamodel::*;
 use migration_connector::steps::MigrationStep;
 use migration_connector::*;
+use sql_migration::SqlMigrationStep;
 use sql_schema_describer::*;
 
 pub struct SqlDatabaseMigrationInferrer<'a> {

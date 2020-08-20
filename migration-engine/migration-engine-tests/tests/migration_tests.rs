@@ -16,7 +16,7 @@ use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
-use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
+use sql_migration_connector::sql_migration::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
 
 #[test_each_connector]

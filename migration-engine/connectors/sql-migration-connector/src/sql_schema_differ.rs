@@ -10,9 +10,14 @@ pub(crate) use table::TableDiffer;
 
 use crate::*;
 use enums::EnumDiffer;
-use sql_schema_describer::walkers::ForeignKeyWalker;
-use sql_schema_describer::walkers::TableWalker;
-use sql_schema_describer::*;
+use sql_migration::{
+    AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, CreateTable,
+    DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, SqlMigrationStep, TableChange,
+};
+use sql_schema_describer::{
+    walkers::{ForeignKeyWalker, TableWalker},
+    *,
+};
 use std::collections::HashSet;
 
 #[derive(Debug)]

@@ -7,8 +7,8 @@ pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 
 use crate::{
     database_info::DatabaseInfo,
+    sql_migration::{AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropIndex},
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
-    AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex,
 };
 use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::*;

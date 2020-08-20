@@ -1,11 +1,13 @@
 use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
-    expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
     sql_database_step_applier::render_create_index,
+    sql_migration::{
+        expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
+        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex,
+    },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
-    AlterEnum, AlterIndex, CreateIndex, DropIndex,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -278,7 +280,7 @@ impl SqlRenderer for PostgresFlavour {
         Some(rendered_steps)
     }
 
-    fn render_create_enum(&self, create_enum: &crate::CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String> {
         let sql = format!(
             r#"CREATE TYPE {enum_name} AS ENUM ({variants})"#,
             enum_name = Quoted::postgres_ident(&create_enum.name),
@@ -320,7 +322,7 @@ impl SqlRenderer for PostgresFlavour {
         ))
     }
 
-    fn render_drop_enum(&self, drop_enum: &crate::DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String> {
         let sql = format!(
             "DROP TYPE {enum_name}",
             enum_name = Quoted::postgres_ident(&drop_enum.name),

@@ -1,4 +1,8 @@
 use crate::*;
+use sql_migration::{
+    AddColumn, AddForeignKey, AlterColumn, AlterTable, CreateTable, DropColumn, DropForeignKey, DropTable,
+    SqlMigrationStep, TableChange,
+};
 use sql_renderer::{IteratorJoin, Quoted, RenderedAlterColumn};
 use sql_schema_describer::walkers::{find_column, ColumnWalker, SqlSchemaExt};
 use sql_schema_describer::{Index, IndexType, SqlSchema};

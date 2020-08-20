@@ -8,8 +8,9 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
+    sql_migration::{AlterEnum, CreateIndex, DropTable, SqlMigrationStep, TableChange},
     sql_schema_differ::{ColumnDiffer, TableDiffer},
-    AlterEnum, Component, CreateIndex, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    Component, SqlMigration, SqlResult,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};

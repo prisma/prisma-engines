@@ -1,6 +1,8 @@
-#![deny(rust_2018_idioms)]
-#![deny(unsafe_code)]
+#![deny(rust_2018_idioms, unsafe_code)]
 #![allow(clippy::trivial_regex)] // these will grow
+
+// This is public for test purposes.
+pub mod sql_migration;
 
 mod component;
 mod database_info;
@@ -9,14 +11,12 @@ mod flavour;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
 mod sql_destructive_change_checker;
-mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
 
-pub use error::*;
-pub use sql_migration::*;
+pub use error::{SqlError, SqlResult};
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use component::Component;
@@ -31,6 +31,7 @@ use quaint::{
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_change_checker::*;
+use sql_migration::SqlMigration;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 use std::{sync::Arc, time::Duration};

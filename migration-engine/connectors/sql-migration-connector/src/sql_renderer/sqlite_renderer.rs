@@ -3,8 +3,8 @@ use crate::{
     database_info::DatabaseInfo,
     flavour::{SqlFlavour, SqliteFlavour},
     sql_database_step_applier::render_create_index,
+    sql_migration::{AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex},
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
-    AlterEnum, AlterIndex, CreateIndex, DropIndex,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -105,7 +105,7 @@ impl SqlRenderer for SqliteFlavour {
         None
     }
 
-    fn render_create_enum(&self, _create_enum: &crate::CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _create_enum: &CreateEnum) -> Vec<String> {
         Vec::new()
     }
 
@@ -155,7 +155,7 @@ impl SqlRenderer for SqliteFlavour {
         ))
     }
 
-    fn render_drop_enum(&self, _drop_enum: &crate::DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
         Vec::new()
     }
 
