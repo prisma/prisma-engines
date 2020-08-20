@@ -63,8 +63,8 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
 
     //family top
     //  Start:    3 roundtrip
-    //  Current:  3 roundtrip
-    val family = server.query(
+    //  Current:  2 roundtrip
+    val family = server.query_with_log(
       """
         |query {
         |  tops(where: { id: { equals: "family_top" }}){
@@ -81,12 +81,13 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    family.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":{\"id\":\"middle\",\"bottom\":{\"id\":\"bottom\"}}}]}}")
+    family._1.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":{\"id\":\"middle\",\"bottom\":{\"id\":\"bottom\"}}}]}}")
+    assert_request_count(family._2, 2)
 
     //lonely top
     //  Start:    3 roundtrip
     //  Current:  1 roundtrip
-    val lonely = server.query(
+    val lonely = server.query_with_log(
       """
                    |query {
                    |  tops(where: { id: { equals: "lonely_top" }}){
@@ -103,12 +104,13 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    lonely.toString() should be("{\"data\":{\"tops\":[{\"id\":\"lonely_top\",\"middle\":null}]}}")
+    lonely._1.toString() should be("{\"data\":{\"tops\":[{\"id\":\"lonely_top\",\"middle\":null}]}}")
+    assert_request_count(lonely._2, 1)
 
     //no top
     //  Start:    3 roundtrip
     //  Current:  1 roundtrip
-    val no = server.query(
+    val no = server.query_with_log(
       """
         |query {
         |  tops(where: { id: { equals: "does not exist" }}){
@@ -125,12 +127,13 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    no.toString() should be("{\"data\":{\"tops\":[]}}")
+    no._1.toString() should be("{\"data\":{\"tops\":[]}}")
+    assert_request_count(no._2, 1)
 
     //two levels
     //  Start:    3 roundtrip
     //  Current:  1 roundtrip
-    val two_levels = server.query(
+    val two_levels = server.query_with_log(
       """
         |query {
         |  tops(where: { id: { equals: "family_top" }}){
@@ -144,7 +147,8 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    two_levels.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":{\"id\":\"middle\"}}]}}")
+    two_levels._1.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":{\"id\":\"middle\"}}]}}")
+    assert_request_count(two_levels._2, 1)
 
   }
 
@@ -209,8 +213,8 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
 
     //family top
     //  Start:    5 roundtrip
-    //  Current:  5 roundtrip
-    val family = server.query(
+    //  Current:  3 roundtrip
+    val family = server.query_with_log(
       """
         |query {
         |  tops(where: { id: { equals: "family_top" }}){
@@ -227,12 +231,13 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    family.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":[{\"id\":\"middle\",\"bottom\":[{\"id\":\"bottom\"}]}]}]}}")
+    family._1.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":[{\"id\":\"middle\",\"bottom\":[{\"id\":\"bottom\"}]}]}]}}")
+    assert_request_count(family._2, 3)
 
     //lonely top
     //  Start:    5 roundtrip
     //  Current:  2 roundtrip
-    val lonely = server.query(
+    val lonely = server.query_with_log(
       """
         |query {
         |  tops(where: { id: { equals: "lonely_top" }}){
@@ -249,12 +254,13 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    lonely.toString() should be("{\"data\":{\"tops\":[{\"id\":\"lonely_top\",\"middle\":[]}]}}")
+    lonely._1.toString() should be("{\"data\":{\"tops\":[{\"id\":\"lonely_top\",\"middle\":[]}]}}")
+    assert_request_count(lonely._2, 2)
 
     //no top
     //  Start:    5 roundtrip
     //  Current:  1 roundtrip
-    val no = server.query(
+    val no = server.query_with_log(
       """
         |query {
         |  tops(where: { id: { equals: "does not exist" }}){
@@ -271,12 +277,13 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    no.toString() should be("{\"data\":{\"tops\":[]}}")
+    no._1.toString() should be("{\"data\":{\"tops\":[]}}")
+    assert_request_count(no._2, 1)
 
     //two levels
     //  Start:    3 roundtrip
     //  Current:  2 roundtrip
-    val two_levels = server.query(
+    val two_levels = server.query_with_log(
       """
         |query {
         |  tops(where: { id: { equals: "family_top" }}){
@@ -290,6 +297,13 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    two_levels.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":[{\"id\":\"middle\"}]}]}}")
+    two_levels._1.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":[{\"id\":\"middle\"}]}]}}")
+    assert_request_count(two_levels._2, 2)
+
   }
+
+  def assert_request_count(lines: Vector[String], desired_count: Int): Unit = {
+    lines.count(l => l.contains("quaint::connector::metrics: query=\"SELECT")) should be(desired_count)
+  }
+
 }

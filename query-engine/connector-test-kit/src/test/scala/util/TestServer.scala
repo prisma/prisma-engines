@@ -26,7 +26,24 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       legacy = legacy,
       batchSize = batchSize,
     )
-    result.assertSuccessfulResponse(dataContains)
+    result._1.assertSuccessfulResponse(dataContains)
+    result._1
+  }
+
+  def query_with_log(
+      query: String,
+      project: Project,
+      dataContains: String = "",
+      legacy: Boolean = true,
+      batchSize: Int = 5000,
+  ): (JsValue, Vector[String]) = {
+    val result = queryBinaryCLI(
+      request = createSingleQuery(query),
+      project = project,
+      legacy = legacy,
+      batchSize = batchSize,
+    )
+    result._1.assertSuccessfulResponse(dataContains)
     result
   }
 
@@ -41,7 +58,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       project = project,
       legacy = legacy,
     )
-    result
+    result._1
   }
 
   def queryThatMustFail(
@@ -62,8 +79,8 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       )
 
     // Ignore error codes for external tests (0) and containment checks ("")
-    result.assertFailingResponse(errorCode, errorCount, errorContains, errorMetaContains)
-    result
+    result._1.assertFailingResponse(errorCode, errorCount, errorContains, errorMetaContains)
+    result._1
   }
 
   def createSingleQuery(query: String): JsValue = {
@@ -76,7 +93,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     Json.obj("batch" -> queries.map(createSingleQuery), "transaction" -> transaction)
   }
 
-  def queryBinaryCLI(request: JsValue, project: Project, legacy: Boolean = true, batchSize: Int = 5000) = {
+  def queryBinaryCLI(request: JsValue, project: Project, legacy: Boolean = true, batchSize: Int = 5000): (JsValue, Vector[String]) = {
     val encoded_query  = UTF8Base64.encode(Json.stringify(request))
     val binaryLogLevel = "RUST_LOG" -> s"query_engine=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
 
@@ -157,7 +174,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     Try(UTF8Base64.decode(responseLine)) match {
       case Success(decodedResponse) =>
         debug(decodedResponse)
-        Json.parse(decodedResponse)
+        (Json.parse(decodedResponse), lines)
 
       case Failure(e) =>
         error(s"Error while decoding this line: \n$responseLine")
