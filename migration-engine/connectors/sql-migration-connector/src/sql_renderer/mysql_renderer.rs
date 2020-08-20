@@ -12,10 +12,9 @@ use crate::{
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_schema_describer::walkers::ColumnWalker;
-use sql_schema_describer::*;
+use sql_schema_describer::{walkers::ColumnWalker, *};
 use std::borrow::Cow;
-use walkers::{walk_columns, TableWalker};
+use walkers::TableWalker;
 
 const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
@@ -26,34 +25,11 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_alter_enum(
         &self,
-        alter_enum: &AlterEnum,
-        differ: &SqlSchemaDiffer<'_>,
-        schema_name: &str,
+        _alter_enum: &AlterEnum,
+        _differ: &SqlSchemaDiffer<'_>,
+        _schema_name: &str,
     ) -> anyhow::Result<Vec<String>> {
-        let column = walk_columns(differ.next)
-            .find(|col| match &col.column_type().family {
-                ColumnTypeFamily::Enum(enum_name) if enum_name.as_str() == alter_enum.name.as_str() => true,
-                _ => false,
-            })
-            .ok_or_else(|| anyhow::anyhow!("Could not find column to alter for {:?}", alter_enum))?;
-        let enum_variants = differ
-            .next
-            .get_enum(&alter_enum.name)
-            .ok_or_else(|| anyhow::anyhow!("Couldn't find enum {:?}", alter_enum.name))?
-            .values
-            .iter()
-            .map(Quoted::mysql_string)
-            .join(", ");
-
-        let change_column = format!(
-            "ALTER TABLE {schema_name}.{table_name} CHANGE {column_name} {column_name} ENUM({enum_variants})",
-            schema_name = Quoted::mysql_ident(schema_name),
-            table_name = Quoted::mysql_ident(column.table().name()),
-            column_name = column.name(),
-            enum_variants = enum_variants,
-        );
-
-        Ok(vec![change_column])
+        unreachable!("render_alter_enum on MySQL")
     }
 
     fn render_alter_index(

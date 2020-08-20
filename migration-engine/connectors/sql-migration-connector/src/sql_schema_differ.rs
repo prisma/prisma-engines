@@ -348,21 +348,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn alter_enums(&self) -> Vec<AlterEnum> {
-        self.enum_pairs()
-            .filter_map(|differ| {
-                let step = AlterEnum {
-                    created_variants: differ.created_values().map(String::from).collect(),
-                    dropped_variants: differ.dropped_values().map(String::from).collect(),
-                    name: differ.previous.name.clone(),
-                };
-
-                if step.is_empty() {
-                    None
-                } else {
-                    Some(step)
-                }
-            })
-            .collect()
+        self.flavour.alter_enums(self)
     }
 
     /// An iterator over the tables that are present in both schemas.

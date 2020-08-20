@@ -143,3 +143,57 @@ async fn arity_of_enum_columns_can_be_changed(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"), log = "debug,sql_schema_describer=info")]
+async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+
+        model A {
+            id              Int @id
+            primaryColor    Color
+            secondaryColor  Color?
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("primaryColor", |col| col.assert_is_required())?
+            .assert_column("secondaryColor", |col| col.assert_is_nullable())
+    })?;
+
+    let dm2 = r#"
+        enum Color {
+            ROT
+            GRUEN
+            BLAU
+        }
+
+        model A {
+            id              Int @id
+            primaryColor    Color
+            secondaryColor  Color?
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .force(true)
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_has_executed_steps()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("primaryColor", |col| col.assert_is_required())?
+            .assert_column("secondaryColor", |col| col.assert_is_nullable())
+    })?;
+
+    Ok(())
+}
