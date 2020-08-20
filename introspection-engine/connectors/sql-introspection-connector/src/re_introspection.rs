@@ -11,9 +11,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate keeping of old manual custom relation names
 
-    // println!("{:#?}", old_data_model);
-    // println!("{:#?}", new_data_model);
-
     let mut warnings = vec![];
 
     //@@map on models
@@ -266,30 +263,31 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
     }
 
-    //todo @defaults
-    // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
-    // you could not get rid of it
-    //for every singular string id field, if you can find it in the old datamodel and it has a cuid/uuid reapply it
+    // Prisma Level Only concepts
+    // @default(cuid) / @default(uuid) / @updatedAt
     let mut re_introspected_prisma_level_cuids = vec![];
     let mut re_introspected_prisma_level_uuids = vec![];
+    let mut re_introspected_updated_at = vec![];
     {
         for model in new_data_model.models() {
-            for field in model
-                .scalar_fields()
-                .filter(|f| f.is_id && f.field_type == FieldType::Base(ScalarType::String, None))
-            {
+            for field in model.scalar_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     if let Some(old_field) = old_model.find_scalar_field(&field.name) {
-                        if field.default_value.is_none() {
+                        if field.default_value.is_none()
+                            && field.is_id
+                            && field.field_type == FieldType::Base(ScalarType::String, None)
+                        {
                             if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_cuid())) {
-                                let mf = ModelAndField::new(&model.name, &field.name);
-                                re_introspected_prisma_level_cuids.push((mf, old_field.name.clone()));
+                                re_introspected_prisma_level_cuids.push(ModelAndField::new(&model.name, &field.name));
                             }
 
                             if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_uuid())) {
-                                let mf = ModelAndField::new(&model.name, &field.name);
-                                re_introspected_prisma_level_uuids.push((mf, old_field.name.clone()));
+                                re_introspected_prisma_level_uuids.push(ModelAndField::new(&model.name, &field.name));
                             }
+                        }
+
+                        if field.field_type == FieldType::Base(ScalarType::DateTime, None) && old_field.is_updated_at {
+                            re_introspected_updated_at.push(ModelAndField::new(&model.name, &field.name));
                         }
                     }
                 }
@@ -298,14 +296,88 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
         for cuid in &re_introspected_prisma_level_cuids {
             new_data_model
-                .find_scalar_field_mut(&cuid.0.model, &cuid.0.field)
+                .find_scalar_field_mut(&cuid.model, &cuid.field)
                 .default_value = Some(DefaultValue::Expression(ValueGenerator::new_cuid()));
         }
 
         for uuid in &re_introspected_prisma_level_uuids {
             new_data_model
-                .find_scalar_field_mut(&uuid.0.model, &uuid.0.field)
+                .find_scalar_field_mut(&uuid.model, &uuid.field)
                 .default_value = Some(DefaultValue::Expression(ValueGenerator::new_uuid()));
+        }
+
+        for updated_at in &re_introspected_updated_at {
+            new_data_model
+                .find_scalar_field_mut(&updated_at.model, &updated_at.field)
+                .is_updated_at = true;
+        }
+    }
+
+    // comments - we do NOT generate warnings for comments
+    {
+        let mut re_introspected_model_comments = vec![];
+        let mut re_introspected_field_comments = vec![];
+        {
+            for model in new_data_model.models() {
+                for field in &model.fields {
+                    if let Some(old_model) = old_data_model.find_model(&model.name) {
+                        if old_model.documentation.is_some() {
+                            re_introspected_model_comments.push((Model::new(&model.name), &old_model.documentation))
+                        }
+                        if let Some(old_field) = old_model.find_field(&field.name()) {
+                            if old_field.documentation().is_some() {
+                                re_introspected_field_comments.push((
+                                    ModelAndField::new(&model.name, &field.name()),
+                                    old_field.documentation().map(|s| s.to_string()),
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
+
+            for model_comment in &re_introspected_model_comments {
+                new_data_model.find_model_mut(&model_comment.0.model).documentation = model_comment.1.clone();
+            }
+
+            for field_comment in &re_introspected_field_comments {
+                new_data_model
+                    .find_field_mut(&field_comment.0.model, &field_comment.0.field)
+                    .set_documentation(field_comment.1.clone());
+            }
+        }
+
+        let mut re_introspected_enum_comments = vec![];
+        let mut re_introspected_enum_value_comments = vec![];
+        {
+            for enm in new_data_model.enums() {
+                for value in &enm.values {
+                    if let Some(old_enum) = old_data_model.find_enum(&enm.name) {
+                        if old_enum.documentation.is_some() {
+                            re_introspected_enum_comments.push((Enum::new(&enm.name), &old_enum.documentation))
+                        }
+                        if let Some(old_value) = old_enum.find_value(&value.name) {
+                            if old_value.documentation.is_some() {
+                                re_introspected_enum_value_comments.push((
+                                    EnumAndValue::new(&enm.name, &value.name),
+                                    old_value.documentation.clone(),
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
+
+            for enum_comment in &re_introspected_enum_comments {
+                new_data_model.find_enum_mut(&enum_comment.0.enm).documentation = enum_comment.1.clone();
+            }
+
+            for enum_value_comment in &re_introspected_enum_value_comments {
+                new_data_model
+                    .find_enum_mut(&enum_value_comment.0.enm)
+                    .find_value_mut(&enum_value_comment.0.value)
+                    .documentation = enum_value_comment.1.clone();
+            }
         }
     }
 
@@ -324,8 +396,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
         re_order_putting_new_ones_last(enum_a_idx, enum_b_idx)
     });
-
-    // println!("{:#?}", new_data_model);
 
     //warnings
 
@@ -357,19 +427,15 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     }
 
     if !re_introspected_prisma_level_cuids.is_empty() {
-        let models_and_fields = re_introspected_prisma_level_cuids
-            .iter()
-            .map(|c| ModelAndField::new(&c.0.model, &c.1))
-            .collect();
-        warnings.push(warning_enriched_with_cuid(&models_and_fields));
+        warnings.push(warning_enriched_with_cuid(&re_introspected_prisma_level_cuids));
     }
 
     if !re_introspected_prisma_level_uuids.is_empty() {
-        let models_and_fields = re_introspected_prisma_level_uuids
-            .iter()
-            .map(|c| ModelAndField::new(&c.0.model, &c.1))
-            .collect();
-        warnings.push(warning_enriched_with_uuid(&models_and_fields));
+        warnings.push(warning_enriched_with_uuid(&re_introspected_prisma_level_uuids));
+    }
+
+    if !re_introspected_updated_at.is_empty() {
+        warnings.push(warning_enriched_with_updated_at(&re_introspected_updated_at));
     }
 
     warnings
