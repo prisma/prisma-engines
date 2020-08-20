@@ -42,6 +42,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       project = project,
       legacy = legacy,
       batchSize = batchSize,
+      log_level = "info"
     )
     result._1.assertSuccessfulResponse(dataContains)
     result
@@ -93,9 +94,13 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     Json.obj("batch" -> queries.map(createSingleQuery), "transaction" -> transaction)
   }
 
-  def queryBinaryCLI(request: JsValue, project: Project, legacy: Boolean = true, batchSize: Int = 5000): (JsValue, Vector[String]) = {
+  def queryBinaryCLI(request: JsValue,
+                     project: Project,
+                     legacy: Boolean = true,
+                     batchSize: Int = 5000,
+                     log_level: String = logLevel): (JsValue, Vector[String]) = {
     val encoded_query  = UTF8Base64.encode(Json.stringify(request))
-    val binaryLogLevel = "RUST_LOG" -> s"query_engine=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
+    val binaryLogLevel = "RUST_LOG" -> s"query_engine=$log_level,quaint=$log_level,query_core=$log_level,query_connector=$log_level,sql_query_connector=$log_level,prisma_models=$log_level,sql_introspection_connector=$log_level"
 
     val response = (project.isPgBouncer, legacy) match {
       case (true, true) =>

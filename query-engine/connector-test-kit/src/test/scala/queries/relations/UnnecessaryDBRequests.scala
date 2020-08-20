@@ -149,7 +149,6 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
 
     two_levels._1.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":{\"id\":\"middle\"}}]}}")
     assert_request_count(two_levels._2, 1)
-
   }
 
   "Many to Many relations" should "not create unnecessary round trips" in {
