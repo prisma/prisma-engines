@@ -3,7 +3,9 @@ use crate::{
     database_info::DatabaseInfo,
     flavour::{SqlFlavour, SqliteFlavour},
     sql_database_step_applier::render_create_index,
-    sql_migration::{AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex},
+    sql_migration::{
+        AddColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropIndex, TableChange,
+    },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
 };
 use once_cell::sync::Lazy;
@@ -103,6 +105,47 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_alter_column(&self, _differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
         None
+    }
+
+    fn render_alter_table(
+        &self,
+        alter_table: &AlterTable,
+        database_info: &DatabaseInfo,
+        differ: &SqlSchemaDiffer<'_>,
+    ) -> Vec<String> {
+        let AlterTable { table, changes } = alter_table;
+        let schema_name = database_info.connection_info().schema_name();
+
+        let mut statements = Vec::new();
+
+        // See https://www.sqlite.org/lang_altertable.html for the reference on
+        // what is possible on SQLite.
+
+        for change in changes {
+            match change {
+                TableChange::AddColumn(AddColumn { column }) => {
+                    let column = ColumnWalker {
+                        table,
+                        schema: differ.next,
+                        column,
+                    };
+
+                    let col_sql = self.render_column(&schema_name, column, true);
+
+                    statements.push(format!(
+                        "ALTER TABLE {table_name} ADD COLUMN {column_definition}",
+                        table_name = self.quote_with_schema(schema_name, &table.name),
+                        column_definition = col_sql,
+                    ));
+                }
+                TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
+                TableChange::AddPrimaryKey { .. } => unreachable!("AddPrimaryKey on SQLite"),
+                TableChange::DropColumn(_) => unreachable!("DropColumn on SQLite"),
+                TableChange::AlterColumn(_) => unreachable!("AlterColumn on SQLite"),
+            };
+        }
+
+        statements
     }
 
     fn render_create_enum(&self, _create_enum: &CreateEnum) -> Vec<String> {

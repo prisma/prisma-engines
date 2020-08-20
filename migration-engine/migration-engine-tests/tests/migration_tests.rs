@@ -2405,7 +2405,7 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "sql_schema_describer=info,debug")]
 async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
