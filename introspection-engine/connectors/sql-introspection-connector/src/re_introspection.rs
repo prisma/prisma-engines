@@ -303,7 +303,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
     }
 
-    // comments - we do NOT generated warnings for comments
+    // comments - we do NOT generate warnings for comments
     {
         let mut re_introspected_model_comments = vec![];
         let mut re_introspected_field_comments = vec![];
