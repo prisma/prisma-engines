@@ -134,7 +134,8 @@ impl SqlRenderer for SqliteFlavour {
             while let Some(fk) = fks.next() {
                 write!(
                     rendered_fks,
-                    "FOREIGN KEY ({constrained_columns}) {references}{comma}",
+                    "{indentation}FOREIGN KEY ({constrained_columns}) {references}{comma}",
+                    indentation = SQL_INDENTATION,
                     constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
                     references = self.render_references(&schema_name, fk),
                     comma = if fks.peek().is_some() { ",\n" } else { "" },
