@@ -253,6 +253,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     val filterOnNotNull =
       server.query("""{scalarModels(where: { optString: { not: { equals: null }}}, orderBy: { id: asc }){ idTest }}""", project = project)
 
+    val filterOnNotNullWithoutEquals =
+      server.query("""{scalarModels(where: { optString: { not: null }}, orderBy: { id: asc }){ idTest }}""", project = project)
+
     // Must be the same as not null
     val filterOnNotNotNotNull =
       server.query("""{scalarModels(where: { optString: { not: { not: { not: { equals: null }}}}}, orderBy: { id: asc }){ idTest }}""", project = project)
@@ -264,6 +267,7 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
       )
 
     filterOnNotNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
+    filterOnNotNullWithoutEquals.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
     filterOnNotNotNotNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
     filterOnNotNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
 
