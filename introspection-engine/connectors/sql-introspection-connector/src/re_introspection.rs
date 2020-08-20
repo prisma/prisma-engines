@@ -263,27 +263,31 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
     }
 
-    // @default(cuid) / @default(uuid)
+    // Prisma Level Only concepts
+    // @default(cuid) / @default(uuid) / @updatedAt
     let mut re_introspected_prisma_level_cuids = vec![];
     let mut re_introspected_prisma_level_uuids = vec![];
+    let mut re_introspected_updated_at = vec![];
     {
         for model in new_data_model.models() {
-            for field in model
-                .scalar_fields()
-                .filter(|f| f.is_id && f.field_type == FieldType::Base(ScalarType::String, None))
-            {
+            for field in model.scalar_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     if let Some(old_field) = old_model.find_scalar_field(&field.name) {
-                        if field.default_value.is_none() {
+                        if field.default_value.is_none()
+                            && field.is_id
+                            && field.field_type == FieldType::Base(ScalarType::String, None)
+                        {
                             if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_cuid())) {
-                                let mf = ModelAndField::new(&model.name, &field.name);
-                                re_introspected_prisma_level_cuids.push((mf, old_field.name.clone()));
+                                re_introspected_prisma_level_cuids.push(ModelAndField::new(&model.name, &field.name));
                             }
 
                             if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_uuid())) {
-                                let mf = ModelAndField::new(&model.name, &field.name);
-                                re_introspected_prisma_level_uuids.push((mf, old_field.name.clone()));
+                                re_introspected_prisma_level_uuids.push(ModelAndField::new(&model.name, &field.name));
                             }
+                        }
+
+                        if field.field_type == FieldType::Base(ScalarType::DateTime, None) && old_field.is_updated_at {
+                            re_introspected_updated_at.push(ModelAndField::new(&model.name, &field.name));
                         }
                     }
                 }
@@ -292,14 +296,20 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
         for cuid in &re_introspected_prisma_level_cuids {
             new_data_model
-                .find_scalar_field_mut(&cuid.0.model, &cuid.0.field)
+                .find_scalar_field_mut(&cuid.model, &cuid.field)
                 .default_value = Some(DefaultValue::Expression(ValueGenerator::new_cuid()));
         }
 
         for uuid in &re_introspected_prisma_level_uuids {
             new_data_model
-                .find_scalar_field_mut(&uuid.0.model, &uuid.0.field)
+                .find_scalar_field_mut(&uuid.model, &uuid.field)
                 .default_value = Some(DefaultValue::Expression(ValueGenerator::new_uuid()));
+        }
+
+        for updated_at in &re_introspected_updated_at {
+            new_data_model
+                .find_scalar_field_mut(&updated_at.model, &updated_at.field)
+                .is_updated_at = true;
         }
     }
 
@@ -417,19 +427,15 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     }
 
     if !re_introspected_prisma_level_cuids.is_empty() {
-        let models_and_fields = re_introspected_prisma_level_cuids
-            .iter()
-            .map(|c| ModelAndField::new(&c.0.model, &c.1))
-            .collect();
-        warnings.push(warning_enriched_with_cuid(&models_and_fields));
+        warnings.push(warning_enriched_with_cuid(&re_introspected_prisma_level_cuids));
     }
 
     if !re_introspected_prisma_level_uuids.is_empty() {
-        let models_and_fields = re_introspected_prisma_level_uuids
-            .iter()
-            .map(|c| ModelAndField::new(&c.0.model, &c.1))
-            .collect();
-        warnings.push(warning_enriched_with_uuid(&models_and_fields));
+        warnings.push(warning_enriched_with_uuid(&re_introspected_prisma_level_uuids));
+    }
+
+    if !re_introspected_updated_at.is_empty() {
+        warnings.push(warning_enriched_with_updated_at(&re_introspected_updated_at));
     }
 
     warnings

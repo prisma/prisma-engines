@@ -1005,3 +1005,40 @@ async fn re_introspecting_comments(api: &TestApi) {
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_updated_at(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+                t.inject_custom("lastupdated Timestamp");
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model User {
+               id           String    @id
+               lastupdated  DateTime? @updatedAt
+            }
+        "#;
+
+    let final_dm = r#"
+            model User {
+               id           String    @id
+               lastupdated  DateTime? @updatedAt
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}

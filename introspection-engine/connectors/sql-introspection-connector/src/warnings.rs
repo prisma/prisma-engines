@@ -168,3 +168,13 @@ pub fn warning_enriched_with_uuid(affected: &Vec<ModelAndField>) -> Warning {
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }
+
+pub fn warning_enriched_with_updated_at(affected: &Vec<ModelAndField>) -> Warning {
+    Warning {
+        code: 13,
+        message:
+            "These DateTime fields were enriched with `@updatedAt` information taken from the previous Prisma schema."
+                .into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
