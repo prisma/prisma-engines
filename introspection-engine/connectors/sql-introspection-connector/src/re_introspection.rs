@@ -11,8 +11,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate keeping of old manual custom relation names
 
-    // println!("{:#?}", old_data_model);
-    // println!("{:#?}", new_data_model);
+    println!("{:#?}", old_data_model);
+    println!("{:#?}", new_data_model);
 
     let mut warnings = vec![];
 
@@ -266,10 +266,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
     }
 
-    //todo @defaults
-    // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
-    // you could not get rid of it
-    //for every singular string id field, if you can find it in the old datamodel and it has a cuid/uuid reapply it
+    // @default(cuid) / @default(uuid)
     let mut re_introspected_prisma_level_cuids = vec![];
     let mut re_introspected_prisma_level_uuids = vec![];
     {
@@ -307,6 +304,40 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                 .find_scalar_field_mut(&uuid.0.model, &uuid.0.field)
                 .default_value = Some(DefaultValue::Expression(ValueGenerator::new_uuid()));
         }
+    }
+
+    // comments
+    // model, field, enum, enum value, global
+    let mut re_introspected_model_comments = vec![];
+    let mut re_introspected_field_comments = vec![];
+    {
+        for model in new_data_model.models() {
+            for field in model {
+                if let Some(old_model) = old_data_model.find_model(&model.name) {
+                    if old_model.documentation.is_some() {
+                        re_introspected_model_comments.push((Model::new(&model.name), &old_model.documentation))
+                    }
+                    if let Some(old_field) = old_model.find_field(&field.name) {
+                        if old_field.documentation().is_some() {
+                            re_introspected_field_comments.push((
+                                ModelAndField::new(&model.name, &field.name()),
+                                old_field.documentation(),
+                            ))
+                        }
+                    }
+                }
+            }
+        }
+
+        for model_comment in &re_introspected_model_comments {
+            new_data_model.find_model_mut(&model_comment.0.model).documentation = model_comment.1.clone();
+        }
+
+        // for field_comment in &re_introspected_field_comments {
+        //     new_data_model
+        //         .find_field_mut(&uuid.0.model, &uuid.0.field)
+        //         .default_value = Some(DefaultValue::Expression(ValueGenerator::new_uuid()));
+        // }
     }
 
     // restore old model order
