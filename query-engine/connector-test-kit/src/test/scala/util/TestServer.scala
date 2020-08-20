@@ -30,17 +30,15 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     result._1
   }
 
-  def query_with_log(
+  def query_with_logged_requests(
       query: String,
       project: Project,
   ): (JsValue, Vector[String]) = {
-    Logger.setDefaultFormatter(SimpleLogFormatter)
-    Logger.setDefaultLogLevel(LogLevel.apply("info"))
 
     val result = queryBinaryCLI(
       request = createSingleQuery(query),
       project = project,
-      log_level = "info"
+      log_requests = true
     )
     result._1.assertSuccessfulResponse()
     result
@@ -96,9 +94,10 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
                      project: Project,
                      legacy: Boolean = true,
                      batchSize: Int = 5000,
-                     log_level: String = logLevel): (JsValue, Vector[String]) = {
-    val encoded_query  = UTF8Base64.encode(Json.stringify(request))
-    val binaryLogLevel = "RUST_LOG" -> s"query_engine=$log_level,quaint=$log_level,query_core=$log_level,query_connector=$log_level,sql_query_connector=$log_level,prisma_models=$log_level,sql_introspection_connector=$log_level"
+                     log_requests: Boolean = false): (JsValue, Vector[String]) = {
+    val encoded_query    = UTF8Base64.encode(Json.stringify(request))
+    val binaryLogLevel   = "RUST_LOG" -> s"query_engine=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
+    val log_requests_env = if (log_requests) { "LOG_QUERIES" -> "y" } else { ("", "") }
 
     val response = (project.isPgBouncer, legacy) match {
       case (true, true) =>
@@ -116,6 +115,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           "PRISMA_DML"       -> project.pgBouncerEnvVar,
           "QUERY_BATCH_SIZE" -> batchSize.toString,
           binaryLogLevel,
+          log_requests_env
         ).!!
 
       case (true, false) =>
@@ -132,6 +132,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           "PRISMA_DML"       -> project.pgBouncerEnvVar,
           "QUERY_BATCH_SIZE" -> batchSize.toString,
           binaryLogLevel,
+          log_requests_env
         ).!!
 
       case (false, true) =>
@@ -149,6 +150,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           "PRISMA_DML"       -> project.envVar,
           "QUERY_BATCH_SIZE" -> batchSize.toString,
           binaryLogLevel,
+          log_requests_env
         ).!!
 
       case (false, false) =>
@@ -165,6 +167,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           "PRISMA_DML"       -> project.envVar,
           "QUERY_BATCH_SIZE" -> batchSize.toString,
           binaryLogLevel,
+          log_requests_env
         ).!!
     }
 

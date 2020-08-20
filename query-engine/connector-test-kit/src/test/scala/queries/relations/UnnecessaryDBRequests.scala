@@ -64,7 +64,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //family top
     //  Start:    3 roundtrip
     //  Current:  2 roundtrip
-    val family = server.query_with_log(
+    val family = server.query_with_logged_requests(
       """
         |query {
         |  tops(where: { id: { equals: "family_top" }}){
@@ -87,7 +87,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //lonely top
     //  Start:    3 roundtrip
     //  Current:  1 roundtrip
-    val lonely = server.query_with_log(
+    val lonely = server.query_with_logged_requests(
       """
                    |query {
                    |  tops(where: { id: { equals: "lonely_top" }}){
@@ -110,7 +110,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //no top
     //  Start:    3 roundtrip
     //  Current:  1 roundtrip
-    val no = server.query_with_log(
+    val no = server.query_with_logged_requests(
       """
         |query {
         |  tops(where: { id: { equals: "does not exist" }}){
@@ -133,7 +133,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //two levels
     //  Start:    3 roundtrip
     //  Current:  1 roundtrip
-    val two_levels = server.query_with_log(
+    val two_levels = server.query_with_logged_requests(
       """
         |query {
         |  tops(where: { id: { equals: "family_top" }}){
@@ -213,7 +213,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //family top
     //  Start:    5 roundtrip
     //  Current:  3 roundtrip
-    val family = server.query_with_log(
+    val family = server.query_with_logged_requests(
       """
         |query {
         |  tops(where: { id: { equals: "family_top" }}){
@@ -236,7 +236,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //lonely top
     //  Start:    5 roundtrip
     //  Current:  2 roundtrip
-    val lonely = server.query_with_log(
+    val lonely = server.query_with_logged_requests(
       """
         |query {
         |  tops(where: { id: { equals: "lonely_top" }}){
@@ -259,7 +259,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //no top
     //  Start:    5 roundtrip
     //  Current:  1 roundtrip
-    val no = server.query_with_log(
+    val no = server.query_with_logged_requests(
       """
         |query {
         |  tops(where: { id: { equals: "does not exist" }}){
@@ -282,7 +282,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //two levels
     //  Start:    3 roundtrip
     //  Current:  2 roundtrip
-    val two_levels = server.query_with_log(
+    val two_levels = server.query_with_logged_requests(
       """
         |query {
         |  tops(where: { id: { equals: "family_top" }}){
