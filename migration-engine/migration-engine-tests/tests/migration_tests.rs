@@ -623,14 +623,14 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
 #[test_each_connector]
 async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
     let dm1 = r#"
-            model A {
-                id Int @id
-                b String
-            }
-            model B {
-                id Int @id
-            }
-        "#;
+        model A {
+            id Int @id
+            b String
+        }
+        model B {
+            id Int @id
+        }
+    "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b");
@@ -638,16 +638,16 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
     assert_eq!(table.foreign_keys, vec![]);
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                b Int
-                b_rel B @relation(fields: [b], references: [id])
-            }
-            model B {
-                id Int @id
-                a A // remove this once the implicit back relation field is implemented
-            }
-        "#;
+        model A {
+            id Int @id
+            b Int
+            b_rel B @relation(fields: [b], references: [id])
+        }
+        model B {
+            id Int @id
+            a A // remove this once the implicit back relation field is implemented
+        }
+    "#;
     let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
     let table = result.table_bang("A");
     let column = result.table_bang("A").column_bang("b");
@@ -757,22 +757,22 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
 #[test_each_connector]
 async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                bid Int
-                cid Int?
-                b  B   @relation(fields: [bid], references: [id])
-                c  C?  @relation(fields: [cid], references: [id])
-            }
+        model A {
+            id Int @id
+            bid Int
+            cid Int?
+            b  B   @relation(fields: [bid], references: [id])
+            c  C?  @relation(fields: [cid], references: [id])
+        }
 
-            model B {
-                id Int @id
-            }
+        model B {
+            id Int @id
+        }
 
-            model C {
-                id Int @id
-            }
-        "#;
+        model C {
+            id Int @id
+        }
+    "#;
 
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
@@ -821,16 +821,17 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
 #[test_each_connector]
 async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
     let dm1 = r#"
-            model A {
-                id Int @id
-                b_id_field Int @map(name: "b_column")
-                b B @relation(fields: [b_id_field], references: [id])
-            }
+        model A {
+            id Int @id
+            b_id_field Int @map(name: "b_column")
+            b B @relation(fields: [b_id_field], references: [id])
+        }
 
-            model B {
-                id Int @id
-            }
-        "#;
+        model B {
+            id Int @id
+        }
+    "#;
+
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
     let column = table.column_bang("b_column");
@@ -1099,36 +1100,43 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
     assert_eq!(index.is_some(), false);
 }
 
-#[test_each_connector]
-async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) {
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
+async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id    Int    @id
-                field String
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-    assert_eq!(index.is_some(), false);
+        model A {
+            id    Int    @id
+            field String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema()
+        .await?
+        .assert_table("A", |table| table.assert_indexes_count(0))?;
 
     let dm2 = r#"
-            model A {
-                id    Int    @id
-                field String @unique
-            }
-        "#;
-    let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
-    let index = result
-        .table_bang("A")
-        .indices
-        .iter()
-        .find(|i| i.columns == vec!["field"]);
-    assert!(index.is_some());
-    assert_eq!(index.unwrap().tpe, IndexType::Unique);
+        model A {
+            id    Int    @id
+            field String @unique
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .force(true)
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_warnings(&["The migration will add a unique constraint covering the columns `[field]` on the table `A`. If there are existing duplicate values, the migration will fail.".into()])?
+        .assert_has_executed_steps()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_indexes_count(1)?
+            .assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1152,7 +1160,7 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
         "#;
     let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
-    assert!(!index.is_some());
+    assert!(index.is_none());
 }
 
 #[test_each_connector]
@@ -1673,7 +1681,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_each_connector]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::Insert;
 
@@ -1761,10 +1769,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
         }
     "#;
 
-    let output = api.infer_apply(dm2).send().await?.assert_green()?.into_inner();
-
-    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
-    anyhow::ensure!(output.datamodel_steps.is_empty(), "Migration should be empty");
+    api.infer_apply(dm2).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }
@@ -2035,6 +2040,95 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
             .assert_foreign_keys_count(1)?
             .assert_fk_on_columns(&["user_email"], |fk| fk.assert_references("User", &["email"]))
     })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn foreign_keys_can_be_added_on_existing_columns(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model User {
+            id Int @id
+            email String @unique
+        }
+
+        model Account {
+            id Int @id
+            user_email String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema()
+        .await?
+        // There should be no foreign keys yet.
+        .assert_table("Account", |table| table.assert_foreign_keys_count(0))?;
+
+    let dm2 = r#"
+        model User {
+            id Int @id
+            email String @unique
+        }
+
+        model Account {
+            id Int @id
+            user_email String
+            user User @relation(fields: [user_email], references: [email])
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["user_email"], |fk| fk.assert_references("User", &["email"]))
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn foreign_keys_can_be_dropped_on_existing_columns(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model User {
+            id Int @id
+            email String @unique
+        }
+
+        model Account {
+            id Int @id
+            user_email String
+            user User @relation(fields: [user_email], references: [email])
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["user_email"], |fk| fk.assert_references("User", &["email"]))
+    })?;
+
+    let dm2 = r#"
+        model User {
+            id Int @id
+            email String @unique
+        }
+
+        model Account {
+            id Int @id
+            user_email String
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    api.assert_schema()
+        .await?
+        .assert_table("Account", |table| table.assert_foreign_keys_count(0))?;
 
     Ok(())
 }
