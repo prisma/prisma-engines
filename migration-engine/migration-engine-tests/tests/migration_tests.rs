@@ -2404,3 +2404,32 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    let dm2 = r#"
+        model Cat {
+            id   Int @id
+            name String?
+            age  Int?
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table
+            .assert_column("name", |col| col.assert_is_nullable())?
+            .assert_column("age", |col| col.assert_is_nullable())
+    })?;
+
+    Ok(())
+}

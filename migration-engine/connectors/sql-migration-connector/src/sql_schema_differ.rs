@@ -19,6 +19,7 @@ use sql_schema_describer::{
     *,
 };
 use std::collections::HashSet;
+use walkers::SqlSchemaExt;
 
 #[derive(Debug)]
 pub(crate) struct SqlSchemaDiffer<'a> {
@@ -93,6 +94,15 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             database_info,
         };
         differ.diff_internal()
+    }
+
+    pub(crate) fn diff_table(&self, table_name: &str) -> Option<TableDiffer<'schema>> {
+        Some(TableDiffer {
+            database_info: self.database_info,
+            flavour: self.flavour,
+            previous: self.previous.table_walker(table_name)?,
+            next: self.next.table_walker(table_name)?,
+        })
     }
 
     fn diff_internal(&self) -> SqlSchemaDiff {
