@@ -7,6 +7,7 @@ use crate::{
     },
     RelationField,
 };
+use datamodel_connector::NativeTypeInstance;
 use itertools::Itertools;
 
 pub fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelWalker<'a>> + 'a {
@@ -165,6 +166,7 @@ impl<'a> ScalarFieldWalker<'a> {
                 r#enum: self.datamodel.find_enum(name).unwrap(),
             }),
             FieldType::Base(scalar_type, _) => TypeWalker::Base(*scalar_type),
+            FieldType::NativeType(scalar_type, native_type) => TypeWalker::NativeType(*scalar_type, native_type),
             _ => TypeWalker::Other,
         }
     }
@@ -197,6 +199,7 @@ impl<'a> ScalarFieldWalker<'a> {
 pub enum TypeWalker<'a> {
     Enum(EnumWalker<'a>),
     Base(ScalarType),
+    NativeType(ScalarType, &'a NativeTypeInstance),
     Other,
 }
 

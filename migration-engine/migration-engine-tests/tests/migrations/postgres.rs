@@ -1,5 +1,6 @@
 use migration_engine_tests::*;
 use sql_schema_describer::{ColumnArity, ColumnTypeFamily};
+use std::fmt::Write;
 
 #[test_each_connector(tags("postgres"))]
 async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
@@ -93,6 +94,70 @@ async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResu
         .await?
         .assert_has_table("spatial_ref_sys")?
         .assert_has_table("Geometry_columns")?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"), log = "debug,sql_schema_describer=info")]
+async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
+    let types = &[
+        ("smallint", "Int", "SmallInt", "int2"),
+        ("int", "Int", "Integer", "int4"),
+        ("bigint", "Int", "BigInt", "int8"),
+        ("decimal", "Decimal", "Decimal(4, 2)", "numeric"),
+        ("numeric", "Decimal", "Numeric(4, 2)", "numeric"),
+        ("real", "Float", "Real", "float4"),
+        ("doublePrecision", "Float", "DoublePrecision", "float8"),
+        ("smallSerial", "Int", "SmallSerial", "int2"),
+        ("serial", "Int", "Serial", "int4"),
+        ("bigSerial", "Int", "BigSerial", "int8"),
+        ("varChar", "String", "VarChar(200)", "varchar"),
+        ("char", "String", "Char(200)", "bpchar"),
+        ("text", "String", "Text", "text"),
+        ("bytea", "Bytes", "ByteA", "bytea"),
+        ("ts", "DateTime", "Timestamp(0)", "timestamp"),
+        ("tstz", "DateTime", "TimestampWithTimeZone(0)", "timestamptz"),
+        ("date", "DateTime", "Date", "date"),
+        ("time", "DateTime", "Time(2)", "time"),
+        ("timetz", "DateTime", "TimeWithTimeZone(2)", "timetz"),
+        ("interval", "Duration", "Interval(2)", "interval"),
+        ("bool", "Boolean", "Boolean", "bool"),
+        ("bit", "String", "Bit(1)", "bit"),
+        ("varbit", "String", "VarBit(1)", "varbit"),
+        ("uuid", "String", "Uuid", "uuid"),
+        ("xml", "XML", "Xml", "xml"),
+        ("json", "Json", "Json", "json"),
+        ("jsonb", "Json", "JsonB", "jsonb"),
+    ];
+
+    let mut dm = r#"
+        datasource pg {
+            provider = "postgres"
+            url = "postgresql://localhost/test"
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model A {
+            id Int @id
+    "#
+    .to_owned();
+
+    for (field_name, prisma_type, native_type, _) in types {
+        writeln!(&mut dm, "    {} {} @pg.{}", field_name, prisma_type, native_type)?;
+    }
+
+    dm.push_str("}\n");
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        types.iter().fold(
+            Ok(table),
+            |table, (field_name, _prisma_type, _native_type, database_type)| {
+                table.and_then(|table| table.assert_column(field_name, |col| col.assert_full_data_type(database_type)))
+            },
+        )
+    })?;
 
     Ok(())
 }

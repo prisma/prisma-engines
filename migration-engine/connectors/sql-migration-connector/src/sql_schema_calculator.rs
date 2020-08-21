@@ -1,8 +1,11 @@
-use crate::{sql_renderer::IteratorJoin, DatabaseInfo};
+mod sql_schema_calculator_flavour;
+
+pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
+
+use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin, DatabaseInfo};
 use datamodel::{
-    walkers::{walk_models, walk_relations, walk_scalar_fields, ModelWalker, ScalarFieldWalker, TypeWalker},
+    walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
     Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType, ValueGenerator, ValueGeneratorFn,
-    WithDatabaseName,
 };
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
@@ -11,13 +14,19 @@ use sql_schema_describer::{self as sql, ColumnArity};
 pub struct SqlSchemaCalculator<'a> {
     data_model: &'a Datamodel,
     database_info: &'a DatabaseInfo,
+    flavour: &'a dyn SqlFlavour,
 }
 
 impl<'a> SqlSchemaCalculator<'a> {
-    pub fn calculate(data_model: &Datamodel, database_info: &DatabaseInfo) -> sql::SqlSchema {
+    pub(crate) fn calculate(
+        data_model: &Datamodel,
+        database_info: &DatabaseInfo,
+        flavour: &dyn SqlFlavour,
+    ) -> sql::SqlSchema {
         let calculator = SqlSchemaCalculator {
             data_model,
             database_info,
+            flavour,
         };
         calculator.calculate_internal()
     }
@@ -33,50 +42,13 @@ impl<'a> SqlSchemaCalculator<'a> {
 
         tables.extend(self.calculate_relation_tables());
 
-        let enums = self.calculate_enums();
+        let enums = self.flavour.calculate_enums(self);
         let sequences = Vec::new();
 
         sql::SqlSchema {
             tables,
             enums,
             sequences,
-        }
-    }
-
-    fn calculate_enums(&self) -> Vec<sql::Enum> {
-        match self.database_info.sql_family() {
-            SqlFamily::Postgres => self
-                .data_model
-                .enums()
-                .map(|r#enum| sql::Enum {
-                    name: r#enum.final_database_name().to_owned(),
-                    values: r#enum.database_values(),
-                })
-                .collect(),
-            SqlFamily::Mysql => {
-                // This is a lower bound for the size of the generated enums (we assume each enum is
-                // used at least once).
-                let mut enums = Vec::with_capacity(self.data_model.enums().len());
-
-                let enum_fields = walk_scalar_fields(&self.data_model)
-                    .filter_map(|field| field.field_type().as_enum().map(|enum_ref| (field, enum_ref)));
-
-                for (field, enum_tpe) in enum_fields {
-                    let sql_enum = sql::Enum {
-                        name: format!(
-                            "{model_name}_{field_name}",
-                            model_name = field.model().database_name(),
-                            field_name = field.db_name()
-                        ),
-                        values: enum_tpe.r#enum.database_values(),
-                    };
-
-                    enums.push(sql_enum)
-                }
-
-                enums
-            }
-            _ => Vec::new(),
         }
     }
 
@@ -107,6 +79,19 @@ impl<'a> SqlSchemaCalculator<'a> {
                             auto_increment: false,
                         })
                     }
+                    TypeWalker::NativeType(scalar_type, native_type_instance) =>{
+                        let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
+
+                        // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
+                        let is_sqlite_integer_primary_key = self.database_info.sql_family().is_sqlite() && f.is_id() && f.field_type().is_int();
+
+                        Some(sql::Column {
+                            name: f.db_name().to_owned(),
+                            tpe: self.flavour.column_type_for_native_type(&f, scalar_type, native_type_instance),
+                            default: migration_value_new(&f),
+                            auto_increment: has_auto_increment_default || is_sqlite_integer_primary_key
+                        })
+                    } ,
                     _ => None,
                 })
                 .collect();
@@ -311,7 +296,7 @@ fn enum_column_type(field: &ScalarFieldWalker<'_>, database_info: &DatabaseInfo,
             sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().db_name(), field.db_name())),
             arity,
         ),
-        _ => column_type(field),
+        _ => unreachable!("enum_column_type on flavour that does not support enums"),
     }
 }
 
@@ -322,7 +307,8 @@ fn column_type(field: &ScalarFieldWalker<'_>) -> sql::ColumnType {
 fn scalar_type_for_field(field: &ScalarFieldWalker<'_>) -> ScalarType {
     match field.field_type() {
         TypeWalker::Base(ref scalar) => *scalar,
-        TypeWalker::Enum(_) => ScalarType::String,
+        TypeWalker::NativeType(_, _) => todo!(),
+        TypeWalker::Enum(_) => panic!("Trying to render an enum field to ScalarType"),
         x => panic!(format!(
             "This field type is not suported here. Field type is {:?} on field {}",
             x,
@@ -347,7 +333,10 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
         ScalarType::String => sql::ColumnType::pure(sql::ColumnTypeFamily::String, column_arity),
         ScalarType::DateTime => sql::ColumnType::pure(sql::ColumnTypeFamily::DateTime, column_arity),
         ScalarType::Json => sql::ColumnType::pure(sql::ColumnTypeFamily::Json, column_arity),
-        _ => todo!(),
+        ScalarType::Bytes => sql::ColumnType::pure(sql::ColumnTypeFamily::Binary, column_arity),
+        ScalarType::XML => unreachable!("XML type rendering"),
+        ScalarType::Decimal => unreachable!("Decimal type rendering"),
+        ScalarType::Duration => unreachable!("Duration type rendering"),
     }
 }
 
