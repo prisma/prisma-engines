@@ -14,6 +14,8 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
                     || differ.column_pairs().filter(|columns| columns.all_changes().iter().next().is_some()).next().is_some()
                     // ALTER INDEX does not exist on SQLite
                     || differ.index_pairs().next().is_some()
+                    || differ.created_foreign_keys().next().is_some()
+                    || differ.dropped_foreign_keys().next().is_some()
             })
             .map(|table| table.next.name().to_owned())
             .collect()
