@@ -1,4 +1,4 @@
-use datamodel::transform::ast_to_dml::reserved_model_names::ReservedModelNameValidator;
+use datamodel::transform::ast_to_dml::reserved_model_names::TypeNameValidator;
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
 use query_core::{schema_builder, BuildMode, QuerySchema};
@@ -163,7 +163,7 @@ fn list_of_reserved_model_names_must_be_up_to_date() {
     let inputs = &dmmf.schema.input_types;
     let model_names: Vec<_> = datamodel.models.iter().map(|m| m.name.as_str()).collect();
 
-    let validator = ReservedModelNameValidator::new();
+    let validator = TypeNameValidator::new();
 
     let mut types_that_should_be_reserved: Vec<String> = Vec::new();
     types_that_should_be_reserved.append(&mut dmmf.schema.enums.iter().map(|en| en.name.clone()).collect());

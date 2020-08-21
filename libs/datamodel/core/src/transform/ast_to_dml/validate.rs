@@ -433,7 +433,7 @@ impl<'a> Validator<'a> {
     }
 
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        let validator = super::reserved_model_names::ReservedModelNameValidator::new();
+        let validator = super::reserved_model_names::TypeNameValidator::new();
 
         if validator.is_reserved(&model.name) {
             Err(DatamodelError::new_model_validation_error(
@@ -450,7 +450,7 @@ impl<'a> Validator<'a> {
     }
 
     fn validate_enum_name(&self, ast_enum: &ast::Enum, dml_enum: &dml::Enum) -> Result<(), DatamodelError> {
-        let validator = super::reserved_model_names::ReservedModelNameValidator::new();
+        let validator = super::reserved_model_names::TypeNameValidator::new();
 
         if validator.is_reserved(&dml_enum.name) {
             Err(DatamodelError::new_enum_validation_error(

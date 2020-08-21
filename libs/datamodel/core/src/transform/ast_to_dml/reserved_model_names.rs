@@ -1,8 +1,8 @@
-pub struct ReservedModelNameValidator {
+pub struct TypeNameValidator {
     reserved_names: Vec<&'static str>,
 }
 
-impl ReservedModelNameValidator {
+impl TypeNameValidator {
     pub fn new() -> Self {
         Self {
             reserved_names: vec![
