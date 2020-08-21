@@ -8,6 +8,7 @@ use crate::{
 };
 
 use datamodel::{Configuration, Datamodel};
+use datamodel_connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
 use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode};
 use std::sync::Arc;
@@ -87,7 +88,10 @@ impl CliCommand {
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
         let template = DatamodelConverter::convert(&request.datamodel);
 
-        let datasource = request.config.datasources.first().unwrap();
+        let capabilities = match request.config.datasources.first() {
+            Some(datasource) => datasource.capabilities(),
+            None => ConnectorCapabilities::empty(),
+        };
 
         // temporary code duplication
         let internal_data_model = template.build("".into());
@@ -95,7 +99,7 @@ impl CliCommand {
             internal_data_model,
             request.build_mode,
             request.enable_raw_queries,
-            datasource.capabilities(),
+            capabilities,
         ));
 
         let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);
@@ -119,11 +123,14 @@ impl CliCommand {
         let decoded = base64::decode(&request.query)?;
         let decoded_request = String::from_utf8(decoded)?;
 
-        let cx = PrismaContext::builder(request.config, request.datamodel)
-            .legacy(request.legacy)
-            .enable_raw_queries(request.enable_raw_queries)
-            .build()
-            .await?;
+        let cx = PrismaContext::builder(
+            request.config.validate_that_one_datasource_is_provided()?,
+            request.datamodel,
+        )
+        .legacy(request.legacy)
+        .enable_raw_queries(request.enable_raw_queries)
+        .build()
+        .await?;
         let cx = Arc::new(cx);
 
         let body: GraphQlBody = serde_json::from_str(&decoded_request)?;
