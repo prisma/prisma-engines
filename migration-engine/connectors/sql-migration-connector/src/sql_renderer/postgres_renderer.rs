@@ -360,6 +360,10 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         _ => "",
     };
 
+    if !t.full_data_type.is_empty() {
+        return format!("{}{}", t.full_data_type, array);
+    }
+
     match &t.family {
         ColumnTypeFamily::Boolean => format!("boolean {}", array),
         ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),

@@ -8,6 +8,7 @@ use crate::{
     error::{CheckDatabaseInfoResult, SystemDatabase},
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
     sql_renderer::SqlRenderer,
+    sql_schema_calculator::SqlSchemaCalculatorFlavour,
     sql_schema_differ::SqlSchemaDifferFlavour,
     SqlError, SqlResult,
 };
@@ -23,6 +24,7 @@ use regex::RegexSet;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::{
     collections::HashMap,
+    fmt::Debug,
     fs,
     path::{Path, PathBuf},
     sync::Arc,
@@ -42,7 +44,7 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
 
 #[async_trait::async_trait]
 pub(crate) trait SqlFlavour:
-    DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + std::fmt::Debug
+    DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
 {
     /// This method should be considered deprecated. Prefer extending SqlFlavour
     /// with methods expressing clearly what is being specialized by database

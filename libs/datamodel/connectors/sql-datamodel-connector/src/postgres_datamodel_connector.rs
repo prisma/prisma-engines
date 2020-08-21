@@ -21,13 +21,13 @@ const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const TIMESTAMP_WITH_TIMEZONE_TYPE_NAME: &str = "TimestampWithTimeZone";
 const DATE_TYPE_NAME: &str = "Date";
 const TIME_TYPE_NAME: &str = "Time";
-const TIME_WITH_TIMEZONE_TYPE_NAME: &str = "TimeWithTimezone";
+const TIME_WITH_TIMEZONE_TYPE_NAME: &str = "TimeWithTimeZone";
 const INTERVAL_TYPE_NAME: &str = "Interval";
 const BOOLEAN_TYPE_NAME: &str = "Boolean";
 const BIT_TYPE_NAME: &str = "Bit";
 const VAR_BIT_TYPE_NAME: &str = "VarBit";
-const UUID_TYPE_NAME: &str = "UUID";
-const XML_TYPE_NAME: &str = "XML";
+const UUID_TYPE_NAME: &str = "Uuid";
+const XML_TYPE_NAME: &str = "Xml";
 const JSON_TYPE_NAME: &str = "Json";
 const JSON_B_TYPE_NAME: &str = "JsonB";
 
@@ -56,6 +56,7 @@ impl PostgresDatamodelConnector {
         let real = NativeTypeConstructor::without_args(REAL_TYPE_NAME, ScalarType::Float);
         let double_precision = NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, ScalarType::Float);
         let small_serial = NativeTypeConstructor::without_args(SMALL_SERIAL_TYPE_NAME, ScalarType::Int);
+        let serial = NativeTypeConstructor::without_args(SERIAL_TYPE_NAME, ScalarType::Int);
         let big_serial = NativeTypeConstructor::without_args(BIG_SERIAL_TYPE_NAME, ScalarType::Int);
         let varchar = NativeTypeConstructor::with_args(VARCHAR_TYPE_NAME, 1, ScalarType::String);
         let char = NativeTypeConstructor::with_args(CHAR_TYPE_NAME, 1, ScalarType::String);
@@ -86,6 +87,7 @@ impl PostgresDatamodelConnector {
             real,
             double_precision,
             small_serial,
+            serial,
             big_serial,
             varchar,
             char,

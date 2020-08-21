@@ -29,12 +29,6 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
             boolean Boolean
             string String
             dateTime DateTime
-            enum MyEnum
-        }
-
-        enum MyEnum {
-            A
-            B
         }
     "#;
 
@@ -42,7 +36,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
-            .assert_columns_count(7)?
+            .assert_columns_count(6)?
             .assert_column("int", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
@@ -57,7 +51,31 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
             })?
             .assert_column("dateTime", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
-            })?
+            })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("enums"))]
+async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            enum MyEnum
+        }
+
+        enum MyEnum {
+            A
+            B
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table
+            .assert_columns_count(2)?
             .assert_column("enum", |c| match api.sql_family() {
                 SqlFamily::Postgres => c
                     .assert_is_required()?
@@ -702,56 +720,31 @@ async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_t
 }
 
 #[test_each_connector]
-async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi) {
+async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                bs B[] @relation(name: "my_relation")
-            }
-            model B {
-                id Int @id
-                as A[] @relation(name: "my_relation")
-            }
-        "#;
+        model A {
+            id Int @id
+            bs B[] @relation(name: "my_relation")
+        }
+        model B {
+            id Int @id
+            as A[] @relation(name: "my_relation")
+        }
+    "#;
 
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let relation_table = result.table_bang("_my_relation");
-    assert_eq!(relation_table.columns.len(), 2);
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
-    let a_column = relation_table.column_bang("A");
-    assert_eq!(a_column.tpe.family, ColumnTypeFamily::Int);
-    let b_column = relation_table.column_bang("B");
-    assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
+    api.assert_schema().await?.assert_table("_my_relation", |table| {
+        table
+            .assert_columns_count(2)?
+            .assert_column("A", |col| col.assert_type_is_int())?
+            .assert_column("B", |col| col.assert_type_is_int())?
+            .assert_foreign_keys_count(2)?
+            .assert_fk_on_columns(&["A"], |fk| fk.assert_references("A", &["id"]))?
+            .assert_fk_on_columns(&["B"], |fk| fk.assert_references("B", &["id"]))
+    })?;
 
-    assert_eq!(
-        relation_table.foreign_keys,
-        vec![
-            ForeignKey {
-                constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("_my_relation_A_fkey".to_owned()),
-                    SqlFamily::Mysql => Some("_my_relation_ibfk_1".to_owned()),
-                    SqlFamily::Sqlite => None,
-                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
-                },
-                columns: vec![a_column.name.clone()],
-                referenced_table: "A".to_string(),
-                referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Cascade,
-            },
-            ForeignKey {
-                constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("_my_relation_B_fkey".to_owned()),
-                    SqlFamily::Mysql => Some("_my_relation_ibfk_2".to_owned()),
-                    SqlFamily::Sqlite => None,
-                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
-                },
-                columns: vec![b_column.name.clone()],
-                referenced_table: "B".to_string(),
-                referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Cascade,
-            }
-        ]
-    );
+    Ok(())
 }
 
 #[test_each_connector]
