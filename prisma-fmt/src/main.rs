@@ -37,6 +37,8 @@ pub enum FmtOpts {
     Lint(LintOpts),
     /// Specifies format mode
     Format(FormatOpts),
+    /// Specifies Native Types mode
+    NativeTypes,
 }
 
 #[derive(serde::Serialize)]
@@ -50,6 +52,6 @@ fn main() {
     match FmtOpts::from_args() {
         FmtOpts::Lint(opts) => lint::run(opts),
         FmtOpts::Format(opts) => format::run(opts),
-        _ => native::run(),
+        FmtOpts::NativeTypes => native::run(),
     }
 }
