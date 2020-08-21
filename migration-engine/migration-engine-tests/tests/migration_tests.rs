@@ -645,7 +645,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
         }
         model B {
             id Int @id
-            a A // remove this once the implicit back relation field is implemented
+            a A
         }
     "#;
     let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
