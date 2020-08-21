@@ -1,5 +1,6 @@
 mod format;
 mod lint;
+mod native;
 
 use std::path::PathBuf;
 
@@ -23,7 +24,7 @@ pub struct FormatOpts {
     /// written to STDOUT
     #[structopt(short = "o", long)]
     output: Option<PathBuf>,
-    /// Specifies wich tab width to use when formatting
+    /// Specifies which tab width to use when formatting
     #[structopt(short = "s", long, default_value = "2")]
     tabwidth: usize,
 }
@@ -49,5 +50,6 @@ fn main() {
     match FmtOpts::from_args() {
         FmtOpts::Lint(opts) => lint::run(opts),
         FmtOpts::Format(opts) => format::run(opts),
+        _ => native::run(),
     }
 }
