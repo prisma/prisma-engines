@@ -151,8 +151,6 @@ impl PrismaOpt {
             datamodel::parse_configuration_with_url_overrides(datamodel_str, datasource_url_overrides)
         };
 
-        let config_result = config_result.and_then(|c| c.validate_that_one_datasource_is_provided());
-
         config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }
 
