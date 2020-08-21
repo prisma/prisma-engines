@@ -363,7 +363,9 @@ impl SqlSchemaDescriber {
         let filtered_rows = result_set
             .into_iter()
             // Exclude primary keys, they are inferred separately.
-            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk");
+            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
+            // Exclude partial indices
+            .filter(|row| row.get("partial").and_then(|partial| partial.as_bool()).unwrap() != true);
 
         for row in filtered_rows {
             let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");

@@ -302,3 +302,41 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("sqlite"))]
+async fn introspecting_a_table_with_partial_indexes_should_ignore_them(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Pages", |t| {
+                t.inject_custom("id Integer Primary Key");
+                t.inject_custom("staticid Int Not Null");
+                t.inject_custom("islatest Boolean Not Null");
+                t.inject_custom("other Int Not Null");
+            });
+        })
+        .await;
+
+    let partial = format!(
+        r#"CREATE UNIQUE INDEX "{}"."idx_pages_unique_staticId_partial"  on pages (staticId) WHERE isLatest = true;"#,
+        api.schema_name(),
+    );
+    api.database().raw_cmd(&partial).await.unwrap();
+
+    let non_partial = format!(
+        r#"CREATE UNIQUE INDEX "{}"."idx_pages_unique_staticId_non_partial"  on pages (other);"#,
+        api.schema_name(),
+    );
+    api.database().execute_raw(&non_partial, &[]).await.unwrap();
+
+    let dm = r#"
+            model Pages {
+              id       Int     @id @default(autoincrement())
+              staticid Int     
+              islatest Boolean
+              other    Int     @unique
+            }      
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
