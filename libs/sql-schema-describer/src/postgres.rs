@@ -450,6 +450,8 @@ impl SqlSchemaDescriber {
                     pg_index.indkey AS indkey,
                     generate_subscripts(pg_index.indkey, 1) AS indkeyidx
                 FROM pg_index
+                -- ignores partial indexes
+                Where indpred is Null
                 GROUP BY indrelid, indexrelid, indisunique, indisprimary, indkeyidx, indkey
                 ORDER BY indrelid, indexrelid, indkeyidx
             ) rawIndex,

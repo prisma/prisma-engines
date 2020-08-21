@@ -180,30 +180,30 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
     custom_assert(&result, dm);
 }
 
-// #[test_each_connector(tags("postgres"))]
-// async fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
-//     let barrel = api.barrel();
-//     let _setup_schema = barrel
-//         .execute(|migration| {
-//             migration.create_table("User", |t| {
-//                 t.add_column("id", types::primary());
-//                 t.add_column("name", types::text());
-//                 t.inject_custom("\"current_timestamp\" Timestamp with time zone DEFAULT CURRENT_TIMESTAMP");
-//                 t.inject_custom("\"now\" Timestamp with time zone DEFAULT NOW()");
-//             });
-//         })
-//         .await;
-//     let dm = r#"
-//             model User {
-//                 id                  Int       @default(autoincrement()) @id
-//                 current_timestamp   DateTime? @default(now())
-//                 now                 DateTime? @default(now())
-//                 name                String
-//             }
-//         "#;
-//     let result = dbg!(api.introspect().await);
-//     custom_assert(&result, dm);
-// }
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("name", types::text());
+                t.inject_custom("\"current_timestamp\" Timestamp with time zone DEFAULT CURRENT_TIMESTAMP");
+                t.inject_custom("\"now\" Timestamp with time zone DEFAULT NOW()");
+            });
+        })
+        .await;
+    let dm = r#"
+            model User {
+                id                  Int       @default(autoincrement()) @id
+                name                String
+                current_timestamp   DateTime? @default(now())
+                now                 DateTime? @default(now())
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
 
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
@@ -536,6 +536,39 @@ async fn introspecting_a_table_non_id_autoincrement_should_work(api: &TestApi) {
               authorid Int @default(autoincrement())
               authorid2 Int @default(autoincrement())
             }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_partial_indexes_should_ignore_them(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("pages", |t| {
+                t.inject_custom("id Integer Primary Key");
+                t.inject_custom("staticId Int Not Null");
+                t.inject_custom("isLatest Boolean Not Null");
+                t.inject_custom("other Int Not Null");
+            });
+        })
+        .await;
+
+    let partial =
+        format!(r#"CREATE UNIQUE INDEX "idx_pages_unique_staticId_partial" ON pages(staticId) WHERE isLatest = true;"#);
+    let non_partial = format!(r#"CREATE UNIQUE INDEX "idx_pages_unique_staticId_non_partial" ON pages(other);"#);
+
+    api.database().execute_raw(&partial, &[]).await.unwrap();
+    api.database().execute_raw(&non_partial, &[]).await.unwrap();
+
+    let dm = r#"
+            model pages {
+              id       Int     @id
+              staticid Int     
+              islatest Boolean
+              other    Int     @unique
+            }      
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
