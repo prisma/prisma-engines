@@ -190,7 +190,7 @@ fn rename_reserved(model: &mut Model) {
 
 /// Reformats a reserved string as "Renamed{}"
 fn reformat_reserved_string(s: &str) -> String {
-    let validator = reserved_model_names::ReservedModelNameValidator::new();
+    let validator = reserved_model_names::TypeNameValidator::new();
 
     if validator.is_reserved(s) {
         format!("Renamed{}", s)
