@@ -1,4 +1,3 @@
-use crate::NativeTypesOpts;
 use std::io;
 use std::io::Read;
 
