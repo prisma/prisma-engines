@@ -112,6 +112,19 @@ impl<'a> Validator<'a> {
             all_errors.append(&mut errors_for_model);
         }
 
+        // Enum level validations.
+        for declared_enum in schema.enums() {
+            let mut errors_for_enum = ErrorCollection::new();
+            if let Err(err) = self.validate_enum_name(
+                ast_schema.find_enum(&declared_enum.name).expect(STATE_ERROR),
+                declared_enum,
+            ) {
+                errors_for_enum.push(err);
+            }
+
+            all_errors.append(&mut errors_for_enum);
+        }
+
         if all_errors.has_errors() {
             Err(all_errors)
         } else {
@@ -464,6 +477,23 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
+    }
+
+    fn validate_enum_name(&self, ast_enum: &ast::Enum, dml_enum: &dml::Enum) -> Result<(), DatamodelError> {
+        let validator = super::reserved_model_names::ReservedModelNameValidator::new();
+
+        if validator.is_reserved(&dml_enum.name) {
+            Err(DatamodelError::new_enum_validation_error(
+                &format!(
+                    "The enum name `{}` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
+                    &dml_enum.name
+                ),
+                &dml_enum.name,
+                ast_enum.span
+            ))
+        } else {
+            Ok(())
+        }
     }
 
     fn validate_base_fields_for_relation(
