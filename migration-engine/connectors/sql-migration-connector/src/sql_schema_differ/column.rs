@@ -1,6 +1,6 @@
 use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
 use prisma_value::PrismaValue;
-use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultValue};
+use sql_schema_describer::{walkers::ColumnWalker, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
@@ -9,9 +9,6 @@ pub(crate) struct ColumnDiffer<'a> {
     pub(crate) previous: ColumnWalker<'a>,
     pub(crate) next: ColumnWalker<'a>,
 }
-
-/// On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
-const MARIADB_ALIASES: &[ColumnTypeFamily] = &[ColumnTypeFamily::String, ColumnTypeFamily::Json];
 
 impl<'a> ColumnDiffer<'a> {
     pub(crate) fn name(&self) -> &'a str {
@@ -61,14 +58,7 @@ impl<'a> ColumnDiffer<'a> {
     }
 
     fn column_type_changed(&self) -> bool {
-        if self.database_info.is_mariadb()
-            && MARIADB_ALIASES.contains(&self.previous.column_type_family())
-            && MARIADB_ALIASES.contains(&self.next.column_type_family())
-        {
-            return false;
-        }
-
-        self.previous.column_type_family() != self.next.column_type_family()
+        self.flavour.column_type_changed(self)
     }
 
     /// There are workarounds to cope with current migration and introspection limitations.
@@ -98,32 +88,29 @@ impl<'a> ColumnDiffer<'a> {
             ) => json_defaults_match(prev_json, next_json),
 
             (Some(DefaultValue::VALUE(prev)), Some(DefaultValue::VALUE(next))) => prev == next,
-            (Some(DefaultValue::VALUE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::NOW)) => false,
             (Some(DefaultValue::VALUE(_)), None) => false,
 
             (Some(DefaultValue::NOW), Some(DefaultValue::NOW)) => true,
-            (Some(DefaultValue::NOW), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::NOW), None) => false,
             (Some(DefaultValue::NOW), Some(DefaultValue::VALUE(_))) => false,
 
-            (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::VALUE(_))) => false,
             (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::NOW)) => false,
             (Some(DefaultValue::DBGENERATED(_)), None) => false,
 
-            (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::SEQUENCE(_)), None) => false,
             (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::VALUE(_))) => false,
             (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::NOW)) => false,
 
             (None, None) => true,
-            (None, Some(DefaultValue::SEQUENCE(_))) => true,
             (None, Some(DefaultValue::VALUE(_))) => false,
             (None, Some(DefaultValue::NOW)) => false,
 
             // We can never migrate to @dbgenerated
             (_, Some(DefaultValue::DBGENERATED(_))) => true,
+            // Sequence migrations are handled separately.
+            (_, Some(DefaultValue::SEQUENCE(_))) => true,
         }
     }
 }
@@ -164,6 +151,10 @@ impl ColumnChanges {
 
     pub(crate) fn only_default_changed(&self) -> bool {
         matches!(self.changes, [None, None, None, Some(ColumnChange::Default), None])
+    }
+
+    pub(crate) fn only_type_changed(&self) -> bool {
+        matches!(self.changes, [None, Some(ColumnChange::Type), None, None, None])
     }
 
     pub(crate) fn column_was_renamed(&self) -> bool {

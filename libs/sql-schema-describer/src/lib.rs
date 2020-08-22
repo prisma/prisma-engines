@@ -298,6 +298,17 @@ pub enum ColumnTypeFamily {
 }
 
 impl ColumnTypeFamily {
+    pub fn as_enum(&self) -> Option<&str> {
+        match self {
+            ColumnTypeFamily::Enum(name) => Some(name),
+            _ => None,
+        }
+    }
+
+    pub fn is_enum(&self) -> bool {
+        matches!(self, ColumnTypeFamily::Enum(_))
+    }
+
     pub fn is_json(&self) -> bool {
         matches!(self, ColumnTypeFamily::Json)
     }

@@ -1,5 +1,5 @@
 use crate::{
-    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, ForeignKey, PrimaryKey, SqlSchema, Table,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, PrimaryKey, SqlSchema, Table,
 };
 
 pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWalker<'a>> + 'a {
@@ -39,6 +39,15 @@ impl<'a> ColumnWalker<'a> {
 
     pub fn column_type_family(&self) -> &'a ColumnTypeFamily {
         &self.column.tpe.family
+    }
+
+    pub fn column_type_family_as_enum(&self) -> Option<&'a Enum> {
+        self.column_type_family().as_enum().map(|enum_name| {
+            self.schema()
+                .get_enum(enum_name)
+                .ok_or_else(|| panic!("Cannot find enum referenced in ColumnTypeFamily (`{}`)", enum_name))
+                .unwrap()
+        })
     }
 
     pub fn name(&self) -> &'a str {

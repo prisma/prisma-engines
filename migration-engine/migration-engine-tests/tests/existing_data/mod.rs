@@ -765,7 +765,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_each_connector(capabilities("enums"), log = "debug,sql_schema_describer=info")]
 async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -828,9 +828,23 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         let cat_data: Vec<Vec<quaint::ast::Value>> =
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
-        let expected_cat_data = vec![
-            vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
-            vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
+        let expected_cat_data = &[
+            &[
+                Value::text("felix"),
+                if api.is_mysql() {
+                    Value::text("HUNGRY")
+                } else {
+                    Value::enum_variant("HUNGRY")
+                },
+            ],
+            &[
+                Value::text("mittens"),
+                if api.is_mysql() {
+                    Value::text("HAPPY")
+                } else {
+                    Value::enum_variant("HAPPY")
+                },
+            ],
         ];
 
         assert_eq!(cat_data, expected_cat_data);
@@ -930,8 +944,22 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
         let expected_cat_data = vec![
-            vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
-            vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
+            vec![
+                Value::text("felix"),
+                if api.is_mysql() {
+                    Value::text("HUNGRY")
+                } else {
+                    Value::enum_variant("HUNGRY")
+                },
+            ],
+            vec![
+                Value::text("mittens"),
+                if api.is_mysql() {
+                    Value::text("HAPPY")
+                } else {
+                    Value::enum_variant("HAPPY")
+                },
+            ],
         ];
 
         assert_eq!(cat_data, expected_cat_data);
