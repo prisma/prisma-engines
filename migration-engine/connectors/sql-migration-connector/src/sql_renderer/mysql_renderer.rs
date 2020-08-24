@@ -299,6 +299,10 @@ fn render_mysql_modify(
 }
 
 pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
+    if !column.column_type().full_data_type.is_empty() {
+        return column.column_type().full_data_type.clone().into();
+    }
+
     match &column.column_type().family {
         ColumnTypeFamily::Boolean => "boolean".into(),
         ColumnTypeFamily::DateTime => "datetime(3)".into(),
