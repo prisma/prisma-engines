@@ -41,9 +41,41 @@ fn scalar_input_fields_for_update(ctx: &mut BuilderContext, model: &ModelRef) ->
             .scalar_writable()
             .filter(field_should_be_kept_for_update_input_type)
             .collect(),
-        |f: ScalarFieldRef| map_optional_input_type(&f),
+        |ctx, f: ScalarFieldRef| scalar_update_field_type(ctx, &f),
         false,
     )
+}
+
+fn scalar_update_field_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
+    match (&field.type_identifier, field.is_list) {
+        (TypeIdentifier::Float, false) => wrap_opt_input_object(number_operations_object_type(ctx, "Float", field)),
+        (TypeIdentifier::Int, false) => wrap_opt_input_object(number_operations_object_type(ctx, "Int", field)),
+        _ => map_optional_input_type(field),
+    }
+}
+
+fn number_operations_object_type(
+    ctx: &mut BuilderContext,
+    prefix: &str,
+    field: &ScalarFieldRef,
+) -> InputObjectTypeWeakRef {
+    let name = format!("{}FieldUpdateOperationsInput", prefix);
+    return_cached_input!(ctx, &name);
+
+    let obj = Arc::new(init_input_object_type(&name));
+    let field_type = map_optional_input_type(field);
+    ctx.cache_input_type(name, obj.clone());
+
+    let fields = vec![
+        input_field("set", field_type.clone(), None),
+        input_field("increment", field_type.clone(), None),
+        input_field("decrement", field_type.clone(), None),
+        input_field("multiply", field_type.clone(), None),
+        input_field("divide", field_type, None),
+    ];
+
+    obj.set_fields(fields);
+    Arc::downgrade(&obj)
 }
 
 /// For update input types only. Compute input fields for relational fields.
