@@ -29,8 +29,6 @@ impl SelectDefinition for Select<'static> {
 
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        println!("Into Select");
-
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model);
         let orderings = ordering::build(&self);
 

@@ -172,8 +172,6 @@ impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
         let ids = self.field.model().primary_identifier().as_columns();
-        //Fixme this should not always select the primary identifier i think
-
         let columns: Vec<Column<'static>> = match alias {
             Some(alias) => ids.map(|c| c.table(alias.to_string(None))).collect(),
             None => ids.collect(),
@@ -220,50 +218,47 @@ impl AliasedSelect for RelationFilter {
             .map(|c| c.table(alias.to_string(None)))
             .collect();
 
-        // if would_perform_needless_join {
-        // if false {
-        //     //Fixme if for some reason these columns is empty the subselect will be an invalid select *
-        //
-        //     let nested_conditions = self
-        //         .nested_filter
-        //         .aliased_cond(Some(alias))
-        //         .invert_if(condition.invert_of_subselect());
-        //
-        //     let conditions = relation_columns
-        //         .clone()
-        //         .into_iter()
-        //         .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
-        //
-        //     Select::from_table(table.alias(alias.to_string(None)))
-        //         .columns(relation_columns)
-        //         .so_that(conditions)
-        // } else {
-        let opposite_columns: Vec<_> = self
-            .field
-            .opposite_columns(false)
-            .map(|c| c.table(alias.to_string(None)))
-            .collect();
+        if would_perform_needless_join {
+            let nested_conditions = self
+                .nested_filter
+                .aliased_cond(Some(alias))
+                .invert_if(condition.invert_of_subselect());
 
-        let related_identifier_columns: Vec<_> = related_identifier
-            .as_columns()
-            .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
-            .collect();
+            let conditions = relation_columns
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-        let conditions = self
-            .nested_filter
-            .aliased_cond(Some(alias.flip(AliasMode::Join)))
-            .invert_if(condition.invert_of_subselect());
+            Select::from_table(table.alias(alias.to_string(None)))
+                .columns(relation_columns)
+                .so_that(conditions)
+        } else {
+            let opposite_columns: Vec<_> = self
+                .field
+                .opposite_columns(false)
+                .map(|c| c.table(alias.to_string(None)))
+                .collect();
 
-        let join = related_table
-            .clone()
-            .alias(alias.to_string(Some(AliasMode::Join)))
-            .on(Row::from(related_identifier_columns).equals(Row::from(opposite_columns)));
+            let related_identifier_columns: Vec<_> = related_identifier
+                .as_columns()
+                .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
+                .collect();
 
-        Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
-            .columns(relation_columns)
-            .inner_join(join)
-            .so_that(conditions)
-        // }
+            let conditions = self
+                .nested_filter
+                .aliased_cond(Some(alias.flip(AliasMode::Join)))
+                .invert_if(condition.invert_of_subselect());
+
+            let join = related_table
+                .clone()
+                .alias(alias.to_string(Some(AliasMode::Join)))
+                .on(Row::from(related_identifier_columns).equals(Row::from(opposite_columns)));
+
+            Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+                .columns(relation_columns)
+                .inner_join(join)
+                .so_that(conditions)
+        }
     }
 }
 

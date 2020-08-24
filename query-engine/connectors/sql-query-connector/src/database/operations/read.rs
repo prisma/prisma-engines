@@ -41,8 +41,6 @@ pub async fn get_many_records(
     let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
     let mut records = ManyRecords::new(field_names);
 
-    println!("Got Here");
-
     // Todo: This can't work for all cases. Cursor-based pagination will not work, because it relies on the ordering
     // to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.
     // The can_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
@@ -68,7 +66,6 @@ pub async fn get_many_records(
             records.order_by(&order)
         }
     } else {
-        println!("Non-Batched");
         let query = read::get_records(model, selected_fields.as_columns(), query_arguments);
 
         for item in conn.filter(query.into(), idents.as_slice()).await?.into_iter() {

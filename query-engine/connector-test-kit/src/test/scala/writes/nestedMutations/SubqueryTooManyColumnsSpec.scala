@@ -60,6 +60,20 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
     )
 
     result.toString() should be("{\"data\":{\"users\":[]}}")
+
+//    val result2 = server.query(
+//      """{users(where: { friendOf:{ is:{ name: {contains: "B"}}}}){
+//        |    id
+//        |    friends { id, name}
+//        |    friendOf{ id, name }
+//        |  }
+//        |}
+//      """.stripMargin,
+//      project
+//    )
+
+//    result2.toString() should be("{\"data\":{\"users\":[]}}")
+
   }
 
   "Subquery has too many columns " should "not occur 2" in {
@@ -119,18 +133,18 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
 
     result.toString() should be("{\"data\":{\"posts\":[{\"id\":20,\"name\":\"BB\",\"user\":{\"id\":2,\"name\":\"B\"}}]}}")
 
-//    val result2 = server.query(
-//      """{users(where: { posts:{ some:{ name: {contains: "BB"}}}}){
-//        |    id
-//        |    name
-//        |    posts { id, name}
-//        |  }
-//        |}
-//      """.stripMargin,
-//      project
-//    )
-//
-//    result2.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"name\":\"B\",\"posts\":[{\"id\":20,\"name\":\"BB\"}]}]}}")
+    val result2 = server.query(
+      """{users(where: { posts:{ some:{ name: {contains: "BB"}}}}){
+        |    id
+        |    name
+        |    posts { id, name}
+        |  }
+        |}
+      """.stripMargin,
+      project
+    )
+
+    result2.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"name\":\"B\",\"posts\":[{\"id\":20,\"name\":\"BB\"}]}]}}")
   }
 
 }
