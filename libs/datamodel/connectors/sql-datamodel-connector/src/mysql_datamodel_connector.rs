@@ -225,6 +225,7 @@ impl Connector for MySqlDatamodelConnector {
                     MySqlType::DateTime(None)
                 }
             }
+            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().map(|i| *i)),
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
 

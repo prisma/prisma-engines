@@ -17,7 +17,5 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         _field: &ScalarFieldWalker<'_>,
         _scalar_type: ScalarType,
         _native_type_instance: &NativeTypeInstance,
-    ) -> sql::ColumnType {
-        todo!()
-    }
+    ) -> sql::ColumnType;
 }

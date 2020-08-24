@@ -60,6 +60,10 @@ impl TestApi {
         self.sql_family() == SqlFamily::Mysql
     }
 
+    pub fn is_mysql_8(&self) -> bool {
+        self.connector_name == "mysql_8"
+    }
+
     pub fn is_mariadb(&self) -> bool {
         self.connector_name == "mysql_mariadb"
     }
