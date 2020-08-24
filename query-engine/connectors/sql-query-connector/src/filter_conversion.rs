@@ -171,8 +171,7 @@ impl AliasedCondition for ScalarFilter {
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        let identifier = self.field.model().primary_identifier();
-        let ids = identifier.as_columns();
+        let ids = self.field.model().primary_identifier().as_columns();
 
         let columns: Vec<Column<'static>> = match alias {
             Some(alias) => ids.map(|c| c.table(alias.to_string(None))).collect(),
@@ -232,11 +231,9 @@ impl AliasedSelect for RelationFilter {
                 .into_iter()
                 .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-            let select_base = Select::from_table(table.alias(alias.to_string(None))).so_that(conditions);
-
-            these_columns
-                .into_iter()
-                .fold(select_base, |acc, column| acc.column(column))
+            Select::from_table(table.alias(alias.to_string(None)))
+                .columns(these_columns)
+                .so_that(conditions);
         } else {
             let other_columns: Vec<_> = self
                 .field
@@ -262,13 +259,10 @@ impl AliasedSelect for RelationFilter {
                 .alias(alias.to_string(Some(AliasMode::Join)))
                 .on(Row::from(identifiers).equals(Row::from(other_columns)));
 
-            let select_base = Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+            Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+                .columns(these_columns)
                 .inner_join(join)
-                .so_that(conditions);
-
-            these_columns
-                .into_iter()
-                .fold(select_base, |acc, column| acc.column(column))
+                .so_that(conditions)
         }
     }
 }
@@ -308,11 +302,8 @@ impl AliasedCondition for OneRelationIsNullFilter {
                         }
                     });
 
-            let select = self
-                .field
-                .related_field()
-                .as_columns()
-                .fold(Select::from_table(relation_table), |acc, col| acc.column(col.clone()))
+            let sub_select = Select::from_table(relation_table)
+                .columns(self.field.related_field().as_columns())
                 .and_where(columns_not_null);
 
             let id_columns: Vec<Column<'static>> = self
@@ -323,7 +314,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
                 .map(|c| c.opt_table(alias.clone()))
                 .collect();
 
-            Row::from(id_columns).not_in_selection(select).into()
+            Row::from(id_columns).not_in_selection(sub_select).into()
         };
 
         ConditionTree::single(condition)
