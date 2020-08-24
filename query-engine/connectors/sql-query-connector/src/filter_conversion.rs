@@ -233,8 +233,9 @@ impl AliasedSelect for RelationFilter {
 
             Select::from_table(table.alias(alias.to_string(None)))
                 .columns(these_columns)
-                .so_that(conditions);
+                .so_that(conditions)
         } else {
+            println!("Extra join");
             let other_columns: Vec<_> = self
                 .field
                 .opposite_columns(false)
