@@ -1,4 +1,5 @@
 use migration_engine_tests::sql::*;
+use std::fmt::Write as _;
 
 /// We need to test this specifically for mysql, because foreign keys are indexes, and they are
 /// inferred as both foreign key and index by the sql-schema-describer. We do not want to
@@ -193,6 +194,90 @@ async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
         table
             .assert_column("primaryColor", |col| col.assert_is_required())?
             .assert_column("secondaryColor", |col| col.assert_is_nullable())
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
+    let types = &[
+        ("int", "Int", "Int", if api.is_mysql_8() { "int" } else { "int(11)" }),
+        (
+            "smallint",
+            "Int",
+            "SmallInt",
+            if api.is_mysql_8() { "smallint" } else { "smallint(6)" },
+        ),
+        (
+            "tinyint",
+            "Int",
+            "TinyInt",
+            if api.is_mysql_8() { "tinyint" } else { "tinyint(4)" },
+        ),
+        (
+            "mediumint",
+            "Int",
+            "MediumInt",
+            if api.is_mysql_8() { "mediumint" } else { "mediumint(9)" },
+        ),
+        (
+            "bigint",
+            "Int",
+            "BigInt",
+            if api.is_mysql_8() { "bigint" } else { "bigint(20)" },
+        ),
+        ("decimal", "Decimal", "Decimal(5, 3)", "decimal(5,3)"),
+        ("numeric", "Decimal", "Numeric(4,1)", "decimal(4,1)"),
+        ("float", "Float", "Float", "float"),
+        ("double", "Float", "Double", "double"),
+        ("bits", "Bytes", "Bit(10)", "bit(10)"),
+        ("chars", "String", "Char(10)", "char(10)"),
+        ("varchars", "String", "VarChar(500)", "varchar(500)"),
+        ("binary", "Bytes", "Binary(230)", "binary(230)"),
+        ("varbinary", "Bytes", "VarBinary(150)", "varbinary(150)"),
+        ("tinyBlob", "Bytes", "TinyBlob", "tinyblob"),
+        ("blob", "Bytes", "Blob", "blob"),
+        ("mediumBlob", "Bytes", "MediumBlob", "mediumblob"),
+        ("longBlob", "Bytes", "LongBlob", "longblob"),
+        ("tinytext", "String", "TinyText", "tinytext"),
+        ("text", "String", "Text", "text"),
+        ("mediumText", "String", "MediumText", "mediumtext"),
+        ("longText", "String", "LongText", "longtext"),
+        ("date", "DateTime", "Date", "date"),
+        ("timeWithPrecision", "DateTime", "Time(3)", "time(3)"),
+        ("dateTimeWithPrecision", "DateTime", "Datetime(3)", "datetime(3)"),
+        ("timestampWithPrecision", "DateTime", "Timestamp(3)", "timestamp(3)"),
+        ("year", "Int", "Year", if api.is_mysql_8() { "year" } else { "year(4)" }),
+    ];
+
+    let mut dm = r#"
+        datasource mysql {
+            provider = "mysql"
+            url = "mysql://localhost/test"
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model A {
+            id Int @id
+    "#
+    .to_owned();
+
+    for (field_name, prisma_type, native_type, _) in types {
+        writeln!(&mut dm, "    {} {} @mysql.{}", field_name, prisma_type, native_type)?;
+    }
+
+    dm.push_str("}\n");
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        types.iter().fold(
+            Ok(table),
+            |table, (field_name, _prisma_type, _native_type, database_type)| {
+                table.and_then(|table| table.assert_column(field_name, |col| col.assert_full_data_type(database_type)))
+            },
+        )
     })?;
 
     Ok(())

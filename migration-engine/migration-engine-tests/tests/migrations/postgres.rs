@@ -98,7 +98,7 @@ async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(tags("postgres"))]
 async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     let types = &[
         ("smallint", "Int", "SmallInt", "int2"),
