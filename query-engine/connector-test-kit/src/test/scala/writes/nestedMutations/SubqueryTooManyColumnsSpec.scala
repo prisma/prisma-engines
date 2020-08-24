@@ -62,4 +62,75 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
     result.toString() should be("{\"data\":{\"users\":[]}}")
   }
 
+  "Subquery has too many columns " should "not occur 2" in {
+
+    val project = ProjectDsl.fromString {
+      s"""
+         |model User {
+         |  id         Int     @id
+         |  name       String?
+         |  posts      Post[]  @relation("UserfriendOf")
+         |}
+         |
+         |model Post {
+         |  id         Int     @id
+         |  name       String?
+         |  user       User?   @relation("UserPost", fields: [userId], references: [id])
+         |  userId Int?
+         |}
+       """.stripMargin
+    }
+    database.setup(project)
+
+    val setup = server.query(
+      """mutation{createUser(data: { id: 1, name: "A" posts:{ create:{ name: "AA", id: 10}}}){
+        |    id
+        |    posts { id, name }
+        |  }
+        |}
+      """.stripMargin,
+      project
+    )
+
+    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"posts\":[{\"id\":10,\"name\":\"AA\"}]}}}")
+
+    val setup2 = server.query(
+      """mutation{createUser(data: { id: 2, name: "B" posts:{ create:{ name: "BB", id: 20}}}){
+        |    id
+        |    posts { id, name }
+        |  }
+        |}
+      """.stripMargin,
+      project
+    )
+
+    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"posts\":[{\"id\":20,\"name\":\"BB\"}]}}}")
+
+    val result = server.query(
+      """{posts(where: { user:{ is:{ name: {contains: "B"}}}}){
+        |    id
+        |    name
+        |    user { id, name}
+        |  }
+        |}
+      """.stripMargin,
+      project
+    )
+
+    result.toString() should be("{\"data\":{\"posts\":[{\"id\":20,\"name\":\"BB\",\"user\":{\"id\":2,\"name\":\"B\"}}]}}")
+
+//    val result2 = server.query(
+//      """{users(where: { posts:{ some:{ name: {contains: "BB"}}}}){
+//        |    id
+//        |    name
+//        |    posts { id, name}
+//        |  }
+//        |}
+//      """.stripMargin,
+//      project
+//    )
+//
+//    result2.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"name\":\"B\",\"posts\":[{\"id\":20,\"name\":\"BB\"}]}]}}")
+  }
+
 }
