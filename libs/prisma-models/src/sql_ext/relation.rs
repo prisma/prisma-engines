@@ -1,5 +1,5 @@
 use crate::{AsColumns, AsTable, ColumnIterator, Relation, RelationField, RelationLinkManifestation, RelationSide};
-use quaint::ast::{Column, Table};
+use quaint::ast::Table;
 
 pub trait RelationExt {
     /// A helper function to decide actions based on the `Relation` type. Inline
@@ -13,9 +13,6 @@ pub trait RelationFieldExt {
     fn m2m_column_names(&self) -> Vec<String>;
     fn opposite_columns(&self, alias: bool) -> ColumnIterator;
     fn relation_columns(&self, alias: bool) -> ColumnIterator;
-
-    // legacy single column unique
-    fn relation_column(&self, alias: bool) -> Column<'static>;
 }
 
 impl RelationFieldExt for RelationField {
@@ -62,17 +59,6 @@ impl RelationFieldExt for RelationField {
             ColumnIterator::new(inner, count)
         } else {
             cols
-        }
-    }
-
-    fn relation_column(&self, alias: bool) -> Column<'static> {
-        let mut col_iter = self.relation().columns_for_relation_side(self.relation_side);
-        let col = col_iter.next().unwrap();
-
-        if alias && !self.relation_is_inlined_in_child() {
-            col.table(Relation::TABLE_ALIAS)
-        } else {
-            col
         }
     }
 }
