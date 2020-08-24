@@ -22,13 +22,7 @@ use quaint::{
 };
 use regex::RegexSet;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::{
-    collections::HashMap,
-    fmt::Debug,
-    fs,
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::{collections::HashMap, fmt::Debug, path::Path, sync::Arc};
 use url::Url;
 
 pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
@@ -69,9 +63,6 @@ pub(crate) trait SqlFlavour:
 
     /// Drop the current database.
     async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()>;
-
-    /// Create the database schema.
-    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()>;
 }
 
 #[derive(Debug)]
@@ -108,8 +99,8 @@ impl SqlFlavour for MysqlFlavour {
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         let mut url = Url::parse(database_str).unwrap();
         url.set_path("/mysql");
-        let (conn, _) = connect(&url.to_string()).await?;
 
+        let (conn, _) = connect(&url.to_string()).await?;
         let db_name = self.0.dbname();
 
         let query = format!(
@@ -136,17 +127,6 @@ impl SqlFlavour for MysqlFlavour {
         let sql_str = format!(r#"DROP SCHEMA `{}`;"#, schema_name);
 
         conn.raw_cmd(&sql_str).await?;
-
-        Ok(())
-    }
-
-    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()> {
-        let schema_sql = format!(
-            "CREATE SCHEMA IF NOT EXISTS `{}` DEFAULT CHARACTER SET utf8mb4;",
-            database_info.connection_info().schema_name()
-        );
-
-        conn.raw_cmd(&schema_sql).await?;
 
         Ok(())
     }
@@ -219,16 +199,6 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
-    async fn initialize(&self, _conn: &dyn Queryable, _database_info: &DatabaseInfo) -> SqlResult<()> {
-        let path_buf = PathBuf::from(&self.file_path);
-
-        if let Some(parent_directory) = path_buf.parent() {
-            fs::create_dir_all(parent_directory).expect("creating the database folders failed")
-        }
-
-        Ok(())
-    }
-
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Sqlite
     }
@@ -254,6 +224,19 @@ impl SqlFlavour for PostgresFlavour {
         let query = format!("CREATE DATABASE \"{}\"", db_name);
         catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
 
+        let (conn, database_info) = connect(database_str).await?;
+
+        let schema_sql = format!(
+            "CREATE SCHEMA IF NOT EXISTS \"{}\";",
+            &database_info.connection_info().schema_name()
+        );
+
+        catch(
+            conn.connection_info(),
+            conn.raw_cmd(&schema_sql).map_err(SqlError::from),
+        )
+        .await?;
+
         Ok(db_name.to_owned())
     }
 
@@ -265,17 +248,6 @@ impl SqlFlavour for PostgresFlavour {
         Ok(sql_schema_describer::postgres::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
-    }
-
-    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()> {
-        let schema_sql = format!(
-            "CREATE SCHEMA IF NOT EXISTS \"{}\";",
-            &database_info.connection_info().schema_name()
-        );
-
-        conn.raw_cmd(&schema_sql).await?;
-
-        Ok(())
     }
 
     async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()> {

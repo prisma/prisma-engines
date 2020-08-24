@@ -31,6 +31,10 @@ pub fn sqlite_test_url(db_name: &str) -> String {
 pub fn sqlite_test_file(db_name: &str) -> String {
     let database_folder_path = format!("{}/db", server_root());
     let file_path = format!("{}/{}.db", database_folder_path, db_name);
+
+    // Truncate the file.
+    std::fs::File::create(&file_path).expect("Failed to truncate SQLite database.");
+
     file_path
 }
 
@@ -38,8 +42,8 @@ pub fn postgres_9_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_9();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
-        host, port, db_name, SCHEMA_NAME
+        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
+        host, port, db_name
     )
 }
 
@@ -47,8 +51,8 @@ pub fn pgbouncer_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_for_pgbouncer();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true",
-        host, port, db_name, SCHEMA_NAME
+        "postgresql://postgres:prisma@{}:{}/{}?pgbouncer=true",
+        host, port, db_name
     )
 }
 
@@ -56,8 +60,8 @@ pub fn postgres_10_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_10();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
-        host, port, db_name, SCHEMA_NAME
+        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
+        host, port, db_name
     )
 }
 
@@ -65,8 +69,8 @@ pub fn postgres_11_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_11();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
-        host, port, db_name, SCHEMA_NAME
+        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
+        host, port, db_name
     )
 }
 
@@ -74,8 +78,8 @@ pub fn postgres_12_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_12();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
-        host, port, db_name, SCHEMA_NAME
+        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
+        host, port, db_name
     )
 }
 
@@ -83,8 +87,8 @@ pub fn postgres_13_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_13();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
-        host, port, db_name, SCHEMA_NAME
+        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
+        host, port, db_name
     )
 }
 
@@ -373,24 +377,39 @@ fn fetch_db_name<'a>(url: &'a Url, default: &'static str) -> &'a str {
 }
 
 pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyError> {
-    let mut url = original_url.clone();
-    url.set_path("/mysql");
+    let mut mysql_db_url = original_url.clone();
+    mysql_db_url.set_path("/mysql");
 
     let db_name = fetch_db_name(&original_url, "mysql");
+
     debug_assert!(!db_name.is_empty());
     debug_assert!(
         db_name.len() < 64,
         "db_name should be less than 64 characters, got {:?}",
         db_name.len()
     );
-    let conn = Quaint::new(url.as_str()).await.unwrap();
 
-    let drop_stmt = format!("DROP DATABASE IF EXISTS `{}`", db_name);
-    conn.query_raw(&drop_stmt, &[]).await.unwrap();
-    let create_stmt = format!("CREATE DATABASE `{}`", db_name);
-    conn.query_raw(&create_stmt, &[]).await.unwrap();
+    let conn = Quaint::new(&mysql_db_url.to_string()).await?;
 
-    Ok(Quaint::new(original_url.as_str()).await?)
+    let drop = format!(
+        r#"
+        DROP DATABASE IF EXISTS `{db_name}`;
+        "#,
+        db_name = db_name,
+    );
+
+    let recreate = format!(
+        r#"
+        CREATE DATABASE `{db_name}`;
+        "#,
+        db_name = db_name,
+    );
+
+    // The two commands have to be run separately on mariadb.
+    conn.raw_cmd(&drop).await?;
+    conn.raw_cmd(&recreate).await?;
+
+    Ok(Quaint::new(&original_url.to_string()).await?)
 }
 
 pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyError> {
@@ -399,17 +418,25 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
 
     let db_name = fetch_db_name(&original_url, "postgres");
 
-    let drop_stmt = format!("DROP DATABASE IF EXISTS \"{}\"", db_name);
-    let create_stmt = format!("CREATE DATABASE \"{}\"", db_name);
-    let create_schema_stmt = format!("CREATE SCHEMA \"{}\"", SCHEMA_NAME);
+    let drop = format!(
+        r#"
+        DROP DATABASE IF EXISTS "{db_name}";
+        "#,
+        db_name = db_name,
+    );
 
-    let conn = Quaint::new(url.as_str()).await.unwrap();
+    let recreate = format!(
+        r#"
+        CREATE DATABASE "{db_name}";
+        "#,
+        db_name = db_name,
+    );
 
-    conn.query_raw(&drop_stmt, &[]).await.ok();
-    conn.query_raw(&create_stmt, &[]).await.ok();
+    let conn = Quaint::new(url.as_str()).await?;
 
-    let conn = Quaint::new(original_url.as_str()).await?;
-    conn.query_raw(&create_schema_stmt, &[]).await.ok();
+    // The two commands have to be run separately on postgres.
+    conn.raw_cmd(&drop).await?;
+    conn.raw_cmd(&recreate).await?;
 
-    Ok(conn)
+    Ok(Quaint::new(&original_url.to_string()).await?)
 }
