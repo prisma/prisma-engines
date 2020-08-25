@@ -9,278 +9,148 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
 
   "A relation filter on a 1:M self relation " should "work" in {
 
-    val project = ProjectDsl.fromString {
-      s"""
-       |model User {
-       |  id         Int     @id
-       |  name       String?
-       |  field_b    User[]  @relation("UserfriendOf")
-       |  field_a   User?    @relation("UserfriendOf", fields: [field_aId], references: [id])
-       |  field_aId Int?
-       |}
+    for (fieldName <- Vector("field_a", "field_z")) {
+      val project = ProjectDsl.fromString {
+        s"""
+           |model User {
+           |  id         Int     @id
+           |  name       String?
+           |  field_b    User[]  @relation("UserfriendOf")
+           |  $fieldName   User?    @relation("UserfriendOf", fields: [${fieldName}Id], references: [id])
+           |  ${fieldName}Id Int?
+           |}
        """
+      }
+      database.setup(project)
+
+      val setup = server.query(
+        s"""mutation{createUser(data: { id: 1, name: "A" $fieldName:{ create:{ id: 10, name: "AA"}}}){
+          |    id
+          |    field_b { id }
+          |    $fieldName{ id }
+          |  }
+          |}
+      """,
+        project
+      )
+
+      val setup_res = s"""{\"data\":{\"createUser\":{\"id\":1,\"field_b\":[],\"$fieldName\":{\"id\":10}}}}"""
+
+      setup.toString() should be(setup_res)
+
+      val setup2 = server.query(
+        s"""mutation{createUser(data: { id: 2, name: "B" $fieldName:{ create:{ id: 20, name: "BB"}}}){
+          |    id
+          |    field_b { id }
+          |    $fieldName{ id }
+          |  }
+          |}
+      """,
+        project
+      )
+
+      val setup2_res = s"""{\"data\":{\"createUser\":{\"id\":2,\"field_b\":[],\"$fieldName\":{\"id\":20}}}}"""
+
+      setup2.toString() should be(setup2_res)
+
+      val result = server.query(
+        s"""{users(where: { $fieldName:{ is:{ name: {contains: "B"}}}}){
+          |    id
+          |    field_b { id, name}
+          |    $fieldName{ id, name }
+          |  }
+          |}
+      """,
+        project
+      )
+
+      val result_res = s"""{\"data\":{\"users\":[{\"id\":2,\"field_b\":[],\"$fieldName\":{\"id\":20,\"name\":\"BB\"}}]}}"""
+      result.toString() should be(result_res)
+
+      val result2 = server.query(
+        s"""{users(where: { field_b:{ some:{ name: {contains: "B"}}}}){
+          |    id
+          |    field_b { id, name}
+          |    $fieldName{ id, name }
+          |  }
+          |}
+      """,
+        project
+      )
+
+      val result2_res = s"""{\"data\":{\"users\":[{\"id\":20,\"field_b\":[{\"id\":2,\"name\":\"B\"}],\"$fieldName\":null}]}}"""
+      result2.toString() should be(result2_res)
     }
-    database.setup(project)
-
-    val setup = server.query(
-      """mutation{createUser(data: { id: 1, name: "A" field_a:{ create:{ id: 10, name: "AA"}}}){
-        |    id
-        |    field_b { id }
-        |    field_a{ id }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"field_b\":[],\"field_a\":{\"id\":10}}}}")
-
-    val setup2 = server.query(
-      """mutation{createUser(data: { id: 2, name: "B" field_a:{ create:{ id: 20, name: "BB"}}}){
-        |    id
-        |    field_b { id }
-        |    field_a{ id }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"field_b\":[],\"field_a\":{\"id\":20}}}}")
-
-    val result = server.query(
-      """{users(where: { field_a:{ is:{ name: {contains: "B"}}}}){
-      |    id
-      |    field_b { id, name}
-      |    field_a{ id, name }
-      |  }
-      |}
-      """,
-      project
-    )
-
-    result.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"field_b\":[],\"field_a\":{\"id\":20,\"name\":\"BB\"}}]}}")
-
-    val result2 = server.query(
-      """{users(where: { field_b:{ some:{ name: {contains: "B"}}}}){
-        |    id
-        |    field_b { id, name}
-        |    field_a{ id, name }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    result2.toString() should be("{\"data\":{\"users\":[{\"id\":20,\"field_b\":[{\"id\":2,\"name\":\"B\"}],\"field_a\":null}]}}")
-
   }
 
   "A relation filter on a N:M self relation " should "work" in {
 
-    val project = ProjectDsl.fromString {
-      s"""
+    for (fieldName <- Vector("field_a", "field_z")) {
+      val project = ProjectDsl.fromString {
+        s"""
          |model User {
          |  id         Int     @id
          |  name       String?
          |  field_b    User[]  @relation("UserfriendOf")
-         |  field_a    User[] @relation("UserfriendOf")
-         |  field_aId  Int?
+         |  $fieldName    User[] @relation("UserfriendOf")
+         |  ${fieldName}Id  Int?
          |}
        """
+      }
+      database.setup(project)
+
+      val setup = server.query(
+        s"""mutation{createUser(data: { id: 1, name: "A" $fieldName:{ create:{ id: 10, name: "AA"}}}){
+        |    id
+        |    field_b { id }
+        |    $fieldName{ id }
+        |  }
+        |}
+      """,
+        project
+      )
+
+      setup.toString() should be(s"""{\"data\":{\"createUser\":{\"id\":1,\"field_b\":[],\"$fieldName\":[{\"id\":10}]}}}""")
+
+      val setup2 = server.query(
+        s"""mutation{createUser(data: { id: 2, name: "B" $fieldName:{ create:{ id: 20, name: "BB"}}}){
+        |    id
+        |    field_b { id }
+        |    $fieldName{ id }
+        |  }
+        |}
+      """,
+        project
+      )
+
+      setup2.toString() should be(s"""{\"data\":{\"createUser\":{\"id\":2,\"field_b\":[],\"$fieldName\":[{\"id\":20}]}}}""")
+
+      val result = server.query(
+        s"""{users(where: { $fieldName:{ some:{ name: {contains: "B"}}}}){
+        |    id
+        |    field_b { id, name}
+        |    $fieldName{ id, name }
+        |  }
+        |}
+      """,
+        project
+      )
+
+      result.toString() should be(s"""{\"data\":{\"users\":[{\"id\":2,\"field_b\":[],\"$fieldName\":[{\"id\":20,\"name\":\"BB\"}]}]}}""")
+
+      val result2 = server.query(
+        s"""{users(where: { field_b:{ some:{ name: {contains: "B"}}}}){
+        |    id
+        |    field_b { id, name}
+        |    $fieldName{ id, name }
+        |  }
+        |}
+      """,
+        project
+      )
+
+      result2.toString() should be(s"""{\"data\":{\"users\":[{\"id\":20,\"field_b\":[{\"id\":2,\"name\":\"B\"}],\"$fieldName\":[]}]}}""")
     }
-    database.setup(project)
-
-    val setup = server.query(
-      """mutation{createUser(data: { id: 1, name: "A" field_a:{ create:{ id: 10, name: "AA"}}}){
-        |    id
-        |    field_b { id }
-        |    field_a{ id }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"field_b\":[],\"field_a\":[{\"id\":10}]}}}")
-
-    val setup2 = server.query(
-      """mutation{createUser(data: { id: 2, name: "B" field_a:{ create:{ id: 20, name: "BB"}}}){
-        |    id
-        |    field_b { id }
-        |    field_a{ id }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"field_b\":[],\"field_a\":[{\"id\":20}]}}}")
-
-    val result = server.query(
-      """{users(where: { field_a:{ some:{ name: {contains: "B"}}}}){
-        |    id
-        |    field_b { id, name}
-        |    field_a{ id, name }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    result.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"field_b\":[],\"field_a\":[{\"id\":20,\"name\":\"BB\"}]}]}}")
-
-    val result2 = server.query(
-      """{users(where: { field_b:{ some:{ name: {contains: "B"}}}}){
-        |    id
-        |    field_b { id, name}
-        |    field_a{ id, name }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    result2.toString() should be("{\"data\":{\"users\":[{\"id\":20,\"field_b\":[{\"id\":2,\"name\":\"B\"}],\"field_a\":[]}]}}")
-
-  }
-
-  "A relation filter on a 1:M self relation " should "work  with inverted lexicographic field order" in {
-
-    val project = ProjectDsl.fromString {
-      s"""
-         |model User {
-         |  id         Int     @id
-         |  name       String?
-         |  field_b    User[]  @relation("UserfriendOf")
-         |  field_z   User?    @relation("UserfriendOf", fields: [field_zId], references: [id])
-         |  field_zId Int?
-         |}
-       """
-    }
-    database.setup(project)
-
-    val setup = server.query(
-      """mutation{createUser(data: { id: 1, name: "A" field_z:{ create:{ id: 10, name: "AA"}}}){
-        |    id
-        |    field_b { id }
-        |    field_z{ id }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"field_b\":[],\"field_z\":{\"id\":10}}}}")
-
-    val setup2 = server.query(
-      """mutation{createUser(data: { id: 2, name: "B" field_z:{ create:{ id: 20, name: "BB"}}}){
-        |    id
-        |    field_b { id }
-        |    field_z{ id }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"field_b\":[],\"field_z\":{\"id\":20}}}}")
-
-    val result = server.query(
-      """{users(where: { field_z:{ is:{ name: {contains: "B"}}}}){
-        |    id
-        |    field_b { id, name}
-        |    field_z{ id, name }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    result.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"field_b\":[],\"field_z\":{\"id\":20,\"name\":\"BB\"}}]}}")
-
-    val result2 = server.query(
-      """{users(where: { field_b:{ some:{ name: {contains: "B"}}}}){
-        |    id
-        |    field_b { id, name}
-        |    field_z{ id, name }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    result2.toString() should be("{\"data\":{\"users\":[{\"id\":20,\"field_b\":[{\"id\":2,\"name\":\"B\"}],\"field_z\":null}]}}")
-
-  }
-
-  "A relation filter on a N:M self relation " should "work  with inverted lexicographic field order" in {
-
-    val project = ProjectDsl.fromString {
-      s"""
-         |model User {
-         |  id         Int     @id
-         |  name       String?
-         |  field_b    User[]  @relation("UserfriendOf")
-         |  field_z    User[] @relation("UserfriendOf")
-         |  field_zId  Int?
-         |}
-       """
-    }
-    database.setup(project)
-
-    val setup = server.query(
-      """mutation{createUser(data: { id: 1, name: "A" field_z:{ create:{ id: 10, name: "AA"}}}){
-        |    id
-        |    field_b { id }
-        |    field_z{ id }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"field_b\":[],\"field_z\":[{\"id\":10}]}}}")
-
-    val setup2 = server.query(
-      """mutation{createUser(data: { id: 2, name: "B" field_z:{ create:{ id: 20, name: "BB"}}}){
-        |    id
-        |    field_b { id }
-        |    field_z{ id }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"field_b\":[],\"field_z\":[{\"id\":20}]}}}")
-
-    val result = server.query(
-      """{users(where: { field_z:{ some:{ name: {contains: "B"}}}}){
-        |    id
-        |    field_b { id, name}
-        |    field_z{ id, name }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    result.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"field_b\":[],\"field_z\":[{\"id\":20,\"name\":\"BB\"}]}]}}")
-
-    val result2 = server.query(
-      """{users(where: { field_b:{ some:{ name: {contains: "B"}}}}){
-        |    id
-        |    field_b { id, name}
-        |    field_z{ id, name }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    result2.toString() should be("{\"data\":{\"users\":[{\"id\":20,\"field_b\":[{\"id\":2,\"name\":\"B\"}],\"field_z\":[]}]}}")
-
   }
 
   "A relationfilter on a non-self relation" should "work" in {
@@ -355,5 +225,3 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
   }
 
 }
-
-//Fixme M2M Selfrelation
