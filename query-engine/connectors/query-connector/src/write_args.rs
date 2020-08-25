@@ -51,16 +51,16 @@ pub enum WriteExpression {
     Value(PrismaValue),
 
     /// Add value to field.
-    Add(Box<WriteExpression>),
+    Add(PrismaValue),
 
     /// Substract value from field
-    Substract(Box<WriteExpression>),
+    Substract(PrismaValue),
 
     /// Multiply field by value.
-    Multiply(Box<WriteExpression>),
+    Multiply(PrismaValue),
 
     /// Divide field by value.
-    Divide(Box<WriteExpression>),
+    Divide(PrismaValue),
 }
 
 impl From<PrismaValue> for WriteExpression {
@@ -102,6 +102,14 @@ impl From<Vec<(DatasourceFieldName, PrismaValue)>> for WriteArgs {
     fn from(pairs: Vec<(DatasourceFieldName, PrismaValue)>) -> Self {
         Self {
             args: pairs.into_iter().map(|(k, v)| (k, WriteExpression::Value(v))).collect(),
+        }
+    }
+}
+
+impl From<Vec<(DatasourceFieldName, WriteExpression)>> for WriteArgs {
+    fn from(pairs: Vec<(DatasourceFieldName, WriteExpression)>) -> Self {
+        Self {
+            args: pairs.into_iter().collect(),
         }
     }
 }

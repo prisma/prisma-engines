@@ -166,34 +166,53 @@ fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
         .into_iter()
         .filter_map(|field| {
             args.get_field_value(field.db_name())
-                .map(|v| (field.db_name().to_owned(), v.clone()))
+                .map(|v| (DatasourceFieldName::from(&field), v.clone()))
         })
         .collect();
 
     WriteArgs::from(pairs)
 }
 
-/// Merges the arg values into the given ids. Overwrites existing values.
-fn merge_write_args(ids: Vec<RecordProjection>, args: WriteArgs) -> Vec<RecordProjection> {
-    if ids.is_empty() || args.is_empty() {
-        return ids;
+/// Merges the incoming write argument values into the given, already loaded, ids. Overwrites existing values.
+fn merge_write_args(mut loaded_ids: Vec<RecordProjection>, incoming_args: WriteArgs) -> Vec<RecordProjection> {
+    if loaded_ids.is_empty() || incoming_args.is_empty() {
+        return loaded_ids;
     }
 
-    let rid = ids.first().unwrap();
-    let positions: HashMap<usize, &PrismaValue> = rid
+    // Contains all positions that need to be updated with the given expression.
+    let positions: HashMap<usize, &WriteExpression> = loaded_ids
+        .first()
+        .unwrap()
         .pairs
         .iter()
         .enumerate()
-        .filter_map(|(i, (field, _))| args.get_field_value(field.db_name()).map(|val| (i, val)))
+        .filter_map(|(i, (field, _))| incoming_args.get_field_value(field.db_name()).map(|val| (i, val)))
         .collect();
 
-    ids.into_iter()
-        .map(|mut id| {
-            for (position, value) in positions.iter() {
-                id.pairs[position.to_owned()].1 = (*value).clone();
-            }
+    loaded_ids.into_iter().for_each(|mut id| {
+        for (position, expr) in positions.iter() {
+            let current_val = id.pairs[position.to_owned()].1.clone();
+            id.pairs[position.to_owned()].1 = apply_expression(current_val, (*expr).clone());
+        }
+    });
 
-            id
-        })
-        .collect()
+    loaded_ids
+}
+
+fn apply_expression(val: PrismaValue, expr: WriteExpression) -> PrismaValue {
+    match expr {
+        WriteExpression::Field(_) => unimplemented!(),
+        WriteExpression::Value(pv) => pv,
+        WriteExpression::Add(rhs) => val + rhs,
+        WriteExpression::Substract(rhs) => todo!(),
+        WriteExpression::Multiply(_) => todo!(),
+        WriteExpression::Divide(_) => todo!(),
+    }
+
+    // match current_val {
+    //     PrismaValue::Null(_) => (), // Stays null.
+    //     PrismaValue::Int(_) => {}
+    //     PrismaValue::Float(_) => {}
+    //     _ => unreachable!(),
+    // }
 }
