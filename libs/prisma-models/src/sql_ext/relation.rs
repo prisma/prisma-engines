@@ -1,10 +1,13 @@
+use crate::sql_ext::column::AsColumns;
+use crate::RelationLinkManifestation::*;
 use crate::{AsTable, ColumnIterator, Relation, RelationField, RelationLinkManifestation, RelationSide};
 use quaint::ast::Table;
 
 pub trait RelationFieldExt {
     fn m2m_column_names(&self) -> Vec<String>;
-    fn opposite_columns(&self) -> ColumnIterator;
-    fn relation_columns(&self) -> ColumnIterator;
+    fn join_columns(&self) -> ColumnIterator;
+    fn identifier_columns(&self) -> ColumnIterator;
+    fn as_table(&self) -> Table<'static>;
 }
 
 impl RelationFieldExt for RelationField {
@@ -22,23 +25,27 @@ impl RelationFieldExt for RelationField {
         }
     }
 
-    fn opposite_columns(&self) -> ColumnIterator {
-        use crate::RelationLinkManifestation::*;
-
+    fn join_columns(&self) -> ColumnIterator {
         match (&self.relation().manifestation, &self.relation_side) {
             (RelationTable(ref m), RelationSide::A) => ColumnIterator::from(vec![m.model_b_column.clone().into()]),
             (RelationTable(ref m), RelationSide::B) => ColumnIterator::from(vec![m.model_a_column.clone().into()]),
-            _ => unreachable!(),
+            _ => self.linking_fields().as_columns(),
         }
     }
 
-    fn relation_columns(&self) -> ColumnIterator {
-        use crate::RelationLinkManifestation::*;
-
+    fn identifier_columns(&self) -> ColumnIterator {
         match (&self.relation().manifestation, &self.relation_side) {
             (RelationTable(ref m), RelationSide::A) => ColumnIterator::from(vec![m.model_a_column.clone().into()]),
             (RelationTable(ref m), RelationSide::B) => ColumnIterator::from(vec![m.model_b_column.clone().into()]),
-            _ => unreachable!(),
+            _ => self.model().primary_identifier().as_columns(),
+        }
+    }
+
+    fn as_table(&self) -> Table<'static> {
+        if self.relation().is_many_to_many() {
+            self.related_field().relation().as_table()
+        } else {
+            self.model().as_table()
         }
     }
 }

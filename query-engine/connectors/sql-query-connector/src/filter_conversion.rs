@@ -197,38 +197,18 @@ impl AliasedSelect for RelationFilter {
         let alias = alias.unwrap_or(Alias::default());
         let condition = self.condition.clone();
 
-        let (table, selected_identifier, join_columns) = if self.field.relation().is_many_to_many() {
-            let columns: Vec<Column> = self
-                .field
-                .relation_columns()
-                .map(|c| c.table(alias.to_string(None)))
-                .collect();
+        let table = self.field.as_table();
+        let selected_identifier: Vec<Column> = self
+            .field
+            .identifier_columns()
+            .map(|c| c.table(alias.to_string(None)))
+            .collect();
 
-            let join_columns: Vec<Column> = self
-                .field
-                .opposite_columns()
-                .map(|c| c.table(alias.to_string(None)))
-                .collect();
-
-            (self.field.related_field().relation().as_table(), columns, join_columns)
-        } else {
-            let columns: Vec<Column> = self
-                .field
-                .model()
-                .primary_identifier()
-                .as_columns()
-                .map(|c| c.table(alias.to_string(None)))
-                .collect();
-
-            let join_columns: Vec<_> = self
-                .field
-                .linking_fields()
-                .as_columns()
-                .map(|c| c.table(alias.to_string(None)))
-                .collect();
-
-            (self.field.model().as_table(), columns, join_columns)
-        };
+        let join_columns: Vec<Column> = self
+            .field
+            .join_columns()
+            .map(|c| c.table(alias.to_string(None)))
+            .collect();
 
         let related_table = self.field.related_model().as_table();
         let related_join_columns: Vec<_> = self
