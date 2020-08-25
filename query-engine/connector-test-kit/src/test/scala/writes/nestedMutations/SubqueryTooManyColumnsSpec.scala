@@ -14,65 +14,65 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
        |model User {
        |  id         Int     @id
        |  name       String?
-       |  friends    User[]  @relation("UserfriendOf")
-       |  friendOf   User?   @relation("UserfriendOf", fields: [friendOfId], references: [id])
-       |  friendOfId Int?
+       |  field_a    User[]  @relation("UserfriendOf")
+       |  field_b   User?    @relation("UserfriendOf", fields: [field_bId], references: [id])
+       |  field_bId Int?
        |}
-       """.stripMargin
+       """
     }
     database.setup(project)
 
     val setup = server.query(
-      """mutation{createUser(data: { id: 1, name: "A" friendOf:{ create:{ name: "B", id: 2}}}){
+      """mutation{createUser(data: { id: 1, name: "A" field_b:{ create:{ id: 10, name: "AA"}}}){
         |    id
-        |    friends { id }
-        |    friendOf{ id }
+        |    field_a { id }
+        |    field_b{ id }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 
-    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"friends\":[],\"friendOf\":{\"id\":2}}}}")
+    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"field_a\":[],\"field_b\":{\"id\":10}}}}")
 
     val setup2 = server.query(
-      """mutation{createUser(data: { id: 3, name: "C" friendOf:{ create:{ name: "D", id: 4}}}){
+      """mutation{createUser(data: { id: 2, name: "B" field_b:{ create:{ id: 20, name: "BB"}}}){
         |    id
-        |    friends { id }
-        |    friendOf{ id }
+        |    field_a { id }
+        |    field_b{ id }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 
-    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":3,\"friends\":[],\"friendOf\":{\"id\":4}}}}")
+    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"field_a\":[],\"field_b\":{\"id\":20}}}}")
 
     val result = server.query(
-      """{users(where: { friendOf:{ is:{ name: {contains: "B"}}}}){
+      """{users(where: { field_b:{ is:{ name: {contains: "B"}}}}){
       |    id
-      |    friends { id, name}
-      |    friendOf{ id, name }
+      |    field_a { id, name}
+      |    field_b{ id, name }
       |  }
       |}
-      """.stripMargin,
+      """,
       project
     )
 
-    result.toString() should be("{\"data\":{\"users\":[]}}")
+    result.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"field_a\":[],\"field_b\":{\"id\":20,\"name\":\"BB\"}}]}}")
 
-//    val result2 = server.query(
-//      """{users(where: { friendOf:{ is:{ name: {contains: "B"}}}}){
-//        |    id
-//        |    friends { id, name}
-//        |    friendOf{ id, name }
-//        |  }
-//        |}
-//      """.stripMargin,
-//      project
-//    )
+    val result2 = server.query(
+      """{users(where: { field_a:{ some:{ name: {contains: "B"}}}}){
+        |    id
+        |    field_a { id, name}
+        |    field_b{ id, name }
+        |  }
+        |}
+      """,
+      project
+    )
 
-//    result2.toString() should be("{\"data\":{\"users\":[]}}")
+    result2.toString() should be("{\"data\":{\"users\":[{\"id\":20,\"field_a\":[{\"id\":2,\"name\":\"B\"}],\"field_b\":null}]}}")
 
   }
 
@@ -83,7 +83,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
          |model User {
          |  id         Int     @id
          |  name       String?
-         |  posts      Post[]  @relation("UserfriendOf")
+         |  posts      Post[]  @relation("UserPost")
          |}
          |
          |model Post {
@@ -92,7 +92,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
          |  user       User?   @relation("UserPost", fields: [userId], references: [id])
          |  userId Int?
          |}
-       """.stripMargin
+       """
     }
     database.setup(project)
 
@@ -102,7 +102,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
         |    posts { id, name }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -114,7 +114,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
         |    posts { id, name }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -127,7 +127,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
         |    user { id, name}
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -140,7 +140,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
         |    posts { id, name}
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 

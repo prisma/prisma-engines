@@ -193,24 +193,12 @@ impl AliasedCondition for RelationFilter {
 
 impl AliasedSelect for RelationFilter {
     /// The subselect part of the `RelationFilter` `ConditionTree`.
-    fn aliased_sel(self, alias: Option<Alias>) -> Select<'static> {
+    fn aliased_sel<'a>(self, alias: Option<Alias>) -> Select<'static> {
         let alias = alias.unwrap_or(Alias::default());
         let condition = self.condition.clone();
         let relation = self.field.relation();
         let table = relation.as_table();
         let related_table = self.field.related_model().as_table();
-        let related_identifier = self.field.related_model().primary_identifier();
-
-        let would_perform_needless_join = {
-            // check whether the join would join the same table and same column
-            // prevent: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
-            let opposite_columns = self.field.opposite_columns(false);
-            let related_identifier_columns = related_identifier.as_columns();
-
-            opposite_columns.len() == related_identifier_columns.len()
-                && table.typ == related_table.typ
-                && related_identifier_columns.eq(opposite_columns)
-        };
 
         let relation_columns: Vec<Column> = self
             .field
@@ -218,47 +206,39 @@ impl AliasedSelect for RelationFilter {
             .map(|c| c.table(alias.to_string(None)))
             .collect();
 
-        if would_perform_needless_join {
-            let nested_conditions = self
-                .nested_filter
-                .aliased_cond(Some(alias))
-                .invert_if(condition.invert_of_subselect());
+        let opposite_columns: Vec<_> = self
+            .field
+            .opposite_columns(false)
+            .map(|c| c.table(alias.to_string(None)))
+            .collect();
 
-            let conditions = relation_columns
-                .clone()
-                .into_iter()
-                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+        let related_identifier_columns: Vec<_> = self
+            .field
+            .related_model()
+            .primary_identifier()
+            .as_columns()
+            .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
+            .collect();
 
-            Select::from_table(table.alias(alias.to_string(None)))
-                .columns(relation_columns)
-                .so_that(conditions)
-        } else {
-            let opposite_columns: Vec<_> = self
-                .field
-                .opposite_columns(false)
-                .map(|c| c.table(alias.to_string(None)))
-                .collect();
+        let nested_conditions = self
+            .nested_filter
+            .aliased_cond(Some(alias.flip(AliasMode::Join)))
+            .invert_if(condition.invert_of_subselect());
 
-            let related_identifier_columns: Vec<_> = related_identifier
-                .as_columns()
-                .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
-                .collect();
+        let conditions = relation_columns
+            .clone()
+            .into_iter()
+            .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-            let conditions = self
-                .nested_filter
-                .aliased_cond(Some(alias.flip(AliasMode::Join)))
-                .invert_if(condition.invert_of_subselect());
+        let join = related_table
+            .clone()
+            .alias(alias.to_string(Some(AliasMode::Join)))
+            .on(Row::from(related_identifier_columns).equals(Row::from(opposite_columns)));
 
-            let join = related_table
-                .clone()
-                .alias(alias.to_string(Some(AliasMode::Join)))
-                .on(Row::from(related_identifier_columns).equals(Row::from(opposite_columns)));
-
-            Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
-                .columns(relation_columns)
-                .inner_join(join)
-                .so_that(conditions)
-        }
+        Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+            .columns(relation_columns)
+            .inner_join(join)
+            .so_that(conditions)
     }
 }
 
