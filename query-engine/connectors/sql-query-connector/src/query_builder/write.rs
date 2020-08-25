@@ -1,6 +1,7 @@
-use connector_interface::WriteArgs;
+use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
 use prisma_models::*;
 use quaint::ast::*;
+use std::convert::TryInto;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
@@ -23,6 +24,10 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
         .into_iter()
         .fold(Insert::single_into(model.as_table()), |insert, db_name| {
             let value = args.take_field_value(&db_name).unwrap();
+            let value: PrismaValue = value
+                .try_into()
+                .expect("Create calls can only use PrismaValue write expressions (right now).");
+
             insert.value(db_name, value)
         });
 
@@ -40,8 +45,34 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
     let query = args
         .args
         .into_iter()
-        .fold(Update::table(model.as_table()), |acc, (name, val)| {
-            acc.set(name, val.clone())
+        .fold(Update::table(model.as_table()), |acc, (field_name, val)| {
+            let DatasourceFieldName(name) = field_name;
+
+            let value: Expression = match val {
+                WriteExpression::Field(_) => unimplemented!(),
+                WriteExpression::Value(rhs) => rhs.into(),
+                WriteExpression::Add(rhs) => {
+                    let e: Expression<'_> = Column::from(name.clone()).into();
+                    e + rhs.into()
+                }
+
+                WriteExpression::Substract(rhs) => {
+                    let e: Expression<'_> = Column::from(name.clone()).into();
+                    e - rhs.into()
+                }
+
+                WriteExpression::Multiply(rhs) => {
+                    let e: Expression<'_> = Column::from(name.clone()).into();
+                    e * rhs.into()
+                }
+
+                WriteExpression::Divide(rhs) => {
+                    let e: Expression<'_> = Column::from(name.clone()).into();
+                    e / rhs.into()
+                }
+            };
+
+            acc.set(name, value)
         });
 
     let columns: Vec<_> = model.primary_identifier().as_columns().collect();

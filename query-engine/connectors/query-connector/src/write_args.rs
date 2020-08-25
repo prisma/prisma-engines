@@ -18,7 +18,7 @@ pub struct WriteArgs {
 /// Wrapper struct to force a bit of a reflection whether or not the string passed
 /// to the write arguments is the data source field name, not the model field name.
 /// Also helps to avoid errors with convenient from-field conversions.
-pub struct DatasourceFieldName(String);
+pub struct DatasourceFieldName(pub String);
 
 impl Deref for DatasourceFieldName {
     type Target = str;
@@ -69,13 +69,12 @@ impl From<PrismaValue> for WriteExpression {
     }
 }
 
-impl TryInto<PrismaValue> for &WriteExpression {
+impl TryInto<PrismaValue> for WriteExpression {
     type Error = ConnectorError;
 
-    fn try_into(self) -> crate::Result<PrismaValue> {
-        // InternalConversionError
+    fn try_into(self) -> Result<PrismaValue, Self::Error> {
         match self {
-            WriteExpression::Value(pv) => Ok(pv.clone()),
+            WriteExpression::Value(pv) => Ok(pv),
             x => Err(ConnectorError::from_kind(ErrorKind::InternalConversionError(format!(
                 "Unable to convert write expression {:?} into prisma value.",
                 x
@@ -189,7 +188,7 @@ impl WriteArgs {
                         // null values. At the moment, this function is used to extract an ID for
                         // create record calls, which only operate on plain values _for now_. As soon
                         // as that changes we need to revisit the whole ID extraction on create / update topic.
-                        let p: Option<PrismaValue> = val.try_into().ok();
+                        let p: Option<PrismaValue> = val.clone().try_into().ok();
                         match p {
                             Some(p) => p,
                             None => PrismaValue::null(field.type_identifier.clone()),

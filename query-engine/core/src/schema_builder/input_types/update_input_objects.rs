@@ -62,7 +62,10 @@ fn number_operations_object_type(
     let name = format!("{}FieldUpdateOperationsInput", prefix);
     return_cached_input!(ctx, &name);
 
-    let obj = Arc::new(init_input_object_type(&name));
+    let mut obj = init_input_object_type(&name);
+    obj.set_one_of(true);
+
+    let obj = Arc::new(obj);
     let field_type = map_optional_input_type(field);
     ctx.cache_input_type(name, obj.clone());
 
@@ -75,6 +78,7 @@ fn number_operations_object_type(
     ];
 
     obj.set_fields(fields);
+
     Arc::downgrade(&obj)
 }
 

@@ -174,7 +174,7 @@ fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
 }
 
 /// Merges the incoming write argument values into the given, already loaded, ids. Overwrites existing values.
-fn merge_write_args(mut loaded_ids: Vec<RecordProjection>, incoming_args: WriteArgs) -> Vec<RecordProjection> {
+fn merge_write_args(loaded_ids: Vec<RecordProjection>, incoming_args: WriteArgs) -> Vec<RecordProjection> {
     if loaded_ids.is_empty() || incoming_args.is_empty() {
         return loaded_ids;
     }
@@ -189,14 +189,17 @@ fn merge_write_args(mut loaded_ids: Vec<RecordProjection>, incoming_args: WriteA
         .filter_map(|(i, (field, _))| incoming_args.get_field_value(field.db_name()).map(|val| (i, val)))
         .collect();
 
-    loaded_ids.into_iter().for_each(|mut id| {
-        for (position, expr) in positions.iter() {
-            let current_val = id.pairs[position.to_owned()].1.clone();
-            id.pairs[position.to_owned()].1 = apply_expression(current_val, (*expr).clone());
-        }
-    });
-
     loaded_ids
+        .into_iter()
+        .map(|mut id| {
+            for (position, expr) in positions.iter() {
+                let current_val = id.pairs[position.to_owned()].1.clone();
+                id.pairs[position.to_owned()].1 = apply_expression(current_val, (*expr).clone());
+            }
+
+            id
+        })
+        .collect()
 }
 
 fn apply_expression(val: PrismaValue, expr: WriteExpression) -> PrismaValue {
@@ -204,15 +207,8 @@ fn apply_expression(val: PrismaValue, expr: WriteExpression) -> PrismaValue {
         WriteExpression::Field(_) => unimplemented!(),
         WriteExpression::Value(pv) => pv,
         WriteExpression::Add(rhs) => val + rhs,
-        WriteExpression::Substract(rhs) => todo!(),
-        WriteExpression::Multiply(_) => todo!(),
-        WriteExpression::Divide(_) => todo!(),
+        WriteExpression::Substract(rhs) => val - rhs,
+        WriteExpression::Multiply(rhs) => val * rhs,
+        WriteExpression::Divide(rhs) => val / rhs,
     }
-
-    // match current_val {
-    //     PrismaValue::Null(_) => (), // Stays null.
-    //     PrismaValue::Int(_) => {}
-    //     PrismaValue::Float(_) => {}
-    //     _ => unreachable!(),
-    // }
 }

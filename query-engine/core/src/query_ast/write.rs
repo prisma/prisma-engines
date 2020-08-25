@@ -1,7 +1,7 @@
 //! Write query AST
 use super::FilteredQuery;
 use crate::RawQueryType;
-use connector::{filter::Filter, RecordFilter, WriteArgs};
+use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::sync::Arc;
 
@@ -45,7 +45,7 @@ impl WriteQuery {
             _ => return,
         };
 
-        args.insert(key, value)
+        args.insert(DatasourceFieldName(key), value)
     }
 
     pub fn returns(&self, projection: &ModelProjection) -> bool {
