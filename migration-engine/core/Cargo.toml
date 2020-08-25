@@ -5,8 +5,8 @@ authors = ["Marcus Böhm <boehm@prisma.io>", "Julius de Bruijn <bruijn@prisma.i
 edition = "2018"
 
 [dependencies]
-migration-connector = { path = "../connectors/migration-connector" }
 datamodel = { path = "../../libs/datamodel/core" }
+migration-connector = { path = "../connectors/migration-connector" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector", optional = true }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
