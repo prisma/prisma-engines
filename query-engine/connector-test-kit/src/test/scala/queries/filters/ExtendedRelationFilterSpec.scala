@@ -455,7 +455,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
           """{albums(where:{Tracks: { some:{NOT:[{MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}){Title}}""",
         project = project
       )
-      .toString should be("""{"data":{"albums":[{"Title":"Album3"},{"Title":"Album5"}]}}""")
+      .toString should be("""{"data":{"albums":[{"Title":"Album5"},{"Title":"Album3"}]}}""")
 
     server
       .query(

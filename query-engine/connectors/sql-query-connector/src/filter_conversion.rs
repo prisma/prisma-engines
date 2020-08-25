@@ -197,17 +197,16 @@ impl AliasedSelect for RelationFilter {
         let alias = alias.unwrap_or(Alias::default());
         let condition = self.condition.clone();
 
-        let (table, primary_identifier, join_columns) = if self.field.relation().is_many_to_many() {
+        let (table, selected_identifier, join_columns) = if self.field.relation().is_many_to_many() {
             let columns: Vec<Column> = self
                 .field
-                .relation_columns(false)
+                .relation_columns()
                 .map(|c| c.table(alias.to_string(None)))
                 .collect();
 
             let join_columns: Vec<Column> = self
                 .field
-                .opposite_columns(false)
-                // .relation_columns(false)
+                .opposite_columns()
                 .map(|c| c.table(alias.to_string(None)))
                 .collect();
 
@@ -232,13 +231,6 @@ impl AliasedSelect for RelationFilter {
         };
 
         let related_table = self.field.related_model().as_table();
-        // let join_columns: Vec<_> = self
-        //     .field
-        //     .linking_fields()
-        //     .as_columns()
-        //     .map(|c| c.table(alias.to_string(None)))
-        //     .collect();
-
         let related_join_columns: Vec<_> = self
             .field
             .related_field()
@@ -252,7 +244,7 @@ impl AliasedSelect for RelationFilter {
             .aliased_cond(Some(alias.flip(AliasMode::Join)))
             .invert_if(condition.invert_of_subselect());
 
-        let conditions = primary_identifier
+        let conditions = selected_identifier
             .clone()
             .into_iter()
             .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
@@ -262,7 +254,7 @@ impl AliasedSelect for RelationFilter {
             .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
 
         Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
-            .columns(primary_identifier)
+            .columns(selected_identifier)
             .inner_join(join)
             .so_that(conditions)
     }
