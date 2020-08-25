@@ -197,27 +197,47 @@ impl AliasedSelect for RelationFilter {
         let alias = alias.unwrap_or(Alias::default());
         let condition = self.condition.clone();
 
-        let table = if self.field.relation().is_many_to_many() {
-            self.field.related_field().relation().as_table()
+        let (table, primary_identifier, join_columns) = if self.field.relation().is_many_to_many() {
+            let columns: Vec<Column> = self
+                .field
+                .relation_columns(false)
+                .map(|c| c.table(alias.to_string(None)))
+                .collect();
+
+            let join_columns: Vec<Column> = self
+                .field
+                .opposite_columns(false)
+                // .relation_columns(false)
+                .map(|c| c.table(alias.to_string(None)))
+                .collect();
+
+            (self.field.related_field().relation().as_table(), columns, join_columns)
         } else {
-            self.field.model().as_table()
+            let columns: Vec<Column> = self
+                .field
+                .model()
+                .primary_identifier()
+                .as_columns()
+                .map(|c| c.table(alias.to_string(None)))
+                .collect();
+
+            let join_columns: Vec<_> = self
+                .field
+                .linking_fields()
+                .as_columns()
+                .map(|c| c.table(alias.to_string(None)))
+                .collect();
+
+            (self.field.model().as_table(), columns, join_columns)
         };
 
-        let primary_identifier: Vec<Column> = self
-            .field
-            .model()
-            .primary_identifier()
-            .as_columns()
-            .map(|c| c.table(alias.to_string(None)))
-            .collect();
-
         let related_table = self.field.related_model().as_table();
-        let join_columns: Vec<_> = self
-            .field
-            .linking_fields()
-            .as_columns()
-            .map(|c| c.table(alias.to_string(None)))
-            .collect();
+        // let join_columns: Vec<_> = self
+        //     .field
+        //     .linking_fields()
+        //     .as_columns()
+        //     .map(|c| c.table(alias.to_string(None)))
+        //     .collect();
 
         let related_join_columns: Vec<_> = self
             .field

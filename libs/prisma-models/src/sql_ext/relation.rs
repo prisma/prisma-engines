@@ -4,7 +4,7 @@ use quaint::ast::Table;
 pub trait RelationExt {
     /// A helper function to decide actions based on the `Relation` type. Inline
     /// relation will return columns for updates, a relation table gives back `None`.
-    fn columns_for_relation_side(&self, side: RelationSide) -> ColumnIterator;
+    // fn columns_for_relation_side(&self, side: RelationSide) -> ColumnIterator;
     fn model_a_columns(&self) -> ColumnIterator;
     fn model_b_columns(&self) -> ColumnIterator;
 }
@@ -86,12 +86,12 @@ impl AsTable for Relation {
 }
 
 impl RelationExt for Relation {
-    fn columns_for_relation_side(&self, side: RelationSide) -> ColumnIterator {
-        match side {
-            RelationSide::A => self.model_a_columns(),
-            RelationSide::B => self.model_b_columns(),
-        }
-    }
+    // fn columns_for_relation_side(&self, side: RelationSide) -> ColumnIterator {
+    //     match side {
+    //         RelationSide::A => self.model_a_columns(),
+    //         RelationSide::B => self.model_b_columns(),
+    //     }
+    // }
 
     #[allow(clippy::if_same_then_else)]
     fn model_a_columns(&self) -> ColumnIterator {
