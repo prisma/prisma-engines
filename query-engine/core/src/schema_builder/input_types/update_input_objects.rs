@@ -41,23 +41,35 @@ fn scalar_input_fields_for_update(ctx: &mut BuilderContext, model: &ModelRef) ->
             .scalar_writable()
             .filter(field_should_be_kept_for_update_input_type)
             .collect(),
-        |ctx, f: ScalarFieldRef| scalar_update_field_type(ctx, &f),
+        |ctx, f: ScalarFieldRef| scalar_update_field_type_mapper(ctx, &f),
         false,
     )
 }
 
-fn scalar_update_field_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
-    match (&field.type_identifier, field.is_list) {
-        (TypeIdentifier::Float, false) => wrap_opt_input_object(number_operations_object_type(ctx, "Float", field)),
-        (TypeIdentifier::Int, false) => wrap_opt_input_object(number_operations_object_type(ctx, "Int", field)),
-        _ => map_optional_input_type(field),
+fn scalar_update_field_type_mapper(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
+    if field.is_list {
+        map_optional_input_type(field)
+    } else {
+        let typ = match &field.type_identifier {
+            TypeIdentifier::Float => operations_object_type(ctx, "Float", field, true),
+            TypeIdentifier::Int => operations_object_type(ctx, "Int", field, true),
+            TypeIdentifier::String => operations_object_type(ctx, "String", field, false),
+            TypeIdentifier::Boolean => operations_object_type(ctx, "Bool", field, false),
+            TypeIdentifier::Enum(e) => operations_object_type(ctx, &format!("Enum{}", e), field, false),
+            TypeIdentifier::Json => operations_object_type(ctx, "Json", field, false),
+            TypeIdentifier::DateTime => operations_object_type(ctx, "DateTime", field, false),
+            TypeIdentifier::UUID => operations_object_type(ctx, "Uuid", field, false),
+        };
+
+        wrap_opt_input_object(typ)
     }
 }
 
-fn number_operations_object_type(
+fn operations_object_type(
     ctx: &mut BuilderContext,
     prefix: &str,
     field: &ScalarFieldRef,
+    with_number_operators: bool,
 ) -> InputObjectTypeWeakRef {
     let name = format!("{}FieldUpdateOperationsInput", prefix);
     return_cached_input!(ctx, &name);
@@ -69,13 +81,14 @@ fn number_operations_object_type(
     let field_type = map_optional_input_type(field);
     ctx.cache_input_type(name, obj.clone());
 
-    let fields = vec![
-        input_field("set", field_type.clone(), None),
-        input_field("increment", field_type.clone(), None),
-        input_field("decrement", field_type.clone(), None),
-        input_field("multiply", field_type.clone(), None),
-        input_field("divide", field_type, None),
-    ];
+    let mut fields = vec![input_field("set", field_type.clone(), None)];
+
+    if with_number_operators {
+        fields.push(input_field("increment", field_type.clone(), None));
+        fields.push(input_field("decrement", field_type.clone(), None));
+        fields.push(input_field("multiply", field_type.clone(), None));
+        fields.push(input_field("divide", field_type, None));
+    }
 
     obj.set_fields(fields);
 

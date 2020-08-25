@@ -10,6 +10,7 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
       |  id     String  @id @default(cuid())
       |  title  String
       |  opt    String?
+      |
       |}
     """.stripMargin
   }
@@ -28,7 +29,7 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
       """mutation {
         |  updateManyTodoes(
         |    where: { title: { equals: "title1" }}
-        |    data: { title: "updated title", opt: "test" }
+        |    data: { title: { set: "updated title" }, opt: "test" }
         |  ) {
         |    count
         |  }
@@ -63,7 +64,7 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
       """mutation {
         |  updateManyTodoes(
         |    where: { }
-        |    data: { title: "updated title" }
+        |    data: { title: { set: "updated title" } }
         |  ){
         |    count
         |  }
