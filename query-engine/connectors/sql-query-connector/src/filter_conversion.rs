@@ -196,26 +196,33 @@ impl AliasedSelect for RelationFilter {
     fn aliased_sel<'a>(self, alias: Option<Alias>) -> Select<'static> {
         let alias = alias.unwrap_or(Alias::default());
         let condition = self.condition.clone();
-        let relation = self.field.relation();
-        let table = relation.as_table();
-        let related_table = self.field.related_model().as_table();
 
-        let relation_columns: Vec<Column> = self
-            .field
-            .relation_columns(false)
-            .map(|c| c.table(alias.to_string(None)))
-            .collect();
+        let table = if self.field.relation().is_many_to_many() {
+            self.field.related_field().relation().as_table()
+        } else {
+            self.field.model().as_table()
+        };
 
-        let opposite_columns: Vec<_> = self
+        let primary_identifier: Vec<Column> = self
             .field
-            .opposite_columns(false)
-            .map(|c| c.table(alias.to_string(None)))
-            .collect();
-
-        let related_identifier_columns: Vec<_> = self
-            .field
-            .related_model()
+            .model()
             .primary_identifier()
+            .as_columns()
+            .map(|c| c.table(alias.to_string(None)))
+            .collect();
+
+        let related_table = self.field.related_model().as_table();
+        let join_columns: Vec<_> = self
+            .field
+            .linking_fields()
+            .as_columns()
+            .map(|c| c.table(alias.to_string(None)))
+            .collect();
+
+        let related_join_columns: Vec<_> = self
+            .field
+            .related_field()
+            .linking_fields()
             .as_columns()
             .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
             .collect();
@@ -225,18 +232,17 @@ impl AliasedSelect for RelationFilter {
             .aliased_cond(Some(alias.flip(AliasMode::Join)))
             .invert_if(condition.invert_of_subselect());
 
-        let conditions = relation_columns
+        let conditions = primary_identifier
             .clone()
             .into_iter()
             .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
         let join = related_table
-            .clone()
             .alias(alias.to_string(Some(AliasMode::Join)))
-            .on(Row::from(related_identifier_columns).equals(Row::from(opposite_columns)));
+            .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
 
         Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
-            .columns(relation_columns)
+            .columns(primary_identifier)
             .inner_join(join)
             .so_that(conditions)
     }

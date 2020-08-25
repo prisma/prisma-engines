@@ -14,65 +14,65 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
        |model User {
        |  id         Int     @id
        |  name       String?
-       |  field_a    User[]  @relation("UserfriendOf")
-       |  field_b   User?    @relation("UserfriendOf", fields: [field_bId], references: [id])
-       |  field_bId Int?
+       |  field_b    User[]  @relation("UserfriendOf")
+       |  field_a   User?    @relation("UserfriendOf", fields: [field_aId], references: [id])
+       |  field_aId Int?
        |}
        """
     }
     database.setup(project)
 
     val setup = server.query(
-      """mutation{createUser(data: { id: 1, name: "A" field_b:{ create:{ id: 10, name: "AA"}}}){
+      """mutation{createUser(data: { id: 1, name: "A" field_a:{ create:{ id: 10, name: "AA"}}}){
         |    id
-        |    field_a { id }
-        |    field_b{ id }
+        |    field_b { id }
+        |    field_a{ id }
         |  }
         |}
       """,
       project
     )
 
-    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"field_a\":[],\"field_b\":{\"id\":10}}}}")
+    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"field_b\":[],\"field_a\":{\"id\":10}}}}")
 
     val setup2 = server.query(
-      """mutation{createUser(data: { id: 2, name: "B" field_b:{ create:{ id: 20, name: "BB"}}}){
+      """mutation{createUser(data: { id: 2, name: "B" field_a:{ create:{ id: 20, name: "BB"}}}){
         |    id
-        |    field_a { id }
-        |    field_b{ id }
+        |    field_b { id }
+        |    field_a{ id }
         |  }
         |}
       """,
       project
     )
 
-    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"field_a\":[],\"field_b\":{\"id\":20}}}}")
+    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"field_b\":[],\"field_a\":{\"id\":20}}}}")
 
     val result = server.query(
-      """{users(where: { field_b:{ is:{ name: {contains: "B"}}}}){
+      """{users(where: { field_a:{ is:{ name: {contains: "B"}}}}){
       |    id
-      |    field_a { id, name}
-      |    field_b{ id, name }
+      |    field_b { id, name}
+      |    field_a{ id, name }
       |  }
       |}
       """,
       project
     )
 
-    result.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"field_a\":[],\"field_b\":{\"id\":20,\"name\":\"BB\"}}]}}")
+    result.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"field_b\":[],\"field_a\":{\"id\":20,\"name\":\"BB\"}}]}}")
 
     val result2 = server.query(
-      """{users(where: { field_a:{ some:{ name: {contains: "B"}}}}){
+      """{users(where: { field_b:{ some:{ name: {contains: "B"}}}}){
         |    id
-        |    field_a { id, name}
-        |    field_b{ id, name }
+        |    field_b { id, name}
+        |    field_a{ id, name }
         |  }
         |}
       """,
       project
     )
 
-    result2.toString() should be("{\"data\":{\"users\":[{\"id\":20,\"field_a\":[{\"id\":2,\"name\":\"B\"}],\"field_b\":null}]}}")
+    result2.toString() should be("{\"data\":{\"users\":[{\"id\":20,\"field_b\":[{\"id\":2,\"name\":\"B\"}],\"field_a\":null}]}}")
 
   }
 
@@ -81,7 +81,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
     val project = ProjectDsl.fromString {
       s"""
          |model User {
-         |  id         Int     @id
+         |  id_user         Int     @id
          |  name       String?
          |  posts      Post[]  @relation("UserPost")
          |}
@@ -89,7 +89,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
          |model Post {
          |  id         Int     @id
          |  name       String?
-         |  user       User?   @relation("UserPost", fields: [userId], references: [id])
+         |  user       User?   @relation("UserPost", fields: [userId], references: [id_user])
          |  userId Int?
          |}
        """
@@ -97,8 +97,8 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
     database.setup(project)
 
     val setup = server.query(
-      """mutation{createUser(data: { id: 1, name: "A" posts:{ create:{ name: "AA", id: 10}}}){
-        |    id
+      """mutation{createUser(data: { id_user: 1, name: "A" posts:{ create:{ name: "AA", id: 10}}}){
+        |    id_user
         |    posts { id, name }
         |  }
         |}
@@ -106,11 +106,11 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
       project
     )
 
-    setup.toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"posts\":[{\"id\":10,\"name\":\"AA\"}]}}}")
+    setup.toString() should be("{\"data\":{\"createUser\":{\"id_user\":1,\"posts\":[{\"id\":10,\"name\":\"AA\"}]}}}")
 
     val setup2 = server.query(
-      """mutation{createUser(data: { id: 2, name: "B" posts:{ create:{ name: "BB", id: 20}}}){
-        |    id
+      """mutation{createUser(data: { id_user: 2, name: "B" posts:{ create:{ name: "BB", id: 20}}}){
+        |    id_user
         |    posts { id, name }
         |  }
         |}
@@ -118,24 +118,24 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
       project
     )
 
-    setup2.toString() should be("{\"data\":{\"createUser\":{\"id\":2,\"posts\":[{\"id\":20,\"name\":\"BB\"}]}}}")
+    setup2.toString() should be("{\"data\":{\"createUser\":{\"id_user\":2,\"posts\":[{\"id\":20,\"name\":\"BB\"}]}}}")
 
     val result = server.query(
       """{posts(where: { user:{ is:{ name: {contains: "B"}}}}){
         |    id
         |    name
-        |    user { id, name}
+        |    user { id_user, name}
         |  }
         |}
       """,
       project
     )
 
-    result.toString() should be("{\"data\":{\"posts\":[{\"id\":20,\"name\":\"BB\",\"user\":{\"id\":2,\"name\":\"B\"}}]}}")
+    result.toString() should be("{\"data\":{\"posts\":[{\"id\":20,\"name\":\"BB\",\"user\":{\"id_user\":2,\"name\":\"B\"}}]}}")
 
     val result2 = server.query(
       """{users(where: { posts:{ some:{ name: {contains: "BB"}}}}){
-        |    id
+        |    id_user
         |    name
         |    posts { id, name}
         |  }
@@ -144,7 +144,7 @@ class SubqueryTooManyColumnsSpec extends FlatSpec with Matchers with ApiSpecBase
       project
     )
 
-    result2.toString() should be("{\"data\":{\"users\":[{\"id\":2,\"name\":\"B\",\"posts\":[{\"id\":20,\"name\":\"BB\"}]}]}}")
+    result2.toString() should be("{\"data\":{\"users\":[{\"id_user\":2,\"name\":\"B\",\"posts\":[{\"id\":20,\"name\":\"BB\"}]}]}}")
   }
 
 }
