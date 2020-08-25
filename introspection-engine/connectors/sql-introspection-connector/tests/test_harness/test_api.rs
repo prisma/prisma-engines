@@ -220,17 +220,6 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str) ->
         .await
         .unwrap();
     let connection_info = database.connection_info().to_owned();
-    let drop_schema = dbg!(format!(
-        "DROP SCHEMA IF EXISTS \"{}\" CASCADE;",
-        connection_info.schema_name()
-    ));
-    database.query_raw(&drop_schema, &[]).await.ok();
-
-    let create_schema = dbg!(format!(
-        "CREATE SCHEMA IF NOT EXISTS \"{}\";",
-        connection_info.schema_name()
-    ));
-    database.query_raw(&create_schema, &[]).await.ok();
     let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
 
     TestApi {
@@ -243,8 +232,7 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str) ->
 }
 
 pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
-    let database_file_path = sqlite_test_file(db_name);
-    std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
+    sqlite_test_file(db_name);
     let connection_string = sqlite_test_url(db_name);
     let database = Quaint::new(&connection_string).await.unwrap();
     let introspection_connector = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
