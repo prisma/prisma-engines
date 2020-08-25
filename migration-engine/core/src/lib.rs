@@ -82,6 +82,44 @@ pub async fn create_database(datamodel: &str) -> CoreResult<String> {
     }
 }
 
+/// Drop the database configured in the passed in schema.
+pub async fn drop_database(prisma_schema: &str) -> CoreResult<()> {
+    let config = datamodel::parse_configuration(prisma_schema)?;
+
+    let source = config
+        .datasources
+        .first()
+        .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
+
+    match &source.active_provider {
+        provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
+            SqlMigrationConnector::drop_database(&source.url().value).await?;
+        }
+        x => unimplemented!("Connector {} is not supported yet", x),
+    }
+
+    Ok(())
+}
+
+/// Database setup for connector-test-kit.
+pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
+    let config = datamodel::parse_configuration(prisma_schema)?;
+
+    let source = config
+        .datasources
+        .first()
+        .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
+
+    match &source.active_provider {
+        provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
+            SqlMigrationConnector::qe_setup(&source.url().value).await?;
+        }
+        x => unimplemented!("Connector {} is not supported yet", x),
+    }
+
+    Ok(())
+}
+
 pub(crate) fn parse_datamodel(datamodel: &str) -> CommandResult<Datamodel> {
     datamodel::parse_datamodel(&datamodel)
         .map_err(|err| CommandError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
