@@ -277,7 +277,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
 
   "2 level m-relation filter" should "work for some/some" in {
     server
-      .query(query = """{artists(where:{Albums: { some: { Tracks: { some: {Milliseconds: { lte: 9000 }}}}}}){Name}}""", project = project)
+      .query(query = """{artists(where:{Albums: { some: { Tracks: { some: {Milliseconds: { lte: 9000 }}}}}}, orderBy: {Name: asc}){Name}}""", project = project)
       .toString should be("""{"data":{"artists":[{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
     server.query(query = """{artists(where:{Albums: { some:{Tracks: { some: {Bytes: { equals: 512 }}}}}}){Name}}""", project = project).toString should be(
