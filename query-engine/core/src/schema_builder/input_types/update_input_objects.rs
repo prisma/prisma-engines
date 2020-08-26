@@ -71,23 +71,34 @@ fn operations_object_type(
     field: &ScalarFieldRef,
     with_number_operators: bool,
 ) -> InputObjectTypeWeakRef {
-    let name = format!("{}FieldUpdateOperationsInput", prefix);
+    // Nullability is important for the `set` operation, so we need to
+    // construct and cache different objects to reflect that.
+    let nullable = if field.is_required { "" } else { "Nullable" };
+    let name = format!("{}{}FieldUpdateOperationsInput", nullable, prefix);
     return_cached_input!(ctx, &name);
 
     let mut obj = init_input_object_type(&name);
     obj.set_one_of(true);
 
     let obj = Arc::new(obj);
-    let field_type = map_optional_input_type(field);
+    let nullable_field_type = map_optional_input_type(field);
+    let mapped = map_required_input_type(field);
+
+    let non_nullable_field_type = if let InputType::Null(typ) = mapped {
+        InputType::opt(*typ)
+    } else {
+        InputType::opt(mapped)
+    };
+
     ctx.cache_input_type(name, obj.clone());
 
-    let mut fields = vec![input_field("set", field_type.clone(), None)];
+    let mut fields = vec![input_field("set", nullable_field_type, None)];
 
     if with_number_operators && feature_flags::get().atomicNumberOperations {
-        fields.push(input_field("increment", field_type.clone(), None));
-        fields.push(input_field("decrement", field_type.clone(), None));
-        fields.push(input_field("multiply", field_type.clone(), None));
-        fields.push(input_field("divide", field_type, None));
+        fields.push(input_field("increment", non_nullable_field_type.clone(), None));
+        fields.push(input_field("decrement", non_nullable_field_type.clone(), None));
+        fields.push(input_field("multiply", non_nullable_field_type.clone(), None));
+        fields.push(input_field("divide", non_nullable_field_type, None));
     }
 
     obj.set_fields(fields);
