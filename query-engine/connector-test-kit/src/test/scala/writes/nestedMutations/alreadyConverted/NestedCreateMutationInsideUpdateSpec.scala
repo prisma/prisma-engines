@@ -46,7 +46,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  updateParent(
          |  where: $parentIdentifier
          |  data:{
-         |    p: "p2"
+         |    p: {set: "p2"}
          |    childReq: {create: {c: "SomeC"}}
          |  }){
          |  p
@@ -58,7 +58,8 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
         project,
         errorCode = 2014,
-        errorContains = """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" })"""
+        errorContains =
+          """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" })"""
       )
     }
   }
@@ -101,7 +102,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  updateParent(
          |  where: $parentIdentifier
          |  data:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childReq: {create: {
          |      c: "SomeC"
          |      c_1: "c_1_2"
@@ -156,7 +157,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  updateParent(
          |  where: $parentIdentifier
          |  data:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childOpt: {create: {
          |      c: "SomeC"
          |      c_1: "c_1_1"
@@ -203,7 +204,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  updateParent(
          |  where: $parentIdentifier
          |  data:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childOpt: {create: {c: "SomeC"}}
          |  }){
          |    childOpt {

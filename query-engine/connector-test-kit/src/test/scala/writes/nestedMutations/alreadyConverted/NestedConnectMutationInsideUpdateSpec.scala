@@ -53,17 +53,18 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       )
 
       server.queryThatMustFail(
-        s"""mutation {
+        s"""
+           |mutation {
            |  updateParent(
-           |  where: $parentIdentifier
-           |  data:{
-           |    childReq: {connect:  $childIdentifier}
-           |  }){
+           |    where: $parentIdentifier
+           |    data: { childReq: { connect: $childIdentifier } }
+           |  ) {
            |    childReq {
            |      c
            |    }
            |  }
-           |}""",
+           |}
+         """.stripMargin,
         project,
         errorCode = 2014,
         errorContains =
@@ -122,12 +123,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       )
 
       server.queryThatMustFail(
-        s"""mutation {
-           |  updateParent(
-           |  where: $parent2 ,
-           |  data: {
-           |    childReq: {connect: $child1}
-           |  }){
+        s"""
+           |mutation {
+           |  updateParent(where: $parent2, data: { childReq: { connect: $child1 } }) {
            |    childReq {
            |      c
            |    }
@@ -216,16 +214,15 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  updateParent(
-           |  where: $parent
-           |  data:{
-           |    p: "p2"
-           |    childReq: {connect: $child1}
-           |  }){
+           |    where: $parent
+           |    data: { p: { set: "p2" }, childReq: { connect: $child1 } }
+           |  ) {
            |    childReq {
            |      c
            |    }
            |  }
            |}
+           |
       """,
         project
       )
@@ -344,16 +341,13 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       val res = server.query(
         s"""
            |mutation {
-           |  updateParent(
-           |  where:$parent3
-           |  data:{
-           |    childOpt: {connect: $child3}
-           |  }){
+           |  updateParent(where: $parent3, data: { childOpt: { connect: $child3 } }) {
            |    childOpt {
            |      c
            |    }
            |  }
            |}
+           |
       """,
         project
       )
@@ -430,16 +424,13 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       val res = server.query(
         s"""
            |mutation {
-           |  updateParent(
-           |  where:$parent1
-           |  data:{
-           |    childOpt: {connect: $child1}
-           |  }){
+           |  updateParent(where: $parent1, data: { childOpt: { connect: $child1 } }) {
            |    childOpt {
            |      c
            |    }
            |  }
            |}
+           |
       """,
         project
       )
@@ -490,11 +481,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       val res = server.query(
         s"""
            |mutation {
-           |  updateParent(
-           |  where:$parent
-           |  data:{
-           |    childOpt: {connect: $child1}
-           |  }){
+           |  updateParent(where: $parent, data: { childOpt: { connect: $child1 } }) {
            |    childOpt {
            |      c
            |    }
@@ -552,16 +539,13 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       val res = server.query(
         s"""
            |mutation {
-           |  updateParent(
-           |  where:$parent
-           |  data:{
-           |    childOpt: {connect: $childId}
-           |  }){
+           |  updateParent(where: $parent, data: { childOpt: { connect: $childId } }) {
            |    childOpt {
            |      c
            |    }
            |  }
            |}
+           |
       """,
         project
       )
@@ -614,11 +598,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       val res = server.query(
         s"""
            |mutation {
-           |  updateParent(
-           |  where:$parent
-           |  data:{
-           |    childrenOpt: {connect: $child}
-           |  }){
+           |  updateParent(where: $parent, data: { childrenOpt: { connect: $child } }) {
            |    childrenOpt {
            |      c
            |    }
@@ -633,11 +613,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       val res2 = server.query(
         s"""
            |mutation {
-           |  updateParent(
-           |  where: $parent
-           |  data:{
-           |    childrenOpt: {connect: $child}
-           |  }){
+           |  updateParent(where: $parent, data: { childrenOpt: { connect: $child } }) {
            |    childrenOpt {
            |      c
            |    }
