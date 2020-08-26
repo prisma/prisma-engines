@@ -453,6 +453,10 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     // Set
     queryNumberOperation(project, 1, "optInt", "set", "5") should be("""{"optInt":5}""")
     queryNumberOperation(project, 2, "optInt", "set", "5") should be("""{"optInt":5}""")
+
+    // Set null
+    queryNumberOperation(project, 1, "optInt", "set", "null") should be("""{"optInt":null}""")
+    queryNumberOperation(project, 2, "optInt", "set", "null") should be("""{"optInt":null}""")
   }
 
   "An upsertOne mutation" should "correctly apply all number operations for Float on update" in {
@@ -488,6 +492,10 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     // Set
     queryNumberOperation(project, 1, "optFloat", "set", "5.1") should be("""{"optFloat":5.1}""")
     queryNumberOperation(project, 2, "optFloat", "set", "5.1") should be("""{"optFloat":5.1}""")
+
+    // Set null
+    queryNumberOperation(project, 1, "optFloat", "set", "null") should be("""{"optFloat":null}""")
+    queryNumberOperation(project, 2, "optFloat", "set", "null") should be("""{"optFloat":null}""")
   }
 
   def queryNumberOperation(project: Project, id: Int, field: String, op: String, value: String): String = {

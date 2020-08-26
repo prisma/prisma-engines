@@ -115,6 +115,9 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     // Set
     queryNumberOperation("optInt", "set", "5") should be("""[{"optInt":5},{"optInt":5},{"optInt":5}]""")
+
+    // Set null
+    queryNumberOperation("optInt", "set", "null") should be("""[{"optInt":null},{"optInt":null},{"optInt":null}]""")
   }
 
   "An updateMany mutation" should "correctly apply all number operations for Float" in {
@@ -136,6 +139,9 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     // Set
     queryNumberOperation("optFloat", "set", "5") should be("""[{"optFloat":5},{"optFloat":5},{"optFloat":5}]""")
+
+    // Set null
+    queryNumberOperation("optFloat", "set", "null") should be("""[{"optFloat":null},{"optFloat":null},{"optFloat":null}]""")
   }
 
   def queryNumberOperation(field: String, op: String, value: String): String = {
