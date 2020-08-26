@@ -277,7 +277,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
 
   "2 level m-relation filter" should "work for some/some" in {
     server
-      .query(query = """{artists(where:{Albums: { some: { Tracks: { some: {Milliseconds: { lte: 9000 }}}}}}){Name}}""", project = project)
+      .query(query = """{artists(where:{Albums: { some: { Tracks: { some: {Milliseconds: { lte: 9000 }}}}}}, orderBy: {Name: asc}){Name}}""", project = project)
       .toString should be("""{"data":{"artists":[{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
     server.query(query = """{artists(where:{Albums: { some:{Tracks: { some: {Bytes: { equals: 512 }}}}}}){Name}}""", project = project).toString should be(
@@ -452,7 +452,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
     server
       .query(
         query =
-          """{albums(where:{Tracks: { some:{NOT:[{MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}){Title}}""",
+          """{albums(where:{Tracks: { some:{NOT:[{MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}, orderBy: { Title: asc}){Title}}""",
         project = project
       )
       .toString should be("""{"data":{"albums":[{"Title":"Album3"},{"Title":"Album5"}]}}""")
