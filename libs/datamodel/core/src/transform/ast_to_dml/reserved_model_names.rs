@@ -94,6 +94,12 @@ impl TypeNameValidator {
                 "NestedJsonNullableFilter",
                 "JsonNullableFilter",
                 "InputJsonValue",
+                "IntFieldUpdateOperationsInput",
+                "FloatFieldUpdateOperationsInput",
+                "BoolFieldUpdateOperationsInput",
+                "StringFieldUpdateOperationsInput",
+                "DateTimeFieldUpdateOperationsInput",
+                "JsonFieldUpdateOperationsInput",
                 // JavaScript keywords
                 "await",
                 "async",
