@@ -220,7 +220,7 @@ class NonEmbeddedUpsertDesignSpec extends FlatSpec with Matchers with ApiSpecBas
              |                        upsert:{
              |                               where:{uTodo: "B"}
              |		                           create:{uTodo:"C" tags: {connect: {uTag: "D"}}}
-             |		                           update:{uTodo:"Should Not Matter" tags: {create: {uTag: "D"}}}
+             |		                           update:{uTodo:{set:"Should Not Matter"},tags: {create: {uTag: "D"}}}
              |}}
              |}){id}}""".stripMargin,
           project
@@ -248,7 +248,7 @@ class NonEmbeddedUpsertDesignSpec extends FlatSpec with Matchers with ApiSpecBas
              |                        upsert:{
              |                               where:{uTodo: "B"}
              |		                           create:{uTodo:"Should Not Matter" tags: {connect: {uTag: "D"}}}
-             |		                           update:{uTodo:"C" tags: {connect: {uTag: "D"}}}
+             |		                           update:{uTodo: { set: "C" }, tags: { connect: { uTag: "D" }}}
              |}}
              |}){id}}""".stripMargin,
           project

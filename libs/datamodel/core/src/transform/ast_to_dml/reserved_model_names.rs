@@ -100,6 +100,12 @@ impl TypeNameValidator {
                 "StringFieldUpdateOperationsInput",
                 "DateTimeFieldUpdateOperationsInput",
                 "JsonFieldUpdateOperationsInput",
+                "NullableIntFieldUpdateOperationsInput",
+                "NullablFloatFieldUpdateOperationsInput",
+                "NullablBoolFieldUpdateOperationsInput",
+                "NullablStringFieldUpdateOperationsInput",
+                "NullablDateTimeFieldUpdateOperationsInput",
+                "NullablJsonFieldUpdateOperationsInput",
                 // JavaScript keywords
                 "await",
                 "async",
