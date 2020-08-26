@@ -96,7 +96,7 @@ class UpdatedAtShouldChangeSpec extends FlatSpec with Matchers with ApiSpecBase 
           s"""mutation b {
            |  updateManyTops(
            |    where: { top: { equals: "top5" }}
-           |    data: { top: "top50" }
+           |    data: { top: { set: "top50" }}
            |  ) {
            |    count
            |  }

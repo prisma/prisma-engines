@@ -71,7 +71,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_id: 1 } data: { age: 41 }) {
+        |  updateParent(where: { child_id: 1 } data: { age: { set: 41 }}) {
         |    name
         |    age
         |  }
@@ -85,7 +85,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { age: 42 }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { age: { set: 42 }}}}) {
         |    parent { age }
         |  }
         |}
@@ -100,7 +100,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
         |mutation {
         |  upsertParent(
         |    where: { child_id: 2 }
-        |    update: { age: 43 }
+        |    update: { age: { set: 43 }}
         |    create: { name: "Milutin", age: 42, child: { create: { id: 2, name: "Nikola" } } }
         |  ) {
         |    age
@@ -811,7 +811,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
         |    parents: {
         |       updateMany: {
         |         where: { age: { equals: 41 }}
-        |         data: { age: 42 } }
+        |         data: { age: { set: 42 } }}
         |       }
         |     }
         |  ) {
@@ -964,7 +964,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
         |      parents: {
         |        updateMany: {
         |          where: { age: { equals: 40 }}
-        |          data: { age: 41 }
+        |          data: { age: { set: 41 }}
         |        }
         |      }
         |    }

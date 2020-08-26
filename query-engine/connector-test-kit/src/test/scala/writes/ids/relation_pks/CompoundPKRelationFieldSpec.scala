@@ -1054,7 +1054,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |      parents: {
         |        updateMany: {
         |          where: { age: { equals: 40 }}
-        |          data: { age: 41 }
+        |          data: { age: { set: 41 }}
         |        }
         |      }
         |    }
@@ -1192,7 +1192,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |    parents: {
         |       updateMany: {
         |         where: { age: { equals: 41 }}
-        |         data: { age: 42 } }
+        |         data: { age: { set: 42 }}
         |       }
         |     }
         |  ) {

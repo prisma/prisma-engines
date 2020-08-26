@@ -66,7 +66,7 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     val firstCount       = topUpdatedCount
     val filterQueryCount = server.query(s"""{tops(where: $filter){id}}""", project).pathAsSeq("data.tops").length
     val filterUpdatedCount = server
-      .query(s"""mutation { updateManyTops(where: $filter, data: { top: "updated" }){count}}""".stripMargin, project)
+      .query(s"""mutation { updateManyTops(where: $filter, data: { top: { set: "updated" }}){count}}""".stripMargin, project)
       .pathAsLong("data.updateManyTops.count")
 
     val lastCount = topUpdatedCount
@@ -100,7 +100,7 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     val firstCount       = topUpdatedCount
     val filterQueryCount = server.query(s"""{tops{id}}""", project).pathAsSeq("data.tops").length
     val filterUpdatedCount = server
-      .query(s"""mutation {updateManyTops(data: { top: "updated" }){count}}""".stripMargin, project)
+      .query(s"""mutation {updateManyTops(data: { top: { set: "updated" }}){count}}""".stripMargin, project)
       .pathAsLong("data.updateManyTops.count")
 
     val lastCount = topUpdatedCount
@@ -137,7 +137,7 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     val firstCount       = topUpdatedCount
     val filterQueryCount = server.query(s"""{tops(where: $filter){id}}""", project).pathAsSeq("data.tops").length
     val filterUpdatedCount = server
-      .query(s"""mutation {updateManyTops(where: $filter, data: { top: "updated" }){count}}""".stripMargin, project)
+      .query(s"""mutation {updateManyTops(where: $filter, data: { top: { set: "updated" }}){count}}""".stripMargin, project)
       .pathAsLong("data.updateManyTops.count")
 
     val lastCount = topUpdatedCount

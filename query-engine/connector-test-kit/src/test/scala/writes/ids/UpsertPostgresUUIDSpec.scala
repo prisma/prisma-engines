@@ -26,7 +26,7 @@ class UpsertPostgresUUIDSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  upsertTodo(
         |    where: {id: "00000000-0000-0000-0000-000000000000"}
         |    create: { title: "the title" }
-        |    update: { title: "the updated title" }
+        |    update: { title: { set: "the updated title" } }
         |  ){
         |    id
         |    title

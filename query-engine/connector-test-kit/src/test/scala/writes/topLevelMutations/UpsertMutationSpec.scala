@@ -188,7 +188,7 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |      alias: "irrelevant"
          |    }
          |    update: {
-         |      title: { set:"updated title" }
+         |      title: { set: "updated title" }
          |    }
          |  ){
          |    id

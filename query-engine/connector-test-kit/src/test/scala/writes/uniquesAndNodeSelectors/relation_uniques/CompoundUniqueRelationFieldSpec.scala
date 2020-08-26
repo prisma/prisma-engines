@@ -847,7 +847,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |    parents: {
         |       updateMany: {
         |         where: { p: { equals: "Parent1Updated" }}
-        |         data: { p: "Parent2UpdatedMany" } }
+        |         data: { p: { set: "Parent2UpdatedMany" }}
         |       }
         |     }
         |  ) {
@@ -1021,7 +1021,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |      parents: {
         |        updateMany: {
         |          where: { p: { equals: "Parent2New" }}
-        |          data: { p: "Parent2NewUpdateMany" }
+        |          data: { p: { set: "Parent2NewUpdateMany" }}
         |        }
         |      }
         |    }

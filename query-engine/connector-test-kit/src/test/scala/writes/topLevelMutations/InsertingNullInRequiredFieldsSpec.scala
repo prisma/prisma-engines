@@ -34,7 +34,7 @@ class InsertingNullInRequiredFieldsSpec extends FlatSpec with Matchers with ApiS
             |  updateA(
             |    where: { b: "abc" }
             |    data: {
-            |      key: null
+            |      key: { set: null }
             |    }) {
             |    id
             |  }
@@ -100,7 +100,7 @@ class InsertingNullInRequiredFieldsSpec extends FlatSpec with Matchers with ApiS
         |  updateA(
         |    where: { b: "abc" }
         |    data: {
-        |      key: null
+        |      key: { set: null }
         |    }) {
         |    id
         |  }
