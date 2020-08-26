@@ -96,68 +96,78 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
       """[{"optStr":"updated","optInt":null,"optFloat":null},{"optStr":"updated","optInt":1,"optFloat":null},{"optStr":"updated","optInt":2,"optFloat":1.55}]""")
   }
 
-//  "UpdateMany" should "work between top level types" in {
-//
-//    val project = ProjectDsl.fromString {
-//      """
-//        |model ZChild{
-//        |    id       String  @id @default(cuid())
-//        |    name     String? @unique
-//        |    test     String?
-//        |    parentId String?
-//        |
-//        |    parent  Parent? @relation(fields: [parentId], references: [id])
-//        |}
-//        |
-//        |model Parent{
-//        |    id       String   @id @default(cuid())
-//        |    name     String?  @unique
-//        |    children ZChild[]
-//        |}"""
-//    }
-//
-//    database.setup(project)
-//
-//    val create = server.query(
-//      s"""mutation {
-//         |   createParent(data: {
-//         |   name: "Dad",
-//         |   children: {create:[{ name: "Daughter"},{ name: "Daughter2"}, { name: "Son"},{ name: "Son2"}]}
-//         |}){
-//         |  name,
-//         |  children{ name}
-//         |}}""",
-//      project
-//    )
-//
-//    create.toString should be(
-//      """{"data":{"createParent":{"name":"Dad","children":[{"name":"Daughter"},{"name":"Daughter2"},{"name":"Son"},{"name":"Son2"}]}}}""")
-//
-//    val nestedUpdateMany = server.query(
-//      s"""mutation {
-//         |   updateParent(
-//         |   where: { name: "Dad" }
-//         |   data: {  children: {updateMany:[
-//         |      {
-//         |          where:{name: { contains:"Daughter" }}
-//         |          data:{test: { set: "UpdateManyDaughters"} }
-//         |      },
-//         |      {
-//         |          where:{name: { contains:"Son" }}
-//         |          data:{test: { set: "UpdateManySons" }}
-//         |      }
-//         |   ]
-//         |  }}
-//         |){
-//         |  name,
-//         |  children{ name, test}
-//         |}}""",
-//      project
-//    )
-//
-//    nestedUpdateMany.toString should be(
-//      """{"data":{"updateParent":{"name":"Dad","children":[{"name":"Daughter","test":"UpdateManyDaughters"},{"name":"Daughter2","test":"UpdateManyDaughters"},{"name":"Son","test":"UpdateManySons"},{"name":"Son2","test":"UpdateManySons"}]}}}""")
-//  }
+  "An updateMany mutation" should "correctly apply all number operations for Int" in {
+    createTestModel("str1")
+    createTestModel("str2", Some(2))
+    createTestModel("str3", Some(3), Some(3.1))
+
+    // Increment
+    queryNumberOperation("optInt", "increment", "10") should be("""[{"optInt":null},{"optInt":12},{"optInt":13}]""")
+
+    // Decrement
+    queryNumberOperation("optInt", "decrement", "10") should be("""[{"optInt":null},{"optInt":2},{"optInt":3}]""")
+
+    // Multiply
+    queryNumberOperation("optInt", "multiply", "2") should be("""[{"optInt":null},{"optInt":4},{"optInt":6}]""")
+
+    // Divide
+    queryNumberOperation("optInt", "divide", "3") should be("""[{"optInt":null},{"optInt":1},{"optInt":2}]""")
+
+    // Set
+    queryNumberOperation("optInt", "set", "5") should be("""[{"optInt":5},{"optInt":5},{"optInt":5}]""")
+  }
+
+  "An updateMany mutation" should "correctly apply all number operations for Float" in {
+    createTestModel("str1")
+    createTestModel("str2", None, Some(2))
+    createTestModel("str3", None, Some(3.1))
+
+    // Increment
+    queryNumberOperation("optFloat", "increment", "1.1") should be("""[{"optFloat":null},{"optFloat":3.1},{"optFloat":4.2}]""")
+
+    // Decrement
+    queryNumberOperation("optFloat", "decrement", "1.1") should be("""[{"optFloat":null},{"optFloat":2},{"optFloat":3.1}]""")
+
+    // Multiply
+    queryNumberOperation("optFloat", "multiply", "5.5") should be("""[{"optFloat":null},{"optFloat":11},{"optFloat":17.05}]""")
+
+    // Divide
+    queryNumberOperation("optFloat", "divide", "2") should be("""[{"optFloat":null},{"optFloat":5.5},{"optFloat":8.525}]""")
+
+    // Set
+    queryNumberOperation("optFloat", "set", "5") should be("""[{"optFloat":5},{"optFloat":5},{"optFloat":5}]""")
+  }
+
+  def queryNumberOperation(field: String, op: String, value: String): String = {
+    var result = server.query(
+      s"""mutation {
+      |  updateManyTestModel(
+      |    where: {}
+      |    data: { $field: { $op: $value } }
+      |  ){
+      |    count
+      |  }
+      |}
+    """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    result.pathAsLong("data.updateManyTestModel.count") should equal(3)
+
+    result = server.query(
+      s"""{
+      |  findManyTestModel {
+      |    $field
+      |  }
+      |}
+    """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    result.pathAsJsValue("data.findManyTestModel").toString
+  }
 
   def createTestModel(optStr: String, optInt: Option[Int] = None, optFloat: Option[Double] = None): Unit = {
     val f = optFloat match {
