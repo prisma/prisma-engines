@@ -83,7 +83,7 @@ fn operations_object_type(
 
     let mut fields = vec![input_field("set", field_type.clone(), None)];
 
-    if with_number_operators {
+    if with_number_operators && feature_flags::get().atomicNumberOperations {
         fields.push(input_field("increment", field_type.clone(), None));
         fields.push(input_field("decrement", field_type.clone(), None));
         fields.push(input_field("multiply", field_type.clone(), None));
