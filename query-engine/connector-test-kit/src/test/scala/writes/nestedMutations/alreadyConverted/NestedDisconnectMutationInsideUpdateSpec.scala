@@ -371,6 +371,25 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       )
       val otherChild = t.child.whereMulti(otherParentResult, "data.createParent.childrenOpt")(1)
 
+      val empty = server.query(
+        s"""
+           |mutation {
+           |  updateParent(
+           |  where: $parentIdentifier
+           |  data:{
+           |    childrenOpt: {disconnect: []}
+           |  }){
+           |    childrenOpt{
+           |      c
+           |    }
+           |  }
+           |}
+      """,
+        project
+      )
+
+      empty.toString() should be("{\"data\":{\"updateParent\":{\"childrenOpt\":[{\"c\":\"c1\"},{\"c\":\"c2\"}]}}}")
+
       server.queryThatMustFail(
         s"""
          |mutation {
