@@ -8,8 +8,8 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
   val project = SchemaDsl.fromStringV11() {
     """model Item {
       |  id    String @id @default(cuid())
-      |  float Float
-      |  int   Int
+      |  float Float  @map("db_float")
+      |  int   Int    @map("db_int")
       |}
     """.stripMargin
   }
