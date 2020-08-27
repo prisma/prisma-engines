@@ -299,22 +299,22 @@ impl SqlRenderer for SqliteFlavour {
         result
     }
 
-    fn render_rename_table(&self, name: &str, new_name: &str, schema_name: &str) -> String {
+    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(&schema_name, &name),
+            self.quote_with_schema(self.attached_name(), &name),
             new_name = self.quote(new_name).to_string(),
         )
     }
 }
 
-fn render_column_type(t: &ColumnType) -> String {
+fn render_column_type(t: &ColumnType) -> &'static str {
     match &t.family {
-        ColumnTypeFamily::Boolean => "BOOLEAN".to_string(),
-        ColumnTypeFamily::DateTime => "DATETIME".to_string(),
-        ColumnTypeFamily::Float => "REAL".to_string(),
-        ColumnTypeFamily::Int => "INTEGER".to_string(),
-        ColumnTypeFamily::String => "TEXT".to_string(),
+        ColumnTypeFamily::Boolean => "BOOLEAN",
+        ColumnTypeFamily::DateTime => "DATETIME",
+        ColumnTypeFamily::Float => "REAL",
+        ColumnTypeFamily::Int => "INTEGER",
+        ColumnTypeFamily::String => "TEXT",
         x => unimplemented!("{:?} not handled yet", x),
     }
 }
