@@ -16,12 +16,18 @@ where
     let end = Instant::now();
 
     if *crate::LOG_QUERIES {
+        let result = match res {
+            Ok(_) => "success",
+            Err(_) => "error",
+        };
+
         #[cfg(not(feature = "tracing-log"))]
         {
             info!(
-                "query: \"{}\", params: {} (in {}ms)",
+                "query: \"{}\", params: {} ({} in {}ms)",
                 query,
                 Params(params),
+                result,
                 start.elapsed().as_millis(),
             );
         }
@@ -32,6 +38,7 @@ where
                 item_type = "query",
                 params = %Params(params),
                 duration_ms = start.elapsed().as_millis() as u64,
+                result,
             )
         }
     }
