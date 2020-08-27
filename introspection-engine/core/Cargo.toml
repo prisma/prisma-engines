@@ -41,4 +41,3 @@ test-setup = { path = "../../libs/test-setup" }
 [[bin]]
 name = "introspection-engine"
 path = "src/main.rs"
-

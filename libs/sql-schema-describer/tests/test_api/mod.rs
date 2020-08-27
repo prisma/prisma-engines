@@ -27,7 +27,7 @@ impl TestApi {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
             SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
             SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
+            SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(db)),
         };
 
         Ok(describer.describe(self.schema_name()).await?)
@@ -42,7 +42,12 @@ impl TestApi {
     }
 
     pub(crate) fn schema_name(&self) -> &str {
-        self.connection_info.schema_name()
+        match self.sql_family {
+            // It is not possible to connect to a specific schema in MSSQL. The
+            // user has a dedicated schema from the admin, that's all.
+            SqlFamily::Mssql => self.db_name(),
+            _ => self.connection_info.schema_name(),
+        }
     }
 
     pub(crate) fn sql_family(&self) -> SqlFamily {
@@ -57,7 +62,7 @@ impl TestApi {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
-                SqlFamily::Mssql => todo!("Hey Barrel, greetings from Redmond"),
+                SqlFamily::Mssql => barrel::SqlVariant::Mssql,
             },
         }
     }
@@ -148,16 +153,11 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str, co
         .await
         .unwrap();
     let connection_info = database.connection_info().to_owned();
-    let drop_schema = dbg!(format!(
-        "DROP SCHEMA IF EXISTS \"{}\" CASCADE;",
-        connection_info.schema_name()
-    ));
+    let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", connection_info.schema_name());
     database.query_raw(&drop_schema, &[]).await.ok();
 
-    let create_schema = dbg!(format!(
-        "CREATE SCHEMA IF NOT EXISTS \"{}\";",
-        connection_info.schema_name()
-    ));
+    let create_schema = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", connection_info.schema_name());
+
     database.query_raw(&create_schema, &[]).await.ok();
 
     TestApi {
@@ -184,6 +184,68 @@ pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
     }
 }
 
+pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
+    let connection_string = mssql_2019_url("master");
+    let database = Quaint::new(&connection_string).await.unwrap();
+    let connection_info = database.connection_info().to_owned();
+
+    // Mickie misses DROP SCHEMA .. CASCADE, so what we need to do here is to
+    // delete first the foreign keys, then all the tables from the test schema
+    // to allow a clean slate for the next test.
+
+    let drop_fks = format!(
+        r#"
+        DECLARE @stmt NVARCHAR(max)
+        DECLARE @n CHAR(1)
+
+        SET @n = CHAR(10)
+
+        SELECT @stmt = ISNULL(@stmt + @n, '') +
+            'ALTER TABLE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(parent_object_id) + '] DROP CONSTRAINT [' + name + ']'
+        FROM sys.foreign_keys
+        WHERE SCHEMA_NAME(schema_id) = '{0}'
+
+        EXEC SP_EXECUTESQL @stmt
+        "#,
+        schema
+    );
+
+    let drop_tables = format!(
+        r#"
+        DECLARE @stmt NVARCHAR(max)
+        DECLARE @n CHAR(1)
+
+        SET @n = CHAR(10)
+
+        SELECT @stmt = ISNULL(@stmt + @n, '') +
+            'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
+        FROM sys.tables
+        WHERE SCHEMA_NAME(schema_id) = '{0}'
+
+        EXEC SP_EXECUTESQL @stmt
+        "#,
+        schema
+    );
+
+    database.raw_cmd(&drop_fks).await.unwrap();
+    database.raw_cmd(&drop_tables).await.unwrap();
+
+    database
+        .raw_cmd(&format!("DROP SCHEMA IF EXISTS {}", schema))
+        .await
+        .unwrap();
+
+    database.raw_cmd(&format!("CREATE SCHEMA {}", schema)).await.unwrap();
+
+    TestApi {
+        connector_name: "mssql2019",
+        db_name: schema,
+        connection_info,
+        database: Arc::new(database),
+        sql_family: SqlFamily::Mssql,
+    }
+}
+
 pub struct BarrelMigrationExecutor {
     pub(super) database: Arc<dyn Queryable + Send + Sync>,
     pub(super) sql_variant: barrel::backend::SqlVariant,
@@ -204,6 +266,7 @@ impl BarrelMigrationExecutor {
     {
         let mut migration = Migration::new().schema(schema_name);
         migration_fn(&mut migration);
+
         let full_sql = migration.make_from(self.sql_variant);
         run_full_sql(&self.database, &full_sql).await;
     }

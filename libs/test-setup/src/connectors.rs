@@ -34,6 +34,10 @@ fn mysql_5_6_capabilities() -> BitFlags<Capabilities> {
     Capabilities::Enums.into()
 }
 
+fn mssql_2019_capabilities() -> BitFlags<Capabilities> {
+    BitFlags::empty()
+}
+
 fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
     if tags.intersects(Tags::Postgres) {
         return postgres_capabilities();
@@ -47,11 +51,39 @@ fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
         return mysql_capabilities();
     }
 
+    if tags.intersects(Tags::Mssql2009) {
+        return mssql_2019_capabilities();
+    }
+
     BitFlags::empty()
 }
 
 pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
     let connectors: Vec<Connector> = connector_names()
+        .iter()
+        .map(|(name, tags)| Connector {
+            name: (*name).to_owned(),
+            test_api_factory_name: format!("{}_test_api", name),
+            capabilities: infer_capabilities(*tags),
+            tags: *tags,
+        })
+        .collect();
+
+    Connectors::new(connectors)
+});
+
+pub static CONNECTORS_MSSQL: Lazy<Connectors> = Lazy::new(|| {
+    // So, macOS doesn't like SQL Server's certificates, and we disable
+    // tests on Apple.
+    let names = if cfg!(not(target_os = "macos")) {
+        let mut names = connector_names();
+        names.push(("mssql_2019", Tags::Mssql2009.into()));
+        names
+    } else {
+        connector_names()
+    };
+
+    let connectors: Vec<Connector> = names
         .iter()
         .map(|(name, tags)| Connector {
             name: (*name).to_owned(),
