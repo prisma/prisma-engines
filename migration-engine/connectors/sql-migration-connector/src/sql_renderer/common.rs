@@ -1,3 +1,5 @@
+use crate::flavour::SqlFlavour;
+use quaint::prelude::SqlFamily;
 use sql_schema_describer::walkers::*;
 use sql_schema_describer::*;
 use std::fmt::{Display, Write as _};
@@ -89,6 +91,36 @@ pub(crate) fn render_on_delete(on_delete: &ForeignKeyAction) -> &'static str {
     }
 }
 
+pub(super) fn render_create_index(
+    renderer: &dyn SqlFlavour,
+    schema_name: &str,
+    table_name: &str,
+    index: &Index,
+    sql_family: SqlFamily,
+) -> String {
+    let Index { name, columns, tpe } = index;
+    let index_type = match tpe {
+        IndexType::Unique => "UNIQUE ",
+        IndexType::Normal => "",
+    };
+    let index_name = match sql_family {
+        SqlFamily::Sqlite => renderer.quote_with_schema(schema_name, &name).to_string(),
+        _ => renderer.quote(&name).to_string(),
+    };
+    let table_reference = match sql_family {
+        SqlFamily::Sqlite => renderer.quote(table_name).to_string(),
+        _ => renderer.quote_with_schema(schema_name, table_name).to_string(),
+    };
+    let columns = columns.iter().map(|c| renderer.quote(c));
+
+    format!(
+        "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+        index_type = index_type,
+        index_name = index_name,
+        table_reference = table_reference,
+        columns = columns.join(", ")
+    )
+}
 pub(crate) trait IteratorJoin {
     fn join(self, sep: &str) -> String;
 }

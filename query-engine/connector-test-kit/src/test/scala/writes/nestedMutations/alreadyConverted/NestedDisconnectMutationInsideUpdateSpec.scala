@@ -324,6 +324,10 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
+      // Note for review
+      // we were relying of the order of the returned child ids without specifying an order by.
+      // with the direct return of the manyrecord that order seems to have changed in the case where we return the id field
+      // that means depending on whether you have queryargs that do nothing or not your order might change -.-
       val parentResult = server.query(
         s"""mutation {
         |  createParent(data: {
@@ -336,7 +340,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    }
         |  }){
         |    ${t.parent.selection}
-        |    childrenOpt{
+        |    childrenOpt(orderBy: { id: asc }){
         |       ${t.child.selection}
         |    }
         |  }
@@ -358,7 +362,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |      connect: [$firstChild]
         |    }
         |  }){
-        |    childrenOpt{
+        |    childrenOpt(orderBy: { id: asc }){
         |       ${t.child.selection}
         |    }
         |  }
@@ -366,6 +370,25 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
       val otherChild = t.child.whereMulti(otherParentResult, "data.createParent.childrenOpt")(1)
+
+      val empty = server.query(
+        s"""
+           |mutation {
+           |  updateParent(
+           |  where: $parentIdentifier
+           |  data:{
+           |    childrenOpt: {disconnect: []}
+           |  }){
+           |    childrenOpt{
+           |      c
+           |    }
+           |  }
+           |}
+      """,
+        project
+      )
+
+      empty.toString() should be("{\"data\":{\"updateParent\":{\"childrenOpt\":[{\"c\":\"c1\"},{\"c\":\"c2\"}]}}}")
 
       server.queryThatMustFail(
         s"""
@@ -436,7 +459,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    }
         |  }){
         |    ${t.parent.selection}
-        |    childrenOpt{
+        |    childrenOpt(orderBy: { id: asc }){
         |       ${t.child.selection}
         |    }
         |  }
@@ -458,7 +481,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |      connect: [$child1Identifier]
         |    }
         |  }){
-        |    childrenOpt{
+        |    childrenOpt(orderBy: { id: asc }){
         |       ${t.child.selection}
         |    }
         |  }

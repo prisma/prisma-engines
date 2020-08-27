@@ -210,32 +210,6 @@ impl Relation {
         !self.is_many_to_many() && !self.is_one_to_one()
     }
 
-    pub fn contains_the_model(&self, model: ModelRef) -> bool {
-        self.model_a().name == model.name || self.model_b().name == model.name
-    }
-
-    pub fn get_field_on_model(&self, model_id: &str) -> crate::Result<Arc<RelationField>> {
-        if model_id == self.model_a().name {
-            Ok(self.field_a())
-        } else if model_id == self.model_b().name {
-            Ok(self.field_b())
-        } else {
-            Err(DomainError::ModelForRelationNotFound {
-                model_id: model_id.to_string(),
-                relation: self.name.clone(),
-            })
-        }
-    }
-
-    pub fn inline_manifestation(&self) -> Option<&InlineRelation> {
-        use RelationLinkManifestation::*;
-
-        match self.manifestation {
-            Inline(ref m) => Some(m),
-            _ => None,
-        }
-    }
-
     pub fn internal_data_model(&self) -> InternalDataModelRef {
         self.internal_data_model
             .upgrade()

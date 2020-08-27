@@ -1,12 +1,12 @@
-use crate::*;
-use sql_migration::{AddForeignKey, CreateTable, DropForeignKey, DropTable, SqlMigrationStep};
-use sql_renderer::{IteratorJoin, Quoted};
-use sql_schema_describer::walkers::SqlSchemaExt;
-use sql_schema_describer::{Index, IndexType, SqlSchema};
-use sql_schema_differ::SqlSchemaDiffer;
-use std::fmt::Write as _;
+use crate::{
+    database_info::DatabaseInfo,
+    sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
+    sql_schema_differ::SqlSchemaDiffer,
+    Component, SqlError, SqlFlavour, SqlResult,
+};
+use migration_connector::{ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, PrettyDatabaseMigrationStep};
+use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use tracing_futures::Instrument;
-use SqlFlavour;
 
 pub struct SqlDatabaseStepApplier<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -110,7 +110,6 @@ fn render_raw_sql(
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
 ) -> Result<Vec<String>, anyhow::Error> {
-    let sql_family = renderer.sql_family();
     let schema_name = database_info.connection_info().schema_name().to_string();
     let differ = SqlSchemaDiffer {
         previous: current_schema,
@@ -123,82 +122,22 @@ fn render_raw_sql(
         SqlMigrationStep::RedefineTables { names } => Ok(renderer.render_redefine_tables(names, differ, database_info)),
         SqlMigrationStep::CreateEnum(create_enum) => Ok(renderer.render_create_enum(create_enum)),
         SqlMigrationStep::DropEnum(drop_enum) => Ok(renderer.render_drop_enum(drop_enum)),
-        SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ, &schema_name),
+        SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let table = next_schema
                 .table_walker(&table.name)
                 .expect("CreateTable referring to an unknown table.");
 
-            Ok(vec![renderer.render_create_table(&table, &schema_name)?])
+            Ok(vec![renderer.render_create_table(&table)?])
         }
-        SqlMigrationStep::DropTable(DropTable { name }) => match sql_family {
-            SqlFamily::Mysql | SqlFamily::Postgres => Ok(vec![format!(
-                "DROP TABLE {}",
-                renderer.quote_with_schema(&schema_name, &name)
-            )]),
-            // Turning off the pragma is safe, because schema validation would forbid foreign keys
-            // to a non-existent model. There appears to be no other way to deal with cyclic
-            // dependencies in the dropping order of tables in the presence of foreign key
-            // constraints on SQLite.
-            SqlFamily::Sqlite => Ok(vec![
-                "PRAGMA foreign_keys=off".to_string(),
-                format!("DROP TABLE {}", renderer.quote_with_schema(&schema_name, &name)),
-                "PRAGMA foreign_keys=on".to_string(),
-            ]),
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
-        },
-        SqlMigrationStep::RenameTable { name, new_name } => {
-            let new_name = match sql_family {
-                SqlFamily::Sqlite => renderer.quote(new_name).to_string(),
-                _ => renderer.quote_with_schema(&schema_name, &new_name).to_string(),
-            };
-            Ok(vec![format!(
-                "ALTER TABLE {} RENAME TO {}",
-                renderer.quote_with_schema(&schema_name, &name),
-                new_name
-            )])
+        SqlMigrationStep::DropTable(DropTable { name }) => Ok(renderer.render_drop_table(name, &schema_name)),
+        SqlMigrationStep::RenameTable { name, new_name } => Ok(vec![renderer.render_rename_table(name, new_name)]),
+        SqlMigrationStep::AddForeignKey(add_foreign_key) => {
+            Ok(vec![renderer.render_add_foreign_key(add_foreign_key, &schema_name)])
         }
-        SqlMigrationStep::AddForeignKey(AddForeignKey { table, foreign_key }) => match sql_family {
-            SqlFamily::Sqlite => Ok(Vec::new()),
-            _ => {
-                let mut add_constraint = String::with_capacity(120);
-
-                write!(
-                    add_constraint,
-                    "ALTER TABLE {table} ADD ",
-                    table = renderer.quote_with_schema(&schema_name, table)
-                )?;
-
-                if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
-                    write!(add_constraint, "CONSTRAINT {} ", renderer.quote(constraint_name))?;
-                }
-
-                write!(
-                    add_constraint,
-                    "FOREIGN KEY ({})",
-                    foreign_key.columns.iter().map(|col| renderer.quote(col)).join(", ")
-                )?;
-
-                add_constraint.push_str(&renderer.render_references(&schema_name, &foreign_key));
-
-                Ok(vec![add_constraint])
-            }
-        },
-        SqlMigrationStep::DropForeignKey(DropForeignKey { table, constraint_name }) => match sql_family {
-            SqlFamily::Mysql => Ok(vec![format!(
-                "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
-                table = renderer.quote_with_schema(&schema_name, table),
-                constraint_name = Quoted::mysql_ident(constraint_name),
-            )]),
-            SqlFamily::Postgres => Ok(vec![format!(
-                "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-                table = renderer.quote_with_schema(&schema_name, table),
-                constraint_name = Quoted::postgres_ident(constraint_name),
-            )]),
-            SqlFamily::Sqlite => Ok(Vec::new()),
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
-        },
-
+        SqlMigrationStep::DropForeignKey(drop_foreign_key) => {
+            Ok(vec![renderer.render_drop_foreign_key(drop_foreign_key)])
+        }
         SqlMigrationStep::AlterTable(alter_table) => {
             Ok(renderer.render_alter_table(alter_table, database_info, &differ))
         }
@@ -210,35 +149,4 @@ fn render_raw_sql(
             renderer.render_alter_index(alter_index, database_info, current_schema)
         }
     }
-}
-
-pub(crate) fn render_create_index(
-    renderer: &dyn SqlFlavour,
-    schema_name: &str,
-    table_name: &str,
-    index: &Index,
-    sql_family: SqlFamily,
-) -> String {
-    let Index { name, columns, tpe } = index;
-    let index_type = match tpe {
-        IndexType::Unique => "UNIQUE ",
-        IndexType::Normal => "",
-    };
-    let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer.quote_with_schema(schema_name, &name).to_string(),
-        _ => renderer.quote(&name).to_string(),
-    };
-    let table_reference = match sql_family {
-        SqlFamily::Sqlite => renderer.quote(table_name).to_string(),
-        _ => renderer.quote_with_schema(schema_name, table_name).to_string(),
-    };
-    let columns = columns.iter().map(|c| renderer.quote(c));
-
-    format!(
-        "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
-        index_type = index_type,
-        index_name = index_name,
-        table_reference = table_reference,
-        columns = columns.join(", ")
-    )
 }

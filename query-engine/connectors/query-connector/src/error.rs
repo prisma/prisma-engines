@@ -21,6 +21,9 @@ impl ConnectorError {
                 })
                 .unwrap(),
             ),
+            ErrorKind::TableDoesNotExist { table } => Some(
+                KnownError::new(user_facing_errors::query_engine::TableDoesNotExist { table: table.clone() }).unwrap(),
+            ),
             _ => None,
         };
 

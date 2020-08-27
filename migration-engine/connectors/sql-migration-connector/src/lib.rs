@@ -25,7 +25,7 @@ use flavour::SqlFlavour;
 use migration_connector::*;
 use quaint::{
     error::ErrorKind,
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
+    prelude::{ConnectionInfo, Queryable},
     single::Quaint,
 };
 use sql_database_migration_inferrer::*;

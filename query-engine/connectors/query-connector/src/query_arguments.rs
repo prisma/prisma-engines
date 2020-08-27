@@ -47,6 +47,15 @@ impl QueryArguments {
         }
     }
 
+    pub fn do_nothing(&self) -> bool {
+        self.cursor.is_none()
+            && self.take.is_none()
+            && self.skip.is_none()
+            && self.filter.is_none()
+            && self.order_by.is_empty()
+            && self.distinct.is_none()
+    }
+
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.
     pub fn contains_unstable_cursor(&self) -> bool {
         self.cursor.is_some() && !self.is_stable_ordering()
