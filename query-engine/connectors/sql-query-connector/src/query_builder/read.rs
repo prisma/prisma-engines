@@ -129,10 +129,10 @@ fn extract_columns(model: &ModelRef, aggregators: &[Aggregator]) -> Vec<Column<'
         .iter()
         .flat_map(|aggregator| match aggregator {
             Aggregator::Count => model.primary_identifier().scalar_fields().collect(),
-            Aggregator::Average(fields) => fields,
-            Aggregator::Sum(fields) => fields,
-            Aggregator::Min(fields) => fields,
-            Aggregator::Max(fields) => fields,
+            Aggregator::Average(fields) => fields.clone(),
+            Aggregator::Sum(fields) => fields.clone(),
+            Aggregator::Min(fields) => fields.clone(),
+            Aggregator::Max(fields) => fields.clone(),
         })
         .unique_by(|field| field.db_name().to_owned())
         .collect();
