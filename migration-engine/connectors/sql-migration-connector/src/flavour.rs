@@ -35,8 +35,9 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
     match connection_info {
         ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour(url.clone())),
         ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour(url.clone())),
-        ConnectionInfo::Sqlite { file_path, .. } => Box::new(SqliteFlavour {
+        ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
+            attached_name: db_name.clone(),
         }),
         ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond!"),
     }
@@ -158,6 +159,13 @@ impl SqlFlavour for MysqlFlavour {
 #[derive(Debug)]
 pub(crate) struct SqliteFlavour {
     file_path: String,
+    attached_name: String,
+}
+
+impl SqliteFlavour {
+    pub(crate) fn attached_name(&self) -> &str {
+        &self.attached_name
+    }
 }
 
 #[async_trait::async_trait]
