@@ -263,11 +263,11 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_redefine_table on MySQL")
     }
 
-    fn render_rename_table(&self, name: &str, new_name: &str, schema_name: &str) -> String {
+    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(&schema_name, &name),
-            new_name = self.quote_with_schema(&schema_name, &new_name).to_string(),
+            self.quote_with_schema(self.schema_name(), &name),
+            new_name = self.quote_with_schema(self.schema_name(), &new_name).to_string(),
         )
     }
 }

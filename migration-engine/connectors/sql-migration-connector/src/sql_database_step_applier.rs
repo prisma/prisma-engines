@@ -131,9 +131,7 @@ fn render_raw_sql(
             Ok(vec![renderer.render_create_table(&table, &schema_name)?])
         }
         SqlMigrationStep::DropTable(DropTable { name }) => Ok(renderer.render_drop_table(name, &schema_name)),
-        SqlMigrationStep::RenameTable { name, new_name } => {
-            Ok(vec![renderer.render_rename_table(name, new_name, &schema_name)])
-        }
+        SqlMigrationStep::RenameTable { name, new_name } => Ok(vec![renderer.render_rename_table(name, new_name)]),
         SqlMigrationStep::AddForeignKey(add_foreign_key) => {
             Ok(vec![renderer.render_add_foreign_key(add_foreign_key, &schema_name)])
         }
