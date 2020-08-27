@@ -42,7 +42,7 @@ impl Rpc for RpcImpl {
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
-        Box::new(Self::introspect_internal(input.schema, input.clean).boxed().compat())
+        Box::new(Self::introspect_internal(input.schema, input.force).boxed().compat())
     }
 }
 
@@ -78,10 +78,10 @@ impl RpcImpl {
         }
     }
 
-    pub async fn introspect_internal(schema: String, clean: bool) -> RpcResult<IntrospectionResultOutput> {
+    pub async fn introspect_internal(schema: String, force: bool) -> RpcResult<IntrospectionResultOutput> {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
-        let input_data_model = if !clean {
+        let input_data_model = if !force {
             datamodel::parse_datamodel(&schema).map_err(|err| {
                 Error::from(CommandError::ReceivedBadDatamodel(
                     err.to_pretty_string("schema.prisma", &schema),
@@ -132,7 +132,7 @@ impl RpcImpl {
 pub struct IntrospectionInput {
     pub(crate) schema: String,
     #[serde(default = "default_false")]
-    pub(crate) clean: bool,
+    pub(crate) force: bool,
 }
 
 fn default_false() -> bool {
