@@ -42,11 +42,7 @@ impl Rpc for RpcImpl {
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
-        Box::new(
-            Self::introspect_internal(input.schema, input.reintrospect, input.clean)
-                .boxed()
-                .compat(),
-        )
+        Box::new(Self::introspect_internal(input.schema, input.clean).boxed().compat())
     }
 }
 
@@ -82,14 +78,10 @@ impl RpcImpl {
         }
     }
 
-    pub async fn introspect_internal(
-        schema: String,
-        reintrospect: bool,
-        clean: bool,
-    ) -> RpcResult<IntrospectionResultOutput> {
+    pub async fn introspect_internal(schema: String, clean: bool) -> RpcResult<IntrospectionResultOutput> {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
-        let input_data_model = if reintrospect && !clean {
+        let input_data_model = if !clean {
             datamodel::parse_datamodel(&schema).map_err(|err| {
                 Error::from(CommandError::ReceivedBadDatamodel(
                     err.to_pretty_string("schema.prisma", &schema),
@@ -99,7 +91,7 @@ impl RpcImpl {
             Datamodel::new()
         };
 
-        let result = match connector.introspect(&input_data_model, reintrospect).await {
+        let result = match connector.introspect(&input_data_model).await {
             Ok(introspection_result) => {
                 if introspection_result.data_model.is_empty() {
                     Err(Error::from(CommandError::IntrospectionResultEmpty(url.to_string())))
@@ -139,8 +131,6 @@ impl RpcImpl {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IntrospectionInput {
     pub(crate) schema: String,
-    #[serde(default = "default_false")]
-    pub(crate) reintrospect: bool,
     #[serde(default = "default_false")]
     pub(crate) clean: bool,
 }
