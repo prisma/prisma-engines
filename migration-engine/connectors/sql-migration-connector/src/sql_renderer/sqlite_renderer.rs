@@ -215,6 +215,18 @@ impl SqlRenderer for SqliteFlavour {
         )
     }
 
+    fn render_drop_table(&self, table_name: &str, schema_name: &str) -> Vec<String> {
+        // Turning off the pragma is safe, because schema validation would forbid foreign keys
+        // to a non-existent model. There appears to be no other way to deal with cyclic
+        // dependencies in the dropping order of tables in the presence of foreign key
+        // constraints on SQLite.
+        vec![
+            "PRAGMA foreign_keys=off".to_string(),
+            format!("DROP TABLE {}", self.quote_with_schema(&schema_name, &table_name)),
+            "PRAGMA foreign_keys=on".to_string(),
+        ]
+    }
+
     fn render_redefine_tables(
         &self,
         tables: &[String],

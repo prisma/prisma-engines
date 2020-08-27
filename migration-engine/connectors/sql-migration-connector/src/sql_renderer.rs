@@ -196,6 +196,14 @@ pub(crate) trait SqlRenderer {
     /// Render a `DropIndex` step.
     fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String;
 
+    /// Render a `DropTable` step.
+    fn render_drop_table(&self, table_name: &str, schema_name: &str) -> Vec<String> {
+        vec![format!(
+            "DROP TABLE {}",
+            self.quote_with_schema(&schema_name, &table_name)
+        )]
+    }
+
     /// Render a `RedefineTables` step.
     fn render_redefine_tables(
         &self,
