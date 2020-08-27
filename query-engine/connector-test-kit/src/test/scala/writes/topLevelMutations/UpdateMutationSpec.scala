@@ -393,6 +393,59 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     queryNumberOperation(project, 2, "optFloat", "set", "null") should be("""{"optFloat":null}""")
   }
 
+  "An updateOne mutation with number operations" should "handle id changes correctly" in {
+    val project = ProjectDsl.fromString {
+      """model TestModel {
+        |  id1  Float
+        |  id2  Int
+        |  uniq Int @unique
+        |  
+        |  @@id([id1, id2])
+        |}
+      """.stripMargin
+    }
+    database.setup(project)
+
+    server.query(
+      s"""
+         |mutation {
+         |  createOneTestModel(
+         |    data: {
+         |      id1: 1.23456
+         |      id2: 2
+         |      uniq: 3
+         |    }
+         |  ) {
+         |    uniq
+         |  }
+         |}
+      """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    val result = server.query(
+      s"""mutation {
+         |  updateOneTestModel(
+         |    where: { id1_id2: { id1: 1.23456, id2: 2 } }
+         |    data: {
+         |      id1: { divide: 2 }
+         |      uniq: { multiply: 3 }
+         |    }
+         |  ){
+         |    id1
+         |    id2
+         |    uniq
+         |  }
+         |}
+    """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    result.pathAsJsValue("data.updateOneTestModel").toString should be("""{"id1":0.61728,"id2":2,"uniq":9}""")
+  }
+
   def queryNumberOperation(project: Project, id: Int, field: String, op: String, value: String): String = {
     val result = server.query(
       s"""mutation {
