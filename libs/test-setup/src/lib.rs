@@ -14,6 +14,7 @@ pub mod connectors;
 
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
+use std::collections::BTreeMap;
 use url::Url;
 
 type AnyError = Box<dyn std::error::Error + Send + Sync>;
@@ -149,6 +150,17 @@ pub fn mariadb_url(db_name: &str) -> String {
     )
 }
 
+pub fn mssql_2019_url(db_name: &str) -> String {
+    let (host, port) = db_host_mssql_2019();
+
+    format!(
+        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;sockettimeout=15",
+        db_name = db_name,
+        host = host,
+        port = port,
+    )
+}
+
 fn db_host_and_port_postgres_9() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-postgres-9", 5432),
@@ -216,6 +228,13 @@ fn db_host_and_port_mariadb() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-mariadb", 3306),
         Err(_) => ("127.0.0.1", 3308),
+    }
+}
+
+fn db_host_mssql_2019() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-mssql-2019", 1433),
+        Err(_) => ("127.0.0.1", 1433),
     }
 }
 
@@ -445,6 +464,41 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
     let conn = Quaint::new(&original_url.to_string()).await?;
 
     conn.raw_cmd("CREATE SCHEMA \"prisma-tests\"").await?;
+
+    Ok(conn)
+}
+
+pub async fn create_mssql_database(jdbc_string: &str) -> Result<Quaint, AnyError> {
+    let mut splitted = jdbc_string.split(';');
+    let uri = splitted.next().unwrap().to_string();
+
+    let mut params: BTreeMap<String, String> = splitted
+        .map(|kv| kv.split('='))
+        .map(|mut kv| {
+            let key = kv.next().unwrap().to_string();
+            let value = kv.next().unwrap().to_string();
+
+            (key, value)
+        })
+        .collect();
+
+    match params.remove("database") {
+        Some(ref db_name) if db_name != "master" => {
+            params.insert("database".into(), "master".into());
+
+            let params: Vec<_> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
+            let conn_str = format!("{};{}", uri, params.join(";"));
+
+            let conn = Quaint::new(conn_str.as_str()).await?;
+
+            conn.raw_cmd(&format!("DROP DATABASE IF EXISTS {}", db_name)).await?;
+            conn.raw_cmd(&format!("CREATE DATABASE {}", db_name)).await?;
+        }
+        _ => (),
+    }
+
+    let conn = Quaint::new(jdbc_string).await?;
+    conn.query_raw("select db_name() as name", &[]).await?;
 
     Ok(conn)
 }
