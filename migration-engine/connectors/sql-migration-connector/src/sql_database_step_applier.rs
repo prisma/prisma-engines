@@ -122,13 +122,13 @@ fn render_raw_sql(
         SqlMigrationStep::RedefineTables { names } => Ok(renderer.render_redefine_tables(names, differ, database_info)),
         SqlMigrationStep::CreateEnum(create_enum) => Ok(renderer.render_create_enum(create_enum)),
         SqlMigrationStep::DropEnum(drop_enum) => Ok(renderer.render_drop_enum(drop_enum)),
-        SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ, &schema_name),
+        SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let table = next_schema
                 .table_walker(&table.name)
                 .expect("CreateTable referring to an unknown table.");
 
-            Ok(vec![renderer.render_create_table(&table, &schema_name)?])
+            Ok(vec![renderer.render_create_table(&table)?])
         }
         SqlMigrationStep::DropTable(DropTable { name }) => Ok(renderer.render_drop_table(name, &schema_name)),
         SqlMigrationStep::RenameTable { name, new_name } => Ok(vec![renderer.render_rename_table(name, new_name)]),

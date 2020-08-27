@@ -22,12 +22,7 @@ impl SqlRenderer for MysqlFlavour {
         Quoted::Backticks(name)
     }
 
-    fn render_alter_enum(
-        &self,
-        _alter_enum: &AlterEnum,
-        _differ: &SqlSchemaDiffer<'_>,
-        _schema_name: &str,
-    ) -> anyhow::Result<Vec<String>> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
         unreachable!("render_alter_enum on MySQL")
     }
 
@@ -87,7 +82,7 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
+    fn render_column(&self, column: ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(&column);
         let nullability_str = render_nullability(&column);
@@ -116,7 +111,7 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, foreign_key: &ForeignKey) -> String {
         let referenced_columns = foreign_key
             .referenced_columns
             .iter()
@@ -125,7 +120,7 @@ impl SqlRenderer for MysqlFlavour {
 
         format!(
             " REFERENCES `{}`.`{}`({}) {} ON UPDATE CASCADE",
-            schema_name,
+            self.schema_name(),
             foreign_key.referenced_table,
             referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
@@ -187,11 +182,8 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String> {
-        let columns: String = table
-            .columns()
-            .map(|column| self.render_column(&schema_name, column, false))
-            .join(",\n");
+    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
+        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_columns = table.table.primary_key_columns();
 
@@ -226,7 +218,7 @@ impl SqlRenderer for MysqlFlavour {
 
         Ok(format!(
             "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            table_name = self.quote_with_schema(&schema_name, table.name()),
+            table_name = self.quote_with_schema(self.schema_name(), table.name()),
             columns = columns,
             indexes= indexes,
             primary_key = primary_key,

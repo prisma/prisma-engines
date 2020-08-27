@@ -50,21 +50,16 @@ pub(crate) trait SqlRenderer {
         )
         .unwrap();
 
-        add_constraint.push_str(&self.render_references(&schema_name, &foreign_key));
+        add_constraint.push_str(&self.render_references(&foreign_key));
 
         add_constraint
     }
 
-    fn render_alter_enum(
-        &self,
-        alter_enum: &AlterEnum,
-        differ: &SqlSchemaDiffer<'_>,
-        schema_name: &str,
-    ) -> anyhow::Result<Vec<String>>;
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>>;
 
-    fn render_column(&self, schema_name: &str, column: ColumnWalker<'_>, add_fk_prefix: bool) -> String;
+    fn render_column(&self, column: ColumnWalker<'_>) -> String;
 
-    fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
+    fn render_references(&self, foreign_key: &ForeignKey) -> String;
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
 
@@ -119,7 +114,7 @@ pub(crate) trait SqlRenderer {
                         schema: differ.next,
                         column,
                     };
-                    let col_sql = self.render_column(&schema_name, column, true);
+                    let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn(DropColumn { name }) => {
@@ -154,7 +149,7 @@ pub(crate) trait SqlRenderer {
                             let name = self.quote(&name);
                             lines.push(format!("DROP COLUMN {}", name));
 
-                            let col_sql = self.render_column(&schema_name, column.next, true);
+                            let col_sql = self.render_column(column.next);
                             lines.push(format!("ADD COLUMN {}", col_sql));
                         }
                     }
@@ -188,7 +183,7 @@ pub(crate) trait SqlRenderer {
     fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String;
 
     /// Render a `CreateTable` step.
-    fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String>;
+    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String>;
 
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
