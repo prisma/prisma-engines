@@ -214,6 +214,8 @@ pub(crate) trait SqlRenderer {
         differ: SqlSchemaDiffer<'_>,
         database_info: &DatabaseInfo,
     ) -> Vec<String>;
+
+    fn render_rename_table(&self, name: &str, new_name: &str, schema_name: &str) -> String;
 }
 
 #[derive(Default)]

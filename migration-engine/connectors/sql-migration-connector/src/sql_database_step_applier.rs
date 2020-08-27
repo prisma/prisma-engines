@@ -5,7 +5,6 @@ use crate::{
     Component, SqlError, SqlFlavour, SqlResult,
 };
 use migration_connector::{ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, PrettyDatabaseMigrationStep};
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use tracing_futures::Instrument;
 
@@ -111,7 +110,6 @@ fn render_raw_sql(
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
 ) -> Result<Vec<String>, anyhow::Error> {
-    let sql_family = renderer.sql_family();
     let schema_name = database_info.connection_info().schema_name().to_string();
     let differ = SqlSchemaDiffer {
         previous: current_schema,
@@ -134,15 +132,7 @@ fn render_raw_sql(
         }
         SqlMigrationStep::DropTable(DropTable { name }) => Ok(renderer.render_drop_table(name, &schema_name)),
         SqlMigrationStep::RenameTable { name, new_name } => {
-            let new_name = match sql_family {
-                SqlFamily::Sqlite => renderer.quote(new_name).to_string(),
-                _ => renderer.quote_with_schema(&schema_name, &new_name).to_string(),
-            };
-            Ok(vec![format!(
-                "ALTER TABLE {} RENAME TO {}",
-                renderer.quote_with_schema(&schema_name, &name),
-                new_name
-            )])
+            Ok(vec![renderer.render_rename_table(name, new_name, &schema_name)])
         }
         SqlMigrationStep::AddForeignKey(add_foreign_key) => {
             Ok(vec![renderer.render_add_foreign_key(add_foreign_key, &schema_name)])

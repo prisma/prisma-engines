@@ -298,6 +298,14 @@ impl SqlRenderer for SqliteFlavour {
 
         result
     }
+
+    fn render_rename_table(&self, name: &str, new_name: &str, schema_name: &str) -> String {
+        format!(
+            "ALTER TABLE {} RENAME TO {}",
+            self.quote_with_schema(&schema_name, &name),
+            new_name = self.quote(new_name).to_string(),
+        )
+    }
 }
 
 fn render_column_type(t: &ColumnType) -> String {
