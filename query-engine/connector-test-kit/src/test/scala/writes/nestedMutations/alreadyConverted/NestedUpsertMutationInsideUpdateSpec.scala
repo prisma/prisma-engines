@@ -44,7 +44,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      childrenOpt: {
          |        upsert: {
          |          where: {c: "DOES NOT EXIST"}
-         |          update: {c: "DOES NOT MATTER"}
+         |          update: {c: { set: "DOES NOT MATTER" }}
          |          create :{c: "c2"}
          |        }
          |      }
@@ -97,7 +97,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    data:{
          |    childrenOpt: {upsert: {
          |    where: {c: "c1"}
-         |    update: {c: "updated C"}
+         |    update: {c: { set: "updated C" }}
          |    create :{c: "DOES NOT MATTER"}
          |    }}
          |  }){
@@ -149,7 +149,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  data:{
          |    childrenOpt: {upsert: [{
          |    where: {c: "DOES NOT EXIST"}
-         |    update: {c: "DOES NOT MATTER"}
+         |    update: {c: {set: "DOES NOT MATTER"}}
          |    create :{c: "new C"}
          |    }]}
          |  }){
@@ -201,7 +201,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  data:{
          |    childrenOpt: {upsert: [{
          |    where: {c: "c1"}
-         |    update: {c: "updated C"}
+         |    update: {c: {set:"updated C"}}
          |    create :{c: "DOES NOT MATTER"}
          |    }]}
          |  }){
@@ -253,7 +253,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      childrenOpt: {
          |        upsert: [{
          |          where:  {c: "c2"}
-         |          update: {c: "updated C"}
+         |          update: {c: {set: "updated C"}}
          |          create: {c: "DOES NOT MATTER"}
          |        }]
          |      }
@@ -308,7 +308,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  data:{
          |    childrenOpt: {upsert: [{
          |      where: {c: "DOES NOT EXIST"}
-         |      update: {c: "DOES NOT MATTER"}
+         |      update: {c: {set: "DOES NOT MATTER"}}
          |      create :{c: "updated C"}
          |    }]}
          |  }){
@@ -372,8 +372,8 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    data:{
          |      comments: {
          |        upsert: [
-         |          {where: {id: "$comment1Id"}, update: {text: "update comment1"}, create: {text: "irrelevant"}},
-         |          {where: {id: "5beea4aa6183dd734b2dbd9b"}, update: {text: "irrelevant"}, create: {text: "new comment3"}},
+         |          {where: {id: "$comment1Id"}, update: {text: {set: "update comment1"}}, create: {text: "irrelevant"}},
+         |          {where: {id: "5beea4aa6183dd734b2dbd9b"}, update: {text: {set: "irrelevant"}}, create: {text: "new comment3"}},
          |        ]
          |      }
          |    }
@@ -448,8 +448,8 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    data:{
          |      comments: {
          |        upsert: [
-         |          {where: {id: "$comment1Id"}, update: {text: "update comment1"}, create: {text: "irrelevant"}},
-         |          {where: {id: "$comment2Id"}, update: {text: "irrelevant"}, create: {text: "new comment3"}},
+         |          {where: {id: "$comment1Id"}, update: {text: {set: "update comment1"}}, create: {text: "irrelevant"}},
+         |          {where: {id: "$comment2Id"}, update: {text: {set: "irrelevant"}}, create: {text: "new comment3"}},
          |        ]
          |      }
          |    }
@@ -517,7 +517,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    data:{
          |      comments: {
          |        upsert: [
-         |          {where: {id: "5beea4aa6183dd734b2dbd9b"}, update: {text: "update comment1"}, create: {text: "irrelevant", uniqueComment: "comments"}},
+         |          {where: {id: "5beea4aa6183dd734b2dbd9b"}, update: {text: {set: "update comment1"}}, create: {text: "irrelevant", uniqueComment: "comments"}},
          |        ]
          |      }
          |    }
@@ -610,12 +610,12 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |                upsert: [
          |                  {
          |                    where: { id: "$tagId" }
-         |                    update: { name: "updated tag" }
+         |                    update: { name: { set: "updated tag" }}
          |                    create: { name: "irrelevant" }
          |                  },
          |                  {
          |                    where: { id: "5beea4aa6183dd734b2dbd9b" }
-         |                    update: { name: "irrelevant" }
+         |                    update: { name: { set: "irrelevant" }}
          |                    create: { name: "new tag" }
          |                  },
          |                ]
@@ -712,7 +712,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |          {
          |            where: { id: "5beea4aa6183dd734b2dbd9b" }
          |            create: { title: "new todo" tags: { create: [ {name: "the tag"}]}}
-         |            update: { title: "updated todo"}
+         |            update: { title: { set: "updated todo" }}
          |          }
          |        ]
          |      }
