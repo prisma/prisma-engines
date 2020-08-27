@@ -226,3 +226,12 @@ pub struct InputError {
 pub struct ValueOutOfRange {
     pub details: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2021",
+    message = "The table `${table}` does not exist in the current database."
+)]
+pub struct TableDoesNotExist {
+    pub table: String,
+}
