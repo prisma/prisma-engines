@@ -4,7 +4,8 @@ use crate::{
     flavour::{SqlFlavour, SqliteFlavour},
     sql_database_step_applier::render_create_index,
     sql_migration::{
-        AddColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropIndex, TableChange,
+        AddColumn, AddForeignKey, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropIndex,
+        TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
 };
@@ -101,6 +102,10 @@ impl SqlRenderer for SqliteFlavour {
             (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
             (DefaultValue::SEQUENCE(_), _) => "".into(),
         }
+    }
+
+    fn render_add_foreign_key(&self, _add_foreign_key: &AddForeignKey, _schema_name: &str) -> String {
+        unreachable!("AddForeignKey on SQLite")
     }
 
     fn render_alter_column(&self, _differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {

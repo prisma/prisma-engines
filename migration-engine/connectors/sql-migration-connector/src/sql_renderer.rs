@@ -8,15 +8,15 @@ pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 use crate::{
     database_info::DatabaseInfo,
     sql_migration::{
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropIndex, TableChange,
+        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
+        DropEnum, DropIndex, TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
 };
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::*;
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt::Write as _};
 
 pub(crate) trait SqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str>;
@@ -26,6 +26,33 @@ pub(crate) trait SqlRenderer {
             schema_name,
             name: self.quote(name),
         }
+    }
+
+    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey, schema_name: &str) -> String {
+        let AddForeignKey { foreign_key, table } = add_foreign_key;
+        let mut add_constraint = String::with_capacity(120);
+
+        write!(
+            add_constraint,
+            "ALTER TABLE {table} ADD ",
+            table = self.quote_with_schema(&schema_name, table)
+        )
+        .unwrap();
+
+        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
+            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
+        }
+
+        write!(
+            add_constraint,
+            "FOREIGN KEY ({})",
+            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
+        )
+        .unwrap();
+
+        add_constraint.push_str(&self.render_references(&schema_name, &foreign_key));
+
+        add_constraint
     }
 
     fn render_alter_enum(

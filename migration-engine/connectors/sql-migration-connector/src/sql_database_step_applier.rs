@@ -1,10 +1,9 @@
 use crate::*;
-use sql_migration::{AddForeignKey, CreateTable, DropForeignKey, DropTable, SqlMigrationStep};
+use sql_migration::{CreateTable, DropForeignKey, DropTable, SqlMigrationStep};
 use sql_renderer::{IteratorJoin, Quoted};
 use sql_schema_describer::walkers::SqlSchemaExt;
 use sql_schema_describer::{Index, IndexType, SqlSchema};
 use sql_schema_differ::SqlSchemaDiffer;
-use std::fmt::Write as _;
 use tracing_futures::Instrument;
 use SqlFlavour;
 
@@ -158,32 +157,9 @@ fn render_raw_sql(
                 new_name
             )])
         }
-        SqlMigrationStep::AddForeignKey(AddForeignKey { table, foreign_key }) => match sql_family {
-            SqlFamily::Sqlite => Ok(Vec::new()),
-            _ => {
-                let mut add_constraint = String::with_capacity(120);
-
-                write!(
-                    add_constraint,
-                    "ALTER TABLE {table} ADD ",
-                    table = renderer.quote_with_schema(&schema_name, table)
-                )?;
-
-                if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
-                    write!(add_constraint, "CONSTRAINT {} ", renderer.quote(constraint_name))?;
-                }
-
-                write!(
-                    add_constraint,
-                    "FOREIGN KEY ({})",
-                    foreign_key.columns.iter().map(|col| renderer.quote(col)).join(", ")
-                )?;
-
-                add_constraint.push_str(&renderer.render_references(&schema_name, &foreign_key));
-
-                Ok(vec![add_constraint])
-            }
-        },
+        SqlMigrationStep::AddForeignKey(add_foreign_key) => {
+            Ok(vec![renderer.render_add_foreign_key(add_foreign_key, &schema_name)])
+        }
         SqlMigrationStep::DropForeignKey(DropForeignKey { table, constraint_name }) => match sql_family {
             SqlFamily::Mysql => Ok(vec![format!(
                 "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
