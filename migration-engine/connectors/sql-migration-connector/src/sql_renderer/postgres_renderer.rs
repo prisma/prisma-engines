@@ -2,7 +2,6 @@ use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
     flavour::PostgresFlavour,
-    sql_database_step_applier::render_create_index,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
         AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,

@@ -2,7 +2,6 @@ use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
     flavour::{MysqlFlavour, SqlFlavour},
-    sql_database_step_applier::render_create_index,
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
         AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,

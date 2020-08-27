@@ -1,11 +1,13 @@
-use crate::*;
-use sql_migration::{CreateTable, DropTable, SqlMigrationStep};
-use sql_renderer::IteratorJoin;
-use sql_schema_describer::walkers::SqlSchemaExt;
-use sql_schema_describer::{Index, IndexType, SqlSchema};
-use sql_schema_differ::SqlSchemaDiffer;
+use crate::{
+    database_info::DatabaseInfo,
+    sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
+    sql_schema_differ::SqlSchemaDiffer,
+    Component, SqlError, SqlFlavour, SqlResult,
+};
+use migration_connector::{ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, PrettyDatabaseMigrationStep};
+use quaint::prelude::SqlFamily;
+use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use tracing_futures::Instrument;
-use SqlFlavour;
 
 pub struct SqlDatabaseStepApplier<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -159,35 +161,4 @@ fn render_raw_sql(
             renderer.render_alter_index(alter_index, database_info, current_schema)
         }
     }
-}
-
-pub(crate) fn render_create_index(
-    renderer: &dyn SqlFlavour,
-    schema_name: &str,
-    table_name: &str,
-    index: &Index,
-    sql_family: SqlFamily,
-) -> String {
-    let Index { name, columns, tpe } = index;
-    let index_type = match tpe {
-        IndexType::Unique => "UNIQUE ",
-        IndexType::Normal => "",
-    };
-    let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer.quote_with_schema(schema_name, &name).to_string(),
-        _ => renderer.quote(&name).to_string(),
-    };
-    let table_reference = match sql_family {
-        SqlFamily::Sqlite => renderer.quote(table_name).to_string(),
-        _ => renderer.quote_with_schema(schema_name, table_name).to_string(),
-    };
-    let columns = columns.iter().map(|c| renderer.quote(c));
-
-    format!(
-        "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
-        index_type = index_type,
-        index_name = index_name,
-        table_reference = table_reference,
-        columns = columns.join(", ")
-    )
 }

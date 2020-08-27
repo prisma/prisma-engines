@@ -2,7 +2,6 @@ use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
     flavour::{SqlFlavour, SqliteFlavour},
-    sql_database_step_applier::render_create_index,
     sql_migration::{
         AddColumn, AddForeignKey, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey,
         DropIndex, TableChange,
