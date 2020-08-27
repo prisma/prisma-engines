@@ -5,7 +5,7 @@ use crate::{
     sql_database_step_applier::render_create_index,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex,
+        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
 };
@@ -335,6 +335,14 @@ impl SqlRenderer for PostgresFlavour {
         );
 
         vec![sql]
+    }
+
+    fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
+        format!(
+            "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
+            table = self.quote_with_schema(self.schema_name(), &drop_foreign_key.table),
+            constraint_name = Quoted::postgres_ident(&drop_foreign_key.constraint_name),
+        )
     }
 
     fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String {

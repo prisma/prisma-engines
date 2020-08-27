@@ -9,7 +9,7 @@ use crate::{
     database_info::DatabaseInfo,
     sql_migration::{
         AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
-        DropEnum, DropIndex, TableChange,
+        DropEnum, DropForeignKey, DropIndex, TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
 };
@@ -192,6 +192,9 @@ pub(crate) trait SqlRenderer {
 
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
+
+    /// Render a `DropForeignKey` step.
+    fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String;
 
     /// Render a `DropIndex` step.
     fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String;

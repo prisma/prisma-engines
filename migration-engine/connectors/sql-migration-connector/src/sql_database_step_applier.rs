@@ -1,6 +1,6 @@
 use crate::*;
-use sql_migration::{CreateTable, DropForeignKey, DropTable, SqlMigrationStep};
-use sql_renderer::{IteratorJoin, Quoted};
+use sql_migration::{CreateTable, DropTable, SqlMigrationStep};
+use sql_renderer::IteratorJoin;
 use sql_schema_describer::walkers::SqlSchemaExt;
 use sql_schema_describer::{Index, IndexType, SqlSchema};
 use sql_schema_differ::SqlSchemaDiffer;
@@ -145,21 +145,9 @@ fn render_raw_sql(
         SqlMigrationStep::AddForeignKey(add_foreign_key) => {
             Ok(vec![renderer.render_add_foreign_key(add_foreign_key, &schema_name)])
         }
-        SqlMigrationStep::DropForeignKey(DropForeignKey { table, constraint_name }) => match sql_family {
-            SqlFamily::Mysql => Ok(vec![format!(
-                "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
-                table = renderer.quote_with_schema(&schema_name, table),
-                constraint_name = Quoted::mysql_ident(constraint_name),
-            )]),
-            SqlFamily::Postgres => Ok(vec![format!(
-                "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-                table = renderer.quote_with_schema(&schema_name, table),
-                constraint_name = Quoted::postgres_ident(constraint_name),
-            )]),
-            SqlFamily::Sqlite => Ok(Vec::new()),
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
-        },
-
+        SqlMigrationStep::DropForeignKey(drop_foreign_key) => {
+            Ok(vec![renderer.render_drop_foreign_key(drop_foreign_key)])
+        }
         SqlMigrationStep::AlterTable(alter_table) => {
             Ok(renderer.render_alter_table(alter_table, database_info, &differ))
         }

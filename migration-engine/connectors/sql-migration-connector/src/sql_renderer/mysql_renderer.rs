@@ -5,7 +5,7 @@ use crate::{
     sql_database_step_applier::render_create_index,
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
-        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex,
+        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
     },
     sql_schema_differ::{ColumnChanges, ColumnDiffer, SqlSchemaDiffer},
 };
@@ -236,6 +236,14 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
         Vec::new()
+    }
+
+    fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
+        format!(
+            "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
+            table = self.quote_with_schema(self.schema_name(), &drop_foreign_key.table),
+            constraint_name = Quoted::mysql_ident(&drop_foreign_key.constraint_name),
+        )
     }
 
     fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String {

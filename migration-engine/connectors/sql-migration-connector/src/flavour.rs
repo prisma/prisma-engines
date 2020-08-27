@@ -76,6 +76,12 @@ pub(crate) trait SqlFlavour:
 #[derive(Debug)]
 pub(crate) struct MysqlFlavour(MysqlUrl);
 
+impl MysqlFlavour {
+    pub(crate) fn schema_name(&self) -> &str {
+        self.0.dbname()
+    }
+}
+
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
     fn check_database_info(&self, database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
@@ -222,6 +228,12 @@ impl SqlFlavour for SqliteFlavour {
 
 #[derive(Debug)]
 pub(crate) struct PostgresFlavour(pub(crate) PostgresUrl);
+
+impl PostgresFlavour {
+    pub(crate) fn schema_name(&self) -> &str {
+        self.0.schema()
+    }
+}
 
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
