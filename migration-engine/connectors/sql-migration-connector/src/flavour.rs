@@ -218,7 +218,9 @@ impl SqlFlavour for PostgresFlavour {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         let db_name = self.0.dbname();
 
-        let (conn, _) = create_postgres_admin_conn(&mut url).await?;
+        strip_schema_param_from_url(&mut url);
+
+        let (conn, _) = create_postgres_admin_conn(url.clone()).await?;
 
         let query = format!("CREATE DATABASE \"{}\"", db_name);
 
@@ -263,7 +265,9 @@ impl SqlFlavour for PostgresFlavour {
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let (conn, _) = create_postgres_admin_conn(&mut url).await?;
+
+        strip_schema_param_from_url(&mut url);
+        let (conn, _) = create_postgres_admin_conn(url.clone()).await?;
         let schema = self.0.schema();
         let db_name = self.0.dbname();
 
@@ -295,18 +299,20 @@ impl SqlFlavour for PostgresFlavour {
     }
 }
 
-/// Try to connect as an admin to a postgres database. We try to pick a default database from which
-/// we can create another database.
-async fn create_postgres_admin_conn(url: &mut Url) -> ConnectorResult<(Quaint, DatabaseInfo)> {
-    use migration_connector::ErrorKind;
-
-    let candidate_default_databases = &["postgres", "template1"];
-
+fn strip_schema_param_from_url(url: &mut Url) {
     let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
     params.remove("schema");
     let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
     let params: String = params.join("&");
     url.set_query(Some(&params));
+}
+
+/// Try to connect as an admin to a postgres database. We try to pick a default database from which
+/// we can create another database.
+async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Quaint, DatabaseInfo)> {
+    use migration_connector::ErrorKind;
+
+    let candidate_default_databases = &["postgres", "template1"];
 
     let mut conn = None;
 
