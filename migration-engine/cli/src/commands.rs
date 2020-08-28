@@ -45,10 +45,6 @@ impl Cli {
 
     pub(crate) async fn run_inner(&self) -> Result<String, CliError> {
         match &self.command {
-            CliCommand::ResetDatabase => {
-                reset_database(&self.datasource).await?;
-                Ok(String::new())
-            }
             CliCommand::CreateDatabase => create_database(&self.datasource).await,
             CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
             CliCommand::QeSetup => {
@@ -63,8 +59,6 @@ impl Cli {
 enum CliCommand {
     /// Create an empty database defined in the configuration string.
     CreateDatabase,
-    /// Drop the database and recreate it.
-    ResetDatabase,
     /// Does the database connection string work?
     CanConnectToDatabase,
     /// Set up the database for connector-test-kit.
@@ -83,15 +77,6 @@ async fn create_database(database_str: &str) -> Result<String, CliError> {
     let db_name = migration_core::create_database(&datamodel).await?;
 
     Ok(format!("Database '{}' was successfully created.", db_name))
-}
-
-async fn reset_database(database_str: &str) -> Result<(), CliError> {
-    let datamodel = datasource_from_database_str(database_str)?;
-
-    migration_core::drop_database(&datamodel).await?;
-    migration_core::create_database(&datamodel).await?;
-
-    Ok(())
 }
 
 async fn qe_setup(database_str: &str) -> Result<(), CliError> {

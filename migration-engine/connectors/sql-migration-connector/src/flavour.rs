@@ -63,9 +63,6 @@ pub(crate) trait SqlFlavour:
         schema_name: &'a str,
         conn: Arc<dyn Queryable + Send + Sync>,
     ) -> SqlResult<SqlSchema>;
-
-    /// Drop the passed in database.
-    async fn drop_database(&self, database_url: &str, connection_info: &ConnectionInfo) -> ConnectorResult<()>;
 }
 
 #[derive(Debug)]
@@ -123,20 +120,6 @@ impl SqlFlavour for MysqlFlavour {
         Ok(sql_schema_describer::mysql::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
-    }
-
-    #[tracing::instrument]
-    async fn drop_database(&self, database_str: &str, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
-        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        url.set_path("/mysql");
-
-        let (conn, _) = connect(&url.to_string()).await?;
-        let db_name = self.0.dbname();
-
-        let query = format!("DROP DATABASE IF EXISTS `{}`", db_name);
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
-
-        Ok(())
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
@@ -209,31 +192,6 @@ impl SqlFlavour for SqliteFlavour {
             .await?)
     }
 
-    async fn drop_database(&self, database_str: &str, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
-        use quaint::prelude::Value;
-
-        let conn = Quaint::new(database_str)
-            .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(connection_info))?;
-
-        conn.query_raw("DETACH DATABASE ?", &[Value::from(self.attached_name())])
-            .await
-            .ok();
-
-        std::fs::remove_file(&self.file_path).ok(); // ignore potential errors
-
-        conn.query_raw(
-            "ATTACH DATABASE ? AS ?",
-            &[Value::from(self.file_path.as_str()), Value::from(self.attached_name())],
-        )
-        .await
-        .map_err(SqlError::from)
-        .map_err(|err| err.into_connector_error(connection_info))?;
-
-        Ok(())
-    }
-
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
         use std::fs::File;
         File::create(&self.file_path).expect("Failed to truncate SQLite database");
@@ -301,16 +259,6 @@ impl SqlFlavour for PostgresFlavour {
         Ok(sql_schema_describer::postgres::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
-    }
-
-    async fn drop_database(&self, database_str: &str, _connection_info: &ConnectionInfo) -> ConnectorResult<()> {
-        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let (conn, _database_info) = create_postgres_admin_conn(&mut url).await?;
-        let sql_str = format!(r#"DROP DATABASE IF EXISTS "{}""#, self.0.dbname());
-
-        conn.raw_cmd(&sql_str).await.ok();
-
-        Ok(())
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {

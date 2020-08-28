@@ -111,7 +111,8 @@ async fn test_create_mysql_database() {
 async fn test_create_psql_database() {
     let db_name = "this_should_exist";
 
-    let _drop_database: () = {
+    // Drop the database
+    {
         let url = postgres_url(None);
 
         let conn = Quaint::new(&url).await.unwrap();
