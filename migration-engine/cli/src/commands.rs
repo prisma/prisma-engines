@@ -63,11 +63,11 @@ impl Cli {
 enum CliCommand {
     /// Create an empty database defined in the configuration string.
     CreateDatabase,
-    /// Drop the database and recreates it.
+    /// Drop the database and recreate it.
     ResetDatabase,
     /// Does the database connection string work?
     CanConnectToDatabase,
-    /// Set up the database for connector-test-kit
+    /// Set up the database for connector-test-kit.
     QeSetup,
 }
 

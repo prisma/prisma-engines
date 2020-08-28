@@ -363,7 +363,7 @@ async fn existing_enums_are_picked_up(api: &TestApi) -> TestResult {
     let sql = r#"
         CREATE TYPE "Genre" AS ENUM ('SKA', 'PUNK');
 
-        CREATE TABLE "public"."Band" (
+        CREATE TABLE "prisma-tests"."Band" (
             id SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             genre "Genre" NOT NULL

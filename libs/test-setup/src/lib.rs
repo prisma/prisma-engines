@@ -42,8 +42,8 @@ pub fn postgres_9_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_9();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
-        host, port, db_name
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -51,8 +51,8 @@ pub fn pgbouncer_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_for_pgbouncer();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?pgbouncer=true",
-        host, port, db_name
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true",
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -60,8 +60,8 @@ pub fn postgres_10_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_10();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
-        host, port, db_name
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -69,8 +69,8 @@ pub fn postgres_11_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_11();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
-        host, port, db_name
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -78,8 +78,8 @@ pub fn postgres_12_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_12();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
-        host, port, db_name
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -87,8 +87,8 @@ pub fn postgres_13_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_13();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?statement_cache_size=0",
-        host, port, db_name
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        host, port, db_name, SCHEMA_NAME
     )
 }
 
@@ -438,5 +438,9 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
     conn.raw_cmd(&drop).await?;
     conn.raw_cmd(&recreate).await?;
 
-    Ok(Quaint::new(&original_url.to_string()).await?)
+    let conn = Quaint::new(&original_url.to_string()).await?;
+
+    conn.raw_cmd("CREATE SCHEMA \"prisma-tests\"").await?;
+
+    Ok(conn)
 }
