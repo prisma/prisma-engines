@@ -64,12 +64,13 @@ impl SqlMigrationConnector {
         flavour.create_database(database_str).await
     }
 
-    async fn drop_database(&self) -> ConnectorResult<()> {
-        catch(
-            self.database_info().connection_info(),
-            self.flavour().drop_database(self.conn(), self.schema_name()),
-        )
-        .await
+    pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
+        let connection_info =
+            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+
+        let flavour = flavour::from_connection_info(&connection_info);
+
+        flavour.qe_setup(database_str).await
     }
 
     async fn describe_schema(&self) -> SqlResult<SqlSchema> {
@@ -93,21 +94,12 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn initialize(&self) -> ConnectorResult<()> {
-        catch(
-            self.database_info.connection_info(),
-            self.flavour.initialize(self.database.as_ref(), &self.database_info),
-        )
-        .await?;
-
         self.migration_persistence().init().await?;
 
         Ok(())
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        self.migration_persistence().reset().await?;
-        self.drop_database().await?;
-
         Ok(())
     }
 

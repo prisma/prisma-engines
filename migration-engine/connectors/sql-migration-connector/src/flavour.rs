@@ -22,13 +22,7 @@ use quaint::{
 };
 use regex::RegexSet;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::{
-    collections::HashMap,
-    fmt::Debug,
-    fs,
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::{collections::HashMap, fmt::Debug, path::Path, sync::Arc};
 use url::Url;
 
 pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
@@ -57,8 +51,11 @@ pub(crate) trait SqlFlavour:
         Ok(())
     }
 
-    /// Create a database called `dbname` on the server, if applicable.
+    /// Create a database for the given URL on the server, if applicable.
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
+
+    /// Perform the initialization required by connector-test-kit tests.
+    async fn qe_setup(&self, database_url: &str) -> ConnectorResult<()>;
 
     /// Introspect the SQL schema.
     async fn describe_schema<'a>(
@@ -66,12 +63,6 @@ pub(crate) trait SqlFlavour:
         schema_name: &'a str,
         conn: Arc<dyn Queryable + Send + Sync>,
     ) -> SqlResult<SqlSchema>;
-
-    /// Drop the current database.
-    async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()>;
-
-    /// Create the database schema.
-    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()>;
 }
 
 #[derive(Debug)]
@@ -106,10 +97,10 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
-        let mut url = Url::parse(database_str).unwrap();
+        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
-        let (conn, _) = connect(&url.to_string()).await?;
 
+        let (conn, _) = connect(&url.to_string()).await?;
         let db_name = self.0.dbname();
 
         let query = format!(
@@ -131,22 +122,22 @@ impl SqlFlavour for MysqlFlavour {
             .await?)
     }
 
-    #[tracing::instrument(skip(conn))]
-    async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()> {
-        let sql_str = format!(r#"DROP SCHEMA `{}`;"#, schema_name);
+    async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
+        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        url.set_path("/mysql");
 
-        conn.raw_cmd(&sql_str).await?;
+        let (conn, _) = connect(&url.to_string()).await?;
 
-        Ok(())
-    }
+        let db_name = self.0.dbname();
 
-    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()> {
-        let schema_sql = format!(
-            "CREATE SCHEMA IF NOT EXISTS `{}` DEFAULT CHARACTER SET utf8mb4;",
-            database_info.connection_info().schema_name()
+        let query = format!("DROP DATABASE IF EXISTS `{}`", db_name);
+        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+
+        let query = format!(
+            "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
+            db_name
         );
-
-        conn.raw_cmd(&schema_sql).await?;
+        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
 
         Ok(())
     }
@@ -201,31 +192,9 @@ impl SqlFlavour for SqliteFlavour {
             .await?)
     }
 
-    async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()> {
-        use quaint::prelude::Value;
-
-        conn.query_raw("DETACH DATABASE ?", &[Value::from(schema_name)])
-            .await
-            .ok();
-
-        std::fs::remove_file(&self.file_path).ok(); // ignore potential errors
-
-        conn.query_raw(
-            "ATTACH DATABASE ? AS ?",
-            &[Value::from(self.file_path.as_str()), Value::from(schema_name)],
-        )
-        .await?;
-
-        Ok(())
-    }
-
-    async fn initialize(&self, _conn: &dyn Queryable, _database_info: &DatabaseInfo) -> SqlResult<()> {
-        let path_buf = PathBuf::from(&self.file_path);
-
-        if let Some(parent_directory) = path_buf.parent() {
-            fs::create_dir_all(parent_directory).expect("creating the database folders failed")
-        }
-
+    async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
+        use std::fs::File;
+        File::create(&self.file_path).expect("Failed to truncate SQLite database");
         Ok(())
     }
 
@@ -246,13 +215,40 @@ impl PostgresFlavour {
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
-        let url = Url::parse(database_str).unwrap();
+        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         let db_name = self.0.dbname();
 
-        let (conn, _) = create_postgres_admin_conn(url).await?;
+        strip_schema_param_from_url(&mut url);
+
+        let (conn, _) = create_postgres_admin_conn(url.clone()).await?;
 
         let query = format!("CREATE DATABASE \"{}\"", db_name);
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+
+        let mut database_already_exists_error = None;
+
+        match conn.raw_cmd(&query).map_err(SqlError::from).await {
+            Ok(_) => (),
+            Err(err @ SqlError::DatabaseAlreadyExists { .. }) => database_already_exists_error = Some(err),
+            Err(err @ SqlError::UniqueConstraintViolation { .. }) => database_already_exists_error = Some(err),
+            Err(err) => return Err(SqlError::from(err).into_connector_error(conn.connection_info())),
+        };
+
+        // Now create the schema
+        url.set_path(&format!("/{}", db_name));
+
+        let (conn, _) = connect(&url.to_string()).await?;
+
+        let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", &self.schema_name());
+
+        catch(
+            conn.connection_info(),
+            conn.raw_cmd(&schema_sql).map_err(SqlError::from),
+        )
+        .await?;
+
+        if let Some(err) = database_already_exists_error {
+            return Err(err.into_connector_error(conn.connection_info()));
+        }
 
         Ok(db_name.to_owned())
     }
@@ -267,21 +263,33 @@ impl SqlFlavour for PostgresFlavour {
             .await?)
     }
 
-    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()> {
-        let schema_sql = format!(
-            "CREATE SCHEMA IF NOT EXISTS \"{}\";",
-            &database_info.connection_info().schema_name()
+    async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
+        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+
+        strip_schema_param_from_url(&mut url);
+        let (conn, _) = create_postgres_admin_conn(url.clone()).await?;
+        let schema = self.0.schema();
+        let db_name = self.0.dbname();
+
+        let query = format!("CREATE DATABASE \"{}\"", db_name);
+        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from))
+            .await
+            .ok();
+
+        // Now create the schema
+        url.set_path(&format!("/{}", db_name));
+
+        let (conn, _) = connect(&url.to_string()).await?;
+
+        let drop_and_recreate_schema = format!(
+            "DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;\nCREATE SCHEMA \"{schema}\";",
+            schema = schema
         );
-
-        conn.raw_cmd(&schema_sql).await?;
-
-        Ok(())
-    }
-
-    async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()> {
-        let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, schema_name);
-
-        conn.raw_cmd(&sql_str).await.ok();
+        catch(
+            conn.connection_info(),
+            conn.raw_cmd(&drop_and_recreate_schema).map_err(SqlError::from),
+        )
+        .await?;
 
         Ok(())
     }
@@ -291,18 +299,20 @@ impl SqlFlavour for PostgresFlavour {
     }
 }
 
+fn strip_schema_param_from_url(url: &mut Url) {
+    let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
+    params.remove("schema");
+    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
+    let params: String = params.join("&");
+    url.set_query(Some(&params));
+}
+
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
 async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Quaint, DatabaseInfo)> {
     use migration_connector::ErrorKind;
 
     let candidate_default_databases = &["postgres", "template1"];
-
-    let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
-    params.remove("schema");
-    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
-    let params: String = params.join("&");
-    url.set_query(Some(&params));
 
     let mut conn = None;
 

@@ -7,8 +7,7 @@ import play.api.libs.json._
 case class TestDatabase() {
   def setup(project: Project): Unit = {
     val engine = MigrationEngine(project)
-    engine.createDatabase()
-    engine.reset()
+    engine.setupDatabase()
     engine.schemaPush()
   }
 
@@ -36,13 +35,9 @@ case class MigrationEngine(project: Project) {
     val _: JsValue = sendRpcCall[SchemaPushInput, JsValue]("schemaPush", input)
   }
 
-  def reset(): Unit = {
-    sendRpcCallInternal[JsValue]("reset", Json.obj())
-  }
-
-  def createDatabase(): Unit = {
+  def setupDatabase(): Unit = {
     import scala.sys.process._
-    val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-d", project.dataSourceUrl, "create-database")
+    val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-d", project.dataSourceUrl, "qe-setup")
 
     cmd.!
   }
