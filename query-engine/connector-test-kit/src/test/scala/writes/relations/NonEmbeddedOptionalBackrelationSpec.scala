@@ -40,7 +40,7 @@ class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with Ap
 
     val res = server.query(
       """mutation {updateOwner(where: {ownerName: "jon"},
-        |data: {cat: {update:{catName: "azrael"}}}) {
+        |data: {cat: {update:{catName: {set: "azrael" }}}}) {
         |    ownerName
         |    cat {
         |      catName
@@ -89,7 +89,7 @@ class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with Ap
       """mutation {updateOwner(where: {ownerName: "jon"},
         |data: {cats: {upsert: {
         |                   where:{catName: "garfield"},
-        |                   update: {catName: "azrael"}
+        |                   update: {catName: { set: "azrael"}}
         |                   create: {catName: "should not matter"}
         |                   }}})
         |{
@@ -141,7 +141,7 @@ class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with Ap
       """mutation {updateOwner(where: {ownerName: "jon"},
         |data: {cats: {upsert: {
         |                   where:{catName: "DOES NOT EXIST"},
-        |                   update: {catName: "SHOULD NOT MATTER"}
+        |                   update: {catName: { set: "SHOULD NOT MATTER" }}
         |                   create: {catName: "azrael"}
         |                   }}})
         |{

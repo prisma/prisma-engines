@@ -30,7 +30,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |mutation {
-        |  updateTodo(where: {id: 12}, data: {title: "the title"}){
+        |  updateTodo(where: {id: 12}, data: {title: {set: "the title"}}){
         |    id
         |    title
         |  }
@@ -69,7 +69,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |mutation {
-        |  updateTodo(where: {id: 12}, data: { title: "the title" }){
+        |  updateTodo(where: {id: 12}, data: { title: { set: "the title" }}){
         |    id
         |    title
         |  }
@@ -107,7 +107,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |mutation {
-        |  updateTodo(where: {id: 1}, data: {title: "the title"}){
+        |  updateTodo(where: {id: 1}, data: {title: {set: "the title"}}){
         |    id
         |    title
         |  }
@@ -145,7 +145,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       """
         |mutation {
-        |  updateTodo(where: {id: 1}, data: { title: "the title", id: 2}){
+        |  updateTodo(where: {id: 1}, data: { title: { set: "the title" }, id: { set: 2 }}){
         |    id
         |    title
         |  }
@@ -153,11 +153,12 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
       """.stripMargin,
       project,
       errorCode = 2009,
-      errorContains = "Failed to validate the query `Error occurred during query validation & transformation:\\nMutation (object)\\n  ↳ updateTodo (field)\\n    ↳ data (argument)\\n      ↳ TodoUpdateInput (object)\\n        ↳ id (field)\\n          ↳ Field does not exist on enclosing type.` at `.Mutation.updateTodo.data.TodoUpdateInput.id"
+      errorContains =
+        "Failed to validate the query `Error occurred during query validation & transformation:\\nMutation (object)\\n  ↳ updateTodo (field)\\n    ↳ data (argument)\\n      ↳ TodoUpdateInput (object)\\n        ↳ id (field)\\n          ↳ Field does not exist on enclosing type.` at `.Mutation.updateTodo.data.TodoUpdateInput.id"
     )
   }
 
-  "Updating a unique field of type Int with autoincrement" should "error"  taggedAs (IgnoreSQLite, IgnoreMySql)  in {
+  "Updating a unique field of type Int with autoincrement" should "error" taggedAs (IgnoreSQLite, IgnoreMySql) in {
     val project = ProjectDsl.fromString {
       s"""
          |model Todo {
@@ -183,7 +184,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       """
         |mutation {
-        |  updateTodo(where: {id: "the-id"}, data: { counter: 7}){
+        |  updateTodo(where: {id: "the-id"}, data: { counter: { set: 7 }}){
         |    id
         |    title
         |    counter
@@ -192,12 +193,12 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
       """.stripMargin,
       project,
       errorCode = 2009,
-      errorContains = "Failed to validate the query `Error occurred during query validation & transformation:\\nMutation (object)\\n  ↳ updateTodo (field)\\n    ↳ data (argument)\\n      ↳ TodoUpdateInput (object)\\n        ↳ counter (field)\\n          ↳ Field does not exist on enclosing type.` at `.Mutation.updateTodo.data.TodoUpdateInput.counter"
+      errorContains =
+        "Failed to validate the query `Error occurred during query validation & transformation:\\nMutation (object)\\n  ↳ updateTodo (field)\\n    ↳ data (argument)\\n      ↳ TodoUpdateInput (object)\\n        ↳ counter (field)\\n          ↳ Field does not exist on enclosing type.` at `.Mutation.updateTodo.data.TodoUpdateInput.counter"
     )
   }
 
-
-  "Updating a non-unique field of type Int with autoincrement" should "work"  taggedAs (IgnoreSQLite, IgnoreMySql)  in {
+  "Updating a non-unique field of type Int with autoincrement" should "work" taggedAs (IgnoreSQLite, IgnoreMySql) in {
     val project = ProjectDsl.fromString {
       s"""
          |model Todo {
@@ -223,7 +224,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |mutation {
-        |  updateTodo(where: {id: "the-id"}, data: {title: "the title", counter: 8}){
+        |  updateTodo(where: {id: "the-id"}, data: {title: { set: "the title" }, counter: { set: 8 }}){
         |    id
         |    title
         |    counter

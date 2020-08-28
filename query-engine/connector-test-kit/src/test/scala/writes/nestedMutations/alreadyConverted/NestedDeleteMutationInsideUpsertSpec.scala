@@ -45,7 +45,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  upsertParent(
          |  where: $parentId
          |  update:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childReq: {delete: true}
          |  }
          |  create:{p: "Should not matter" childReq: {create: {c: "Should not matter"}}}
@@ -101,8 +101,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  upsertParent(
          |  where: $parentId
          |  update:{
-         |    p: "p2"
-         |    childReq: {delete: true}
+         |    p: { set: "p2" }
+         |    childReq: { delete: true }
          |  }
          |  create:{p: "Should not matter" childReq: {create: {c: "Should not matter"}}}
          |  ){
@@ -155,7 +155,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  upsertParent(
          |  where: $parentId
          |  update:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childOpt: {delete: true}
          |  }
          |  create:{p: "Should not matter"}
@@ -213,7 +213,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  upsertParent(
          |    where: $parent1Id
          |    update:{
-         |      p: "p2"
+         |      p: { set: "p2" }
          |      childOpt: {delete: true}
          |    }
          |    create:{p: "Should not matter"}
@@ -1091,26 +1091,36 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
     val createMutation =
       """
-        |mutation  {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middles: {
-        |      create:[
-        |        {
-        |          nameMiddle: "the middle"
-        |          bottoms: {
-        |            create: [{ nameBottom: "the bottom"}, { nameBottom: "the second bottom"}]
+        |mutation {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middles: {
+        |        create: [
+        |          {
+        |            nameMiddle: "the middle"
+        |            bottoms: {
+        |              create: [
+        |                { nameBottom: "the bottom" }
+        |                { nameBottom: "the second bottom" }
+        |              ]
+        |            }
         |          }
-        |        },
-        |        {
-        |          nameMiddle: "the second middle"
-        |          bottoms: {
-        |            create: [{nameBottom: "the third bottom"},{nameBottom: "the fourth bottom"}]
+        |          {
+        |            nameMiddle: "the second middle"
+        |            bottoms: {
+        |              create: [
+        |                { nameBottom: "the third bottom" }
+        |                { nameBottom: "the fourth bottom" }
+        |              ]
+        |            }
         |          }
-        |        }
-        |     ]
+        |        ]
+        |      }
         |    }
-        |  }) {id}
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
@@ -1119,23 +1129,27 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     val updateMutation =
       s"""mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middles: {
-         |        upsert: [{
-         |              where: {nameMiddle: "the middle"},
-         |              update:{  nameMiddle: "updated middle"
-         |                      bottoms: {delete: [{nameBottom: "the bottom"}]}}
-         |              create:{nameMiddle:"Should not matter"}
-         |         }]
-         |     }
-         |   }
+         |        upsert: [
+         |          {
+         |            where: { nameMiddle: "the middle" }
+         |            update: {
+         |              nameMiddle: { set: "updated middle" }
+         |              bottoms: { delete: [{ nameBottom: "the bottom" }] }
+         |            }
+         |            create: { nameMiddle: "Should not matter" }
+         |          }
+         |        ]
+         |      }
+         |    }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: asc }){
+         |    middles(orderBy: { id: asc }) {
          |      nameMiddle
-         |      bottoms (orderBy: { id: asc }){
+         |      bottoms(orderBy: { id: asc }) {
          |        nameBottom
          |      }
          |    }
@@ -1170,49 +1184,64 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
     val createMutation =
       """
-        |mutation  {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middles: {
-        |      create:[
-        |        {
-        |          nameMiddle: "the middle"
-        |          bottoms: {
-        |            create: [{ nameBottom: "the bottom"}, { nameBottom: "the second bottom"}]
+        |mutation {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middles: {
+        |        create: [
+        |          {
+        |            nameMiddle: "the middle"
+        |            bottoms: {
+        |              create: [
+        |                { nameBottom: "the bottom" }
+        |                { nameBottom: "the second bottom" }
+        |              ]
+        |            }
         |          }
-        |        },
-        |        {
-        |          nameMiddle: "the second middle"
-        |          bottoms: {
-        |            create: [{nameBottom: "the third bottom"},{nameBottom: "the fourth bottom"}]
+        |          {
+        |            nameMiddle: "the second middle"
+        |            bottoms: {
+        |              create: [
+        |                { nameBottom: "the third bottom" }
+        |                { nameBottom: "the fourth bottom" }
+        |              ]
+        |            }
         |          }
-        |        }
-        |     ]
+        |        ]
+        |      }
         |    }
-        |  }) {id}
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
     server.query(createMutation, project)
 
     val updateMutation =
-      s"""mutation b {
+      s"""
+         |mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middles: {
-         |        upsert: [{
-         |              where:{nameMiddle: "the middle"},
-         |              update:{nameMiddle: "updated middle"
-         |                      bottoms: {delete: [{nameBottom: "the bottom"}]}}
-         |              create:{nameMiddle:"Should not matter"}
-         |              }]
-         |     }
-         |   }
+         |        upsert: [
+         |          {
+         |            where: { nameMiddle: "the middle" }
+         |            update: {
+         |              nameMiddle: { set: "updated middle" }
+         |              bottoms: { delete: [{ nameBottom: "the bottom" }] }
+         |            }
+         |            create: { nameMiddle: "Should not matter" }
+         |          }
+         |        ]
+         |      }
+         |    }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: asc }){
+         |    middles(orderBy: { id: asc }) {
          |      nameMiddle
          |      bottoms {
          |        nameBottom
@@ -1251,45 +1280,54 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
     val createMutation =
       """
-        |mutation  {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middles: {
-        |      create:[
-        |        {
-        |          nameMiddle: "the middle"
-        |          bottom: {create: { nameBottom: "the bottom"}}
-        |        },
-        |        {
-        |          nameMiddle: "the second middle"
-        |          bottom: {create: { nameBottom: "the second bottom"}}
-        |        }
-        |     ]
+        |mutation {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middles: {
+        |        create: [
+        |          {
+        |            nameMiddle: "the middle"
+        |            bottom: { create: { nameBottom: "the bottom" } }
+        |          }
+        |          {
+        |            nameMiddle: "the second middle"
+        |            bottom: { create: { nameBottom: "the second bottom" } }
+        |          }
+        |        ]
+        |      }
         |    }
-        |  }) {id}
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
     server.query(createMutation, project)
 
     val updateMutation =
-      s"""mutation b {
+      s"""
+         |mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middles: {
-         |        upsert: [{
-         |              where: {nameMiddle: "the middle"},
-         |              update:{nameMiddle: "updated middle"
-         |                      bottom: {delete: true}}
-         |              create:{nameMiddle:"Should not matter"}
-         |              }]
-         |     }
-         |   }
+         |        upsert: [
+         |          {
+         |            where: { nameMiddle: "the middle" }
+         |            update: {
+         |              nameMiddle: { set: "updated middle" }
+         |              bottom: { delete: true }
+         |            }
+         |            create: { nameMiddle: "Should not matter" }
+         |          }
+         |        ]
+         |      }
+         |    }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: asc }) {
+         |    middles(orderBy: { id: asc }) {
          |      nameMiddle
          |      bottom {
          |        nameBottom
@@ -1333,54 +1371,62 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     val createMutation =
       """
         |mutation a {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middle: {
-        |      create:
-        |        {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middle: {
+        |        create: {
         |          nameMiddle: "the middle"
         |          bottom: {
-        |            create: { nameBottom: "the bottom"
-        |            below: {
-        |            create: [{ nameBelow: "below"}, { nameBelow: "second below"}]}
-        |        }}}
+        |            create: {
+        |              nameBottom: "the bottom"
+        |              below: {
+        |                create: [{ nameBelow: "below" }, { nameBelow: "second below" }]
+        |              }
+        |            }
+        |          }
         |        }
-        |  }) {id}
+        |      }
+        |    }
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
     server.query(createMutation, project)
 
     val updateMutation =
-      s"""mutation b {
+      s"""
+         |mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |               nameMiddle: "updated middle"
-         |               bottom: {
-         |                upsert: {
-         |                  update:{
-         |                    nameBottom: "updated bottom"
-         |                    below: { delete: {nameBelow: "below"}}}
-         |                create:{nameBottom:"Should not matter"}
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: {
+         |            upsert: {
+         |              update: {
+         |                nameBottom: { set: "updated bottom" }
+         |                below: { delete: { nameBelow: "below" } }
+         |              }
+         |              create: { nameBottom: "Should not matter" }
+         |            }
          |          }
-         |         }
-         |       }
-         |     }
-         |   }
+         |        }
+         |      }
+         |    }
          |  ) {
          |    nameTop
          |    middle {
          |      nameMiddle
          |      bottom {
          |        nameBottom
-         |        below{
-         |           nameBelow
+         |        below {
+         |          nameBelow
          |        }
-         |
          |      }
          |    }
          |  }

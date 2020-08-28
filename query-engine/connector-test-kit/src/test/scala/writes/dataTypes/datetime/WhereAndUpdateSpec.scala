@@ -21,7 +21,7 @@ class WhereAndUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     server.query(s"""query {test(where:{unique:1}){ unique}}""", project).toString should be("""{"data":{"test":{"unique":1}}}""")
 
-    val res = server.query(s"""mutation {updateTest( where: { unique: 1 } data: {unique: 2}){unique}}""", project).toString
+    val res = server.query(s"""mutation {updateTest( where: { unique: 1 } data: { unique: { set: 2 }}){unique}}""", project).toString
     res should be("""{"data":{"updateTest":{"unique":2}}}""")
   }
 }

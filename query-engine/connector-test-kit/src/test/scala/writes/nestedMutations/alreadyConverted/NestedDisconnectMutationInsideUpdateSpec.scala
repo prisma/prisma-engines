@@ -41,7 +41,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  updateParent(
          |  where: $parentIdentifier
          |  data:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childOpt: {disconnect: true}
          |  }){
          |    childOpt {
@@ -98,7 +98,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  updateParent(
          |  where: $parentIdentifier
          |  data:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childOpt: {disconnect: true}
          |  }){
          |    childOpt {
@@ -1045,26 +1045,36 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val createMutation =
       """
-        |mutation  {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middles: {
-        |      create:[
-        |        {
-        |          nameMiddle: "the middle"
-        |          bottoms: {
-        |            create: [{ nameBottom: "the bottom"}, { nameBottom: "the second bottom"}]
+        |mutation {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middles: {
+        |        create: [
+        |          {
+        |            nameMiddle: "the middle"
+        |            bottoms: {
+        |              create: [
+        |                { nameBottom: "the bottom" }
+        |                { nameBottom: "the second bottom" }
+        |              ]
+        |            }
         |          }
-        |        },
-        |        {
-        |          nameMiddle: "the second middle"
-        |          bottoms: {
-        |            create: [{nameBottom: "the third bottom"},{nameBottom: "the fourth bottom"}]
+        |          {
+        |            nameMiddle: "the second middle"
+        |            bottoms: {
+        |              create: [
+        |                { nameBottom: "the third bottom" }
+        |                { nameBottom: "the fourth bottom" }
+        |              ]
+        |            }
         |          }
-        |        }
-        |     ]
+        |        ]
+        |      }
         |    }
-        |  }) {id}
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
@@ -1073,23 +1083,26 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val updateMutation =
       s"""mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middles: {
-         |        update: [{
-         |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottoms: {disconnect: [{nameBottom: "the bottom"}]
-         |              }
-         |       }}]
-         |     }
-         |   }
+         |        update: [
+         |          {
+         |            where: { nameMiddle: "the middle" }
+         |            data: {
+         |              nameMiddle: { set: "updated middle" }
+         |              bottoms: { disconnect: [{ nameBottom: "the bottom" }] }
+         |            }
+         |          }
+         |        ]
+         |      }
+         |    }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: asc }){
+         |    middles(orderBy: { id: asc }) {
          |      nameMiddle
-         |      bottoms (orderBy: { id: asc }){
+         |      bottoms(orderBy: { id: asc }) {
          |        nameBottom
          |      }
          |    }
@@ -1127,26 +1140,36 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val createMutation =
       """
-        |mutation  {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middles: {
-        |      create:[
-        |        {
-        |          nameMiddle: "the middle"
-        |          bottoms: {
-        |            create: [{ nameBottom: "the bottom"}, { nameBottom: "the second bottom"}]
+        |mutation {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middles: {
+        |        create: [
+        |          {
+        |            nameMiddle: "the middle"
+        |            bottoms: {
+        |              create: [
+        |                { nameBottom: "the bottom" }
+        |                { nameBottom: "the second bottom" }
+        |              ]
+        |            }
         |          }
-        |        },
-        |        {
-        |          nameMiddle: "the second middle"
-        |          bottoms: {
-        |            create: [{nameBottom: "the third bottom"},{nameBottom: "the fourth bottom"}]
+        |          {
+        |            nameMiddle: "the second middle"
+        |            bottoms: {
+        |              create: [
+        |                { nameBottom: "the third bottom" }
+        |                { nameBottom: "the fourth bottom" }
+        |              ]
+        |            }
         |          }
-        |        }
-        |     ]
+        |        ]
+        |      }
         |    }
-        |  }) {id}
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
@@ -1155,23 +1178,26 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val updateMutation =
       s"""mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: { set: "the top" } }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: "updated top"
          |      middles: {
-         |        update: [{
-         |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottoms: {disconnect: [{nameBottom: "the bottom"}]
-         |              }
-         |       }}]
-         |     }
-         |   }
+         |        update: [
+         |          {
+         |            where: { nameMiddle: { set: "the middle" } }
+         |            data: {
+         |              nameMiddle: { set: "updated middle" }
+         |              bottoms: { disconnect: [{ nameBottom: "the bottom" }] }
+         |            }
+         |          }
+         |        ]
+         |      }
+         |    }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: asc }){
+         |    middles(orderBy: { id: asc }) {
          |      nameMiddle
-         |      bottoms (orderBy: { id: asc }){
+         |      bottoms(orderBy: { id: asc }) {
          |        nameBottom
          |      }
          |    }
@@ -1211,22 +1237,26 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val createMutation =
       """
-        |mutation  {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middles: {
-        |      create:[
-        |        {
-        |          nameMiddle: "the middle"
-        |          bottom: {create: { nameBottom: "the bottom"}}
-        |        },
-        |        {
-        |          nameMiddle: "the second middle"
-        |          bottom: {create: { nameBottom: "the second bottom"}}
-        |        }
-        |     ]
+        |mutation {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middles: {
+        |        create: [
+        |          {
+        |            nameMiddle: "the middle"
+        |            bottom: { create: { nameBottom: "the bottom" } }
+        |          }
+        |          {
+        |            nameMiddle: "the second middle"
+        |            bottom: { create: { nameBottom: "the second bottom" } }
+        |          }
+        |        ]
+        |      }
         |    }
-        |  }) {id}
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
@@ -1235,21 +1265,24 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val updateMutation =
       s"""mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: { set: "the top" } }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middles: {
-         |        update: [{
-         |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottom: {disconnect: true}
-         |              }
-         |              }]
-         |     }
-         |   }
+         |        update: [
+         |          {
+         |            where: { nameMiddle: "the middle" }
+         |            data: {
+         |              nameMiddle: { set: "updated middle" }
+         |              bottom: { disconnect: true }
+         |            }
+         |          }
+         |        ]
+         |      }
+         |    }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: asc }) {
+         |    middles(orderBy: { id: asc }) {
          |      nameMiddle
          |      bottom {
          |        nameBottom
@@ -1296,19 +1329,26 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val createMutation =
       """
         |mutation a {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middle: {
-        |      create:
-        |        {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middle: {
+        |        create: {
         |          nameMiddle: "the middle"
         |          bottom: {
-        |            create: { nameBottom: "the bottom"
-        |            below: {
-        |            create: [{ nameBelow: "below"}, { nameBelow: "second below"}]}
-        |        }}}
+        |            create: {
+        |              nameBottom: "the bottom"
+        |              below: {
+        |                create: [{ nameBelow: "below" }, { nameBelow: "second below" }]
+        |              }
+        |            }
+        |          }
         |        }
-        |  }) {id}
+        |      }
+        |    }
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
@@ -1317,33 +1357,30 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val updateMutation =
       s"""mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: { set: "the top" } }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |               nameMiddle: "updated middle"
-         |               bottom: {
-         |                update: {
-         |                  nameBottom: "updated bottom"
-         |                  below: { disconnect: {nameBelow: "below"}
-         |
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: {
+         |            update: {
+         |              nameBottom: { set: "updated bottom" }
+         |              below: { disconnect: { nameBelow: "below" } }
+         |            }
          |          }
-         |                }
-         |          }
-         |       }
-         |     }
-         |   }
+         |        }
+         |      }
+         |    }
          |  ) {
          |    nameTop
          |    middle {
          |      nameMiddle
          |      bottom {
          |        nameBottom
-         |        below (orderBy: { id: asc }){
-         |           nameBelow
+         |        below(orderBy: { id: asc }) {
+         |          nameBelow
          |        }
-         |
          |      }
          |    }
          |  }
@@ -1382,21 +1419,20 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val createMutation =
       """
-        |mutation  {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middle: {
-        |      create:
-        |        {
+        |mutation {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middle: {
+        |        create: {
         |          nameMiddle: "the middle"
-        |          bottom: {
-        |            create: {
-        |              nameBottom: "the bottom"
-        |            }
-        |          }
+        |          bottom: { create: { nameBottom: "the bottom" } }
         |        }
+        |      }
         |    }
-        |  }) {id}
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
@@ -1404,20 +1440,18 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val updateMutation =
       s"""
-         |mutation  {
+         |mutation {
          |  updateTop(
-         |    where: {
-         |      nameTop: "the top"
-         |    }
+         |    where: { nameTop: { set: "the top" } }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |              nameMiddle: "updated middle"
-         |              bottom: {disconnect: true}
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: { disconnect: true }
+         |        }
          |      }
-         |     }
-         |   }
+         |    }
          |  ) {
          |    nameTop
          |    middle {
@@ -1458,21 +1492,20 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val createMutation =
       """
-        |mutation  {
-        |  createTop(data: {
-        |    nameTop: "the top",
-        |    middle: {
-        |      create:
-        |        {
+        |mutation {
+        |  createTop(
+        |    data: {
+        |      nameTop: "the top"
+        |      middle: {
+        |        create: {
         |          nameMiddle: "the middle"
-        |          bottom: {
-        |            create: {
-        |              nameBottom: "the bottom"
-        |            }
-        |          }
+        |          bottom: { create: { nameBottom: "the bottom" } }
         |        }
+        |      }
         |    }
-        |  }) {id}
+        |  ) {
+        |    id
+        |  }
         |}
       """
 
@@ -1480,20 +1513,18 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val updateMutation =
       s"""
-         |mutation  {
+         |mutation {
          |  updateTop(
-         |    where: {
-         |      nameTop: "the top"
-         |    }
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |              nameMiddle: "updated middle"
-         |              bottom: {disconnect: true}
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: { disconnect: true }
+         |        }
          |      }
-         |     }
-         |   }
+         |    }
          |  ) {
          |    nameTop
          |    middle {
@@ -1527,19 +1558,17 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     server.query("""mutation  {createUser(data: {name: "Z"}) {id}}""", project)
 
     val updateMutation =
-      s""" mutation {
-         |  updateUser(data:{
-         |    following: {
-         |      connect: [{ name: "Y" }, { name: "Z"}]
-         |    }
-         |  },where:{
-         |    name:"X"
-         |  }) {
+      s"""
+         |mutation {
+         |  updateUser(
+         |    data: { following: { connect: [{ name: "Y" }, { name: "Z" }] } }
+         |    where: { name: "X" }
+         |  ) {
          |    name
-         |    following{
+         |    following {
          |      name
          |    }
-         |    follower{
+         |    follower {
          |      name
          |    }
          |  }
@@ -1556,16 +1585,14 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       """{"data":{"users":[{"name":"X","following":[{"name":"Y"},{"name":"Z"}]},{"name":"Y","following":[]},{"name":"Z","following":[]}]}}""")
 
     val disconnectMutation =
-      s""" mutation {
-         |  updateUser(data:{
-         |    follower: {
-         |      disconnect: [{ name: "X" }]
-         |    }
-         |  },where:{
-         |    name:"Y"
-         |  }) {
+      s"""
+         |mutation {
+         |  updateUser(
+         |    data: { follower: { disconnect: [{ name: "X" }] } }
+         |    where: { name: "Y" }
+         |  ) {
          |    name
-         |    following{
+         |    following {
          |      name
          |    }
          |  }

@@ -32,7 +32,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  updateParent(
          |  where: $parentIdentifier
          |  data:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childOpt: {deleteMany: {
          |        where:{c: "c"}
          |    }}

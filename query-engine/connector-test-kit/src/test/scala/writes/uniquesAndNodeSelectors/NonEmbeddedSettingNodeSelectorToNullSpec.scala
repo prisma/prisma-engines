@@ -28,70 +28,71 @@ class NonEmbeddedSettingNodeSelectorToNullSpec extends FlatSpec with Matchers wi
     database.setup(project)
 
     server.query(
-      """mutation a {
-        |  createA(data: {
-        |    b: "abc"
-        |    key: "abc"
-        |    c: {
-        |       create:{ c: "C" }
-        |    }
-        |  }) {
+      """
+        |mutation a {
+        |  createOneA(data: { b: "abc", key: "abc", c: { create: { c: "C" } } }) {
         |    id
-        |    key,
-        |    b,
-        |    c {c}
-        |  }
-        |}""",
-      project
-    )
-
-    server.query(
-      """mutation a {
-        |  createA(data: {
-        |    b: null
-        |    key: "abc2"
-        |    c: {
-        |       create:{ c: "C2"}
-        |    }
-        |  }) {
-        |    key,
-        |    b,
-        |    c {c}
-        |  }
-        |}""",
-      project
-    )
-
-    server.query(
-      """mutation b {
-        |  updateA(
-        |    where: { b: "abc" }
-        |    data: {
-        |      b: null
-        |      c: {update:{c:"NewC"}}
-        |    }) {
+        |    key
         |    b
-        |    c{c}
+        |    c {
+        |      c
+        |    }
         |  }
-        |}""",
-      project
+        |}
+      """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    server.query(
+      """
+        |mutation a {
+        |  createOneA(data: { b: null, key: "abc2", c: { create: { c: "C2" } } }) {
+        |    key
+        |    b
+        |    c {
+        |      c
+        |    }
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    server.query(
+      """
+        |mutation b {
+        |  updateOneA(
+        |    where: { b: "abc" }
+        |    data: { b: { set: null }, c: { update: { c: { set: "NewC" } } } }
+        |  ) {
+        |    b
+        |    c {
+        |      c
+        |    }
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false,
     )
 
     val result = server.query(
       """
         |{
-        | as  (orderBy: { id: asc }){
-        |   b
-        |   c{
-        |     c
-        |   }
-        | }
+        |  findManyA(orderBy: { id: asc }) {
+        |    b
+        |    c {
+        |      c
+        |    }
+        |  }
         |}
       """.stripMargin,
-      project
+      project,
+      legacy = false,
     )
 
-    result.toString should be("""{"data":{"as":[{"b":null,"c":{"c":"NewC"}},{"b":null,"c":{"c":"C2"}}]}}""")
+    result.toString should be("""{"data":{"findManyA":[{"b":null,"c":{"c":"NewC"}},{"b":null,"c":{"c":"C2"}}]}}""")
   }
-
 }

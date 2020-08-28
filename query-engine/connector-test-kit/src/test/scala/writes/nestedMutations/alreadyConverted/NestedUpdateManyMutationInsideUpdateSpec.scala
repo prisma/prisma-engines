@@ -33,10 +33,10 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  updateParent(
          |  where: $parent1Id
          |  data:{
-         |    p: "p2"
+         |    p: { set: "p2" }
          |    childOpt: {updateMany: {
          |        where:{c: "c"}
-         |        data: {c: "newC"}
+         |        data: {c: { set: "newC" }}
          |
          |    }}
          |  }){
@@ -72,7 +72,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: { c: { contains:"c"} }
-         |        data: { non_unique: "updated" }
+         |        data: { non_unique: { set: "updated" }}
          |    }}
          |  }){
          |    childrenOpt {
@@ -107,7 +107,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: { c: { contains:"c" } }
-         |        data: { non_unique: "updated" }
+         |        data: { non_unique: { set: "updated" }}
          |    }}
          |  }){
          |    childrenOpt {
@@ -142,7 +142,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c: { contains:"c" } }
-         |        data: {non_unique: "updated"}
+         |        data: {non_unique: { set: "updated" }}
          |    }}
          |  }){
          |    childrenOpt {
@@ -178,11 +178,11 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {c: { contains:"1" } }
-         |        data: {non_unique: "updated1"}
+         |        data: {non_unique: { set: "updated1" }}
          |    },
          |    {
          |        where: {c: { contains:"2" } }
-         |        data: {non_unique: "updated2"}
+         |        data: {non_unique: { set: "updated2" }}
          |    }
          |    ]}
          |  }){
@@ -219,7 +219,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {}
-         |        data: {non_unique: "updated1"}
+         |        data: { non_unique: { set: "updated1" }}
          |    }
          |    ]}
          |  }){
@@ -255,12 +255,12 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
-         |        where: {c: { contains:"3" } }
-         |        data: {non_unique: "updated3"}
+         |        where: { c: { contains:"3" }}
+         |        data: { non_unique: { set: "updated3" }}
          |    },
          |    {
-         |        where: {c: { contains:"4" } }
-         |        data: {non_unique: "updated4"}
+         |        where: { c: { contains:"4" }}
+         |        data: { non_unique: { set: "updated4" }}
          |    }
          |    ]}
          |  }){
@@ -298,12 +298,12 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
-         |        where: {c: { contains:"c" } }
-         |        data: {non_unique: "updated1"}
+         |        where: { c: { contains: "c" }}
+         |        data: { non_unique: { set: "updated1" }}
          |    },
          |    {
-         |        where: {c: { contains:"c1" } }
-         |        data: {non_unique: "updated2"}
+         |        where: { c: { contains: "c1" }}
+         |        data: { non_unique: { set: "updated2" }}
          |    }
          |    ]}
          |  }){

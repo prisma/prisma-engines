@@ -1,6 +1,9 @@
 use super::*;
-use crate::query_document::{ParsedInputMap, ParsedInputValue};
-use connector::WriteArgs;
+use crate::{
+    query_document::{ParsedInputMap, ParsedInputValue},
+    InputAssertions,
+};
+use connector::{WriteArgs, WriteExpression};
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -35,12 +38,31 @@ impl WriteArgsParser {
                             }
                         };
 
-                        args.args.insert(sf.db_name().clone(), set_value)
+                        args.args.insert(sf, set_value)
                     }
 
                     Field::Scalar(sf) => {
-                        let value: PrismaValue = v.try_into()?;
-                        args.args.insert(sf.db_name().clone(), value)
+                        let expr: WriteExpression = match v {
+                            ParsedInputValue::Single(v) => v.into(),
+                            ParsedInputValue::Map(map) => {
+                                map.assert_size(1)?;
+
+                                let (operation, value) = map.into_iter().next().unwrap();
+                                let value: PrismaValue = value.try_into()?;
+
+                                match operation.as_str() {
+                                    "set" => WriteExpression::Value(value),
+                                    "increment" => WriteExpression::Add(value),
+                                    "decrement" => WriteExpression::Substract(value),
+                                    "multiply" => WriteExpression::Multiply(value),
+                                    "divide" => WriteExpression::Divide(value),
+                                    _ => unreachable!(),
+                                }
+                            }
+                            _ => unreachable!(),
+                        };
+
+                        args.args.insert(sf, expr)
                     }
 
                     Field::Relation(ref rf) => match v {

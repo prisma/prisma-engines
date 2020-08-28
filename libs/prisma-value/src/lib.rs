@@ -1,3 +1,4 @@
+pub mod arithmetic;
 mod error;
 #[cfg(feature = "sql-ext")]
 pub mod sql_ext;

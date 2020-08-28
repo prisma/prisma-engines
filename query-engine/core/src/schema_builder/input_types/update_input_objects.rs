@@ -41,9 +41,69 @@ fn scalar_input_fields_for_update(ctx: &mut BuilderContext, model: &ModelRef) ->
             .scalar_writable()
             .filter(field_should_be_kept_for_update_input_type)
             .collect(),
-        |f: ScalarFieldRef| map_optional_input_type(&f),
+        |ctx, f: ScalarFieldRef| scalar_update_field_type_mapper(ctx, &f),
         false,
     )
+}
+
+fn scalar_update_field_type_mapper(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
+    if field.is_list {
+        map_optional_input_type(field)
+    } else {
+        let typ = match &field.type_identifier {
+            TypeIdentifier::Float => operations_object_type(ctx, "Float", field, true),
+            TypeIdentifier::Int => operations_object_type(ctx, "Int", field, true),
+            TypeIdentifier::String => operations_object_type(ctx, "String", field, false),
+            TypeIdentifier::Boolean => operations_object_type(ctx, "Bool", field, false),
+            TypeIdentifier::Enum(e) => operations_object_type(ctx, &format!("Enum{}", e), field, false),
+            TypeIdentifier::Json => operations_object_type(ctx, "Json", field, false),
+            TypeIdentifier::DateTime => operations_object_type(ctx, "DateTime", field, false),
+            TypeIdentifier::UUID => operations_object_type(ctx, "Uuid", field, false),
+        };
+
+        wrap_opt_input_object(typ)
+    }
+}
+
+fn operations_object_type(
+    ctx: &mut BuilderContext,
+    prefix: &str,
+    field: &ScalarFieldRef,
+    with_number_operators: bool,
+) -> InputObjectTypeWeakRef {
+    // Nullability is important for the `set` operation, so we need to
+    // construct and cache different objects to reflect that.
+    let nullable = if field.is_required { "" } else { "Nullable" };
+    let name = format!("{}{}FieldUpdateOperationsInput", nullable, prefix);
+    return_cached_input!(ctx, &name);
+
+    let mut obj = init_input_object_type(&name);
+    obj.set_one_of(true);
+
+    let obj = Arc::new(obj);
+    let nullable_field_type = map_optional_input_type(field);
+    let mapped = map_required_input_type(field);
+
+    let non_nullable_field_type = if let InputType::Null(typ) = mapped {
+        InputType::opt(*typ)
+    } else {
+        InputType::opt(mapped)
+    };
+
+    ctx.cache_input_type(name, obj.clone());
+
+    let mut fields = vec![input_field("set", nullable_field_type, None)];
+
+    if with_number_operators && feature_flags::get().atomicNumberOperations {
+        fields.push(input_field("increment", non_nullable_field_type.clone(), None));
+        fields.push(input_field("decrement", non_nullable_field_type.clone(), None));
+        fields.push(input_field("multiply", non_nullable_field_type.clone(), None));
+        fields.push(input_field("divide", non_nullable_field_type, None));
+    }
+
+    obj.set_fields(fields);
+
+    Arc::downgrade(&obj)
 }
 
 /// For update input types only. Compute input fields for relational fields.

@@ -132,7 +132,7 @@ class BringYourOwnIdMongoSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |upsertParent(
          |    where: {id: "5c88f558dee5fb6fe357c7a9"}
          |    create: {p: "Parent 2", id: "5c88f558dee5fb6fe357c7a9"}
-         |    update: {p: "Parent 2"}
+         |    update: {p: { set: "Parent 2" }}
          |    )
          |  {p, id}
          |}""",
@@ -153,7 +153,7 @@ class BringYourOwnIdMongoSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |upsertParent(
          |    where: {id: "5c88f558dee5fb6fe357c7a9"}
          |    create: {p: "Parent 2", id: "5c88f558dee5fb6fe357c7a9aggfasffgasdgasg"}
-         |    update: {p: "Parent 2"}
+         |    update: {p: { set: "Parent 2" }}
          |    )
          |  {p, id}
          |}""",
@@ -179,18 +179,28 @@ class BringYourOwnIdMongoSpec extends FlatSpec with Matchers with ApiSpecBase wi
       res.toString should be(s"""{"data":{"createParent":{"p":"Parent","id":"5c88f558dee5fb6fe357c7a9"}}}""")
 
       val res2 = server.query(
-        s"""mutation {
-         |updateParent(
-         |    where: {id: "5c88f558dee5fb6fe357c7a9"}
-         |    data: {
-         |        childOpt: {upsert:{
-         |              create:{ id: "5c88f558dee5fb6fe357c7a4", c: "test 3"}
-         |              update:{ c: "Does not matter"}
-         |        }}
-         |      }
-         |    )
-         |  {p, id, childOpt{c, id}}
-         |}""",
+        s"""
+           |mutation {
+           |  updateParent(
+           |    where: { id: "5c88f558dee5fb6fe357c7a9" }
+           |    data: {
+           |      childOpt: {
+           |        upsert: {
+           |          create: { id: "5c88f558dee5fb6fe357c7a4", c: "test 3" }
+           |          update: { c: { set: "Does not matter" } }
+           |        }
+           |      }
+           |    }
+           |  ) {
+           |    p
+           |    id
+           |    childOpt {
+           |      c
+           |      id
+           |    }
+           |  }
+           |}
+         """.stripMargin,
         project = project
       )
 

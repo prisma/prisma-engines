@@ -79,7 +79,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        name: "Paul"
         |      }
         |    }
-        |    data: { age: 41 }
+        |    data: { age: { set: 41 }}
         |  ) {
         |    name
         |    age
@@ -94,7 +94,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { age: 42 }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { age: { set: 42 }}}}) {
         |    parent { age }
         |  }
         |}
@@ -112,7 +112,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |      name: "Paul"
         |      child_id: 2
         |    }}
-        |    update: { name: "Milutin", age: 43 }
+        |    update: { name: { set: "Milutin" }, age: { set: 43 }}
         |    create: { name: "Milutin", age: 43, child: { create: { id: 2, name: "Nikola" } } }
         |  ) {
         |    age
@@ -200,7 +200,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        name: "Paul"
         |      }
         |    }
-        |    data: { age: 41 }
+        |    data: { age: { set: 41 }}
         |  ) {
         |    name
         |    age
@@ -215,7 +215,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { age: 42 }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { age: { set: 42 }}}}) {
         |    parent {
         |      age
         |      child {
@@ -242,7 +242,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_ssn: "2"
         |      }
         |    }
-        |    update: { age: 43 }
+        |    update: { age: { set: 43 }}
         |    create: { name: "Milutin", age: 43, child: { create: { id: 2, ssn: "2", name: "Nikola" } } }
         |  ) {
         |    age
@@ -326,7 +326,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_id: 1
         |      }
         |    }
-        |    data: { age: 41 }
+        |    data: { age: { set: 41 }}
         |  ) {
         |    name
         |    age
@@ -341,7 +341,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { age: 42 }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { age: { set: 42 }}}}) {
         |    parent { age }
         |  }
         |}
@@ -361,7 +361,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_id: 2
         |      }
         |    }
-        |    update: { name: "Milutin", age: 43 }
+        |    update: { name: { set: "Milutin" }, age: { set: 43 }}
         |    create: { name: "Milutin", age: 43, child: { create: { id: 2, name: "Nikola" } } }
         |  ) {
         |    age
@@ -479,7 +479,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |            age: 40
         |          }
         |          update: {
-        |            name: "doesn't matter"
+        |            name: { set: "doesn't matter" }
         |          }
         |        }
         |      }
@@ -595,7 +595,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_id: 1
         |        child_ssn: "1"
         |      }}
-        |      data: { age: 41 }
+        |      data: { age: { set: 41 }}
         |    ) {
         |    name
         |    age
@@ -610,7 +610,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { age: 42 }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { age: { set: 42 }}}}) {
         |    parent { age }
         |  }
         |}
@@ -631,7 +631,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_ssn: "2"
         |      }
         |    }
-        |    update: { name: "Milutin", age: 43 }
+        |    update: { name: { set: "Milutin" }, age: { set: 43 }}
         |    create: { name: "Milutin", age: 43, child: { create: { id: 2, ssn: "2", name: "Nikola" } } }
         |  ) {
         |    age
@@ -755,7 +755,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |            age: 40
         |          }
         |          update: {
-        |            name: "doesn't matter"
+        |            name: { set: "doesn't matter" }
         |          }
         |        }
         |      }
@@ -867,7 +867,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_id: 1
         |      }
         |    }
-        |    data: { age: 41 }
+        |    data: { age: { set: 41 }}
         |  ) {
         |    name
         |    age
@@ -886,7 +886,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |    parents: {
         |       updateMany: {
         |         where: { age: { equals: 41 }}
-        |         data: { age: 42 }
+        |         data: { age: { set: 42 }}
         |       }
         |     }
         |  }) {
@@ -909,7 +909,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_id: 2
         |      }
         |    }
-        |    update: { name: "Milutin", age: 43 }
+        |    update: { name: { set: "Milutin" }, age: { set: 43 }}
         |    create: { name: "Milutin", age: 43, child: { create: { id: 2, name: "Nikola" } } }
         |  ) {
         |    age
@@ -1026,7 +1026,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |            }
         |          }
         |          create: { name: "Đuka", age: 40 }
-        |          update: { name: "doesn't matter" }
+        |          update: { name: { set: "doesn't matter" }}
         |        }
         |      }
         |    }
@@ -1054,7 +1054,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |      parents: {
         |        updateMany: {
         |          where: { age: { equals: 40 }}
-        |          data: { age: 41 }
+        |          data: { age: { set: 41 }}
         |        }
         |      }
         |    }
@@ -1173,7 +1173,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_ssn: "1"
         |      }
         |    }
-        |    data: { age: 41 }
+        |    data: { age: { set: 41 }}
         |  ) {
         |    name
         |    age
@@ -1188,11 +1188,14 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: {
-        |    parents: {
-        |       updateMany: {
-        |         where: { age: { equals: 41 }}
-        |         data: { age: 42 } }
+        |  updateChild(
+        |    where: { id: 1 }
+        |    data: {
+        |      parents: {
+        |         updateMany: {
+        |           where: { age: { equals: 41 }}
+        |           data: { age: { set: 42 }}
+        |         }
         |       }
         |     }
         |  ) {
@@ -1216,7 +1219,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |        child_ssn: "2"
         |      }
         |    }
-        |    update: { name: "Milutin", age: 43 }
+        |    update: { name: { set: "Milutin" }, age: { set: 43 }}
         |    create: { name: "Milutin", age: 43, child: { create: { id: 2, ssn: "2", name: "Nikola" } } }
         |  ) {
         |    age
@@ -1341,7 +1344,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |            }
         |          }
         |          create: { name: "Đuka", age: 40 }
-        |          update: { name: "doesn't matter" }
+        |          update: { name: { set: "doesn't matter" }}
         |        }
         |      }
         |    }
@@ -1369,7 +1372,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |      parents: {
         |        updateMany: {
         |          where: { age: { equals: 40 }}
-        |          data: { age: 41 }
+        |          data: { age: { set: 41 }}
         |        }
         |      }
         |    }

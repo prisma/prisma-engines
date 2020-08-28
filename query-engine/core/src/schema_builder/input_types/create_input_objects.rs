@@ -68,7 +68,7 @@ pub(crate) fn create_input_type(
         model.name.clone(),
         "Create",
         scalar_fields,
-        |f: ScalarFieldRef| {
+        |_, f: ScalarFieldRef| {
             if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) {
                 //todo shouldnt these also be Default Value expressions at some point?
                 map_optional_input_type(&f)
