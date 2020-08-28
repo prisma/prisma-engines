@@ -107,19 +107,19 @@ pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArgume
             Aggregator::Count => select.value(count(asterisk())),
 
             Aggregator::Average(fields) => fields.into_iter().fold(select, |select, next_field| {
-                select.value(avg(Column::from(next_field.name.clone())))
+                select.value(avg(Column::from(next_field.db_name().to_owned())))
             }),
 
             Aggregator::Sum(fields) => fields.into_iter().fold(select, |select, next_field| {
-                select.value(sum(Column::from(next_field.name.clone())))
+                select.value(sum(Column::from(next_field.db_name().to_owned())))
             }),
 
             Aggregator::Min(fields) => fields.into_iter().fold(select, |select, next_field| {
-                select.value(min(Column::from(next_field.name.clone())))
+                select.value(min(Column::from(next_field.db_name().to_owned())))
             }),
 
             Aggregator::Max(fields) => fields.into_iter().fold(select, |select, next_field| {
-                select.value(max(Column::from(next_field.name.clone())))
+                select.value(max(Column::from(next_field.db_name().to_owned())))
             }),
         })
 }
@@ -134,7 +134,7 @@ fn extract_columns(model: &ModelRef, aggregators: &[Aggregator]) -> Vec<Column<'
             Aggregator::Min(fields) => fields.clone(),
             Aggregator::Max(fields) => fields.clone(),
         })
-        .unique_by(|field| field.name.clone())
+        .unique_by(|field| field.db_name().to_owned())
         .collect();
 
     fields.as_columns().collect()
