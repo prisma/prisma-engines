@@ -110,7 +110,6 @@ fn render_raw_sql(
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
 ) -> Result<Vec<String>, anyhow::Error> {
-    let schema_name = database_info.connection_info().schema_name().to_string();
     let differ = SqlSchemaDiffer {
         previous: current_schema,
         next: next_schema,
@@ -119,7 +118,7 @@ fn render_raw_sql(
     };
 
     match step {
-        SqlMigrationStep::RedefineTables { names } => Ok(renderer.render_redefine_tables(names, differ, database_info)),
+        SqlMigrationStep::RedefineTables { names } => Ok(renderer.render_redefine_tables(names, differ)),
         SqlMigrationStep::CreateEnum(create_enum) => Ok(renderer.render_create_enum(create_enum)),
         SqlMigrationStep::DropEnum(drop_enum) => Ok(renderer.render_drop_enum(drop_enum)),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
@@ -130,21 +129,17 @@ fn render_raw_sql(
 
             Ok(vec![renderer.render_create_table(&table)?])
         }
-        SqlMigrationStep::DropTable(DropTable { name }) => Ok(renderer.render_drop_table(name, &schema_name)),
+        SqlMigrationStep::DropTable(DropTable { name }) => Ok(renderer.render_drop_table(name)),
         SqlMigrationStep::RenameTable { name, new_name } => Ok(vec![renderer.render_rename_table(name, new_name)]),
-        SqlMigrationStep::AddForeignKey(add_foreign_key) => {
-            Ok(vec![renderer.render_add_foreign_key(add_foreign_key, &schema_name)])
-        }
+        SqlMigrationStep::AddForeignKey(add_foreign_key) => Ok(vec![renderer.render_add_foreign_key(add_foreign_key)]),
         SqlMigrationStep::DropForeignKey(drop_foreign_key) => {
             Ok(vec![renderer.render_drop_foreign_key(drop_foreign_key)])
         }
         SqlMigrationStep::AlterTable(alter_table) => {
             Ok(renderer.render_alter_table(alter_table, database_info, &differ))
         }
-        SqlMigrationStep::CreateIndex(create_index) => {
-            Ok(vec![renderer.render_create_index(create_index, database_info)])
-        }
-        SqlMigrationStep::DropIndex(drop_index) => Ok(vec![renderer.render_drop_index(drop_index, database_info)]),
+        SqlMigrationStep::CreateIndex(create_index) => Ok(vec![renderer.render_create_index(create_index)]),
+        SqlMigrationStep::DropIndex(drop_index) => Ok(vec![renderer.render_drop_index(drop_index)]),
         SqlMigrationStep::AlterIndex(alter_index) => {
             renderer.render_alter_index(alter_index, database_info, current_schema)
         }
