@@ -152,6 +152,24 @@ impl From<rusqlite::Error> for Error {
 
                     builder.build()
                 }
+                Some(d) if d.contains("has no column named") => {
+                    let column = d.split(" has no column named ").last().unwrap().into();
+
+                    let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
+                    builder.set_original_code(format!("{}", extended_code));
+                    builder.set_original_message(d);
+
+                    builder.build()
+                }
+                Some(d) if d.starts_with("no such column: ") => {
+                    let column = d.split("no such column: ").last().unwrap().into();
+
+                    let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
+                    builder.set_original_code(format!("{}", extended_code));
+                    builder.set_original_message(d);
+
+                    builder.build()
+                }
                 _ => {
                     let description = description.as_ref().map(|d| d.to_string());
                     let mut builder = Error::builder(ErrorKind::QueryError(e.into()));

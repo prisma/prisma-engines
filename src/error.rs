@@ -126,8 +126,8 @@ pub enum ErrorKind {
     #[error("Error accessing result set, index out of bounds: {}", _0)]
     ResultIndexOutOfBounds(usize),
 
-    #[error("Error accessing result set, column not found: {}", _0)]
-    ColumnNotFound(String),
+    #[error("Error accessing result set, column not found: {}", column)]
+    ColumnNotFound { column: String },
 
     #[error("Error accessing result set, type mismatch, expected: {}", _0)]
     ResultTypeMismatch(&'static str),

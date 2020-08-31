@@ -135,6 +135,17 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
+            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1054 => {
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted[2].split('\'').collect();
+                let column = splitted[1].into();
+
+                let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
+                builder.set_original_code(format!("{}", code));
+                builder.set_original_message(message);
+
+                builder.build()
+            }
             my::error::Error::Server(ServerError {
                 ref message,
                 code,

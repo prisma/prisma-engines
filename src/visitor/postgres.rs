@@ -498,7 +498,7 @@ mod tests {
 
     #[test]
     fn test_raw_comparator() {
-        let (sql, params) =
+        let (sql, _) =
             Postgres::build(Select::from_table("foo").so_that("bar".compare_raw("ILIKE", "baz%"))).unwrap();
 
         assert_eq!(r#"SELECT "foo".* FROM "foo" WHERE "bar" ILIKE $1"#, sql);

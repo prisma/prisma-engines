@@ -132,6 +132,17 @@ impl From<tiberius::error::Error> for Error {
 
                 builder.build()
             }
+            tiberius::error::Error::Server(e) if e.code() == 207 => {
+                let splitted: Vec<&str> = e.message().split_whitespace().collect();
+                let splitted: Vec<&str> = splitted[3].split('\'').collect();
+                let column = splitted[1].to_string();
+
+                let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
+                builder.set_original_code(format!("{}", e.code()));
+                builder.set_original_message(e.message().to_string());
+
+                builder.build()
+            }
             tiberius::error::Error::Server(e) => {
                 let kind = ErrorKind::QueryError(e.clone().into());
 

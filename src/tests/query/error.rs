@@ -23,6 +23,51 @@ async fn table_does_not_exist(api: &mut dyn TestApi) -> crate::Result<()> {
 }
 
 #[test_each_connector]
+async fn column_does_not_exist_on_write(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id1 int").await?;
+
+    let insert = Insert::single_into(&table).value("id1", 1).value("does_not_exist", 2);
+    let res = api.conn().insert(insert.clone().into()).await;
+
+    assert!(res.is_err());
+
+    let err = res.unwrap_err();
+
+    match err.kind() {
+        ErrorKind::ColumnNotFound { column } => {
+            assert_eq!("does_not_exist", column.as_str());
+        }
+        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+    }
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn column_does_not_exist_on_read(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id1 int").await?;
+
+    let insert = Insert::single_into(&table).value("id1", 1);
+    api.conn().insert(insert.clone().into()).await?;
+
+    let select = format!("Select does_not_exist from {}", table);
+    let res = api.conn().query_raw(&select, &[]).await;
+
+    assert!(res.is_err());
+
+    let err = res.unwrap_err();
+
+    match err.kind() {
+        ErrorKind::ColumnNotFound { column } => {
+            assert_eq!("does_not_exist", column.as_str());
+        }
+        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+    }
+
+    Ok(())
+}
+
+#[test_each_connector]
 async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_table("id1 int, id2 int").await?;
     let index = api.create_index(&table, "id1, id2").await?;

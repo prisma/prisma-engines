@@ -143,6 +143,23 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 builder.build()
             }
+            Some(code) if code == "42703" => {
+                let code = code.to_string();
+                let error = e.into_source().unwrap(); // boom
+                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
+                let message = db_error.message();
+
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let column: Vec<&str> = splitted[1].split('\"').collect();
+                let column = column[1].into();
+
+                let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
+                builder.set_original_code(code);
+                builder.set_original_message(message);
+
+                builder.build()
+            }
+
             Some(code) if code == "42P04" => {
                 let code = code.to_string();
                 let error = e.into_source().unwrap(); // boom
