@@ -6,13 +6,13 @@ use pretty_assertions::assert_eq;
 async fn introspecting_a_table_with_reserved_name_should_rename(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("StringFilter", |t| {
+            migration.create_table("await", |t| {
                 t.add_column("id", types::primary());
             });
         })
         .await;
 
-    let dm = "/// This model has been renamed to \'RenamedStringFilter\' during introspection, because the original name \'StringFilter\' is reserved.\nmodel RenamedStringFilter {\n  id Int @default(autoincrement()) @id\n\n  @@map(\"StringFilter\")\n}\n";
+    let dm = "/// This model has been renamed to \'Renamedawait\' during introspection, because the original name \'await\' is reserved.\nmodel Renamedawait {\n  id Int @default(autoincrement()) @id\n\n  @@map(\"await\")\n}\n";
     let result = api.introspect().await;
 
     assert_eq!(&result, dm);
@@ -22,13 +22,13 @@ async fn introspecting_a_table_with_reserved_name_should_rename(api: &TestApi) {
 async fn reserved_names_case_sensitivity(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("query", |t| {
+            migration.create_table("Await", |t| {
                 t.add_column("id", types::primary());
             });
         })
         .await;
 
-    let dm = "model query {\n  id Int @default(autoincrement()) @id\n}\n";
+    let dm = "model Await {\n  id Int @default(autoincrement()) @id\n}\n";
     let result = api.introspect().await;
 
     assert_eq!(&result, dm);
