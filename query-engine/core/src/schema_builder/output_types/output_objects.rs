@@ -14,7 +14,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
         .into_iter()
         .for_each(|model| {
             ctx.cache_output_type(
-                model.name.clone(),
+                model_output_type_name(&model),
                 Arc::new(ObjectType::new(model.name.clone(), Some(model))),
             )
         });
@@ -32,6 +32,10 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
         });
 }
 
+fn model_output_type_name(model: &ModelRef) -> String {
+    format!("{}OutputType", model.name.clone())
+}
+
 /// Computes model output type fields.
 /// Important: This requires that the cache has already been initialized.
 fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
@@ -46,7 +50,7 @@ fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) 
 /// Returns an output object type for the given model.
 /// Relies on the output type cache being initalized.
 pub(crate) fn map_model_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    ctx.get_output_type(&model.name)
+    ctx.get_output_type(&model_output_type_name(model))
         .expect("Invariant violation: Initialized output object type for each model.")
 }
 
