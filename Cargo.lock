@@ -783,7 +783,7 @@ dependencies = [
  "pretty_assertions",
  "prisma-value",
  "regex",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "serde",
  "serde_json",
  "serial_test",
@@ -2035,7 +2035,7 @@ dependencies = [
  "num-traits",
  "rand",
  "regex",
- "rust_decimal 1.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rust_decimal",
  "serde",
  "serde_json",
  "sha1",
@@ -2512,7 +2512,7 @@ dependencies = [
  "prisma-value",
  "quaint",
  "rand",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2528,7 +2528,7 @@ dependencies = [
  "once_cell",
  "quaint",
  "regex",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2623,7 +2623,7 @@ dependencies = [
  "postgres-native-tls",
  "postgres-types",
  "rusqlite",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "serde",
  "serde_json",
  "thiserror",
@@ -2675,7 +2675,7 @@ dependencies = [
  "prisma-models",
  "prisma-value",
  "query-connector",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "serde",
  "serde_json",
  "thiserror",
@@ -2711,7 +2711,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "rustc_version",
  "serde",
  "serde_json",
@@ -2868,16 +2868,6 @@ dependencies = [
  "postgres",
  "serde",
  "tokio-postgres",
-]
-
-[[package]]
-name = "rust_decimal"
-version = "1.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95ba36e8c41bf675947e200af432325f332f60a0aea0ef2dc456636c2f6037d7"
-dependencies = [
- "num-traits",
- "serde",
 ]
 
 [[package]]
@@ -3159,7 +3149,7 @@ dependencies = [
  "prisma-value",
  "quaint",
  "regex",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "serde",
  "serde_json",
  "sql-schema-describer",
@@ -3217,7 +3207,7 @@ dependencies = [
  "quaint",
  "query-connector",
  "rand",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "serde",
  "serde_json",
  "thiserror",
@@ -3240,7 +3230,7 @@ dependencies = [
  "prisma-value",
  "quaint",
  "regex",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "serde",
  "serde_json",
  "test-macros",
@@ -3519,7 +3509,7 @@ dependencies = [
  "once_cell",
  "pin-project-lite",
  "pretty-hex",
- "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
+ "rust_decimal",
  "thiserror",
  "tokio",
  "tokio-util 0.3.1",
