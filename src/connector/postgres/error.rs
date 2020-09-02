@@ -151,7 +151,11 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let column: Vec<&str> = splitted[1].split('\"').collect();
-                let column = column[1].into();
+                let column = if column.len() == 1 {
+                    column[0].into()
+                } else {
+                    column[1].into()
+                };
 
                 let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
                 builder.set_original_code(code);
