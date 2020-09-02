@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
-  "Using a json field" should "work" taggedAs IgnoreSQLite {
+  "Using a json field" should "work" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """|model Model {
          | id    String @id
