@@ -132,7 +132,7 @@ where
 
 /// Appends an option of type T to a vector over T if the option is Some.
 pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
-    opt.into_iter().for_each(|t| vec.push(t));
+    vec.extend(opt.into_iter())
 }
 
 /// Computes a compound field name based on an index.

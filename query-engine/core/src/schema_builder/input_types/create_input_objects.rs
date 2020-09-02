@@ -83,6 +83,7 @@ pub(crate) fn create_input_type(
 
     // Compute input fields for relational fields.
     let mut relational_fields = relation_input_fields_for_create(ctx, model, parent_field);
+
     fields.append(&mut relational_fields);
 
     input_object.set_fields(fields);
@@ -120,16 +121,13 @@ fn relation_input_fields_for_create(
                         let input_object = Arc::new(init_input_object_type(input_name.clone()));
                         ctx.cache_input_type(input_name, input_object.clone());
 
-                        let mut fields = vec![input_fields::nested_create_input_field(ctx, &rf)];
-                        let nested_connect = input_fields::nested_connect_input_field(ctx, &rf);
-                        append_opt(&mut fields, nested_connect);
+                        // Enqueue the nested create input for its fields to be
+                        // created at a later point, to avoid recursing too deep
+                        // (that has caused stack overflows on large schemas in
+                        // the past).
+                        ctx.nested_create_inputs_queue
+                            .push((Arc::clone(&input_object), Arc::clone(&rf)));
 
-                        if feature_flags::get().connectOrCreate {
-                            let nested_connect_or_create = input_fields::nested_connect_or_create_field(ctx, &rf);
-                            append_opt(&mut fields, nested_connect_or_create);
-                        }
-
-                        input_object.set_fields(fields);
                         Arc::downgrade(&input_object)
                     }
                 };

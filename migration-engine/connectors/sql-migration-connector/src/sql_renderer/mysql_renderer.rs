@@ -22,6 +22,13 @@ impl SqlRenderer for MysqlFlavour {
         Quoted::Backticks(name)
     }
 
+    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+        QuotedWithSchema {
+            schema_name: self.schema_name(),
+            name: self.quote(name),
+        }
+    }
+
     fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
         unreachable!("render_alter_enum on MySQL")
     }
@@ -63,19 +70,13 @@ impl SqlRenderer for MysqlFlavour {
 
             // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
             Ok(vec![
-                render_create_index(
-                    self,
-                    database_info.connection_info().schema_name(),
-                    table,
-                    &new_index,
-                    self.sql_family(),
-                ),
-                mysql_drop_index(self, database_info.connection_info().schema_name(), table, index_name),
+                render_create_index(self, table, &new_index, self.sql_family()),
+                mysql_drop_index(self, table, index_name),
             ])
         } else {
             Ok(vec![format!(
                 "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
-                table_name = self.quote_with_schema(database_info.connection_info().schema_name(), &table),
+                table_name = self.quote_with_schema(&table),
                 index_name = self.quote(index_name),
                 index_new_name = self.quote(index_new_name)
             )])
@@ -166,20 +167,14 @@ impl SqlRenderer for MysqlFlavour {
         Vec::new() // enums are defined on each column that uses them on MySQL
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String {
+    fn render_create_index(&self, create_index: &CreateIndex) -> String {
         let CreateIndex {
             table,
             index,
             caused_by_create_table: _,
         } = create_index;
 
-        render_create_index(
-            self,
-            database_info.connection_info().schema_name(),
-            table,
-            index,
-            self.sql_family(),
-        )
+        render_create_index(self, table, index, self.sql_family())
     }
 
     fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
@@ -218,7 +213,7 @@ impl SqlRenderer for MysqlFlavour {
 
         Ok(format!(
             "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            table_name = self.quote_with_schema(self.schema_name(), table.name()),
+            table_name = self.quote_with_schema(table.name()),
             columns = columns,
             indexes= indexes,
             primary_key = primary_key,
@@ -232,34 +227,24 @@ impl SqlRenderer for MysqlFlavour {
     fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
         format!(
             "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
-            table = self.quote_with_schema(self.schema_name(), &drop_foreign_key.table),
+            table = self.quote_with_schema(&drop_foreign_key.table),
             constraint_name = Quoted::mysql_ident(&drop_foreign_key.constraint_name),
         )
     }
 
-    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String {
-        mysql_drop_index(
-            self,
-            database_info.connection_info().schema_name(),
-            &drop_index.table,
-            &drop_index.name,
-        )
+    fn render_drop_index(&self, drop_index: &DropIndex) -> String {
+        mysql_drop_index(self, &drop_index.table, &drop_index.name)
     }
 
-    fn render_redefine_tables(
-        &self,
-        _names: &[String],
-        _differ: SqlSchemaDiffer<'_>,
-        _database_info: &DatabaseInfo,
-    ) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on MySQL")
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(self.schema_name(), &name),
-            new_name = self.quote_with_schema(self.schema_name(), &new_name).to_string(),
+            self.quote_with_schema(&name),
+            new_name = self.quote_with_schema(&new_name),
         )
     }
 }
@@ -339,10 +324,10 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }
 
-fn mysql_drop_index(renderer: &dyn SqlFlavour, schema_name: &str, table_name: &str, index_name: &str) -> String {
+fn mysql_drop_index(renderer: &dyn SqlFlavour, table_name: &str, index_name: &str) -> String {
     format!(
         "DROP INDEX {} ON {}",
         renderer.quote(index_name),
-        renderer.quote_with_schema(schema_name, table_name)
+        renderer.quote_with_schema(table_name)
     )
 }

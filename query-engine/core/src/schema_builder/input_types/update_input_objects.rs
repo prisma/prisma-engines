@@ -117,7 +117,7 @@ fn relation_input_fields_for_update(
     model
         .fields()
         .relation()
-        .iter()
+        .into_iter()
         .filter_map(|rf| {
             let related_model = rf.related_model();
             let related_field = rf.related_field();
@@ -144,22 +144,13 @@ fn relation_input_fields_for_update(
                         let input_object = Arc::new(init_input_object_type(input_name.clone()));
                         ctx.cache_input_type(input_name, input_object.clone());
 
-                        let mut fields = vec![input_fields::nested_create_input_field(ctx, rf)];
+                        // Enqueue the nested update input for its fields to be
+                        // created at a later point, to avoid recursing too deep
+                        // (that has caused stack overflows on large schemas in
+                        // the past).
+                        ctx.nested_update_inputs_queue
+                            .push((Arc::clone(&input_object), Arc::clone(&rf)));
 
-                        append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, rf));
-                        append_opt(&mut fields, input_fields::nested_set_input_field(ctx, rf));
-                        append_opt(&mut fields, input_fields::nested_disconnect_input_field(ctx, rf));
-                        append_opt(&mut fields, input_fields::nested_delete_input_field(ctx, rf));
-                        fields.push(input_fields::nested_update_input_field(ctx, rf));
-                        append_opt(&mut fields, input_fields::nested_update_many_field(ctx, rf));
-                        append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, rf));
-                        append_opt(&mut fields, input_fields::nested_upsert_field(ctx, rf));
-
-                        if feature_flags::get().connectOrCreate {
-                            append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, rf));
-                        }
-
-                        input_object.set_fields(fields);
                         Arc::downgrade(&input_object)
                     }
                 };

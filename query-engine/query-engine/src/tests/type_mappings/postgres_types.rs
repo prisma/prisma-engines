@@ -7,7 +7,7 @@ use test_macros::test_each_connector;
 
 const CREATE_TYPES_TABLE: &str = indoc! {
     r##"
-    CREATE TABLE "prisma-tests"."types" (
+    CREATE TABLE "types" (
         id SERIAL PRIMARY KEY,
         numeric_int2 int2,
         numeric_int4 int4,
@@ -305,7 +305,7 @@ async fn small_float_values_must_work(api: &TestApi) -> TestResult {
 
 const CREATE_ARRAY_TYPES_TABLE: &str = indoc! {
     r##"
-    CREATE TABLE "prisma-tests"."arraytypes" (
+    CREATE TABLE "arraytypes" (
         id SERIAL PRIMARY KEY,
         numeric_int2 int2[],
         numeric_int4 int4[],
@@ -508,12 +508,12 @@ async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
         ("jsonb", "\"{\\\"isThisPrimaryKeyReallyJSON\\\":true}\""),
     ];
 
-    let drop_table = r#"DROP TABLE IF EXISTS "prisma-tests"."pk_test""#;
+    let drop_table = r#"DROP TABLE IF EXISTS "pk_test""#;
 
     for (identifier_type, identifier_value) in identifier_types {
         for index_type in &["PRIMARY KEY", "UNIQUE"] {
             let create_table = format!(
-                r#"CREATE TABLE "prisma-tests"."pk_test" (id {} NOT NULL, {} (id))"#,
+                r#"CREATE TABLE "pk_test" (id {} NOT NULL, {} (id))"#,
                 identifier_type, index_type,
             );
             api.execute_sql(drop_table).await?;
@@ -603,7 +603,7 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
 
 const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
     r##"
-    CREATE TABLE "prisma-tests"."types" (
+    CREATE TABLE "types" (
         id SERIAL PRIMARY KEY,
         numeric_int2 int2 NOT NULL DEFAULT 7,
         numeric_int4 int4 NOT NULL DEFAULT 777,
@@ -741,7 +741,7 @@ async fn postgres_db_level_defaults_work(api: &TestApi) -> TestResult {
 
 const CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS: &str = indoc! {
     r##"
-    CREATE TABLE "prisma-tests"."arraytypes" (
+    CREATE TABLE "arraytypes" (
         id SERIAL PRIMARY KEY,
         numeric_int2 int2[] NOT NULL DEFAULT '{1, 2, 3}',
         numeric_int4 int4[] NOT NULL DEFAULT '{3, 2, 3}',
@@ -910,7 +910,7 @@ async fn length_mismatch_is_a_known_error(api: &TestApi) -> TestResult {
 async fn serial_columns_can_be_optional(api: &TestApi) -> TestResult {
     let create_table = indoc! {
         r##"
-        CREATE TABLE "prisma-tests"."timestamps" (
+        CREATE TABLE "timestamps" (
             id SERIAL PRIMARY KEY,
             serial serial4 NOT NULL,
             bigserial serial8,

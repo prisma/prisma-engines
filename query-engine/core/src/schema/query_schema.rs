@@ -298,7 +298,7 @@ impl InputObjectType {
     pub fn set_fields(&self, fields: Vec<InputField>) {
         self.fields
             .set(fields.into_iter().map(|f| Arc::new(f)).collect())
-            .unwrap();
+            .expect("InputObjectType::set_fields");
     }
 
     /// True if fields are empty, false otherwise.

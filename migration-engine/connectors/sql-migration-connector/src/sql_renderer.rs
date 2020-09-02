@@ -21,21 +21,16 @@ use std::{borrow::Cow, fmt::Write as _};
 pub(crate) trait SqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str>;
 
-    fn quote_with_schema<'a, 'b>(&'a self, schema_name: &'a str, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        QuotedWithSchema {
-            schema_name,
-            name: self.quote(name),
-        }
-    }
+    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str>;
 
-    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey, schema_name: &str) -> String {
+    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
         let AddForeignKey { foreign_key, table } = add_foreign_key;
         let mut add_constraint = String::with_capacity(120);
 
         write!(
             add_constraint,
             "ALTER TABLE {table} ADD ",
-            table = self.quote_with_schema(&schema_name, table)
+            table = self.quote_with_schema(table)
         )
         .unwrap();
 
@@ -84,7 +79,6 @@ pub(crate) trait SqlRenderer {
         differ: &SqlSchemaDiffer<'_>,
     ) -> Vec<String> {
         let AlterTable { table, changes } = alter_table;
-        let schema_name = database_info.connection_info().schema_name();
 
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
@@ -163,7 +157,7 @@ pub(crate) trait SqlRenderer {
 
         let alter_table = format!(
             "ALTER TABLE {} {}",
-            self.quote_with_schema(&schema_name, &table.name),
+            self.quote_with_schema(&table.name),
             lines.join(",\n")
         );
 
@@ -180,7 +174,7 @@ pub(crate) trait SqlRenderer {
     fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String>;
 
     /// Render a `CreateIndex` step.
-    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String;
+    fn render_create_index(&self, create_index: &CreateIndex) -> String;
 
     /// Render a `CreateTable` step.
     fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String>;
@@ -192,23 +186,15 @@ pub(crate) trait SqlRenderer {
     fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String;
 
     /// Render a `DropIndex` step.
-    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String;
+    fn render_drop_index(&self, drop_index: &DropIndex) -> String;
 
     /// Render a `DropTable` step.
-    fn render_drop_table(&self, table_name: &str, schema_name: &str) -> Vec<String> {
-        vec![format!(
-            "DROP TABLE {}",
-            self.quote_with_schema(&schema_name, &table_name)
-        )]
+    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+        vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
     }
 
     /// Render a `RedefineTables` step.
-    fn render_redefine_tables(
-        &self,
-        tables: &[String],
-        differ: SqlSchemaDiffer<'_>,
-        database_info: &DatabaseInfo,
-    ) -> Vec<String>;
+    fn render_redefine_tables(&self, tables: &[String], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;
 }

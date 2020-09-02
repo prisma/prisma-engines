@@ -1,5 +1,6 @@
 use super::*;
 use crate::{write, QueryGraph};
+use input_types::input_fields;
 use prisma_models::{dml, PrismaValue};
 
 /// Builds the root `Mutation` type.
@@ -22,6 +23,8 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         .flatten()
         .collect();
 
+    create_nested_inputs(ctx);
+
     if ctx.enable_raw_queries {
         fields.push(create_execute_raw_field());
         fields.push(create_query_raw_field());
@@ -30,6 +33,51 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
     let strong_ref = Arc::new(object_type("Mutation", fields, None));
 
     (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)
+}
+
+// implementation note: these need to be in the same function, because these vecs interact: the create inputs will enqueue update inputs, and vice versa.
+fn create_nested_inputs(ctx: &mut BuilderContext) {
+    let mut nested_create_inputs_queue = std::mem::replace(&mut ctx.nested_create_inputs_queue, Vec::new());
+    let mut nested_update_inputs_queue = std::mem::replace(&mut ctx.nested_update_inputs_queue, Vec::new());
+
+    while !(nested_create_inputs_queue.is_empty() && nested_update_inputs_queue.is_empty()) {
+        // Create inputs.
+        for (input_object, rf) in nested_create_inputs_queue.drain(..) {
+            let mut fields = vec![input_fields::nested_create_input_field(ctx, &rf)];
+            let nested_connect = input_fields::nested_connect_input_field(ctx, &rf);
+            append_opt(&mut fields, nested_connect);
+
+            if feature_flags::get().connectOrCreate {
+                let nested_connect_or_create = input_fields::nested_connect_or_create_field(ctx, &rf);
+                append_opt(&mut fields, nested_connect_or_create);
+            }
+
+            input_object.set_fields(fields);
+        }
+
+        // Update inputs.
+        for (input_object, rf) in nested_update_inputs_queue.drain(..) {
+            let mut fields = vec![input_fields::nested_create_input_field(ctx, &rf)];
+
+            append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
+            append_opt(&mut fields, input_fields::nested_set_input_field(ctx, &rf));
+            append_opt(&mut fields, input_fields::nested_disconnect_input_field(ctx, &rf));
+            append_opt(&mut fields, input_fields::nested_delete_input_field(ctx, &rf));
+            fields.push(input_fields::nested_update_input_field(ctx, &rf));
+            append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));
+            append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, &rf));
+            append_opt(&mut fields, input_fields::nested_upsert_field(ctx, &rf));
+
+            if feature_flags::get().connectOrCreate {
+                append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
+            }
+
+            input_object.set_fields(fields);
+        }
+
+        std::mem::swap(&mut nested_create_inputs_queue, &mut ctx.nested_create_inputs_queue);
+        std::mem::swap(&mut nested_update_inputs_queue, &mut ctx.nested_update_inputs_queue);
+    }
 }
 
 fn create_execute_raw_field() -> Field {

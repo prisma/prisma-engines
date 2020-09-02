@@ -7,7 +7,7 @@ pub enum GqlObjectRenderer {
 }
 
 impl Renderer for GqlObjectRenderer {
-    fn render(&self, ctx: RenderContext) -> (String, RenderContext) {
+    fn render(&self, ctx: &mut RenderContext) -> String {
         match &self {
             GqlObjectRenderer::Input(input) => self.render_input_object(input, ctx),
             GqlObjectRenderer::Output(output) => self.render_output_object(output, ctx),
@@ -16,28 +16,21 @@ impl Renderer for GqlObjectRenderer {
 }
 
 impl GqlObjectRenderer {
-    fn render_input_object(
-        &self,
-        input_object: &InputObjectTypeWeakRef,
-        ctx: RenderContext,
-    ) -> (String, RenderContext) {
+    fn render_input_object(&self, input_object: &InputObjectTypeWeakRef, ctx: &mut RenderContext) -> String {
         let input_object = input_object.into_arc();
         if ctx.already_rendered(&input_object.name) {
-            return ("".into(), ctx);
+            return "".into();
         } else {
             // This short circuits recursive processing for fields.
             ctx.mark_as_rendered(input_object.name.clone())
         }
 
-        let (rendered_fields, ctx): (Vec<String>, RenderContext) =
-            input_object
-                .get_fields()
-                .iter()
-                .fold((vec![], ctx), |(mut acc, ctx), field| {
-                    let (rendered_field, ctx) = field.into_renderer().render(ctx);
-                    acc.push(rendered_field);
-                    (acc, ctx)
-                });
+        let fields = input_object.get_fields();
+        let mut rendered_fields = Vec::with_capacity(fields.len());
+
+        for field in fields {
+            rendered_fields.push(field.into_renderer().render(ctx))
+        }
 
         let indented: Vec<String> = rendered_fields
             .into_iter()
@@ -47,28 +40,26 @@ impl GqlObjectRenderer {
         let rendered = format!("input {} {{\n{}\n}}", input_object.name, indented.join("\n"));
 
         ctx.add(input_object.name.clone(), rendered.clone());
-        (rendered, ctx)
+
+        rendered
     }
 
-    fn render_output_object(&self, output_object: &ObjectTypeWeakRef, ctx: RenderContext) -> (String, RenderContext) {
+    fn render_output_object(&self, output_object: &ObjectTypeWeakRef, ctx: &mut RenderContext) -> String {
         let output_object = output_object.into_arc();
 
         if ctx.already_rendered(output_object.name()) {
-            return ("".into(), ctx);
+            return "".into();
         } else {
             // This short circuits recursive processing for fields.
             ctx.mark_as_rendered(output_object.name().to_string())
         }
 
-        let (rendered_fields, ctx): (Vec<String>, RenderContext) =
-            output_object
-                .get_fields()
-                .iter()
-                .fold((vec![], ctx), |(mut acc, ctx), field| {
-                    let (rendered_field, ctx) = field.into_renderer().render(ctx);
-                    acc.push(rendered_field);
-                    (acc, ctx)
-                });
+        let fields = output_object.get_fields();
+        let mut rendered_fields = Vec::with_capacity(fields.len());
+
+        for field in fields {
+            rendered_fields.push(field.into_renderer().render(ctx))
+        }
 
         let indented: Vec<String> = rendered_fields
             .into_iter()
@@ -78,6 +69,7 @@ impl GqlObjectRenderer {
         let rendered = format!("type {} {{\n{}\n}}", output_object.name(), indented.join("\n"));
 
         ctx.add_output(rendered.clone());
-        (rendered, ctx)
+
+        rendered
     }
 }

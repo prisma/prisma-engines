@@ -1,7 +1,7 @@
 use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
-    flavour::PostgresFlavour,
+    flavour::{PostgresFlavour, SqlFlavour},
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
         AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
@@ -18,6 +18,13 @@ use std::borrow::Cow;
 impl SqlRenderer for PostgresFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
+    }
+
+    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+        QuotedWithSchema {
+            schema_name: self.schema_name(),
+            name: self.quote(name),
+        }
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
@@ -133,7 +140,7 @@ impl SqlRenderer for PostgresFlavour {
     ) -> anyhow::Result<Vec<String>> {
         Ok(vec![format!(
             "ALTER INDEX {} RENAME TO {}",
-            self.quote_with_schema(&self.0.schema(), &alter_index.index_name),
+            self.quote_with_schema(&alter_index.index_name),
             self.quote(&alter_index.index_new_name)
         )])
     }
@@ -165,7 +172,7 @@ impl SqlRenderer for PostgresFlavour {
 
         format!(
             "REFERENCES {}({}) {} ON UPDATE CASCADE",
-            self.quote_with_schema(self.schema_name(), &foreign_key.referenced_table),
+            self.quote_with_schema(&foreign_key.referenced_table),
             referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
         )
@@ -290,14 +297,8 @@ impl SqlRenderer for PostgresFlavour {
         vec![sql]
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String {
-        render_create_index(
-            self,
-            database_info.connection_info().schema_name(),
-            &create_index.table,
-            &create_index.index,
-            database_info.sql_family(),
-        )
+    fn render_create_index(&self, create_index: &CreateIndex) -> String {
+        render_create_index(self, &create_index.table, &create_index.index, self.sql_family())
     }
 
     fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
@@ -313,7 +314,7 @@ impl SqlRenderer for PostgresFlavour {
 
         Ok(format!(
             "CREATE TABLE {table_name} (\n{columns}{primary_key}\n)",
-            table_name = self.quote_with_schema(self.schema_name(), table.name()),
+            table_name = self.quote_with_schema(table.name()),
             columns = columns,
             primary_key = pk,
         ))
@@ -331,32 +332,24 @@ impl SqlRenderer for PostgresFlavour {
     fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-            table = self.quote_with_schema(self.schema_name(), &drop_foreign_key.table),
+            table = self.quote_with_schema(&drop_foreign_key.table),
             constraint_name = Quoted::postgres_ident(&drop_foreign_key.constraint_name),
         )
     }
 
-    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String {
-        format!(
-            "DROP INDEX {}",
-            self.quote_with_schema(database_info.connection_info().schema_name(), &drop_index.name)
-        )
+    fn render_drop_index(&self, drop_index: &DropIndex) -> String {
+        format!("DROP INDEX {}", self.quote_with_schema(&drop_index.name))
     }
 
-    fn render_redefine_tables(
-        &self,
-        _names: &[String],
-        _differ: SqlSchemaDiffer<'_>,
-        _database_info: &DatabaseInfo,
-    ) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on Postgres")
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(self.schema_name(), &name),
-            new_name = self.quote_with_schema(self.schema_name(), &new_name).to_string(),
+            self.quote_with_schema(&name),
+            new_name = self.quote_with_schema(&new_name).to_string(),
         )
     }
 }

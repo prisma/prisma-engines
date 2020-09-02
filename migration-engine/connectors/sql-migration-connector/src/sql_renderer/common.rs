@@ -93,7 +93,6 @@ pub(crate) fn render_on_delete(on_delete: &ForeignKeyAction) -> &'static str {
 
 pub(super) fn render_create_index(
     renderer: &dyn SqlFlavour,
-    schema_name: &str,
     table_name: &str,
     index: &Index,
     sql_family: SqlFamily,
@@ -104,12 +103,12 @@ pub(super) fn render_create_index(
         IndexType::Normal => "",
     };
     let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer.quote_with_schema(schema_name, &name).to_string(),
+        SqlFamily::Sqlite => renderer.quote_with_schema(&name).to_string(),
         _ => renderer.quote(&name).to_string(),
     };
     let table_reference = match sql_family {
         SqlFamily::Sqlite => renderer.quote(table_name).to_string(),
-        _ => renderer.quote_with_schema(schema_name, table_name).to_string(),
+        _ => renderer.quote_with_schema(table_name).to_string(),
     };
     let columns = columns.iter().map(|c| renderer.quote(c));
 
