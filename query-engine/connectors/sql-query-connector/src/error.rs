@@ -55,8 +55,8 @@ pub enum SqlError {
     #[error("Table {} does not exist", _0)]
     TableDoesNotExist(String),
 
-    #[error("Column does not exist")]
-    ColumnDoesNotExist,
+    #[error("Column {} does not exist", _0)]
+    ColumnDoesNotExist(String),
 
     #[error("Error creating a database connection. ({})", _0)]
     ConnectionError(QuaintKind),
@@ -129,7 +129,7 @@ impl SqlError {
             }
             SqlError::RecordDoesNotExist => ConnectorError::from_kind(ErrorKind::RecordDoesNotExist),
             SqlError::TableDoesNotExist(table) => ConnectorError::from_kind(ErrorKind::TableDoesNotExist { table }),
-            SqlError::ColumnDoesNotExist => ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist),
+            SqlError::ColumnDoesNotExist(column) => ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist { column }),
             SqlError::ConnectionError(e) => ConnectorError {
                 user_facing_error: user_facing_errors::quaint::render_quaint_error(&e, connection_info),
                 kind: ErrorKind::ConnectionError(e.into()),
@@ -207,7 +207,7 @@ impl From<quaint::error::Error> for SqlError {
 
             e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
-            QuaintKind::ColumnNotFound(_) => Self::ColumnDoesNotExist,
+            QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(column),
             QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(table),
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
