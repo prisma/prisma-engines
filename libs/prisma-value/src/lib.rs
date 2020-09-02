@@ -23,13 +23,15 @@ pub enum TypeHint {
     Float,
     Boolean,
     Enum,
-    Json,
     DateTime,
+    Duration,
     UUID,
     Int,
     Array,
     Char,
     Bytes,
+    Json,
+    Xml,
     Unknown,
 }
 
@@ -40,18 +42,20 @@ pub enum PrismaValue {
     Boolean(bool),
     Enum(String),
     Int(i64),
-
-    #[serde(serialize_with = "serialize_null")]
-    Null(TypeHint),
     Uuid(Uuid),
     List(PrismaListValue),
     Json(String),
+    Xml(String),
 
+    // NT Todo we probably need more date types for a clean serialization.
     #[serde(serialize_with = "serialize_date")]
     DateTime(DateTime<Utc>),
 
     #[serde(serialize_with = "serialize_decimal")]
     Float(Decimal),
+
+    #[serde(serialize_with = "serialize_null")]
+    Null(TypeHint),
 }
 
 pub fn stringify_date(date: &DateTime<Utc>) -> String {
