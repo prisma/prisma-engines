@@ -335,7 +335,7 @@ impl MssqlUrl {
 
         write!(&mut buf, "Server=tcp:{},{}", params.host(), params.port())?;
         write!(&mut buf, ";Encrypt={}", params.encrypt())?;
-        write!(&mut buf, ";Intial Catalog={}", params.database())?;
+        write!(&mut buf, ";Database={}", params.database())?;
 
         write!(
             &mut buf,
