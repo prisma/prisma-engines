@@ -325,7 +325,7 @@ fn fail_when_no_source_is_declared() {
     if let Err(error) = res.validate_that_one_datasource_is_provided() {
         error.assert_is(DatamodelError::ValidationError {
             message: "You defined no datasource. You must define exactly one datasource.".to_string(),
-            span: datamodel::ast::Span::new(0, 5),
+            span: datamodel::ast::Span::new(0, 0),
         });
     } else {
         panic!("Expected error.")

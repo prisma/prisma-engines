@@ -11,7 +11,7 @@ impl Configuration {
         if self.datasources.is_empty() {
             Err(DatamodelError::new_validation_error(
                 "You defined no datasource. You must define exactly one datasource.",
-                crate::ast::Span::new(0, 5),
+                crate::ast::Span::new(0, 0),
             )
             .into())
         } else {
