@@ -88,5 +88,6 @@ pub fn lower_prisma_value(pv: &PrismaValue) -> ast::Expression {
             vec.iter().map(|pv| lower_prisma_value(pv)).collect(),
             ast::Span::empty(),
         ),
+        PrismaValue::Xml(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
     }
 }

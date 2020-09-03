@@ -24,7 +24,6 @@ pub enum TypeHint {
     Boolean,
     Enum,
     DateTime,
-    Duration,
     UUID,
     Int,
     Array,
@@ -47,7 +46,6 @@ pub enum PrismaValue {
     Json(String),
     Xml(String),
 
-    // NT Todo we probably need more date types for a clean serialization.
     #[serde(serialize_with = "serialize_date")]
     DateTime(DateTime<Utc>),
 
@@ -176,6 +174,7 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Null(_) => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),
             PrismaValue::Json(x) => x.fmt(f),
+            PrismaValue::Xml(x) => x.fmt(f),
             PrismaValue::List(x) => {
                 let as_string = format!("{:?}", x);
                 as_string.fmt(f)

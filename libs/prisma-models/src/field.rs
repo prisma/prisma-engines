@@ -69,7 +69,6 @@ pub enum TypeIdentifier {
     Xml,
     Bytes,
     DateTime,
-    Duration,
 }
 
 impl From<TypeIdentifier> for TypeHint {
@@ -85,7 +84,6 @@ impl From<TypeIdentifier> for TypeHint {
             TypeIdentifier::Int => TypeHint::Int,
             TypeIdentifier::Xml => TypeHint::Xml,
             TypeIdentifier::Bytes => TypeHint::Bytes,
-            TypeIdentifier::Duration => TypeHint::Duration,
         }
     }
 }
@@ -195,7 +193,7 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::XML => Self::Xml,
             ScalarType::Bytes => Self::Bytes,
             ScalarType::Decimal => Self::Float,
-            ScalarType::Duration => Self::Duration,
+            ScalarType::Duration => todo!("No idea what this is supposed to be"),
         }
     }
 }
