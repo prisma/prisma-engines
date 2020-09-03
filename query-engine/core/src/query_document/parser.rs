@@ -172,25 +172,27 @@ impl QueryDocumentParser {
     }
 
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
-    #[rustfmt::skip]
     pub fn parse_scalar(value: QueryValue, scalar_type: &ScalarType) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
-            (QueryValue::Null, typ)                       => Ok(PrismaValue::null(&typ)),
-            (QueryValue::String(s), ScalarType::String)   => Ok(PrismaValue::String(s)),
-            (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
+            (QueryValue::Null, typ) => Ok(PrismaValue::null(&typ)),
+            (QueryValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
+            (QueryValue::String(s), ScalarType::DateTime) => {
+                Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime)
+            }
             (QueryValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(Self::parse_json(&s).map(|_| s)?)),
             (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(&s),
-            (QueryValue::String(s), ScalarType::UUID)     => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
-            (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from(i))),
-            (QueryValue::Int(i), ScalarType::Int)         => Ok(PrismaValue::Int(i)),
-            (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(f)),
-            (QueryValue::Float(f), ScalarType::Int)       => {
-                Ok(PrismaValue::Int(f.to_i64().unwrap()))
-            },
+            (QueryValue::String(s), ScalarType::UUID) => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
+            (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(Decimal::from(i))),
+            (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
+            (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
+            (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().unwrap())),
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
 
             // All other combinations are invalid.
-            (qv, _)                                       => Err(QueryParserError::ValueTypeMismatchError { have: qv, want: InputType::Scalar(scalar_type.clone()) }),
+            (qv, _) => Err(QueryParserError::ValueTypeMismatchError {
+                have: qv,
+                want: InputType::Scalar(scalar_type.clone()),
+            }),
         }
     }
 
