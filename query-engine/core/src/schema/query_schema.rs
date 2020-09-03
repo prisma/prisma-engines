@@ -10,8 +10,6 @@ use std::{
     sync::{Arc, Weak},
 };
 
-pub type OutputTypeRef = Arc<OutputType>;
-
 pub type ObjectTypeStrongRef = Arc<ObjectType>;
 pub type ObjectTypeWeakRef = Weak<ObjectType>;
 
@@ -19,6 +17,7 @@ pub type InputObjectTypeStrongRef = Arc<InputObjectType>;
 pub type InputObjectTypeWeakRef = Weak<InputObjectType>;
 
 pub type QuerySchemaRef = Arc<QuerySchema>;
+pub type OutputTypeRef = Arc<OutputType>;
 pub type FieldRef = Arc<Field>;
 pub type InputFieldRef = Arc<InputField>;
 pub type EnumTypeRef = Arc<EnumType>;
