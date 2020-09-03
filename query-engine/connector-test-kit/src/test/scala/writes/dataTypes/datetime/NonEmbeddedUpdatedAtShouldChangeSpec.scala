@@ -41,7 +41,7 @@ class NonEmbeddedUpdatedAtShouldChangeSpec extends FlatSpec with Matchers with A
         s"""mutation b {
            |  updateTop(
            |    where: { top: "top2" }
-           |    data: { bottom: {update:{bottom: "bottom20"}} }
+           |    data: { bottom: { update:{ bottom: { set: "bottom20" }}}}
            |  ) {
            |    bottom{
            |      updatedAt
@@ -66,7 +66,7 @@ class NonEmbeddedUpdatedAtShouldChangeSpec extends FlatSpec with Matchers with A
         s"""mutation b {
            |  updateTop(
            |    where: { top: "top4" }
-           |    data: { bottom: {upsert:{create:{bottom: "Should not matter"}, update:{bottom: "Bottom40"}}} }
+           |    data: { bottom: { upsert:{ create:{ bottom: "Should not matter" }, update:{ bottom: { set: "Bottom40" }}}}}
            |  ) {
            |    bottom{
            |      updatedAt

@@ -34,7 +34,7 @@ impl TestApi {
     pub async fn introspect_and_start_query_engine(&self) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
         let datasource = self.datasource();
 
-        let introspection_result = introspection_core::RpcImpl::introspect_internal(datasource, false, false)
+        let introspection_result = introspection_core::RpcImpl::introspect_internal(datasource, false)
             .await
             .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 

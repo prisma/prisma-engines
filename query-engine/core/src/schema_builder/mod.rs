@@ -40,7 +40,7 @@ mod utils;
 use crate::schema::*;
 use cache::TypeRefCache;
 use datamodel_connector::ConnectorCapabilities;
-use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, TypeIdentifier};
+use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier};
 use std::sync::Arc;
 
 pub use utils::*;
@@ -63,6 +63,8 @@ pub(crate) struct BuilderContext {
     enable_raw_queries: bool,
     cache: TypeCache,
     capabilities: ConnectorCapabilities,
+    nested_create_inputs_queue: NestedInputsQueue,
+    nested_update_inputs_queue: NestedInputsQueue,
 }
 
 impl BuilderContext {
@@ -78,6 +80,8 @@ impl BuilderContext {
             enable_raw_queries,
             cache: TypeCache::new(),
             capabilities,
+            nested_create_inputs_queue: Vec::new(),
+            nested_update_inputs_queue: Vec::new(),
         }
     }
 
@@ -164,3 +168,5 @@ pub fn build(
         ctx.internal_data_model,
     )
 }
+
+type NestedInputsQueue = Vec<(Arc<InputObjectType>, RelationFieldRef)>;

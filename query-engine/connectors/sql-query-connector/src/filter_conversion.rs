@@ -171,9 +171,7 @@ impl AliasedCondition for ScalarFilter {
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        let identifier = self.field.model().primary_identifier();
-        let ids = identifier.as_columns();
-
+        let ids = self.field.model().primary_identifier().as_columns();
         let columns: Vec<Column<'static>> = match alias {
             Some(alias) => ids.map(|c| c.table(alias.to_string(None))).collect(),
             None => ids.collect(),
@@ -195,81 +193,50 @@ impl AliasedCondition for RelationFilter {
 
 impl AliasedSelect for RelationFilter {
     /// The subselect part of the `RelationFilter` `ConditionTree`.
-    fn aliased_sel(self, alias: Option<Alias>) -> Select<'static> {
+    fn aliased_sel<'a>(self, alias: Option<Alias>) -> Select<'static> {
         let alias = alias.unwrap_or(Alias::default());
         let condition = self.condition.clone();
-        let relation = self.field.relation();
 
-        let other_columns = self.field.opposite_columns(false);
-        let other_columns_len = other_columns.len();
-
-        let id_columns = self.field.related_model().primary_identifier().as_columns();
-        let id_columns_len = id_columns.len();
-
-        let related_table = self.field.related_model().as_table();
-        let table = relation.as_table();
-
-        // check whether the join would join the same table and same column
-        // prevent: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
-        let would_perform_needless_join = other_columns_len == id_columns_len
-            && table.typ == related_table.typ
-            && id_columns.zip(other_columns).all(|(id, other)| id == other);
-
-        let these_columns: Vec<Column> = self
+        let table = self.field.as_table();
+        let selected_identifier: Vec<Column> = self
             .field
-            .relation_columns(false)
+            .identifier_columns()
             .map(|c| c.table(alias.to_string(None)))
             .collect();
 
-        if would_perform_needless_join {
-            let nested_conditions = self
-                .nested_filter
-                .aliased_cond(Some(alias))
-                .invert_if(condition.invert_of_subselect());
+        let join_columns: Vec<Column> = self
+            .field
+            .join_columns()
+            .map(|c| c.table(alias.to_string(None)))
+            .collect();
 
-            let conditions = these_columns
-                .clone()
-                .into_iter()
-                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+        let related_table = self.field.related_model().as_table();
+        let related_join_columns: Vec<_> = self
+            .field
+            .related_field()
+            .linking_fields()
+            .as_columns()
+            .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
+            .collect();
 
-            let select_base = Select::from_table(table.alias(alias.to_string(None))).so_that(conditions);
+        let nested_conditions = self
+            .nested_filter
+            .aliased_cond(Some(alias.flip(AliasMode::Join)))
+            .invert_if(condition.invert_of_subselect());
 
-            these_columns
-                .into_iter()
-                .fold(select_base, |acc, column| acc.column(column))
-        } else {
-            let other_columns: Vec<_> = self
-                .field
-                .opposite_columns(false)
-                .map(|c| c.table(alias.to_string(None)))
-                .collect();
+        let conditions = selected_identifier
+            .clone()
+            .into_iter()
+            .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-            let identifiers: Vec<_> = self
-                .field
-                .related_model()
-                .primary_identifier()
-                .as_columns()
-                .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
-                .collect();
+        let join = related_table
+            .alias(alias.to_string(Some(AliasMode::Join)))
+            .on(Row::from(related_join_columns).equals(Row::from(join_columns)));
 
-            let conditions = self
-                .nested_filter
-                .aliased_cond(Some(alias.flip(AliasMode::Join)))
-                .invert_if(condition.invert_of_subselect());
-
-            let join = related_table
-                .clone()
-                .alias(alias.to_string(Some(AliasMode::Join)))
-                .on(Row::from(identifiers).equals(Row::from(other_columns)));
-
-            let select_base = Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
-                .inner_join(join)
-                .so_that(conditions);
-
-            these_columns
-                .into_iter()
-                .fold(select_base, |acc, column| acc.column(column))
-        }
+        Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+            .columns(selected_identifier)
+            .inner_join(join)
+            .so_that(conditions)
     }
 }
 
@@ -308,11 +275,8 @@ impl AliasedCondition for OneRelationIsNullFilter {
                         }
                     });
 
-            let select = self
-                .field
-                .related_field()
-                .as_columns()
-                .fold(Select::from_table(relation_table), |acc, col| acc.column(col.clone()))
+            let sub_select = Select::from_table(relation_table)
+                .columns(self.field.related_field().as_columns())
                 .and_where(columns_not_null);
 
             let id_columns: Vec<Column<'static>> = self
@@ -323,7 +287,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
                 .map(|c| c.opt_table(alias.clone()))
                 .collect();
 
-            Row::from(id_columns).not_in_selection(select).into()
+            Row::from(id_columns).not_in_selection(sub_select).into()
         };
 
         ConditionTree::single(condition)

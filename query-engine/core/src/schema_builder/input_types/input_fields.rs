@@ -103,7 +103,7 @@ pub(crate) fn scalar_input_fields<T, F>(
 ) -> Vec<InputField>
 where
     T: Into<String>,
-    F: Fn(ScalarFieldRef) -> InputType,
+    F: Fn(&mut BuilderContext, ScalarFieldRef) -> InputType,
 {
     let input_object_name = input_object_name.into();
     let mut non_list_fields: Vec<InputField> = prefiltered_fields
@@ -111,7 +111,7 @@ where
         .filter(|f| !f.is_list)
         .map(|f| {
             let default = if with_defaults { f.default_value.clone() } else { None };
-            input_field(f.name.clone(), field_mapper(f.clone()), default)
+            input_field(f.name.clone(), field_mapper(ctx, f.clone()), default)
         })
         .collect();
 

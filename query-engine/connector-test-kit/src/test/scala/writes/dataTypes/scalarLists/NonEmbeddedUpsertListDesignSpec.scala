@@ -228,8 +228,8 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
           s"""mutation{updateList(where:{uList: "A"}
           |                       data:{todoes: { upsert:{
           |                               where:{uTodo: "B"}
-          |		                            create:{uTodo:"Should Not Matter", todoInts:{set: [300, 400]}}
-          |		                            update:{uTodo: "C", todoInts:{set: [700, 800]}}
+          |		                            create:{uTodo: "Should Not Matter", todoInts: { set: [300, 400] }}
+          |		                            update:{uTodo: { set: "C" }, todoInts:{ set: [700, 800] }}
           |}}
           |}){id}}""".stripMargin,
           project
@@ -249,13 +249,24 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
 
       server
         .query(
-          s"""mutation{updateList(where:{uList: "A"}
-             |                    data:{todoes: { upsert:{
-             |                               where:{uTodo: "Does not Matter"}
-             |		                           create:{uTodo:"C", todoInts:{set: [100, 200]}}
-             |		                           update:{uTodo:"D", todoInts:{set: [700, 800]}}
-             |}}
-             |}){id}}""".stripMargin,
+          s"""
+             |mutation {
+             |  updateList(
+             |    where: { uList: "A" }
+             |    data: {
+             |      todoes: {
+             |        upsert: {
+             |          where: { uTodo: "Does not Matter" }
+             |          create: { uTodo: "C", todoInts: { set: [100, 200] } }
+             |          update: { uTodo: { set: "D" }, todoInts: { set: [700, 800] } }
+             |        }
+             |      }
+             |    }
+             |  ) {
+             |    id
+             |  }
+             |}
+           """.stripMargin,
           project
         )
 
@@ -277,7 +288,7 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
              |                    data:{todoes: { upsert:{
              |                               where:{uTodo: "Does not Matter"}
              |		                           create:{uTodo:"C", todoInts:{set: [100, 200]}}
-             |		                           update:{uTodo:"D", todoInts:{set: [700, 800]}}
+             |		                           update:{uTodo: {set: "D"}, todoInts: {set: [700, 800]}}
              |}}
              |}){id}}""".stripMargin,
           project

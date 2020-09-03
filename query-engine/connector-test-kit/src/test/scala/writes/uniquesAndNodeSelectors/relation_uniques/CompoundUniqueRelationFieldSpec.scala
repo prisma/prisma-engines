@@ -90,7 +90,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |        p: "Parent1"
         |      }
         |    }
-        |    data: { p: "UpdatedParent" }
+        |    data: { p: { set: "UpdatedParent" }}
         |  ) {
         |    p
         |  }
@@ -104,7 +104,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { p: "UpdatedFromChild" }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { p: { set: "UpdatedFromChild" }}}}) {
         |    parent { p }
         |  }
         |}
@@ -119,7 +119,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  upsertParent(
         |    where: { child_id_p: { child_id: 2, p: "Parent2" } }
-        |    update: { p: "Doesn't matter" }
+        |    update: { p: { set: "Doesn't matter" }}
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
         |    id
@@ -208,7 +208,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: "UpdatedParent" }) {
+        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: { set: "UpdatedParent" }}) {
         |    p
         |  }
         |}
@@ -221,7 +221,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { p: "UpdatedFromChild" }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { p: { set: "UpdatedFromChild" }}}}) {
         |    parent { p }
         |  }
         |}
@@ -236,7 +236,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  upsertParent(
         |    where:  { child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2" } }
-        |    update: { p: "Doesn't matter" }
+        |    update: { p: { set: "Doesn't matter" }}
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
         |    id
@@ -312,7 +312,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_id_p: { child_id: 1, p: "Parent1" } } data: { p: "UpdatedParent1" }) {
+        |  updateParent(where: { child_id_p: { child_id: 1, p: "Parent1" } } data: { p: { set: "UpdatedParent1" }}) {
         |    p
         |  }
         |}
@@ -325,7 +325,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { p: "UpdateParent1FromChild" }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { p: { set: "UpdateParent1FromChild" }}}}) {
         |    parent { p }
         |  }
         |}
@@ -340,7 +340,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  upsertParent(
         |    where: { child_id_p: { child_id: 2, p: "Parent2" } }
-        |    update: { p: "doesn't matter" }
+        |    update: { p: { set: "doesn't matter" }}
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
         |    p
@@ -455,7 +455,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |            p: "Parent3",
         |          }
         |          update: {
-        |            p: "doesn't matter"
+        |            p: { set: "doesn't matter" }
         |          }
         |        }
         |      }
@@ -561,7 +561,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: "UpdatedParent1" }) {
+        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: { set: "UpdatedParent1" }}) {
         |    p
         |  }
         |}
@@ -574,7 +574,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { p: "UpdateParent1FromChild" }}}) {
+        |  updateChild(where: { id: 1 } data: { parent: { update: { p: { set: "UpdateParent1FromChild" }}}}) {
         |    parent { p }
         |  }
         |}
@@ -589,7 +589,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  upsertParent(
         |    where: { child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2" } }
-        |    update: { p: "doesn't matter" }
+        |    update: { p: { set: "doesn't matter" }}
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
         |    p
@@ -723,7 +723,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |            p: "Parent3",
         |          }
         |          update: {
-        |            p: "doesn't matter"
+        |            p: { set: "doesn't matter" }
         |          }
         |        }
         |      }
@@ -830,7 +830,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_id_p: { child_id: 1, p: "Parent1" } } data: { p: "Parent1Updated" }) {
+        |  updateParent(where: { child_id_p: { child_id: 1, p: "Parent1" } } data: { p: { set: "Parent1Updated" }}) {
         |    p
         |  }
         |}
@@ -843,13 +843,16 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: { id: 1 } data: {
-        |    parents: {
-        |       updateMany: {
-        |         where: { p: { equals: "Parent1Updated" }}
-        |         data: { p: "Parent2UpdatedMany" } }
-        |       }
-        |     }
+        |  updateChild(
+        |    where: { id: 1 }
+        |    data: {
+        |      parents: {
+        |        updateMany: {
+        |          where: { p: { equals: "Parent1Updated" } }
+        |          data: { p: { set: "Parent2UpdatedMany" } }
+        |        }
+        |      }
+        |    }
         |  ) {
         |    parents {
         |      p
@@ -867,7 +870,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  upsertParent(
         |    where: { child_id_p: { child_id: 2, p: "Parent2" } }
-        |    update: { p: "doesn't matter" }
+        |    update: { p: { set: "doesn't matter" }}
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
         |    p
@@ -992,7 +995,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |        upsert: {
         |          where: { child_id_p: { child_id: 3, p: "Parent3" } }
         |          create: { id: 3, p: "Parent3" }
-        |          update: { p: "doesn't matter" }
+        |          update: { p: { set: "doesn't matter" }}
         |        }
         |      }
         |    }
@@ -1021,7 +1024,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |      parents: {
         |        updateMany: {
         |          where: { p: { equals: "Parent2New" }}
-        |          data: { p: "Parent2NewUpdateMany" }
+        |          data: { p: { set: "Parent2NewUpdateMany" }}
         |        }
         |      }
         |    }
@@ -1130,7 +1133,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: "Parent1Updated" }) {
+        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: { set: "Parent1Updated" }}) {
         |    p
         |  }
         |}
@@ -1147,7 +1150,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |    parents: {
         |       updateMany: {
         |         where: { p: { equals: "Parent1Updated" }}
-        |         data: { p: "Parent2UpdatedMany" }}
+        |         data: { p: { set: "Parent2UpdatedMany" }}}
         |       }
         |     }
         |  ) {
@@ -1167,7 +1170,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  upsertParent(
         |    where: { child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2" } }
-        |    update: { p: "doesn't matter" }
+        |    update: { p: { set: "doesn't matter" }}
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
         |    p
@@ -1292,7 +1295,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |        upsert: {
         |          where: { child_id_child_c_p: { child_id: 3, child_c: "Child3", p: "Parent3" } }
         |          create: { id: 3, p: "Parent3" }
-        |          update: { p: "doesn't matter" }
+        |          update: { p: { set: "doesn't matter" }}
         |        }
         |      }
         |    }
@@ -1321,7 +1324,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |      parents: {
         |        updateMany: {
         |          where: { p: { equals: "Parent2New" }}
-        |          data: { p: "Parent2NewUpdateMany" }
+        |          data: { p: { set: "Parent2NewUpdateMany" }}
         |        }
         |      }
         |    }

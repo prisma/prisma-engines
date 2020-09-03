@@ -51,7 +51,7 @@ class RequiredRelationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       """
         | mutation {
-        |  updateList(where: { id: 1 }, data: { name: "C", todo: null }) {
+        |  updateList(where: { id: 1 }, data: { name: { set: "C" }, todo: null }) {
         |    name
         |    todo {
         |      id

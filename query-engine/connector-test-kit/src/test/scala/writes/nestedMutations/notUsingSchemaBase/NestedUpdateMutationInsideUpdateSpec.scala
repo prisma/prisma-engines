@@ -42,8 +42,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |  where: $parentIdentifier
            |  data:{
            |    childReq: {
-           |        update:  {non_unique: "updated"},
-           |          
+           |        update: { non_unique: { set: "updated" }}
            |      }
            |  }){
            |    childReq {
@@ -94,9 +93,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |  where: $parentIdentifier
            |  data:{
            |    childOpt: {
-           |        update:  {non_unique: "updated"},
-           |          
-           |      }
+           |      update: { non_unique: { set: "updated" }}
+           |    }
            |  }){
            |    childOpt {
            |      non_unique
@@ -127,8 +125,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                |    childrenOpt: {
                |      create: [{c: "c1", c_1: "c", c_2: "1"},{c: "c2", c_1: "c", c_2: "2"}]
                |    }
-               |  }){
-               |  
+               |  }) {
                |    ${t.parent.selection}
                |    childrenOpt{
                |       ${t.child.selection}
@@ -148,7 +145,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |  data:{
            |    childrenOpt: {
            |        update:  [
-           |          {where: $childIdentifier, data: {non_unique: "updated"}}
+           |          { where: $childIdentifier, data: { non_unique: { set: "updated" } }}
            |        ]  
            |      }
            |  }){
@@ -202,7 +199,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |  data:{
            |    childrenOpt: {
            |        update:  [
-           |          {where: $childIdentifier, data: {non_unique: "updated"}}
+           |          {where: $childIdentifier, data: {non_unique: { set: "updated" }}}
            |        ]  
            |      }
            |  }){
@@ -266,8 +263,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    data:{
          |      comments: {
          |        update: [
-         |          {where: {id: "$comment1Id"}, data: {text: "update comment1"}},
-         |          {where: {id: "$comment2Id"}, data: {text: "update comment2"}},
+         |          {where: {id: "$comment1Id"}, data: {text: {set: "update comment1"}}},
+         |          {where: {id: "$comment2Id"}, data: {text: {set: "update comment2"}}},
          |        ]
          |      }
          |    }
@@ -328,8 +325,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    data:{
          |      comments: {
          |        update: [
-         |          {where: {alias: "alias1"}, data: {text: "update comment1"}},
-         |          {where: {alias: "alias2"}, data: {text: "update comment2"}}
+         |          {where: {alias: "alias1"}, data: {text: {set: "update comment1"}}},
+         |          {where: {alias: "alias2"}, data: {text: {set: "update comment2"}}}
          |        ]
          |      }
          |    }
@@ -387,7 +384,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |    data:{
          |      todoes: {
-         |        update: [{where: {todoUnique: "todo"}, data: {todoUnique: "new todo"}}]
+         |        update: [{where: {todoUnique: "todo"}, data: {todoUnique: {set: "new todo"}}}]
          |      }
          |    }
          |  ){
@@ -448,7 +445,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |    data: {
          |      todo: {
-         |        update: {title: "updated title"}
+         |        update: {title: {set: "updated title"}}
          |      }
          |    }
          |  ){
@@ -507,7 +504,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |    data: {
          |      todo: {
-         |        update: { title: "updated title" }
+         |        update: { title: { set: "updated title" }}
          |      }
          |    }
          |  ){
@@ -567,11 +564,11 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      id: "$noteId"
          |    }
          |    data: {
-         |      text: "Some Changed Text"
+         |      text: { set: "Some Changed Text" }
          |      todoes: {
          |        update: {
          |          where: {id: "DOES NOT EXIST"},
-         |          data:{title: "updated title"}
+         |          data:{ title: { set: "updated title" }}
          |        }
          |      }
          |    }
@@ -635,11 +632,11 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      id: "$noteId"
          |    }
          |    data: {
-         |      text: "Some Changed Text"
+         |      text: { set: "Some Changed Text" }
          |      todoes: {
          |        update: {
-         |          where: {id: "5beea4aa6183dd734b2dbd9b"},
-         |          data:{title: "updated title"}
+         |          where: { id: "5beea4aa6183dd734b2dbd9b" },
+         |          data:{ title: { set: "updated title" }}
          |        }
          |      }
          |    }
@@ -698,11 +695,11 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      text: "Some Text"
          |    }
          |    data: {
-         |      text: "Some Changed Text"
+         |      text: { set: "Some Changed Text" }
          |      todos: {
          |        update: {
          |          where: { unique: null },
-         |          data: { title: "updated title" }
+         |          data: { title: { set: "updated title" }}
          |        }
          |      }
          |    }
@@ -774,16 +771,21 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  updateTop(
          |    where: {nameTop: "the top"},
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middles: {
          |        update: [{
-         |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottoms: {update: [{ where: {nameBottom: "the bottom"},
-         |                                           data:  {nameBottom: "updated bottom"}
-         |                      }]
+         |              where: { nameMiddle: "the middle" },
+         |              data:{
+         |                nameMiddle: { set: "updated middle" }
+         |                bottoms: {
+         |                  update: [{
+         |                    where: { nameBottom: "the bottom" },
+         |                    data:  { nameBottom: { set: "updated bottom" }}
+         |                  }]
          |              }
-         |              }}]
+         |            }
+         |          }
+         |        ]
          |     }
          |   }
          |  ) {
@@ -855,16 +857,21 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  updateTop(
          |    where: {nameTop: "the top"},
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middles: {
          |        update: [{
-         |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottoms: {update: [{ where: {nameBottom: "the bottom"},
-         |                                           data:  {nameBottom: "updated bottom"}
-         |                      }]
-         |              }
-         |              }}]
+         |          where: { nameMiddle: "the middle" }
+         |          data: {
+         |            nameMiddle: { set: "updated middle" }
+         |            bottoms: {
+         |              update: [{
+         |                where: { nameBottom: "the bottom" }
+         |                data:  { nameBottom: { set: "updated bottom" }}
+         |              }]
+         |            }
+         |          }
+         |        }
+         |      ]
          |     }
          |   }
          |  ) {
@@ -930,23 +937,27 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     server.query(createMutation, project)
 
     val updateMutation =
-      s"""mutation b {
+      s"""
+         |mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middles: {
-         |        update: [{
-         |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottom: {update: {nameBottom: "updated bottom"}}
-         |              }
-         |              }]
-         |     }
-         |   }
+         |        update: [
+         |          {
+         |            where: { nameMiddle: "the middle" }
+         |            data: {
+         |              nameMiddle: { set: "updated middle" }
+         |              bottom: { update: { nameBottom: { set: "updated bottom" } } }
+         |            }
+         |          }
+         |        ]
+         |      }
+         |    }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: asc }) {
+         |    middles(orderBy: { id: asc }) {
          |      nameMiddle
          |      bottom {
          |        nameBottom
@@ -954,6 +965,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
+         |
       """
 
     val result = server.query(updateMutation, project)
@@ -1009,37 +1021,38 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     server.query(createMutation, project)
 
     val updateMutation =
-      s"""mutation b {
+      s"""
+         |mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |               nameMiddle: "updated middle"
-         |               bottom: {
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: {
+         |            update: {
+         |              nameBottom: { set: "updated bottom" }
+         |              below: {
          |                update: {
-         |                  nameBottom: "updated bottom"
-         |                  below: { update: {
-         |                    where: {nameBelow: "below"}
-         |                    data:{nameBelow: "updated below"}
-         |                  }
-         |          }
+         |                  where: { nameBelow: "below" }
+         |                  data: { nameBelow: { set: "updated below" } }
          |                }
+         |              }
+         |            }
          |          }
-         |       }
-         |     }
-         |   }
+         |        }
+         |      }
+         |    }
          |  ) {
          |    nameTop
          |    middle {
          |      nameMiddle
          |      bottom {
          |        nameBottom
-         |        below  (orderBy: { id: asc }){
-         |           nameBelow
+         |        below(orderBy: { id: asc }) {
+         |          nameBelow
          |        }
-         |
          |      }
          |    }
          |  }
@@ -1120,37 +1133,38 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     server.query(createMutation2, project)
 
     val updateMutation =
-      s"""mutation b {
+      s"""
+         |mutation b {
          |  updateTop(
-         |    where: {nameTop: "the top"},
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |               nameMiddle: "updated middle"
-         |               bottom: {
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: {
+         |            update: {
+         |              nameBottom: { set: "updated bottom" }
+         |              below: {
          |                update: {
-         |                  nameBottom: "updated bottom"
-         |                  below: { update: {
-         |                    where: {nameBelow: "other below"}
-         |                    data:{nameBelow: "updated below"}
-         |                  }
-         |          }
+         |                  where: { nameBelow: "other below" }
+         |                  data: { nameBelow: { set: "updated below" } }
          |                }
+         |              }
+         |            }
          |          }
-         |       }
-         |     }
-         |   }
+         |        }
+         |      }
+         |    }
          |  ) {
          |    nameTop
          |    middle {
          |      nameMiddle
          |      bottom {
          |        nameBottom
-         |        below{
-         |           nameBelow
+         |        below {
+         |          nameBelow
          |        }
-         |
          |      }
          |    }
          |  }
@@ -1211,20 +1225,18 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
     val updateMutation =
       s"""
-         |mutation  {
+         |mutation {
          |  updateTop(
-         |    where: {
-         |      nameTop: "the top"
-         |    }
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |              nameMiddle: "updated middle"
-         |              bottom: {update: {nameBottom: "updated bottom"}}
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: { update: { nameBottom: { set: "updated bottom" } } }
+         |        }
          |      }
-         |     }
-         |   }
+         |    }
          |  ) {
          |    nameTop
          |    middle {
@@ -1286,20 +1298,18 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
     val updateMutation =
       s"""
-         |mutation  {
+         |mutation {
          |  updateTop(
-         |    where: {
-         |      nameTop: "the top"
-         |    }
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |              nameMiddle: "updated middle"
-         |              bottom: {update: {nameBottom: "updated bottom"}}
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: { update: { nameBottom: { set: "updated bottom" } } }
+         |        }
          |      }
-         |     }
-         |   }
+         |    }
          |  ) {
          |    nameTop
          |    middle {
@@ -1353,20 +1363,18 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
     val updateMutation =
       s"""
-         |mutation  {
+         |mutation {
          |  updateTop(
-         |    where: {
-         |      nameTop: "the top"
-         |    }
+         |    where: { nameTop: "the top" }
          |    data: {
-         |      nameTop: "updated top",
+         |      nameTop: { set: "updated top" }
          |      middle: {
          |        update: {
-         |              nameMiddle: "updated middle"
-         |              bottom: {update: {nameBottom: "updated bottom"}}
+         |          nameMiddle: { set: "updated middle" }
+         |          bottom: { update: { nameBottom: { set: "updated bottom" } } }
+         |        }
          |      }
-         |     }
-         |   }
+         |    }
          |  ) {
          |    nameTop
          |    middle {

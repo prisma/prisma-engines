@@ -76,6 +76,9 @@ class FilterRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val find_2 = server.query("""query {companies(where: {locations: { every: {name: { equals: "A" }}}}){id}}""", project)
     find_2.toString should be("{\"data\":{\"companies\":[{\"id\":135}]}}")
+
+    val find_3 = server.query("""query {locations(where: {company: { is: {id: { equals: 135 }}}}){id}}""", project)
+    find_3.toString should be("{\"data\":{\"locations\":[{\"id\":311},{\"id\":314}]}}")
   }
 
   "Querying 1:M with relation filters" should "work in the presence of nulls and with compound ids" in {

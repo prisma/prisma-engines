@@ -165,13 +165,20 @@ fn process_nested<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
-        let mut results = Vec::with_capacity(nested.len());
+        let results = if matches!(parent_result, Some(parent_records) if parent_records.records.is_empty()) {
+            //this catches most cases where there is no parent to cause a nested query. but sometimes even with parent records,
+            // we do not need to do roundtrips which is why the nested_reads contain additional logic
+            vec![]
+        } else {
+            let mut nested_results = Vec::with_capacity(nested.len());
 
-        for query in nested {
-            let result = execute(tx, query, parent_result).await?;
-            results.push(result);
-        }
+            for query in nested {
+                let result = execute(tx, query, parent_result).await?;
+                nested_results.push(result);
+            }
 
+            nested_results
+        };
         Ok(results)
     };
 

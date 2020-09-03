@@ -8,36 +8,53 @@ pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 use crate::{
     database_info::DatabaseInfo,
     sql_migration::{
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropIndex, TableChange,
+        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
+        DropEnum, DropForeignKey, DropIndex, TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
 };
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::*;
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt::Write as _};
 
 pub(crate) trait SqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str>;
 
-    fn quote_with_schema<'a, 'b>(&'a self, schema_name: &'a str, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        QuotedWithSchema {
-            schema_name,
-            name: self.quote(name),
+    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str>;
+
+    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
+        let AddForeignKey { foreign_key, table } = add_foreign_key;
+        let mut add_constraint = String::with_capacity(120);
+
+        write!(
+            add_constraint,
+            "ALTER TABLE {table} ADD ",
+            table = self.quote_with_schema(table)
+        )
+        .unwrap();
+
+        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
+            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
         }
+
+        write!(
+            add_constraint,
+            "FOREIGN KEY ({})",
+            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
+        )
+        .unwrap();
+
+        add_constraint.push_str(&self.render_references(&foreign_key));
+
+        add_constraint
     }
 
-    fn render_alter_enum(
-        &self,
-        alter_enum: &AlterEnum,
-        differ: &SqlSchemaDiffer<'_>,
-        schema_name: &str,
-    ) -> anyhow::Result<Vec<String>>;
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>>;
 
-    fn render_column(&self, schema_name: &str, column: ColumnWalker<'_>, add_fk_prefix: bool) -> String;
+    fn render_column(&self, column: ColumnWalker<'_>) -> String;
 
-    fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
+    fn render_references(&self, foreign_key: &ForeignKey) -> String;
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
 
@@ -62,7 +79,6 @@ pub(crate) trait SqlRenderer {
         differ: &SqlSchemaDiffer<'_>,
     ) -> Vec<String> {
         let AlterTable { table, changes } = alter_table;
-        let schema_name = database_info.connection_info().schema_name();
 
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
@@ -92,7 +108,7 @@ pub(crate) trait SqlRenderer {
                         schema: differ.next,
                         column,
                     };
-                    let col_sql = self.render_column(&schema_name, column, true);
+                    let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn(DropColumn { name }) => {
@@ -127,7 +143,7 @@ pub(crate) trait SqlRenderer {
                             let name = self.quote(&name);
                             lines.push(format!("DROP COLUMN {}", name));
 
-                            let col_sql = self.render_column(&schema_name, column.next, true);
+                            let col_sql = self.render_column(column.next);
                             lines.push(format!("ADD COLUMN {}", col_sql));
                         }
                     }
@@ -141,7 +157,7 @@ pub(crate) trait SqlRenderer {
 
         let alter_table = format!(
             "ALTER TABLE {} {}",
-            self.quote_with_schema(&schema_name, &table.name),
+            self.quote_with_schema(&table.name),
             lines.join(",\n")
         );
 
@@ -158,24 +174,29 @@ pub(crate) trait SqlRenderer {
     fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String>;
 
     /// Render a `CreateIndex` step.
-    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String;
+    fn render_create_index(&self, create_index: &CreateIndex) -> String;
 
     /// Render a `CreateTable` step.
-    fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String>;
+    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String>;
 
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
 
+    /// Render a `DropForeignKey` step.
+    fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String;
+
     /// Render a `DropIndex` step.
-    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String;
+    fn render_drop_index(&self, drop_index: &DropIndex) -> String;
+
+    /// Render a `DropTable` step.
+    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+        vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
+    }
 
     /// Render a `RedefineTables` step.
-    fn render_redefine_tables(
-        &self,
-        tables: &[String],
-        differ: SqlSchemaDiffer<'_>,
-        database_info: &DatabaseInfo,
-    ) -> Vec<String>;
+    fn render_redefine_tables(&self, tables: &[String], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
+
+    fn render_rename_table(&self, name: &str, new_name: &str) -> String;
 }
 
 #[derive(Default)]

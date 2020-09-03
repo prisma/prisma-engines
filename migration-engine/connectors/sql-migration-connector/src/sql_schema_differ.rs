@@ -174,7 +174,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .table_pairs()
             .filter(|tables| !tables_to_redefine.contains(tables.next.name()));
 
-        push_foreign_keys_from_created_tables(&mut add_foreign_keys, self.created_tables());
+        if self.flavour.should_push_foreign_keys_from_created_tables() {
+            push_foreign_keys_from_created_tables(&mut add_foreign_keys, self.created_tables());
+        }
+
         push_created_foreign_keys(&mut add_foreign_keys, table_pairs);
 
         add_foreign_keys

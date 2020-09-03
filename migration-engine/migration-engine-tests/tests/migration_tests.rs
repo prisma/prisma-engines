@@ -1896,7 +1896,7 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn relations_with_mappings_on_both_sides_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+async fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id

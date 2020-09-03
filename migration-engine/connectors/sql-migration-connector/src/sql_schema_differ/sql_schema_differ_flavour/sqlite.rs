@@ -20,4 +20,8 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
             .map(|table| table.next.name().to_owned())
             .collect()
     }
+
+    fn should_push_foreign_keys_from_created_tables(&self) -> bool {
+        false
+    }
 }

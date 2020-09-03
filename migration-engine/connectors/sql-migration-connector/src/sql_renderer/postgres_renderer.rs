@@ -1,11 +1,10 @@
 use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
-    flavour::PostgresFlavour,
-    sql_database_step_applier::render_create_index,
+    flavour::{PostgresFlavour, SqlFlavour},
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropIndex,
+        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
 };
@@ -21,12 +20,14 @@ impl SqlRenderer for PostgresFlavour {
         Quoted::postgres_ident(name)
     }
 
-    fn render_alter_enum(
-        &self,
-        alter_enum: &AlterEnum,
-        differ: &SqlSchemaDiffer<'_>,
-        schema_name: &str,
-    ) -> anyhow::Result<Vec<String>> {
+    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+        QuotedWithSchema {
+            schema_name: self.schema_name(),
+            name: self.quote(name),
+        }
+    }
+
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
         if alter_enum.dropped_variants.is_empty() {
             let stmts: Vec<String> = alter_enum
                 .created_variants
@@ -60,7 +61,7 @@ impl SqlRenderer for PostgresFlavour {
             let create_new_enum = format!(
                 "CREATE TYPE {enum_name} AS ENUM ({variants})",
                 enum_name = QuotedWithSchema {
-                    schema_name: schema_name,
+                    schema_name: self.schema_name(),
                     name: Quoted::postgres_ident(&tmp_name),
                 },
                 variants = new_enum.values.iter().map(Quoted::postgres_string).join(", ")
@@ -83,7 +84,7 @@ impl SqlRenderer for PostgresFlavour {
                             ALTER COLUMN {column_name} TYPE {tmp_name} \
                                 USING ({column_name}::text::{tmp_name}),
                             ALTER COLUMN {column_name} SET DEFAULT {new_enum_default}",
-                    schema_name = Quoted::postgres_ident(schema_name),
+                    schema_name = Quoted::postgres_ident(self.schema_name()),
                     table_name = Quoted::postgres_ident(column.table().name()),
                     column_name = Quoted::postgres_ident(column.name()),
                     tmp_name = Quoted::postgres_ident(&tmp_name),
@@ -139,12 +140,12 @@ impl SqlRenderer for PostgresFlavour {
     ) -> anyhow::Result<Vec<String>> {
         Ok(vec![format!(
             "ALTER INDEX {} RENAME TO {}",
-            self.quote_with_schema(&self.0.schema(), &alter_index.index_name),
+            self.quote_with_schema(&alter_index.index_name),
             self.quote(&alter_index.index_new_name)
         )])
     }
 
-    fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
+    fn render_column(&self, column: ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);
@@ -162,7 +163,7 @@ impl SqlRenderer for PostgresFlavour {
         }
     }
 
-    fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, foreign_key: &ForeignKey) -> String {
         let referenced_columns = foreign_key
             .referenced_columns
             .iter()
@@ -171,7 +172,7 @@ impl SqlRenderer for PostgresFlavour {
 
         format!(
             "REFERENCES {}({}) {} ON UPDATE CASCADE",
-            self.quote_with_schema(schema_name, &foreign_key.referenced_table),
+            self.quote_with_schema(&foreign_key.referenced_table),
             referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
         )
@@ -296,21 +297,12 @@ impl SqlRenderer for PostgresFlavour {
         vec![sql]
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String {
-        render_create_index(
-            self,
-            database_info.connection_info().schema_name(),
-            &create_index.table,
-            &create_index.index,
-            database_info.sql_family(),
-        )
+    fn render_create_index(&self, create_index: &CreateIndex) -> String {
+        render_create_index(self, &create_index.table, &create_index.index, self.sql_family())
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String> {
-        let columns: String = table
-            .columns()
-            .map(|column| self.render_column(&schema_name, column, false))
-            .join(",\n");
+    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
+        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_columns = table.table.primary_key_columns();
         let pk_column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
@@ -322,7 +314,7 @@ impl SqlRenderer for PostgresFlavour {
 
         Ok(format!(
             "CREATE TABLE {table_name} (\n{columns}{primary_key}\n)",
-            table_name = self.quote_with_schema(&schema_name, table.name()),
+            table_name = self.quote_with_schema(table.name()),
             columns = columns,
             primary_key = pk,
         ))
@@ -337,20 +329,28 @@ impl SqlRenderer for PostgresFlavour {
         vec![sql]
     }
 
-    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String {
+    fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
         format!(
-            "DROP INDEX {}",
-            self.quote_with_schema(database_info.connection_info().schema_name(), &drop_index.name)
+            "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
+            table = self.quote_with_schema(&drop_foreign_key.table),
+            constraint_name = Quoted::postgres_ident(&drop_foreign_key.constraint_name),
         )
     }
 
-    fn render_redefine_tables(
-        &self,
-        _names: &[String],
-        _differ: SqlSchemaDiffer<'_>,
-        _database_info: &DatabaseInfo,
-    ) -> Vec<String> {
+    fn render_drop_index(&self, drop_index: &DropIndex) -> String {
+        format!("DROP INDEX {}", self.quote_with_schema(&drop_index.name))
+    }
+
+    fn render_redefine_tables(&self, _names: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on Postgres")
+    }
+
+    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
+        format!(
+            "ALTER TABLE {} RENAME TO {}",
+            self.quote_with_schema(&name),
+            new_name = self.quote_with_schema(&new_name).to_string(),
+        )
     }
 }
 

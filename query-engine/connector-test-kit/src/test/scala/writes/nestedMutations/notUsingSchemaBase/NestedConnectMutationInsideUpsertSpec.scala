@@ -12,7 +12,7 @@ class NestedConnectMutationInsideUpsertSpec extends FlatSpec with Matchers with 
       val childId = server.query("""mutation { createChild(data: {c:"c1"}){ id } }""", project).pathAsString("data.createChild.id")
 
       val result = server.query(
-        s"""mutation{upsertParent(where: {id: "5beea4aa6183dd734b2dbd9b"}, create: {p: "p1", childOpt:{connect:{id:"$childId"}}}, update: {p: "p-new"}) {
+        s"""mutation{upsertParent(where: {id: "5beea4aa6183dd734b2dbd9b"}, create: {p: "p1", childOpt:{connect:{id:"$childId"}}}, update: {p: { set: "p-new" }}) {
            |    childOpt{c}
            |  }
            |}
@@ -30,7 +30,7 @@ class NestedConnectMutationInsideUpsertSpec extends FlatSpec with Matchers with 
       val parentId = server.query("""mutation { createParent(data: {p:"p1"}){ id } }""", project).pathAsString("data.createParent.id")
 
       val result = server.query(
-        s"""mutation{upsertParent(where: {id: "$parentId"}, create: {p: "p new"}, update: {p: "p updated",childOpt:{connect:{id:"$childId"}}}) {
+        s"""mutation{upsertParent(where: {id: "$parentId"}, create: {p: "p new"}, update: {p: { set: "p updated" },childOpt:{connect:{id:"$childId"}}}) {
            |    childOpt{c}
            |  }
            |}
@@ -48,7 +48,7 @@ class NestedConnectMutationInsideUpsertSpec extends FlatSpec with Matchers with 
       server.query("""mutation { createParent(data: {p:"p1"}){ id } }""", project)
 
       val result = server.query(
-        s"""mutation{upsertParent(where: {p: "p1"}, create: {p: "p new"}, update: {p: "p updated",childOpt:{connect:{c:"c1"}}}) {
+        s"""mutation{upsertParent(where: {p: "p1"}, create: {p: "p new"}, update: {p: { set: "p updated" },childOpt:{connect:{c:"c1"}}}) {
            |    childOpt{c}
            |  }
            |}
@@ -67,14 +67,15 @@ class NestedConnectMutationInsideUpsertSpec extends FlatSpec with Matchers with 
       server.query("""mutation { createParent(data: {p:"p1"}){ id } }""", project)
 
       server.queryThatMustFail(
-        s"""mutation{upsertParent(where: {p: "p1"}, create: {p: "new p"}, update: {p: "p updated",childOpt:{connect:{c:"DOES NOT EXIST"}}}) {
+        s"""mutation{upsertParent(where: {p: "p1"}, create: {p: "new p"}, update: {p: { set: "p updated" },childOpt:{connect:{c:"DOES NOT EXIST"}}}) {
            |    childOpt{c}
            |  }
            |}
       """,
         project,
         errorCode = 2016, // 3039
-        errorContains = """Query interpretation error. Error for binding '3': AssertionError(\"[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."""
+        errorContains =
+          """Query interpretation error. Error for binding '3': AssertionError(\"[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."""
         // Error occurred during query execution:\nInterpretationError(\"Error for binding \\'3\\': AssertionError(\\\"[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation.
       )
     }

@@ -45,7 +45,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
            |  updateTodo(
            |    where: { id: "$todoId" }
            |    data:{
-           |      a: "$i"
+           |      a: { set: "$i" }
            |    }
            |  ){
            |    a
@@ -90,7 +90,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
            |  updateTodo(
            |    where: { id: "$todoId" }
            |    data:{
-           |      a: "$i"
+           |      a: { set: "$i" }
            |      tags: {
            |        set: ["important", "doitnow"]
            |      }
@@ -135,9 +135,9 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
            |  updateTodo(
            |    where: { id: "$todoId" }
            |    data:{
-           |      a: "$i"
+           |      a: { set: "$i" }
            |      comments: {
-           |        update: [{where: {id: "$comment1Id"}, data: {text: "update $i"}}]
+           |        update: [{where: {id: "$comment1Id"}, data: {text: { set: "update $i" }}}]
            |      }
            |    }
            |  ){

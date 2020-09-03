@@ -34,7 +34,7 @@ class SettingNodeSelectorToNullSpec extends FlatSpec with Matchers with ApiSpecB
         |  updateA(
         |    where: { b: "abc" }
         |    data: {
-        |      b: null
+        |      b: { set: null }
         |    }) {
         |    b
         |  }

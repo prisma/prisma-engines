@@ -2,14 +2,15 @@ use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
     flavour::{SqlFlavour, SqliteFlavour},
-    sql_database_step_applier::render_create_index,
     sql_migration::{
-        AddColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropIndex, TableChange,
+        AddColumn, AddForeignKey, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey,
+        DropIndex, TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
+use quaint::prelude::SqlFamily;
 use regex::Regex;
 use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
@@ -19,12 +20,14 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn render_alter_enum(
-        &self,
-        _alter_enum: &AlterEnum,
-        _differ: &SqlSchemaDiffer<'_>,
-        _schema_name: &str,
-    ) -> anyhow::Result<Vec<String>> {
+    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+        QuotedWithSchema {
+            schema_name: self.attached_name(),
+            name: self.quote(name),
+        }
+    }
+
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
         unreachable!("render_alter_enum on sqlite")
     }
 
@@ -37,17 +40,11 @@ impl SqlRenderer for SqliteFlavour {
         unreachable!("render_alter_index on sqlite")
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex, database_info: &DatabaseInfo) -> String {
-        render_create_index(
-            self,
-            database_info.connection_info().schema_name(),
-            &create_index.table,
-            &create_index.index,
-            self.sql_family(),
-        )
+    fn render_create_index(&self, create_index: &CreateIndex) -> String {
+        render_create_index(self, &create_index.table, &create_index.index, self.sql_family())
     }
 
-    fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
+    fn render_column(&self, column: ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);
@@ -73,7 +70,7 @@ impl SqlRenderer for SqliteFlavour {
         )
     }
 
-    fn render_references(&self, _schema_name: &str, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, foreign_key: &ForeignKey) -> String {
         let referenced_fields = foreign_key
             .referenced_columns
             .iter()
@@ -103,6 +100,10 @@ impl SqlRenderer for SqliteFlavour {
         }
     }
 
+    fn render_add_foreign_key(&self, _add_foreign_key: &AddForeignKey) -> String {
+        unreachable!("AddForeignKey on SQLite")
+    }
+
     fn render_alter_column(&self, _differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
         None
     }
@@ -110,11 +111,10 @@ impl SqlRenderer for SqliteFlavour {
     fn render_alter_table(
         &self,
         alter_table: &AlterTable,
-        database_info: &DatabaseInfo,
+        _database_info: &DatabaseInfo,
         differ: &SqlSchemaDiffer<'_>,
     ) -> Vec<String> {
         let AlterTable { table, changes } = alter_table;
-        let schema_name = database_info.connection_info().schema_name();
 
         let mut statements = Vec::new();
 
@@ -130,11 +130,11 @@ impl SqlRenderer for SqliteFlavour {
                         column,
                     };
 
-                    let col_sql = self.render_column(&schema_name, column, true);
+                    let col_sql = self.render_column(column);
 
                     statements.push(format!(
                         "ALTER TABLE {table_name} ADD COLUMN {column_definition}",
-                        table_name = self.quote_with_schema(schema_name, &table.name),
+                        table_name = self.quote_with_schema(&table.name),
                         column_definition = col_sql,
                     ));
                 }
@@ -152,13 +152,10 @@ impl SqlRenderer for SqliteFlavour {
         Vec::new()
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String> {
+    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
         use std::fmt::Write;
 
-        let columns: String = table
-            .columns()
-            .map(|column| self.render_column(&schema_name, column, false))
-            .join(",\n");
+        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_key_is_already_set = columns.contains("PRIMARY KEY");
         let primary_columns = table.table.primary_key_columns();
@@ -180,7 +177,7 @@ impl SqlRenderer for SqliteFlavour {
                     "{indentation}FOREIGN KEY ({constrained_columns}) {references}{comma}",
                     indentation = SQL_INDENTATION,
                     constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
-                    references = self.render_references(&schema_name, fk),
+                    references = self.render_references(fk),
                     comma = if fks.peek().is_some() { ",\n" } else { "" },
                 )?;
             }
@@ -192,7 +189,7 @@ impl SqlRenderer for SqliteFlavour {
 
         Ok(format!(
             "CREATE TABLE {table_name} (\n{columns}{foreign_keys}{primary_key}\n)",
-            table_name = self.quote_with_schema(&schema_name, table.name()),
+            table_name = self.quote_with_schema(table.name()),
             columns = columns,
             foreign_keys = foreign_keys,
             primary_key = primary_key,
@@ -203,33 +200,36 @@ impl SqlRenderer for SqliteFlavour {
         Vec::new()
     }
 
-    fn render_drop_index(&self, drop_index: &DropIndex, database_info: &DatabaseInfo) -> String {
-        format!(
-            "DROP INDEX {}",
-            self.quote_with_schema(database_info.connection_info().schema_name(), &drop_index.name)
-        )
+    fn render_drop_foreign_key(&self, _drop_foreign_key: &DropForeignKey) -> String {
+        unreachable!("render_drop_foreign_key on SQLite")
     }
 
-    fn render_redefine_tables(
-        &self,
-        tables: &[String],
-        differ: SqlSchemaDiffer<'_>,
-        database_info: &DatabaseInfo,
-    ) -> Vec<String> {
+    fn render_drop_index(&self, drop_index: &DropIndex) -> String {
+        format!("DROP INDEX {}", self.quote_with_schema(&drop_index.name))
+    }
+
+    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+        // Turning off the pragma is safe, because schema validation would forbid foreign keys
+        // to a non-existent model. There appears to be no other way to deal with cyclic
+        // dependencies in the dropping order of tables in the presence of foreign key
+        // constraints on SQLite.
+        vec![
+            "PRAGMA foreign_keys=off".to_string(),
+            format!("DROP TABLE {}", self.quote_with_schema(&table_name)),
+            "PRAGMA foreign_keys=on".to_string(),
+        ]
+    }
+
+    fn render_redefine_tables(&self, tables: &[String], differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
         let mut result: Vec<String> = Vec::new();
-        let schema_name = database_info.connection_info().schema_name();
-        let sql_family = database_info.sql_family();
 
         result.push("PRAGMA foreign_keys=OFF".to_string());
 
-        for table in tables {
-            let differ = TableDiffer {
-                database_info,
-                flavour: self,
-                previous: differ.previous.table_walker(table).expect(""),
-                next: differ.next.table_walker(table).expect(""),
-            };
+        for table_name in tables {
+            let differ = differ
+                .diff_table(table_name)
+                .expect("Invariant violation: diffing unknown table.");
 
             let name_of_temporary_table = format!("new_{}", &differ.next.name());
             let mut temporary_table = differ.next.table.clone();
@@ -242,19 +242,15 @@ impl SqlRenderer for SqliteFlavour {
             };
 
             // TODO start transaction now. Unclear if we really want to do that.
-            result.push(
-                self.render_create_table(&temporary_table, schema_name)
-                    .expect("render_create_table"),
-            );
+            result.push(self.render_create_table(&temporary_table).expect("render_create_table"));
 
-            copy_current_table_into_new_table(&mut result, &differ, temporary_table.name(), schema_name, self).unwrap();
+            copy_current_table_into_new_table(&mut result, &differ, temporary_table.name(), self).unwrap();
 
-            result.push(format!("DROP TABLE \"{}\".\"{}\"", schema_name, differ.next.name()));
+            result.push(format!("DROP TABLE {}", self.quote_with_schema(differ.next.name())));
 
             result.push(format!(
-                "ALTER TABLE \"{schema_name}\".\"{old_name}\" RENAME TO \"{new_name}\"",
-                schema_name = schema_name,
-                old_name = temporary_table.name(),
+                "ALTER TABLE {old_name} RENAME TO \"{new_name}\"",
+                old_name = self.quote_with_schema(temporary_table.name()),
                 new_name = differ.next.name()
             ));
 
@@ -265,28 +261,36 @@ impl SqlRenderer for SqliteFlavour {
                     .table
                     .indices
                     .iter()
-                    .map(|index| render_create_index(self, schema_name, differ.next.name(), index, sql_family)),
+                    .map(|index| render_create_index(self, differ.next.name(), index, SqlFamily::Sqlite)),
             );
         }
 
         result.push(format!(
             "PRAGMA {}.foreign_key_check",
-            Quoted::sqlite_ident(schema_name)
+            Quoted::sqlite_ident(self.attached_name())
         ));
 
         result.push("PRAGMA foreign_keys=ON".to_string());
 
         result
     }
+
+    fn render_rename_table(&self, name: &str, new_name: &str) -> String {
+        format!(
+            "ALTER TABLE {} RENAME TO {}",
+            self.quote_with_schema(&name),
+            self.quote(new_name),
+        )
+    }
 }
 
-fn render_column_type(t: &ColumnType) -> String {
+fn render_column_type(t: &ColumnType) -> &'static str {
     match &t.family {
-        ColumnTypeFamily::Boolean => "BOOLEAN".to_string(),
-        ColumnTypeFamily::DateTime => "DATETIME".to_string(),
-        ColumnTypeFamily::Float => "REAL".to_string(),
-        ColumnTypeFamily::Int => "INTEGER".to_string(),
-        ColumnTypeFamily::String => "TEXT".to_string(),
+        ColumnTypeFamily::Boolean => "BOOLEAN",
+        ColumnTypeFamily::DateTime => "DATETIME",
+        ColumnTypeFamily::Float => "REAL",
+        ColumnTypeFamily::Int => "INTEGER",
+        ColumnTypeFamily::String => "TEXT",
         x => unimplemented!("{:?} not handled yet", x),
     }
 }
@@ -306,8 +310,7 @@ fn copy_current_table_into_new_table(
     steps: &mut Vec<String>,
     differ: &TableDiffer<'_>,
     temporary_table: &str,
-    schema_name: &str,
-    flavour: &dyn SqlFlavour,
+    flavour: &SqliteFlavour,
 ) -> std::fmt::Result {
     use std::fmt::Write as _;
 
@@ -335,7 +338,7 @@ fn copy_current_table_into_new_table(
     write!(
         query,
         "INSERT INTO {}.{} (",
-        Quoted::sqlite_ident(schema_name),
+        Quoted::sqlite_ident(flavour.attached_name()),
         Quoted::sqlite_ident(temporary_table)
     )?;
 
@@ -390,7 +393,7 @@ fn copy_current_table_into_new_table(
     write!(
         query,
         " FROM {}.{}",
-        Quoted::sqlite_ident(schema_name),
+        Quoted::sqlite_ident(flavour.attached_name()),
         Quoted::sqlite_ident(&differ.next.name())
     )?;
 

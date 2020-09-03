@@ -24,8 +24,15 @@ pub async fn m2m<'a, 'b>(
                 .projections(&parent_model_id)?
         }
     };
-
+    if parent_ids.is_empty() {
+        return Ok(ManyRecords::empty(&query.selected_fields));
+    }
     let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
+
+    if ids.is_empty() {
+        return Ok(ManyRecords::empty(&query.selected_fields));
+    }
+
     let child_model_id = query.parent_field.related_model().primary_identifier();
 
     let child_ids: Vec<Vec<PrismaValue>> = ids
@@ -36,17 +43,20 @@ pub async fn m2m<'a, 'b>(
         })
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
-    let mut args = query.args.clone();
-    let filter = child_link_id.is_in(child_ids);
+    // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
+    let mut scalars = if query.args.do_nothing() && child_link_id == query.selected_fields {
+        ManyRecords::from_projection(child_ids, &query.selected_fields)
+    } else {
+        let mut args = query.args.clone();
+        let filter = child_link_id.is_in(child_ids);
 
-    args.filter = match args.filter {
-        Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-        None => Some(filter),
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
+        };
+        tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+            .await?
     };
-
-    let mut scalars = tx
-        .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-        .await?;
 
     // Child id to parent ids
     let mut id_map: HashMap<RecordProjection, Vec<RecordProjection>> = HashMap::new();
@@ -145,22 +155,29 @@ pub async fn one2m<'a, 'b>(
         }
     }
 
-    let uniq_projections = uniq_projections
+    let uniq_projections: Vec<Vec<PrismaValue>> = uniq_projections
         .into_iter()
         .filter(|p| !p.iter().any(|v| v.is_null()))
         .collect();
 
-    let filter = child_link_id.is_in(uniq_projections);
-    let mut args = query_args;
+    if uniq_projections.is_empty() {
+        return Ok(ManyRecords::empty(selected_fields));
+    }
 
-    args.filter = match args.filter {
-        Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-        None => Some(filter),
+    // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
+    let mut scalars = if query_args.do_nothing() && &child_link_id == selected_fields {
+        ManyRecords::from_projection(uniq_projections, selected_fields)
+    } else {
+        let filter = child_link_id.is_in(uniq_projections);
+        let mut args = query_args;
+
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
+        };
+        tx.get_many_records(&parent_field.related_model(), args, selected_fields)
+            .await?
     };
-
-    let mut scalars = tx
-        .get_many_records(&parent_field.related_model(), args, selected_fields)
-        .await?;
 
     // Inlining is done on the parent, this means that we need to write the primary parent ID
     // into the child records that we retrieved. The matching is done based on the parent link values.

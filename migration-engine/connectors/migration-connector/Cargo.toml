@@ -5,15 +5,14 @@ authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 
 [dependencies]
-async-trait = "0.1.17"
 datamodel = { path = "../../../libs/datamodel/core" }
-chrono = { version = "0.4" }
+user-facing-errors = { path = "../../../libs/user-facing-errors" }
 
+anyhow = "1.0.26"
+async-trait = "0.1.17"
+chrono = "0.4"
 serde = "1.0"
 serde_json = "1.0"
-
-user-facing-errors = { path = "../../../libs/user-facing-errors" }
-tracing = "0.1.10"
 thiserror = "1.0.9"
-anyhow = "1.0.26"
+tracing = "0.1.10"
 tracing-error = "0.1.2"

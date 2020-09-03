@@ -17,7 +17,6 @@ pub fn calculate_datamodel(
     schema: &SqlSchema,
     family: &SqlFamily,
     previous_data_model: &Datamodel,
-    reintrospect: bool,
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
@@ -34,10 +33,8 @@ pub fn calculate_datamodel(
     deduplicate_relation_field_names(&mut data_model);
 
     let mut warnings = vec![];
-    if reintrospect {
-        warnings.append(&mut enrich(previous_data_model, &mut data_model));
-        tracing::debug!("Enriching datamodel is done: {:?}", data_model);
-    }
+    warnings.append(&mut enrich(previous_data_model, &mut data_model));
+    tracing::debug!("Enriching datamodel is done: {:?}", data_model);
 
     // commenting out models, fields, enums, enum values
     warnings.append(&mut commenting_out_guardrails(&mut data_model));

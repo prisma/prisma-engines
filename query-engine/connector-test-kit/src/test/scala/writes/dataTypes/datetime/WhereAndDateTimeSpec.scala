@@ -38,7 +38,7 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
          |      outerDateTime: $outerWhere
          |      todos: {
          |        create: [
-         |        {innerString: "Inner String", innerDateTime: $innerWhere}
+         |          { innerString: "Inner String", innerDateTime: $innerWhere }
          |        ]
          |      }
          |    }
@@ -55,9 +55,12 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  updateNote(
          |    where: { outerDateTime: $outerWhere }
          |    data: {
-         |      outerString: "Changed Outer String"
+         |      outerString: { set: "Changed Outer String" }
          |      todos: {
-         |        update: [{where: { innerDateTime: $innerWhere },data:{ innerString: "Changed Inner String"}}]
+         |        update: [{ 
+         |          where: { innerDateTime: $innerWhere },
+         |          data:{ innerString: { set: "Changed Inner String" }}
+         |        }]
          |      }
          |    }
          |  ){
@@ -73,6 +76,7 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
       project,
       dataContains = """{"note":{"outerString":"Changed Outer String","outerDateTime":"2018-12-05T12:34:23.000Z"}}"""
     )
+
     server.query(
       s"""query{todo(where:{innerDateTime:$innerWhere}){innerString, innerDateTime}}""",
       project,
@@ -94,7 +98,7 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
          |      outerDateTime: $outerWhere
          |      todos: {
          |        create: [
-         |        {innerString: "Inner String", innerDateTime: $innerWhere}
+         |          { innerString: "Inner String", innerDateTime: $innerWhere }
          |        ]
          |      }
          |    }
@@ -111,11 +115,12 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  updateNote(
          |    where: { outerDateTime: $outerWhere }
          |    data: {
-         |      outerString: "Changed Outer String"
+         |      outerString: { set: "Changed Outer String" }
          |      todos: {
-         |        update: [
-         |        {where: { innerDateTime: $innerWhere },data:{ innerString: "Changed Inner String"}}
-         |        ]
+         |        update: [{
+         |          where: { innerDateTime: $innerWhere }
+         |          data:{ innerString: { set: "Changed Inner String" }}
+         |        }]
          |      }
          |    }
          |  ){

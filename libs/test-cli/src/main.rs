@@ -78,7 +78,7 @@ async fn main() -> anyhow::Result<()> {
                 unreachable!()
             };
             //todo configurable
-            let introspected = introspection_core::RpcImpl::introspect_internal(schema, false, false)
+            let introspected = introspection_core::RpcImpl::introspect_internal(schema, false)
                 .await
                 .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
@@ -188,7 +188,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
         if let Some(url) = cmd.url.as_ref() {
             let skeleton = minimal_schema_from_url(url)?;
             //todo make this configurable
-            let introspected = introspection_core::RpcImpl::introspect_internal(skeleton, false, false)
+            let introspected = introspection_core::RpcImpl::introspect_internal(skeleton, false)
                 .await
                 .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 

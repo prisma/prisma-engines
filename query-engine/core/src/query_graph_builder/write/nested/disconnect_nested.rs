@@ -112,7 +112,11 @@ fn handle_many_to_many(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let expected_disconnects = std::cmp::max(filter.size(), 1);
+    let expected_disconnects = filter.size();
+
+    if expected_disconnects == 0 {
+        return Ok(());
+    }
     let find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter)?;
 

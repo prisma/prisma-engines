@@ -256,7 +256,7 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
          |    }
          |  }
          |  data: {
-         |    first_name: "Worst"
+         |    first_name: { set: "Worst" }
          |  }) {
          |    first_name
          |  }
@@ -322,7 +322,7 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
          |          }
          |        },
          |        data: {
-         |          published: true
+         |          published: { set: true }
          |        }
          |      }
          |  }}) {
@@ -468,7 +468,7 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
                          |      last_name: "Dude"
                          |    }
                          |    update: {
-                         |      last_name: "Knight of Ni"
+                         |      last_name: { set: "Knight of Ni" }
                          |    }) {
                          |    id
                          |    last_name
@@ -540,7 +540,7 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
                          |          category: "Pop Culture"
                          |        },
                          |        update: {
-                         |          category: "Drama"
+                         |          category: { set: "Drama" }
                          |        }
                          |      }
                          |  }}) {

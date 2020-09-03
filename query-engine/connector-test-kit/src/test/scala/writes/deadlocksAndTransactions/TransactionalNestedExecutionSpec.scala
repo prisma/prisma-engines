@@ -172,11 +172,11 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |  updateNote(
          |    where: { outerUnique: $outerWhere }
          |    data: {
-         |      outerString: "Changed Outer String"
+         |      outerString: { set: "Changed Outer String" }
          |      todos: {
          |        update: [
-         |        {where: { innerUnique: $innerWhere },data:{ innerString: "Changed Inner String"}},
-         |        {where: { innerUnique: $falseWhere2 },data:{ innerString: "Changed Inner String"}}
+         |        { where: { innerUnique: $innerWhere }, data:{ innerString: { set: "Changed Inner String" }}},
+         |        { where: { innerUnique: $falseWhere2 }, data:{ innerString: { set: "Changed Inner String" }}}
          |        ]
          |      }
          |    }
@@ -201,11 +201,11 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |  updateNote(
          |    where: { outerUnique: $outerWhere }
          |    data: {
-         |      outerString: "Changed Outer String"
+         |      outerString: { set: "Changed Outer String" }
          |      todos: {
          |        update: [
-         |        {where: { innerUnique: $falseWhere},data:{ innerString: "Changed Inner String"}},
-         |        {where: { innerUnique: $innerWhere2 },data:{ innerString: "Changed Inner String"}}
+         |        {where: { innerUnique: $falseWhere},data:{ innerString: { set: "Changed Inner String" }}},
+         |        {where: { innerUnique: $innerWhere2 },data:{ innerString: { set: "Changed Inner String" }}}
          |        ]
          |      }
          |    }
@@ -259,11 +259,11 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |  updateNote(
          |    where: { outerUnique: $outerWhere }
          |    data: {
-         |      outerString: "Changed Outer String"
+         |      outerString: { set: "Changed Outer String" }
          |      todos: {
          |        update: [
-         |          { where: { innerUnique: $innerWhere }, data:{ innerString: "Changed Inner String" } },
-         |          { where: { innerUnique: $innerWhere2 },data:{ innerString: "Changed Inner String" } }
+         |          { where: { innerUnique: $innerWhere }, data:{ innerString: { set: "Changed Inner String" }}},
+         |          { where: { innerUnique: $innerWhere2 }, data:{ innerString: { set: "Changed Inner String" }}}
          |        ]
          |      }
          |    }
@@ -311,11 +311,11 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |  updateNote(
          |    where: { outerUnique: $outerWhere }
          |    data: {
-         |      outerString: "Changed Outer String"
+         |      outerString: { set: "Changed Outer String" }
          |      todos: {
          |        update: {
          |          where: { innerUnique: $falseWhere },
-         |          data:{ innerString: "Changed Inner String" }
+         |          data:{ innerString: { set: "Changed Inner String" }}
          |        }
          |      }
          |    }
@@ -340,11 +340,11 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |  updateNote(
          |    where: { outerUnique: $falseWhere }
          |    data: {
-         |      outerString: "Changed Outer String"
+         |      outerString: { set: "Changed Outer String" }
          |      todos: {
          |        update: {
          |          where: { innerUnique: $innerWhere },
-         |          data:{ innerString: "Changed Inner String" }
+         |          data:{ innerString: { set: "Changed Inner String" }}
          |        }
          |      }
          |    }

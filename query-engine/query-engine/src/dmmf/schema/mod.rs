@@ -25,7 +25,15 @@ pub struct DMMFQuerySchemaRenderer;
 impl QuerySchemaRenderer<(DMMFSchema, Vec<DMMFMapping>)> for DMMFQuerySchemaRenderer {
     fn render(query_schema: QuerySchemaRef) -> (DMMFSchema, Vec<DMMFMapping>) {
         let mut ctx = RenderContext::new();
-        query_schema.into_renderer().render(&mut ctx);
+        ctx.mark_to_be_rendered(&query_schema);
+
+        while !ctx.next_pass.is_empty() {
+            let renderers = std::mem::replace(&mut ctx.next_pass, Vec::new());
+
+            for renderer in renderers {
+                renderer.render(&mut ctx)
+            }
+        }
 
         ctx.finalize()
     }
@@ -41,6 +49,10 @@ pub struct RenderContext {
     /// Prevents double rendering of elements that are referenced multiple times.
     /// Names of input / output types / enums / models are globally unique.
     rendered: HashSet<String>,
+
+    /// The child objects to render next. Rendering is considered complete when
+    /// this is empty.
+    next_pass: Vec<Box<dyn Renderer>>,
 }
 
 impl RenderContext {
@@ -49,6 +61,7 @@ impl RenderContext {
             schema: DMMFSchema::new(),
             mappings: vec![],
             rendered: HashSet::new(),
+            next_pass: Vec::new(),
         }
     }
 
@@ -101,60 +114,62 @@ impl RenderContext {
             };
         }
     }
+
+    fn mark_to_be_rendered(&mut self, into_renderer: &dyn IntoRenderer) {
+        if !into_renderer.is_already_rendered(self) {
+            let renderer: Box<dyn Renderer> = into_renderer.into_renderer();
+            self.next_pass.push(renderer)
+        }
+    }
 }
 
-pub trait Renderer<'a, T> {
-    fn render(&self, ctx: &mut RenderContext) -> T;
+pub trait Renderer {
+    fn render(&self, ctx: &mut RenderContext);
 }
 
-trait IntoRenderer<'a, T> {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, T> + 'a>;
+trait IntoRenderer {
+    fn into_renderer(&self) -> Box<dyn Renderer>;
+
+    /// Returns whether the item still needs to be rendered.
+    fn is_already_rendered(&self, ctx: &RenderContext) -> bool;
 }
 
-impl<'a> IntoRenderer<'a, ()> for QuerySchemaRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
+impl IntoRenderer for QuerySchemaRef {
+    fn into_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DMMFSchemaRenderer::new(Arc::clone(self)))
     }
-}
 
-impl<'a> IntoRenderer<'a, DMMFTypeInfo> for OutputType {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, DMMFTypeInfo> + 'a> {
-        Box::new(DMMFTypeRenderer::Output(self))
+    fn is_already_rendered(&self, _ctx: &RenderContext) -> bool {
+        false
     }
 }
 
-impl<'a> IntoRenderer<'a, DMMFTypeInfo> for InputType {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, DMMFTypeInfo> + 'a> {
-        Box::new(DMMFTypeRenderer::Input(self))
-    }
-}
-
-impl<'a> IntoRenderer<'a, ()> for EnumType {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
+impl<'a> IntoRenderer for &'a EnumType {
+    fn into_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DMMFEnumRenderer::new(self))
     }
-}
 
-impl<'a> IntoRenderer<'a, DMMFFieldWrapper> for InputFieldRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, DMMFFieldWrapper> + 'a> {
-        Box::new(DMMFFieldRenderer::Input(Arc::clone(self)))
+    fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
+        ctx.already_rendered(self.name())
     }
 }
 
-impl<'a> IntoRenderer<'a, DMMFFieldWrapper> for FieldRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, DMMFFieldWrapper> + 'a> {
-        Box::new(DMMFFieldRenderer::Output(Arc::clone(self)))
-    }
-}
-
-impl<'a> IntoRenderer<'a, ()> for InputObjectTypeWeakRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
+impl IntoRenderer for InputObjectTypeWeakRef {
+    fn into_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DMMFObjectRenderer::Input(Weak::clone(self)))
     }
+
+    fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
+        ctx.already_rendered(&self.into_arc().name)
+    }
 }
 
-impl<'a> IntoRenderer<'a, ()> for ObjectTypeWeakRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
+impl IntoRenderer for ObjectTypeWeakRef {
+    fn into_renderer(&self) -> Box<dyn Renderer> {
         Box::new(DMMFObjectRenderer::Output(Weak::clone(self)))
+    }
+
+    fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
+        ctx.already_rendered(self.into_arc().name())
     }
 }

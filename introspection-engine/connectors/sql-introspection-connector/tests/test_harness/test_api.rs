@@ -62,7 +62,7 @@ impl TestApi {
     pub async fn introspect(&self) -> String {
         let introspection_result = self
             .introspection_connector
-            .introspect(&Datamodel::new(), false)
+            .introspect(&Datamodel::new())
             .await
             .unwrap();
         datamodel::render_datamodel_to_string(&introspection_result.data_model).expect("Datamodel rendering failed")
@@ -70,28 +70,20 @@ impl TestApi {
 
     pub async fn re_introspect(&self, data_model_string: &str) -> String {
         let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
-        let introspection_result = self
-            .introspection_connector
-            .introspect(&data_model, true)
-            .await
-            .unwrap();
+        let introspection_result = self.introspection_connector.introspect(&data_model).await.unwrap();
         datamodel::render_datamodel_to_string(&introspection_result.data_model).expect("Datamodel rendering failed")
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> String {
         let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
-        let introspection_result = self
-            .introspection_connector
-            .introspect(&data_model, true)
-            .await
-            .unwrap();
+        let introspection_result = self.introspection_connector.introspect(&data_model).await.unwrap();
         serde_json::to_string(&introspection_result.warnings).unwrap()
     }
 
     pub async fn introspect_version(&self) -> Version {
         let introspection_result = self
             .introspection_connector
-            .introspect(&Datamodel::new(), false)
+            .introspect(&Datamodel::new())
             .await
             .unwrap();
         introspection_result.version
@@ -100,7 +92,7 @@ impl TestApi {
     pub async fn introspection_warnings(&self) -> String {
         let introspection_result = self
             .introspection_connector
-            .introspect(&Datamodel::new(), false)
+            .introspect(&Datamodel::new())
             .await
             .unwrap();
         serde_json::to_string(&introspection_result.warnings).unwrap()
@@ -228,17 +220,6 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str) ->
         .await
         .unwrap();
     let connection_info = database.connection_info().to_owned();
-    let drop_schema = dbg!(format!(
-        "DROP SCHEMA IF EXISTS \"{}\" CASCADE;",
-        connection_info.schema_name()
-    ));
-    database.query_raw(&drop_schema, &[]).await.ok();
-
-    let create_schema = dbg!(format!(
-        "CREATE SCHEMA IF NOT EXISTS \"{}\";",
-        connection_info.schema_name()
-    ));
-    database.query_raw(&create_schema, &[]).await.ok();
     let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
 
     TestApi {
@@ -251,8 +232,7 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str) ->
 }
 
 pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
-    let database_file_path = sqlite_test_file(db_name);
-    std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
+    sqlite_test_file(db_name);
     let connection_string = sqlite_test_url(db_name);
     let database = Quaint::new(&connection_string).await.unwrap();
     let introspection_connector = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
