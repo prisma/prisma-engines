@@ -78,7 +78,7 @@ fn operations_object_type(
     return_cached_input!(ctx, &name);
 
     let mut obj = init_input_object_type(&name);
-    obj.set_one_of(true);
+    obj.require_exactly_one_field();
 
     let obj = Arc::new(obj);
     let nullable_field_type = map_optional_input_type(field);

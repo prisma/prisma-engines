@@ -271,19 +271,24 @@ pub struct Argument {
 
 pub struct InputObjectType {
     pub name: String,
-
-    /// If true this means that _exactly_ one of the contained fields must be specified in an incoming query.
-    /// This allows clients to handle this input type in a special way and ensure this invariant in a typesafe way.
-    pub is_one_of: bool,
-
+    pub constraints: InputObjectTypeConstraints,
     pub fields: OnceCell<Vec<InputFieldRef>>,
+}
+
+#[derive(Debug, Default)]
+pub struct InputObjectTypeConstraints {
+    /// The maximum number of fields that can be provided.
+    pub min_num_fields: Option<usize>,
+
+    /// The minimum number of fields that must be provided.
+    pub max_num_fields: Option<usize>,
 }
 
 impl Debug for InputObjectType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("InputObjectType")
             .field("name", &self.name)
-            .field("is_one_of", &self.is_one_of)
+            .field("constraints", &self.constraints)
             .field("fields", &"#Input Fields Cell#")
             .finish()
     }
@@ -313,8 +318,26 @@ impl InputObjectType {
         self.get_fields().into_iter().find(|f| f.name == name).cloned()
     }
 
-    pub fn set_one_of(&mut self, one_of: bool) {
-        self.is_one_of = one_of;
+    /// Allow exactly one field of the possible ones to be in the input.
+    pub fn require_exactly_one_field(&mut self) {
+        self.set_max_fields(1);
+        self.set_min_fields(1);
+    }
+
+    /// Allow at most one field of the possible ones to be in the input.
+    pub fn allow_at_most_one_field(&mut self) {
+        self.set_max_fields(1);
+        self.set_min_fields(0);
+    }
+
+    /// Allow a maximum of `max` fields to be present in the input.
+    pub fn set_max_fields(&mut self, max: usize) {
+        self.constraints.max_num_fields = Some(max);
+    }
+
+    /// Require a minimum of `min` fields to be present in the input.
+    pub fn set_min_fields(&mut self, min: usize) {
+        self.constraints.min_num_fields = Some(min);
     }
 }
 
@@ -340,6 +363,9 @@ pub enum InputType {
     /// A nullable input denotes that, if provided, a given input can be null.
     /// This makes no assumption about if an input needs to be provided or not.
     Null(Box<InputType>),
+
+    /// A union of input types, each one valid for the given input (but only one can be provided at any time).
+    Union(Vec<InputType>),
 }
 
 impl From<&InputType> for TypeHint {
@@ -351,6 +377,7 @@ impl From<&InputType> for TypeHint {
             InputType::Enum(_) => TypeHint::Enum,
             InputType::List(_) => TypeHint::Array,
             InputType::Object(_) => TypeHint::Unknown,
+            InputType::Union(_) => TypeHint::Unknown,
         }
     }
 }
@@ -366,6 +393,10 @@ impl InputType {
 
     pub fn null(containing: InputType) -> InputType {
         InputType::Null(Box::new(containing))
+    }
+
+    pub fn union(containing: Vec<InputType>) -> InputType {
+        InputType::Union(containing)
     }
 
     pub fn object(containing: InputObjectTypeWeakRef) -> InputType {

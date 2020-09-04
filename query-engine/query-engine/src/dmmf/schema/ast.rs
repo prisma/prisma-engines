@@ -10,12 +10,6 @@ pub struct DmmfSchema {
     pub enums: Vec<DmmfEnum>,
 }
 
-impl DmmfSchema {
-    pub fn new() -> Self {
-        Default::default()
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DmmfOutputField {

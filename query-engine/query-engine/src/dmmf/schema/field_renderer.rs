@@ -5,10 +5,10 @@ use super::{
 use query_core::{Argument, FieldRef, InputFieldRef};
 
 pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DmmfInputField {
-    let type_info = render_input_type(&input_field.field_type, ctx);
+    let type_reference = render_input_type(&input_field.field_type, ctx);
     let field = DmmfInputField {
         name: input_field.name.clone(),
-        input_type: type_info,
+        input_type: type_reference,
     };
 
     field

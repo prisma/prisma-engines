@@ -34,7 +34,7 @@ where
 {
     InputObjectType {
         name: name.into(),
-        is_one_of: false,
+        constraints: InputObjectTypeConstraints::default(),
         fields: OnceCell::new(),
     }
 }

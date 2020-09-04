@@ -79,7 +79,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     return_cached_input!(ctx, &name);
 
     let mut x = init_input_object_type(name.clone());
-    x.is_one_of = true;
+    x.require_exactly_one_field();
 
     let input_object = Arc::new(x);
     ctx.cache_input_type(name, input_object.clone());
