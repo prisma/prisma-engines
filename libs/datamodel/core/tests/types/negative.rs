@@ -170,15 +170,14 @@ fn should_fail_on_missing_native_types_feature_flag() {
         model Blog {
             id     Int    @id
             bigInt Int    @pg.Numerical(3, 4)
-            foobar String @pg.VarChar(5)
         }
     "#;
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error( // TODO create error for this case!
-        "Native type Numerical is not supported for postgresql connector.",
-        ast::Span::new(222, 240),
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your datasource block: `previewFeatures = [\"previewFeatures\"]`",
+        ast::Span::new(178, 196),
     ));
 }
 
