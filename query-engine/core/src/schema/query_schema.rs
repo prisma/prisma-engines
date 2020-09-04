@@ -264,6 +264,7 @@ pub struct GenericQueryBuilder {
 
 #[derive(Debug)]
 pub struct Argument {
+    // todo arguments are pretty much input fields... 1:1
     pub name: String,
     pub argument_type: InputType,
     pub default_value: Option<dml::DefaultValue>,
@@ -346,6 +347,14 @@ pub struct InputField {
     pub name: String,
     pub field_type: InputType,
     pub default_value: Option<dml::DefaultValue>,
+
+    /// Indicates whether or not the presence of the field in the higher input objects
+    /// is required or not, but doesn't make any assumption about if the input can be null.
+    pub is_required: bool,
+
+    /// A nullable field can be a given input can be null.
+    /// This makes no assumption about if an input needs to be provided or not.
+    pub is_nullable: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -355,15 +364,6 @@ pub enum InputType {
     List(Box<InputType>),
     Object(InputObjectTypeWeakRef),
 
-    /// An optional input type may be provided, meaning only that the presence
-    /// of the input is required or not, but doesn't make any assumption about
-    /// whether or not the input can be null.
-    Opt(Box<InputType>),
-
-    /// A nullable input denotes that, if provided, a given input can be null.
-    /// This makes no assumption about if an input needs to be provided or not.
-    Null(Box<InputType>),
-
     /// A union of input types, each one valid for the given input (but only one can be provided at any time).
     Union(Vec<InputType>),
 }
@@ -371,8 +371,6 @@ pub enum InputType {
 impl From<&InputType> for TypeHint {
     fn from(i: &InputType) -> Self {
         match i {
-            InputType::Opt(inner) => (&**inner).into(),
-            InputType::Null(inner) => (&**inner).into(),
             InputType::Scalar(st) => st.into(),
             InputType::Enum(_) => TypeHint::Enum,
             InputType::List(_) => TypeHint::Array,
@@ -385,14 +383,6 @@ impl From<&InputType> for TypeHint {
 impl InputType {
     pub fn list(containing: InputType) -> InputType {
         InputType::List(Box::new(containing))
-    }
-
-    pub fn opt(containing: InputType) -> InputType {
-        InputType::Opt(Box::new(containing))
-    }
-
-    pub fn null(containing: InputType) -> InputType {
-        InputType::Null(Box::new(containing))
     }
 
     pub fn union(containing: Vec<InputType>) -> InputType {

@@ -54,8 +54,8 @@ pub struct DmmfOutputType {
 #[serde(rename_all = "camelCase")]
 pub struct DmmfInputField {
     pub name: String,
-    pub is_required: bool,
     pub is_list: bool,
+    pub is_required: bool,
     pub is_nullable: bool,
     pub input_types: Vec<DmmfTypeReference>,
 }
