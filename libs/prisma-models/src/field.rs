@@ -60,13 +60,15 @@ impl From<&RelationFieldRef> for FieldWeak {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypeIdentifier {
     String,
+    Int,
     Float,
     Boolean,
     Enum(String),
-    Json,
-    DateTime,
     UUID,
-    Int,
+    Json,
+    Xml,
+    Bytes,
+    DateTime,
 }
 
 impl From<TypeIdentifier> for TypeHint {
@@ -80,6 +82,8 @@ impl From<TypeIdentifier> for TypeHint {
             TypeIdentifier::DateTime => TypeHint::DateTime,
             TypeIdentifier::UUID => TypeHint::UUID,
             TypeIdentifier::Int => TypeHint::Int,
+            TypeIdentifier::Xml => TypeHint::Xml,
+            TypeIdentifier::Bytes => TypeHint::Bytes,
         }
     }
 }
@@ -186,7 +190,10 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Boolean => Self::Boolean,
             ScalarType::DateTime => Self::DateTime,
             ScalarType::Json => Self::Json,
-            _ => todo!(),
+            ScalarType::XML => Self::Xml,
+            ScalarType::Bytes => Self::Bytes,
+            ScalarType::Decimal => Self::Float,
+            ScalarType::Duration => todo!("No idea what this is supposed to be"),
         }
     }
 }

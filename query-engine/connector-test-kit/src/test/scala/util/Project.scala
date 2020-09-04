@@ -23,6 +23,7 @@ case class Project(
            |datasource test {
            |  provider = "${config.provider}"
            |  url = "${dataSourceUrl}"
+           |  previewFeatures = ["nativeTypes"]
            |}
     """.stripMargin
   }
@@ -49,6 +50,7 @@ case class Project(
          |datasource test {
          |  provider = "${ConnectorConfig.instance.provider}"
          |  url = "${url}"
+         |  previewFeatures = ["nativeTypes"]
          |}
          |
          |$dataModel

@@ -79,8 +79,9 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
             .chain(alphanumeric_filters(sf))
             .collect(),
 
-        TypeIdentifier::Boolean | TypeIdentifier::Json => equality_filters(sf).collect(),
+        TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml => equality_filters(sf).collect(),
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
+        TypeIdentifier::Bytes => {}
     };
 
     fields.push(input_field(

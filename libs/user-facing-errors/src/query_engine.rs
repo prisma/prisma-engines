@@ -235,3 +235,12 @@ pub struct ValueOutOfRange {
 pub struct TableDoesNotExist {
     pub table: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2022",
+    message = "The column `${column}` does not exist in the current database."
+)]
+pub struct ColumnDoesNotExist {
+    pub column: String,
+}

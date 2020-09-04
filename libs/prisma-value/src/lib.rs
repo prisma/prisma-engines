@@ -23,13 +23,14 @@ pub enum TypeHint {
     Float,
     Boolean,
     Enum,
-    Json,
     DateTime,
     UUID,
     Int,
     Array,
     Char,
     Bytes,
+    Json,
+    Xml,
     Unknown,
 }
 
@@ -40,18 +41,19 @@ pub enum PrismaValue {
     Boolean(bool),
     Enum(String),
     Int(i64),
-
-    #[serde(serialize_with = "serialize_null")]
-    Null(TypeHint),
     Uuid(Uuid),
     List(PrismaListValue),
     Json(String),
+    Xml(String),
 
     #[serde(serialize_with = "serialize_date")]
     DateTime(DateTime<Utc>),
 
     #[serde(serialize_with = "serialize_decimal")]
     Float(Decimal),
+
+    #[serde(serialize_with = "serialize_null")]
+    Null(TypeHint),
 }
 
 pub fn stringify_date(date: &DateTime<Utc>) -> String {
@@ -172,6 +174,7 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Null(_) => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),
             PrismaValue::Json(x) => x.fmt(f),
+            PrismaValue::Xml(x) => x.fmt(f),
             PrismaValue::List(x) => {
                 let as_string = format!("{:?}", x);
                 as_string.fmt(f)
