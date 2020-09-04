@@ -4,10 +4,15 @@ use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor,
 use native_types::{MySqlType, NativeType};
 
 const INT_TYPE_NAME: &str = "Int";
+const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
+const UNSIGNED_SMALL_INT_TYPE_NAME: &str = "UnsignedSmallInt";
 const TINY_INT_TYPE_NAME: &str = "TinyInt";
+const UNSIGNED_TINY_INT_TYPE_NAME: &str = "UnsignedTinyInt";
 const MEDIUM_INT_TYPE_NAME: &str = "MediumInt";
+const UNSIGNED_MEDIUM_INT_TYPE_NAME: &str = "UnsignedMediumInt";
 const BIG_INT_TYPE_NAME: &str = "BigInt";
+const UNSIGNED_BIG_INT_TYPE_NAME: &str = "UnsignedBigInt";
 const DECIMAL_TYPE_NAME: &str = "Decimal";
 const NUMERIC_TYPE_NAME: &str = "Numeric";
 const FLOAT_TYPE_NAME: &str = "Float";
@@ -48,10 +53,15 @@ impl MySqlDatamodelConnector {
         ];
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, ScalarType::Int);
+        let unsigned_int = NativeTypeConstructor::without_args(UNSIGNED_INT_TYPE_NAME, ScalarType::Int);
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, ScalarType::Int);
+        let unsigned_small_int = NativeTypeConstructor::without_args(UNSIGNED_SMALL_INT_TYPE_NAME, ScalarType::Int);
         let tiny_int = NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, ScalarType::Int);
+        let unsigned_tiny_int = NativeTypeConstructor::without_args(UNSIGNED_TINY_INT_TYPE_NAME, ScalarType::Int);
         let medium_int = NativeTypeConstructor::without_args(MEDIUM_INT_TYPE_NAME, ScalarType::Int);
+        let unsigned_medium_int = NativeTypeConstructor::without_args(UNSIGNED_MEDIUM_INT_TYPE_NAME, ScalarType::Int);
         let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, ScalarType::Int);
+        let unsigned_big_int = NativeTypeConstructor::without_args(UNSIGNED_BIG_INT_TYPE_NAME, ScalarType::Int);
         let decimal = NativeTypeConstructor::with_args(DECIMAL_TYPE_NAME, 2, ScalarType::Decimal);
         let numeric = NativeTypeConstructor::with_args(NUMERIC_TYPE_NAME, 2, ScalarType::Decimal);
         let float = NativeTypeConstructor::without_args(FLOAT_TYPE_NAME, ScalarType::Float);
@@ -78,10 +88,15 @@ impl MySqlDatamodelConnector {
 
         let constructors: Vec<NativeTypeConstructor> = vec![
             int,
+            unsigned_int,
             small_int,
+            unsigned_small_int,
             tiny_int,
+            unsigned_tiny_int,
             medium_int,
+            unsigned_medium_int,
             big_int,
+            unsigned_big_int,
             decimal,
             numeric,
             float,
@@ -127,10 +142,15 @@ impl Connector for MySqlDatamodelConnector {
         let constructor = self.find_native_type_constructor(name);
         let native_type = match name {
             INT_TYPE_NAME => MySqlType::Int,
+            UNSIGNED_INT_TYPE_NAME => MySqlType::UnsignedInt,
             SMALL_INT_TYPE_NAME => MySqlType::SmallInt,
+            UNSIGNED_SMALL_INT_TYPE_NAME => MySqlType::UnsignedSmallInt,
             TINY_INT_TYPE_NAME => MySqlType::TinyInt,
+            UNSIGNED_TINY_INT_TYPE_NAME => MySqlType::UnsignedTinyInt,
             MEDIUM_INT_TYPE_NAME => MySqlType::MediumInt,
+            UNSIGNED_MEDIUM_INT_TYPE_NAME => MySqlType::UnsignedMediumInt,
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
+            UNSIGNED_BIG_INT_TYPE_NAME => MySqlType::UnsignedBigInt,
             DECIMAL_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
                     MySqlType::Decimal(*first_arg as u8, *second_arg as u8)
@@ -243,10 +263,15 @@ impl Connector for MySqlDatamodelConnector {
         let native_type: MySqlType = serde_json::from_value(native_type.to_json()).unwrap();
         let (constructor_name, args) = match native_type {
             MySqlType::Int => (INT_TYPE_NAME, vec![]),
+            MySqlType::UnsignedInt => (UNSIGNED_INT_TYPE_NAME, vec![]),
             MySqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
+            MySqlType::UnsignedSmallInt => (UNSIGNED_SMALL_INT_TYPE_NAME, vec![]),
             MySqlType::TinyInt => (TINY_INT_TYPE_NAME, vec![]),
+            MySqlType::UnsignedTinyInt => (UNSIGNED_TINY_INT_TYPE_NAME, vec![]),
             MySqlType::MediumInt => (MEDIUM_INT_TYPE_NAME, vec![]),
+            MySqlType::UnsignedMediumInt => (UNSIGNED_MEDIUM_INT_TYPE_NAME, vec![]),
             MySqlType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
+            MySqlType::UnsignedBigInt => (UNSIGNED_BIG_INT_TYPE_NAME, vec![]),
             MySqlType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x as u32, y as u32]),
             MySqlType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x as u32, y as u32]),
             MySqlType::Float => (FLOAT_TYPE_NAME, vec![]),
