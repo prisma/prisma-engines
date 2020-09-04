@@ -296,7 +296,7 @@ impl<'a> LiftAstToDml<'a> {
             } else {
                 if let Some(native_type_attribute) = ast_field.directives.iter().find(|d| d.name.name.contains(".")) {
                     return Err(DatamodelError::new_connector_error(
-                        &ConnectorError::from_kind(ErrorKind::PreviewFeatureDisabled {}).to_string(),
+                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
                         native_type_attribute.span,
                     ));
                 } else {
