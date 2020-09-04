@@ -35,7 +35,7 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Summing with no records in the database" should "return null" in {
+  "Summing with no records in the database" should "return zero" in {
     val result = server.query(
       s"""{
          |  aggregateItem {
@@ -48,8 +48,8 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsJsValue("data.aggregateItem.sum.float") should be(JsNull)
-    result.pathAsJsValue("data.aggregateItem.sum.int") should be(JsNull)
+    result.pathAsFloat("data.aggregateItem.sum.float") should be(0.0)
+    result.pathAsInt("data.aggregateItem.sum.int") should be(0)
   }
 
   "Summing with some records in the database" should "return the correct sum" in {
