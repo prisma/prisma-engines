@@ -1,12 +1,12 @@
 use super::{
     type_renderer::{render_input_type, render_output_type},
-    DMMFArgument, DMMFField, DMMFInputField, RenderContext,
+    DmmfArgument, DmmfInputField, DmmfOutputField, RenderContext,
 };
 use query_core::{Argument, FieldRef, InputFieldRef};
 
-pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DMMFInputField {
+pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DmmfInputField {
     let type_info = render_input_type(&input_field.field_type, ctx);
-    let field = DMMFInputField {
+    let field = DmmfInputField {
         name: input_field.name.clone(),
         input_type: type_info,
     };
@@ -14,10 +14,10 @@ pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderCo
     field
 }
 
-pub(super) fn render_output_field(field: &FieldRef, ctx: &mut RenderContext) -> DMMFField {
+pub(super) fn render_output_field(field: &FieldRef, ctx: &mut RenderContext) -> DmmfOutputField {
     let args = render_arguments(&field.arguments, ctx);
     let output_type = render_output_type(&field.field_type, ctx);
-    let output_field = DMMFField {
+    let output_field = DmmfOutputField {
         name: field.name.clone(),
         args,
         output_type,
@@ -28,13 +28,13 @@ pub(super) fn render_output_field(field: &FieldRef, ctx: &mut RenderContext) -> 
     output_field
 }
 
-fn render_arguments(args: &[Argument], ctx: &mut RenderContext) -> Vec<DMMFArgument> {
+fn render_arguments(args: &[Argument], ctx: &mut RenderContext) -> Vec<DmmfArgument> {
     args.iter().map(|arg| render_argument(arg, ctx)).collect()
 }
 
-fn render_argument(arg: &Argument, ctx: &mut RenderContext) -> DMMFArgument {
+fn render_argument(arg: &Argument, ctx: &mut RenderContext) -> DmmfArgument {
     let input_type = render_input_type(&arg.argument_type, ctx);
-    let rendered_arg = DMMFArgument {
+    let rendered_arg = DmmfArgument {
         name: arg.name.clone(),
         input_type,
     };
