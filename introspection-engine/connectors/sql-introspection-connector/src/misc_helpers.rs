@@ -3,6 +3,10 @@ use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
     OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
+use datamodel_connector::Connector;
+use native_types::MySqlType;
+use quaint::connector::SqlFamily;
+use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
 };
@@ -119,9 +123,16 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &SqlFamily) -> ScalarField {
     debug!("Handling column {:?}", column);
-    let field_type = calculate_scalar_field_type(&column);
+    let native_types_enabled = true;
+
+    let field_type = if native_types_enabled {
+        calculate_scalar_field_type_with_native_types(column, family)
+    } else {
+        calculate_scalar_field_type(column)
+    };
+
     let (is_commented_out, documentation) = match field_type {
         FieldType::Unsupported(_) => (true, Some("This type is currently not supported.".to_string())),
         _ => (false, None),
@@ -308,6 +319,27 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         x => FieldType::Unsupported(x.to_string()),
     }
+}
+
+pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, family: &SqlFamily) -> FieldType {
+    debug!("Calculating field type for '{}'", column.name);
+
+    let connector: Box<dyn Connector> = match family {
+        SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql()),
+        SqlFamily::Postgres => Box::new(SqlDatamodelConnectors::postgres()),
+        SqlFamily::Sqlite => Box::new(SqlDatamodelConnectors::sqlite()),
+        SqlFamily::Mssql => Box::new(SqlDatamodelConnectors::mssql()),
+    };
+
+    println!("{:?}", column);
+
+    let native_type = match column.tpe.data_type.as_ref() {
+        "int" => MySqlType::Int,
+        x => MySqlType::Int,
+    };
+
+    let native_type_instance = connector.introspect_native_type(Box::new(native_type)).unwrap();
+    FieldType::NativeType(ScalarType::Int, native_type_instance)
 }
 
 // misc

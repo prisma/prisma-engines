@@ -24,7 +24,7 @@ pub fn calculate_datamodel(
     let mut data_model = Datamodel::new();
 
     // 1to1 translation of the sql schema
-    introspect(schema, &mut version_check, &mut data_model)?;
+    introspect(schema, &mut version_check, &mut data_model, family.clone())?;
 
     // our opinionation about valid names
     sanitize_datamodel_names(&mut data_model, family);

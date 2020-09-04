@@ -229,7 +229,10 @@ impl Connector for MySqlDatamodelConnector {
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
 
-            _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
+            x => unreachable!(format!(
+                "This code is unreachable as the core must guarantee to just call with known names. {}",
+                x
+            )),
         };
 
         Ok(NativeTypeInstance::new(

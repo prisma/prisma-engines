@@ -1,6 +1,6 @@
 use super::scalars::ScalarType;
 
-/// represents an availabe native type
+/// represents an available native type
 #[derive(serde::Serialize)]
 pub struct NativeTypeConstructor {
     /// the name that is used in the Prisma schema when declaring the native type

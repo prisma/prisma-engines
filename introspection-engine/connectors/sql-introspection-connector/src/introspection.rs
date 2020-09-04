@@ -6,6 +6,7 @@ use crate::misc_helpers::{
 use crate::version_checker::VersionChecker;
 use crate::SqlError;
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, FieldType, Model, RelationField};
+use quaint::connector::SqlFamily;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
 
@@ -13,6 +14,7 @@ pub fn introspect(
     schema: &SqlSchema,
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
+    sql_family: SqlFamily,
 ) -> Result<(), SqlError> {
     for table in schema
         .tables
@@ -27,7 +29,7 @@ pub fn introspect(
 
         for column in &table.columns {
             version_check.check_column_for_type_and_default_value(&column);
-            let field = calculate_scalar_field(&table, &column);
+            let field = calculate_scalar_field(&table, &column, &sql_family);
             model.add_field(Field::ScalarField(field));
         }
 
