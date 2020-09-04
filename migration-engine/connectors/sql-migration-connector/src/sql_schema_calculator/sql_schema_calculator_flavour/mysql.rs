@@ -73,7 +73,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::Timestamp(None) => "TIMESTAMP".into(),
             MySqlType::Year => "YEAR".into(),
             MySqlType::JSON => "JSON".into(),
-            _ => todo!()
+            _ => todo!(),
         };
 
         sql::ColumnType {
