@@ -32,13 +32,6 @@ pub fn parse_enum(token: &Token) -> Result<Enum, ErrorCollection> {
         }
     }
 
-    if values.len() == 0 {
-        errors.push(DatamodelError::new_validation_error(
-            "An enum must have at least one value.",
-            Span::from_pest(token.as_span()),
-        ))
-    }
-
     errors.ok()?;
 
     match name {

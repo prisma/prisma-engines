@@ -90,7 +90,6 @@ fn must_error_for_invalid_model_names() {
 fn must_error_for_invalid_enum_names() {
     let dml = r#"
     enum StringFilter {
-      one
     }
     "#;
 
@@ -98,7 +97,7 @@ fn must_error_for_invalid_enum_names() {
     errors.assert_is(DatamodelError::new_enum_validation_error(
         "The enum name `StringFilter` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
         "StringFilter",
-        Span::new(5, 40),
+        Span::new(5, 30),
     ));
 }
 
