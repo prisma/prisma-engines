@@ -16,7 +16,6 @@ pub fn parse_enum(token: &Token) -> Result<Enum, ErrorCollection> {
     let mut comment: Option<Comment> = None;
 
     for current in token.relevant_children() {
-        println!("rule: {:?}, token: {:?}", current.as_rule(), current.as_str());
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::block_level_directive => directives.push(parse_directive(&current)),
