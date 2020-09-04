@@ -294,7 +294,14 @@ impl<'a> LiftAstToDml<'a> {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
             } else {
-                Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
+                if let Some(native_type_attribute) = ast_field.directives.iter().find(|d| d.name.name.contains(".")) {
+                    return Err(DatamodelError::new_connector_error(
+                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
+                        native_type_attribute.span,
+                    ));
+                } else {
+                    Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
+                }
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
