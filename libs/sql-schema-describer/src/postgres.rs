@@ -228,6 +228,10 @@ impl SqlSchemaDescriber {
                                 Some(float_value) => DefaultValue::VALUE(float_value),
                                 None => DefaultValue::DBGENERATED(default_string),
                             },
+                            ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                                Some(float_value) => DefaultValue::VALUE(float_value),
+                                None => DefaultValue::DBGENERATED(default_string),
+                            },
                             ColumnTypeFamily::Boolean => match parse_bool(&default_string) {
                                 Some(bool_value) => DefaultValue::VALUE(bool_value),
                                 None => DefaultValue::DBGENERATED(default_string),
@@ -246,7 +250,7 @@ impl SqlSchemaDescriber {
                                     _ => DefaultValue::DBGENERATED(default_string), //todo parse values
                                 }
                             }
-                            ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Bytes => DefaultValue::DBGENERATED(default_string),
                             // JSON/JSONB defaults come in the '{}'::jsonb form.
                             ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
                                 .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
@@ -642,7 +646,7 @@ fn get_column_type<'a>(
         "citext" | "_citext" => String,
         "varchar" | "_varchar" => String,
         "date" | "_date" => DateTime,
-        "bytea" | "_bytea" => Binary,
+        "bytea" | "_bytea" => Bytes,
         "json" | "_json" => Json,
         "jsonb" | "_jsonb" => Json,
         "uuid" | "_uuid" => Uuid,

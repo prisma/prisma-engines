@@ -327,6 +327,7 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
 pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, family: &SqlFamily) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
 
+    //fixme xml and enum???
     let scalar_type = match &column.tpe.family {
         ColumnTypeFamily::Boolean => ScalarType::Boolean,
         ColumnTypeFamily::DateTime => ScalarType::DateTime,
@@ -335,9 +336,9 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
         ColumnTypeFamily::String => ScalarType::String,
         ColumnTypeFamily::Uuid => ScalarType::String,
         ColumnTypeFamily::Json => ScalarType::Json,
-        // ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
-        // x => FieldType::Unsupported(x.to_string()),
-        _ => ScalarType::Int,
+        ColumnTypeFamily::Decimal => ScalarType::Decimal,
+        ColumnTypeFamily::Bytes => ScalarType::Bytes,
+        x => ScalarType::Int,
     };
 
     //fixme move this out of function

@@ -160,6 +160,10 @@ impl SqlSchemaDescriber {
                                     Some(float_value) => DefaultValue::VALUE(float_value),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 },
+                                ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                                    Some(float_value) => DefaultValue::VALUE(float_value),
+                                    None => DefaultValue::DBGENERATED(default_string),
+                                },
                                 ColumnTypeFamily::Boolean => match parse_int(&default_string) {
                                     Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
                                     Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
@@ -177,7 +181,7 @@ impl SqlSchemaDescriber {
                                     }
                                     _ => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Bytes => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
@@ -419,9 +423,9 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "date" => ColumnTypeFamily::DateTime,
         "datetime" => ColumnTypeFamily::DateTime,
         "timestamp" => ColumnTypeFamily::DateTime,
-        "binary" => ColumnTypeFamily::Binary,
+        "binary" => ColumnTypeFamily::Bytes,
         "double" => ColumnTypeFamily::Float,
-        "binary[]" => ColumnTypeFamily::Binary,
+        "binary[]" => ColumnTypeFamily::Bytes,
         "boolean[]" => ColumnTypeFamily::Boolean,
         "date[]" => ColumnTypeFamily::DateTime,
         "datetime[]" => ColumnTypeFamily::DateTime,

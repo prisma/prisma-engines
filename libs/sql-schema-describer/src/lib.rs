@@ -275,6 +275,8 @@ pub enum ColumnTypeFamily {
     Int,
     /// Floating point types.
     Float,
+    /// Decimal Types.
+    Decimal,
     /// Boolean types.
     Boolean,
     /// String types.
@@ -282,7 +284,7 @@ pub enum ColumnTypeFamily {
     /// DateTime types.
     DateTime,
     /// Binary types.
-    Binary,
+    Bytes,
     /// JSON types.
     Json,
     /// UUID types.
@@ -323,10 +325,11 @@ impl fmt::Display for ColumnTypeFamily {
         let str = match self {
             Self::Int => "int".to_string(),
             Self::Float => "float".to_string(),
+            Self::Decimal => "decimal".to_string(),
             Self::Boolean => "boolean".to_string(),
             Self::String => "string".to_string(),
             Self::DateTime => "dateTime".to_string(),
-            Self::Binary => "binary".to_string(),
+            Self::Bytes => "bytes".to_string(),
             Self::Json => "json".to_string(),
             Self::Uuid => "uuid".to_string(),
             Self::Geometric => "geometric".to_string(),

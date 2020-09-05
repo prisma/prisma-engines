@@ -1,6 +1,7 @@
 use super::*;
 use native_types::{MySqlType, NativeType};
 use quaint::prelude::Queryable;
+use serde_json::from_str;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::{borrow::Cow, sync::Arc};
 use tracing::debug;
@@ -272,6 +273,10 @@ async fn get_all_columns(
                             Some(float_value) => DefaultValue::VALUE(float_value),
                             None => DefaultValue::DBGENERATED(default_string),
                         },
+                        ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                            Some(float_value) => DefaultValue::VALUE(float_value),
+                            None => DefaultValue::DBGENERATED(default_string),
+                        },
                         ColumnTypeFamily::Boolean => match parse_int(&default_string) {
                             Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
                             Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
@@ -285,7 +290,7 @@ async fn get_all_columns(
                             true => DefaultValue::NOW,
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
-                        ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Bytes => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
@@ -551,18 +556,38 @@ fn get_column_type_and_enum(
         ("tinyint", _) => (ColumnTypeFamily::Int, MySqlType::TinyInt),
         ("mediumint", _) => (ColumnTypeFamily::Int, MySqlType::MediumInt),
         ("bigint", _) => (ColumnTypeFamily::Int, MySqlType::BigInt),
-        ("decimal", _) => (ColumnTypeFamily::Float, MySqlType::Decimal(0, 0)),
-        ("numeric", _) => (ColumnTypeFamily::Float, MySqlType::Numeric(0, 0)),
+        ("decimal", fdt) => (
+            ColumnTypeFamily::Decimal,
+            MySqlType::Decimal(extract_double_length_arg(fdt).0, extract_double_length_arg(fdt).1),
+        ),
+        ("numeric", fdt) => (
+            ColumnTypeFamily::Decimal,
+            MySqlType::Numeric(extract_double_length_arg(fdt).0, extract_double_length_arg(fdt).1),
+        ),
         ("float", _) => (ColumnTypeFamily::Float, MySqlType::Float),
         ("double", _) => (ColumnTypeFamily::Float, MySqlType::Double),
-        ("bit", _) => (ColumnTypeFamily::Int, MySqlType::Bit(0)),
         ("date", _) => (ColumnTypeFamily::DateTime, MySqlType::Date),
-        ("time", _) => (ColumnTypeFamily::DateTime, MySqlType::Time(None)),
-        ("datetime", _) => (ColumnTypeFamily::DateTime, MySqlType::DateTime(None)),
-        ("timestamp", _) => (ColumnTypeFamily::DateTime, MySqlType::Timestamp(None)),
+        ("time", fdt) => (
+            ColumnTypeFamily::DateTime,
+            MySqlType::Time(extract_optional_length_arg(fdt)),
+        ),
+        ("datetime", fdt) => (
+            ColumnTypeFamily::DateTime,
+            MySqlType::DateTime(extract_optional_length_arg(fdt)),
+        ),
+        ("timestamp", fdt) => (
+            ColumnTypeFamily::DateTime,
+            MySqlType::Timestamp(extract_optional_length_arg(fdt)),
+        ),
         ("year", _) => (ColumnTypeFamily::Int, MySqlType::Year),
-        ("char", _) => (ColumnTypeFamily::String, MySqlType::Char(0)),
-        ("varchar", _) => (ColumnTypeFamily::String, MySqlType::VarChar(0)),
+        ("char", fdt) => (
+            ColumnTypeFamily::String,
+            MySqlType::Char(extract_single_length_arg(fdt)),
+        ),
+        ("varchar", fdt) => (
+            ColumnTypeFamily::String,
+            MySqlType::VarChar(extract_single_length_arg(fdt)),
+        ),
         ("text", _) => (ColumnTypeFamily::String, MySqlType::Text),
         ("tinytext", _) => (ColumnTypeFamily::String, MySqlType::TinyText),
         ("mediumtext", _) => (ColumnTypeFamily::String, MySqlType::MediumText),
@@ -572,13 +597,21 @@ fn get_column_type_and_enum(
             MySqlType::Enum,
         ),
         ("json", _) => (ColumnTypeFamily::Json, MySqlType::JSON),
-        ("binary", _) => (ColumnTypeFamily::Binary, MySqlType::Binary(0)),
-        ("varbinary", _) => (ColumnTypeFamily::Binary, MySqlType::VarBinary(0)),
-        ("blob", _) => (ColumnTypeFamily::Binary, MySqlType::Blob),
-        ("tinyblob", _) => (ColumnTypeFamily::Binary, MySqlType::TinyBlob),
-        ("mediumblob", _) => (ColumnTypeFamily::Binary, MySqlType::MediumBlob),
-        ("longblob", _) => (ColumnTypeFamily::Binary, MySqlType::LongBlob),
-        ("set", _) => (ColumnTypeFamily::String, MySqlType::NotHandled), //????
+        ("bit", fdt) => (ColumnTypeFamily::Bytes, MySqlType::Bit(extract_single_length_arg(fdt))),
+        ("binary", fdt) => (
+            ColumnTypeFamily::Bytes,
+            MySqlType::Binary(extract_single_length_arg(fdt)),
+        ),
+        ("varbinary", fdt) => (
+            ColumnTypeFamily::Bytes,
+            MySqlType::VarBinary(extract_single_length_arg(fdt)),
+        ),
+        ("blob", _) => (ColumnTypeFamily::Bytes, MySqlType::Blob),
+        ("tinyblob", _) => (ColumnTypeFamily::Bytes, MySqlType::TinyBlob),
+        ("mediumblob", _) => (ColumnTypeFamily::Bytes, MySqlType::MediumBlob),
+        ("longblob", _) => (ColumnTypeFamily::Bytes, MySqlType::LongBlob),
+        //Fixme
+        ("set", _) => (ColumnTypeFamily::String, MySqlType::NotHandled),
         ("geometry", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
         ("point", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
         ("linestring", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
@@ -618,6 +651,31 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
     vals.split(',').map(|v| unquote_string(v)).collect()
+}
+
+fn extract_single_length_arg(full_data_type: &str) -> u32 {
+    let len = &full_data_type.len() - 1;
+
+    let a = full_data_type[..len].split('(').last().unwrap();
+    from_str::<u32>(a).unwrap()
+}
+
+fn extract_optional_length_arg(full_data_type: &str) -> Option<u32> {
+    let len = &full_data_type.len() - 1;
+
+    match full_data_type[..len].split('(').last() {
+        Some(v) => Some(from_str::<u32>(v).unwrap()),
+        None => None,
+    }
+}
+
+fn extract_double_length_arg(full_data_type: &str) -> (u32, u32) {
+    let len = &full_data_type.len() - 1;
+
+    let a = full_data_type[..len].split('(').last().unwrap();
+    let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
+
+    (a[0], a[1])
 }
 
 // See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html

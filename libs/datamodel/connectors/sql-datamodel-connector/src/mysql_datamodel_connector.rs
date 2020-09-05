@@ -135,7 +135,7 @@ impl Connector for MySqlDatamodelConnector {
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
             DECIMAL_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    MySqlType::Decimal(*first_arg as u8, *second_arg as u8)
+                    MySqlType::Decimal(*first_arg, *second_arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         DECIMAL_TYPE_NAME,
@@ -146,7 +146,7 @@ impl Connector for MySqlDatamodelConnector {
             }
             NUMERIC_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    MySqlType::Numeric(*first_arg as u8, *second_arg as u8)
+                    MySqlType::Numeric(*first_arg, *second_arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         NUMERIC_TYPE_NAME,
@@ -252,8 +252,8 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::TinyInt => (TINY_INT_TYPE_NAME, vec![]),
             MySqlType::MediumInt => (MEDIUM_INT_TYPE_NAME, vec![]),
             MySqlType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
-            MySqlType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x as u32, y as u32]),
-            MySqlType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x as u32, y as u32]),
+            MySqlType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x, y]),
+            MySqlType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x, y]),
             MySqlType::Float => (FLOAT_TYPE_NAME, vec![]),
             MySqlType::Double => (DOUBLE_TYPE_NAME, vec![]),
             MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x]),
