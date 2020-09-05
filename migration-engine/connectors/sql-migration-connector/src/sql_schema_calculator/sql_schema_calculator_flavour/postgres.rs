@@ -66,6 +66,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
+            native_type: native_type_instance.serialized_native_type.clone(),
         }
     }
 }

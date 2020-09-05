@@ -1,7 +1,7 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
-use native_types::{NativeType, PostgresType};
+use native_types::PostgresType;
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -262,8 +262,8 @@ impl Connector for PostgresDatamodelConnector {
         ))
     }
 
-    fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: PostgresType = serde_json::from_value(native_type.to_json()).unwrap();
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+        let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
             PostgresType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             PostgresType::Integer => (INTEGER_TYPE_NAME, vec![]),

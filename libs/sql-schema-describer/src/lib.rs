@@ -8,6 +8,7 @@ use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 use std::{fmt, str::FromStr};
 use thiserror::Error;
 use tracing::debug;
@@ -248,6 +249,8 @@ pub struct ColumnType {
     pub family: ColumnTypeFamily,
     /// The arity of the column.
     pub arity: ColumnArity,
+    /// The Native type of the column.
+    pub native_type: serde_json::Value,
 }
 
 impl ColumnType {
@@ -258,6 +261,7 @@ impl ColumnType {
             character_maximum_length: None,
             family,
             arity,
+            native_type: serde_json::Value::default(),
         }
     }
 }

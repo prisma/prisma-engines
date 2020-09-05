@@ -73,6 +73,8 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::Timestamp(None) => "TIMESTAMP".into(),
             MySqlType::Year => "YEAR".into(),
             MySqlType::JSON => "JSON".into(),
+            MySqlType::Enum => "ENUM".into(), //Fixme
+            MySqlType::NotHandled => panic!("An Unhandled Datatype should not reach this point. "),
         };
 
         sql::ColumnType {
@@ -85,6 +87,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
+            native_type: native_type_instance.serialized_native_type.clone(),
         }
     }
 }

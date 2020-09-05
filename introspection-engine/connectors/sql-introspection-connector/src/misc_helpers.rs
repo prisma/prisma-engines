@@ -4,7 +4,6 @@ use datamodel::{
     OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use datamodel_connector::Connector;
-use native_types::MySqlType;
 use quaint::connector::SqlFamily;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::{
@@ -123,11 +122,15 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &SqlFamily) -> ScalarField {
+pub(crate) fn calculate_scalar_field(
+    table: &Table,
+    column: &Column,
+    family: &SqlFamily,
+    native_types: bool,
+) -> ScalarField {
     debug!("Handling column {:?}", column);
-    let native_types_enabled = true;
 
-    let field_type = if native_types_enabled {
+    let field_type = if native_types {
         calculate_scalar_field_type_with_native_types(column, family)
     } else {
         calculate_scalar_field_type(column)
@@ -324,6 +327,20 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
 pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, family: &SqlFamily) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
 
+    let scalar_type = match &column.tpe.family {
+        ColumnTypeFamily::Boolean => ScalarType::Boolean,
+        ColumnTypeFamily::DateTime => ScalarType::DateTime,
+        ColumnTypeFamily::Float => ScalarType::Float,
+        ColumnTypeFamily::Int => ScalarType::Int,
+        ColumnTypeFamily::String => ScalarType::String,
+        ColumnTypeFamily::Uuid => ScalarType::String,
+        ColumnTypeFamily::Json => ScalarType::Json,
+        // ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
+        // x => FieldType::Unsupported(x.to_string()),
+        _ => ScalarType::Int,
+    };
+
+    //fixme move this out of function
     let connector: Box<dyn Connector> = match family {
         SqlFamily::Mysql => Box::new(SqlDatamodelConnectors::mysql()),
         SqlFamily::Postgres => Box::new(SqlDatamodelConnectors::postgres()),
@@ -333,13 +350,10 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
 
     println!("{:?}", column);
 
-    let native_type = match column.tpe.data_type.as_ref() {
-        "int" => MySqlType::Int,
-        x => MySqlType::Int,
-    };
-
-    let native_type_instance = connector.introspect_native_type(Box::new(native_type)).unwrap();
-    FieldType::NativeType(ScalarType::Int, native_type_instance)
+    let native_type_instance = connector
+        .introspect_native_type(column.tpe.native_type.clone())
+        .unwrap();
+    FieldType::NativeType(scalar_type, native_type_instance)
 }
 
 // misc

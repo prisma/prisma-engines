@@ -1,4 +1,5 @@
 use super::misc_helpers::*;
+use datamodel::configuration::preview_features::PreviewFeatures;
 use datamodel::Datamodel;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use quaint::{
@@ -70,7 +71,18 @@ impl TestApi {
 
     pub async fn re_introspect(&self, data_model_string: &str) -> String {
         let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
-        let introspection_result = self.introspection_connector.introspect(&data_model).await.unwrap();
+
+        let native_types = match datamodel::parse_configuration(data_model_string) {
+            Ok(config) => config.datasources.first().has_preview_feature("nativeTypes"),
+            Err(_) => false,
+        };
+
+        let introspection_result = self
+            .introspection_connector
+            .introspect(&data_model, native_types)
+            .await
+            .unwrap();
+        println!("{:?}", introspection_result.data_model);
         datamodel::render_datamodel_to_string(&introspection_result.data_model).expect("Datamodel rendering failed")
     }
 

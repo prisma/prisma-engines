@@ -1,4 +1,5 @@
 use super::*;
+use native_types::{MySqlType, NativeType};
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::{borrow::Cow, sync::Arc};
@@ -541,48 +542,55 @@ fn get_column_type_and_enum(
     character_maximum_length: Option<i64>,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
-    let family = match (data_type, full_data_type) {
-        ("int", _) => ColumnTypeFamily::Int,
-        ("smallint", _) => ColumnTypeFamily::Int,
-        ("tinyint", "tinyint(1)") => ColumnTypeFamily::Boolean,
-        ("tinyint", _) => ColumnTypeFamily::Int,
-        ("mediumint", _) => ColumnTypeFamily::Int,
-        ("bigint", _) => ColumnTypeFamily::Int,
-        ("decimal", _) => ColumnTypeFamily::Float,
-        ("numeric", _) => ColumnTypeFamily::Float,
-        ("float", _) => ColumnTypeFamily::Float,
-        ("double", _) => ColumnTypeFamily::Float,
-        ("bit", _) => ColumnTypeFamily::Int,
-        ("date", _) => ColumnTypeFamily::DateTime,
-        ("time", _) => ColumnTypeFamily::DateTime,
-        ("datetime", _) => ColumnTypeFamily::DateTime,
-        ("timestamp", _) => ColumnTypeFamily::DateTime,
-        ("year", _) => ColumnTypeFamily::Int,
-        ("char", _) => ColumnTypeFamily::String,
-        ("varchar", _) => ColumnTypeFamily::String,
-        ("text", _) => ColumnTypeFamily::String,
-        ("tinytext", _) => ColumnTypeFamily::String,
-        ("mediumtext", _) => ColumnTypeFamily::String,
-        ("longtext", _) => ColumnTypeFamily::String,
-        ("enum", _) => ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)),
-        // XXX: Is this correct?
-        ("set", _) => ColumnTypeFamily::String,
-        ("binary", _) => ColumnTypeFamily::Binary,
-        ("varbinary", _) => ColumnTypeFamily::Binary,
-        ("blob", _) => ColumnTypeFamily::Binary,
-        ("tinyblob", _) => ColumnTypeFamily::Binary,
-        ("mediumblob", _) => ColumnTypeFamily::Binary,
-        ("longblob", _) => ColumnTypeFamily::Binary,
-        ("geometry", _) => ColumnTypeFamily::Geometric,
-        ("point", _) => ColumnTypeFamily::Geometric,
-        ("linestring", _) => ColumnTypeFamily::Geometric,
-        ("polygon", _) => ColumnTypeFamily::Geometric,
-        ("multipoint", _) => ColumnTypeFamily::Geometric,
-        ("multilinestring", _) => ColumnTypeFamily::Geometric,
-        ("multipolygon", _) => ColumnTypeFamily::Geometric,
-        ("geometrycollection", _) => ColumnTypeFamily::Geometric,
-        ("json", _) => ColumnTypeFamily::Json,
-        (_, full_data_type) => ColumnTypeFamily::Unsupported(full_data_type.into()),
+    //Fixme family mappings, length args
+    // Decimal, Duration and XML are missing from ColumnTypefamily
+    let (family, native_type) = match (data_type, full_data_type) {
+        ("int", _) => (ColumnTypeFamily::Int, MySqlType::Int),
+        ("smallint", _) => (ColumnTypeFamily::Int, MySqlType::SmallInt),
+        ("tinyint", "tinyint(1)") => (ColumnTypeFamily::Boolean, MySqlType::TinyInt),
+        ("tinyint", _) => (ColumnTypeFamily::Int, MySqlType::TinyInt),
+        ("mediumint", _) => (ColumnTypeFamily::Int, MySqlType::MediumInt),
+        ("bigint", _) => (ColumnTypeFamily::Int, MySqlType::BigInt),
+        ("decimal", _) => (ColumnTypeFamily::Float, MySqlType::Decimal(0, 0)),
+        ("numeric", _) => (ColumnTypeFamily::Float, MySqlType::Numeric(0, 0)),
+        ("float", _) => (ColumnTypeFamily::Float, MySqlType::Float),
+        ("double", _) => (ColumnTypeFamily::Float, MySqlType::Double),
+        ("bit", _) => (ColumnTypeFamily::Int, MySqlType::Bit(0)),
+        ("date", _) => (ColumnTypeFamily::DateTime, MySqlType::Date),
+        ("time", _) => (ColumnTypeFamily::DateTime, MySqlType::Time(None)),
+        ("datetime", _) => (ColumnTypeFamily::DateTime, MySqlType::DateTime(None)),
+        ("timestamp", _) => (ColumnTypeFamily::DateTime, MySqlType::Timestamp(None)),
+        ("year", _) => (ColumnTypeFamily::Int, MySqlType::Year),
+        ("char", _) => (ColumnTypeFamily::String, MySqlType::Char(0)),
+        ("varchar", _) => (ColumnTypeFamily::String, MySqlType::VarChar(0)),
+        ("text", _) => (ColumnTypeFamily::String, MySqlType::Text),
+        ("tinytext", _) => (ColumnTypeFamily::String, MySqlType::TinyText),
+        ("mediumtext", _) => (ColumnTypeFamily::String, MySqlType::MediumText),
+        ("longtext", _) => (ColumnTypeFamily::String, MySqlType::LongText),
+        ("enum", _) => (
+            ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)),
+            MySqlType::Enum,
+        ),
+        ("json", _) => (ColumnTypeFamily::Json, MySqlType::JSON),
+        ("binary", _) => (ColumnTypeFamily::Binary, MySqlType::Binary(0)),
+        ("varbinary", _) => (ColumnTypeFamily::Binary, MySqlType::VarBinary(0)),
+        ("blob", _) => (ColumnTypeFamily::Binary, MySqlType::Blob),
+        ("tinyblob", _) => (ColumnTypeFamily::Binary, MySqlType::TinyBlob),
+        ("mediumblob", _) => (ColumnTypeFamily::Binary, MySqlType::MediumBlob),
+        ("longblob", _) => (ColumnTypeFamily::Binary, MySqlType::LongBlob),
+        ("set", _) => (ColumnTypeFamily::String, MySqlType::NotHandled), //????
+        ("geometry", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
+        ("point", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
+        ("linestring", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
+        ("polygon", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
+        ("multipoint", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
+        ("multilinestring", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
+        ("multipolygon", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
+        ("geometrycollection", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
+        (_, full_data_type) => (
+            ColumnTypeFamily::Unsupported(full_data_type.into()),
+            MySqlType::NotHandled,
+        ),
     };
 
     let tpe = ColumnType {
@@ -591,6 +599,7 @@ fn get_column_type_and_enum(
         character_maximum_length,
         family: family.clone(),
         arity,
+        native_type: native_type.to_json(),
     };
 
     match &family {

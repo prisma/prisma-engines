@@ -1,7 +1,7 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
-use native_types::{MySqlType, NativeType};
+use native_types::MySqlType;
 
 const INT_TYPE_NAME: &str = "Int";
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
@@ -31,6 +31,8 @@ const DATETIME_TYPE_NAME: &str = "Datetime";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const YEAR_TYPE_NAME: &str = "Year";
 const JSON_TYPE_NAME: &str = "JSON";
+const ENUM_TYPE_NAME: &str = "Enum";
+const NOT_HANDLED_TYPE_NAME: &str = "NotHandled";
 
 pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -242,8 +244,8 @@ impl Connector for MySqlDatamodelConnector {
         ))
     }
 
-    fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: MySqlType = serde_json::from_value(native_type.to_json()).unwrap();
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+        let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
             MySqlType::Int => (INT_TYPE_NAME, vec![]),
             MySqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
@@ -282,6 +284,8 @@ impl Connector for MySqlDatamodelConnector {
             },
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
+            MySqlType::Enum => (ENUM_TYPE_NAME, vec![]),
+            MySqlType::NotHandled => (NOT_HANDLED_TYPE_NAME, vec![]),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {

@@ -1,5 +1,6 @@
 //! Postgres description.
 use super::*;
+use native_types::{NativeType, PostgresType};
 use quaint::prelude::Queryable;
 use regex::Regex;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
@@ -675,6 +676,7 @@ fn get_column_type<'a>(
         character_maximum_length,
         family,
         arity,
+        native_type: PostgresType::Integer.to_json(),
     }
 }
 

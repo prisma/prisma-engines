@@ -3238,6 +3238,7 @@ dependencies = [
  "barrel",
  "chrono",
  "futures 0.3.5",
+ "native-types",
  "once_cell",
  "pretty_assertions",
  "prisma-value",

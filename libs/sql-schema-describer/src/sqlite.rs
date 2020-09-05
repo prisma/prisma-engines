@@ -1,5 +1,6 @@
 //! SQLite description.
 use super::*;
+use native_types::{MySqlType, NativeType};
 use quaint::{ast::Value, prelude::Queryable};
 use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
 use tracing::debug;
@@ -438,6 +439,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         character_maximum_length: None,
         family,
         arity,
+        native_type: MySqlType::Int.to_json(),
     }
 }
 
