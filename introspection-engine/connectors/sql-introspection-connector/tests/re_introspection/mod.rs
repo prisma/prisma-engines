@@ -898,6 +898,7 @@ async fn re_introspecting_virtual_cuid_default(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("non_id", types::varchar(30));
             });
 
             migration.create_table("User2", |t| {
@@ -913,6 +914,7 @@ async fn re_introspecting_virtual_cuid_default(api: &TestApi) {
     let input_dm = r#"
             model User {
                id        String    @id @default(cuid())
+               non_id    String    @default(cuid())
             }
             
             model User2 {
@@ -923,6 +925,7 @@ async fn re_introspecting_virtual_cuid_default(api: &TestApi) {
     let final_dm = r#"
             model User {
                id        String    @id @default(cuid())
+               non_id    String    @default(cuid())
             }
             
             model User2 {

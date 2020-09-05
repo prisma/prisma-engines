@@ -274,7 +274,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     if let Some(old_field) = old_model.find_scalar_field(&field.name) {
                         if field.default_value.is_none()
-                            && field.is_id
                             && field.field_type == FieldType::Base(ScalarType::String, None)
                         {
                             if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_cuid())) {
