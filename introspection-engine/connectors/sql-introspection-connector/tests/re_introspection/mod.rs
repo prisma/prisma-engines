@@ -852,14 +852,14 @@ async fn re_introspecting_multiple_changed_relation_names_due_to_mapped_models(a
                id               Int @id @default(autoincrement())
                user_id          Int  @unique
                user_id2         Int  @unique
-               custom_User      Custom_User @relation("OtherUserToPost_user_id", fields: [user_id], references: [id])
-               custom_User2     Custom_User @relation("OtherUserToPost_user_id2", fields: [user_id2], references: [id])
+               custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
+               custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
             }
 
             model Custom_User {
                id               Int @id @default(autoincrement())
-               custom_Post      Post? @relation("OtherUserToPost_user_id")
-               custom_Post2     Post? @relation("OtherUserToPost_user_id2")
+               custom_Post      Post? @relation("CustomRelationName")
+               custom_Post2     Post? @relation("AnotherCustomRelationName")
                
                @@map("User")
             }
@@ -870,14 +870,14 @@ async fn re_introspecting_multiple_changed_relation_names_due_to_mapped_models(a
                id               Int @id @default(autoincrement())
                user_id          Int  @unique
                user_id2         Int  @unique
-               custom_User      Custom_User @relation("Custom_UserToPost_user_id", fields: [user_id], references: [id])
-               custom_User2     Custom_User @relation("Custom_UserToPost_user_id2", fields: [user_id2], references: [id])
+               custom_User      Custom_User @relation("CustomRelationName", fields: [user_id], references: [id])
+               custom_User2     Custom_User @relation("AnotherCustomRelationName", fields: [user_id2], references: [id])
             }
 
             model Custom_User {
                id               Int @id @default(autoincrement())
-               custom_Post      Post? @relation("Custom_UserToPost_user_id")
-               custom_Post2     Post? @relation("Custom_UserToPost_user_id2")
+               custom_Post      Post? @relation("CustomRelationName")
+               custom_Post2     Post? @relation("AnotherCustomRelationName")
                
                @@map("User")
             }
