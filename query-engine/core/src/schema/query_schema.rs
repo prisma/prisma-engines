@@ -157,7 +157,7 @@ impl ObjectType {
 #[derive(Debug)]
 pub struct Field {
     pub name: String,
-    pub arguments: Vec<Argument>,
+    pub arguments: Vec<InputFieldRef>,
     pub field_type: OutputTypeRef,
     pub query_builder: Option<SchemaQueryBuilder>,
 }
@@ -262,14 +262,6 @@ pub struct GenericQueryBuilder {
     // WIP
 }
 
-#[derive(Debug)]
-pub struct Argument {
-    // todo arguments are pretty much input fields... 1:1
-    pub name: String,
-    pub argument_type: InputType,
-    pub default_value: Option<dml::DefaultValue>,
-}
-
 pub struct InputObjectType {
     pub name: String,
     pub constraints: InputObjectTypeConstraints,
@@ -371,6 +363,15 @@ impl InputField {
         self.is_nullable = true;
         self.field_types.push(InputType::null());
         self
+    }
+
+    /// Sets the field as nullable if the condition is true.
+    pub fn nullable_if(self, condition: bool) -> Self {
+        if condition {
+            self.nullable()
+        } else {
+            self
+        }
     }
 }
 

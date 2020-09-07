@@ -50,22 +50,10 @@ where
     })
 }
 
-/// Argument convenience wrapper function.
-pub fn argument<T>(name: T, arg_type: InputType, default_value: Option<dml::DefaultValue>) -> Argument
-where
-    T: Into<String>,
-{
-    Argument {
-        name: name.into(),
-        argument_type: arg_type,
-        default_value,
-    }
-}
-
 /// Field convenience wrapper function.
 pub fn field<T>(
     name: T,
-    arguments: Vec<Argument>,
+    arguments: Vec<InputFieldRef>,
     field_type: OutputType,
     query_builder: Option<SchemaQueryBuilder>,
 ) -> Field
@@ -87,8 +75,10 @@ where
 {
     InputField {
         name: name.into(),
-        field_type,
+        field_types: vec![field_type],
         default_value,
+        is_required: true,
+        is_nullable: false,
     }
 }
 

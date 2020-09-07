@@ -42,8 +42,9 @@ pub(crate) fn nested_delete_many_field(ctx: &mut BuilderContext, field: &Relatio
 /// Builds "updateMany" field for nested updates (on relation fields).
 pub(crate) fn nested_update_many_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     update_input_objects::nested_update_many_input_object(ctx, field).map(|input_object| {
-        let input_type = InputType::opt(InputType::null(InputType::list(InputType::object(input_object))));
-        input_field("updateMany", input_type, None)
+        input_field("updateMany", InputType::list(InputType::object(input_object)), None)
+            .optional()
+            .nullable()
     })
 }
 

@@ -90,25 +90,17 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
 }
 
 fn equality_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let input_field = input_field("equals", map_scalar_input_type(sf), None).optional();
-
-    let input_field = if sf.is_required {
-        input_field
-    } else {
-        input_field.nullable()
-    };
-
-    vec![input_field].into_iter()
+    vec![input_field("equals", map_scalar_input_type(sf), None)
+        .optional()
+        .nullable_if(!sf.is_required)]
+    .into_iter()
 }
 
 fn inclusion_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = if sf.is_required {
-        InputType::opt(InputType::list(map_required_input_type(sf)))
-    } else {
-        InputType::opt(InputType::null(InputType::list(map_required_input_type(sf))))
-    };
-
-    vec![input_field("in", mapped_type.clone(), None)].into_iter()
+    vec![input_field("in", InputType::list(map_scalar_input_type(sf)), None)
+        .optional()
+        .nullable_if(!sf.is_required)]
+    .into_iter()
 }
 
 fn alphanumeric_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {

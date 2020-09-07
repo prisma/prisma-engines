@@ -10,21 +10,9 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
 
     let weak_ref = Arc::downgrade(&input_object);
     let mut input_fields = vec![
-        input_field(
-            "AND",
-            InputType::opt(InputType::list(InputType::object(weak_ref.clone()))),
-            None,
-        ),
-        input_field(
-            "OR",
-            InputType::opt(InputType::list(InputType::object(weak_ref.clone()))),
-            None,
-        ),
-        input_field(
-            "NOT",
-            InputType::opt(InputType::list(InputType::object(weak_ref.clone()))),
-            None,
-        ),
+        input_field("AND", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
+        input_field("OR", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
+        input_field("NOT", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
     ];
 
     input_fields.extend(model.fields().all.iter().filter_map(|f| match f {
@@ -46,21 +34,9 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
 
     let weak_ref = Arc::downgrade(&input_object);
     let mut fields = vec![
-        input_field(
-            "AND",
-            InputType::opt(InputType::list(InputType::object(weak_ref.clone()))),
-            None,
-        ),
-        input_field(
-            "OR",
-            InputType::opt(InputType::list(InputType::object(weak_ref.clone()))),
-            None,
-        ),
-        input_field(
-            "NOT",
-            InputType::opt(InputType::list(InputType::object(weak_ref.clone()))),
-            None,
-        ),
+        input_field("AND", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
+        input_field("OR", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
+        input_field("NOT", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
     ];
 
     fields.extend(
@@ -91,9 +67,9 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
         .into_iter()
         .map(|sf| {
             let name = sf.name.clone();
-            let typ = map_optional_input_type(&sf);
+            let typ = map_scalar_input_type(&sf);
 
-            input_field(name, typ, None)
+            input_field(name, typ, None).optional()
         })
         .collect();
 
@@ -105,7 +81,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
             let typ = compound_field_unique_object_type(ctx, index.name.as_ref(), index.fields());
             let name = compound_index_field_name(index);
 
-            input_field(name, InputType::opt(InputType::object(typ)), None)
+            input_field(name, InputType::object(typ), None).optional()
         })
         .collect();
 
@@ -116,7 +92,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
             let name = compound_id_field_name(&fields.iter().map(|f| f.name.as_ref()).collect::<Vec<&str>>());
             let typ = compound_field_unique_object_type(ctx, None, fields);
 
-            input_field(name, InputType::opt(InputType::object(typ)), None)
+            input_field(name, InputType::object(typ), None).optional()
         })
     } else {
         None
@@ -146,7 +122,7 @@ fn compound_field_unique_object_type(
         .into_iter()
         .map(|field| {
             let name = field.name.clone();
-            let typ = map_required_input_type(&field);
+            let typ = map_scalar_input_type(&field);
 
             input_field(name, typ, None)
         })
