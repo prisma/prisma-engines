@@ -114,6 +114,27 @@ model Author {
 }
 
 #[test]
+fn test_parser_renderer_order_of_directives_via_ast() {
+    let input = r#"model Post {
+  id        Int      @id @default(autoincrement())
+  content   String?
+  published Boolean  @default(false) @map("_published")
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  id    Int    @default(autoincrement()) @id
+  email String @unique
+  name  String
+  posts Post[]
+}
+"#;
+
+    assert_rendered(input, input);
+}
+
+#[test]
 fn test_parser_renderer_native_types_via_ast() {
     let input = r#"datasource pg {
   provider        = "postgresql"
@@ -205,6 +226,7 @@ model Author {
 
 fn assert_rendered(input: &str, expected: &str) {
     let ast = parse_to_ast(&input).expect("failed to parse");
+    println!("{:?}", ast);
     let rendered = render_schema_ast_to_string(&ast);
     assert_eq!(rendered, expected);
 }
