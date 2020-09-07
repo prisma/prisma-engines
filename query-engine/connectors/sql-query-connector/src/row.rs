@@ -2,7 +2,7 @@ use crate::error::SqlError;
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{AggregationResult, Aggregator};
 use datamodel::FieldArity;
-use prisma_models::{PrismaValue, Record, ScalarFieldRef, TypeIdentifier};
+use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use quaint::{
     ast::{Expression, Value},
     connector::ResultRow,
