@@ -70,7 +70,6 @@ pub(crate) fn create_input_type(
         scalar_fields,
         |_, f: ScalarFieldRef| {
             if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) {
-                //todo shouldnt these also be Default Value expressions at some point?
                 map_optional_input_type(&f)
             } else if f.is_required && f.default_value.is_none() {
                 map_required_input_type(&f)
@@ -91,7 +90,6 @@ pub(crate) fn create_input_type(
 }
 
 /// For create input types only. Compute input fields for relational fields.
-/// This recurses into create_input_type (via nested_create_input_field).
 fn relation_input_fields_for_create(
     ctx: &mut BuilderContext,
     model: &ModelRef,
@@ -137,14 +135,13 @@ fn relation_input_fields_for_create(
                     .scalar_fields()
                     .all(|scalar_field| scalar_field.default_value.is_some());
 
-                let input_type = InputType::object(input_object);
-                let input_field = if rf.is_required && !all_required_scalar_fields_have_defaults {
-                    input_field(rf.name.clone(), input_type, None)
-                } else {
-                    input_field(rf.name.clone(), InputType::opt(input_type), None)
-                };
+                let input_field = input_field(rf.name.clone(), InputType::object(input_object), None);
 
-                Some(input_field)
+                if rf.is_required && !all_required_scalar_fields_have_defaults {
+                    Some(input_field)
+                } else {
+                    Some(input_field.optional())
+                }
             }
         })
         .collect()

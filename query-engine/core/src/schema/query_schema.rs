@@ -345,16 +345,33 @@ impl InputObjectType {
 #[derive(Debug)]
 pub struct InputField {
     pub name: String,
-    pub field_type: InputType,
     pub default_value: Option<dml::DefaultValue>,
 
-    /// Indicates whether or not the presence of the field in the higher input objects
-    /// is required or not, but doesn't make any assumption about if the input can be null.
+    /// Possible field types, represented as a union of input types, but only one can be provided at any time.
+    pub field_types: Vec<InputType>,
+
+    /// Indicates if the presence of the field on the higher input objects
+    /// is required, but doesn't state whether or not the input can be null.
     pub is_required: bool,
 
     /// A nullable field can be a given input can be null.
     /// This makes no assumption about if an input needs to be provided or not.
-    pub is_nullable: bool,
+    pub is_nullable: bool, // Note: Kepts around for legacy reasons, ScalarType::Null replaced this.
+}
+
+impl InputField {
+    /// Sets the field as optional (not required to be present on the input).
+    pub fn optional(self) -> Self {
+        self.is_required = false;
+        self
+    }
+
+    /// Sets the field as nullable (accepting null inputs).
+    pub fn nullable(self) -> Self {
+        self.is_nullable = true;
+        self.field_types.push(InputType::null());
+        self
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -363,9 +380,6 @@ pub enum InputType {
     Enum(EnumTypeRef),
     List(Box<InputType>),
     Object(InputObjectTypeWeakRef),
-
-    /// A union of input types, each one valid for the given input (but only one can be provided at any time).
-    Union(Vec<InputType>),
 }
 
 impl From<&InputType> for TypeHint {
@@ -375,7 +389,6 @@ impl From<&InputType> for TypeHint {
             InputType::Enum(_) => TypeHint::Enum,
             InputType::List(_) => TypeHint::Array,
             InputType::Object(_) => TypeHint::Unknown,
-            InputType::Union(_) => TypeHint::Unknown,
         }
     }
 }
@@ -383,10 +396,6 @@ impl From<&InputType> for TypeHint {
 impl InputType {
     pub fn list(containing: InputType) -> InputType {
         InputType::List(Box::new(containing))
-    }
-
-    pub fn union(containing: Vec<InputType>) -> InputType {
-        InputType::Union(containing)
     }
 
     pub fn object(containing: InputObjectTypeWeakRef) -> InputType {
@@ -423,6 +432,14 @@ impl InputType {
 
     pub fn uuid() -> InputType {
         InputType::Scalar(ScalarType::UUID)
+    }
+
+    pub fn null() -> InputType {
+        InputType::Scalar(ScalarType::Null)
+    }
+
+    pub fn enum_type(containing: EnumTypeRef) -> InputType {
+        InputType::Enum(containing)
     }
 }
 
@@ -507,6 +524,7 @@ impl OutputType {
 
 #[derive(Debug, Clone)]
 pub enum ScalarType {
+    Null,
     String,
     Int,
     Float,
@@ -521,6 +539,7 @@ pub enum ScalarType {
 impl From<&ScalarType> for TypeHint {
     fn from(t: &ScalarType) -> Self {
         match t {
+            ScalarType::Null => TypeHint::Unknown, // [DTODO] Note for MSSQL and Julius: Collecting typehints this far up isn't feasible anymore.
             ScalarType::String => TypeHint::String,
             ScalarType::Int => TypeHint::Int,
             ScalarType::Float => TypeHint::Float,

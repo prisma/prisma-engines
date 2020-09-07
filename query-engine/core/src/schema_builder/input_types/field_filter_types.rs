@@ -23,22 +23,18 @@ fn relation_filter_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
 
     let fields = if rf.is_list {
         vec![
-            input_field("every", wrap_opt_input_object(related_input_type.clone()), None),
-            input_field("some", wrap_opt_input_object(related_input_type.clone()), None),
-            input_field("none", wrap_opt_input_object(related_input_type.clone()), None),
+            input_field("every", InputType::object(related_input_type.clone()), None).optional(),
+            input_field("some", InputType::object(related_input_type.clone()), None).optional(),
+            input_field("none", InputType::object(related_input_type.clone()), None).optional(),
         ]
     } else {
         vec![
-            input_field(
-                "is",
-                InputType::opt(InputType::null(InputType::object(related_input_type.clone()))),
-                None,
-            ),
-            input_field(
-                "isNot",
-                InputType::opt(InputType::null(InputType::object(related_input_type))),
-                None,
-            ),
+            input_field("is", InputType::object(related_input_type.clone()), None)
+                .optional()
+                .nullable(),
+            input_field("isNot", InputType::object(related_input_type), None)
+                .optional()
+                .nullable(),
         ]
     };
 
@@ -83,20 +79,26 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
     };
 
-    fields.push(input_field(
-        "not",
-        InputType::opt(InputType::null(InputType::object(scalar_filter_type(ctx, sf, true)))),
-        None,
-    ));
+    fields.push(
+        input_field("not", InputType::object(scalar_filter_type(ctx, sf, true)), None)
+            .optional()
+            .nullable(),
+    );
 
     object.set_fields(fields);
     Arc::downgrade(&object)
 }
 
 fn equality_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = map_optional_input_type(sf);
+    let input_field = input_field("equals", map_scalar_input_type(sf), None).optional();
 
-    vec![input_field("equals", mapped_type.clone(), None)].into_iter()
+    let input_field = if sf.is_required {
+        input_field
+    } else {
+        input_field.nullable()
+    };
+
+    vec![input_field].into_iter()
 }
 
 fn inclusion_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
@@ -110,24 +112,24 @@ fn inclusion_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
 }
 
 fn alphanumeric_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = map_optional_input_type(sf);
+    let mapped_type = map_scalar_input_type(sf);
 
     vec![
-        input_field("lt", mapped_type.clone(), None),
-        input_field("lte", mapped_type.clone(), None),
-        input_field("gt", mapped_type.clone(), None),
-        input_field("gte", mapped_type.clone(), None),
+        input_field("lt", mapped_type.clone(), None).optional(),
+        input_field("lte", mapped_type.clone(), None).optional(),
+        input_field("gt", mapped_type.clone(), None).optional(),
+        input_field("gte", mapped_type.clone(), None).optional(),
     ]
     .into_iter()
 }
 
 fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = map_optional_input_type(sf);
+    let mapped_type = map_scalar_input_type(sf);
 
     vec![
-        input_field("contains", mapped_type.clone(), None),
-        input_field("startsWith", mapped_type.clone(), None),
-        input_field("endsWith", mapped_type.clone(), None),
+        input_field("contains", mapped_type.clone(), None).optional(),
+        input_field("startsWith", mapped_type.clone(), None).optional(),
+        input_field("endsWith", mapped_type.clone(), None).optional(),
     ]
     .into_iter()
 }
@@ -146,9 +148,10 @@ fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = 
 
         let field = input_field(
             "mode",
-            InputType::Opt(Box::new(InputType::Enum(enum_type))),
+            InputType::enum_type(enum_type),
             Some(DefaultValue::Single(PrismaValue::Enum("default".to_owned()))),
-        );
+        )
+        .optional();
 
         vec![field]
     } else {
