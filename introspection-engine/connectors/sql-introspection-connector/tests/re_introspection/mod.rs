@@ -1042,3 +1042,102 @@ async fn re_introspecting_updated_at(api: &TestApi) {
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_multiple_many_to_many_on_same_model(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("_PostToUser", |t| {
+                t.inject_custom(
+                    "A INTEGER NOT NULL REFERENCES  \"Post\"(\"id\") ON DELETE CASCADE,
+                    B INTEGER NOT NULL REFERENCES  \"User\"(\"id\") ON DELETE CASCADE",
+                )
+            });
+            migration.create_table("_PostToUser2", |t| {
+                t.inject_custom(
+                    "A INTEGER NOT NULL REFERENCES  \"Post\"(\"id\") ON DELETE CASCADE,
+                    B INTEGER NOT NULL REFERENCES  \"User\"(\"id\") ON DELETE CASCADE",
+                )
+            });
+        })
+        .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX test ON \"{}\".\"_PostToUser\" (\"a\", \"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX test2 ON \"{}\".\"_PostToUser2\" (\"a\", \"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE INDEX test3 ON \"{}\".\"_PostToUser\" (\"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE INDEX test4 ON \"{}\".\"_PostToUser2\" (\"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    let input_dm = r#"
+                    model Post {
+                      id   Int      @default(autoincrement()) @id
+                      User User[]   @relation("Name")
+                      User2 User[]
+                    }
+                    
+                    model User {
+                      id   Int      @default(autoincrement()) @id
+                      Post Post[]   @relation("Name")
+                      Post2 Post[]
+                    }
+                    "#;
+
+    let final_dm = r#"
+              model Post {
+                      id   Int      @default(autoincrement()) @id
+                      User User[]   @relation("Name")
+                      User2 User[]
+              }
+            
+              model User {
+                      id   Int      @default(autoincrement()) @id
+                      Post Post[]   @relation("Name")
+                      Post2 Post[]
+              }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}
