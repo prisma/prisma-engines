@@ -118,7 +118,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
                         if relation_info_partial_eq
                             && (!many_to_many || old_field.relation_info.name == field.relation_info.name)
-
                         {
                             let mf = ModelAndField::new(&model.name, &field.name);
                             changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
@@ -158,7 +157,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                         let many_to_many = old_field.is_list() && old_related_field.is_list();
 
                         if relation_info_partial_eq && !many_to_many {
-
                             let mf = ModelAndField::new(&model.name, &field.name);
                             let other_mf = ModelAndField::new(&field.relation_info.to, &related_field.name);
                             changed_relation_names.push((mf, old_field.relation_info.name.clone()));
