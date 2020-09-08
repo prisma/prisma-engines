@@ -66,10 +66,6 @@ impl<'a> ColumnWalker<'a> {
         self.column.auto_increment
     }
 
-    pub fn is_required(&self) -> bool {
-        self.column.is_required()
-    }
-
     pub fn is_same_column(&self, other: &ColumnWalker<'_>) -> bool {
         self.name() == other.name() && self.table().name() == other.table().name()
     }

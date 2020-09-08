@@ -99,7 +99,7 @@ impl<'a> ColumnDiffer<'a> {
             (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::NOW)) => false,
             (Some(DefaultValue::DBGENERATED(_)), None) => false,
 
-            (Some(DefaultValue::SEQUENCE(_)), None) => false,
+            (Some(DefaultValue::SEQUENCE(_)), None) => true, // sequences are dropped separately
             (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::VALUE(_))) => false,
             (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::NOW)) => false,
 

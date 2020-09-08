@@ -21,7 +21,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             MysqlAlterColumn::Modify { .. } => {
                 // Column went from optional to required. This is unexecutable unless the table is
                 // empty or the column has no existing NULLs.
-                if columns.all_changes().arity_changed() && columns.next.column.tpe.arity.is_required() {
+                if columns.all_changes().arity_changed() && columns.next.arity().is_required() {
                     plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
                         column: columns.previous.name().to_owned(),
                         table: columns.previous.table().name().to_owned(),

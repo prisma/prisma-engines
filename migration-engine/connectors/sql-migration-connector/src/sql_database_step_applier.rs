@@ -135,9 +135,7 @@ fn render_raw_sql(
         SqlMigrationStep::DropForeignKey(drop_foreign_key) => {
             Ok(vec![renderer.render_drop_foreign_key(drop_foreign_key)])
         }
-        SqlMigrationStep::AlterTable(alter_table) => {
-            Ok(renderer.render_alter_table(alter_table, database_info, &differ))
-        }
+        SqlMigrationStep::AlterTable(alter_table) => Ok(renderer.render_alter_table(alter_table, &differ)),
         SqlMigrationStep::CreateIndex(create_index) => Ok(vec![renderer.render_create_index(create_index)]),
         SqlMigrationStep::DropIndex(drop_index) => Ok(vec![renderer.render_drop_index(drop_index)]),
         SqlMigrationStep::AlterIndex(alter_index) => {
