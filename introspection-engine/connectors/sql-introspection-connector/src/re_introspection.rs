@@ -112,8 +112,12 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
-                        if &old_field.relation_info == &field.relation_info
-                            && old_related_field.relation_info == related_field.relation_info
+                        let relation_info_partial_eq = &old_field.relation_info == &field.relation_info
+                            && old_related_field.relation_info == related_field.relation_info;
+                        let many_to_many = old_field.is_list() && old_related_field.is_list();
+
+                        if relation_info_partial_eq
+                            && (!many_to_many || old_field.relation_info.name == field.relation_info.name)
                         {
                             let mf = ModelAndField::new(&model.name, &field.name);
                             changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
@@ -133,7 +137,10 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
     }
 
-    //always keep old virtual relation names
+    //keep old virtual relation names on non M:N relations
+    // M:N relations cannot be uniquely identified without ignoring the relationname and their relationnames cant
+    // be changed without necessitation db changes since RelationName -> Join table name
+
     let mut changed_relation_names = vec![];
     {
         for model in new_data_model.models() {
@@ -145,9 +152,11 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
-                        if &old_field.relation_info == &field.relation_info
-                            && old_related_field.relation_info == related_field.relation_info
-                        {
+                        let relation_info_partial_eq = &old_field.relation_info == &field.relation_info
+                            && old_related_field.relation_info == related_field.relation_info;
+                        let many_to_many = old_field.is_list() && old_related_field.is_list();
+
+                        if relation_info_partial_eq && !many_to_many {
                             let mf = ModelAndField::new(&model.name, &field.name);
                             let other_mf = ModelAndField::new(&field.relation_info.to, &related_field.name);
                             changed_relation_names.push((mf, old_field.relation_info.name.clone()));

@@ -1045,3 +1045,103 @@ async fn re_introspecting_updated_at(api: &TestApi) {
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_multiple_many_to_many_on_same_model(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("A", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("B", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("_AToB", |t| {
+                t.inject_custom(
+                    "A INTEGER NOT NULL REFERENCES  \"A\"(\"id\") ON DELETE CASCADE,
+                    B INTEGER NOT NULL REFERENCES  \"B\"(\"id\") ON DELETE CASCADE",
+                )
+            });
+            migration.create_table("_AToB2", |t| {
+                t.inject_custom(
+                    "A INTEGER NOT NULL REFERENCES  \"A\"(\"id\") ON DELETE CASCADE,
+                    B INTEGER NOT NULL REFERENCES  \"B\"(\"id\") ON DELETE CASCADE",
+                )
+            });
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX test ON \"{}\".\"_AToB\" (\"a\", \"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX test2 ON \"{}\".\"_AToB2\" (\"a\", \"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!("CREATE INDEX test3 ON \"{}\".\"_AToB\" (\"b\");", api.schema_name()),
+            &[],
+        )
+        .await
+        .unwrap();
+    api.database()
+        .execute_raw(
+            &format!("CREATE INDEX test4 ON \"{}\".\"_AToB2\" (\"b\");", api.schema_name()),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    let input_dm = r#"
+              model B {
+                id              Int @default(autoincrement()) @id
+                custom_A        A[]
+                special_A       A[] @relation("AToB2")
+              }
+                    
+              model A {
+                id              Int @default(autoincrement()) @id
+                custom_B        B[]
+                special_B       B[] @relation("AToB2")
+              }
+                    "#;
+
+    let final_dm = r#"
+              model B {
+                id              Int @default(autoincrement()) @id
+                custom_A        A[]
+                special_A       A[] @relation("AToB2")
+              }
+                    
+              model A {
+                id              Int @default(autoincrement()) @id
+                custom_B        B[]
+                special_B       B[] @relation("AToB2")
+              }
+                          
+              model Unrelated {
+                id Int @default(autoincrement()) @id
+              }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}
