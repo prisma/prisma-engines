@@ -1,16 +1,12 @@
 use crate::misc_helpers::replace_field_names;
 use crate::warnings::*;
-use datamodel::{common::RelationNames, Datamodel, DefaultValue, FieldType, ScalarType, ValueGenerator};
+use datamodel::{Datamodel, DefaultValue, FieldType, ScalarType, ValueGenerator};
 use introspection_connector::Warning;
 use prisma_value::PrismaValue;
 use std::cmp::Ordering;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
-    // Notes
-    // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
-    // investigate keeping of old manual custom relation names
-
     let mut warnings = vec![];
 
     //@@map on models
@@ -104,21 +100,23 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
     }
 
-    //virtual relationfield names
+    //always keep old virtual relationfield names
     let mut changed_relation_field_names = vec![];
     {
         for model in new_data_model.models() {
             for field in model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     for old_field in old_model.relation_fields() {
+                        let related_field = &new_data_model.find_related_field_bang(&field);
+                        let old_related_field = &old_data_model.find_related_field_bang(&old_field);
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
+
                         if &old_field.relation_info == &field.relation_info
-                            && &old_data_model.find_related_field_bang(&old_field).relation_info
-                                == &new_data_model.find_related_field_bang(&field).relation_info
+                            && old_related_field.relation_info == related_field.relation_info
                         {
                             let mf = ModelAndField::new(&model.name, &field.name);
-                            changed_relation_field_names.push((mf, old_field.name.clone()));
+                            changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
                         }
                     }
                 }
@@ -135,61 +133,36 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
     }
 
-    // update relation names (needs all fields and models to already be updated)
-    // todo this only updates relation names where the name of a model changed.
-    // the change of a field name would here not be reflected yet, but these would have been rendered already
+    //always keep old virtual relation names
+    let mut changed_relation_names = vec![];
     {
-        let mut relation_fields_to_change = vec![];
-        for changed_model_name in &changed_model_names {
-            let changed_model = new_data_model.find_model(&changed_model_name.1.model).unwrap();
+        for model in new_data_model.models() {
+            for field in model.relation_fields() {
+                if let Some(old_model) = old_data_model.find_model(&model.name) {
+                    for old_field in old_model.relation_fields() {
+                        let related_field = &new_data_model.find_related_field_bang(&field);
+                        let old_related_field = &old_data_model.find_related_field_bang(&old_field);
+                        //the relationinfos of both sides need to be compared since the relationinfo of the
+                        // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
-            for rf in changed_model.relation_fields() {
-                let info = &rf.relation_info;
-                let other_model_in_relation = new_data_model.find_model(&info.to).unwrap();
-                let number_of_relations_to_other_model_in_relation = changed_model
-                    .relation_fields()
-                    .filter(|f| f.points_to_model(&info.to))
-                    .count();
-
-                let other_relation_field = new_data_model.find_related_field_bang(&rf);
-                let other_info = &other_relation_field.relation_info;
-
-                let (model_with_fk, referenced_model, fk_column_name) = if info.to_fields.is_empty() {
-                    // does not hold the fk
-                    (
-                        &other_model_in_relation.name,
-                        &changed_model.name,
-                        other_info.fields.join("_"),
-                    )
-                } else {
-                    // holds the fk
-                    (
-                        &changed_model.name,
-                        &other_model_in_relation.name,
-                        info.fields.join("_"),
-                    )
-                };
-
-                let unambiguous = number_of_relations_to_other_model_in_relation < 2;
-                let relation_name = if unambiguous {
-                    RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
-                } else {
-                    RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
-                };
-
-                relation_fields_to_change.push((changed_model.name.clone(), rf.name.clone(), relation_name.clone()));
-                relation_fields_to_change.push((
-                    other_model_in_relation.name.clone(),
-                    other_relation_field.name.clone(),
-                    relation_name.clone(),
-                ));
+                        if &old_field.relation_info == &field.relation_info
+                            && old_related_field.relation_info == related_field.relation_info
+                        {
+                            let mf = ModelAndField::new(&model.name, &field.name);
+                            let other_mf = ModelAndField::new(&field.relation_info.to, &related_field.name);
+                            changed_relation_names.push((mf, old_field.relation_info.name.clone()));
+                            changed_relation_names.push((other_mf, old_field.relation_info.name.clone()))
+                        }
+                    }
+                }
             }
         }
 
-        // change usages in @@id, @@index, @@unique and on RelationInfo.fields
-        for changed_relation_field in &relation_fields_to_change {
-            let field = new_data_model.find_relation_field_mut(&changed_relation_field.0, &changed_relation_field.1);
-            field.relation_info.name = changed_relation_field.2.clone();
+        for changed_relation_name in changed_relation_names {
+            new_data_model
+                .find_relation_field_mut(&changed_relation_name.0.model, &changed_relation_name.0.field)
+                .relation_info
+                .name = changed_relation_name.1;
         }
     }
 
@@ -274,7 +247,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     if let Some(old_field) = old_model.find_scalar_field(&field.name) {
                         if field.default_value.is_none()
-                            && field.is_id
                             && field.field_type == FieldType::Base(ScalarType::String, None)
                         {
                             if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_cuid())) {
