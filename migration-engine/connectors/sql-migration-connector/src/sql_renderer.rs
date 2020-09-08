@@ -8,12 +8,10 @@ pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 use crate::{
     database_info::DatabaseInfo,
     sql_migration::{
-        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
-        DropEnum, DropForeignKey, DropIndex, TableChange,
+        AddForeignKey, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
     },
-    sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
+    sql_schema_differ::SqlSchemaDiffer,
 };
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::*;
 use std::{borrow::Cow, fmt::Write as _};
@@ -58,12 +56,6 @@ pub(crate) trait SqlRenderer {
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
 
-    /// Attempt to render a database-specific ALTER COLUMN based on the
-    /// passed-in differ. `None` means that we could not generate a good (set
-    /// of) ALTER COLUMN(s), and we should fall back to dropping and recreating
-    /// the column.
-    fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn>;
-
     /// Render an `AlterIndex` step.
     fn render_alter_index(
         &self,
@@ -72,103 +64,7 @@ pub(crate) trait SqlRenderer {
         current_schema: &SqlSchema,
     ) -> anyhow::Result<Vec<String>>;
 
-    fn render_alter_table(
-        &self,
-        alter_table: &AlterTable,
-        database_info: &DatabaseInfo,
-        differ: &SqlSchemaDiffer<'_>,
-    ) -> Vec<String> {
-        let AlterTable { table, changes } = alter_table;
-
-        let mut lines = Vec::new();
-        let mut before_statements = Vec::new();
-        let mut after_statements = Vec::new();
-
-        for change in changes {
-            match change {
-                TableChange::DropPrimaryKey { constraint_name } => match database_info.sql_family() {
-                    SqlFamily::Mysql => lines.push("DROP PRIMARY KEY".to_owned()),
-                    SqlFamily::Postgres => lines.push(format!(
-                        "DROP CONSTRAINT {}",
-                        Quoted::postgres_ident(
-                            constraint_name
-                                .as_ref()
-                                .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
-                        )
-                    )),
-                    _ => (),
-                },
-                TableChange::AddPrimaryKey { columns } => lines.push(format!(
-                    "ADD PRIMARY KEY ({})",
-                    columns.iter().map(|colname| self.quote(colname)).join(", ")
-                )),
-                TableChange::AddColumn(AddColumn { column }) => {
-                    let column = ColumnWalker {
-                        table,
-                        schema: differ.next,
-                        column,
-                    };
-                    let col_sql = self.render_column(column);
-                    lines.push(format!("ADD COLUMN {}", col_sql));
-                }
-                TableChange::DropColumn(DropColumn { name }) => {
-                    let name = self.quote(&name);
-                    lines.push(format!("DROP COLUMN {}", name));
-                }
-                TableChange::AlterColumn(AlterColumn { name, column: _ }) => {
-                    let column = differ
-                        .diff_table(&table.name)
-                        .expect("AlterTable on unknown table.")
-                        .diff_column(name)
-                        .expect("AlterColumn on unknown column.");
-                    match self.render_alter_column(&column) {
-                        Some(RenderedAlterColumn {
-                            alter_columns,
-                            before,
-                            after,
-                        }) => {
-                            for statement in alter_columns {
-                                lines.push(statement);
-                            }
-
-                            if let Some(before) = before {
-                                before_statements.push(before);
-                            }
-
-                            if let Some(after) = after {
-                                after_statements.push(after);
-                            }
-                        }
-                        None => {
-                            let name = self.quote(&name);
-                            lines.push(format!("DROP COLUMN {}", name));
-
-                            let col_sql = self.render_column(column.next);
-                            lines.push(format!("ADD COLUMN {}", col_sql));
-                        }
-                    }
-                }
-            };
-        }
-
-        if lines.is_empty() {
-            return Vec::new();
-        }
-
-        let alter_table = format!(
-            "ALTER TABLE {} {}",
-            self.quote_with_schema(&table.name),
-            lines.join(",\n")
-        );
-
-        let statements = before_statements
-            .into_iter()
-            .chain(std::iter::once(alter_table))
-            .chain(after_statements.into_iter())
-            .collect();
-
-        statements
-    }
+    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String>;
 
     /// Render a `CreateEnum` step.
     fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String>;
@@ -197,14 +93,4 @@ pub(crate) trait SqlRenderer {
     fn render_redefine_tables(&self, tables: &[String], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;
-}
-
-#[derive(Default)]
-pub(crate) struct RenderedAlterColumn {
-    /// The statements that will be included in the ALTER TABLE
-    pub(crate) alter_columns: Vec<String>,
-    /// The statements to be run before the ALTER TABLE.
-    pub(crate) before: Option<String>,
-    /// The statements to be run after the ALTER TABLE.
-    pub(crate) after: Option<String>,
 }

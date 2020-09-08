@@ -63,7 +63,7 @@ impl SqlDestructiveChangeChecker<'_> {
     /// - The new column is required
     /// - There is no default value for the new column
     fn check_add_column(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan) {
-        let column_is_required_without_default = column.is_required() && column.default().is_none();
+        let column_is_required_without_default = column.arity().is_required() && column.default().is_none();
 
         // Optional columns and columns with a default can safely be added.
         if !column_is_required_without_default {
