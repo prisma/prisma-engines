@@ -109,14 +109,14 @@ impl QueryDocumentParser {
         schema_field
             .arguments
             .iter()
-            .filter_map(|schema_arg| {
+            .filter_map(|schema_input| {
                 // Match schema field to a field in the incoming document
                 let selection_arg: Option<(String, QueryValue)> = given_arguments
                     .iter()
                     .find(|given_argument| given_argument.0 == schema_arg.name)
                     .cloned();
 
-                let arg_type = &schema_arg.argument_type;
+                let arg_type = &schema_input.argument_type;
 
                 // If optional and not present ignore the field, else commence regular parsing.
                 let parsed = match (selection_arg, arg_type) {
@@ -143,54 +143,62 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates a QueryValue against an InputType, recursively.
-    #[rustfmt::skip]
     pub fn parse_input_value(value: QueryValue, input_type: &InputType) -> QueryParserResult<ParsedInputValue> {
         // todo figure out what is up with enums
         match (&value, input_type) {
             // Handle optional inputs
-            (_, InputType::Opt(ref inner))                  => Self::parse_input_value(value, inner),
+            (_, InputType::Opt(ref inner)) => Self::parse_input_value(value, inner),
 
             // Handle null inputs
-            (QueryValue::Null, InputType::Null(inner))          => Ok(ParsedInputValue::Single(PrismaValue::null(&**inner))),
-            (_, InputType::Null(ref inner))                 => Self::parse_input_value(value, inner),
+            (QueryValue::Null, InputType::Null(inner)) => Ok(ParsedInputValue::Single(PrismaValue::null(&**inner))),
+            (_, InputType::Null(ref inner)) => Self::parse_input_value(value, inner),
 
             // The optional handling above guarantees that if we hit a Null here, a required value is missing.
-            (QueryValue::Null, _)                           => Err(QueryParserError::RequiredValueNotSetError),
+            (QueryValue::Null, _) => Err(QueryParserError::RequiredValueNotSetError),
 
             // Scalar and enum handling.
-            (_, InputType::Scalar(scalar))                  => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
-            (QueryValue::Enum(_), InputType::Enum(et))      => Self::parse_enum(value, et),
-            (QueryValue::String(_), InputType::Enum(et))    => Self::parse_enum(value, et),
-            (QueryValue::Boolean(_), InputType::Enum(et))   => Self::parse_enum(value, et),
+            (_, InputType::Scalar(scalar)) => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
+            (QueryValue::Enum(_), InputType::Enum(et)) => Self::parse_enum(value, et),
+            (QueryValue::String(_), InputType::Enum(et)) => Self::parse_enum(value, et),
+            (QueryValue::Boolean(_), InputType::Enum(et)) => Self::parse_enum(value, et),
 
             // List and object handling.
-            (QueryValue::List(values), InputType::List(l))  => Self::parse_list(values.clone(), &l).map(ParsedInputValue::List),
-            (_, InputType::List(l))                         => Self::parse_list(vec![value], &l).map(ParsedInputValue::List),
-            (QueryValue::Object(o), InputType::Object(obj)) => Self::parse_input_object(o.clone(), obj.into_arc()).map(ParsedInputValue::Map),
-            (_, input_type)                                 => Err(QueryParserError::ValueTypeMismatchError { have: value, want: input_type.clone() }),
+            (QueryValue::List(values), InputType::List(l)) => {
+                Self::parse_list(values.clone(), &l).map(ParsedInputValue::List)
+            }
+            (_, InputType::List(l)) => Self::parse_list(vec![value], &l).map(ParsedInputValue::List),
+            (QueryValue::Object(o), InputType::Object(obj)) => {
+                Self::parse_input_object(o.clone(), obj.into_arc()).map(ParsedInputValue::Map)
+            }
+            (_, input_type) => Err(QueryParserError::ValueTypeMismatchError {
+                have: value,
+                want: input_type.clone(),
+            }),
         }
     }
 
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
-    #[rustfmt::skip]
     pub fn parse_scalar(value: QueryValue, scalar_type: &ScalarType) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
-            (QueryValue::Null, typ)                       => Ok(PrismaValue::null(&typ)),
-            (QueryValue::String(s), ScalarType::String)   => Ok(PrismaValue::String(s)),
-            (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
+            (QueryValue::Null, typ) => Ok(PrismaValue::null(&typ)),
+            (QueryValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
+            (QueryValue::String(s), ScalarType::DateTime) => {
+                Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime)
+            }
             (QueryValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(Self::parse_json(&s).map(|_| s)?)),
             (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(&s),
-            (QueryValue::String(s), ScalarType::UUID)     => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
-            (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from(i))),
-            (QueryValue::Int(i), ScalarType::Int)         => Ok(PrismaValue::Int(i)),
-            (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(f)),
-            (QueryValue::Float(f), ScalarType::Int)       => {
-                Ok(PrismaValue::Int(f.to_i64().unwrap()))
-            },
+            (QueryValue::String(s), ScalarType::UUID) => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
+            (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(Decimal::from(i))),
+            (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
+            (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
+            (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().unwrap())),
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
 
             // All other combinations are invalid.
-            (qv, _)                                       => Err(QueryParserError::ValueTypeMismatchError { have: qv, want: InputType::Scalar(scalar_type.clone()) }),
+            (qv, _) => Err(QueryParserError::ValueTypeMismatchError {
+                have: qv,
+                want: InputType::Scalar(scalar_type.clone()),
+            }),
         }
     }
 
