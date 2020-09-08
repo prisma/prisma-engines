@@ -12,7 +12,7 @@ pub enum QueryParserError {
     ValueParseError(String),
     ValueTypeMismatchError {
         have: QueryValue,
-        want: InputType,
+        want: Vec<InputType>,
     },
     FieldValidationError {
         field_name: String,

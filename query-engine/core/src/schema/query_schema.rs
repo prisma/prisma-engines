@@ -157,6 +157,9 @@ impl ObjectType {
 #[derive(Debug)]
 pub struct Field {
     pub name: String,
+
+    /// Arguments are input fields, but positioned in context of an output field
+    /// instead of being attached to an input object.
     pub arguments: Vec<InputFieldRef>,
     pub field_type: OutputTypeRef,
     pub query_builder: Option<SchemaQueryBuilder>,
@@ -353,16 +356,15 @@ pub struct InputField {
 
 impl InputField {
     /// Sets the field as optional (not required to be present on the input).
-    pub fn optional(self) -> Self {
+    pub fn optional(mut self) -> Self {
         self.is_required = false;
         self
     }
 
     /// Sets the field as nullable (accepting null inputs).
-    pub fn nullable(self) -> Self {
+    pub fn nullable(mut self) -> Self {
         self.is_nullable = true;
-        self.add_type(InputType::null());
-        self
+        self.add_type(InputType::null())
     }
 
     /// Sets the field as nullable if the condition is true.
@@ -375,7 +377,7 @@ impl InputField {
     }
 
     /// Adds possible input type to this input field's type union.
-    pub fn add_type(self, typ: InputType) -> Self {
+    pub fn add_type(mut self, typ: InputType) -> Self {
         self.field_types.push(typ);
         self
     }

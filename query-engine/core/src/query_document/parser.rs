@@ -2,6 +2,7 @@ use super::*;
 use crate::schema::*;
 use chrono::prelude::*;
 use indexmap::IndexMap;
+use prisma_models::TypeHint;
 use prisma_value::PrismaValue;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, sync::Arc};
@@ -109,30 +110,30 @@ impl QueryDocumentParser {
         schema_field
             .arguments
             .iter()
-            .filter_map(|schema_input| {
-                // Match schema field to a field in the incoming document
+            .filter_map(|schema_input_arg| {
+                // Match schema argument field to an argument field in the incoming document.
                 let selection_arg: Option<(String, QueryValue)> = given_arguments
                     .iter()
-                    .find(|given_argument| given_argument.0 == schema_arg.name)
+                    .find(|given_argument| given_argument.0 == schema_input_arg.name)
                     .cloned();
 
-                let arg_type = &schema_input.argument_type;
-
-                // If optional and not present ignore the field, else commence regular parsing.
-                let parsed = match (selection_arg, arg_type) {
-                    (None, InputType::Opt(_)) => None,
-                    (Some((_, value)), _) => Some(Self::parse_input_value(value, &schema_arg.argument_type)),
+                // If optional and not present ignore the field.
+                // If present, parse normally.
+                // If not present but required, throw a validation error.
+                let parsed = match selection_arg {
+                    None if !schema_input_arg.is_required => None,
+                    Some((_, value)) => Some(Self::parse_input_value(value, &schema_input_arg.field_types)),
                     _ => Some(Err(QueryParserError::RequiredValueNotSetError)),
                 };
 
                 parsed.map(|result| {
                     result
                         .map(|value| ParsedArgument {
-                            name: schema_arg.name.clone(),
+                            name: schema_input_arg.name.clone(),
                             value,
                         })
                         .map_err(|err| QueryParserError::ArgumentValidationError {
-                            argument: schema_arg.name.clone(),
+                            argument: schema_input_arg.name.clone(),
                             inner: Box::new(err),
                         })
                 })
@@ -142,37 +143,52 @@ impl QueryDocumentParser {
             .collect()
     }
 
-    /// Parses and validates a QueryValue against an InputType, recursively.
-    pub fn parse_input_value(value: QueryValue, input_type: &InputType) -> QueryParserResult<ParsedInputValue> {
-        // todo figure out what is up with enums
-        match (&value, input_type) {
-            // Handle optional inputs
-            (_, InputType::Opt(ref inner)) => Self::parse_input_value(value, inner),
+    /// Parses and validates a QueryValue against possible input types.
+    /// Matching is done in order of definition on the input type. First matching type wins.
+    pub fn parse_input_value(
+        value: QueryValue,
+        possible_input_types: &[InputType],
+    ) -> QueryParserResult<ParsedInputValue> {
+        let mut parse_results = vec![];
 
-            // Handle null inputs
-            (QueryValue::Null, InputType::Null(inner)) => Ok(ParsedInputValue::Single(PrismaValue::null(&**inner))),
-            (_, InputType::Null(ref inner)) => Self::parse_input_value(value, inner),
+        for input_type in possible_input_types {
+            let value = value.clone();
+            let result = match (&value, input_type) {
+                // Scalar handling
+                (_, InputType::Scalar(scalar)) => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
 
-            // The optional handling above guarantees that if we hit a Null here, a required value is missing.
-            (QueryValue::Null, _) => Err(QueryParserError::RequiredValueNotSetError),
+                // Enum handling
+                (QueryValue::Enum(_), InputType::Enum(et)) => Self::parse_enum(value, et),
+                (QueryValue::String(_), InputType::Enum(et)) => Self::parse_enum(value, et),
+                (QueryValue::Boolean(_), InputType::Enum(et)) => Self::parse_enum(value, et),
 
-            // Scalar and enum handling.
-            (_, InputType::Scalar(scalar)) => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
-            (QueryValue::Enum(_), InputType::Enum(et)) => Self::parse_enum(value, et),
-            (QueryValue::String(_), InputType::Enum(et)) => Self::parse_enum(value, et),
-            (QueryValue::Boolean(_), InputType::Enum(et)) => Self::parse_enum(value, et),
+                // List and object handling.
+                (QueryValue::List(values), InputType::List(l)) => {
+                    Self::parse_list(values.clone(), &l).map(ParsedInputValue::List)
+                }
+                (_, InputType::List(l)) => Self::parse_list(vec![value], &l).map(ParsedInputValue::List),
+                (QueryValue::Object(o), InputType::Object(obj)) => {
+                    Self::parse_input_object(o.clone(), obj.into_arc()).map(ParsedInputValue::Map)
+                }
 
-            // List and object handling.
-            (QueryValue::List(values), InputType::List(l)) => {
-                Self::parse_list(values.clone(), &l).map(ParsedInputValue::List)
-            }
-            (_, InputType::List(l)) => Self::parse_list(vec![value], &l).map(ParsedInputValue::List),
-            (QueryValue::Object(o), InputType::Object(obj)) => {
-                Self::parse_input_object(o.clone(), obj.into_arc()).map(ParsedInputValue::Map)
-            }
-            (_, input_type) => Err(QueryParserError::ValueTypeMismatchError {
+                // Invalid combinations
+                _ => Err(QueryParserError::ValueTypeMismatchError {
+                    have: value,
+                    want: possible_input_types.to_vec(),
+                }),
+            };
+
+            parse_results.push(result);
+        }
+
+        match parse_results.into_iter().find_map(|result| match result {
+            Ok(parsed_value) => Some(parsed_value),
+            Err(_) => None,
+        }) {
+            Some(parsed_value) => Ok(parsed_value),
+            None => Err(QueryParserError::ValueTypeMismatchError {
                 have: value,
-                want: input_type.clone(),
+                want: possible_input_types.to_vec(),
             }),
         }
     }
@@ -180,7 +196,7 @@ impl QueryDocumentParser {
     /// Attempts to parse given query value into a concrete PrismaValue based on given scalar type.
     pub fn parse_scalar(value: QueryValue, scalar_type: &ScalarType) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
-            (QueryValue::Null, typ) => Ok(PrismaValue::null(&typ)),
+            (QueryValue::Null, ScalarType::Null) => Ok(PrismaValue::null(TypeHint::Unknown)),
             (QueryValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
             (QueryValue::String(s), ScalarType::DateTime) => {
                 Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime)
@@ -197,7 +213,7 @@ impl QueryDocumentParser {
             // All other combinations are invalid.
             (qv, _) => Err(QueryParserError::ValueTypeMismatchError {
                 have: qv,
-                want: InputType::Scalar(scalar_type.clone()),
+                want: vec![InputType::Scalar(scalar_type.clone())],
             }),
         }
     }
@@ -214,7 +230,7 @@ impl QueryDocumentParser {
             })
     }
 
-    // [DTODO] This completely misses the point of the API type system. Rework & remove.
+    // [DTODO] This is likely incorrect or at least using the wrong abstractions.
     pub fn parse_json_list(s: &str) -> QueryParserResult<PrismaValue> {
         let json = Self::parse_json(s)?;
 
@@ -245,7 +261,7 @@ impl QueryDocumentParser {
     pub fn parse_list(values: Vec<QueryValue>, value_type: &InputType) -> QueryParserResult<Vec<ParsedInputValue>> {
         values
             .into_iter()
-            .map(|val| Self::parse_input_value(val, value_type))
+            .map(|val| Self::parse_input_value(val, &[value_type.clone()]))
             .collect::<QueryParserResult<Vec<ParsedInputValue>>>()
     }
 
@@ -300,7 +316,7 @@ impl QueryDocumentParser {
         let right: HashSet<&str> = object.keys().map(|k| k.as_str()).collect();
         let diff = Diff::new(&left, &right);
 
-        // First, check that all fields not provided in the query (left diff) are optional,
+        // First, check that all fields **not** provided in the query (left diff) are optional,
         // i.e. run the validation but disregard the result, or have defaults, in which case the
         // value pair gets added to the result.
         diff.left
@@ -317,13 +333,12 @@ impl QueryDocumentParser {
                         Err(err) => Err(err),
                     }),
 
-                    None => match field.field_type {
-                        InputType::Opt(_) => None,
-                        _ => Some(Err(QueryParserError::FieldValidationError {
-                            field_name: field.name.clone(),
-                            inner: Box::new(QueryParserError::RequiredValueNotSetError),
-                        })),
-                    },
+                    None if field.is_required => Some(Err(QueryParserError::FieldValidationError {
+                        field_name: field.name.clone(),
+                        inner: Box::new(QueryParserError::RequiredValueNotSetError),
+                    })),
+
+                    _ => None,
                 }
             })
             .collect::<QueryParserResult<Vec<_>>>()
@@ -346,7 +361,20 @@ impl QueryDocumentParser {
                     })
             })
             .and_then(|map: ParsedInputMap| {
-                if schema_object.is_one_of && map.len() > 1 {
+                let num_fields = map.len();
+                let too_many = schema_object
+                    .constraints
+                    .max_num_fields
+                    .map(|max| num_fields > max)
+                    .unwrap_or(false);
+
+                let too_few = schema_object
+                    .constraints
+                    .min_num_fields
+                    .map(|min| num_fields < min)
+                    .unwrap_or(false);
+
+                if too_many || too_few {
                     Err(QueryParserError::FieldCountError(FieldCountError::new(
                         None,
                         Some(1),
@@ -364,9 +392,11 @@ impl QueryDocumentParser {
 
     /// Parses and validates an input query value against a schema input field.
     pub fn parse_input_field(value: QueryValue, schema_field: &InputFieldRef) -> QueryParserResult<ParsedInputValue> {
-        Self::parse_input_value(value, &schema_field.field_type).map_err(|err| QueryParserError::FieldValidationError {
-            field_name: schema_field.name.clone(),
-            inner: Box::new(err),
+        Self::parse_input_value(value, &schema_field.field_types).map_err(|err| {
+            QueryParserError::FieldValidationError {
+                field_name: schema_field.name.clone(),
+                inner: Box::new(err),
+            }
         })
     }
 }
