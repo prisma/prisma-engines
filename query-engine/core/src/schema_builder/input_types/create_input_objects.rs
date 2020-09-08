@@ -1,4 +1,5 @@
 use super::*;
+use prisma_models::dml::DefaultValue;
 
 /// Builds "<x>CreateOrConnectNestedInput" input object types.
 pub(crate) fn nested_connect_or_create_input_object(
@@ -51,8 +52,6 @@ pub(crate) fn create_input_type(
     return_cached_input!(ctx, &name);
 
     let input_object = Arc::new(init_input_object_type(name.clone()));
-
-    // Cache empty object for circuit breaking
     ctx.cache_input_type(name, input_object.clone());
 
     // Compute input fields for scalar fields.
@@ -68,13 +67,18 @@ pub(crate) fn create_input_type(
         model.name.clone(),
         "Create",
         scalar_fields,
-        |_, f: ScalarFieldRef| {
+        |_, f: ScalarFieldRef, default: Option<DefaultValue>| {
+            let typ = map_scalar_input_type(&f);
             if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) {
-                map_optional_input_type(&f)
+                input_field(f.name.clone(), typ, default)
+                    .optional()
+                    .nullable_if(!f.is_required)
             } else if f.is_required && f.default_value.is_none() {
-                map_required_input_type(&f)
+                input_field(f.name.clone(), typ, default)
             } else {
-                map_optional_input_type(&f)
+                input_field(f.name.clone(), typ, default)
+                    .optional()
+                    .nullable_if(!f.is_required)
             }
         },
         true,

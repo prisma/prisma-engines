@@ -361,7 +361,7 @@ impl InputField {
     /// Sets the field as nullable (accepting null inputs).
     pub fn nullable(self) -> Self {
         self.is_nullable = true;
-        self.field_types.push(InputType::null());
+        self.add_type(InputType::null());
         self
     }
 
@@ -372,6 +372,12 @@ impl InputField {
         } else {
             self
         }
+    }
+
+    /// Adds possible input type to this input field's type union.
+    pub fn add_type(self, typ: InputType) -> Self {
+        self.field_types.push(typ);
+        self
     }
 }
 

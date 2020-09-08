@@ -53,12 +53,6 @@ fn map_scalar_input_type(field: &ScalarFieldRef) -> InputType {
     } else {
         typ
     }
-
-    // match (field.is_list, field.is_required) {
-    //     (true, _) => InputType::list(typ),
-    //     (false, true) => typ,
-    //     (false, false) => InputType::null(typ),
-    // }
 }
 
 fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
@@ -71,14 +65,14 @@ fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
     et.into()
 }
 
-// /// Wraps an input object type into an option list object type.
-// fn wrap_list_input_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> InputType {
-//     if as_list {
-//         InputType::opt(InputType::list(InputType::object(input)))
-//     } else {
-//         InputType::opt(InputType::object(input))
-//     }
-// }
+/// Wraps an input object type into a list object type, if needed.
+fn wrap_list_input_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> InputType {
+    if as_list {
+        InputType::list(InputType::object(input))
+    } else {
+        InputType::object(input)
+    }
+}
 
 fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
     alias.map(|n| capitalize(n)).unwrap_or_else(|| {
@@ -86,7 +80,3 @@ fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) 
         field_names.join("")
     })
 }
-
-// fn wrap_opt_input_object(o: InputObjectTypeWeakRef) -> InputType {
-//     InputType::opt(InputType::object(o))
-// }

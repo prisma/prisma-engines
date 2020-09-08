@@ -53,7 +53,7 @@ where
 /// Field convenience wrapper function.
 pub fn field<T>(
     name: T,
-    arguments: Vec<InputFieldRef>,
+    arguments: Vec<InputField>,
     field_type: OutputType,
     query_builder: Option<SchemaQueryBuilder>,
 ) -> Field
@@ -62,7 +62,7 @@ where
 {
     Field {
         name: name.into(),
-        arguments,
+        arguments: arguments.into_iter().map(|f| Arc::new(f)).collect(),
         field_type: Arc::new(field_type),
         query_builder,
     }

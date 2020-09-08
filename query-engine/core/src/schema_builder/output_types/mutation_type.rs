@@ -84,12 +84,13 @@ fn create_execute_raw_field() -> Field {
     field(
         "executeRaw",
         vec![
-            argument("query", InputType::string(), None),
-            argument(
+            input_field("query", InputType::string(), None),
+            input_field(
                 "parameters",
-                InputType::opt(InputType::json_list()),
+                InputType::json_list(),
                 Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
-            ),
+            )
+            .optional(),
         ],
         OutputType::json(),
         None,
@@ -100,12 +101,13 @@ fn create_query_raw_field() -> Field {
     field(
         "queryRaw",
         vec![
-            argument("query", InputType::string(), None),
-            argument(
+            input_field("query", InputType::string(), None),
+            input_field(
                 "parameters",
-                InputType::opt(InputType::json_list()),
+                InputType::json_list(),
                 Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
-            ),
+            )
+            .optional(),
         ],
         OutputType::json(),
         None,
