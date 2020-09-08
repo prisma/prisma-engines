@@ -21,39 +21,41 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
                 kind: TypeKind::Enum,
-                is_required: true,
                 is_list: false,
                 is_nullable: false,
             };
 
             type_reference
         }
+
         OutputType::List(ref l) => {
             let mut type_reference = render_output_type(l, ctx);
             type_reference.is_list = true;
 
             type_reference
         }
+
         OutputType::Opt(ref opt) => {
             let mut type_reference = render_output_type(opt, ctx);
             type_reference.is_required = false;
 
             type_reference
         }
+
         OutputType::Scalar(ScalarType::Enum(et)) => {
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
                 kind: TypeKind::Scalar,
-                is_required: true,
                 is_list: false,
-                is_nullable: false,
             };
 
             type_reference
         }
+
         OutputType::Scalar(ref scalar) => {
             let stringified = match scalar {
+                ScalarType::Null => "Null",
                 ScalarType::String => "String",
                 ScalarType::Int => "Int",
                 ScalarType::Boolean => "Boolean",
@@ -68,14 +70,19 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             let type_reference = DmmfTypeReference {
                 typ: stringified.into(),
                 kind: TypeKind::Scalar,
-                is_required: true,
                 is_list: false,
-                is_nullable: false,
             };
 
             type_reference
         }
     }
+}
+
+pub(super) fn render_input_types(input_types: &[InputType], ctx: &mut RenderContext) -> Vec<DmmfTypeReference> {
+    input_types
+        .into_iter()
+        .map(|input_type| render_input_type(input_type, ctx))
+        .collect()
 }
 
 pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext) -> DmmfTypeReference {
@@ -85,9 +92,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             let type_reference = DmmfTypeReference {
                 typ: obj.into_arc().name.clone(),
                 kind: TypeKind::Object,
-                is_required: true,
                 is_list: false,
-                is_nullable: false,
             };
 
             type_reference
@@ -98,9 +103,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
                 kind: TypeKind::Enum,
-                is_required: true,
                 is_list: false,
-                is_nullable: false,
             };
 
             type_reference
@@ -113,28 +116,12 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             type_reference
         }
 
-        InputType::Opt(ref inner) => {
-            let mut type_reference = render_input_type(inner, ctx);
-            type_reference.is_required = false;
-
-            type_reference
-        }
-
-        InputType::Null(ref inner) => {
-            let mut type_reference = render_input_type(inner, ctx);
-            type_reference.is_nullable = true;
-
-            type_reference
-        }
-
         InputType::Scalar(ScalarType::Enum(et)) => {
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
                 kind: TypeKind::Scalar,
-                is_required: true,
                 is_list: false,
-                is_nullable: false,
             };
 
             type_reference
@@ -142,6 +129,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
 
         InputType::Scalar(ref scalar) => {
             let stringified = match scalar {
+                ScalarType::Null => "Null",
                 ScalarType::String => "String",
                 ScalarType::Int => "Int",
                 ScalarType::Boolean => "Boolean",
@@ -156,9 +144,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             let type_reference = DmmfTypeReference {
                 typ: stringified.into(),
                 kind: TypeKind::Scalar,
-                is_required: true,
                 is_list: false,
-                is_nullable: false,
             };
 
             type_reference

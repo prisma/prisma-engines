@@ -14,18 +14,10 @@ pub struct DmmfSchema {
 #[serde(rename_all = "camelCase")]
 pub struct DmmfOutputField {
     pub name: String,
-    pub args: Vec<DmmfArgument>,
+    pub args: Vec<DmmfInputField>,
     pub is_required: bool,
-    pub is_list: bool,
     pub is_nullable: bool,
     pub output_type: DmmfTypeReference,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DmmfArgument {
-    pub name: String,
-    pub input_types: Vec<DmmfTypeReference>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -54,7 +46,6 @@ pub struct DmmfOutputType {
 #[serde(rename_all = "camelCase")]
 pub struct DmmfInputField {
     pub name: String,
-    pub is_list: bool,
     pub is_required: bool,
     pub is_nullable: bool,
     pub input_types: Vec<DmmfTypeReference>,
@@ -66,6 +57,7 @@ pub struct DmmfTypeReference {
     #[serde(rename = "type")]
     pub typ: String,
     pub kind: TypeKind,
+    pub is_list: bool,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]

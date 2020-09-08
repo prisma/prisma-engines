@@ -115,7 +115,7 @@ impl QueryParserError {
             QueryParserError::FieldCountError(err) => format!("{}", err),
             QueryParserError::ValueParseError(reason) => format!("Error parsing value: {}.", reason),
             QueryParserError::ValueTypeMismatchError { have, want } => {
-                format!("Value types mismatch. Have: {:?}, want: {:?}", have, want)
+                format!("Value types mismatch. Have: {:?}, want one of: {:?}", have, want)
             }
         }
     }
