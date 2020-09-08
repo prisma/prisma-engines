@@ -21,7 +21,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 }
 
 /// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.
-fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field> {
+fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::where_unique_argument(ctx, model).map(|arg| {
         let field_name = ctx.pluralize_internal(camel_case(&model.name), format!("findOne{}", model.name));
 
@@ -47,7 +47,7 @@ fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field
 }
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
-fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
+fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model);
     let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
 
@@ -70,7 +70,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
 }
 
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
-fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
+fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model);
     let field_name = ctx.pluralize_internal(
         format!("aggregate{}", model.name), // Has no legacy counterpart.

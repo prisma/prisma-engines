@@ -18,7 +18,7 @@ pub type InputObjectTypeWeakRef = Weak<InputObjectType>;
 
 pub type QuerySchemaRef = Arc<QuerySchema>;
 pub type OutputTypeRef = Arc<OutputType>;
-pub type FieldRef = Arc<Field>;
+pub type OutputFieldRef = Arc<OutputField>;
 pub type InputFieldRef = Arc<InputField>;
 pub type EnumTypeRef = Arc<EnumType>;
 
@@ -66,7 +66,7 @@ impl QuerySchema {
         }
     }
 
-    pub fn find_mutation_field<T>(&self, name: T) -> Option<FieldRef>
+    pub fn find_mutation_field<T>(&self, name: T) -> Option<OutputFieldRef>
     where
         T: Into<String>,
     {
@@ -78,7 +78,7 @@ impl QuerySchema {
             .cloned()
     }
 
-    pub fn find_query_field<T>(&self, name: T) -> Option<FieldRef>
+    pub fn find_query_field<T>(&self, name: T) -> Option<OutputFieldRef>
     where
         T: Into<String>,
     {
@@ -104,7 +104,7 @@ impl QuerySchema {
 pub struct ObjectType {
     name: String,
 
-    fields: OnceCell<Vec<FieldRef>>,
+    fields: OnceCell<Vec<OutputFieldRef>>,
 
     // Object types can directly map to models.
     model: Option<ModelRef>,
@@ -136,15 +136,15 @@ impl ObjectType {
         &self.name
     }
 
-    pub fn get_fields(&self) -> &Vec<FieldRef> {
+    pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
         self.fields.get().unwrap()
     }
 
-    pub fn set_fields(&self, fields: Vec<Field>) {
+    pub fn set_fields(&self, fields: Vec<OutputField>) {
         self.fields.set(fields.into_iter().map(Arc::new).collect()).unwrap();
     }
 
-    pub fn find_field(&self, name: &str) -> Option<FieldRef> {
+    pub fn find_field(&self, name: &str) -> Option<OutputFieldRef> {
         self.get_fields().into_iter().find(|f| &f.name == name).cloned()
     }
 
@@ -155,7 +155,7 @@ impl ObjectType {
 }
 
 #[derive(Debug)]
-pub struct Field {
+pub struct OutputField {
     pub name: String,
 
     /// Arguments are input fields, but positioned in context of an output field
@@ -165,7 +165,7 @@ pub struct Field {
     pub query_builder: Option<SchemaQueryBuilder>,
 }
 
-impl Field {
+impl OutputField {
     pub fn query_builder(&self) -> Option<&SchemaQueryBuilder> {
         self.query_builder.as_ref()
     }

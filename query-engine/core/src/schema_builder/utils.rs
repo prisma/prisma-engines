@@ -6,7 +6,7 @@ use prisma_models::{dml, ModelRef};
 use std::sync::Arc;
 
 /// Object type convenience wrapper function.
-pub fn object_type<T>(name: T, fields: Vec<Field>, model: Option<ModelRef>) -> ObjectType
+pub fn object_type<T>(name: T, fields: Vec<OutputField>, model: Option<ModelRef>) -> ObjectType
 where
     T: Into<String>,
 {
@@ -56,11 +56,11 @@ pub fn field<T>(
     arguments: Vec<InputField>,
     field_type: OutputType,
     query_builder: Option<SchemaQueryBuilder>,
-) -> Field
+) -> OutputField
 where
     T: Into<String>,
 {
-    Field {
+    OutputField {
         name: name.into(),
         arguments: arguments.into_iter().map(|f| Arc::new(f)).collect(),
         field_type: Arc::new(field_type),
