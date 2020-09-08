@@ -118,6 +118,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
                         if relation_info_partial_eq
                             && (!many_to_many || old_field.relation_info.name == field.relation_info.name)
+
                         {
                             let mf = ModelAndField::new(&model.name, &field.name);
                             changed_relation_field_names.push((mf.clone(), old_field.name.clone()));
@@ -140,6 +141,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     //keep old virtual relation names on non M:N relations
     // M:N relations cannot be uniquely identified without ignoring the relationname and their relationnames cant
     // be changed without necessitation db changes since RelationName -> Join table name
+
     let mut changed_relation_names = vec![];
     {
         for model in new_data_model.models() {
@@ -156,6 +158,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                         let many_to_many = old_field.is_list() && old_related_field.is_list();
 
                         if relation_info_partial_eq && !many_to_many {
+
                             let mf = ModelAndField::new(&model.name, &field.name);
                             let other_mf = ModelAndField::new(&field.relation_info.to, &related_field.name);
                             changed_relation_names.push((mf, old_field.relation_info.name.clone()));
