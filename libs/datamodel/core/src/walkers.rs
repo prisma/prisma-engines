@@ -10,6 +10,7 @@ use crate::{
 use datamodel_connector::NativeTypeInstance;
 use itertools::Itertools;
 
+/// Iterator over all the models in the schema.
 pub fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelWalker<'a>> + 'a {
     datamodel.models().map(move |model| ModelWalker { datamodel, model })
 }
@@ -41,6 +42,7 @@ pub fn walk_relations(datamodel: &Datamodel) -> impl Iterator<Item = RelationWal
         })
 }
 
+/// Find the model mapping to the passed in database name.
 pub fn find_model_by_db_name<'a>(datamodel: &'a Datamodel, db_name: &str) -> Option<ModelWalker<'a>> {
     datamodel
         .models()
@@ -367,7 +369,7 @@ pub struct ManyToManyRelationWalker<'a> {
 }
 
 impl<'a> ManyToManyRelationWalker<'a> {
-    pub fn model_a_column(&self) -> &str {
+    pub const fn model_a_column(&self) -> &str {
         "A"
     }
 
@@ -379,7 +381,7 @@ impl<'a> ManyToManyRelationWalker<'a> {
             .expect("Missing id field on a model in a M2M relation.")
     }
 
-    pub fn model_b_column(&self) -> &str {
+    pub const fn model_b_column(&self) -> &str {
         "B"
     }
 
