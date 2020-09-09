@@ -1,16 +1,30 @@
-use bitflags::bitflags;
-use std::{error::Error as StdError, str::FromStr};
+use enumflags2::BitFlags;
+use once_cell::sync::Lazy;
+use std::error::Error as StdError;
 
-bitflags! {
-    pub struct Tags: u8 {
-        const MYSQL     = 0b00000001;
-        const MARIADB   = 0b00000010;
-        const POSTGRES  = 0b00000100;
-        const SQLITE    = 0b00001000;
-        const MYSQL_8   = 0b00010000;
-        const MYSQL_5_6 = 0b00100000;
+#[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
+#[repr(u8)]
+pub enum Tags {
+    Mysql = 0b0001,
+    Mariadb = 0b0010,
+    Postgres = 0b0100,
+    Sqlite = 0b1000,
+    Mysql8 = 0b00010000,
+    Mysql56 = 0b00100000,
+}
 
-        const SQL = Self::MYSQL.bits | Self::POSTGRES.bits | Self::SQLITE.bits;
+impl Tags {
+    pub fn empty() -> BitFlags<Tags> {
+        BitFlags::empty()
+    }
+
+    pub fn from_name(name: &str) -> Result<BitFlags<Tags>, UnknownTagError> {
+        TAG_NAMES
+            .binary_search_by_key(&name, |(name, _tag)| *name)
+            .ok()
+            .and_then(|idx| TAG_NAMES.get(idx))
+            .map(|(_name, tag)| *tag)
+            .ok_or_else(|| UnknownTagError(name.to_owned()))
     }
 }
 
@@ -26,26 +40,15 @@ impl std::fmt::Display for UnknownTagError {
 
 impl StdError for UnknownTagError {}
 
-impl FromStr for Tags {
-    type Err = UnknownTagError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        TAG_NAMES
-            .binary_search_by_key(&s, |(name, _tag)| *name)
-            .ok()
-            .and_then(|idx| TAG_NAMES.get(idx))
-            .map(|(_name, tag)| *tag)
-            .ok_or_else(|| UnknownTagError(s.to_owned()))
-    }
-}
-
 /// All the tags, sorted by name.
-const TAG_NAMES: &[(&str, Tags)] = &[
-    ("mariadb", Tags::MARIADB),
-    ("mysql", Tags::MYSQL),
-    ("mysql_5_6", Tags::MYSQL_5_6),
-    ("mysql_8", Tags::MYSQL_8),
-    ("postgres", Tags::POSTGRES),
-    ("sql", Tags::SQL),
-    ("sqlite", Tags::SQLITE),
-];
+static TAG_NAMES: Lazy<Vec<(&str, BitFlags<Tags>)>> = Lazy::new(|| {
+    vec![
+        ("mariadb", Tags::Mariadb.into()),
+        ("mysql", Tags::Mysql.into()),
+        ("mysql_5_6", Tags::Mysql56.into()),
+        ("mysql_8", Tags::Mysql8.into()),
+        ("postgres", Tags::Postgres.into()),
+        ("sql", Tags::Mysql | Tags::Postgres | Tags::Sqlite),
+        ("sqlite", Tags::Sqlite.into()),
+    ]
+});

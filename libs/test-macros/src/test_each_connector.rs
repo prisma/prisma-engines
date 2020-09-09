@@ -1,4 +1,5 @@
 use darling::FromMeta;
+use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
@@ -7,13 +8,13 @@ use std::str::FromStr;
 use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
 use test_setup::connectors::{Capabilities, Connector, Tags, CONNECTORS};
 
-static TAGS_FILTER: Lazy<Tags> = Lazy::new(|| {
+static TAGS_FILTER: Lazy<BitFlags<Tags>> = Lazy::new(|| {
     let tags_str = std::env::var("TEST_EACH_CONNECTOR_TAGS").ok();
     let mut tags = Tags::empty();
 
     if let Some(tags_str) = tags_str {
         for tag_str in tags_str.split(',') {
-            let tag = Tags::from_str(tag_str).unwrap();
+            let tag = Tags::from_name(tag_str).unwrap();
             tags |= tag;
         }
     }
@@ -43,17 +44,17 @@ struct TestEachConnectorArgs {
 }
 
 #[derive(Debug)]
-struct CapabilitiesWrapper(Capabilities);
+struct CapabilitiesWrapper(BitFlags<Capabilities>);
 
 impl Default for CapabilitiesWrapper {
     fn default() -> Self {
-        CapabilitiesWrapper(Capabilities::empty())
+        CapabilitiesWrapper(BitFlags::empty())
     }
 }
 
 impl darling::FromMeta for CapabilitiesWrapper {
     fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
-        let mut capabilities = Capabilities::empty();
+        let mut capabilities = BitFlags::empty();
 
         for item in items {
             match item {
@@ -77,11 +78,11 @@ impl darling::FromMeta for CapabilitiesWrapper {
 }
 
 #[derive(Debug)]
-struct TagsWrapper(Tags);
+struct TagsWrapper(BitFlags<Tags>);
 
 impl Default for TagsWrapper {
     fn default() -> Self {
-        TagsWrapper(Tags::empty())
+        TagsWrapper(BitFlags::empty())
     }
 }
 
@@ -93,7 +94,7 @@ impl darling::FromMeta for TagsWrapper {
             match item {
                 syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
                     let s = s.value();
-                    let tag = Tags::from_str(&s)
+                    let tag = Tags::from_name(&s)
                         .map_err(|err| darling::Error::unknown_value(&err.to_string()).with_span(&item.span()))?;
                     tags.insert(tag);
                 }
