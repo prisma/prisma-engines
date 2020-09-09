@@ -146,7 +146,7 @@ fn should_handle_type_specifications_on_mysql() {
         model Blog {
             id       Int      @id
             smallInt Int      @mys.SmallInt
-            foobar   DateTime @mys.Datetime(26)
+            foobar   DateTime @mys.Datetime(6)
         }
     "#;
 
@@ -162,5 +162,5 @@ fn should_handle_type_specifications_on_mysql() {
     let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
 
     let mysql_type: MySqlType = sft.deserialize_native_type();
-    assert_eq!(mysql_type, MySqlType::DateTime(Option::from(26)));
+    assert_eq!(mysql_type, MySqlType::DateTime(6));
 }

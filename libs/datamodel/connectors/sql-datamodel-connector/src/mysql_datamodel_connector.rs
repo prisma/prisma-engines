@@ -72,7 +72,7 @@ impl MySqlDatamodelConnector {
         let medium_text = NativeTypeConstructor::without_args(MEDIUM_TEXT_TYPE_NAME, ScalarType::String);
         let long_text = NativeTypeConstructor::without_args(LONG_TEXT_TYPE_NAME, ScalarType::String);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, ScalarType::DateTime);
-        let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, ScalarType::DateTime);
+        let time = NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, ScalarType::DateTime);
         let datetime = NativeTypeConstructor::with_optional_args(DATETIME_TYPE_NAME, 1, ScalarType::DateTime);
         let timestamp = NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, ScalarType::DateTime);
         let year = NativeTypeConstructor::without_args(YEAR_TYPE_NAME, ScalarType::Int);
@@ -213,21 +213,9 @@ impl Connector for MySqlDatamodelConnector {
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
-            TIME_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::Time(Option::from(*arg))
-                } else {
-                    MySqlType::Time(None)
-                }
-            }
-            DATETIME_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::DateTime(Option::from(*arg))
-                } else {
-                    MySqlType::DateTime(None)
-                }
-            }
-            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().map(|i| *i)),
+            TIME_TYPE_NAME => MySqlType::Time(args.first().map(|i| *i).unwrap_or(0)),
+            DATETIME_TYPE_NAME => MySqlType::DateTime(args.first().map(|i| *i).unwrap_or(0)),
+            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().map(|i| *i).unwrap_or(0)),
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
 
@@ -271,16 +259,16 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::LongText => (LONG_TEXT_TYPE_NAME, vec![]),
             MySqlType::Date => (DATE_TYPE_NAME, vec![]),
             MySqlType::Time(x) => match x {
-                Some(arg) => (TIME_TYPE_NAME, vec![arg]),
-                None => (TIME_TYPE_NAME, vec![]),
+                0 => (TIME_TYPE_NAME, vec![]),
+                arg => (TIME_TYPE_NAME, vec![arg]),
             },
             MySqlType::DateTime(x) => match x {
-                Some(arg) => (DATETIME_TYPE_NAME, vec![arg]),
-                None => (DATETIME_TYPE_NAME, vec![]),
+                0 => (DATETIME_TYPE_NAME, vec![]),
+                arg => (DATETIME_TYPE_NAME, vec![arg]),
             },
             MySqlType::Timestamp(x) => match x {
-                Some(arg) => (TIMESTAMP_TYPE_NAME, vec![arg]),
-                None => (TIMESTAMP_TYPE_NAME, vec![]),
+                0 => (TIMESTAMP_TYPE_NAME, vec![]),
+                arg => (TIMESTAMP_TYPE_NAME, vec![arg]),
             },
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),

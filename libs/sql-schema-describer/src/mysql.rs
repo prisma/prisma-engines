@@ -568,16 +568,14 @@ fn get_column_type_and_enum(
         ("double", _) => (ColumnTypeFamily::Float, MySqlType::Double),
         ("date", _) => (ColumnTypeFamily::DateTime, MySqlType::Date),
         ("time", fdt) => (
+            //Fixme this can either be a time or a duration -.-
             ColumnTypeFamily::DateTime,
-            MySqlType::Time(extract_optional_length_arg(fdt)),
+            MySqlType::Time(fractional_seconds(fdt)),
         ),
-        ("datetime", fdt) => (
-            ColumnTypeFamily::DateTime,
-            MySqlType::DateTime(extract_optional_length_arg(fdt)),
-        ),
+        ("datetime", fdt) => (ColumnTypeFamily::DateTime, MySqlType::DateTime(fractional_seconds(fdt))),
         ("timestamp", fdt) => (
             ColumnTypeFamily::DateTime,
-            MySqlType::Timestamp(extract_optional_length_arg(fdt)),
+            MySqlType::Timestamp(fractional_seconds(fdt)),
         ),
         ("year", _) => (ColumnTypeFamily::Int, MySqlType::Year),
         ("char", fdt) => (
@@ -660,15 +658,6 @@ fn extract_single_length_arg(full_data_type: &str) -> u32 {
     from_str::<u32>(a).unwrap()
 }
 
-fn extract_optional_length_arg(full_data_type: &str) -> Option<u32> {
-    let len = &full_data_type.len() - 1;
-
-    match full_data_type[..len].split('(').last() {
-        Some(v) => Some(from_str::<u32>(v).unwrap()),
-        None => None,
-    }
-}
-
 fn extract_double_length_arg(full_data_type: &str) -> (u32, u32) {
     let len = &full_data_type.len() - 1;
 
@@ -703,4 +692,17 @@ fn default_is_current_timestamp(default_str: &str) -> bool {
         Lazy::new(|| Regex::new(r#"(?i)current_timestamp(\([0-9]*\))?"#).unwrap());
 
     MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
+}
+
+/// Extracts optional fractional seconds precision.
+fn fractional_seconds(type_str: &str) -> u32 {
+    //can be between 0->6, defaults to 0 on MySQL
+    //https://dev.mysql.com/doc/refman/8.0/en/date-and-time-type-syntax.html
+
+    static MYSQL_CURRENT_TIMESTAMP_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0123456])\).*"#).unwrap());
+
+    MYSQL_CURRENT_TIMESTAMP_RE
+        .captures(type_str)
+        .and_then(|cap| cap.get(1).map(|fraction| from_str::<u32>(fraction.as_str()).unwrap()))
+        .unwrap_or(0)
 }
