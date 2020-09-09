@@ -1,12 +1,12 @@
-use bitflags::bitflags;
+use enumflags2::BitFlags;
 use std::{error::Error, fmt::Display, str::FromStr};
 
-bitflags! {
-    pub struct Capabilities: u8 {
-        const SCALAR_LISTS = 0b00000001;
-        const ENUMS        = 0b00000010;
-        const JSON         = 0b00000100;
-    }
+#[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
+#[repr(u8)]
+pub enum Capabilities {
+    ScalarLists = 0b0001,
+    Enums = 0b0010,
+    Json = 0b0100,
 }
 
 #[derive(Debug)]
@@ -41,7 +41,7 @@ impl FromStr for Capabilities {
 
 /// All the capabilities, sorted by name.
 const CAPABILITY_NAMES: &[(&str, Capabilities)] = &[
-    ("enums", Capabilities::ENUMS),
-    ("json", Capabilities::JSON),
-    ("scalar_lists", Capabilities::SCALAR_LISTS),
+    ("enums", Capabilities::Enums),
+    ("json", Capabilities::Json),
+    ("scalar_lists", Capabilities::ScalarLists),
 ];

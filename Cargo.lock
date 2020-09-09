@@ -910,6 +910,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a246d82be1c9d791c5dfde9a2bd045fc3cbba3fa2b11ad558f27d01712f00569"
 
 [[package]]
+name = "enumflags2"
+version = "0.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "83c8d82922337cd23a15f88b70d8e4ef5f11da38dd7cdb55e84dd5de99695da0"
+dependencies = [
+ "enumflags2_derive",
+]
+
+[[package]]
+name = "enumflags2_derive"
+version = "0.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "946ee94e3dbf58fdd324f9ce245c7b238d46a66f00e86a020b71996349e46cce"
+dependencies = [
+ "proc-macro2 1.0.19",
+ "quote 1.0.7",
+ "syn 1.0.38",
+]
+
+[[package]]
 name = "error-chain"
 version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3172,6 +3192,7 @@ dependencies = [
  "chrono",
  "datamodel",
  "datamodel-connector",
+ "enumflags2",
  "futures 0.3.5",
  "migration-connector",
  "native-types",
@@ -3431,6 +3452,7 @@ name = "test-macros"
 version = "0.1.0"
 dependencies = [
  "darling",
+ "enumflags2",
  "once_cell",
  "proc-macro2 1.0.19",
  "quote 1.0.7",
@@ -3442,7 +3464,7 @@ dependencies = [
 name = "test-setup"
 version = "0.1.0"
 dependencies = [
- "bitflags",
+ "enumflags2",
  "once_cell",
  "quaint",
  "tokio",

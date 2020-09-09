@@ -4,49 +4,50 @@ mod tags;
 pub use capabilities::*;
 pub use tags::*;
 
+use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 
-fn connector_names() -> Vec<(&'static str, Tags)> {
+fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
     vec![
-        ("mysql_8", Tags::MYSQL | Tags::MYSQL_8),
-        ("mysql", Tags::MYSQL),
-        ("mysql_5_6", Tags::MYSQL | Tags::MYSQL_5_6),
-        ("postgres9", Tags::POSTGRES),
-        ("postgres", Tags::POSTGRES),
-        ("postgres11", Tags::POSTGRES),
-        ("postgres12", Tags::POSTGRES),
-        ("postgres13", Tags::POSTGRES),
-        ("mysql_mariadb", Tags::MYSQL | Tags::MARIADB),
-        ("sqlite", Tags::SQLITE),
+        ("mysql_8", Tags::Mysql | Tags::Mysql8),
+        ("mysql", Tags::Mysql.into()),
+        ("mysql_5_6", Tags::Mysql | Tags::Mysql56),
+        ("postgres9", Tags::Postgres.into()),
+        ("postgres", Tags::Postgres.into()),
+        ("postgres11", Tags::Postgres.into()),
+        ("postgres12", Tags::Postgres.into()),
+        ("postgres13", Tags::Postgres.into()),
+        ("mysql_mariadb", Tags::Mysql | Tags::Mariadb),
+        ("sqlite", Tags::Sqlite.into()),
     ]
 }
 
-fn postgres_capabilities() -> Capabilities {
-    Capabilities::SCALAR_LISTS | Capabilities::ENUMS | Capabilities::JSON
+fn postgres_capabilities() -> BitFlags<Capabilities> {
+    Capabilities::ScalarLists | Capabilities::Enums | Capabilities::Json
 }
 
-fn mysql_capabilities() -> Capabilities {
-    Capabilities::ENUMS | Capabilities::JSON
+fn mysql_capabilities() -> BitFlags<Capabilities> {
+    Capabilities::Enums | Capabilities::Json
 }
 
-fn mysql_5_6_capabilities() -> Capabilities {
-    Capabilities::ENUMS
+fn mysql_5_6_capabilities() -> BitFlags<Capabilities> {
+    Capabilities::Enums.into()
 }
 
-fn infer_capabilities(tags: Tags) -> Capabilities {
-    if tags.intersects(Tags::POSTGRES) {
+fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
+    if tags.intersects(Tags::Postgres) {
         return postgres_capabilities();
     }
 
-    if tags.intersects(Tags::MYSQL_5_6) {
+    if tags.intersects(Tags::Mysql56) {
         return mysql_5_6_capabilities();
     }
 
-    if tags.intersects(Tags::MYSQL) {
+    if tags.intersects(Tags::Mysql) {
         return mysql_capabilities();
     }
 
-    Capabilities::empty()
+    BitFlags::empty()
 }
 
 pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
@@ -89,8 +90,8 @@ impl Connectors {
 pub struct Connector {
     name: String,
     test_api_factory_name: String,
-    pub capabilities: Capabilities,
-    pub tags: Tags,
+    pub capabilities: BitFlags<Capabilities>,
+    pub tags: BitFlags<Tags>,
 }
 
 impl Connector {
