@@ -7,6 +7,8 @@ pub mod error;
 pub mod migration;
 pub mod migration_engine;
 
+mod migrations_directory;
+
 pub use api::GenericApi;
 pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput};
 pub use error::CoreResult;
