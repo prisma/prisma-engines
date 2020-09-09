@@ -80,7 +80,6 @@ impl TestApi {
             .introspect(&data_model, native_types)
             .await
             .unwrap();
-        println!("{:?}", introspection_result.data_model);
         datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config)
             .expect("Datamodel rendering failed")
     }
