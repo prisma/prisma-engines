@@ -82,8 +82,8 @@ impl RenderContext {
         self.rendered.insert(cache_key);
     }
 
-    pub fn add_enum(&mut self, name: String, Dmmf_enum: DmmfEnum) {
-        self.schema.enums.push(Dmmf_enum);
+    pub fn add_enum(&mut self, name: String, dmmf_enum: DmmfEnum) {
+        self.schema.enums.push(dmmf_enum);
         self.mark_as_rendered(name);
     }
 

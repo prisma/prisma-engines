@@ -146,7 +146,7 @@ impl<'a> IntoRenderer<'a> for InputFieldRef {
     }
 }
 
-impl<'a> IntoRenderer<'a> for FieldRef {
+impl<'a> IntoRenderer<'a> for OutputFieldRef {
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Field(GqlFieldRenderer::Output(Arc::clone(self)))
     }
