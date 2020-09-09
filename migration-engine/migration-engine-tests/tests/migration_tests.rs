@@ -6,6 +6,7 @@ mod errors;
 mod existing_data;
 mod existing_databases;
 mod infer_migration_steps;
+mod initialization;
 mod migration_persistence;
 mod migrations;
 mod multi_user;
