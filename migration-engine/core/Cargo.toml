@@ -15,7 +15,6 @@ async-trait = "0.1.17"
 chrono = { version = "0.4", features = ["serde"] }
 futures = { version = "0.3", features = ["compat"] }
 jsonrpc-core = "14.0"
-quaint = { git = "https://github.com/prisma/quaint", optional = true }
 serde = { version = "1.0" }
 serde_json = "1.0"
 thiserror = "1.0.9"
@@ -26,4 +25,4 @@ url = "2"
 
 [features]
 default = ["sql"]
-sql = ["quaint", "sql-migration-connector"]
+sql = ["sql-migration-connector"]

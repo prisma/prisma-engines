@@ -1832,7 +1832,6 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
- "tracing",
  "tracing-error",
  "user-facing-errors",
 ]
@@ -1848,7 +1847,6 @@ dependencies = [
  "futures 0.3.5",
  "jsonrpc-core",
  "migration-connector",
- "quaint",
  "serde",
  "serde_json",
  "sql-migration-connector",
@@ -3244,7 +3242,6 @@ dependencies = [
  "anyhow",
  "async-trait",
  "barrel",
- "chrono",
  "futures 0.3.5",
  "once_cell",
  "pretty_assertions",
