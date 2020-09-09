@@ -233,7 +233,7 @@ impl SqlRenderer for PostgresFlavour {
         }
     }
 
-    fn render_references(&self, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, _table: &str, foreign_key: &ForeignKey) -> String {
         let referenced_columns = foreign_key
             .referenced_columns
             .iter()

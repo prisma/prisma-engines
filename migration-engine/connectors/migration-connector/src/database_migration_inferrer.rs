@@ -9,6 +9,9 @@ pub trait DatabaseMigrationInferrer<T>: Send + Sync {
     /// Infer the database migration steps. The previous datamodel is provided, but the implementor can ignore it.
     async fn infer(&self, previous: &Datamodel, next: &Datamodel, steps: &[MigrationStep]) -> ConnectorResult<T>;
 
+    /// Infer the database migration steps, skipping the schema describer and assuming an empty database.
+    fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<T>;
+
     /// Infer a database migration based on the previous and next datamodels. The method signature is identical to `infer`,
     /// but it is expected that this method is implemented based on the provided previous datamodel, and does not rely
     /// on the current state of the database.

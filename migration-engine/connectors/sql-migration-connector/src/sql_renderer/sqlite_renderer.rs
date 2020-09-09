@@ -84,7 +84,7 @@ impl SqlRenderer for SqliteFlavour {
         )
     }
 
-    fn render_references(&self, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, _table: &str, foreign_key: &ForeignKey) -> String {
         let referenced_fields = foreign_key
             .referenced_columns
             .iter()
@@ -182,7 +182,7 @@ impl SqlRenderer for SqliteFlavour {
                     "{indentation}FOREIGN KEY ({constrained_columns}) {references}{comma}",
                     indentation = SQL_INDENTATION,
                     constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
-                    references = self.render_references(fk),
+                    references = self.render_references(&table.table.name, fk),
                     comma = if fks.peek().is_some() { ",\n" } else { "" },
                 )?;
             }
@@ -265,6 +265,7 @@ impl SqlRenderer for SqliteFlavour {
                     table: differ.next.name().to_owned(),
                     index: index.clone(),
                     caused_by_create_table: false,
+                    contains_nullable_columns: false,
                 })
             }));
         }

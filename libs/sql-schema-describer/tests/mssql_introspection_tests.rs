@@ -511,6 +511,7 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
@@ -518,6 +519,7 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_cascade".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
+                    on_update_action: ForeignKeyAction::Cascade,
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
             ],
@@ -587,7 +589,7 @@ async fn mssql_join_table_unique_indexes_must_be_inferred() {
         &[Index {
             name: "cat_and_human_index".into(),
             columns: vec!["cat".to_owned(), "human".to_owned()],
-            tpe: IndexType::Unique
+            tpe: IndexType::Unique,
         }]
     );
 }

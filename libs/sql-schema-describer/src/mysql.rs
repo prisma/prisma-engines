@@ -440,7 +440,8 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             kcu.referenced_column_name referenced_column_name,
             kcu.ordinal_position ordinal_position,
             kcu.table_name table_name,
-            rc.delete_rule delete_rule
+            rc.delete_rule delete_rule,
+            rc.update_rule update_rule
         FROM information_schema.key_column_usage AS kcu
         INNER JOIN information_schema.referential_constraints AS rc ON
         kcu.constraint_name = rc.constraint_name
@@ -496,6 +497,20 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             "no action" => ForeignKeyAction::NoAction,
             s => panic!(format!("Unrecognized on delete action '{}'", s)),
         };
+        let on_update_action = match row
+            .get("update_rule")
+            .and_then(|x| x.to_string())
+            .expect("get update_rule")
+            .to_lowercase()
+            .as_str()
+        {
+            "cascade" => ForeignKeyAction::Cascade,
+            "set null" => ForeignKeyAction::SetNull,
+            "set default" => ForeignKeyAction::SetDefault,
+            "restrict" => ForeignKeyAction::Restrict,
+            "no action" => ForeignKeyAction::NoAction,
+            s => panic!(format!("Unrecognized on update action '{}'", s)),
+        };
 
         let intermediate_fks = map.entry(table_name).or_default();
 
@@ -518,6 +533,7 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
                     referenced_table,
                     referenced_columns: vec![referenced_column],
                     on_delete_action,
+                    on_update_action,
                 };
                 intermediate_fks.insert(constraint_name, fk);
             }

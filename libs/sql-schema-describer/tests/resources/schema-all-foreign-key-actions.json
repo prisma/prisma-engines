@@ -66,30 +66,35 @@
           "columns": ["column1"],
           "referencedTable": "table2",
           "referencedColumns": ["id"],
+          "onUpdateAction": "noAction",
           "onDeleteAction": "noAction"
         },
         {
           "columns": ["column2"],
           "referencedTable": "table2",
           "referencedColumns": ["id"],
+          "onUpdateAction": "noAction",
           "onDeleteAction": "restrict"
         },
         {
           "columns": ["column3"],
           "referencedTable": "table2",
           "referencedColumns": ["id"],
+          "onUpdateAction": "noAction",
           "onDeleteAction": "cascade"
         },
         {
           "columns": ["column4"],
           "referencedTable": "table2",
           "referencedColumns": ["id"],
+          "onUpdateAction": "noAction",
           "onDeleteAction": "setNull"
         },
         {
           "columns": ["column5"],
           "referencedTable": "table2",
           "referencedColumns": ["id"],
+          "onUpdateAction": "noAction",
           "onDeleteAction": "setDefault"
         }
       ]

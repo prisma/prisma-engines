@@ -176,6 +176,7 @@ impl SqlDestructiveChangeChecker<'_> {
                     table,
                     index,
                     caused_by_create_table: false,
+                    contains_nullable_columns: _,
                 }) if index.is_unique() => plan.push_warning(
                     SqlMigrationWarningCheck::UniqueConstraintAddition {
                         table: table.clone(),

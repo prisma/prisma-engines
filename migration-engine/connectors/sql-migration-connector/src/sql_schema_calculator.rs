@@ -105,13 +105,13 @@ impl<'a> SqlSchemaCalculator<'a> {
                 constraint_name: None,
             }).filter(|pk| !pk.columns.is_empty());
 
-            let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f|
+            let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f| {
                 sql::Index {
                     name: format!("{}.{}_unique", &model.db_name(), &f.db_name()),
                     columns: vec![f.db_name().to_owned()],
                     tpe: sql::IndexType::Unique,
                 }
-            );
+            });
 
             let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
                 let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
@@ -178,6 +178,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     columns: fk_columns,
                     referenced_table: relation_field.referenced_table_name().to_owned(),
                     referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
+                    on_update_action: sql::ForeignKeyAction::Cascade,
                     on_delete_action: match column_arity(relation_field.arity()) {
                         ColumnArity::Required => sql::ForeignKeyAction::Cascade,
                         _ => sql::ForeignKeyAction::SetNull,
@@ -189,10 +190,24 @@ impl<'a> SqlSchemaCalculator<'a> {
         }
     }
 
+    fn m2m_foreign_key_action(
+        family: SqlFamily,
+        model_a: &ModelWalker<'_>,
+        model_b: &ModelWalker<'_>,
+    ) -> sql::ForeignKeyAction {
+        match family {
+            // MSSQL will crash when creating a cyclic cascade
+            SqlFamily::Mssql if model_a.name() == model_b.name() => sql::ForeignKeyAction::NoAction,
+            _ => sql::ForeignKeyAction::Cascade,
+        }
+    }
+
     fn calculate_relation_tables<'b>(&'b self) -> impl Iterator<Item = sql::Table> + 'b {
+        let family = self.flavour.sql_family();
+
         walk_relations(self.data_model)
             .filter_map(|relation| relation.as_m2m())
-            .map(|m2m| {
+            .map(move |m2m| {
                 let table_name = m2m.table_name();
                 let model_a_id = m2m.model_a_id();
                 let model_b_id = m2m.model_b_id();
@@ -205,14 +220,16 @@ impl<'a> SqlSchemaCalculator<'a> {
                         columns: vec![m2m.model_a_column().into()],
                         referenced_table: model_a.db_name().into(),
                         referenced_columns: vec![model_a_id.db_name().into()],
-                        on_delete_action: sql::ForeignKeyAction::Cascade,
+                        on_update_action: Self::m2m_foreign_key_action(family, &model_a, &model_b),
+                        on_delete_action: Self::m2m_foreign_key_action(family, &model_a, &model_b),
                     },
                     sql::ForeignKey {
                         constraint_name: None,
                         columns: vec![m2m.model_b_column().into()],
                         referenced_table: model_b.db_name().into(),
                         referenced_columns: vec![model_b_id.db_name().into()],
-                        on_delete_action: sql::ForeignKeyAction::Cascade,
+                        on_update_action: Self::m2m_foreign_key_action(family, &model_a, &model_b),
+                        on_delete_action: Self::m2m_foreign_key_action(family, &model_a, &model_b),
                     },
                 ];
 

@@ -445,6 +445,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
                     tpe: IndexType::Unique,
                 },
                 caused_by_create_table: false,
+                contains_nullable_columns: false,
             }),
         ];
         let actual_steps = result.sql_migration();

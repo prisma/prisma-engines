@@ -97,10 +97,10 @@ pub fn create_relation_table_records(
     child_ids: &[RecordProjection],
 ) -> Query<'static> {
     let relation = field.relation();
-    let parent_columns: Vec<_> = field.related_field().m2m_column_names();
-    let child_columns: Vec<_> = field.m2m_column_names();
+    let parent_columns: Vec<_> = field.related_field().m2m_columns();
+    let child_columns: Vec<_> = field.m2m_columns();
 
-    let columns: Vec<String> = parent_columns.into_iter().chain(child_columns).collect();
+    let columns: Vec<_> = parent_columns.into_iter().chain(child_columns).collect();
     let insert = Insert::multi_into(relation.as_table(), columns);
 
     let insert: MultiRowInsert = child_ids
@@ -122,18 +122,9 @@ pub fn delete_relation_table_records(
     child_ids: &[RecordProjection],
 ) -> Delete<'static> {
     let relation = parent_field.relation();
-    let mut parent_columns: Vec<_> = parent_field
-        .related_field()
-        .m2m_column_names()
-        .into_iter()
-        .map(|name| Column::from(name))
-        .collect();
 
-    let child_columns: Vec<_> = parent_field
-        .m2m_column_names()
-        .into_iter()
-        .map(|name| Column::from(name))
-        .collect();
+    let mut parent_columns: Vec<_> = parent_field.related_field().m2m_columns();
+    let child_columns: Vec<_> = parent_field.m2m_columns();
 
     let parent_id_values = parent_id.db_values();
     let parent_id_criteria = if parent_columns.len() > 1 {

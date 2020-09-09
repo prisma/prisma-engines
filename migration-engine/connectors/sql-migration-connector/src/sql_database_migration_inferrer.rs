@@ -38,6 +38,19 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
         catch(&self.connection_info(), fut).await
     }
 
+    /// Infer the database migration steps, skipping the schema describer and assuming an empty database.
+    fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<SqlMigration> {
+        let current_database_schema = SqlSchema::empty();
+        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info(), self.flavour());
+
+        Ok(infer(
+            current_database_schema,
+            expected_database_schema,
+            self.database_info(),
+            self.flavour(),
+        ))
+    }
+
     fn infer_from_datamodels(
         &self,
         previous: &Datamodel,

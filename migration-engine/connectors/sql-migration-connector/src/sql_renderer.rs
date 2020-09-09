@@ -1,4 +1,5 @@
 mod common;
+mod mssql_renderer;
 mod mysql_renderer;
 mod postgres_renderer;
 mod sqlite_renderer;
@@ -43,7 +44,7 @@ pub(crate) trait SqlRenderer {
         )
         .unwrap();
 
-        add_constraint.push_str(&self.render_references(&foreign_key));
+        add_constraint.push_str(&self.render_references(&table, &foreign_key));
 
         add_constraint
     }
@@ -52,7 +53,7 @@ pub(crate) trait SqlRenderer {
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String;
 
-    fn render_references(&self, foreign_key: &ForeignKey) -> String;
+    fn render_references(&self, table: &str, foreign_key: &ForeignKey) -> String;
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
 

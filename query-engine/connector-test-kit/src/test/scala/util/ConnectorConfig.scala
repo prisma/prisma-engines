@@ -13,6 +13,7 @@ case class ConnectorConfig(
       case "sqlite"     => ConnectorCapabilities.sqlite
       case "postgresql" => ConnectorCapabilities.postgres
       case "mysql"      => ConnectorCapabilities.mysql
+      case "sqlserver"  => ConnectorCapabilities.mssql
     }
   }
 }
@@ -43,7 +44,37 @@ object ConnectorConfig {
       case "mysql8"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1", false, "mysql8")
       case "mysql56"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", false, "mysql56")
       case "mariadb" => ConnectorConfig("mysql", s"mysql://root:prisma@$mariadb_Host:$mariadb_Port/$$DB?connection_limit=1", false, "mariadb")
+      case "mssql2017" => ConnectorConfig("sqlserver", s"sqlserver://$mssql_2017_Host:$mssql_2017_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", false, "mssql2017")
+      case "mssql2019" => ConnectorConfig("sqlserver", s"sqlserver://$mssql_2019_Host:$mssql_2019_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", false, "mssql2019")
       case x         => sys.error(s"Connector $x is not supported yet.")
+    }
+  }
+
+  lazy val mssql_2019_Host = {
+    if (EnvVars.isBuildkite) {
+      "test-db-mssql-2019"
+    } else {
+      "127.0.0.1"
+    }
+  }
+
+  lazy val mssql_2017_Host = {
+    if (EnvVars.isBuildkite) {
+      "test-db-mssql-2017"
+    } else {
+      "127.0.0.1"
+    }
+  }
+
+  lazy val mssql_2019_Port = {
+    1433
+  }
+
+  lazy val mssql_2017_Port = {
+    if (EnvVars.isBuildkite) {
+      1433
+    } else {
+      1434
     }
   }
 

@@ -183,8 +183,15 @@ pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
     }
 }
 
+pub async fn mssql_2017_test_api(schema: &'static str) -> TestApi {
+    mssql_test_api(mssql_2017_url("master"), schema, "mssql2017").await
+}
+
 pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
-    let connection_string = mssql_2019_url("master");
+    mssql_test_api(mssql_2019_url("master"), schema, "mssql2017").await
+}
+
+pub async fn mssql_test_api(connection_string: String, schema: &'static str, connector_name: &'static str) -> TestApi {
     let database = Quaint::new(&connection_string).await.unwrap();
     let connection_info = database.connection_info().to_owned();
 
@@ -237,7 +244,7 @@ pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
     database.raw_cmd(&format!("CREATE SCHEMA {}", schema)).await.unwrap();
 
     TestApi {
-        connector_name: "mssql2019",
+        connector_name,
         db_name: schema,
         connection_info,
         database,
