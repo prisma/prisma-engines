@@ -1,4 +1,4 @@
-use super::{common::*, RenderedAlterColumn, SqlRenderer};
+use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
     flavour::{SqlFlavour, SqliteFlavour},
@@ -51,7 +51,7 @@ impl SqlRenderer for SqliteFlavour {
         let default_str = column
             .default()
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_) | DefaultValue::SEQUENCE(_)))
-            .map(|default| format!(" DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
+            .map(|default| format!(" DEFAULT {}", self.render_default(default, column.column_type_family())))
             .unwrap_or_else(String::new);
         let auto_increment_str = if column.is_autoincrement() && column.is_single_primary_key() {
             " PRIMARY KEY AUTOINCREMENT"
@@ -104,16 +104,7 @@ impl SqlRenderer for SqliteFlavour {
         unreachable!("AddForeignKey on SQLite")
     }
 
-    fn render_alter_column(&self, _differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
-        None
-    }
-
-    fn render_alter_table(
-        &self,
-        alter_table: &AlterTable,
-        _database_info: &DatabaseInfo,
-        differ: &SqlSchemaDiffer<'_>,
-    ) -> Vec<String> {
+    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         let AlterTable { table, changes } = alter_table;
 
         let mut statements = Vec::new();
@@ -318,8 +309,8 @@ fn copy_current_table_into_new_table(
         .column_pairs()
         .filter(|columns| {
             columns.all_changes().arity_changed()
-                && columns.next.column.tpe.arity.is_required()
-                && columns.next.column.default.is_some()
+                && columns.next.arity().is_required()
+                && columns.next.default().is_some()
         })
         .collect();
 
@@ -370,13 +361,8 @@ fn copy_current_table_into_new_table(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
                 column_name = Quoted::sqlite_ident(columns.name()),
                 default_value = flavour.render_default(
-                    columns
-                        .next
-                        .column
-                        .default
-                        .as_ref()
-                        .expect("default on required column with default"),
-                    &columns.next.column.tpe.family
+                    columns.next.default().expect("default on required column with default"),
+                    &columns.next.column_type_family()
                 )
             )
         }))

@@ -13,6 +13,7 @@ use std::{fmt, str::FromStr};
 use thiserror::Error;
 use tracing::debug;
 
+pub mod mssql;
 pub mod mysql;
 pub mod postgres;
 pub mod sqlite;

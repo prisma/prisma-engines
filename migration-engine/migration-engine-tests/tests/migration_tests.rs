@@ -6,6 +6,7 @@ mod errors;
 mod existing_data;
 mod existing_databases;
 mod infer_migration_steps;
+mod initialization;
 mod migration_persistence;
 mod migrations;
 mod multi_user;
@@ -1674,7 +1675,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug,sql-schema-describer=info")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::Insert;
 

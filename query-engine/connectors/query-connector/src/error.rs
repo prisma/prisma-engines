@@ -24,6 +24,10 @@ impl ConnectorError {
             ErrorKind::TableDoesNotExist { table } => Some(
                 KnownError::new(user_facing_errors::query_engine::TableDoesNotExist { table: table.clone() }).unwrap(),
             ),
+            ErrorKind::ColumnDoesNotExist { column } => Some(
+                KnownError::new(user_facing_errors::query_engine::ColumnDoesNotExist { column: column.clone() })
+                    .unwrap(),
+            ),
             _ => None,
         };
 
@@ -48,8 +52,8 @@ pub enum ErrorKind {
     #[error("Record does not exist.")]
     RecordDoesNotExist,
 
-    #[error("Column does not exist")]
-    ColumnDoesNotExist,
+    #[error("Column '{}' does not exist.", column)]
+    ColumnDoesNotExist { column: String },
 
     #[error("Table '{}' does not exist.", table)]
     TableDoesNotExist { table: String },

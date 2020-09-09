@@ -72,6 +72,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::JSON => "JSON".into(),
             MySqlType::Enum => "ENUM".into(), //Fixme
             MySqlType::NotHandled => panic!("An Unhandled Datatype should not reach this point. "),
+            _ => todo!(),
         };
 
         sql::ColumnType {

@@ -4,12 +4,17 @@ use serde_json::Value;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum MySqlType {
     Int,
+    UnsignedInt,
     SmallInt,
+    UnsignedSmallInt,
     TinyInt,
+    UnsignedTinyInt,
     MediumInt,
+    UnsignedMediumInt,
     BigInt,
     Decimal(u32, u32),
     Numeric(u32, u32),
+    UnsignedBigInt,
     Float,
     Double,
     Bit(u32),
