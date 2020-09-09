@@ -400,12 +400,23 @@ impl InputField {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum InputType {
     Scalar(ScalarType),
     Enum(EnumTypeRef),
     List(Box<InputType>),
     Object(InputObjectTypeWeakRef),
+}
+
+impl Debug for InputType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InputType::Object(obj) => write!(f, "Object({})", obj.into_arc().name),
+            InputType::Scalar(s) => write!(f, "{:?}", s),
+            InputType::Enum(e) => write!(f, "{:?}", e),
+            InputType::List(l) => write!(f, "{:?}", l),
+        }
+    }
 }
 
 impl From<&InputType> for TypeHint {

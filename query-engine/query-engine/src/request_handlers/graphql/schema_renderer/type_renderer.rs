@@ -20,27 +20,23 @@ impl<'a> GqlTypeRenderer<'a> {
         match i {
             InputType::Object(ref obj) => {
                 let _ = obj.into_renderer().render(ctx);
-                format!("{}!", obj.into_arc().name)
+                format!("{}", obj.into_arc().name)
             }
 
             InputType::Enum(et) => {
                 // Not sure how this fits together with the enum handling below.
                 let _ = et.into_renderer().render(ctx);
-                format!("{}!", et.name())
+                format!("{}", et.name())
             }
 
             InputType::List(ref l) => {
                 let substring = self.render_input_type(l, ctx);
-                format!("[{}]!", substring)
+                format!("[{}]", substring)
             }
 
-            // InputType::Opt(ref opt) => {
-            //     let substring = self.render_input_type(opt, ctx);
-            //     substring.trim_end_matches('!').to_owned()
-            // }
             InputType::Scalar(ScalarType::Enum(et)) => {
                 let _ = et.into_renderer().render(ctx);
-                format!("{}!", et.name())
+                format!("{}", et.name())
             }
 
             InputType::Scalar(ref scalar) => {
@@ -66,27 +62,23 @@ impl<'a> GqlTypeRenderer<'a> {
         match o {
             OutputType::Object(obj) => {
                 let _ = obj.into_renderer().render(ctx);
-                format!("{}!", obj.into_arc().name())
+                format!("{}", obj.into_arc().name())
             }
 
             OutputType::Enum(et) => {
                 // Not sure how this fits together with the enum handling below.
                 let _ = et.into_renderer().render(ctx);
-                format!("{}!", et.name())
+                format!("{}", et.name())
             }
 
             OutputType::List(l) => {
                 let substring = self.render_output_type(l, ctx);
-                format!("[{}]!", substring)
+                format!("[{}]", substring)
             }
 
-            // OutputType::Opt(ref opt) => {
-            //     let substring = self.render_output_type(opt, ctx);
-            //     substring.trim_end_matches('!').to_owned()
-            // }
             OutputType::Scalar(ScalarType::Enum(et)) => {
                 let _ = et.into_renderer().render(ctx);
-                format!("{}!", et.name())
+                format!("{}", et.name())
             }
 
             OutputType::Scalar(ref scalar) => {
