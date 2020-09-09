@@ -57,7 +57,7 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates a selection against a schema (output) field.
-    fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryParserResult<ParsedField> {
+    fn parse_field(selection: &Selection, schema_field: &OutputFieldRef) -> QueryParserResult<ParsedField> {
         // Parse and validate all provided arguments for the field
         Self::parse_arguments(schema_field, selection.arguments())
             .and_then(|arguments| {
@@ -88,7 +88,7 @@ impl QueryDocumentParser {
 
     /// Parses and validates selection arguments against a schema defined field.
     pub fn parse_arguments(
-        schema_field: &FieldRef,
+        schema_field: &OutputFieldRef,
         given_arguments: &[(String, QueryValue)],
     ) -> QueryParserResult<Vec<ParsedArgument>> {
         let left: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();

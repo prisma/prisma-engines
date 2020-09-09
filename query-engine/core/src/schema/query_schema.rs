@@ -163,7 +163,8 @@ pub struct OutputField {
     pub arguments: Vec<InputFieldRef>,
     pub field_type: OutputTypeRef,
 
-    /// Indicates if the presence of the field on the higher output objects
+    /// Indicates if the presence of the field on the higher output objects.
+    /// As opposed to input fields, optional output fields are also automatically nullable.
     pub is_required: bool,
     pub query_builder: Option<SchemaQueryBuilder>,
 }
@@ -178,7 +179,7 @@ impl OutputField {
         self
     }
 
-    pub fn optional_if(mut self, condition: bool) -> Self {
+    pub fn optional_if(self, condition: bool) -> Self {
         if condition {
             self.optional()
         } else {

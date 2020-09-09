@@ -9,9 +9,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             let type_reference = DmmfTypeReference {
                 typ: obj.into_arc().name().to_string(),
                 kind: TypeKind::Object,
-                is_required: true,
                 is_list: false,
-                is_nullable: false,
             };
 
             type_reference
@@ -22,7 +20,6 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
                 typ: et.name().to_owned(),
                 kind: TypeKind::Enum,
                 is_list: false,
-                is_nullable: false,
             };
 
             type_reference
@@ -31,13 +28,6 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
         OutputType::List(ref l) => {
             let mut type_reference = render_output_type(l, ctx);
             type_reference.is_list = true;
-
-            type_reference
-        }
-
-        OutputType::Opt(ref opt) => {
-            let mut type_reference = render_output_type(opt, ctx);
-            type_reference.is_required = false;
 
             type_reference
         }

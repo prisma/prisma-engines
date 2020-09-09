@@ -1,5 +1,5 @@
 use super::{internal::serialize_internal, response::*, *};
-use crate::{CoreError, ExpressionResult, OutputType, OutputTypeRef, QueryResult};
+use crate::{CoreError, ExpressionResult, OutputFieldRef, OutputType, QueryResult};
 
 use prisma_models::PrismaValue;
 use std::borrow::Borrow;
@@ -10,8 +10,8 @@ pub struct IrSerializer {
     /// Note: This will change
     pub key: String,
 
-    /// Output type describing the possible shape of the result
-    pub output_type: OutputTypeRef,
+    /// Output field describing the possible shape of the result
+    pub output_field: OutputFieldRef,
 }
 
 impl IrSerializer {
@@ -22,20 +22,23 @@ impl IrSerializer {
             }
 
             ExpressionResult::Query(r) => {
-                let serialized = serialize_internal(r, &self.output_type, false, false)?;
+                let serialized = serialize_internal(r, &self.output_field, false)?;
 
                 // On the top level, each result boils down to a exactly a single serialized result.
                 // All checks for lists and optionals have already been performed during the recursion,
                 // so we just unpack the only result possible.
                 // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
                 let result = if serialized.is_empty() {
-                    match self.output_type.borrow() {
-                        OutputType::Opt(_) => Item::Value(PrismaValue::Null(TypeHint::Unknown)),
-                        OutputType::List(_) => Item::list(Vec::new()),
-                        other => return Err(CoreError::SerializationError(format!(
-                            "Invalid response data: the query result was required, but an empty {:?} was returned instead.",
-                            other
-                        ))),
+                    if !self.output_field.is_required {
+                        Item::Value(PrismaValue::Null(TypeHint::Unknown))
+                    } else {
+                        match self.output_field.field_type.borrow() {
+                            OutputType::List(_) => Item::list(Vec::new()),
+                            other => return Err(CoreError::SerializationError(format!(
+                                "Invalid response data: the query result was required, but an empty {:?} was returned instead.",
+                                other
+                            ))),
+                        }
                     }
                 } else {
                     let (_, item) = serialized.into_iter().take(1).next().unwrap();

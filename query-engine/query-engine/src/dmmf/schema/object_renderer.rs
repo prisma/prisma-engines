@@ -35,14 +35,16 @@ impl DmmfObjectRenderer {
 
         let input_type = DmmfInputType {
             name: input_object.name.clone(),
-            is_one_of: input_object.is_one_of,
+            constraints: DmmfInputTypeConstraints {
+                max_num_fields: input_object.constraints.max_num_fields.clone(),
+                min_num_fields: input_object.constraints.min_num_fields.clone(),
+            },
             fields: rendered_fields,
         };
 
         ctx.add_input_type(input_type);
     }
 
-    // WIP dedup code
     fn render_output_object(&self, output_object: &ObjectTypeWeakRef, ctx: &mut RenderContext) {
         let output_object = output_object.into_arc();
 

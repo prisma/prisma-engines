@@ -9,96 +9,6 @@ use std::sync::Arc;
 
 #[test]
 #[serial]
-fn dmmf_create_inputs_without_fields_for_parent_records_are_correct() {
-    let dm = r#"
-        model Blog {
-            blogId     String @id
-            postsField Post[]
-        }
-
-        model Post {
-            postId    String  @id
-            blogId    String?
-            blogField Blog?   @relation(fields: [blogId], references: [blogId])
-            tagsField Tag[]
-        }
-
-        model Tag {
-            tagId String @id
-            postsField Post[]
-        }
-    "#;
-
-    let (query_schema, datamodel) = get_query_schema(dm);
-
-    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
-
-    let inputs = &dmmf.schema.input_types;
-
-    let create_post_from_blog = inputs
-        .iter()
-        .find(|input| input.name == "PostCreateWithoutBlogFieldInput")
-        .expect("finding PostCreateWithoutBlogFieldInput");
-
-    let create_post_from_blog_fields: Vec<(&str, &str)> = create_post_from_blog
-        .fields
-        .iter()
-        .map(|f| (f.name.as_str(), f.input_type.typ.as_str()))
-        .collect();
-
-    assert_eq!(
-        create_post_from_blog_fields,
-        &[
-            ("postId", "String"),
-            ("tagsField", "TagCreateManyWithoutPostsFieldInput")
-        ]
-    );
-
-    let create_post_from_tags = inputs
-        .iter()
-        .find(|input| input.name == "PostCreateWithoutTagsFieldInput")
-        .expect("finding PostCreateWithoutTagsFieldInput");
-
-    let create_post_from_tags_fields: Vec<(&str, &str)> = create_post_from_tags
-        .fields
-        .iter()
-        .map(|f| (f.name.as_str(), f.input_type.typ.as_str()))
-        .collect();
-
-    assert_eq!(
-        create_post_from_tags_fields,
-        &[
-            ("postId", "String"),
-            ("blogField", "BlogCreateOneWithoutPostsFieldInput")
-        ]
-    );
-}
-
-#[test]
-#[serial]
-fn where_unique_inputs_must_be_flagged_as_union() {
-    let dm = r#"
-        model Blog {
-            blogId String @id
-        }
-    "#;
-
-    let (query_schema, datamodel) = get_query_schema(dm);
-
-    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
-
-    let inputs = &dmmf.schema.input_types;
-
-    let where_unique_input = inputs
-        .iter()
-        .find(|input| input.name == "BlogWhereUniqueInput")
-        .expect("finding BlogWhereUniqueInput");
-
-    assert!(where_unique_input.is_one_of);
-}
-
-#[test]
-#[serial]
 fn must_not_fail_on_missing_env_vars_in_a_datasource() {
     let dm = r#"
         datasource pg {
@@ -130,7 +40,7 @@ fn list_of_reserved_model_names_must_be_up_to_date() {
            provider       = "postgresql"
            url            = "postgresql://localhost"
         }
-        
+
         model Blog {
             id          Int @id
             intReq      Int
@@ -139,20 +49,20 @@ fn list_of_reserved_model_names_must_be_up_to_date() {
             flaotOpt    Float?
             boolReq     Boolean
             boolOpt     Boolean?
-            stringReq   String 
+            stringReq   String
             stringOpt   String?
             datetimeReq DateTime
             datetimeOpt DateTime?
             jsonReq     Json
             jsonOpt     Json?
-            
+
             posts       Post[]
         }
-        
+
         model Post {
           id     Int @id
           blogId Int
-          
+
           blog   Blog @relation(fields: blogId, references: id)
         }
     "#;

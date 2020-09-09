@@ -127,7 +127,7 @@ impl QueryGraphBuilder {
                 .alias()
                 .clone()
                 .unwrap_or_else(|| selection.name().to_string()),
-            output_type: field.schema_field.field_type.clone(),
+            output_field: field.schema_field.clone(),
         }
     }
 }

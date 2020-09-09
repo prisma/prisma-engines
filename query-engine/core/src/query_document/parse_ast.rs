@@ -1,7 +1,7 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 use super::{QueryParserError, QueryParserResult};
-use crate::FieldRef;
+use crate::OutputFieldRef;
 use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 
@@ -20,7 +20,7 @@ pub struct ParsedField {
     pub nested_fields: Option<ParsedObject>,
 
     /// Associated schema field
-    pub schema_field: FieldRef,
+    pub schema_field: OutputFieldRef,
 }
 
 /// Indicator for a query that should be ran as-is in the database, as plain

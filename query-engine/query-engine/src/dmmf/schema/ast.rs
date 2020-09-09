@@ -24,13 +24,13 @@ pub struct DmmfOutputField {
 #[serde(rename_all = "camelCase")]
 pub struct DmmfInputType {
     pub name: String,
-    pub constraints: InputTypeConstraints,
+    pub constraints: DmmfInputTypeConstraints,
     pub fields: Vec<DmmfInputField>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct InputTypeConstraints {
+pub struct DmmfInputTypeConstraints {
     pub max_num_fields: Option<usize>,
     pub min_num_fields: Option<usize>,
 }
