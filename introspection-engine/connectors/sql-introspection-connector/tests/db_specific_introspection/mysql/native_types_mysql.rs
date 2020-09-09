@@ -2,7 +2,7 @@ use crate::*;
 use test_harness::*;
 
 const TYPES: &'static [(&str, &str)] = &[
-    //fieldname, db datatype, non-native result, native result
+    //fieldname, db datatype
     ("int", "int(11)"),
     ("smallint", "SmallInt"),
     ("tinyint", "TinyInt"),

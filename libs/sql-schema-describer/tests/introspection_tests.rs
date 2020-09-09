@@ -113,7 +113,7 @@ async fn is_required_must_work(api: &TestApi) {
 
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Nullable,
-                native_type: varchar_native_type(api, 0),
+                native_type: int_native_type(api),
             },
             default: None,
             auto_increment: false,

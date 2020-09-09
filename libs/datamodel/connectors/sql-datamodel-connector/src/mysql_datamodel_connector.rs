@@ -37,6 +37,7 @@ const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const YEAR_TYPE_NAME: &str = "Year";
 const JSON_TYPE_NAME: &str = "JSON";
 const ENUM_TYPE_NAME: &str = "Enum";
+const SET_TYPE_NAME: &str = "Set";
 const NOT_HANDLED_TYPE_NAME: &str = "NotHandled";
 
 pub struct MySqlDatamodelConnector {
@@ -238,6 +239,8 @@ impl Connector for MySqlDatamodelConnector {
             TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().map(|i| *i).unwrap_or(0)),
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
+            ENUM_TYPE_NAME => MySqlType::Enum,
+            SET_TYPE_NAME => MySqlType::Set,
 
             x => unreachable!(format!(
                 "This code is unreachable as the core must guarantee to just call with known names. {}",
@@ -298,6 +301,7 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
             MySqlType::Enum => (ENUM_TYPE_NAME, vec![]),
+            MySqlType::Set => (ENUM_TYPE_NAME, vec![]),
             MySqlType::NotHandled => (NOT_HANDLED_TYPE_NAME, vec![]),
         };
 

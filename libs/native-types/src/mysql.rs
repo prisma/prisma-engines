@@ -37,6 +37,7 @@ pub enum MySqlType {
     Year,
     JSON,
     Enum,
+    Set,
     NotHandled,
 }
 
