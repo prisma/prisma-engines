@@ -1,4 +1,5 @@
 use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
+use enumflags2::BitFlags;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultValue};
 
@@ -22,39 +23,29 @@ impl<'a> ColumnDiffer<'a> {
     }
 
     pub(crate) fn all_changes(&self) -> ColumnChanges {
-        let renaming = if self.previous.name() != self.next.name() {
-            Some(ColumnChange::Renaming)
-        } else {
-            None
+        let mut changes = BitFlags::empty();
+
+        if self.previous.name() != self.next.name() {
+            changes |= ColumnChange::Renaming;
         };
 
-        let arity = if self.previous.arity() != self.next.arity() {
-            Some(ColumnChange::Arity)
-        } else {
-            None
+        if self.previous.arity() != self.next.arity() {
+            changes |= ColumnChange::Arity
         };
 
-        let r#type = if self.column_type_changed() {
-            Some(ColumnChange::Type)
-        } else {
-            None
+        if self.column_type_changed() {
+            changes |= ColumnChange::TypeChanged;
         };
 
-        let default = if !self.defaults_match() {
-            Some(ColumnChange::Default)
-        } else {
-            None
+        if !self.defaults_match() {
+            changes |= ColumnChange::Default;
         };
 
-        let sequence = if self.previous.is_autoincrement() != self.next.is_autoincrement() {
-            Some(ColumnChange::Sequence)
-        } else {
-            None
+        if self.previous.is_autoincrement() != self.next.is_autoincrement() {
+            changes |= ColumnChange::Sequence;
         };
 
-        ColumnChanges {
-            changes: [renaming, r#type, arity, default, sequence],
-        }
+        ColumnChanges { changes }
     }
 
     fn column_type_changed(&self) -> bool {
@@ -122,42 +113,43 @@ fn json_defaults_match(previous: &str, next: &str) -> bool {
         .unwrap_or(true)
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(BitFlags, Debug, Clone, Copy, PartialEq)]
+#[repr(u8)]
 pub(crate) enum ColumnChange {
-    Renaming,
-    Arity,
-    Default,
-    Type,
-    Sequence,
+    Renaming = 0b0001,
+    Arity = 0b0010,
+    Default = 0b0100,
+    TypeChanged = 0b1000,
+    Sequence = 0b0010000,
 }
 
 #[derive(Debug, Clone)]
 pub(crate) struct ColumnChanges {
-    changes: [Option<ColumnChange>; 5],
+    changes: BitFlags<ColumnChange>,
 }
 
 impl ColumnChanges {
     pub(crate) fn iter<'a>(&'a self) -> impl Iterator<Item = ColumnChange> + 'a {
-        self.changes.iter().filter_map(|c| c.as_ref().cloned())
+        self.changes.iter()
     }
 
     pub(crate) fn type_changed(&self) -> bool {
-        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Type))
+        self.changes.contains(ColumnChange::TypeChanged)
     }
 
     pub(crate) fn arity_changed(&self) -> bool {
-        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Arity))
+        self.changes.contains(ColumnChange::Arity)
     }
 
     pub(crate) fn only_default_changed(&self) -> bool {
-        matches!(self.changes, [None, None, None, Some(ColumnChange::Default), None])
+        self.changes == BitFlags::from(ColumnChange::Default)
     }
 
     pub(crate) fn only_type_changed(&self) -> bool {
-        matches!(self.changes, [None, Some(ColumnChange::Type), None, None, None])
+        self.changes == BitFlags::from(ColumnChange::TypeChanged)
     }
 
     pub(crate) fn column_was_renamed(&self) -> bool {
-        matches!(self.changes, [Some(ColumnChange::Renaming), _, _, _, _])
+        self.changes.contains(ColumnChange::Renaming)
     }
 }

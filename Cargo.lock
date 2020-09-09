@@ -3192,6 +3192,7 @@ dependencies = [
  "chrono",
  "datamodel",
  "datamodel-connector",
+ "enumflags2",
  "futures 0.3.5",
  "migration-connector",
  "native-types",
