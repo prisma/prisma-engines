@@ -57,6 +57,7 @@ pub(crate) fn map_field(ctx: &mut BuilderContext, model_field: &ModelField) -> O
         map_output_type(ctx, &model_field),
         None,
     )
+    .optional_if(!model_field.is_required())
 }
 
 pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputType {
@@ -85,8 +86,6 @@ pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField
 
     if model_field.is_scalar() && model_field.is_list() {
         OutputType::list(output_type)
-    } else if !model_field.is_required() {
-        OutputType::opt(output_type)
     } else {
         output_type
     }
@@ -159,7 +158,7 @@ pub(crate) fn numeric_aggregation_field(
     if numeric_fields.is_empty() {
         None
     } else {
-        let object_type = wrap_opt_object(map_numeric_field_aggregation_object(
+        let object_type = OutputType::object(map_numeric_field_aggregation_object(
             ctx,
             model,
             name,
@@ -167,7 +166,7 @@ pub(crate) fn numeric_aggregation_field(
             fixed_field_type,
         ));
 
-        Some(field(name, vec![], object_type, None))
+        Some(field(name, vec![], object_type, None).optional())
     }
 }
 
@@ -194,6 +193,7 @@ pub(crate) fn map_numeric_field_aggregation_object(
                     .unwrap_or(map_output_type(ctx, &ModelField::Scalar(sf.clone()))),
                 None,
             )
+            .optional_if(!sf.is_required)
         })
         .collect();
 
@@ -214,8 +214,4 @@ fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
             _ => false,
         })
         .collect()
-}
-
-fn wrap_opt_object(o: ObjectTypeWeakRef) -> OutputType {
-    OutputType::opt(OutputType::object(o))
 }

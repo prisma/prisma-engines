@@ -144,7 +144,7 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             args,
-            OutputType::opt(OutputType::object(output_objects::map_model_object_type(ctx, &model))),
+            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 model.clone(),
                 QueryTag::DeleteOne,
@@ -156,6 +156,7 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
                 }),
             ))),
         )
+        .optional()
     })
 }
 
@@ -192,7 +193,7 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             args,
-            OutputType::opt(OutputType::object(output_objects::map_model_object_type(ctx, &model))),
+            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 model.clone(),
                 QueryTag::UpdateOne,
@@ -204,6 +205,7 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
                 }),
             ))),
         )
+        .optional()
     })
 }
 

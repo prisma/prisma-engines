@@ -162,12 +162,28 @@ pub struct OutputField {
     /// instead of being attached to an input object.
     pub arguments: Vec<InputFieldRef>,
     pub field_type: OutputTypeRef,
+
+    /// Indicates if the presence of the field on the higher output objects
+    pub is_required: bool,
     pub query_builder: Option<SchemaQueryBuilder>,
 }
 
 impl OutputField {
     pub fn query_builder(&self) -> Option<&SchemaQueryBuilder> {
         self.query_builder.as_ref()
+    }
+
+    pub fn optional(mut self) -> Self {
+        self.is_required = false;
+        self
+    }
+
+    pub fn optional_if(mut self, condition: bool) -> Self {
+        if condition {
+            self.optional()
+        } else {
+            self
+        }
     }
 }
 
@@ -457,17 +473,12 @@ pub enum OutputType {
     Enum(EnumTypeRef),
     List(OutputTypeRef),
     Object(ObjectTypeWeakRef),
-    Opt(OutputTypeRef),
     Scalar(ScalarType),
 }
 
 impl OutputType {
     pub fn list(containing: OutputType) -> OutputType {
         OutputType::List(Arc::new(containing))
-    }
-
-    pub fn opt(containing: OutputType) -> OutputType {
-        OutputType::Opt(Arc::new(containing))
     }
 
     pub fn object(containing: ObjectTypeWeakRef) -> OutputType {
@@ -509,14 +520,12 @@ impl OutputType {
             OutputType::Enum(_) => None,
             OutputType::List(inner) => inner.as_object_type(),
             OutputType::Object(obj) => Some(obj.into_arc()),
-            OutputType::Opt(inner) => inner.as_object_type(),
             OutputType::Scalar(_) => None,
         }
     }
 
     pub fn is_list(&self) -> bool {
         match self {
-            OutputType::Opt(inner) => inner.is_list(),
             OutputType::List(_) => true,
             _ => false,
         }
@@ -524,7 +533,6 @@ impl OutputType {
 
     pub fn is_object(&self) -> bool {
         match self {
-            OutputType::Opt(inner) => inner.is_object(),
             OutputType::Object(_) => true,
             _ => false,
         }

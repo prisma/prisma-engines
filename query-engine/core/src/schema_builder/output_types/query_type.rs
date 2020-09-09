@@ -28,7 +28,7 @@ fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             vec![arg],
-            OutputType::opt(OutputType::object(output_objects::map_model_object_type(ctx, &model))),
+            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 model.clone(),
                 QueryTag::FindOne,
@@ -43,6 +43,7 @@ fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
                 }),
             ))),
         )
+        .optional()
     })
 }
 
