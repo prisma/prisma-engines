@@ -113,7 +113,13 @@ pub struct EnumAssertion<'a>(&'a Enum);
 
 impl<'a> EnumAssertion<'a> {
     pub fn assert_values(self, expected_values: &[&'static str]) -> AssertionResult<Self> {
-        assert_eq!(self.0.values, expected_values);
+        anyhow::ensure!(
+            self.0.values == expected_values,
+            "Assertion failed. The `{}` enum does not contain the expected variants.\nExpected:\n{:#?}\n\nFound:\n{:#?}\n",
+            self.0.name,
+            expected_values,
+            self.0.values
+        );
 
         Ok(self)
     }
