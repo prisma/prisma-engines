@@ -4,12 +4,10 @@ use chrono::{DateTime, Utc};
 use migration_connector::*;
 use serde::{Deserialize, Serialize};
 
-pub struct MigrationProgressCommand<'a> {
-    input: &'a MigrationProgressInput,
-}
+pub struct MigrationProgressCommand;
 
 #[async_trait::async_trait]
-impl<'a> MigrationCommand for MigrationProgressCommand<'a> {
+impl MigrationCommand for MigrationProgressCommand {
     type Input = MigrationProgressInput;
     type Output = MigrationProgressOutput;
 
@@ -18,16 +16,15 @@ impl<'a> MigrationCommand for MigrationProgressCommand<'a> {
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
     {
-        let cmd = MigrationProgressCommand { input };
         let migration_persistence = engine.connector().migration_persistence();
 
         let migration = migration_persistence
-            .by_name(&cmd.input.migration_id)
+            .by_name(&input.migration_id)
             .await?
             .ok_or_else(|| {
                 let error = anyhow::anyhow!(
                     "Could not load migration from database. Migration name was: {}",
-                    &cmd.input.migration_id
+                    &input.migration_id
                 );
 
                 CommandError::Input(error)
