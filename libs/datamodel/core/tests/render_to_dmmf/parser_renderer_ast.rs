@@ -205,7 +205,6 @@ model Author {
 
 fn assert_rendered(input: &str, expected: &str) {
     let ast = parse_to_ast(&input).expect("failed to parse");
-    println!("{:?}", ast);
     let rendered = render_schema_ast_to_string(&ast);
     assert_eq!(rendered, expected);
 }
