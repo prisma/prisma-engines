@@ -5,9 +5,9 @@ use pest::{Parser, RuleType};
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
-use serde_json::value::Value::Array;
-use pest::iterators::{Pair, Pairs};
 use itertools::Itertools;
+use pest::iterators::{Pair, Pairs};
+use serde_json::value::Value::Array;
 use std::cmp::Ordering;
 
 pub struct Reformatter<'a> {
@@ -378,7 +378,7 @@ impl<'a> Reformatter<'a> {
                     directive_indices.push(i);
                     directives.push(pair);
                 }
-                _ => ()
+                _ => (),
             }
         }
 
@@ -410,12 +410,13 @@ impl<'a> Reformatter<'a> {
                     pair = directives[count].clone();
                     count = count + 1;
                 }
-                _ => ()
+                _ => (),
             }
         }
 
         // write to target
-        for current in sorted_inner_pairs { // todo value used after move
+        for current in sorted_inner_pairs {
+            // todo value used after move
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     target.write(current.as_str());
@@ -507,10 +508,6 @@ impl<'a> Reformatter<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::directive_name => {
-                    // Begin
-
-                    // Check for correct oder of directives
-
                     if !target.line_empty() {
                         target.write(" ");
                     }
