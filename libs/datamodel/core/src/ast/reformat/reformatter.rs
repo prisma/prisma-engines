@@ -378,26 +378,28 @@ impl<'a> Reformatter<'a> {
             }
         }
 
-        // sort directives Vector
+        // sort directives
         let correct_order = vec!["map", "id", "unique", "default", "relation", "updatedAt"];
         directives.sort_by(|a, b| {
-            let mut sort_index_a = 8;
-            let mut sort_index_b = 8;
+            let mut sort_index_a = usize::MAX;
+            let mut sort_index_b = usize::MAX;
+            println!("{:?}", sort_index_a);
             for (i, name) in correct_order.iter().enumerate() {
-                if sort_index_a != 8 && sort_index_b != 8 {
+                if a.as_str().contains(name) {
+                    sort_index_a = i;
                     break;
                 }
-                if sort_index_a == 8 && a.as_str().contains(name) {
-                    sort_index_a = i;
-                }
-                if sort_index_b == 8 && b.as_str().contains(name) {
+            }
+            for (i, name) in correct_order.iter().enumerate() {
+                if b.as_str().contains(name) {
                     sort_index_b = i;
+                    break;
                 }
             }
             sort_index_a.cmp(&sort_index_b)
         });
 
-        // iterate through original Vector and replace values at stored indices with sorted Directives at certain index
+        // iterate through tokens and reorder directives
         let mut count = 0;
         let sorted_inner_pairs = token.clone().into_inner().map(|p| match p.as_rule() {
             Rule::directive => {
