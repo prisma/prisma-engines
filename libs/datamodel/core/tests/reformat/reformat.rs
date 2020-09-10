@@ -477,7 +477,7 @@ fn new_lines_inside_block_above_field_must_stay() {
 
 
 
-  id Int @default(autoincrement()) @id
+  id Int @id @default(autoincrement())
 }
 "#;
 
@@ -489,7 +489,7 @@ fn new_lines_inside_block_above_field_must_stay() {
 #[test]
 fn new_lines_inside_block_below_field_must_stay() {
     let input = r#"model Post {
-  id Int @default(autoincrement()) @id
+  id Int @id @default(autoincrement())
 
 
 
@@ -505,7 +505,7 @@ fn new_lines_inside_block_below_field_must_stay() {
 #[test]
 fn new_lines_inside_block_in_between_fields_must_stay() {
     let input = r#"model Post {
-  id Int @default(autoincrement()) @id
+  id Int @id @default(autoincrement())
 
 
   input String
