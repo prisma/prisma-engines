@@ -9,7 +9,6 @@ use mysql_async::{
     self as my,
     consts::{ColumnFlags, ColumnType},
 };
-use rust_decimal::prelude::ToPrimitive;
 use std::convert::TryFrom;
 
 pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
@@ -25,7 +24,7 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
                 Value::Integer(i) => i.map(|i| my::Value::Int(i)),
                 Value::Real(f) => match f {
                     Some(f) => {
-                        let floating = f.to_f64().ok_or_else(|| {
+                        let floating = f.to_string().parse::<f64>().map_err(|_| {
                             let msg = "Decimal is not a f64.";
                             let kind = ErrorKind::conversion(msg);
 

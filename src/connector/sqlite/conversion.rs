@@ -10,7 +10,6 @@ use rusqlite::{
     types::{Null, ToSql, ToSqlOutput, ValueRef},
     Column, Error as RusqlError, Row as SqliteRow, Rows as SqliteRows,
 };
-use rust_decimal::prelude::ToPrimitive;
 
 impl TypeIdentifier for Column<'_> {
     fn is_real(&self) -> bool {
@@ -171,7 +170,9 @@ impl<'a> ToSql for Value<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match self {
             Value::Integer(integer) => integer.map(|i| ToSqlOutput::from(i)),
-            Value::Real(d) => d.map(|d| ToSqlOutput::from(d.to_f64().expect("Decimal is not a f64."))),
+            Value::Real(d) => {
+                d.map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("Decimal is not a f64.")))
+            }
             Value::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             Value::Enum(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             Value::Boolean(boo) => boo.map(|boo| ToSqlOutput::from(boo)),

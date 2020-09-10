@@ -464,7 +464,7 @@ impl<'a> ToSql for Value<'a> {
                 f.to_sql(ty, out)
             }),
             (Value::Real(decimal), &PostgresType::FLOAT8) => decimal.map(|decimal| {
-                let f = decimal.to_f64().expect("decimal to f64 conversion");
+                let f = decimal.to_string().parse::<f64>().expect("decimal to f64 conversion");
                 f.to_sql(ty, out)
             }),
             (Value::Array(decimals), &PostgresType::FLOAT4_ARRAY) => decimals.as_ref().map(|decimals| {
@@ -477,7 +477,10 @@ impl<'a> ToSql for Value<'a> {
             (Value::Array(decimals), &PostgresType::FLOAT8_ARRAY) => decimals.as_ref().map(|decimals| {
                 let f: Vec<f64> = decimals
                     .into_iter()
-                    .filter_map(|v| v.as_decimal().and_then(|decimal| decimal.to_f64()))
+                    .filter_map(|v| {
+                        v.as_decimal()
+                            .and_then(|decimal| decimal.to_string().parse::<f64>().ok())
+                    })
                     .collect();
                 f.to_sql(ty, out)
             }),

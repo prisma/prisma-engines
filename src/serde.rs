@@ -104,8 +104,6 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     type Error = DeserializeError;
 
     fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
-        use rust_decimal::prelude::ToPrimitive;
-
         match self.0 {
             Value::Text(Some(s)) => visitor.visit_string(s.into_owned()),
             Value::Text(None) => visitor.visit_none(),
@@ -119,7 +117,7 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             Value::Boolean(None) => visitor.visit_none(),
             Value::Char(Some(c)) => visitor.visit_char(c),
             Value::Char(None) => visitor.visit_none(),
-            Value::Real(Some(real)) => visitor.visit_f64(real.to_f64().unwrap()),
+            Value::Real(Some(real)) => visitor.visit_f64(real.to_string().parse::<f64>().unwrap()),
             Value::Real(None) => visitor.visit_none(),
 
             #[cfg(feature = "uuid-0_8")]
