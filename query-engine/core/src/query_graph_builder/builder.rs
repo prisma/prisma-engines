@@ -71,14 +71,22 @@ impl QueryGraphBuilder {
     /// Maps a read operation to one or more queries.
     fn map_read_operation(&self, read_selection: Selection) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
         let query_object = self.query_schema.query();
-        Self::process(read_selection, &query_object)
+        Self::process(
+            QueryPath::new(query_object.name().to_owned()),
+            read_selection,
+            &query_object,
+        )
     }
 
     /// Maps a write operation to one or more queries.
     fn map_write_operation(&self, write_selection: Selection) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
         let mutation_object = self.query_schema.mutation();
 
-        let (mut graph, ir_ser) = Self::process(write_selection, &mutation_object)?;
+        let (mut graph, ir_ser) = Self::process(
+            QueryPath::new(mutation_object.name().to_owned()),
+            write_selection,
+            &mutation_object,
+        )?;
 
         if let QueryType::Graph(ref mut graph) = graph {
             graph.flag_transactional();
@@ -88,11 +96,12 @@ impl QueryGraphBuilder {
     }
 
     fn process(
+        path: QueryPath,
         selection: Selection,
         object: &ObjectTypeStrongRef,
     ) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
         let mut selections = vec![selection];
-        let mut parsed_object = QueryDocumentParser::parse_object(&selections, object)?;
+        let mut parsed_object = QueryDocumentParser::parse_object(path, &selections, object)?;
 
         let parsed_field = parsed_object.fields.pop().unwrap();
         let result_info = Self::derive_serializer(&selections.pop().unwrap(), &parsed_field);

@@ -72,8 +72,6 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-                object.assert_size(1)?;
-
                 let (field_name, sort_order) = object.into_iter().next().unwrap();
                 let field = model.fields().find_from_scalar(&field_name)?;
                 let value: PrismaValue = sort_order.try_into()?;
@@ -119,10 +117,6 @@ fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>>
 }
 
 fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<RecordProjection>> {
-    if let Err(_) = value.assert_non_null() {
-        return Ok(None);
-    }
-
     let input_map: ParsedInputMap = value.try_into()?;
     let mut pairs = vec![];
 

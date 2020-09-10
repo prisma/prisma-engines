@@ -1,8 +1,5 @@
 use super::*;
-use crate::{
-    query_document::{ParsedInputMap, ParsedInputValue},
-    InputAssertions,
-};
+use crate::query_document::{ParsedInputMap, ParsedInputValue};
 use connector::{WriteArgs, WriteExpression};
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
@@ -45,8 +42,6 @@ impl WriteArgsParser {
                         let expr: WriteExpression = match v {
                             ParsedInputValue::Single(v) => v.into(),
                             ParsedInputValue::Map(map) => {
-                                map.assert_size(1)?;
-
                                 let (operation, value) = map.into_iter().next().unwrap();
                                 let value: PrismaValue = value.try_into()?;
 

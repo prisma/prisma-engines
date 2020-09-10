@@ -24,6 +24,12 @@ pub struct QueryPath {
 }
 
 impl QueryPath {
+    pub fn new(initial_segment: String) -> Self {
+        Self {
+            segments: vec![initial_segment],
+        }
+    }
+
     pub fn add(&self, segment: String) -> Self {
         let mut path = self.clone();
         path.segments.push(segment);

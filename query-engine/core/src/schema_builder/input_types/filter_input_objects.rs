@@ -46,6 +46,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
             .iter()
             .map(|f| input_fields::filter_input_field(ctx, f)),
     );
+
     input_object.set_fields(fields);
     weak_ref
 }

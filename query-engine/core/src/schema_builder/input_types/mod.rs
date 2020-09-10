@@ -32,10 +32,6 @@ pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -
     Arc::downgrade(&input_object)
 }
 
-// fn map_optional_input_type(field: &ScalarFieldRef) -> InputType {
-//     InputType::opt(map_required_input_type(field))
-// }
-
 fn map_scalar_input_type(field: &ScalarFieldRef) -> InputType {
     let typ = match field.type_identifier {
         TypeIdentifier::String => InputType::string(),

@@ -167,7 +167,7 @@ impl QueryDocumentParser {
                 }
                 (_, InputType::List(l)) => Self::parse_list(&parent_path, vec![value], &l).map(ParsedInputValue::List),
                 (QueryValue::Object(o), InputType::Object(obj)) => {
-                    Self::parse_input_object(parent_path, o.clone(), obj.into_arc()).map(ParsedInputValue::Map)
+                    Self::parse_input_object(parent_path.clone(), o.clone(), obj.into_arc()).map(ParsedInputValue::Map)
                 }
 
                 // Invalid combinations

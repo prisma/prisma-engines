@@ -1,7 +1,6 @@
 use super::*;
 use crate::{
     query_ast::*,
-    query_document::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, QueryResult,
 };
@@ -29,10 +28,6 @@ pub fn nested_connect(
         .into_iter()
         .map(|value: ParsedInputValue| {
             let value: ParsedInputMap = value.try_into()?;
-
-            value.assert_size(1)?;
-            value.assert_non_null()?;
-
             extract_unique_filter(value, &child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
