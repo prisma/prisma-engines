@@ -109,7 +109,12 @@ impl TypeIdentifier for my::Column {
 
         matches!(
             self.column_type(),
-            MYSQL_TYPE_TINY | MYSQL_TYPE_SHORT | MYSQL_TYPE_LONG | MYSQL_TYPE_LONGLONG | MYSQL_TYPE_YEAR
+            MYSQL_TYPE_TINY
+                | MYSQL_TYPE_SHORT
+                | MYSQL_TYPE_LONG
+                | MYSQL_TYPE_LONGLONG
+                | MYSQL_TYPE_YEAR
+                | MYSQL_TYPE_INT24
         )
     }
 
