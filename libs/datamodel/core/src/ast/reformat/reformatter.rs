@@ -1,14 +1,10 @@
 use crate::{ast::parser::*, ast::renderer::*};
-use pest::{Parser, RuleType};
+use pest::Parser;
 
 // We have to use RefCell as rust cannot
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
-use itertools::Itertools;
-use pest::iterators::{Pair, Pairs};
-use serde_json::value::Value::Array;
-use std::cmp::Ordering;
 
 pub struct Reformatter<'a> {
     input: &'a str,
