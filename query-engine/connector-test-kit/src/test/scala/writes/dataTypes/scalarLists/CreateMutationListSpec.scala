@@ -12,7 +12,7 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
     s"""
       |model ScalarModel {
-      |  id           String @id @default(cuid())
+      |  id           String     @id @default(cuid())
       |  optStrings   String[]
       |  optInts      Int[]
       |  optFloats    Float[]
@@ -36,7 +36,6 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def beforeEach(): Unit = database.truncateProjectTables(project)
 
   "A Create Mutation" should "create and return items with listvalues" in {
-
     val res = server.query(
       s"""mutation {
          |  createScalarModel(data: {
@@ -62,7 +61,6 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A Create Mutation" should "create and return items with empty listvalues" in {
-
     val res = server.query(
       s"""mutation {
          |  createScalarModel(data: {
@@ -82,7 +80,6 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A Create Mutation with an empty scalar list update input object" should "return a detailed error" in {
-
     val res = server.queryThatMustFail(
       s"""mutation {
          |  createScalarModel(data: {
@@ -95,7 +92,7 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res.pathAsString("errors.[0].user_facing_error.message") should be(
-      """Missing the required argument `set` for field `optStrings` on `ScalarModel`."""
+      """Missing a required value at `Mutation.createScalarModel.data.ScalarModelCreateInput.optStrings.ScalarModelCreateoptStringsInput.set`"""
     )
   }
 

@@ -11,7 +11,7 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
   val schema =
     """
     |model User {
-    |  id      Int    @id
+    |  id      Int      @id
     |  test    String[]
     |}
     |""".stripMargin
