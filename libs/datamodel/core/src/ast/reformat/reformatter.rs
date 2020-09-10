@@ -409,7 +409,6 @@ impl<'a> Reformatter<'a> {
 
         // write to target
         for current in sorted_inner_pairs {
-            // todo value used after move
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     target.write(current.as_str());
