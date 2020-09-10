@@ -240,3 +240,34 @@ async fn ms_my_foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate:
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn garbage_datetime_values(api: &mut dyn TestApi) -> crate::Result<()> {
+    api.conn()
+        .raw_cmd("set @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO'")
+        .await?;
+
+    let table = api
+        .create_table("data datetime not null default '0000-00-00 00:00:00'")
+        .await?;
+
+    let insert = format!("INSERT INTO {} () VALUES ()", table);
+    api.conn().raw_cmd(&insert).await?;
+
+    let res = api.conn().select(Select::from_table(&table)).await;
+    assert!(res.is_err());
+
+    let err = res.unwrap_err();
+
+    match err.kind() {
+        ErrorKind::ValueOutOfRange { message } => {
+            let expected_message =
+                format!("The column `data` contained an invalid datetime value with either day or month set to zero.");
+
+            assert_eq!(&expected_message, message);
+        }
+        e => panic!("Expected error ColumnNotFound, got {:?}", e),
+    }
+
+    Ok(())
+}

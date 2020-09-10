@@ -244,6 +244,15 @@ impl TakeRow for my::Row {
                 my::Value::Double(f) => Value::from(f),
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
+                    if day == 0 || month == 0 {
+                        let msg = format!(
+                            "The column `{}` contained an invalid datetime value with either day or month set to zero.",
+                            column.name_str()
+                        );
+                        let kind = ErrorKind::value_out_of_range(msg);
+                        Err(Error::builder(kind).build())?;
+                    }
+
                     let time = NaiveTime::from_hms_micro(hour.into(), min.into(), sec.into(), micro);
 
                     let date = NaiveDate::from_ymd(year.into(), month.into(), day.into());
