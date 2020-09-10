@@ -112,6 +112,13 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
+        if en.values.len() == 0 {
+            errors.push(DatamodelError::new_validation_error(
+                "An enum must have at least one value.",
+                ast_enum.span,
+            ))
+        }
+
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
         if let Err(mut err) = self.directives.enm.validate_and_apply(ast_enum, &mut en) {
