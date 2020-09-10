@@ -55,8 +55,6 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     userUniques(filter) should be(Vector(4))
   }
 
-  // todo Null and lists is weird
-
   "Using in with null" should "return all nodes with null for that field" in {
     val filter = """(where: {optional: { in: null }})"""
 
@@ -65,6 +63,24 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   "Using in with [null]" should "return all nodes with null for that field" ignore {
     val filter = """(where: {optional: { in: ["test", null] }})"""
+
+    userUniques(filter) should be(Vector(1, 2, 3, 4))
+  }
+
+  "Using in" should "return all nodes with the given values for that field" in {
+    val filter = """(where: { name: { in: ["Bernd", "Paul"] }})"""
+
+    userUniques(filter) should be(Vector(1, 2))
+  }
+
+  "Using notIn" should "return all nodes not with the given values for that field" in {
+    val filter = """(where: { name: { notIn: ["Bernd", "Paul"] }})"""
+
+    userUniques(filter) should be(Vector(3, 4))
+  }
+
+  "Using notIn with null" should "return all nodes with not null values for that field" in {
+    val filter = """(where: { name: { notIn: null }})"""
 
     userUniques(filter) should be(Vector(1, 2, 3, 4))
   }
@@ -118,7 +134,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Nested filter" should "work" in {
-    val filter = """(where: {ride:{ is: { brand: { startsWith: "P" }}}})"""
+    val filter = """(where: {ride: { is: { brand: { startsWith: "P" }}}})"""
 
     userUniques(filter) should be(Vector(1))
   }
@@ -139,6 +155,23 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     val filter = """(where: {size: { gt: 100.500000000001 }})"""
 
     lotUniques(filter) should be(Vector(1))
+  }
+
+  "Inverted filters with null" should "work for optional fields" in {
+    val filter = """(where: { name: { not: null }})"""
+
+    userUniques(filter) should be(Vector(1, 2, 3, 4))
+  }
+
+  "Inverted filters with null" should "not work for required fields" in {
+    val filter = """(where: { unique: { not: null }})"""
+
+    server.queryThatMustFail(
+      s"{ users $filter{ unique } }",
+      project,
+      errorCode = 2012,
+      errorContains = "Missing a required value at `Query.users.where.UserWhereInput.unique.IntFilter.not`"
+    )
   }
 
   def userUniques(filter: String)    = server.query(s"{ users $filter{ unique } }", project).pathAsSeq("data.users").map(_.pathAsLong("unique")).toVector

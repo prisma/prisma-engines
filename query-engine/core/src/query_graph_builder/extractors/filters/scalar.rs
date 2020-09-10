@@ -40,6 +40,20 @@ pub fn parse(
             }
         }
 
+        "notIn" => {
+            // Legacy operation
+            let value: PrismaValue = input.try_into()?;
+            match value {
+                PrismaValue::Null(_) if reverse => field.equals(value), // not not in null => in null
+                PrismaValue::List(values) if reverse => field.is_in(values), // not not in values => in values
+
+                PrismaValue::Null(_) => field.not_equals(value),
+                PrismaValue::List(values) => field.not_in(values),
+
+                _ => unreachable!(), // Validation guarantees this.
+            }
+        }
+
         "equals" if reverse => field.not_equals(as_prisma_value(input)?),
         "contains" if reverse => field.not_contains(as_prisma_value(input)?),
         "startsWith" if reverse => field.not_starts_with(as_prisma_value(input)?),

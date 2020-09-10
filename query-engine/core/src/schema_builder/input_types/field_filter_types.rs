@@ -82,7 +82,7 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
     fields.push(
         input_field("not", InputType::object(scalar_filter_type(ctx, sf, true)), None)
             .optional()
-            .nullable(),
+            .nullable_if(!sf.is_required),
     );
 
     object.set_fields(fields);
@@ -97,9 +97,16 @@ fn equality_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
 }
 
 fn inclusion_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    vec![input_field("in", InputType::list(map_scalar_input_type(sf)), None)
-        .optional()
-        .nullable_if(!sf.is_required)]
+    let typ = InputType::list(map_scalar_input_type(sf));
+
+    vec![
+        input_field("in", typ.clone(), None)
+            .optional()
+            .nullable_if(!sf.is_required),
+        input_field("notIn", typ, None) // Kept for legacy reasons!
+            .optional()
+            .nullable_if(!sf.is_required),
+    ]
     .into_iter()
 }
 
