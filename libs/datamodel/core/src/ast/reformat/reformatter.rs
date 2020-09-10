@@ -401,18 +401,15 @@ impl<'a> Reformatter<'a> {
             sort_index_a.cmp(&sort_index_b)
         });
 
-        let sorted_inner_pairs = token.clone().into_inner();
         // iterate through original Vector and replace values at stored indices with sorted Directives at certain index
         let mut count = 0;
-        for mut pair in sorted_inner_pairs {
-            match pair.as_rule() {
-                Rule::directive => {
-                    pair = directives[count].clone();
-                    count = count + 1;
-                }
-                _ => (),
+        let sorted_inner_pairs = token.clone().into_inner().map(|p| match p.as_rule() {
+            Rule::directive => {
+                count = count + 1;
+                directives[count - 1].clone()
             }
-        }
+            _ => p,
+        });
 
         // write to target
         for current in sorted_inner_pairs {

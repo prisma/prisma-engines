@@ -95,13 +95,12 @@ model Status {
   id       Int     @id @default(autoincrement())
   title    String
   content  String?
-  @@map("_Status") @@index([title, content])
 }
 "#;
     let expected = r#"model Post {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   content   String?
-  published Boolean  @map("_published") @default(false)
+  published Boolean @map("_published") @default(false)
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
 }
@@ -114,9 +113,9 @@ model User {
 }
 
 model Status {
-  id       Int     @id @default(autoincrement())
-  title    String
-  content  String?
+  id      Int     @id @default(autoincrement())
+  title   String
+  content String?
 }
 "#;
 
