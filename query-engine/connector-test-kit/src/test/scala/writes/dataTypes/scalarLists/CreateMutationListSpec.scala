@@ -87,8 +87,8 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  }){optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }
          |}""",
       project = project,
-      errorCode = 2013,
-      errorContains = """Missing the required argument `set` for field `optStrings` on `ScalarModel`"""
+      errorCode = 2012,
+      errorContains = """Missing a required value at `Mutation.createScalarModel.data.ScalarModelCreateInput.optStrings.ScalarModelCreateoptStringsInput.set`"""
     )
 
     res.pathAsString("errors.[0].user_facing_error.message") should be(

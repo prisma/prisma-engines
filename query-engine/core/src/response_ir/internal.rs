@@ -123,7 +123,6 @@ fn serialize_record_selection(
 
     match typ.borrow() {
         OutputType::List(inner) => serialize_record_selection(record_selection, field, inner, true),
-        // OutputType::Opt(inner) => serialize_record_selection(record_selection, inner, is_list, true),
         OutputType::Object(obj) => {
             let result = serialize_objects(record_selection, obj.into_arc())?;
             let is_optional = !field.is_required;
