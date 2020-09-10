@@ -285,7 +285,7 @@ pub enum ColumnTypeFamily {
     /// DateTime types.
     DateTime,
     /// Binary types.
-    Bytes,
+    Binary,
     /// JSON types.
     Json,
     /// UUID types.
@@ -330,7 +330,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::Boolean => "boolean".to_string(),
             Self::String => "string".to_string(),
             Self::DateTime => "dateTime".to_string(),
-            Self::Bytes => "bytes".to_string(),
+            Self::Binary => "bytes".to_string(),
             Self::Json => "json".to_string(),
             Self::Uuid => "uuid".to_string(),
             Self::Geometric => "geometric".to_string(),

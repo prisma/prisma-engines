@@ -250,7 +250,7 @@ impl SqlSchemaDescriber {
                                     _ => DefaultValue::DBGENERATED(default_string), //todo parse values
                                 }
                             }
-                            ColumnTypeFamily::Bytes => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                             // JSON/JSONB defaults come in the '{}'::jsonb form.
                             ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
                                 .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
@@ -646,7 +646,7 @@ fn get_column_type<'a>(
         "citext" | "_citext" => String,
         "varchar" | "_varchar" => String,
         "date" | "_date" => DateTime,
-        "bytea" | "_bytea" => Bytes,
+        "bytea" | "_bytea" => Binary,
         "json" | "_json" => Json,
         "jsonb" | "_jsonb" => Json,
         "uuid" | "_uuid" => Uuid,
