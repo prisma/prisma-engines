@@ -377,7 +377,7 @@ impl QueryDocumentParser {
             .into_iter()
             .filter_map(|unset_field_name| {
                 let field = schema_object.find_field(*unset_field_name).unwrap();
-                let path = parent_path.add(field.name.clone());
+                let path = path.add(field.name.clone());
                 let default_pair = field.default_value.clone().map(|def| (&field.name, def));
 
                 // If the input field has a default, add the default to the result.
@@ -438,8 +438,8 @@ impl QueryDocumentParser {
                     Err(QueryParserError {
                         path: path,
                         error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(
-                            None,
-                            Some(1),
+                            schema_object.constraints.min_num_fields.clone(),
+                            schema_object.constraints.max_num_fields.clone(),
                             map.len(),
                         )),
                     })

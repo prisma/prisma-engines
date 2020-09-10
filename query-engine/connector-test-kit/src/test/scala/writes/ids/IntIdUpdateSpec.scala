@@ -153,7 +153,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
       """.stripMargin,
       project,
       errorCode = 2009,
-      errorContains = "TodoUpdateInput (object)\\\\n        ↳ id (field)\\\\n          ↳ Field does not exist on enclosing type."
+      errorContains = "`Field does not exist on enclosing type.` at `Mutation.updateTodo.data.TodoUpdateInput.id`"
     )
   }
 

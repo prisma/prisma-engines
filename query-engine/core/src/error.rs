@@ -1,4 +1,7 @@
-use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, RelationViolation};
+use crate::{
+    InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
+    RelationViolation,
+};
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
@@ -83,12 +86,19 @@ impl From<CoreError> for user_facing_errors::Error {
             })) => user_facing_error.into(),
             CoreError::QueryParserError(query_parser_error)
             | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
-                let known_error =
-                    user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
+                let known_error = match query_parser_error.error_kind {
+                    QueryParserErrorKind::RequiredValueNotSetError => {
+                        user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
+                            path: format!("{}", query_parser_error.path),
+                        })
+                        .unwrap()
+                    }
+                    _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
                         query_validation_error: format!("{}", query_parser_error.error_kind),
                         query_position: format!("{}", query_parser_error.path),
                     })
-                    .unwrap();
+                    .unwrap(),
+                };
 
                 known_error.into()
             }

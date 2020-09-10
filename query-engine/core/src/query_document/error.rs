@@ -96,6 +96,9 @@ impl FieldCountError {
 impl Display for FieldCountError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match (self.min, self.max) {
+            (Some(min), Some(max)) if min == 1 && max == 1 => {
+                write!(f, "Expected exactly one field to be present, got {}.", self.got)
+            }
             (Some(min), Some(max)) => write!(
                 f,
                 "Expected a minimum of {} and at most {} fields to be present, got {}.",
