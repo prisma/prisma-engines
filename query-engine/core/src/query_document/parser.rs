@@ -151,6 +151,15 @@ impl QueryDocumentParser {
         for input_type in possible_input_types {
             let value = value.clone();
             let result = match (&value, input_type) {
+                // Null handling
+                (QueryValue::Null, InputType::Scalar(ScalarType::Null)) => {
+                    Ok(ParsedInputValue::Single(PrismaValue::null(TypeHint::Unknown)))
+                }
+                (QueryValue::Null, _) => Err(QueryParserError {
+                    path: parent_path.clone(),
+                    error_kind: QueryParserErrorKind::RequiredValueNotSetError,
+                }),
+
                 // Scalar handling
                 (_, InputType::Scalar(scalar)) => {
                     Self::parse_scalar(&parent_path, value, &scalar).map(ParsedInputValue::Single)
@@ -183,20 +192,24 @@ impl QueryDocumentParser {
             parse_results.push(result);
         }
 
-        let (successes, failures): (Vec<_>, Vec<_>) = parse_results.into_iter().partition(|result| result.is_ok());
+        let (successes, mut failures): (Vec<_>, Vec<_>) = parse_results.into_iter().partition(|result| result.is_ok());
         if successes.is_empty() {
-            Err(QueryParserError {
-                path: parent_path,
-                error_kind: QueryParserErrorKind::InputUnionParseError {
-                    parsing_errors: failures
-                        .into_iter()
-                        .map(|err| match err {
-                            Err(e) => e,
-                            Ok(_) => unreachable!("Expecting to only have Result::Err in the `failures` vector."),
-                        })
-                        .collect(),
-                },
-            })
+            if failures.len() == 1 {
+                failures.pop().unwrap()
+            } else {
+                Err(QueryParserError {
+                    path: parent_path,
+                    error_kind: QueryParserErrorKind::InputUnionParseError {
+                        parsing_errors: failures
+                            .into_iter()
+                            .map(|err| match err {
+                                Err(e) => e,
+                                Ok(_) => unreachable!("Expecting to only have Result::Err in the `failures` vector."),
+                            })
+                            .collect(),
+                    },
+                })
+            }
         } else {
             successes.into_iter().next().unwrap()
         }
@@ -209,7 +222,6 @@ impl QueryDocumentParser {
         scalar_type: &ScalarType,
     ) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
-            (QueryValue::Null, ScalarType::Null) => Ok(PrismaValue::null(TypeHint::Unknown)),
             (QueryValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
             (QueryValue::String(s), ScalarType::DateTime) => {
                 Self::parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)
@@ -227,7 +239,7 @@ impl QueryDocumentParser {
             (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().unwrap())),
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
 
-            // All other combinations are invalid.
+            // All other combinations are value type mismatches.
             (qv, _) => Err(QueryParserError {
                 path: parent_path.clone(),
                 error_kind: QueryParserErrorKind::ValueTypeMismatchError {

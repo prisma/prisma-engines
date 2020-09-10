@@ -12,7 +12,7 @@ impl fmt::Display for QueryParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "Query parsing/validation error at `{}`:\n{}",
+            "Query parsing/validation error at `{}`: {}",
             self.path, self.error_kind,
         )
     }
@@ -66,8 +66,12 @@ impl Display for QueryParserErrorKind {
             Self::ValueParseError(reason) => write!(f, "Error parsing value: {}.", reason),
             Self::InputUnionParseError { parsing_errors } => write!(
                 f,
-                "Unable to match input value to any allowed input type for the field. Parse errors: {:?}",
+                "Unable to match input value to any allowed input type for the field. Parse errors: [{}]",
                 parsing_errors
+                    .into_iter()
+                    .map(|err| format!("{}", err))
+                    .collect::<Vec<_>>()
+                    .join(", ")
             ),
             Self::ValueTypeMismatchError { have, want } => {
                 write!(f, "Value types mismatch. Have: {:?}, want: {:?}", have, want)
