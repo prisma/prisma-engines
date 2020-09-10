@@ -1,10 +1,14 @@
 use crate::{ast::parser::*, ast::renderer::*};
-use pest::Parser;
+use pest::{Parser, RuleType};
 
 // We have to use RefCell as rust cannot
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
+use serde_json::value::Value::Array;
+use pest::iterators::{Pair, Pairs};
+use itertools::Itertools;
+use std::cmp::Ordering;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -364,7 +368,54 @@ impl<'a> Reformatter<'a> {
 
     fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
         let field_name = &Self::get_identifier(token);
-        for current in token.clone().into_inner() {
+
+        // get indices of directives and store in separate Vector
+        let mut directive_indices = Vec::new();
+        let mut directives = Vec::new();
+        for (i, pair) in token.clone().into_inner().enumerate() {
+            match pair.as_rule() {
+                Rule::directive => {
+                    directive_indices.push(i);
+                    directives.push(pair);
+                }
+                _ => ()
+            }
+        }
+
+        // sort directives Vector
+        let correct_order = vec!["map", "id", "unique", "default", "relation", "updatedAt"];
+        directives.sort_by(|a, b| {
+            let mut sort_index_a = 8;
+            let mut sort_index_b = 8;
+            for (i, name) in correct_order.iter().enumerate() {
+                if sort_index_a != 8 && sort_index_b != 8 {
+                    break;
+                }
+                if sort_index_a == 8 && a.as_str().contains(name) {
+                    sort_index_a = i;
+                }
+                if sort_index_b == 8 && b.as_str().contains(name) {
+                    sort_index_b = i;
+                }
+            }
+            sort_index_a.cmp(&sort_index_b)
+        });
+
+        let sorted_inner_pairs = token.clone().into_inner();
+        // iterate through original Vector and replace values at stored indices with sorted Directives at certain index
+        let mut count = 0;
+        for mut pair in sorted_inner_pairs {
+            match pair.as_rule() {
+                Rule::directive => {
+                    pair = directives[count].clone();
+                    count = count + 1;
+                }
+                _ => ()
+            }
+        }
+
+        // write to target
+        for current in sorted_inner_pairs { // todo value used after move
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     target.write(current.as_str());
@@ -457,6 +508,9 @@ impl<'a> Reformatter<'a> {
             match current.as_rule() {
                 Rule::directive_name => {
                     // Begin
+
+                    // Check for correct oder of directives
+
                     if !target.line_empty() {
                         target.write(" ");
                     }

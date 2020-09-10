@@ -33,6 +33,7 @@ impl AllDirectives {
 fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
     let mut validator = DirectiveListValidator::<dml::Field>::new();
 
+    // this order of field attributes is used in the formatter as well
     validator.add(Box::new(map::MapDirectiveValidatorForField {}));
     validator.add(Box::new(id::IdDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::FieldLevelUniqueDirectiveValidator {}));
@@ -46,6 +47,7 @@ fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
 fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
     let mut validator = DirectiveListValidator::<dml::Model>::new();
 
+    // this order of field attributes is used in the formatter as well
     validator.add(Box::new(map::MapDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelIndexDirectiveValidator {}));

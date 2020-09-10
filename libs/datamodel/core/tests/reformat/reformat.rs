@@ -75,6 +75,55 @@ model Post {
 }
 
 #[test]
+fn format_should_enforce_order_of_directives() {
+    let input = r#"model Post {
+  id        Int      @default(autoincrement()) @id
+  content   String?
+  published Boolean  @default(false) @map("_published")
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  id    Int    @default(autoincrement()) @id
+  email String @unique
+  name  String
+  posts Post[]
+}
+
+model Status {
+  id       Int     @id @default(autoincrement())
+  title    String
+  content  String?
+  @@map("_Status") @@index([title, content])
+}
+"#;
+    let expected = r#"model Post {
+  id        Int      @id @default(autoincrement())
+  content   String?
+  published Boolean  @map("_published") @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  name  String
+  posts Post[]
+}
+
+model Status {
+  id       Int     @id @default(autoincrement())
+  title    String
+  content  String?
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn comments_in_a_model_must_not_move() {
     let input = r#"
         model User {
@@ -683,8 +732,6 @@ model Bl
 }
 
 fn assert_reformat(schema: &str, expected_result: &str) {
-    println!("schema: {:?}", schema);
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
-    println!("result: {}", result);
     assert_eq!(result, expected_result);
 }
