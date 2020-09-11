@@ -2,8 +2,8 @@ use super::*;
 use prisma_models::dml::DefaultValue;
 
 pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField) -> InputField {
-    let typ = field_filter_types::get_field_filter_type(ctx, field);
-    input_field(field.name().to_owned(), InputType::object(typ), None).optional()
+    let types = field_filter_types::get_field_filter_types(ctx, field);
+    input_field(field.name().to_owned(), types, None).optional()
 }
 
 pub(crate) fn nested_create_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {

@@ -70,16 +70,22 @@ where
 }
 
 /// Field convenience wrapper function.
-pub fn input_field<T>(name: T, field_type: InputType, default_value: Option<dml::DefaultValue>) -> InputField
+pub fn input_field<T, S>(name: T, field_types: S, default_value: Option<dml::DefaultValue>) -> InputField
 where
     T: Into<String>,
+    S: Into<Vec<InputType>>,
 {
     InputField {
         name: name.into(),
-        field_types: vec![field_type],
+        field_types: field_types.into(),
         default_value,
         is_required: true,
-        is_nullable: false,
+    }
+}
+
+impl Into<Vec<InputType>> for InputType {
+    fn into(self) -> Vec<InputType> {
+        vec![self]
     }
 }
 

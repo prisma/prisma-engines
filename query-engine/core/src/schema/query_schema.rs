@@ -282,13 +282,14 @@ pub struct GenericQueryBuilder {
     // WIP
 }
 
+#[derive(PartialEq)]
 pub struct InputObjectType {
     pub name: String,
     pub constraints: InputObjectTypeConstraints,
     pub fields: OnceCell<Vec<InputFieldRef>>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)]
 pub struct InputObjectTypeConstraints {
     /// The maximum number of fields that can be provided.
     pub min_num_fields: Option<usize>,
@@ -354,7 +355,7 @@ impl InputObjectType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct InputField {
     pub name: String,
     pub default_value: Option<dml::DefaultValue>,
@@ -365,10 +366,6 @@ pub struct InputField {
     /// Indicates if the presence of the field on the higher input objects
     /// is required, but doesn't state whether or not the input can be null.
     pub is_required: bool,
-
-    /// A nullable field can be a given input can be null.
-    /// This makes no assumption about if an input needs to be provided or not.
-    pub is_nullable: bool, // Note: Kepts around for legacy reasons, ScalarType::Null replaced this.
 }
 
 impl InputField {
@@ -379,8 +376,7 @@ impl InputField {
     }
 
     /// Sets the field as nullable (accepting null inputs).
-    pub fn nullable(mut self) -> Self {
-        self.is_nullable = true;
+    pub fn nullable(self) -> Self {
         self.add_type(InputType::null())
     }
 
@@ -406,6 +402,18 @@ pub enum InputType {
     Enum(EnumTypeRef),
     List(Box<InputType>),
     Object(InputObjectTypeWeakRef),
+}
+
+impl PartialEq for InputType {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (InputType::Scalar(_), InputType::Scalar(_)) => true,
+            (InputType::Enum(_), InputType::Enum(_)) => true,
+            (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
+            (InputType::Object(obj), InputType::Object(oobj)) => obj.into_arc().name == oobj.into_arc().name,
+            _ => false,
+        }
+    }
 }
 
 impl Debug for InputType {
@@ -551,7 +559,7 @@ impl OutputType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ScalarType {
     Null,
     String,

@@ -2,16 +2,38 @@ use super::*;
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
-/// Builds filter type for the given model field.
-pub(crate) fn get_field_filter_type(ctx: &mut BuilderContext, field: &ModelField) -> InputObjectTypeWeakRef {
+/// Builds filter types for the given model field.
+pub(crate) fn get_field_filter_types(ctx: &mut BuilderContext, field: &ModelField) -> Vec<InputType> {
     match field {
-        ModelField::Relation(rf) => relation_filter_type(ctx, rf),
-        ModelField::Scalar(sf) if field.is_list() => scalar_list_filter_type(ctx, sf),
-        ModelField::Scalar(sf) => scalar_filter_type(ctx, sf, false),
+        ModelField::Relation(rf) => {
+            let mut types = vec![InputType::object(full_relation_filter(ctx, rf))];
+            types.extend(convenience_mto1_relation_filter_types(ctx, rf));
+            types
+        }
+        ModelField::Scalar(sf) if field.is_list() => vec![InputType::object(scalar_list_filter_type(ctx, sf))],
+        ModelField::Scalar(sf) => vec![InputType::object(scalar_filter_type(ctx, sf, false))],
     }
 }
 
-fn relation_filter_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+/// Builds shorthand relation equality filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
+/// If the field is also not required, null is also added as possible type.
+fn convenience_mto1_relation_filter_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Vec<InputType> {
+    let mut types = vec![];
+
+    if !rf.is_list {
+        let related_model = rf.related_model();
+        let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
+        types.push(InputType::object(related_input_type));
+
+        if !rf.is_required {
+            types.push(InputType::null());
+        }
+    }
+
+    types
+}
+
+fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
     let list = if rf.is_list { "List" } else { "" };
@@ -31,10 +53,10 @@ fn relation_filter_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
         vec![
             input_field("is", InputType::object(related_input_type.clone()), None)
                 .optional()
-                .nullable(),
+                .nullable_if(!rf.is_required),
             input_field("isNot", InputType::object(related_input_type), None)
                 .optional()
-                .nullable(),
+                .nullable_if(!rf.is_required),
         ]
     };
 
