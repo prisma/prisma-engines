@@ -169,7 +169,8 @@ impl TypeIdentifier for my::Column {
     }
 
     fn is_bool(&self) -> bool {
-        self.column_type() == ColumnType::MYSQL_TYPE_BIT
+        (self.column_type() == ColumnType::MYSQL_TYPE_TINY && self.column_length() == 1)
+            || (self.column_type() == ColumnType::MYSQL_TYPE_BIT && self.column_length() == 1)
     }
 
     fn is_json(&self) -> bool {
@@ -238,6 +239,7 @@ impl TakeRow for my::Row {
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
                 my::Value::Bytes(s) => Value::text(String::from_utf8(s)?),
+                my::Value::Int(i) if column.is_bool() => Value::boolean(i == 1),
                 my::Value::Int(i) => Value::integer(i),
                 my::Value::UInt(i) => Value::integer(i64::try_from(i).map_err(|_| {
                     let msg = "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.";
@@ -281,6 +283,7 @@ impl TakeRow for my::Row {
                     Value::time(time)
                 }
                 my::Value::NULL => match column {
+                    t if t.is_bool() => Value::Boolean(None),
                     t if t.is_enum() => Value::Enum(None),
                     t if t.is_real() => Value::Real(None),
                     t if t.is_null() => Value::Integer(None),
@@ -293,7 +296,6 @@ impl TakeRow for my::Row {
                     t if t.is_date() => Value::Date(None),
                     t if t.is_text() => Value::Text(None),
                     t if t.is_bytes() => Value::Bytes(None),
-                    t if t.is_bool() => Value::Boolean(None),
                     #[cfg(feature = "json-1")]
                     t if t.is_json() => Value::Json(None),
                     typ => {

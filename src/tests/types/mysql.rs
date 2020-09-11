@@ -9,27 +9,73 @@ test_type!(tinyint(
     Value::integer(i8::MAX)
 ));
 
-test_type!(year(MySql, "year", Value::integer(1984), Value::integer(2049)));
+test_type!(tinyint_unsigned(
+    MySql,
+    "tinyint(4) unsigned",
+    Value::Integer(None),
+    Value::integer(0),
+    Value::integer(255)
+));
+
+test_type!(year(
+    MySql,
+    "year",
+    Value::Integer(None),
+    Value::integer(1984),
+    Value::integer(2049)
+));
 
 test_type!(smallint(
     MySql,
-    "smallint(6)",
+    "smallint",
     Value::Integer(None),
     Value::integer(i16::MIN),
     Value::integer(i16::MAX)
 ));
 
+test_type!(smallint_unsigned(
+    MySql,
+    "smallint unsigned",
+    Value::Integer(None),
+    Value::integer(0),
+    Value::integer(65535)
+));
+
+test_type!(mediumint(
+    MySql,
+    "mediumint",
+    Value::Integer(None),
+    Value::integer(-8388608),
+    Value::integer(8388607)
+));
+
+test_type!(mediumint_unsigned(
+    MySql,
+    "mediumint unsigned",
+    Value::Integer(None),
+    Value::integer(0),
+    Value::integer(16777215)
+));
+
 test_type!(int(
     MySql,
-    "int(11)",
+    "int",
     Value::Integer(None),
     Value::integer(i32::MIN),
     Value::integer(i32::MAX)
 ));
 
+test_type!(int_unsigned(
+    MySql,
+    "int unsigned",
+    Value::Integer(None),
+    Value::integer(0),
+    Value::integer(4294967295i64)
+));
+
 test_type!(bigint(
     MySql,
-    "bigint(20)",
+    "bigint",
     Value::Integer(None),
     Value::integer(i64::MIN),
     Value::integer(i64::MAX)
@@ -63,13 +109,12 @@ test_type!(bit64(
     Value::bytes(vec![0, 0, 0, 0, 0, 6, 107, 58])
 ));
 
-// SQLx can get booleans here!
 test_type!(boolean(
     MySql,
     "tinyint(1)",
-    Value::Integer(None),
-    Value::integer(1),
-    Value::integer(0)
+    Value::Boolean(None),
+    Value::boolean(true),
+    Value::boolean(false)
 ));
 
 test_type!(char(MySql, "char(255)", Value::Text(None), Value::text("foobar")));
