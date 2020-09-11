@@ -383,7 +383,6 @@ impl<'a> Reformatter<'a> {
         directives.sort_by(|a, b| {
             let mut sort_index_a = usize::MAX;
             let mut sort_index_b = usize::MAX;
-            println!("{:?}", sort_index_a);
             for (i, name) in correct_order.iter().enumerate() {
                 if a.as_str().contains(name) {
                     sort_index_a = i;
