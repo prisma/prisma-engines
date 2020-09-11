@@ -5,6 +5,8 @@ use pest::Parser;
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
+use pest::iterators::{Pair, Pairs};
+use std::iter::Map;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -275,7 +277,20 @@ impl<'a> Reformatter<'a> {
         let mut block_name = "";
         let mut block_has_opened = false;
 
-        for current in token.clone().into_inner() {
+        // sort directives
+        let directives = Self::extract_and_sort_directives(token, false);
+
+        // iterate through tokens and reorder directives
+        let mut count = 0;
+        let sorted_inner_pairs = token.clone().into_inner().map(|p| match p.as_rule() {
+            Rule::directive => {
+                count = count + 1;
+                directives[count - 1].clone()
+            }
+            _ => p,
+        });
+
+        for current in sorted_inner_pairs {
             // println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
                 Rule::BLOCK_OPEN => {
@@ -362,9 +377,7 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
-        let field_name = &Self::get_identifier(token);
-
+    fn extract_and_sort_directives<'i>(token: &'i Token, is_field_directive: bool) -> Vec<Pair<'i, Rule>> {
         // get indices of directives and store in separate Vector
         let mut directive_indices = Vec::new();
         let mut directives = Vec::new();
@@ -379,7 +392,11 @@ impl<'a> Reformatter<'a> {
         }
 
         // sort directives
-        let correct_order = vec!["map", "id", "unique", "default", "relation", "updatedAt"];
+        let correct_order = if is_field_directive {
+            vec!["map", "id", "unique", "default", "relation", "updatedAt"]
+        } else {
+            vec!["map", "unique", "index", "id"]
+        };
         directives.sort_by(|a, b| {
             let mut sort_index_a = usize::MAX;
             let mut sort_index_b = usize::MAX;
@@ -397,6 +414,15 @@ impl<'a> Reformatter<'a> {
             }
             sort_index_a.cmp(&sort_index_b)
         });
+
+        return directives;
+    }
+
+    fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
+        let field_name = &Self::get_identifier(token);
+
+        // extract and sort directives
+        let directives = Self::extract_and_sort_directives(token, true);
 
         // iterate through tokens and reorder directives
         let mut count = 0;

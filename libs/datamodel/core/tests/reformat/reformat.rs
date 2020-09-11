@@ -97,6 +97,58 @@ fn format_should_enforce_order_of_field_directives() {
 }
 
 #[test]
+fn format_should_enforce_order_of_block_directives() {
+    let input = r#"model User {
+  id        Int     @default(autoincrement())
+  firstName String
+  lastName  String
+  isAdmin   Boolean @default(false)
+  @@unique([firstName, lastName]) @@map("_User")
+}
+
+model Post {
+  id      Int     @id @default(autoincrement())
+  title   String
+  content String?
+  @@index([title]) @@map("_Post")
+}
+
+model Test {
+  firstName String
+  lastName  String
+  email     String  @unique
+  isAdmin   Boolean @default(false)
+  @@id([firstName, lastName]) @@map("_Test")
+}
+"#;
+    let expected = r#"model User {
+  id        Int     @default(autoincrement())
+  firstName String
+  lastName  String
+  isAdmin   Boolean @default(false)
+  @@map("_User") @@unique([firstName, lastName])
+}
+
+model Post {
+  id      Int     @id @default(autoincrement())
+  title   String
+  content String?
+  @@map("_Post") @@index([title])
+}
+
+model Test {
+  firstName String
+  lastName  String
+  email     String  @unique
+  isAdmin   Boolean @default(false)
+  @@map("_Test") @@id([firstName, lastName])
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn comments_in_a_model_must_not_move() {
     let input = r#"
         model User {
