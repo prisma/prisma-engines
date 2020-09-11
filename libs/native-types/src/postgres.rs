@@ -30,6 +30,8 @@ pub enum PostgresType {
     XML,
     JSON,
     JSONB,
+    Enum,
+    NotHandled,
 }
 
 impl super::NativeType for PostgresType {

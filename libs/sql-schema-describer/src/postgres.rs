@@ -632,55 +632,64 @@ fn get_column_type<'a>(
     let trim = |name: &'a str| name.trim_start_matches('_');
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
 
-    let family: ColumnTypeFamily = match full_data_type {
-        x if data_type == "USER-DEFINED" && enum_exists(x) => Enum(x.to_owned()),
-        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => Enum(trim(x).to_owned()),
-        "int2" | "_int2" => Int,
-        "int4" | "_int4" => Int,
-        "int8" | "_int8" => Int,
-        "oid" | "_oid" => Int,
-        "float4" | "_float4" => Float,
-        "float8" | "_float8" => Float,
-        "bool" | "_bool" => Boolean,
-        "text" | "_text" => String,
-        "citext" | "_citext" => String,
-        "varchar" | "_varchar" => String,
-        "date" | "_date" => DateTime,
-        "bytea" | "_bytea" => Binary,
-        "json" | "_json" => Json,
-        "jsonb" | "_jsonb" => Json,
-        "uuid" | "_uuid" => Uuid,
+    //Fixme take char lenght args from character max length
+    //the others need to be parsed -.-
+    println!("{}", full_data_type);
+    println!("{:?}", character_maximum_length);
+
+    let (family, native_type) = match full_data_type {
+        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), PostgresType::Enum),
+        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => {
+            (Enum(trim(x).to_owned()), PostgresType::Enum)
+        }
+        "int2" | "_int2" => (Int, PostgresType::Integer),
+        "int4" | "_int4" => (Int, PostgresType::Integer),
+        "int8" | "_int8" => (Int, PostgresType::Integer),
+        "oid" | "_oid" => (Int, PostgresType::Integer),         //Fixme
+        "float4" | "_float4" => (Float, PostgresType::Integer), //Fixme
+        "float8" | "_float8" => (Float, PostgresType::Integer), //Fixme
+        "bool" | "_bool" => (Boolean, PostgresType::Boolean),
+        "text" | "_text" => (String, PostgresType::Text),
+        "citext" | "_citext" => (String, PostgresType::Text), //Fixme
+        "varchar" | "_varchar" => (String, PostgresType::VarChar(character_maximum_length.unwrap() as u32)),
+        "date" | "_date" => (DateTime, PostgresType::Date),
+        "bytea" | "_bytea" => (Binary, PostgresType::ByteA),
+        "json" | "_json" => (Json, PostgresType::JSON),
+        "jsonb" | "_jsonb" => (Json, PostgresType::JSONB),
+        "uuid" | "_uuid" => (Uuid, PostgresType::UUID),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => String,
-        "varbit" | "_varbit" => String,
-        "box" | "_box" => Geometric,
-        "circle" | "_circle" => Geometric,
-        "line" | "_line" => Geometric,
-        "lseg" | "_lseg" => Geometric,
-        "path" | "_path" => Geometric,
-        "polygon" | "_polygon" => Geometric,
-        "bpchar" | "_bpchar" => String,
-        "interval" | "_interval" => String,
-        "numeric" | "_numeric" => Float,
-        "money" | "_money" => Float,
-        "pg_lsn" | "_pg_lsn" => LogSequenceNumber,
-        "time" | "_time" => DateTime,
-        "timetz" | "_timetz" => DateTime,
-        "timestamp" | "_timestamp" => DateTime,
-        "timestamptz" | "_timestamptz" => DateTime,
-        "tsquery" | "_tsquery" => TextSearch,
-        "tsvector" | "_tsvector" => TextSearch,
-        "txid_snapshot" | "_txid_snapshot" => TransactionId,
-        "inet" | "_inet" => String,
-        data_type => Unsupported(data_type.into()),
+        "bit" | "_bit" => (String, PostgresType::Bit(0)), //Fixme
+        "varbit" | "_varbit" => (String, PostgresType::VarBit(0)), //Fixme
+        "bpchar" | "_bpchar" => (String, PostgresType::VarChar(0)), //Fixme
+        "interval" | "_interval" => (String, PostgresType::Interval(0)), //Fixme
+        "numeric" | "_numeric" => (Float, PostgresType::Numeric(0, 0)), //Fixme
+        "money" | "_money" => (Float, PostgresType::Integer), //Fixme
+        "pg_lsn" | "_pg_lsn" => (LogSequenceNumber, PostgresType::Integer), //Fixme
+        "time" | "_time" => (DateTime, PostgresType::Time(0)), //Fixme
+        "timetz" | "_timetz" => (DateTime, PostgresType::TimeWithTimeZone(0)), //Fixme
+        "timestamp" | "_timestamp" => (DateTime, PostgresType::Timestamp(0)), //Fixme
+        "timestamptz" | "_timestamptz" => (DateTime, PostgresType::TimestampWithTimeZone(0)), //Fixme
+        "tsquery" | "_tsquery" => (TextSearch, PostgresType::Text), //Fixme
+        "tsvector" | "_tsvector" => (TextSearch, PostgresType::Text), //Fixme
+        "txid_snapshot" | "_txid_snapshot" => (TransactionId, PostgresType::Text), //Fixme
+        "inet" | "_inet" => (String, PostgresType::Integer), //Fixme
+        //geometric
+        "box" | "_box" => (Geometric, PostgresType::Integer), //Fixme
+        "circle" | "_circle" => (Geometric, PostgresType::Integer), //Fixme
+        "line" | "_line" => (Geometric, PostgresType::Integer), //Fixme
+        "lseg" | "_lseg" => (Geometric, PostgresType::Integer), //Fixme
+        "path" | "_path" => (Geometric, PostgresType::Integer), //Fixme
+        "polygon" | "_polygon" => (Geometric, PostgresType::Integer), //Fixme
+        data_type => (Unsupported(data_type.into()), PostgresType::NotHandled),
     };
+
     ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
         character_maximum_length,
         family,
         arity,
-        native_type: PostgresType::Integer.to_json(),
+        native_type: native_type.to_json(),
     }
 }
 

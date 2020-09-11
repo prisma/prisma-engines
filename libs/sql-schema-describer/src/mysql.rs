@@ -549,6 +549,10 @@ fn get_column_type_and_enum(
 ) -> (ColumnType, Option<Enum>) {
     //Fixme family mappings, length args
     // Decimal, Duration and XML are missing from ColumnTypefamily
+
+    //Fixme parse length arguments
+    println!("{}", full_data_type);
+    println!("{:?}", character_maximum_length);
     let (family, native_type) = match (data_type, full_data_type) {
         ("int", _) => (ColumnTypeFamily::Int, MySqlType::Int),
         ("smallint", _) => (ColumnTypeFamily::Int, MySqlType::SmallInt),
