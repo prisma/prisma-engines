@@ -7,17 +7,26 @@ pub(crate) fn get_field_filter_types(ctx: &mut BuilderContext, field: &ModelFiel
     match field {
         ModelField::Relation(rf) => {
             let mut types = vec![InputType::object(full_relation_filter(ctx, rf))];
-            types.extend(convenience_mto1_relation_filter_types(ctx, rf));
+            types.extend(mto1_relation_filter_shorthand_types(ctx, rf));
             types
         }
         ModelField::Scalar(sf) if field.is_list() => vec![InputType::object(scalar_list_filter_type(ctx, sf))],
-        ModelField::Scalar(sf) => vec![InputType::object(scalar_filter_type(ctx, sf, false))],
+        ModelField::Scalar(sf) => {
+            let mut types = vec![InputType::object(full_scalar_filter_type(ctx, sf, false))];
+            types.push(map_scalar_input_type(sf)); // Scalar equality shorthand
+
+            if !sf.is_required {
+                types.push(InputType::null()); // Scalar null-equality shorthand
+            }
+
+            types
+        }
     }
 }
 
-/// Builds shorthand relation equality filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
+/// Builds shorthand relation equality (`is`) filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
 /// If the field is also not required, null is also added as possible type.
-fn convenience_mto1_relation_filter_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Vec<InputType> {
+fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Vec<InputType> {
     let mut types = vec![];
 
     if !rf.is_list {
@@ -77,7 +86,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     Arc::downgrade(&object)
 }
 
-fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: bool) -> InputObjectTypeWeakRef {
+fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: bool) -> InputObjectTypeWeakRef {
     let name = scalar_filter_name(sf, nested);
     return_cached_input!(ctx, &name);
 
@@ -102,9 +111,16 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
     };
 
     fields.push(
-        input_field("not", InputType::object(scalar_filter_type(ctx, sf, true)), None)
-            .optional()
-            .nullable_if(!sf.is_required),
+        input_field(
+            "not",
+            vec![
+                InputType::object(full_scalar_filter_type(ctx, sf, true)),
+                map_scalar_input_type(sf), // Shorthand `not equals` filter, skips the nested object filter.
+            ],
+            None,
+        )
+        .optional()
+        .nullable_if(!sf.is_required),
     );
 
     object.set_fields(fields);

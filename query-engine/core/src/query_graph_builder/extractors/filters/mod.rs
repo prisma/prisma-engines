@@ -91,26 +91,34 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
 }
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
+/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
 fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
-    let mut filter_map: ParsedInputMap = value.try_into()?;
+    match value {
+        ParsedInputValue::Single(pv) => Ok(vec![field.equals(pv)]),
+        ParsedInputValue::Map(mut filter_map) => {
+            let mode = match filter_map.remove("mode") {
+                Some(i) => parse_query_mode(i)?,
+                None => QueryMode::Default,
+            };
 
-    let mode = match filter_map.remove("mode") {
-        Some(i) => parse_query_mode(i)?,
-        None => QueryMode::Default,
-    };
+            let mut filters = filter_map
+                .into_iter()
+                .map(|(k, v)| scalar::parse(&k, field, v, false))
+                .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
-    let mut filters = filter_map
-        .into_iter()
-        .map(|(k, v)| scalar::parse(&k, field, v, false))
-        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+            filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
 
-    filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
-
-    Ok(filters)
+            Ok(filters)
+        }
+        x => Err(QueryGraphBuilderError::InputError(format!(
+            "Invalid scalar filter input: {:?}",
+            x
+        ))),
+    }
 }
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
-/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
+/// `value` can be either a filter object (for shorthand filter notation) or an object (full filter syntax).
 fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
     match value {
         // Implicit is null filter (`where: { <field>: null }`)

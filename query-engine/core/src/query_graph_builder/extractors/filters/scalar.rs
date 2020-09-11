@@ -12,8 +12,8 @@ pub fn parse(
     let filter = match filter_key {
         "not" => {
             match input {
-                // support for syntax { scalarField: { not: null } }
-                ParsedInputValue::Single(value @ PrismaValue::Null(_)) => field.not_equals(value),
+                // Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: <value> } }`
+                ParsedInputValue::Single(value) => field.not_equals(value),
                 _ => {
                     let inner_object: ParsedInputMap = input.try_into()?;
 
