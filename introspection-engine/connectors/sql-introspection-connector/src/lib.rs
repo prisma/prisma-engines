@@ -67,6 +67,14 @@ impl SqlIntrospectionConnector {
     async fn describe(&self) -> SqlIntrospectionResult<SqlSchema> {
         Ok(self.describer.describe(self.connection_info.schema_name()).await?)
     }
+
+    async fn version(&self) -> SqlIntrospectionResult<String> {
+        Ok(self
+            .describer
+            .version(self.connection_info.schema_name())
+            .await?
+            .unwrap())
+    }
 }
 
 #[async_trait::async_trait]
@@ -81,6 +89,13 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
     async fn get_database_description(&self) -> ConnectorResult<String> {
         let sql_schema = self.catch(self.describe()).await?;
+        tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
+        let description = serde_json::to_string(&sql_schema).unwrap();
+        Ok(description)
+    }
+
+    async fn get_database_version(&self) -> ConnectorResult<String> {
+        let sql_schema = self.catch(self.version()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
         let description = serde_json::to_string(&sql_schema).unwrap();
         Ok(description)
