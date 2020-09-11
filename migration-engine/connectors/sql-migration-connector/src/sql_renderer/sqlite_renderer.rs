@@ -1,7 +1,7 @@
 use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
-    flavour::{SqlFlavour, SqliteFlavour},
+    flavour::SqliteFlavour,
     sql_migration::{
         AddColumn, AddForeignKey, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey,
         DropIndex, TableChange,
@@ -10,7 +10,6 @@ use crate::{
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
-use quaint::prelude::SqlFamily;
 use regex::Regex;
 use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
@@ -41,7 +40,22 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        render_create_index(self, &create_index.table, &create_index.index, self.sql_family())
+        let Index { name, columns, tpe } = &create_index.index;
+        let index_type = match tpe {
+            IndexType::Unique => "UNIQUE ",
+            IndexType::Normal => "",
+        };
+        let index_name = self.quote_with_schema(&name).to_string();
+        let table_reference = self.quote(&create_index.table).to_string();
+        let columns = columns.iter().map(|c| self.quote(c));
+
+        format!(
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+            index_type = index_type,
+            index_name = index_name,
+            table_reference = table_reference,
+            columns = columns.join(", ")
+        )
     }
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String {
@@ -246,14 +260,13 @@ impl SqlRenderer for SqliteFlavour {
             ));
 
             // Recreate the indices
-            result.extend(
-                differ
-                    .next
-                    .table
-                    .indices
-                    .iter()
-                    .map(|index| render_create_index(self, differ.next.name(), index, SqlFamily::Sqlite)),
-            );
+            result.extend(differ.next.table.indices.iter().map(|index| {
+                self.render_create_index(&CreateIndex {
+                    table: differ.next.name().to_owned(),
+                    index: index.clone(),
+                    caused_by_create_table: false,
+                })
+            }));
         }
 
         result.push(format!(

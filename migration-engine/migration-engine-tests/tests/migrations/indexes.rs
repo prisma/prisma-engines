@@ -478,7 +478,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), log = "sql-schema-describer=info,debug")]
+#[test_each_connector(tags("postgres", "mysql"), log = "sql-schema-describer=info,debug")]
 async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestApi) -> TestResult {
     let dm = r#"
         model TestModelWithALongName {
@@ -502,7 +502,15 @@ async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestA
                     "evenLongerFieldNameWth",
                     "omgWhatEvenIsThatLongFieldName",
                 ],
-                |idx| idx.assert_name("TestModelWithALongName.looooooooooooongfield_evenLongerFieldNam"),
+                |idx| {
+                    idx.assert_name(if api.is_mysql() {
+                        // The size limit of identifiers is 64 bytes on MySQL
+                        // and 63 on Postgres.
+                        "TestModelWithALongName.looooooooooooongfield_evenLongerFieldName"
+                    } else {
+                        "TestModelWithALongName.looooooooooooongfield_evenLongerFieldNam"
+                    })
+                },
             )
         })?;
 
