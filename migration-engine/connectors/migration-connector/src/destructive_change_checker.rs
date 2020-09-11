@@ -24,22 +24,28 @@ where
 /// The errors and warnings emitted by the [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
 #[derive(Debug, Default)]
 pub struct DestructiveChangeDiagnostics {
+    /// Soon to be deleted.
     pub errors: Vec<MigrationError>,
+    /// The warnings.
     pub warnings: Vec<MigrationWarning>,
+    /// Steps that are not executable.
     pub unexecutable_migrations: Vec<UnexecutableMigration>,
 }
 
 impl DestructiveChangeDiagnostics {
+    /// Equivalent to Default::default()
     pub fn new() -> DestructiveChangeDiagnostics {
         Default::default()
     }
 
+    /// Add a warning to the diagnostics.
     pub fn add_warning<T: Into<Option<MigrationWarning>>>(&mut self, warning: T) {
         if let Some(warning) = warning.into() {
             self.warnings.push(warning)
         }
     }
 
+    /// Is there any warning to be rendered?
     pub fn has_warnings(&self) -> bool {
         !self.warnings.is_empty()
     }
@@ -49,6 +55,7 @@ impl DestructiveChangeDiagnostics {
 /// prevent a migration from being applied, unless the `force` flag is passed.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct MigrationWarning {
+    /// The user-facing warning description.
     pub description: String,
 }
 
@@ -56,13 +63,14 @@ pub struct MigrationWarning {
 /// always prevent a migration from being applied.
 #[derive(Debug, Serialize, PartialEq, Deserialize)]
 pub struct MigrationError {
-    pub tpe: String,
+    /// The user-facing error description.
     pub description: String,
-    pub field: Option<String>,
 }
 
+/// An unexecutable migration step detected by the DestructiveChangeChecker.
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct UnexecutableMigration {
+    /// The user-facing problem description.
     pub description: String,
 }
 
