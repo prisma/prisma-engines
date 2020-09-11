@@ -1,0 +1,120 @@
+use crate::{catch, component::Component, SqlError, SqlMigrationConnector};
+use futures::TryFutureExt;
+use migration_connector::{ConnectorResult, ImperativeMigrationsPersistence, MigrationRecord, UniqueId};
+use quaint::ast::*;
+use sha2::{Digest, Sha256};
+use std::fmt::Write as _;
+use uuid::Uuid;
+
+const IMPERATIVE_MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
+
+#[async_trait::async_trait]
+impl ImperativeMigrationsPersistence for SqlMigrationConnector {
+    async fn start_migration(&self, migration_name: &str, script: &str) -> ConnectorResult<UniqueId> {
+        let conn = self.conn();
+        self.flavour
+            .ensure_migrations_table(conn, self.connection_info())
+            .await?;
+
+        let id = Uuid::new_v4().to_string();
+
+        let mut hasher = Sha256::new();
+        hasher.update(script.as_bytes());
+        let checksum: [u8; 32] = hasher.finalize().into();
+        let mut checksum_string = String::with_capacity(32 * 2);
+
+        for byte in &checksum {
+            write!(checksum_string, "{:x}", byte).unwrap();
+        }
+
+        let insert = Insert::single_into(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+            .value("id", id.as_str())
+            .value("checksum", checksum_string.as_str())
+            // We need this line because MySQL can't default a text field to an empty string
+            .value("logs", "")
+            .value("migration_name", migration_name)
+            .value("script", script);
+
+        catch(
+            self.connection_info(),
+            conn.execute(insert.into()).map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(id)
+    }
+
+    async fn record_successful_step(&self, id: &UniqueId, logs: &str) -> ConnectorResult<()> {
+        use quaint::ast::*;
+
+        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+            .so_that(Column::from("id").equals(id.as_str()))
+            .set(
+                "applied_steps_count",
+                Expression::from(Column::from("applied_steps_count")) + Expression::from(1),
+            )
+            .set("logs", logs);
+
+        catch(
+            self.connection_info(),
+            self.conn().execute(update.into()).map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    async fn record_failed_step(&self, _id: &UniqueId, _logs: &str) -> ConnectorResult<()> {
+        // let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+        //     .so_that(Column::from("id").equals(id.as_ref()))
+        //     .set("logs", Expression::from(Column::from("logs").concat(logs)));
+
+        // catch(
+        //     self.connection_info(),
+        //     self.conn().execute(update.into()).map_err(SqlError::from),
+        // )
+        // .await?;
+
+        Ok(())
+    }
+
+    async fn record_migration_finished(&self, id: &UniqueId) -> ConnectorResult<()> {
+        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+            .so_that(Column::from("id").equals(id.as_str()))
+            .set("finished_at", chrono::Utc::now()); // TODO maybe use a database generated timestamp
+
+        catch(
+            self.connection_info(),
+            self.conn().execute(update.into()).map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    async fn list_migrations(&self) -> ConnectorResult<Vec<MigrationRecord>> {
+        let select = Select::from_table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+            .column("id")
+            .column("checksum")
+            .column("finished_at")
+            .column("migration_name")
+            .column("logs")
+            .column("rolled_back_at")
+            .column("started_at")
+            .column("applied_steps_count")
+            .column("script")
+            .order_by("started_at".ascend());
+
+        let result = catch(
+            self.connection_info(),
+            self.conn().query(select.into()).map_err(SqlError::from),
+        )
+        .await?;
+
+        let rows = quaint::serde::from_rows(result)
+            .map_err(SqlError::from)
+            .map_err(|err| err.into_connector_error(self.connection_info()))?;
+
+        Ok(rows)
+    }
+}

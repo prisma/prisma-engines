@@ -24,9 +24,11 @@ quaint = { git = "https://github.com/prisma/quaint", features = ["single"] }
 regex = "1"
 serde = "1.0"
 serde_json = "1.0"
+sha2 = "0.9.1"
 thiserror = "1.0.9"
 tokio = { version = "=0.2.13", features = ["time"] }
 tracing = "0.1.10"
 tracing-error = "0.1.2"
 tracing-futures = "0.2.0"
+uuid = { version = "*", features = ["v4"] }
 url = "2.1.1"
