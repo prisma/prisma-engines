@@ -5,8 +5,7 @@ use pest::Parser;
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
-use pest::iterators::{Pair, Pairs};
-use std::iter::Map;
+use pest::iterators::{Pair};
 
 pub struct Reformatter<'a> {
     input: &'a str,
