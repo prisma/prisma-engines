@@ -75,26 +75,13 @@ model Post {
 }
 
 #[test]
-fn format_should_enforce_order_of_directives() {
+fn format_should_enforce_order_of_field_directives() {
     let input = r#"model Post {
   id        Int      @default(autoincrement()) @id
   content   String?
   published Boolean  @default(false) @map("_published")
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
-}
-
-model User {
-  id    Int    @default(autoincrement()) @id
-  email String @unique
-  name  String
-  posts Post[]
-}
-
-model Status {
-  id       Int     @id @default(autoincrement())
-  title    String
-  content  String?
 }
 "#;
     let expected = r#"model Post {
@@ -103,19 +90,6 @@ model Status {
   published Boolean @map("_published") @default(false)
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
-}
-
-model User {
-  id    Int    @id @default(autoincrement())
-  email String @unique
-  name  String
-  posts Post[]
-}
-
-model Status {
-  id      Int     @id @default(autoincrement())
-  title   String
-  content String?
 }
 "#;
 
