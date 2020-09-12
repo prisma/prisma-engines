@@ -271,6 +271,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     // MSSQL doesn't support tuples, we do AND/OR.
     fn visit_multiple_tuple_comparison(&mut self, left: Row<'a>, right: Values<'a>, negate: bool) -> visitor::Result {
         let row_len = left.len();
+        let values_len = right.len();
 
         if negate {
             self.write("NOT ")?;
@@ -294,7 +295,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                     Ok(())
                 })?;
 
-                if i < row_len - 1 {
+                if i < values_len - 1 {
                     this.write(" OR ")?;
                 }
             }
