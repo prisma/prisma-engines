@@ -26,6 +26,7 @@ mod reset;
 mod schema_push;
 #[allow(missing_docs)]
 mod unapply_migration;
+mod version;
 
 pub use apply_migration::*;
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
@@ -45,6 +46,7 @@ pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigration
 pub use reset::ResetCommand;
 pub use schema_push::{SchemaPushCommand, SchemaPushInput, SchemaPushOutput};
 pub use unapply_migration::*;
+pub use version::*;
 
 use migration_connector::{
     MigrationError, MigrationStep, MigrationWarning, PrettyDatabaseMigrationStep, UnexecutableMigration,

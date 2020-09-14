@@ -73,7 +73,7 @@ impl SqlIntrospectionConnector {
             .describer
             .version(self.connection_info.schema_name())
             .await?
-            .unwrap())
+            .unwrap_or("Database version information not available.".into()))
     }
 }
 
