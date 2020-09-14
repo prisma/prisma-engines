@@ -52,20 +52,25 @@ fn non_list_scalar_update_field_mapper(
     field: &ScalarFieldRef,
     default: Option<DefaultValue>,
 ) -> InputField {
-    let typ = match &field.type_identifier {
-        TypeIdentifier::Float => operations_object_type(ctx, "Float", field, true),
-        TypeIdentifier::Int => operations_object_type(ctx, "Int", field, true),
-        TypeIdentifier::String => operations_object_type(ctx, "String", field, false),
-        TypeIdentifier::Boolean => operations_object_type(ctx, "Bool", field, false),
-        TypeIdentifier::Enum(e) => operations_object_type(ctx, &format!("Enum{}", e), field, false),
-        TypeIdentifier::Json => operations_object_type(ctx, "Json", field, false),
-        TypeIdentifier::DateTime => operations_object_type(ctx, "DateTime", field, false),
-        TypeIdentifier::UUID => operations_object_type(ctx, "Uuid", field, false),
+    let base_update_type = match &field.type_identifier {
+        TypeIdentifier::Float => InputType::object(operations_object_type(ctx, "Float", field, true)),
+        TypeIdentifier::Int => InputType::object(operations_object_type(ctx, "Int", field, true)),
+        TypeIdentifier::String => InputType::object(operations_object_type(ctx, "String", field, false)),
+        TypeIdentifier::Boolean => InputType::object(operations_object_type(ctx, "Bool", field, false)),
+        TypeIdentifier::Enum(e) => InputType::object(operations_object_type(ctx, &format!("Enum{}", e), field, false)),
+        TypeIdentifier::Json => map_scalar_input_type(field),
+        TypeIdentifier::DateTime => InputType::object(operations_object_type(ctx, "DateTime", field, false)),
+        TypeIdentifier::UUID => InputType::object(operations_object_type(ctx, "Uuid", field, false)),
     };
 
-    input_field(field.name.clone(), InputType::object(typ), default)
-        .optional()
-        .nullable_if(!field.is_required)
+    let input_field = if field.type_identifier != TypeIdentifier::Json {
+        let types = vec![map_scalar_input_type(field), base_update_type];
+        input_field(field.name.clone(), types, default)
+    } else {
+        input_field(field.name.clone(), base_update_type, default)
+    };
+
+    input_field.optional().nullable_if(!field.is_required)
 }
 
 fn operations_object_type(

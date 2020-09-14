@@ -21,7 +21,6 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
     }));
 
     input_object.set_fields(input_fields);
-
     weak_ref
 }
 
