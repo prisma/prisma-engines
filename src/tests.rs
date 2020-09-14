@@ -1,3 +1,3 @@
-pub mod test_api;
 mod query;
+pub mod test_api;
 mod types;

@@ -48,7 +48,7 @@ impl From<tiberius::error::Error> for Error {
             tiberius::error::Error::Server(e) if e.code() == 2627 => {
                 let index = e
                     .message()
-                    .split('.')
+                    .split(". ")
                     .nth(1)
                     .unwrap()
                     .split(' ')

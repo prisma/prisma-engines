@@ -131,9 +131,9 @@ pub mod prelude;
 pub mod serde;
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub mod single;
-pub mod visitor;
 #[cfg(test)]
 mod tests;
+pub mod visitor;
 
 use once_cell::sync::Lazy;
 
