@@ -44,15 +44,23 @@ where
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput>;
+    async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
     async fn calculate_database_steps(
         &self,
         input: &CalculateDatabaseStepsInput,
     ) -> CoreResult<MigrationStepsResultOutput>;
     async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> CoreResult<CalculateDatamodelOutput>;
+    async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput>;
     async fn debug_panic(&self, input: &()) -> CoreResult<()>;
+    async fn diagnose_migration_history(
+        &self,
+        input: &DiagnoseMigrationHistoryInput,
+    ) -> CoreResult<DiagnoseMigrationHistoryOutput>;
     async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> CoreResult<MigrationStepsResultOutput>;
+    async fn initialize(&self, input: &InitializeInput) -> CoreResult<InitializeOutput>;
     async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>>;
     async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput>;
+    async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
     async fn reset(&self, input: &serde_json::Value) -> CoreResult<serde_json::Value>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
@@ -83,6 +91,12 @@ where
             .await
     }
 
+    async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
+        self.handle_command::<ApplyMigrationsCommand>(input)
+            .instrument(tracing::info_span!("ApplyMigrations"))
+            .await
+    }
+
     async fn calculate_database_steps(
         &self,
         input: &CalculateDatabaseStepsInput,
@@ -93,7 +107,13 @@ where
     }
 
     async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> CoreResult<CalculateDatamodelOutput> {
-        self.handle_command::<CalculateDatamodelCommand<'_>>(input)
+        self.handle_command::<CalculateDatamodelCommand>(input)
+            .instrument(tracing::info_span!("CalculateDatamodel"))
+            .await
+    }
+
+    async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
+        self.handle_command::<CreateMigrationCommand>(input)
             .instrument(tracing::info_span!("CalculateDatamodel"))
             .await
     }
@@ -101,6 +121,15 @@ where
     async fn debug_panic(&self, input: &()) -> CoreResult<()> {
         self.handle_command::<DebugPanicCommand>(input)
             .instrument(tracing::info_span!("DebugPanic"))
+            .await
+    }
+
+    async fn diagnose_migration_history(
+        &self,
+        input: &DiagnoseMigrationHistoryInput,
+    ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
+        self.handle_command::<DiagnoseMigrationHistoryCommand>(input)
+            .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
             .await
     }
 
@@ -113,6 +142,15 @@ where
             .await
     }
 
+    async fn initialize(&self, input: &InitializeInput) -> CoreResult<InitializeOutput> {
+        self.handle_command::<InitializeCommand>(input)
+            .instrument(tracing::info_span!(
+                "Initialize",
+                migrations_directory_path = input.migrations_directory_path.as_str()
+            ))
+            .await
+    }
+
     async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>> {
         self.handle_command::<ListMigrationsCommand>(input)
             .instrument(tracing::info_span!("ListMigrations"))
@@ -120,11 +158,17 @@ where
     }
 
     async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput> {
-        self.handle_command::<MigrationProgressCommand<'_>>(input)
+        self.handle_command::<MigrationProgressCommand>(input)
             .instrument(tracing::info_span!(
                 "MigrationProgress",
                 migration_id = input.migration_id.as_str()
             ))
+            .await
+    }
+
+    async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput> {
+        self.handle_command::<PlanMigrationCommand>(input)
+            .instrument(tracing::info_span!("PlanMigration"))
             .await
     }
 
@@ -135,7 +179,7 @@ where
     }
 
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput> {
-        self.handle_command::<SchemaPushCommand<'_>>(input)
+        self.handle_command::<SchemaPushCommand>(input)
             .instrument(tracing::info_span!("SchemaPush"))
             .await
     }

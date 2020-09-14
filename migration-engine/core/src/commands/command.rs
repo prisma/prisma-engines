@@ -5,19 +5,25 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use thiserror::Error;
 
+/// The implementation of an RPC command exposed by the migration engine.
 #[async_trait::async_trait]
 pub trait MigrationCommand {
+    /// The input parameters to the command.
     type Input: DeserializeOwned;
+    /// The response shape of the command.
     type Output: Serialize + 'static;
 
+    /// Handle the input, producing the response or an error.
     async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static;
 }
 
+/// The result type for migration engine commands.
 pub type CommandResult<T> = Result<T, CommandError>;
 
+/// The top-level error type for migration engine commands.
 #[derive(Debug, Error)]
 pub enum CommandError {
     /// When there was a bad datamodel as part of the input.
@@ -32,12 +38,11 @@ pub enum CommandError {
     #[error("The migration contains an invalid schema.\n{}", render_datamodel_error(.0, Some(.1)))]
     InvalidPersistedDatamodel(datamodel::error::ErrorCollection, String),
 
-    #[error("Failed to render the schema to a string  ({0:?})")]
+    /// Failed to render a prisma schema to a string.
+    #[error("Failed to render the schema to a string ({0:?})")]
     DatamodelRenderingError(datamodel::error::ErrorCollection),
 
-    #[error("Initialization error. (error: {0})")]
-    InitializationError(#[source] anyhow::Error),
-
+    /// Errors from the connector.
     #[error("Connector error. (error: {0})")]
     ConnectorError(
         #[source]
@@ -45,9 +50,11 @@ pub enum CommandError {
         ConnectorError,
     ),
 
+    /// Generic unspecified errors.
     #[error("Generic error. (error: {0})")]
     Generic(#[source] anyhow::Error),
 
+    /// Error in command input.
     #[error("Error in command input. (error: {0})")]
     Input(#[source] anyhow::Error),
 }

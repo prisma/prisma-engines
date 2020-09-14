@@ -1,6 +1,7 @@
 use super::{CommandResult, MigrationCommand};
 use crate::migration_engine::MigrationEngine;
 
+/// Make the migration engine crash. This is useful only for debugging error handling in clients.
 pub struct DebugPanicCommand;
 
 #[async_trait::async_trait]

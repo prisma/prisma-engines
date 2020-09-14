@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 //! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
@@ -50,6 +52,9 @@ pub(crate) trait SqlFlavour:
     fn check_database_info(&self, _database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
         Ok(())
     }
+
+    /// Check a connection to make sure it is usable by the migration engine. This can include some set up on the database, like ensuring that the schema we connect to exists.
+    async fn ensure_connection_validity(&self, connection: &Quaint) -> ConnectorResult<()>;
 
     /// Create a database for the given URL on the server, if applicable.
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
@@ -122,6 +127,16 @@ impl SqlFlavour for MysqlFlavour {
             .await?)
     }
 
+    async fn ensure_connection_validity(&self, connection: &Quaint) -> ConnectorResult<()> {
+        catch(
+            connection.connection_info(),
+            connection.raw_cmd("SELECT 1").map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(())
+    }
+
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
@@ -190,6 +205,10 @@ impl SqlFlavour for SqliteFlavour {
         Ok(sql_schema_describer::sqlite::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
+    }
+
+    async fn ensure_connection_validity(&self, _connection: &Quaint) -> ConnectorResult<()> {
+        Ok(())
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
@@ -261,6 +280,44 @@ impl SqlFlavour for PostgresFlavour {
         Ok(sql_schema_describer::postgres::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
+    }
+
+    async fn ensure_connection_validity(&self, connection: &Quaint) -> ConnectorResult<()> {
+        let schema_exists_result = catch(
+            connection.connection_info(),
+            connection
+                .query_raw(
+                    "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1)",
+                    &[connection.connection_info().schema_name().into()],
+                )
+                .map_err(SqlError::from),
+        )
+        .await?;
+
+        if let Some(true) = schema_exists_result
+            .get(0)
+            .and_then(|row| row.at(0).and_then(|value| value.as_bool()))
+        {
+            return Ok(());
+        }
+
+        tracing::debug!(
+            "Detected that the `{schema_name}` schema does not exist on the target database. Attempting to create it.",
+            schema_name = connection.connection_info().schema_name(),
+        );
+
+        catch(
+            connection.connection_info(),
+            connection
+                .raw_cmd(&format!(
+                    "CREATE SCHEMA \"{}\"",
+                    connection.connection_info().schema_name()
+                ))
+                .map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(())
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {

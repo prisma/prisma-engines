@@ -34,7 +34,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                 SqlFamily::Postgres => {
                     let mut m = barrel::Migration::new().schema(self.schema_name());
                     m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_postgres);
-                    m.make_from(barrel::SqlVariant::Pg)
+                    m.schema(self.schema_name()).make_from(barrel::SqlVariant::Pg)
                 }
                 SqlFamily::Mysql => {
                     let mut m = barrel::Migration::new().schema(self.schema_name());

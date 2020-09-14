@@ -24,7 +24,6 @@ use database_info::DatabaseInfo;
 use flavour::SqlFlavour;
 use migration_connector::*;
 use quaint::{
-    error::ErrorKind,
     prelude::{ConnectionInfo, Queryable},
     single::Quaint,
 };
@@ -34,9 +33,7 @@ use sql_destructive_change_checker::*;
 use sql_migration::SqlMigration;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
-use std::{sync::Arc, time::Duration};
-
-const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
+use std::sync::Arc;
 
 pub struct SqlMigrationConnector {
     pub database: Arc<dyn Queryable + Send + Sync + 'static>,
@@ -48,7 +45,9 @@ impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let (connection, database_info) = connect(database_str).await?;
         let flavour = flavour::from_connection_info(database_info.connection_info());
+
         flavour.check_database_info(&database_info)?;
+        flavour.ensure_connection_validity(&connection).await?;
 
         Ok(Self {
             flavour,
@@ -144,29 +143,10 @@ async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> 
     let connection_info =
         ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
-    let connection_fut = async {
-        let connection = Quaint::new(database_str)
-            .await
-            .map_err(SqlError::from)
-            .map_err(|err: SqlError| err.into_connector_error(&connection_info))?;
-
-        // async connections can be lazy, so we issue a simple query to fail early if the database
-        // is not reachable.
-        connection
-            .raw_cmd("SELECT 1")
-            .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
-
-        Ok::<_, ConnectorError>(connection)
-    };
-
-    let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut)
+    let connection = Quaint::new(database_str)
         .await
-        .map_err(|_elapsed| {
-            // TODO: why...
-            SqlError::from(ErrorKind::ConnectTimeout("Tokio timer".into())).into_connector_error(&connection_info)
-        })??;
+        .map_err(SqlError::from)
+        .map_err(|err: SqlError| err.into_connector_error(&connection_info))?;
 
     let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone())
         .await

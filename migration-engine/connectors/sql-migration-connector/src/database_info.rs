@@ -85,8 +85,6 @@ fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<Migrati
                     field.model().name(),
                     field.name()
                 ),
-                field: None,
-                tpe: "".into(),
             })
         }
     });
