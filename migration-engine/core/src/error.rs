@@ -1,40 +1,46 @@
+#![deny(missing_docs)]
+
+//! Errors for the migration core.
+
 use crate::commands::CommandError;
 use datamodel::error::ErrorCollection;
 use migration_connector::ConnectorError;
 use thiserror::Error;
 
+/// Top-level result type for the migration core.
 pub type CoreResult<T> = Result<T, Error>;
 
+/// Top-level migration core error.
 #[derive(Debug, Error)]
 pub enum Error {
+    /// Error from a connector.
     #[error("Error in connector: {0}")]
-    ConnectorError(ConnectorError),
+    ConnectorError(
+        #[source]
+        #[from]
+        ConnectorError,
+    ),
 
+    /// Error from a migration command.
     #[error("Failure during a migration command: {0}")]
-    CommandError(CommandError),
+    CommandError(
+        #[source]
+        #[from]
+        CommandError,
+    ),
 
+    /// Error from the datamodel parser.
     #[error("Error in datamodel: {}", .0)]
     DatamodelError(ErrorCollection),
 
+    /// IO error.
     #[error("Error performing IO: {:?}", .0)]
-    IOError(anyhow::Error),
-}
-
-impl From<ConnectorError> for Error {
-    fn from(e: ConnectorError) -> Self {
-        Error::ConnectorError(e)
-    }
-}
-
-impl From<CommandError> for Error {
-    fn from(e: CommandError) -> Self {
-        Error::CommandError(e)
-    }
+    IOError(#[source] anyhow::Error),
 }
 
 impl From<ErrorCollection> for Error {
-    fn from(e: ErrorCollection) -> Self {
-        Error::DatamodelError(e)
+    fn from(v: ErrorCollection) -> Self {
+        Error::DatamodelError(v)
     }
 }
 

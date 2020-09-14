@@ -56,7 +56,7 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
                 | (ColumnArity::Required, ColumnArity::Required)
                 | (ColumnArity::List, ColumnArity::List) => (),
             },
-            ColumnChange::Type => match (
+            ColumnChange::TypeChanged => match (
                 &columns.previous.column_type_family(),
                 &columns.next.column_type_family(),
             ) {

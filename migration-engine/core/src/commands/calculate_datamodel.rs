@@ -5,12 +5,10 @@ use migration_connector::*;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
-pub struct CalculateDatamodelCommand<'a> {
-    input: &'a CalculateDatamodelInput,
-}
+pub struct CalculateDatamodelCommand;
 
 #[async_trait::async_trait]
-impl<'a> MigrationCommand for CalculateDatamodelCommand<'a> {
+impl MigrationCommand for CalculateDatamodelCommand {
     type Input = CalculateDatamodelInput;
     type Output = CalculateDatamodelOutput;
 
@@ -19,11 +17,10 @@ impl<'a> MigrationCommand for CalculateDatamodelCommand<'a> {
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
     {
-        let cmd = CalculateDatamodelCommand { input };
-        debug!("{:?}", cmd.input);
+        debug!("{:?}", input);
 
         let base_datamodel = SchemaAst::empty();
-        let datamodel = engine.datamodel_calculator().infer(&base_datamodel, &cmd.input.steps)?;
+        let datamodel = engine.datamodel_calculator().infer(&base_datamodel, &input.steps)?;
 
         Ok(CalculateDatamodelOutput {
             datamodel: datamodel::render_schema_ast_to_string(&datamodel).unwrap(),

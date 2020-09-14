@@ -35,7 +35,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
   }
 
-  "Using a combination of aggregations with no records in the database" should "return null for most aggregations" in {
+  "Using a combination of aggregations with no records in the database" should "return 0 for all aggregations" in {
     val result = server.query(
       s"""{
          |  aggregateItem {
@@ -62,7 +62,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":0,"sum":{"float":null,"int":null},"avg":{"float":null,"int":null},"min":{"float":null,"int":null},"max":{"float":null,"int":null}}}}""")
+      """{"data":{"aggregateItem":{"count":0,"sum":{"float":0,"int":0},"avg":{"float":0,"int":0},"min":{"float":0,"int":0},"max":{"float":0,"int":0}}}}""")
   }
 
   "Using a combination of aggregations with some records in the database" should "return the correct results for each aggregation" in {

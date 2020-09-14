@@ -74,7 +74,7 @@ where
 }
 
 pub(crate) fn render_nullability(column: &ColumnWalker<'_>) -> &'static str {
-    if column.is_required() {
+    if column.arity().is_required() {
         " NOT NULL"
     } else {
         ""
