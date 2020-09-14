@@ -13,10 +13,13 @@ pub(crate) fn get_field_filter_types(ctx: &mut BuilderContext, field: &ModelFiel
         ModelField::Scalar(sf) if field.is_list() => vec![InputType::object(scalar_list_filter_type(ctx, sf))],
         ModelField::Scalar(sf) => {
             let mut types = vec![InputType::object(full_scalar_filter_type(ctx, sf, false))];
-            types.push(map_scalar_input_type(sf)); // Scalar equality shorthand
 
-            if !sf.is_required {
-                types.push(InputType::null()); // Scalar null-equality shorthand
+            if sf.type_identifier != TypeIdentifier::Json {
+                types.push(map_scalar_input_type(sf)); // Scalar equality shorthand
+
+                if !sf.is_required {
+                    types.push(InputType::null()); // Scalar null-equality shorthand
+                }
             }
 
             types
@@ -110,20 +113,20 @@ fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
     };
 
-    fields.push(
-        input_field(
-            "not",
-            vec![
-                InputType::object(full_scalar_filter_type(ctx, sf, true)),
-                map_scalar_input_type(sf), // Shorthand `not equals` filter, skips the nested object filter.
-            ],
-            None,
-        )
-        .optional()
-        .nullable_if(!sf.is_required),
-    );
+    let mut not_types = vec![InputType::object(full_scalar_filter_type(ctx, sf, true))];
 
+    if sf.type_identifier != TypeIdentifier::Json {
+        // Shorthand `not equals` filter, skips the nested object filter.
+        not_types.push(map_scalar_input_type(sf));
+    }
+
+    let not_field = input_field("not", not_types, None)
+        .optional()
+        .nullable_if(!sf.is_required && sf.type_identifier != TypeIdentifier::Json);
+
+    fields.push(not_field);
     object.set_fields(fields);
+
     Arc::downgrade(&object)
 }
 
