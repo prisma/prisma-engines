@@ -29,7 +29,7 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""mutation {createUser(data: {id: 1, test: {set: null}}){id, test }}""",
       project = project,
-      errorCode = 2012
+      errorCode = 2009
     )
 
     server

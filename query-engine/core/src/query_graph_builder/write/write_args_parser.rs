@@ -43,7 +43,7 @@ impl WriteArgsParser {
                                     "decrement" => WriteExpression::Substract(value),
                                     "multiply" => WriteExpression::Multiply(value),
                                     "divide" => WriteExpression::Divide(value),
-                                    _ => unreachable!(),
+                                    _ => unreachable!("Invalid update operation"),
                                 }
                             }
                             _ => unreachable!(),
