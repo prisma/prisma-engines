@@ -5,10 +5,7 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
     let object_name = format!("{}ScalarWhereInput", model.name);
     return_cached_input!(ctx, &object_name);
 
-    let mut input_object = init_input_object_type(object_name.clone());
-    input_object.set_min_fields(1);
-
-    let input_object = Arc::new(input_object);
+    let input_object = Arc::new(init_input_object_type(object_name.clone()));
     ctx.cache_input_type(object_name, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
@@ -32,10 +29,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
     let name = format!("{}WhereInput", model.name);
     return_cached_input!(ctx, &name);
 
-    let mut input_object = init_input_object_type(name.clone());
-    input_object.set_min_fields(1);
-
-    let input_object = Arc::new(input_object);
+    let input_object = Arc::new(init_input_object_type(name.clone()));
     ctx.cache_input_type(name, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
