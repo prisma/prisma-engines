@@ -60,6 +60,31 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{"data":{"scalarModels":[{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}]}}""".parseJson)
   }
 
+  "A Create Mutation" should "create and return items with listvalues with shorthand notation" in {
+    val res = server.query(
+      s"""mutation {
+         |  createScalarModel(data: {
+         |    optStrings: ["lala${TroubleCharacters.value}"],
+         |    optInts: [1337, 12],
+         |    optFloats: [1.234, 1.45],
+         |    optBooleans: [true,false],
+         |    optEnums: [A,A],
+         |    optDateTimes: ["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],
+         |  }){optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }
+         |}""",
+      project = project
+    )
+
+    res should be(
+      s"""{"data":{"createScalarModel":{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}}}""".parseJson)
+
+    val queryRes: JsValue =
+      server.query("""{ scalarModels{optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }}""", project = project)
+
+    queryRes should be(
+      s"""{"data":{"scalarModels":[{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}]}}""".parseJson)
+  }
+
   "A Create Mutation" should "create and return items with empty listvalues" in {
     val res = server.query(
       s"""mutation {
@@ -84,15 +109,12 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""mutation {
          |  createScalarModel(data: {
          |    optStrings: {},
-         |  }){optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }
+         |  }){ optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }
          |}""",
       project = project,
-      errorCode = 2012,
-      errorContains = """Missing a required value at `Mutation.createScalarModel.data.ScalarModelCreateInput.optStrings.ScalarModelCreateoptStringsInput.set`"""
-    )
-
-    res.pathAsString("errors.[0].user_facing_error.message") should be(
-      """Missing a required value at `Mutation.createScalarModel.data.ScalarModelCreateInput.optStrings.ScalarModelCreateoptStringsInput.set`"""
+      errorCode = 2009,
+      errorContains =
+        """`Mutation.createScalarModel.data.ScalarModelCreateInput.optStrings.ScalarModelCreateoptStringsInput.set`: A value is required but not set."""
     )
   }
 

@@ -21,18 +21,10 @@ impl WriteArgsParser {
 
                 match field {
                     Field::Scalar(sf) if sf.is_list => {
-                        let vals: ParsedInputMap = v.try_into()?;
-                        let set_value = vals.into_iter().find(|(k, _)| k == "set");
-
-                        let set_value: PrismaValue = match set_value {
-                            Some(value) => value.1.try_into()?,
-                            None => {
-                                return Err(QueryGraphBuilderError::MissingRequiredArgument {
-                                    argument_name: "set".to_owned(),
-                                    field_name: sf.name.to_owned(),
-                                    object_name: model.name.to_owned(),
-                                })
-                            }
+                        let set_value: PrismaValue = match v {
+                            ParsedInputValue::List(_) => v.try_into()?,
+                            ParsedInputValue::Map(mut map) => map.remove("set").unwrap().try_into()?,
+                            _ => unreachable!(),
                         };
 
                         args.args.insert(sf, set_value)

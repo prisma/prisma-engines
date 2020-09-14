@@ -122,20 +122,21 @@ where
         .filter(|f| f.is_list)
         .map(|f| {
             let name = f.name.clone();
-            let set_name = format!("{}{}{}Input", model_name, input_object_name, f.name);
-            let input_object = match ctx.get_input_type(&set_name) {
+            let list_input_type = map_scalar_input_type(&f);
+            let set_object_name = format!("{}{}{}Input", model_name, input_object_name, f.name);
+            let input_object = match ctx.get_input_type(&set_object_name) {
                 Some(t) => t,
                 None => {
-                    let set_fields = vec![input_field("set", map_scalar_input_type(&f), None)];
-                    let input_object = Arc::new(input_object_type(set_name.clone(), set_fields));
+                    let set_fields = vec![input_field("set", list_input_type.clone(), None)];
+                    let input_object = Arc::new(input_object_type(set_object_name.clone(), set_fields));
 
-                    ctx.cache_input_type(set_name, input_object.clone());
+                    ctx.cache_input_type(set_object_name, input_object.clone());
                     Arc::downgrade(&input_object)
                 }
             };
 
             let set_input_type = InputType::object(input_object);
-            input_field(name, set_input_type, None).optional()
+            input_field(name, vec![set_input_type, list_input_type], None).optional()
         })
         .collect();
 
