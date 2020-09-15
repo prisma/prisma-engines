@@ -1,5 +1,7 @@
 //! Convert results from the database into any type implementing `serde::Deserialize`.
 
+use std::borrow::Cow;
+
 use crate::{
     ast::Value,
     connector::{ResultRow, ResultSet},
@@ -168,8 +170,25 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
         }
     }
 
+    fn deserialize_bytes<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: Visitor<'de>,
+    {
+        if let Value::Bytes(Some(bytes)) = self.0 {
+            match bytes {
+                Cow::Borrowed(bytes) => visitor.visit_borrowed_bytes(bytes),
+                Cow::Owned(bytes) => visitor.visit_byte_buf(bytes),
+            }
+        } else {
+            Err(DeserializeError::invalid_type(
+                Unexpected::Other(&format!("{:?}", self.0)),
+                &visitor,
+            ))
+        }
+    }
+
     serde::forward_to_deserialize_any! {
-        bool i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 char str bytes byte_buf
+        bool i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 char str byte_buf
         string unit unit_struct newtype_struct seq tuple tuple_struct map
         struct enum identifier ignored_any
     }

@@ -116,6 +116,13 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Real(None),
                 },
+                PostgresType::BYTEA => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: &[u8] = val;
+                        Value::bytes(val.to_owned())
+                    }
+                    None => Value::Bytes(None),
+                },
                 PostgresType::MONEY => match row.try_get(i)? {
                     Some(val) => {
                         let val: NaiveMoney = val;
