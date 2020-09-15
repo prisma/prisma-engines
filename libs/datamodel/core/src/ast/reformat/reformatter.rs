@@ -398,30 +398,26 @@ impl<'a> Reformatter<'a> {
         }
 
         // sort directives
+        directives.sort_by(|a, b| {
+            let sort_index_a = Self::get_sort_index_of_directive(is_field_directive, a.as_str());
+            let sort_index_b = Self::get_sort_index_of_directive(is_field_directive, b.as_str());
+            sort_index_a.cmp(&sort_index_b)
+        });
+
+        return directives;
+    }
+
+    fn get_sort_index_of_directive(is_field_directive: bool, directive_name: &str) -> usize {
         let correct_order = if is_field_directive {
             vec!["map", "id", "unique", "default", "relation", "updatedAt"]
         } else {
             vec!["map", "unique", "index", "id"]
         };
-        directives.sort_by(|a, b| {
-            let mut sort_index_a = usize::MAX;
-            let mut sort_index_b = usize::MAX;
-            for (i, name) in correct_order.iter().enumerate() {
-                if a.as_str().contains(name) {
-                    sort_index_a = i;
-                    break;
-                }
-            }
-            for (i, name) in correct_order.iter().enumerate() {
-                if b.as_str().contains(name) {
-                    sort_index_b = i;
-                    break;
-                }
-            }
-            sort_index_a.cmp(&sort_index_b)
-        });
-
-        return directives;
+        return if let Some(sort_index) = correct_order.iter().position(|p| directive_name.contains(p)) {
+            sort_index
+        } else {
+            usize::MAX
+        };
     }
 
     fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
