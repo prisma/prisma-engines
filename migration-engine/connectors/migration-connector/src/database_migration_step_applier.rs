@@ -17,6 +17,8 @@ pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
 /// rendered query string for that step.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PrettyDatabaseMigrationStep {
+    /// The serialized database migration step.
     pub step: serde_json::Value,
+    /// The raw query string.
     pub raw: String,
 }
