@@ -24,7 +24,7 @@ const SCHEMA_NAME: &str = "prisma-tests";
 /// DANGER. This will be used for destructive filesystem access, be careful when changing this. DANGER.
 pub fn server_root() -> &'static str {
     static SERVER_ROOT: Lazy<String> =
-        Lazy::new(|| std::env::var("SERVER_ROOT").unwrap_or(env!("CARGO_MANIFEST_DIR").to_string()));
+        Lazy::new(|| std::env::var("SERVER_ROOT").expect("SERVER_ROOT env var is not defined"));
 
     SERVER_ROOT.as_ref()
 }
@@ -38,7 +38,7 @@ pub fn sqlite_test_file(db_name: &str) -> String {
     let file_path = format!("{}/{}.db", database_folder_path, db_name);
 
     // Truncate the file.
-    std::fs::File::create(&file_path).expect("Failed to truncate SQLite database.");
+    std::fs::File::create(&file_path).expect("Failed to create or truncate SQLite database.");
 
     file_path
 }

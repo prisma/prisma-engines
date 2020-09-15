@@ -1,5 +1,6 @@
 mod apply;
 mod calculate_database_steps;
+mod create_migration;
 mod infer;
 mod infer_apply;
 mod schema_push;
@@ -7,6 +8,7 @@ mod unapply_migration;
 
 pub use apply::Apply;
 pub use calculate_database_steps::CalculateDatabaseSteps;
+pub use create_migration::CreateMigration;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
 pub use schema_push::SchemaPush;
@@ -27,6 +29,7 @@ use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_migration_connector::{sql_migration::SqlMigration, SqlMigrationConnector, MIGRATION_TABLE_NAME};
 use sql_schema_describer::*;
 use std::sync::Arc;
+use tempfile::TempDir;
 use test_setup::*;
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
@@ -98,6 +101,11 @@ impl TestApi {
         (self.schema_name().to_owned(), table_name.to_owned()).into()
     }
 
+    /// Create a temporary directory to serve as a test migrations directory.
+    pub fn create_migrations_directory(&self) -> anyhow::Result<TempDir> {
+        Ok(tempfile::tempdir()?)
+    }
+
     pub async fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
         let input = ApplyMigrationInput {
             migration_id: migration_id.into(),
@@ -119,6 +127,16 @@ impl TestApi {
             sql_schema: self.describe_database().await.unwrap(),
             migration_output,
         }
+    }
+
+    /// Convenient builder and assertions for the CreateMigration command.
+    pub fn create_migration<'a>(
+        &'a self,
+        name: &'a str,
+        prisma_schema: &'a str,
+        migrations_directory: &'a TempDir,
+    ) -> CreateMigration<'a> {
+        CreateMigration::new(&self.api, name, prisma_schema, migrations_directory)
     }
 
     pub fn infer_apply<'a>(&'a self, schema: &'a str) -> InferApply<'a> {

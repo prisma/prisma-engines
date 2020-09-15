@@ -15,7 +15,7 @@ use crate::{
     SqlError, SqlResult,
 };
 use futures::future::TryFutureExt;
-use migration_connector::{ConnectorError, ConnectorResult};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
 use quaint::{
     connector::{ConnectionInfo, MysqlUrl, PostgresUrl, Queryable},
@@ -82,6 +82,15 @@ pub(crate) trait SqlFlavour:
         schema_name: &'a str,
         conn: Arc<dyn Queryable + Send + Sync>,
     ) -> SqlResult<SqlSchema>;
+
+    /// Apply the given migration history to a temporary database, and return
+    /// the final introspected SQL schema.
+    async fn sql_schema_from_migration_history(
+        &self,
+        migrations: &[MigrationDirectory],
+        connection: &dyn Queryable,
+        connection_info: &ConnectionInfo,
+    ) -> ConnectorResult<SqlSchema>;
 }
 
 #[derive(Debug)]
@@ -196,6 +205,74 @@ impl SqlFlavour for MysqlFlavour {
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Mysql
     }
+
+    #[tracing::instrument(skip(self, migrations, connection, connection_info))]
+    async fn sql_schema_from_migration_history(
+        &self,
+        migrations: &[MigrationDirectory],
+        connection: &dyn Queryable,
+        connection_info: &ConnectionInfo,
+    ) -> ConnectorResult<SqlSchema> {
+        let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
+        let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
+        let create_database = format!("CREATE DATABASE `{}`", database_name);
+
+        catch(
+            connection_info,
+            connection.raw_cmd(&drop_database).map_err(SqlError::from),
+        )
+        .await?;
+        catch(
+            connection_info,
+            connection.raw_cmd(&create_database).map_err(SqlError::from),
+        )
+        .await?;
+
+        let mut temporary_database_url = self.0.url().clone();
+        temporary_database_url.set_path(&format!("/{}", database_name));
+        let temporary_database_url = temporary_database_url.to_string();
+
+        tracing::debug!("Connecting to temporary database at {:?}", temporary_database_url);
+
+        let quaint = catch(
+            connection_info,
+            Quaint::new(&temporary_database_url).map_err(SqlError::from),
+        )
+        .await?;
+
+        for migration in migrations {
+            let script = migration
+                .read_migration_script()
+                .expect("failed to read migration script");
+
+            tracing::debug!(
+                "Applying migration `{}` to temporary database.",
+                migration.migration_name()
+            );
+
+            catch(
+                quaint.connection_info(),
+                quaint.raw_cmd(&script).map_err(SqlError::from),
+            )
+            .await?;
+        }
+
+        let connection_info = quaint.connection_info().clone();
+
+        let sql_schema = catch(
+            &connection_info,
+            self.describe_schema(connection_info.schema_name(), Arc::new(quaint)),
+        )
+        .await?;
+
+        catch(
+            &connection_info,
+            connection.raw_cmd(&drop_database).map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(sql_schema)
+    }
 }
 
 #[derive(Debug)]
@@ -277,6 +354,48 @@ impl SqlFlavour for SqliteFlavour {
 
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Sqlite
+    }
+
+    #[tracing::instrument(skip(self, migrations, _connection, _connection_info))]
+    async fn sql_schema_from_migration_history(
+        &self,
+        migrations: &[MigrationDirectory],
+        _connection: &dyn Queryable,
+        _connection_info: &ConnectionInfo,
+    ) -> ConnectorResult<SqlSchema> {
+        let temp_dir = tempfile::tempdir().expect("Failed to create temporary directory.");
+        let database_url = format!(
+            "file:{}/scratch.db?db_name={}",
+            temp_dir.path().to_str().unwrap(),
+            self.attached_name
+        );
+
+        tracing::debug!("Applying migrations to temporary SQLite database at `{}`", database_url);
+
+        let connection_info = ConnectionInfo::from_url(&database_url)
+            .map_err(|err| ConnectorError::url_parse_error(err, &database_url))?;
+        let conn = catch(&connection_info, Quaint::new(&database_url).map_err(SqlError::from)).await?;
+
+        for migration in migrations {
+            let script = migration
+                .read_migration_script()
+                .expect("failed to read migration script");
+
+            tracing::debug!(
+                "Applying migration `{}` to temporary database.",
+                migration.migration_name()
+            );
+
+            catch(conn.connection_info(), conn.raw_cmd(&script).map_err(SqlError::from)).await?;
+        }
+
+        let sql_schema = catch(
+            &conn.connection_info().clone(),
+            self.describe_schema(&self.attached_name, Arc::new(conn)),
+        )
+        .await?;
+
+        Ok(sql_schema)
     }
 }
 
@@ -433,6 +552,79 @@ impl SqlFlavour for PostgresFlavour {
 
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Postgres
+    }
+
+    #[tracing::instrument(skip(self, migrations, connection, connection_info))]
+    async fn sql_schema_from_migration_history(
+        &self,
+        migrations: &[MigrationDirectory],
+        connection: &dyn Queryable,
+        connection_info: &ConnectionInfo,
+    ) -> ConnectorResult<SqlSchema> {
+        let database_name = format!("prisma_migrations_shadow_database_{}", uuid::Uuid::new_v4());
+        let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", database_name);
+        let create_database = format!("CREATE DATABASE \"{}\"", database_name);
+        let create_schema = format!("CREATE SCHEMA IF NOT EXISTS \"{}\"", self.schema_name());
+
+        catch(
+            connection_info,
+            connection.raw_cmd(&drop_database).map_err(SqlError::from),
+        )
+        .await?;
+        catch(
+            connection_info,
+            connection.raw_cmd(&create_database).map_err(SqlError::from),
+        )
+        .await?;
+
+        let mut temporary_database_url = self.0.url().clone();
+        temporary_database_url.set_path(&format!("/{}", database_name));
+        let temporary_database_url = temporary_database_url.to_string();
+
+        tracing::debug!("Connecting to temporary database at {}", temporary_database_url);
+
+        let quaint = catch(
+            connection_info,
+            Quaint::new(&temporary_database_url).map_err(SqlError::from),
+        )
+        .await?;
+
+        catch(
+            quaint.connection_info(),
+            quaint.raw_cmd(&create_schema).map_err(SqlError::from),
+        )
+        .await?;
+
+        for migration in migrations {
+            let script = migration
+                .read_migration_script()
+                .expect("failed to read migration script");
+
+            tracing::debug!(
+                "Applying migration `{}` to temporary database.",
+                migration.migration_name()
+            );
+
+            catch(
+                quaint.connection_info(),
+                quaint.raw_cmd(&script).map_err(SqlError::from),
+            )
+            .await?;
+        }
+
+        let sql_schema = catch(
+            &quaint.connection_info().clone(),
+            self.describe_schema(self.schema_name(), Arc::new(quaint)),
+        )
+        .await?;
+
+        catch(
+            connection_info,
+            connection.raw_cmd(&drop_database).map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(sql_schema)
     }
 }
 

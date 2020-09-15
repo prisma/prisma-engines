@@ -785,7 +785,7 @@ dependencies = [
  "colored",
  "cuid",
  "datamodel-connector",
- "indoc",
+ "indoc 0.3.6",
  "itertools",
  "native-types",
  "once_cell",
@@ -1448,6 +1448,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "indoc"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "644defcefee68d7805653a682e99a2e2a5014a1fc3cc9be7059a215844eeea6f"
+dependencies = [
+ "unindent",
+]
+
+[[package]]
 name = "indoc-impl"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1839,7 +1848,9 @@ dependencies = [
  "datamodel",
  "serde",
  "serde_json",
+ "sha2 0.9.1",
  "thiserror",
+ "tracing",
  "tracing-error",
  "user-facing-errors",
 ]
@@ -1900,6 +1911,7 @@ dependencies = [
  "datamodel",
  "futures 0.3.5",
  "git2",
+ "indoc 1.0.2",
  "migration-connector",
  "migration-core",
  "pretty_assertions",
@@ -2729,7 +2741,7 @@ dependencies = [
  "futures 0.3.5",
  "graphql-parser",
  "indexmap",
- "indoc",
+ "indoc 0.3.6",
  "introspection-core",
  "itertools",
  "migration-connector",
@@ -3213,6 +3225,7 @@ dependencies = [
  "serde_json",
  "sha2 0.9.1",
  "sql-schema-describer",
+ "tempfile",
  "thiserror",
  "tokio",
  "tracing",

@@ -121,7 +121,10 @@ where
 
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
         self.handle_command::<CreateMigrationCommand>(input)
-            .instrument(tracing::info_span!("CalculateDatamodel"))
+            .instrument(tracing::info_span!(
+                "CreateMigration",
+                migration_name = input.migration_name.as_str()
+            ))
             .await
     }
 
