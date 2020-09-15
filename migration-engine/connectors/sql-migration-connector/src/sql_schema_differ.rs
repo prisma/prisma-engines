@@ -475,7 +475,7 @@ fn push_foreign_keys_from_created_tables<'a>(
 
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
-fn foreign_keys_match(previous: &ForeignKeyWalker<'_, '_>, next: &ForeignKeyWalker<'_, '_>) -> bool {
+fn foreign_keys_match(previous: &ForeignKeyWalker<'_>, next: &ForeignKeyWalker<'_>) -> bool {
     // Foreign keys point to different tables.
     if previous.referenced_table().name() != next.referenced_table().name() {
         return false;
