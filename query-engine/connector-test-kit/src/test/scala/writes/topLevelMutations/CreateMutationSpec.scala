@@ -157,7 +157,7 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
       project,
       errorCode = 2009,
       errorContains =
-        """Query parsing/validation error at `Mutation.createScalarModel.data.ScalarModelCreateInput.optEnum`: Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnum."""
+        """Query parsing/validation error at `Mutation.createScalarModel.data.ScalarModelCreateInput.optEnum`: Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnumDatabaseEnumType."""
     )
   }
 
