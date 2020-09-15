@@ -59,23 +59,6 @@ impl DatabaseInfo {
     }
 }
 
-// async fn get_database_version(connection: &Quaint, connection_info: &ConnectionInfo) -> SqlResult<Option<String>> {
-//     match connection_info.sql_family() {
-//         SqlFamily::Mysql => {
-//             let query = r#"SELECT @@GLOBAL.version version"#;
-//
-//             let rows = connection.query_raw(query, &[]).await?;
-//
-//             let version_string = rows
-//                 .get(0)
-//                 .and_then(|row| row.get("version").and_then(|version| version.to_string()));
-//
-//             Ok(version_string)
-//         }
-//         _ => Ok(None),
-//     }
-// }
-
 fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<MigrationError>) {
     walk_scalar_fields(datamodel).for_each(|field| {
         if field.field_type().is_json() {

@@ -96,7 +96,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
     async fn get_database_version(&self) -> ConnectorResult<String> {
         let sql_schema = self.catch(self.version()).await?;
-        tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
+        tracing::debug!("Fetched db version for: {:?}", sql_schema);
         let description = serde_json::to_string(&sql_schema).unwrap();
         Ok(description)
     }
