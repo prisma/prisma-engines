@@ -788,16 +788,16 @@ fn model_level_directives_reset_the_table_layout() {
     let input = r#"model Post {
   id Int @id
   aVeryLongName  String
-  @@index([a])
   alsoAVeryLongName String
+  @@index([a])
 }
 "#;
 
     let expected = r#"model Post {
-  id            Int    @id
-  aVeryLongName String
-  @@index([a])
+  id                Int    @id
+  aVeryLongName     String
   alsoAVeryLongName String
+  @@index([a])
 }
 "#;
 
