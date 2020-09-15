@@ -386,7 +386,6 @@ impl<'a> Reformatter<'a> {
     fn extract_and_sort_directives<'i>(token: &'i Token, is_field_directive: bool) -> Vec<Pair<'i, Rule>> {
         // get indices of directives and store in separate Vector
         let mut directives = Vec::new();
-
         for pair in token.clone().into_inner() {
             match pair.as_rule() {
                 Rule::directive => directives.push(pair),
@@ -400,7 +399,6 @@ impl<'a> Reformatter<'a> {
             let sort_index_b = Self::get_sort_index_of_directive(is_field_directive, b.as_str());
             sort_index_a.cmp(&sort_index_b)
         });
-
         return directives;
     }
 
@@ -426,7 +424,7 @@ impl<'a> Reformatter<'a> {
 
         // iterate through tokens and reorder directives
         let mut count = 0;
-        let sorted_inner_pairs = token.clone().into_inner().map(|p| match p.as_rule() {
+        let inner_pairs_with_sorted_directives = token.clone().into_inner().map(|p| match p.as_rule() {
             Rule::directive => {
                 count = count + 1;
                 directives[count - 1].clone()
@@ -435,7 +433,7 @@ impl<'a> Reformatter<'a> {
         });
 
         // write to target
-        for current in sorted_inner_pairs {
+        for current in inner_pairs_with_sorted_directives {
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     target.write(current.as_str());
