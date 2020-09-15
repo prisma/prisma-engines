@@ -385,7 +385,6 @@ impl<'a> Reformatter<'a> {
 
     fn extract_and_sort_directives<'i>(token: &'i Token, is_field_directive: bool) -> Vec<Pair<'i, Rule>> {
         // get indices of directives and store in separate Vector
-        let mut directive_indices = Vec::new();
         let mut directives = Vec::new();
         for (i, pair) in token.clone().into_inner().enumerate() {
             match pair.as_rule() {
