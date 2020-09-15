@@ -1,6 +1,7 @@
 use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
+    flavour::MYSQL_IDENTIFIER_SIZE_LIMIT,
     flavour::{MysqlFlavour, SqlFlavour},
     sql_migration::AddColumn,
     sql_migration::AlterColumn,
@@ -49,7 +50,6 @@ impl SqlRenderer for MysqlFlavour {
             index_name,
             index_new_name,
         } = alter_index;
-
         // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
         if database_info.is_mariadb() || database_info.is_mysql_5_6() {
             let old_index = current_schema
@@ -71,11 +71,15 @@ impl SqlRenderer for MysqlFlavour {
                     )
                 })?;
             let mut new_index = old_index.clone();
-            new_index.name = index_new_name.clone();
+            new_index.name = index_new_name.to_owned();
 
             // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
             Ok(vec![
-                render_create_index(self, table, &new_index, self.sql_family()),
+                self.render_create_index(&CreateIndex {
+                    table: table.clone(),
+                    index: new_index,
+                    caused_by_create_table: false,
+                }),
                 mysql_drop_index(self, table, index_name),
             ])
         } else {
@@ -142,7 +146,7 @@ impl SqlRenderer for MysqlFlavour {
         vec![format!(
             "ALTER TABLE {} {}",
             self.quote_with_schema(&table.name),
-            lines.join(",\n")
+            lines.join(",\n    ")
         )]
     }
 
@@ -211,13 +215,28 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let CreateIndex {
-            table,
-            index,
-            caused_by_create_table: _,
-        } = create_index;
+        let Index { name, columns, tpe } = &create_index.index;
+        let name = if name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+            &name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+        } else {
+            &name
+        };
+        let index_type = match tpe {
+            IndexType::Unique => "UNIQUE ",
+            IndexType::Normal => "",
+        };
+        let index_name = self.quote(&name);
+        let table_reference = self.quote_with_schema(&create_index.table);
 
-        render_create_index(self, table, index, self.sql_family())
+        let columns = columns.iter().map(|c| self.quote(c));
+
+        format!(
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+            index_type = index_type,
+            index_name = index_name,
+            table_reference = table_reference,
+            columns = columns.join(", ")
+        )
     }
 
     fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
@@ -239,11 +258,16 @@ impl SqlRenderer for MysqlFlavour {
                 .iter()
                 .map(|index| {
                     let tpe = if index.is_unique() { "UNIQUE " } else { "" };
+                    let index_name = if index.name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+                        &index.name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+                    } else {
+                        &index.name
+                    };
 
                     format!(
-                        "{}Index {}({})",
+                        "{}INDEX {}({})",
                         tpe,
-                        self.quote(&index.name),
+                        self.quote(&index_name),
                         index.columns.iter().map(|col| self.quote(&col)).join(",\n")
                     )
                 })

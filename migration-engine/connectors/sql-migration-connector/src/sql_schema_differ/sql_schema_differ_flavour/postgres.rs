@@ -2,6 +2,12 @@ use super::SqlSchemaDifferFlavour;
 use crate::{flavour::PostgresFlavour, sql_migration::AlterEnum, sql_schema_differ::SqlSchemaDiffer};
 use once_cell::sync::Lazy;
 use regex::RegexSet;
+use sql_schema_describer::Index;
+
+/// The maximum length of postgres identifiers, in bytes.
+///
+/// Reference: https://www.postgresql.org/docs/12/limits.html
+const POSTGRES_IDENTIFIER_SIZE_LIMIT: usize = 63;
 
 impl SqlSchemaDifferFlavour for PostgresFlavour {
     fn alter_enums(&self, differ: &SqlSchemaDiffer<'_>) -> Vec<AlterEnum> {
@@ -21,6 +27,15 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 }
             })
             .collect()
+    }
+
+    fn index_should_be_renamed(&self, previous: &Index, next: &Index) -> bool {
+        // Implements correct comparison for truncated index names.
+        if previous.name.len() == POSTGRES_IDENTIFIER_SIZE_LIMIT && next.name.len() > POSTGRES_IDENTIFIER_SIZE_LIMIT {
+            previous.name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT] != next.name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT]
+        } else {
+            previous.name != next.name
+        }
     }
 
     fn table_should_be_ignored(&self, table_name: &str) -> bool {

@@ -1,7 +1,7 @@
 use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
-    flavour::{PostgresFlavour, SqlFlavour},
+    flavour::PostgresFlavour,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
         AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
@@ -281,7 +281,22 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        render_create_index(self, &create_index.table, &create_index.index, self.sql_family())
+        let Index { name, columns, tpe } = &create_index.index;
+        let index_type = match tpe {
+            IndexType::Unique => "UNIQUE ",
+            IndexType::Normal => "",
+        };
+        let index_name = self.quote(&name).to_string();
+        let table_reference = self.quote_with_schema(&create_index.table).to_string();
+        let columns = columns.iter().map(|c| self.quote(c));
+
+        format!(
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+            index_type = index_type,
+            index_name = index_name,
+            table_reference = table_reference,
+            columns = columns.join(", ")
+        )
     }
 
     fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {

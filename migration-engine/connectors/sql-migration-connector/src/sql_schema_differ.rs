@@ -379,13 +379,18 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         self.table_pairs()
             .filter(|tables| !tables_to_redefine.contains(tables.next.name()))
             .for_each(|differ| {
-                differ.index_pairs().for_each(|(previous_index, renamed_index)| {
-                    alter_indexes.push(AlterIndex {
-                        index_name: previous_index.name.clone(),
-                        index_new_name: renamed_index.name.clone(),
-                        table: differ.next.name().to_owned(),
+                differ
+                    .index_pairs()
+                    .filter(|(previous_index, next_index)| {
+                        self.flavour.index_should_be_renamed(previous_index, next_index)
                     })
-                })
+                    .for_each(|(previous_index, renamed_index)| {
+                        alter_indexes.push(AlterIndex {
+                            index_name: previous_index.name.clone(),
+                            index_new_name: renamed_index.name.clone(),
+                            table: differ.next.name().to_owned(),
+                        })
+                    })
             });
 
         alter_indexes

@@ -88,7 +88,7 @@ impl<'schema> TableDiffer<'schema> {
     pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = (&'schema Index, &'schema Index)> + 'a {
         self.previous_indexes().filter_map(move |previous_index| {
             self.next_indexes()
-                .find(|next_index| indexes_match(previous_index, next_index) && previous_index.name != next_index.name)
+                .find(|next_index| indexes_match(previous_index, next_index))
                 .map(|renamed_index| (previous_index, renamed_index))
         })
     }

@@ -27,6 +27,11 @@ use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::{collections::HashMap, fmt::Debug, path::Path, sync::Arc};
 use url::Url;
 
+/// The maximum size of identifiers on MySQL, in bytes.
+///
+/// reference: https://dev.mysql.com/doc/refman/5.7/en/identifier-length.html
+pub(crate) const MYSQL_IDENTIFIER_SIZE_LIMIT: usize = 64;
+
 pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     match connection_info {
         ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour(url.clone())),
