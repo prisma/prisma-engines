@@ -175,7 +175,6 @@ fn format_should_put_block_directives_to_end_of_block_with_comments() {
     assert_reformat(input, expected);
 }
 
-
 #[test]
 fn format_should_put_block_directives_to_end_of_block_without_comments() {
     let input = r#"model Blog {

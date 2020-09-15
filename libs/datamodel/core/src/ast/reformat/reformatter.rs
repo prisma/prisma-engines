@@ -339,7 +339,7 @@ impl<'a> Reformatter<'a> {
                 _ => {
                     the_fn(&mut table, renderer, &current, block_name);
                     last_token_was_directive = false;
-                },
+                }
             }
         }
 
