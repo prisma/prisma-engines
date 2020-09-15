@@ -340,9 +340,9 @@ impl QueryDocumentParser {
         };
 
         match typ.borrow() {
-            EnumType::Internal(i) => match i.map_input_value(&raw) {
+            EnumType::Database(db) => match db.map_input_value(&raw) {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
-                None => err(&i.name),
+                None => err(&db.name),
             },
             EnumType::String(s) => match s.value_for(raw.as_str()) {
                 Some(val) => Ok(ParsedInputValue::Single(PrismaValue::String(val.to_owned()))),
