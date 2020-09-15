@@ -386,13 +386,11 @@ impl<'a> Reformatter<'a> {
     fn extract_and_sort_directives<'i>(token: &'i Token, is_field_directive: bool) -> Vec<Pair<'i, Rule>> {
         // get indices of directives and store in separate Vector
         let mut directives = Vec::new();
-        for (i, pair) in token.clone().into_inner().enumerate() {
+
+        for pair in token.clone().into_inner() {
             match pair.as_rule() {
-                Rule::directive => {
-                    directive_indices.push(i);
-                    directives.push(pair);
-                }
-                _ => (),
+                Rule::directive => directives.push(pair),
+                _ => {}
             }
         }
 
@@ -408,9 +406,9 @@ impl<'a> Reformatter<'a> {
 
     fn get_sort_index_of_directive(is_field_directive: bool, directive_name: &str) -> usize {
         let correct_order = if is_field_directive {
-            vec!["map", "id", "unique", "default", "relation", "updatedAt"]
+            vec!["id", "unique", "default", "updatedAt", "map", "relation"]
         } else {
-            vec!["map", "unique", "index", "id"]
+            vec!["id", "unique", "index", "map"]
         };
         return if let Some(sort_index) = correct_order.iter().position(|p| directive_name.contains(p)) {
             sort_index

@@ -78,18 +78,24 @@ model Post {
 fn format_should_enforce_order_of_field_directives() {
     let input = r#"model Post {
   id        Int      @default(autoincrement()) @id
-  content   String?
-  published Boolean  @default(false) @map("_published")
+  published Boolean  @map("_published") @default(false)
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
+}
+
+model User {
+  megaField DateTime @map("mega_field") @id @default("_megaField") @unique @updatedAt
 }
 "#;
     let expected = r#"model Post {
   id        Int     @id @default(autoincrement())
-  content   String?
-  published Boolean @map("_published") @default(false)
+  published Boolean @default(false) @map("_published")
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
+}
+
+model User {
+  megaField DateTime @id @unique @default("_megaField") @updatedAt @map("mega_field")
 }
 "#;
 
@@ -99,25 +105,25 @@ fn format_should_enforce_order_of_field_directives() {
 #[test]
 fn format_should_enforce_order_of_block_directives() {
     let input = r#"model Person {
-    firstName   String
-    lastName    String
-    codeName    String
-    yearOfBirth Int
-    @@map("blog")
-    @@index([yearOfBirth])
-    @@unique([codeName, yearOfBirth])
-    @@id([firstName, lastName])
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+  @@map("blog")
+  @@index([yearOfBirth])
+  @@unique([codeName, yearOfBirth])
+  @@id([firstName, lastName])
 }
 "#;
     let expected = r#"model Person {
-    firstName   String
-    lastName    String
-    codeName    String
-    yearOfBirth Int
-    @@id([firstName, lastName])
-    @@unique([codeName, yearOfBirth])
-    @@index([yearOfBirth])
-    @@map("blog")
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+  @@id([firstName, lastName])
+  @@unique([codeName, yearOfBirth])
+  @@index([yearOfBirth])
+  @@map("blog")
 }
 "#;
 
@@ -148,17 +154,17 @@ fn format_should_put_block_directives_to_end_of_block_with_comments() {
 #[test]
 fn format_should_put_block_directives_to_end_of_block_without_comments() {
     let input = r#"model Blog {
-  @@id([id1, id2])
+  @@map("blog")
   id1 Int
   id2 Int
-  @@map("blog")
+  @@id([id1, id2])
 }
 "#;
     let expected = r#"model Blog {
   id1 Int
   id2 Int
-  @@map("blog")
   @@id([id1, id2])
+  @@map("blog")
 }
 "#;
 
@@ -168,7 +174,7 @@ fn format_should_put_block_directives_to_end_of_block_without_comments() {
 #[test]
 fn format_should_put_block_directives_in_same_line_to_end_of_block_in_separate_lines() {
     let input = r#"model Blog {
-  @@id([id1, id2]) @@map("blog")
+  @@map("blog") @@id([id1, id2])
   id1 Int
   id2 Int
 }
@@ -176,8 +182,8 @@ fn format_should_put_block_directives_in_same_line_to_end_of_block_in_separate_l
     let expected = r#"model Blog {
   id1 Int
   id2 Int
-  @@map("blog")
   @@id([id1, id2])
+  @@map("blog")
 }
 "#;
 
