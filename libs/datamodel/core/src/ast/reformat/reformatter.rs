@@ -5,7 +5,7 @@ use pest::Parser;
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
-use pest::iterators::Pair;
+use pest::iterators::{Pair, Pairs};
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -278,24 +278,26 @@ impl<'a> Reformatter<'a> {
 
         // sort directives
         let directives = Self::extract_and_sort_directives(token, false);
+        let mut last_token_was_directive = false;
 
-        // iterate through tokens and reorder directives
-        let mut count = 0;
-        let sorted_inner_pairs = token.clone().into_inner().map(|p| match p.as_rule() {
-            Rule::directive => {
-                count = count + 1;
-                directives[count - 1].clone()
-            }
-            _ => p,
-        });
-
-        for current in sorted_inner_pairs {
+        for current in token.clone().into_inner() {
             // println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
                 Rule::BLOCK_OPEN => {
                     block_has_opened = true;
                 }
-                Rule::BLOCK_CLOSE => {}
+                Rule::BLOCK_CLOSE => {
+                    for d in &directives {
+                        the_fn(&mut table, renderer, &d, block_name);
+                        table.render(renderer);
+                        table = TableFormat::new();
+                        renderer.end_line();
+                    }
+                }
+
+                Rule::directive => {
+                    last_token_was_directive = true;
+                }
 
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     // Begin.
@@ -319,9 +321,10 @@ impl<'a> Reformatter<'a> {
                     } else {
                         comment(renderer, current.as_str())
                     }
+                    last_token_was_directive = false;
                 }
                 Rule::NEWLINE => {
-                    if block_has_opened {
+                    if block_has_opened && !last_token_was_directive {
                         // do not render newlines before the block
                         // Reset the table layout on a newline.
                         table.render(renderer);
@@ -331,8 +334,12 @@ impl<'a> Reformatter<'a> {
                 }
                 Rule::BLOCK_LEVEL_CATCH_ALL => {
                     table.interleave(strip_new_line(current.as_str()));
+                    last_token_was_directive = false;
                 }
-                _ => the_fn(&mut table, renderer, &current, block_name),
+                _ => {
+                    the_fn(&mut table, renderer, &current, block_name);
+                    last_token_was_directive = false;
+                },
             }
         }
 

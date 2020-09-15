@@ -103,14 +103,16 @@ fn format_should_enforce_order_of_block_directives() {
   firstName String
   lastName  String
   isAdmin   Boolean @default(false)
-  @@unique([firstName, lastName]) @@map("_User")
+  @@unique([firstName, lastName])
+  @@map("_User")
 }
 
 model Post {
   id      Int     @id @default(autoincrement())
   title   String
   content String?
-  @@index([title]) @@map("_Post")
+  @@index([title])
+  @@map("_Post")
 }
 
 model Test {
@@ -118,7 +120,8 @@ model Test {
   lastName  String
   email     String  @unique
   isAdmin   Boolean @default(false)
-  @@id([firstName, lastName]) @@map("_Test")
+  @@id([firstName, lastName])
+  @@map("_Test")
 }
 "#;
     let expected = r#"model User {
@@ -126,14 +129,16 @@ model Test {
   firstName String
   lastName  String
   isAdmin   Boolean @default(false)
-  @@map("_User") @@unique([firstName, lastName])
+  @@map("_User")
+  @@unique([firstName, lastName])
 }
 
 model Post {
   id      Int     @id @default(autoincrement())
   title   String
   content String?
-  @@map("_Post") @@index([title])
+  @@map("_Post")
+  @@index([title])
 }
 
 model Test {
@@ -141,7 +146,69 @@ model Test {
   lastName  String
   email     String  @unique
   isAdmin   Boolean @default(false)
-  @@map("_Test") @@id([firstName, lastName])
+  @@map("_Test")
+  @@id([firstName, lastName])
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+#[ignore]
+fn format_should_put_block_directives_to_end_of_block_with_comments() {
+    let input = r#"model Blog {
+  @@id([id1, id2]) /// id comment
+  id1 Int
+  id2 Int
+  @@map("blog") /// blog comment
+}
+"#;
+    let expected = r#"model Blog {
+  id1 Int
+  id2 Int
+  @@map("blog") /// blog comment
+  @@id([id1, id2]) /// id comment
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+
+#[test]
+fn format_should_put_block_directives_to_end_of_block_without_comments() {
+    let input = r#"model Blog {
+  @@id([id1, id2])
+  id1 Int
+  id2 Int
+  @@map("blog")
+}
+"#;
+    let expected = r#"model Blog {
+  id1 Int
+  id2 Int
+  @@map("blog")
+  @@id([id1, id2])
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn format_should_put_block_directives_in_same_line_to_end_of_block_in_separate_lines() {
+    let input = r#"model Blog {
+  @@id([id1, id2]) @@map("blog")
+  id1 Int
+  id2 Int
+}
+"#;
+    let expected = r#"model Blog {
+  id1 Int
+  id2 Int
+  @@map("blog")
+  @@id([id1, id2])
 }
 "#;
 
