@@ -13,7 +13,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     async fn start_migration(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
         let conn = self.conn();
         self.flavour
-            .ensure_migrations_table(conn, self.connection_info())
+            .ensure_imperative_migrations_table(conn, self.connection_info())
             .await?;
 
         let id = Uuid::new_v4().to_string();

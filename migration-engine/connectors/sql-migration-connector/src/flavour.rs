@@ -64,7 +64,7 @@ pub(crate) trait SqlFlavour:
     async fn ensure_connection_validity(&self, connection: &Quaint) -> ConnectorResult<()>;
 
     /// Make sure that the `_prisma_migrations` table exists.
-    async fn ensure_migrations_table(
+    async fn ensure_imperative_migrations_table(
         &self,
         connection: &dyn Queryable,
         connection_info: &ConnectionInfo,
@@ -151,7 +151,7 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
-    async fn ensure_migrations_table(
+    async fn ensure_imperative_migrations_table(
         &self,
         connection: &dyn Queryable,
         connection_info: &ConnectionInfo,
@@ -247,7 +247,7 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
-    async fn ensure_migrations_table(
+    async fn ensure_imperative_migrations_table(
         &self,
         connection: &dyn Queryable,
         connection_info: &ConnectionInfo,
@@ -378,7 +378,7 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
-    async fn ensure_migrations_table(
+    async fn ensure_imperative_migrations_table(
         &self,
         connection: &dyn Queryable,
         connection_info: &ConnectionInfo,
