@@ -68,10 +68,12 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 547 => {
-                let index = e
-                    .message()
+                let index = dbg!(e.message())
+                    .split('.')
+                    .nth(0)
+                    .unwrap()
                     .split_whitespace()
-                    .nth(8)
+                    .last()
                     .unwrap()
                     .split("\"")
                     .nth(1)

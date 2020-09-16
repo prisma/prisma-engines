@@ -806,6 +806,12 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    fn visit_average(&mut self, avg: Average<'a>) -> Result {
+        self.write("AVG")?;
+        self.surround_with("(", ")", |ref mut s| s.visit_column(avg.column))?;
+        Ok(())
+    }
+
     fn visit_function(&mut self, fun: Function<'a>) -> Result {
         match fun.typ_ {
             FunctionType::RowNumber(fun_rownum) => {
@@ -828,8 +834,7 @@ pub trait Visitor<'a> {
                 self.visit_aggregate_to_string(agg.value.as_ref().clone())?;
             }
             FunctionType::Average(avg) => {
-                self.write("AVG")?;
-                self.surround_with("(", ")", |ref mut s| s.visit_column(avg.column))?;
+                self.visit_average(avg)?;
             }
             FunctionType::Sum(sum) => {
                 self.write("SUM")?;
