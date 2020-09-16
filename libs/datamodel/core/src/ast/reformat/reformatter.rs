@@ -229,7 +229,7 @@ impl<'a> Reformatter<'a> {
             &token,
             Box::new(|table, renderer, token, model_name| {
                 match token.as_rule() {
-                    Rule::directive => {
+                    Rule::block_level_directive => {
                         // model level Directives reset the table. -> .render() does that
                         table.render(renderer);
                         Self::reformat_directive(renderer, &token, "@@");
@@ -278,7 +278,6 @@ impl<'a> Reformatter<'a> {
 
         // sort directives
         let directives = Self::extract_and_sort_directives(token, false);
-        let mut last_token_was_directive = false;
 
         for current in token.clone().into_inner() {
             // println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
@@ -289,15 +288,14 @@ impl<'a> Reformatter<'a> {
                 Rule::BLOCK_CLOSE => {
                     for d in &directives {
                         the_fn(&mut table, renderer, &d, block_name);
+                        // New line after each block attribute
                         table.render(renderer);
                         table = TableFormat::new();
-                        renderer.end_line();
+                        renderer.maybe_end_line();
                     }
                 }
 
-                Rule::directive => {
-                    last_token_was_directive = true;
-                }
+                Rule::block_level_directive => {}
 
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     // Begin.
@@ -321,10 +319,9 @@ impl<'a> Reformatter<'a> {
                     } else {
                         comment(renderer, current.as_str())
                     }
-                    last_token_was_directive = false;
                 }
                 Rule::NEWLINE => {
-                    if block_has_opened && !last_token_was_directive {
+                    if block_has_opened {
                         // do not render newlines before the block
                         // Reset the table layout on a newline.
                         table.render(renderer);
@@ -334,12 +331,8 @@ impl<'a> Reformatter<'a> {
                 }
                 Rule::BLOCK_LEVEL_CATCH_ALL => {
                     table.interleave(strip_new_line(current.as_str()));
-                    last_token_was_directive = false;
                 }
-                _ => {
-                    the_fn(&mut table, renderer, &current, block_name);
-                    last_token_was_directive = false;
-                }
+                _ => the_fn(&mut table, renderer, &current, block_name),
             }
         }
 
@@ -387,9 +380,16 @@ impl<'a> Reformatter<'a> {
         // get indices of directives and store in separate Vector
         let mut directives = Vec::new();
         for pair in token.clone().into_inner() {
-            match pair.as_rule() {
-                Rule::directive => directives.push(pair),
-                _ => {}
+            if is_field_directive {
+                match pair.as_rule() {
+                    Rule::directive => directives.push(pair),
+                    _ => {}
+                }
+            } else {
+                match pair.as_rule() {
+                    Rule::block_level_directive => directives.push(pair),
+                    _ => {}
+                }
             }
         }
 

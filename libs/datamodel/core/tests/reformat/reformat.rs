@@ -172,25 +172,6 @@ fn format_should_put_block_directives_to_end_of_block_without_comments() {
 }
 
 #[test]
-fn format_should_put_block_directives_in_same_line_to_end_of_block_in_separate_lines() {
-    let input = r#"model Blog {
-  @@map("blog") @@id([id1, id2])
-  id1 Int
-  id2 Int
-}
-"#;
-    let expected = r#"model Blog {
-  id1 Int
-  id2 Int
-  @@id([id1, id2])
-  @@map("blog")
-}
-"#;
-
-    assert_reformat(input, expected);
-}
-
-#[test]
 fn comments_in_a_model_must_not_move() {
     let input = r#"
         model User {
