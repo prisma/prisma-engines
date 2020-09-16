@@ -1,4 +1,4 @@
-package queries.orderAndPagination
+package queries.regressions
 
 import org.scalatest.{FlatSpec, Matchers}
 import util._
@@ -88,6 +88,47 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     page4.toString should equal(
       """{"data":{"findManyModelB":[{"id":"bae99648-bdad-440f-953b-ddab33c6ea0b","createdAt":"2020-06-10T21:52:26.000Z"},{"id":"eb8c5a20-ae61-402b-830f-f9518957f195","createdAt":"2020-06-10T21:52:26.000Z"},{"id":"79066f5a-3640-42e9-be04-2a702924f4c6","createdAt":"2020-06-04T16:00:21.000Z"},{"id":"a4b0472a-52fc-4b2d-8c44-4c401c18f469","createdAt":"2020-06-03T21:13:57.000Z"},{"id":"fc34b132-e376-406e-ab89-10ee35b4d58d","createdAt":"2020-05-12T12:30:12.000Z"}]}}""")
+  }
+
+  "[prisma/3505] Paging and ordering with potential null values" should "still allow paging through records predictably" in {
+    val project = SchemaDsl.fromStringV11() {
+      """
+      |model Task {
+      |  id          Int       @default(autoincrement()) @id
+      |  createdAt   DateTime  @default(now())
+      |  updatedAt   DateTime  @default(now())
+      |  completedAt DateTime?
+      |}
+    """.stripMargin
+    }
+
+    database.setup(project)
+
+    // 5 records with ids 1 to 5
+    // Contain nulls for completedAt.
+    server.query("mutation { createOneTask(data: {}) { id }}".stripMargin, project, legacy = false)
+    server.query("mutation { createOneTask(data: {}) { id }}".stripMargin, project, legacy = false)
+    server.query("mutation { createOneTask(data: {}) { id }}".stripMargin, project, legacy = false)
+    server.query("mutation { createOneTask(data: {}) { id }}".stripMargin, project, legacy = false)
+    server.query("mutation { createOneTask(data: {}) { id }}".stripMargin, project, legacy = false)
+
+    // Selects the 2 records after ID 2: [3, 4]
+    val result = server.query(
+      """
+        |{
+        |  findManyTask(
+        |    cursor: { id: 2 },
+        |    take: 2,
+        |    skip: 1,
+        |    orderBy: [{ completedAt: desc }, { id: asc }]
+        |  ) { id }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+
+    result.toString() should be("""{"data":{"findManyTask":[{"id":3},{"id":4}]}}""")
   }
 
   def create_test_data_2855(project: Project): Unit = {
