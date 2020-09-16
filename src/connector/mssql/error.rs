@@ -71,7 +71,7 @@ impl From<tiberius::error::Error> for Error {
                 let index = e
                     .message()
                     .split_whitespace()
-                    .nth(9)
+                    .nth(8)
                     .unwrap()
                     .split("\"")
                     .nth(1)
