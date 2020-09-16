@@ -1896,6 +1896,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "barrel 0.6.5",
+ "chrono",
  "datamodel",
  "futures 0.3.5",
  "git2",
@@ -2629,7 +2630,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#fa7b439e1fae2c8e19fdced60014d3ae2877d322"
+source = "git+https://github.com/prisma/quaint#0f57f151c0eb105d05ddfabd1cabedf209fefc16"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -3210,6 +3211,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "sha2 0.9.1",
  "sql-schema-describer",
  "thiserror",
  "tokio",
@@ -3218,6 +3220,7 @@ dependencies = [
  "tracing-futures",
  "url 2.1.1",
  "user-facing-errors",
+ "uuid",
 ]
 
 [[package]]

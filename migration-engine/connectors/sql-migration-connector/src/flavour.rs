@@ -58,8 +58,17 @@ pub(crate) trait SqlFlavour:
         Ok(())
     }
 
-    /// Check a connection to make sure it is usable by the migration engine. This can include some set up on the database, like ensuring that the schema we connect to exists.
+    /// Check a connection to make sure it is usable by the migration engine.
+    /// This can include some set up on the database, like ensuring that the
+    /// schema we connect to exists.
     async fn ensure_connection_validity(&self, connection: &Quaint) -> ConnectorResult<()>;
+
+    /// Make sure that the `_prisma_migrations` table exists.
+    async fn ensure_imperative_migrations_table(
+        &self,
+        connection: &dyn Queryable,
+        connection_info: &ConnectionInfo,
+    ) -> ConnectorResult<()>;
 
     /// Create a database for the given URL on the server, if applicable.
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
@@ -142,6 +151,28 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
+    async fn ensure_imperative_migrations_table(
+        &self,
+        connection: &dyn Queryable,
+        connection_info: &ConnectionInfo,
+    ) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE IF NOT EXISTS _prisma_migrations (
+                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+                checksum                VARCHAR(64) NOT NULL,
+                finished_at             DATETIME(3),
+                migration_name          TEXT NOT NULL,
+                logs                    TEXT NOT NULL,
+                rolled_back_at          DATETIME(3),
+                started_at              DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+                applied_steps_count     INTEGER UNSIGNED NOT NULL DEFAULT 0,
+                script                  TEXT NOT NULL
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        "#;
+
+        catch(connection_info, connection.raw_cmd(sql).map_err(SqlError::from)).await
+    }
+
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
@@ -214,6 +245,28 @@ impl SqlFlavour for SqliteFlavour {
 
     async fn ensure_connection_validity(&self, _connection: &Quaint) -> ConnectorResult<()> {
         Ok(())
+    }
+
+    async fn ensure_imperative_migrations_table(
+        &self,
+        connection: &dyn Queryable,
+        connection_info: &ConnectionInfo,
+    ) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
+                "id"                    TEXT PRIMARY KEY NOT NULL,
+                "checksum"              TEXT NOT NULL,
+                "finished_at"           DATETIME,
+                "migration_name"        TEXT NOT NULL,
+                "logs"                  TEXT NOT NULL,
+                "rolled_back_at"        DATETIME,
+                "started_at"            DATETIME NOT NULL DEFAULT current_timestamp,
+                "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
+                "script"                TEXT NOT NULL
+            );
+        "#;
+
+        catch(connection_info, connection.raw_cmd(sql).map_err(SqlError::from)).await
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
@@ -323,6 +376,28 @@ impl SqlFlavour for PostgresFlavour {
         .await?;
 
         Ok(())
+    }
+
+    async fn ensure_imperative_migrations_table(
+        &self,
+        connection: &dyn Queryable,
+        connection_info: &ConnectionInfo,
+    ) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE IF NOT EXISTS _prisma_migrations (
+                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+                checksum                VARCHAR(64) NOT NULL,
+                finished_at             TIMESTAMPTZ,
+                migration_name          TEXT NOT NULL,
+                logs                    TEXT NOT NULL,
+                rolled_back_at          TIMESTAMPTZ,
+                started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+                applied_steps_count     INTEGER NOT NULL DEFAULT 0,
+                script                  TEXT NOT NULL
+            );
+        "#;
+
+        catch(connection_info, connection.raw_cmd(sql).map_err(SqlError::from)).await
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {

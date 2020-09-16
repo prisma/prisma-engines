@@ -18,7 +18,7 @@ use super::{
     sql::barrel_migration_executor::BarrelMigrationExecutor,
     InferAndApplyOutput,
 };
-use migration_connector::{MigrationPersistence, MigrationStep};
+use migration_connector::{ImperativeMigrationsPersistence, MigrationPersistence, MigrationStep};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyMigrationInput,
@@ -70,6 +70,10 @@ impl TestApi {
 
     pub fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
         self.api.migration_persistence()
+    }
+
+    pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
+        self.api.connector()
     }
 
     pub fn connection_info(&self) -> &ConnectionInfo {
