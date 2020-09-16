@@ -1,5 +1,8 @@
-use crate::tests::test_api::Sqlite;
+use crate::tests::test_api::sqlite_test_api;
+use crate::tests::test_api::{Sqlite, TestApi};
+use crate::{ast::*, connector::Queryable};
 use std::str::FromStr;
+use test_macros::test_each_connector;
 
 test_type!(integer(
     Sqlite,
@@ -30,6 +33,7 @@ test_type!(blob(
     Value::Bytes(None),
     Value::bytes(b"DEADBEEF".to_vec())
 ));
+
 test_type!(boolean(
     Sqlite,
     "BOOLEAN",
@@ -53,3 +57,70 @@ test_type!(datetime(
     Value::DateTime(None),
     Value::datetime(chrono::DateTime::from_str("2020-07-29T09:23:44.458Z").unwrap())
 ));
+
+#[cfg(feature = "chrono-0_4")]
+#[test_each_connector(tags("sqlite"))]
+async fn test_type_text_datetime_rfc3339(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_type_table("DATETIME").await?;
+    let dt = chrono::Utc::now();
+
+    api.conn()
+        .execute_raw(
+            &format!("INSERT INTO {} (value) VALUES (?)", &table),
+            &[Value::text(dt.to_rfc3339())],
+        )
+        .await?;
+
+    let select = Select::from_table(&table).column("value").order_by("id".descend());
+    let res = api.conn().select(select).await?.into_single()?;
+
+    assert_eq!(Some(&Value::datetime(dt)), res.at(0));
+
+    Ok(())
+}
+
+#[cfg(feature = "chrono-0_4")]
+#[test_each_connector(tags("sqlite"))]
+async fn test_type_text_datetime_rfc2822(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_type_table("DATETIME").await?;
+    let dt = chrono::DateTime::parse_from_rfc2822("Tue, 1 Jul 2003 10:52:37 +0200")
+        .unwrap()
+        .with_timezone(&chrono::Utc);
+
+    api.conn()
+        .execute_raw(
+            &format!("INSERT INTO {} (value) VALUES (?)", &table),
+            &[Value::text(dt.to_rfc2822())],
+        )
+        .await?;
+
+    let select = Select::from_table(&table).column("value").order_by("id".descend());
+    let res = api.conn().select(select).await?.into_single()?;
+
+    assert_eq!(Some(&Value::datetime(dt)), res.at(0));
+
+    Ok(())
+}
+
+#[cfg(feature = "chrono-0_4")]
+#[test_each_connector(tags("sqlite"))]
+async fn test_type_text_datetime_custom(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_type_table("DATETIME").await?;
+
+    api.conn()
+        .execute_raw(
+            &format!("INSERT INTO {} (value) VALUES (?)", &table),
+            &[Value::text("2020-04-20 16:20:00")],
+        )
+        .await?;
+
+    let select = Select::from_table(&table).column("value").order_by("id".descend());
+    let res = api.conn().select(select).await?.into_single()?;
+
+    let naive = chrono::NaiveDateTime::parse_from_str("2020-04-20 16:20:00", "%Y-%m-%d %H:%M:%S").unwrap();
+    let expected = chrono::DateTime::from_utc(naive, chrono::Utc);
+
+    assert_eq!(Some(&Value::datetime(expected)), res.at(0));
+
+    Ok(())
+}

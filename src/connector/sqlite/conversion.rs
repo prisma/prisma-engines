@@ -148,19 +148,29 @@ impl<'a> GetRow for SqliteRow<'a> {
                 ValueRef::Real(f) => Value::from(f),
                 #[cfg(feature = "chrono-0_4")]
                 ValueRef::Text(bytes) if column.is_datetime() => {
-                    let datetime_string = std::str::from_utf8(bytes).map_err(|_| {
+                    let parse_res = std::str::from_utf8(bytes).map_err(|_| {
                         let builder = Error::builder(ErrorKind::ConversionError(
                             "Failed to read contents of SQLite datetime column as UTF-8".into(),
                         ));
                         builder.build()
-                    })?;
-                    let naive_datetime = chrono::NaiveDateTime::parse_from_str(datetime_string, "%Y-%m-%d %H:%M:%S")
-                        .map_err(|chrono_error| {
-                            let builder = Error::builder(ErrorKind::ConversionError(chrono_error.to_string().into()));
-                            builder.build()
-                        })?;
+                    });
 
-                    Value::datetime(chrono::DateTime::<chrono::Utc>::from_utc(naive_datetime, chrono::Utc))
+                    parse_res.and_then(|s| {
+                        chrono::NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S")
+                            .map(|nd| chrono::DateTime::<chrono::Utc>::from_utc(nd, chrono::Utc))
+                            .or_else(|_| {
+                                chrono::DateTime::parse_from_rfc3339(&s).map(|dt| dt.with_timezone(&chrono::Utc))
+                            })
+                            .or_else(|_| {
+                                chrono::DateTime::parse_from_rfc2822(&s).map(|dt| dt.with_timezone(&chrono::Utc))
+                            })
+                            .map(Value::datetime)
+                            .map_err(|chrono_error| {
+                                let builder =
+                                    Error::builder(ErrorKind::ConversionError(chrono_error.to_string().into()));
+                                builder.build()
+                            })
+                    })?
                 }
                 ValueRef::Text(bytes) => Value::text(String::from_utf8(bytes.to_vec())?),
                 ValueRef::Blob(bytes) => Value::bytes(bytes.to_owned()),
