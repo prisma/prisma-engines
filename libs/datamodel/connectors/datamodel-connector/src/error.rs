@@ -62,4 +62,9 @@ pub enum ErrorKind {
         required_count: usize,
         given_count: usize,
     },
+
+    #[error(
+    "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your datasource block: `previewFeatures = [\"previewFeatures\"]`"
+    )]
+    NativeFlagsPreviewFeatureDisabled,
 }

@@ -7,6 +7,8 @@ pub mod error;
 pub mod migration;
 pub mod migration_engine;
 
+mod migrations_directory;
+
 pub use api::GenericApi;
 pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput};
 pub use error::CoreResult;
@@ -21,6 +23,7 @@ use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 
+/// Top-level constructor for the migration engine API.
 pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericApi>> {
     let config = datamodel::parse_configuration(datamodel)?;
 
@@ -66,8 +69,9 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
     Ok(Arc::new(api))
 }
 
-pub async fn create_database(datamodel: &str) -> CoreResult<String> {
-    let config = datamodel::parse_configuration(datamodel)?;
+/// Create the database referenced by the passed in Prisma schema.
+pub async fn create_database(schema: &str) -> CoreResult<String> {
+    let config = datamodel::parse_configuration(schema)?;
 
     let source = config
         .datasources

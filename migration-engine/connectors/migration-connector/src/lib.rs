@@ -1,15 +1,18 @@
-#![deny(rust_2018_idioms)]
-#![deny(unsafe_code)]
+#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
 mod database_migration_inferrer;
 mod database_migration_step_applier;
 mod destructive_change_checker;
+#[allow(missing_docs)]
 mod error;
+#[allow(missing_docs)]
 mod migration_applier;
+#[allow(missing_docs)]
 mod migration_persistence;
 
+#[allow(missing_docs)]
 pub mod steps;
 
 pub use database_migration_inferrer::*;
@@ -35,6 +38,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// A string that should identify what database backend is being used. Note that this is not necessarily
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
+
+    /// The version of the underlying database.
+    fn version(&self) -> String;
 
     /// Hook to perform connector-specific initialization.
     async fn initialize(&self) -> ConnectorResult<()>;
@@ -70,6 +76,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     // TODO: figure out if this is the best way to do this or move to a better place/interface
     // this is placed here so i can use the associated type
+    /// Deprecated
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<Self::DatabaseMigration>;
 
     /// See [MigrationStepApplier](trait.MigrationStepApplier.html).
@@ -82,7 +89,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     }
 }
 
+/// Marker for the associated migration type for a connector.
 pub trait DatabaseMigrationMarker: Debug + Send + Sync {
+    /// Render the migration as JSON.
     fn serialize(&self) -> serde_json::Value;
 }
 

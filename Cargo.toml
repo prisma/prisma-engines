@@ -26,3 +26,6 @@ members = [
   "libs/feature-flags",
   "libs/native-types",
 ]
+
+[patch.crates-io]
+rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}

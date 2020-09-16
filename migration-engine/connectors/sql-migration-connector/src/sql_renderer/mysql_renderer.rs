@@ -1,12 +1,18 @@
-use super::{common::*, RenderedAlterColumn, SqlRenderer};
+use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
+    flavour::MYSQL_IDENTIFIER_SIZE_LIMIT,
     flavour::{MysqlFlavour, SqlFlavour},
+    sql_migration::AddColumn,
+    sql_migration::AlterColumn,
+    sql_migration::AlterTable,
+    sql_migration::DropColumn,
+    sql_migration::TableChange,
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
         AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
     },
-    sql_schema_differ::{ColumnChanges, ColumnDiffer, SqlSchemaDiffer},
+    sql_schema_differ::{ColumnChanges, SqlSchemaDiffer},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -44,7 +50,6 @@ impl SqlRenderer for MysqlFlavour {
             index_name,
             index_new_name,
         } = alter_index;
-
         // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
         if database_info.is_mariadb() || database_info.is_mysql_5_6() {
             let old_index = current_schema
@@ -66,11 +71,15 @@ impl SqlRenderer for MysqlFlavour {
                     )
                 })?;
             let mut new_index = old_index.clone();
-            new_index.name = index_new_name.clone();
+            new_index.name = index_new_name.to_owned();
 
             // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
             Ok(vec![
-                render_create_index(self, table, &new_index, self.sql_family()),
+                self.render_create_index(&CreateIndex {
+                    table: table.clone(),
+                    index: new_index,
+                    caused_by_create_table: false,
+                }),
                 mysql_drop_index(self, table, index_name),
             ])
         } else {
@@ -81,6 +90,64 @@ impl SqlRenderer for MysqlFlavour {
                 index_new_name = self.quote(index_new_name)
             )])
         }
+    }
+
+    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
+        let AlterTable { table, changes } = alter_table;
+
+        let mut lines = Vec::new();
+
+        for change in changes {
+            match change {
+                TableChange::DropPrimaryKey { constraint_name: _ } => lines.push("DROP PRIMARY KEY".to_owned()),
+                TableChange::AddPrimaryKey { columns } => lines.push(format!(
+                    "ADD PRIMARY KEY ({})",
+                    columns.iter().map(|colname| self.quote(colname)).join(", ")
+                )),
+                TableChange::AddColumn(AddColumn { column }) => {
+                    let column = ColumnWalker {
+                        table,
+                        schema: differ.next,
+                        column,
+                    };
+                    let col_sql = self.render_column(column);
+                    lines.push(format!("ADD COLUMN {}", col_sql));
+                }
+                TableChange::DropColumn(DropColumn { name }) => {
+                    let name = self.quote(&name);
+                    lines.push(format!("DROP COLUMN {}", name));
+                }
+                TableChange::AlterColumn(AlterColumn { name, column: _ }) => {
+                    let columns = differ
+                        .diff_table(&table.name)
+                        .expect("AlterTable on unknown table.")
+                        .diff_column(name)
+                        .expect("AlterColumn on unknown column.");
+
+                    let expanded = expand_mysql_alter_column(&columns);
+
+                    match expanded {
+                        MysqlAlterColumn::DropDefault => lines.push(format!(
+                            "ALTER COLUMN {column} DROP DEFAULT",
+                            column = Quoted::mysql_ident(columns.previous.name())
+                        )),
+                        MysqlAlterColumn::Modify { new_default, changes } => {
+                            lines.push(render_mysql_modify(&changes, new_default.as_ref(), columns.next, self))
+                        }
+                    };
+                }
+            };
+        }
+
+        if lines.is_empty() {
+            return Vec::new();
+        }
+
+        vec![format!(
+            "ALTER TABLE {} {}",
+            self.quote_with_schema(&table.name),
+            lines.join(",\n    ")
+        )]
     }
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String {
@@ -94,7 +161,7 @@ impl SqlRenderer for MysqlFlavour {
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
             })
-            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
+            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column_type_family())))
             .unwrap_or_else(String::new);
         let foreign_key = column.table().foreign_key_for_column(column.name());
         let auto_increment_str = if column.is_autoincrement() {
@@ -143,38 +210,33 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_alter_column<'a>(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
-        let expanded = expand_mysql_alter_column(differ);
-
-        let sql = match expanded {
-            MysqlAlterColumn::DropDefault => vec![format!(
-                "ALTER COLUMN {column} DROP DEFAULT",
-                column = Quoted::mysql_ident(differ.previous.name())
-            )],
-            MysqlAlterColumn::Modify { new_default, changes } => {
-                vec![render_mysql_modify(&changes, new_default.as_ref(), differ.next, self)]
-            }
-        };
-
-        Some(RenderedAlterColumn {
-            alter_columns: sql,
-            before: None,
-            after: None,
-        })
-    }
-
     fn render_create_enum(&self, _create_enum: &CreateEnum) -> Vec<String> {
         Vec::new() // enums are defined on each column that uses them on MySQL
     }
 
     fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let CreateIndex {
-            table,
-            index,
-            caused_by_create_table: _,
-        } = create_index;
+        let Index { name, columns, tpe } = &create_index.index;
+        let name = if name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+            &name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+        } else {
+            &name
+        };
+        let index_type = match tpe {
+            IndexType::Unique => "UNIQUE ",
+            IndexType::Normal => "",
+        };
+        let index_name = self.quote(&name);
+        let table_reference = self.quote_with_schema(&create_index.table);
 
-        render_create_index(self, table, index, self.sql_family())
+        let columns = columns.iter().map(|c| self.quote(c));
+
+        format!(
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+            index_type = index_type,
+            index_name = index_name,
+            table_reference = table_reference,
+            columns = columns.join(", ")
+        )
     }
 
     fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
@@ -196,11 +258,16 @@ impl SqlRenderer for MysqlFlavour {
                 .iter()
                 .map(|index| {
                     let tpe = if index.is_unique() { "UNIQUE " } else { "" };
+                    let index_name = if index.name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+                        &index.name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+                    } else {
+                        &index.name
+                    };
 
                     format!(
-                        "{}Index {}({})",
+                        "{}INDEX {}({})",
                         tpe,
-                        self.quote(&index.name),
+                        self.quote(&index_name),
                         index.columns.iter().map(|col| self.quote(&col)).join(",\n")
                     )
                 })
@@ -259,7 +326,7 @@ fn render_mysql_modify(
         Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains("datetime"))
     // @default(now()) does not work with datetimes of certain sizes
     } else {
-        Some(next_column.column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
+        Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty())
     };
 
     let column_type = column_type

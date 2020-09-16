@@ -1,10 +1,11 @@
 package writes.dataTypes.json
 
 import org.scalatest.{FlatSpec, Matchers}
+import util.ConnectorTag.MySqlConnectorTag
 import util._
 
 class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
-  "Using a json field" should "work" taggedAs IgnoreSQLite in {
+  "Using a json field" should "work" taggedAs (IgnoreMySql, IgnoreSQLite) in {
     val project = ProjectDsl.fromString {
       """|model Model {
          | id    String @id
@@ -23,7 +24,7 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
          |      field: "{\\"a\\": \\"b\\" }"
          |    }
          |  ) {
-         |    field 
+         |    field
          |  }
          |}""".stripMargin,
       project,

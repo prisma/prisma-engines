@@ -3,6 +3,7 @@ use crate::migration_engine::MigrationEngine;
 use migration_connector::*;
 use serde_json::json;
 
+/// The `reset` command.
 pub struct ResetCommand;
 
 #[async_trait::async_trait]
