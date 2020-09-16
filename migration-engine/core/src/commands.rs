@@ -14,6 +14,7 @@ mod command;
 mod create_migration;
 mod debug_panic;
 mod diagnose_migration_history;
+mod get_database_version;
 #[allow(missing_docs)]
 mod infer_migration_steps;
 mod initialize;
@@ -26,7 +27,6 @@ mod reset;
 mod schema_push;
 #[allow(missing_docs)]
 mod unapply_migration;
-mod version;
 
 pub use apply_migration::*;
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
@@ -38,6 +38,7 @@ pub use debug_panic::DebugPanicCommand;
 pub use diagnose_migration_history::{
     DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput,
 };
+pub use get_database_version::*;
 pub use infer_migration_steps::*;
 pub use initialize::{InitializeCommand, InitializeInput, InitializeOutput};
 pub use list_migrations::*;
@@ -46,7 +47,6 @@ pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigration
 pub use reset::ResetCommand;
 pub use schema_push::{SchemaPushCommand, SchemaPushInput, SchemaPushOutput};
 pub use unapply_migration::*;
-pub use version::*;
 
 use migration_connector::{
     MigrationError, MigrationStep, MigrationWarning, PrettyDatabaseMigrationStep, UnexecutableMigration,
