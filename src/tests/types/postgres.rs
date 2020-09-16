@@ -347,6 +347,17 @@ test_type!(bytea(
     Value::bytes(b"DEADBEEF".to_vec())
 ));
 
+#[cfg(feature = "array")]
+test_type!(bytea_array(
+    PostgreSql,
+    "bytea[]",
+    Value::Array(None),
+    Value::array(vec![
+        Value::bytes(b"DEADBEEF".to_vec()),
+        Value::bytes(b"BEEFBEEF".to_vec())
+    ])
+));
+
 /* Reserved for SQLx. All of these are broken in the current impl!
 #[cfg(feature = "chrono-0_4")]
 test_type!(timetz(PostgreSql, "timetz", {
@@ -370,15 +381,6 @@ test_type!(cidr_array(
 ));
 
 
-#[cfg(feature = "array")]
-test_type!(bytea_array(
-    PostgreSql,
-    "bytea[]",
-    Value::array(vec![
-        Value::bytes(b"DEADBEEF".to_vec()),
-        Value::bytes(b"BEEFBEEF".to_vec())
-    ])
-));
 
 #[cfg(all(feature = "uuid-0_8", feature = "array"))]
 test_type!(uuid_array(

@@ -123,6 +123,15 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Bytes(None),
                 },
+                #[cfg(feature = "array")]
+                PostgresType::BYTEA_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<Vec<u8>> = val;
+                        let byteas = val.into_iter().map(Value::bytes);
+                        Value::array(byteas)
+                    }
+                    None => Value::Array(None),
+                },
                 PostgresType::MONEY => match row.try_get(i)? {
                     Some(val) => {
                         let val: NaiveMoney = val;
@@ -290,7 +299,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
+                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
                 PostgresType::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<DateTime<Utc>> = val;
@@ -299,7 +308,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
+                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
                 PostgresType::DATE_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<chrono::NaiveDate> = val;
@@ -307,7 +316,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
+                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
                 PostgresType::TIME_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<chrono::NaiveTime> = val;
@@ -315,7 +324,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
+                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
                 PostgresType::TIMETZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<TimeTz> = val;
