@@ -88,6 +88,13 @@ impl MigrationConnector for SqlMigrationConnector {
         self.database_info.connection_info().sql_family().as_str()
     }
 
+    fn version(&self) -> String {
+        self.database_info
+            .database_version
+            .clone()
+            .unwrap_or("Database version information not available.".into())
+    }
+
     async fn create_database(database_str: &str) -> ConnectorResult<String> {
         Self::create_database(database_str).await
     }
