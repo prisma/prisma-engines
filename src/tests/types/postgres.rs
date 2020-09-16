@@ -340,6 +340,8 @@ test_type!(timestamptz_array(PostgreSql, "timestamptz[]", Value::Array(None), {
     Value::array(vec![dt.with_timezone(&chrono::Utc)])
 }));
 
+test_type!(bytea(PostgreSql, "bytea", Value::bytes(b"DEADBEEF".to_vec())));
+
 /* Reserved for SQLx. All of these are broken in the current impl!
 #[cfg(feature = "chrono-0_4")]
 test_type!(timetz(PostgreSql, "timetz", {
@@ -362,7 +364,6 @@ test_type!(cidr_array(
     Value::array(vec![Value::text("127.0.0.1/16"), Value::text("192.168.1.1/24")])
 ));
 
-test_type!(bytea(PostgreSql, "bytea", Value::bytes(b"DEADBEEF".to_vec())));
 
 #[cfg(feature = "array")]
 test_type!(bytea_array(
