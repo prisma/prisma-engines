@@ -39,6 +39,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
 
+    /// The version of the underlying database.
+    fn version(&self) -> String;
+
     /// Hook to perform connector-specific initialization.
     async fn initialize(&self) -> ConnectorResult<()>;
 

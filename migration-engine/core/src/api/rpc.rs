@@ -13,6 +13,7 @@ pub struct RpcApi {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum RpcCommand {
+    GetDatabaseVersion,
     ApplyMigrations,
     CreateMigration,
     DebugPanic,
@@ -33,6 +34,7 @@ enum RpcCommand {
 impl RpcCommand {
     fn name(&self) -> &'static str {
         match self {
+            RpcCommand::GetDatabaseVersion => "getDatabaseVersion",
             RpcCommand::ApplyMigrations => "applyMigrations",
             RpcCommand::CreateMigration => "createMigration",
             RpcCommand::DebugPanic => "debugPanic",
@@ -53,6 +55,7 @@ impl RpcCommand {
 }
 
 const AVAILABLE_COMMANDS: &[RpcCommand] = &[
+    RpcCommand::GetDatabaseVersion,
     RpcCommand::ApplyMigration,
     RpcCommand::ApplyMigrations,
     RpcCommand::CreateMigration,
@@ -138,6 +141,7 @@ impl RpcApi {
     ) -> Result<serde_json::Value, RunCommandError> {
         tracing::debug!(?cmd, "running the command");
         match cmd {
+            RpcCommand::GetDatabaseVersion => render(executor.version(&serde_json::Value::Null).await?),
             RpcCommand::ApplyMigrations => {
                 let input: ApplyMigrationsInput = params.clone().parse()?;
                 render(executor.apply_migrations(&input).await?)
@@ -181,7 +185,6 @@ impl RpcApi {
             RpcCommand::Reset => render(executor.reset(&serde_json::Value::Null).await?),
             RpcCommand::SchemaPush => {
                 let input: SchemaPushInput = params.clone().parse()?;
-
                 render(executor.schema_push(&input).await?)
             }
             RpcCommand::CalculateDatamodel => {
