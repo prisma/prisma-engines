@@ -1,6 +1,6 @@
 use crate::{catch, component::Component, SqlError, SqlMigrationConnector};
 use futures::TryFutureExt;
-use migration_connector::{ConnectorResult, ImperativeMigrationsPersistence, MigrationRecord, UniqueId};
+use migration_connector::{ConnectorResult, ImperativeMigrationsPersistence, MigrationRecord};
 use quaint::ast::*;
 use sha2::{Digest, Sha256};
 use std::fmt::Write as _;
@@ -10,7 +10,7 @@ const IMPERATIVE_MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
 #[async_trait::async_trait]
 impl ImperativeMigrationsPersistence for SqlMigrationConnector {
-    async fn start_migration(&self, migration_name: &str, script: &str) -> ConnectorResult<UniqueId> {
+    async fn start_migration(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
         let conn = self.conn();
         self.flavour
             .ensure_migrations_table(conn, self.connection_info())
@@ -44,11 +44,11 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(id)
     }
 
-    async fn record_successful_step(&self, id: &UniqueId, logs: &str) -> ConnectorResult<()> {
+    async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
         use quaint::ast::*;
 
         let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
-            .so_that(Column::from("id").equals(id.as_str()))
+            .so_that(Column::from("id").equals(id))
             .set(
                 "applied_steps_count",
                 Expression::from(Column::from("applied_steps_count")) + Expression::from(1),
@@ -64,7 +64,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(())
     }
 
-    async fn record_failed_step(&self, _id: &UniqueId, _logs: &str) -> ConnectorResult<()> {
+    async fn record_failed_step(&self, _id: &str, _logs: &str) -> ConnectorResult<()> {
         // let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
         //     .so_that(Column::from("id").equals(id.as_ref()))
         //     .set("logs", Expression::from(Column::from("logs").concat(logs)));
@@ -78,9 +78,9 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(())
     }
 
-    async fn record_migration_finished(&self, id: &UniqueId) -> ConnectorResult<()> {
+    async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()> {
         let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
-            .so_that(Column::from("id").equals(id.as_str()))
+            .so_that(Column::from("id").equals(id))
             .set("finished_at", chrono::Utc::now()); // TODO maybe use a database generated timestamp
 
         catch(

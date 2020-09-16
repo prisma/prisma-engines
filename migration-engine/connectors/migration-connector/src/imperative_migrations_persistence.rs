@@ -4,25 +4,22 @@ use serde::Deserialize;
 /// A timestamp.
 pub type Timestamp = chrono::DateTime<chrono::Utc>;
 
-/// A unique identifier.
-pub type UniqueId = String;
-
 /// Management of imperative migrations state in the database.
 #[async_trait::async_trait]
 pub trait ImperativeMigrationsPersistence {
-    /// Record that a migration is about to be applied.
-    async fn start_migration(&self, migration_name: &str, script: &str) -> ConnectorResult<UniqueId>;
+    /// Record that a migration is about to be applied. Returns the unique identifier for the migration.
+    async fn start_migration(&self, migration_name: &str, script: &str) -> ConnectorResult<String>;
 
     /// Increase the applied_steps_count counter, and append the given logs.
-    async fn record_successful_step(&self, id: &UniqueId, logs: &str) -> ConnectorResult<()>;
+    async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
 
     /// Report logs for a failed migration step. We assume the next steps in the
     /// migration will not be applied, and the error reported.
-    async fn record_failed_step(&self, id: &UniqueId, logs: &str) -> ConnectorResult<()>;
+    async fn record_failed_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
 
     /// Record that the migration completed *successfully*. This means
     /// populating the `finished_at` field in the migration record.
-    async fn record_migration_finished(&self, id: &UniqueId) -> ConnectorResult<()>;
+    async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()>;
 
     /// List all applied migrations, ordered by `started_at`.
     async fn list_migrations(&self) -> ConnectorResult<Vec<MigrationRecord>>;
@@ -32,7 +29,7 @@ pub trait ImperativeMigrationsPersistence {
 #[derive(Debug, Deserialize)]
 pub struct MigrationRecord {
     /// A unique, randomly generated identifier.
-    pub id: UniqueId,
+    pub id: String,
     /// The SHA-256 checksum of the migration script, to detect if it was
     /// edited. It covers only the content of the script, it does not include
     /// timestamp or migration name information.

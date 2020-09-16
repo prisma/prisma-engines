@@ -20,7 +20,7 @@ pub use database_migration_inferrer::*;
 pub use database_migration_step_applier::*;
 pub use destructive_change_checker::*;
 pub use error::*;
-pub use imperative_migrations_persistence::{ImperativeMigrationsPersistence, MigrationRecord, Timestamp, UniqueId};
+pub use imperative_migrations_persistence::{ImperativeMigrationsPersistence, MigrationRecord, Timestamp};
 pub use migration_applier::*;
 pub use migration_persistence::*;
 pub use steps::MigrationStep;
@@ -65,7 +65,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
 
-    /// See [NewMigrationPersistence](trait.NewMigrationPersistence.html).
+    /// See [ImperativeMigrationPersistence](trait.ImperativeMigrationPersistence.html).
     fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence;
 
     /// See [DatabaseMigrationInferrer](trait.DatabaseMigrationInferrer.html).
