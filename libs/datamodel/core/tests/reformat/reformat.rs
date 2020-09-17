@@ -120,6 +120,7 @@ fn format_should_enforce_order_of_block_directives() {
   lastName    String
   codeName    String
   yearOfBirth Int
+
   @@id([firstName, lastName])
   @@unique([codeName, yearOfBirth])
   @@index([yearOfBirth])
@@ -143,6 +144,7 @@ fn format_should_put_block_directives_to_end_of_block_with_comments() {
     let expected = r#"model Blog {
   id1 Int
   id2 Int
+
   @@map("blog") /// blog comment
   @@id([id1, id2]) /// id comment
 }
@@ -163,6 +165,7 @@ fn format_should_put_block_directives_to_end_of_block_without_comments() {
     let expected = r#"model Blog {
   id1 Int
   id2 Int
+
   @@id([id1, id2])
   @@map("blog")
 }
@@ -352,6 +355,7 @@ model a {
   one Int
   two Int
   // bs  b[] @relation(references: [a])
+
   @@id([one, two])
 }
 
@@ -369,6 +373,7 @@ model a {
   one Int
   two Int
   // bs  b[] @relation(references: [a])
+
   @@id([one, two])
 }
 
@@ -380,6 +385,7 @@ model a {
   one Int
   two Int
   // bs  b[] @relation(references: [a])
+
   @@id([one, two])
 }
 
@@ -745,6 +751,7 @@ fn model_level_directives_reset_the_table_layout() {
   id Int @id
   aVeryLongName  String
   alsoAVeryLongName String
+
   @@index([a])
 }
 "#;
@@ -753,6 +760,7 @@ fn model_level_directives_reset_the_table_layout() {
   id                Int    @id
   aVeryLongName     String
   alsoAVeryLongName String
+
   @@index([a])
 }
 "#;

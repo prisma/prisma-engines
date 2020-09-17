@@ -279,6 +279,9 @@ impl<'a> Reformatter<'a> {
         // sort directives
         let directives = Self::extract_and_sort_directives(token, false);
 
+        // used to add a new line between fields and block attributes if there isn't one already
+        let mut last_line_was_empty = false;
+
         for current in token.clone().into_inner() {
             // println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
@@ -286,6 +289,14 @@ impl<'a> Reformatter<'a> {
                     block_has_opened = true;
                 }
                 Rule::BLOCK_CLOSE => {
+                    // New line between fields and attributes
+                    // only if there isn't already a new line in between
+                    if directives.len() != 0 && !last_line_was_empty {
+                        table.render(renderer);
+                        table = TableFormat::new();
+                        renderer.end_line();
+                    }
+
                     for d in &directives {
                         the_fn(&mut table, renderer, &d, block_name);
                         // New line after each block attribute
@@ -322,6 +333,8 @@ impl<'a> Reformatter<'a> {
                 }
                 Rule::NEWLINE => {
                     if block_has_opened {
+                        last_line_was_empty = renderer.line_empty();
+
                         // do not render newlines before the block
                         // Reset the table layout on a newline.
                         table.render(renderer);
