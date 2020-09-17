@@ -280,7 +280,7 @@ impl SqlRenderer for MysqlFlavour {
 
         Ok(format!(
             "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            table_name = self.quote_with_schema(table.name()),
+            table_name = self.quote(table.name()),
             columns = columns,
             indexes= indexes,
             primary_key = primary_key,

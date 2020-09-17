@@ -16,6 +16,8 @@ mod migration_persistence;
 #[allow(missing_docs)]
 pub mod steps;
 
+mod migrations_directory;
+
 pub use database_migration_inferrer::*;
 pub use database_migration_step_applier::*;
 pub use destructive_change_checker::*;
@@ -23,6 +25,7 @@ pub use error::*;
 pub use imperative_migrations_persistence::{ImperativeMigrationsPersistence, MigrationRecord, Timestamp};
 pub use migration_applier::*;
 pub use migration_persistence::*;
+pub use migrations_directory::{create_migration_directory, list_migrations, MigrationDirectory};
 pub use steps::MigrationStep;
 
 use std::fmt::Debug;
@@ -96,8 +99,14 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
 /// Marker for the associated migration type for a connector.
 pub trait DatabaseMigrationMarker: Debug + Send + Sync {
+    /// The file extension to use for migration scripts.
+    const FILE_EXTENSION: &'static str;
+
     /// Render the migration as JSON.
     fn serialize(&self) -> serde_json::Value;
+
+    /// Is the migration empty?
+    fn is_empty(&self) -> bool;
 }
 
 /// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error

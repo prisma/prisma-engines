@@ -1,6 +1,8 @@
 #![deny(missing_docs)]
 #![allow(dead_code)]
 
+//! Migrations directory management.
+//!
 //! This module is responsible for the management of the contents of the
 //! migrations directory. The migrations directory contains multiple migration
 //! directorys, named after the migration id, and each containing:
@@ -19,7 +21,7 @@ use std::{
 pub const MIGRATION_SCRIPT_FILENAME: &str = "migration";
 
 /// Create a directory for a new migration.
-pub(crate) fn create_migration_directory(
+pub fn create_migration_directory(
     migrations_directory_path: &Path,
     migration_name: &str,
 ) -> io::Result<MigrationDirectory> {
@@ -43,14 +45,11 @@ pub(crate) fn create_migration_directory(
 
     create_dir(&directory_path)?;
 
-    Ok(MigrationDirectory {
-        path: directory_path,
-        script_cache: None,
-    })
+    Ok(MigrationDirectory { path: directory_path })
 }
 
 /// List the migrations present in the migration directory, lexicographically sorted by name.
-pub(crate) fn list_migrations(migrations_directory_path: &Path) -> io::Result<Vec<MigrationDirectory>> {
+pub fn list_migrations(migrations_directory_path: &Path) -> io::Result<Vec<MigrationDirectory>> {
     let mut entries: Vec<MigrationDirectory> = Vec::new();
 
     for entry in read_dir(migrations_directory_path)? {
@@ -61,7 +60,7 @@ pub(crate) fn list_migrations(migrations_directory_path: &Path) -> io::Result<Ve
         }
     }
 
-    entries.sort_by(|a, b| a.migration_id().cmp(b.migration_id()));
+    entries.sort_by(|a, b| a.migration_name().cmp(b.migration_name()));
 
     Ok(entries)
 }
@@ -71,12 +70,11 @@ pub(crate) fn list_migrations(migrations_directory_path: &Path) -> io::Result<Ve
 #[derive(Debug)]
 pub struct MigrationDirectory {
     path: PathBuf,
-    script_cache: Option<String>,
 }
 
 impl MigrationDirectory {
-    /// The `{timestamp}_{name}` formatted migration id.
-    pub fn migration_id(&self) -> &str {
+    /// The `{timestamp}_{name}` formatted migration name.
+    pub fn migration_name(&self) -> &str {
         self.path
             .file_name()
             .expect("MigrationDirectory::migration_id")
@@ -84,6 +82,7 @@ impl MigrationDirectory {
             .expect("Migration directory name is not valid UTF-8.")
     }
 
+    /// Write the checksum of the migration script file to `buf`.
     pub fn checksum(&mut self, buf: &mut Vec<u8>) -> io::Result<()> {
         let script = self.read_migration_script()?;
         let mut hasher = Sha512::new();
@@ -106,11 +105,14 @@ impl MigrationDirectory {
     //     Ok(applied_migration.checksum == filesystem_script_checksum.as_ref())
     // }
 
+    /// Write the migration script to the directory.
     #[tracing::instrument]
     pub fn write_migration_script(&self, script: &str, extension: &str) -> std::io::Result<()> {
         let mut path = self.path.join(MIGRATION_SCRIPT_FILENAME);
 
         path.set_extension(extension);
+
+        tracing::debug!("Writing migration script at {:?}", &path);
 
         let mut file = std::fs::File::create(&path)?;
         file.write_all(script.as_bytes())?;
@@ -118,22 +120,20 @@ impl MigrationDirectory {
         Ok(())
     }
 
+    /// Read the migration script to a string.
     #[tracing::instrument]
-    pub fn read_migration_script(&mut self) -> std::io::Result<&str> {
-        if self.script_cache.is_none() {
-            let script = std::fs::read_to_string(&self.path.join("migration.sql"))?;
-            self.script_cache = Some(script);
-        }
+    pub fn read_migration_script(&self) -> std::io::Result<String> {
+        std::fs::read_to_string(&self.path.join("migration.sql"))
+    }
 
-        Ok(self.script_cache.as_ref().unwrap())
+    /// The filesystem path to the directory.
+    pub fn path(&self) -> &Path {
+        &self.path
     }
 }
 
 impl From<DirEntry> for MigrationDirectory {
     fn from(entry: DirEntry) -> MigrationDirectory {
-        MigrationDirectory {
-            path: entry.path(),
-            script_cache: None,
-        }
+        MigrationDirectory { path: entry.path() }
     }
 }

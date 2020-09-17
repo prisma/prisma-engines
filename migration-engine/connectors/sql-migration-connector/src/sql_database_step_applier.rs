@@ -4,7 +4,10 @@ use crate::{
     sql_schema_differ::SqlSchemaDiffer,
     Component, SqlError, SqlFlavour, SqlResult,
 };
-use migration_connector::{ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, PrettyDatabaseMigrationStep};
+use migration_connector::{
+    ConnectorError, ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier,
+    DestructiveChangeDiagnostics, PrettyDatabaseMigrationStep,
+};
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use tracing_futures::Instrument;
 
@@ -45,6 +48,56 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
             &database_migration.before,
             &database_migration.after,
         )
+    }
+
+    fn render_script(&self, database_migration: &SqlMigration, diagnostics: &DestructiveChangeDiagnostics) -> String {
+        if database_migration.is_empty() {
+            return "-- This is an empty migration.".to_string();
+        }
+
+        let mut script = String::with_capacity(40 * database_migration.steps.len());
+
+        // Note: it would be much nicer if we could place the warnings next to
+        // the SQL for the steps that triggered them.
+        if diagnostics.has_warnings() || diagnostics.unexecutable_migrations.len() > 0 {
+            script.push_str("/*\n  Warnings:\n\n");
+
+            for warning in &diagnostics.warnings {
+                script.push_str("  - ");
+                script.push_str(&warning.description);
+                script.push_str("\n");
+            }
+
+            for unexecutable in &diagnostics.unexecutable_migrations {
+                script.push_str("  - ");
+                script.push_str(&unexecutable.description);
+                script.push_str("\n");
+            }
+
+            script.push_str("\n*/\n")
+        }
+
+        for step in &database_migration.steps {
+            let statements: Vec<String> = render_raw_sql(
+                step,
+                self.flavour(),
+                self.database_info(),
+                &database_migration.before,
+                &database_migration.after,
+            )
+            .unwrap();
+
+            script.push_str("-- ");
+            script.push_str(step.description());
+            script.push_str("\n");
+
+            for statement in statements {
+                script.push_str(&statement);
+                script.push_str(";\n");
+            }
+        }
+
+        script
     }
 }
 
