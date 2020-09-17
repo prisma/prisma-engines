@@ -1,4 +1,4 @@
-package queries.orderAndPagination
+package queries.regressions
 
 import org.scalatest.{FlatSpec, Matchers}
 import util._
@@ -88,6 +88,100 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     page4.toString should equal(
       """{"data":{"findManyModelB":[{"id":"bae99648-bdad-440f-953b-ddab33c6ea0b","createdAt":"2020-06-10T21:52:26.000Z"},{"id":"eb8c5a20-ae61-402b-830f-f9518957f195","createdAt":"2020-06-10T21:52:26.000Z"},{"id":"79066f5a-3640-42e9-be04-2a702924f4c6","createdAt":"2020-06-04T16:00:21.000Z"},{"id":"a4b0472a-52fc-4b2d-8c44-4c401c18f469","createdAt":"2020-06-03T21:13:57.000Z"},{"id":"fc34b132-e376-406e-ab89-10ee35b4d58d","createdAt":"2020-05-12T12:30:12.000Z"}]}}""")
+  }
+
+  "[prisma/3505][Case 1] Paging and ordering with potential null values ON a null row" should "still allow paging through records predictably" in {
+    // "On null row" means that the cursor row contains a null value for the ordering field, in this case row 2.
+    val project = SchemaDsl.fromStringV11() {
+      """
+      |model TestModel {
+      |  id    Int     @id
+      |  field String?
+      |}
+    """.stripMargin
+    }
+
+    database.setup(project)
+
+    // 5 records with ids 1 to 5
+    // Contain some nulls for `field`.
+    server.query("""mutation { createOneTestModel(data: { id: 1 }) { id }}""", project, legacy = false)
+    server.query("""mutation { createOneTestModel(data: { id: 2 }) { id }}""", project, legacy = false)
+    server.query("""mutation { createOneTestModel(data: { id: 3, field: "Test"}) { id }}""", project, legacy = false)
+    server.query("""mutation { createOneTestModel(data: { id: 4 }) { id }}""", project, legacy = false)
+    server.query("""mutation { createOneTestModel(data: { id: 5, field: "Test2"}) { id }}""", project, legacy = false)
+
+    // Selects the 2 records after ID 2.
+    // There are 2 options, depending on how the underlying db orders NULLS (first or last, * ids have nulls in `field`):
+    // Nulls last:  5, 3, 1*, 2*, 4* => take only 4
+    // Nulls first: 1*, 2*, 4*, 5, 3 => take 4, 5
+    val result = server.query(
+      """
+        |{
+        |  findManyTestModel(
+        |    cursor: { id: 2 },
+        |    take: 2,
+        |    skip: 1,
+        |    orderBy: [{ field: desc }, { id: asc }]
+        |  ) { id }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+
+    Seq(
+      """{"data":{"findManyTestModel":[{"id":4}]}}""",
+      """{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"""
+    ) should contain(result.toString())
+  }
+
+  "[prisma/3505][Case 2] Paging and ordering with potential null values NOT ON a null row" should "still allow paging through records predictably" in {
+    // "Not on null row" means that the cursor row does not contain a null value for the ordering field, in this case row 2.
+    // However, other rows might still have nulls, those must be taken into consideration.
+    val project = SchemaDsl.fromStringV11() {
+      """
+        |model TestModel {
+        |  id    Int     @id
+        |  field String?
+        |}
+      """.stripMargin
+    }
+
+    database.setup(project)
+
+    // 5 records with ids 1 to 5
+    // Contain some nulls for `field`.
+    server.query("""mutation { createOneTestModel(data: { id: 1 }) { id }}""", project, legacy = false)
+    server.query("""mutation { createOneTestModel(data: { id: 2, field: "Test" }) { id }}""", project, legacy = false)
+    server.query("""mutation { createOneTestModel(data: { id: 3 }) { id }}""", project, legacy = false)
+    server.query("""mutation { createOneTestModel(data: { id: 4 }) { id }}""", project, legacy = false)
+    server.query("""mutation { createOneTestModel(data: { id: 5, field: "Test2"}) { id }}""", project, legacy = false)
+
+    // Selects the 2 records after ID 5.
+    // There are 2 options, depending on how the underlying db orders NULLS (first or last, * ids have nulls in `field`):
+    // field DESC, id ASC
+    // Nulls last: 5, 2, 1*, 3*, 4* => take 2, 1
+    // Nulls first: 1*, 3*, 4*, 5, 2 => take 2
+    val result = server.query(
+      """
+        |{
+        |  findManyTestModel(
+        |    cursor: { id: 5 },
+        |    take: 2,
+        |    skip: 1,
+        |    orderBy: [{ field: desc }, { id: asc }]
+        |  ) { id }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+
+    Seq(
+      """{"data":{"findManyTestModel":[{"id":2}]}}""",
+      """{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"""
+    ) should contain(result.toString())
   }
 
   def create_test_data_2855(project: Project): Unit = {

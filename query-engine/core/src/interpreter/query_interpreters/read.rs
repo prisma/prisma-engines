@@ -73,7 +73,10 @@ fn read_many<'a, 'b>(
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let scalars = if query.args.distinct.is_some() || query.args.contains_unstable_cursor() {
+        let scalars = if query.args.distinct.is_some()
+            || query.args.contains_unstable_cursor()
+            || query.args.contains_null_cursor()
+        {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
                 .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
