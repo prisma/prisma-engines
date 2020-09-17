@@ -42,6 +42,26 @@ static ORDER_TABLE_ALIAS: &'static str = "order_cmp";
 ///   `TestModel`.`fieldC` ASC,
 ///   `TestModel`.`fieldD` DESC;
 /// ```
+///
+/// The above assumes that all field are non-nullable. If a field is nullable, #2 conditions slighty change:
+/// ```sql
+///   -- ... The first (4 - condition) block:
+///   (
+///     (
+///       `TestModel`.`fieldA` = `order_cmp`.`fieldA`
+///       OR `order_cmp`.`fieldA` IS NULL
+///       OR `TestModel`.`fieldA` IS NULL
+///     )
+///     AND -- ...
+///   )
+///   -- ...The other blocks (3, 2) in between, then the single condition block:
+///   OR (
+///     `TestModel`.`fieldA` < `order_cmp`.`fieldA`
+///     OR `order_cmp`.`fieldA` IS NULL
+///     OR `TestModel`.`fieldA` IS NULL
+///   )
+///   -- ...
+/// ```
 pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Table<'static>>, ConditionTree<'static>) {
     match query_arguments.cursor {
         None => (None, ConditionTree::NoCondition),
@@ -179,8 +199,11 @@ fn map_orderby_condition(
     }
     .into();
 
+    // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
+    // statement over their order relative to the cursor.
     if !field.is_required {
         order_expr
+            .or(field.as_column().is_null())
             .or(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())).is_null())
             .into()
     } else {
@@ -192,11 +215,14 @@ fn map_equality_condition(field: &ScalarFieldRef) -> Expression<'static> {
     let order_column = field.as_column();
     let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
 
+    // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
+    // statement over their order relative to the cursor.
     if !field.is_required {
         order_column
             .clone()
             .equals(cmp_column.clone())
             .or(cmp_column.is_null())
+            .or(order_column.is_null())
             .into()
     } else {
         order_column.equals(cmp_column).into()

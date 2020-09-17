@@ -158,15 +158,16 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query("""mutation { createOneTestModel(data: { id: 4 }) { id }}""", project, legacy = false)
     server.query("""mutation { createOneTestModel(data: { id: 5, field: "Test2"}) { id }}""", project, legacy = false)
 
-    // Selects the 2 records after ID 2.
+    // Selects the 2 records after ID 5.
     // There are 2 options, depending on how the underlying db orders NULLS (first or last, * ids have nulls in `field`):
-    // Nulls last:  5, 3, 1*, 2*, 4* => take 1, 2
-    // Nulls first: 1*, 2*, 4*, 5, 3 => empty result
+    // field DESC, id ASC
+    // Nulls last: 5, 2, 1*, 3*, 4* => take 2, 1
+    // Nulls first: 1*, 3*, 4*, 5, 2 => take 2
     val result = server.query(
       """
         |{
         |  findManyTestModel(
-        |    cursor: { id: 2 },
+        |    cursor: { id: 5 },
         |    take: 2,
         |    skip: 1,
         |    orderBy: [{ field: desc }, { id: asc }]
@@ -178,8 +179,8 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     Seq(
-//      """{"data":{"findManyTestModel":[]}}""",
-      """{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"""
+      """{"data":{"findManyTestModel":[{"id":2}]}}""",
+      """{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"""
     ) should contain(result.toString())
   }
 
