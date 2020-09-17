@@ -8,7 +8,9 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = persistence.start_migration("initial_migration", script).await?;
+    let id = persistence
+        .record_migration_started("initial_migration", script)
+        .await?;
 
     let migrations = persistence.list_migrations().await?;
 
@@ -42,7 +44,9 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = persistence.start_migration("initial_migration", script).await?;
+    let id = persistence
+        .record_migration_started("initial_migration", script)
+        .await?;
     persistence.record_migration_finished(&id).await?;
 
     let migrations = persistence.list_migrations().await?;
@@ -80,7 +84,9 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = persistence.start_migration("initial_migration", script).await?;
+    let id = persistence
+        .record_migration_started("initial_migration", script)
+        .await?;
     persistence.record_successful_step(&id, "oï").await?;
     persistence.record_migration_finished(&id).await?;
 
@@ -119,14 +125,18 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
 
     let script_1 = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id_1 = persistence.start_migration("initial_migration", script_1).await?;
+    let id_1 = persistence
+        .record_migration_started("initial_migration", script_1)
+        .await?;
     persistence.record_successful_step(&id_1, "oï").await?;
     persistence.record_migration_finished(&id_1).await?;
 
     std::thread::sleep(std::time::Duration::from_millis(10));
 
     let script_2 = "DROP ENUM MyBoolean";
-    let id_2 = persistence.start_migration("second_migration", script_2).await?;
+    let id_2 = persistence
+        .record_migration_started("second_migration", script_2)
+        .await?;
     persistence
         .record_successful_step(&id_2, "logs for the second migration")
         .await?;

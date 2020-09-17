@@ -1,9 +1,11 @@
 use crate::{
+    catch,
     database_info::DatabaseInfo,
     sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
     sql_schema_differ::SqlSchemaDiffer,
     Component, SqlError, SqlFlavour, SqlResult,
 };
+use futures::TryFutureExt;
 use migration_connector::{
     ConnectorError, ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier,
     DestructiveChangeDiagnostics, PrettyDatabaseMigrationStep,
@@ -98,6 +100,14 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
         }
 
         script
+    }
+
+    async fn apply_script(&self, script: &str) -> ConnectorResult<()> {
+        catch(
+            self.connection_info(),
+            self.conn().raw_cmd(script).map_err(SqlError::from),
+        )
+        .await
     }
 }
 

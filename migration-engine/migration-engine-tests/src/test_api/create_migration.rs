@@ -43,7 +43,7 @@ impl<'a> CreateMigration<'a> {
             .await?;
 
         Ok(CreateMigrationAssertion {
-            _output: output,
+            output: output,
             _api: self.api,
             migrations_directory: self.migrations_directory,
         })
@@ -51,7 +51,7 @@ impl<'a> CreateMigration<'a> {
 }
 
 pub struct CreateMigrationAssertion<'a> {
-    _output: CreateMigrationOutput,
+    output: CreateMigrationOutput,
     _api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
 }
@@ -115,6 +115,32 @@ impl<'a> CreateMigrationAssertion<'a> {
                 name_matcher
             ),
         }
+
+        Ok(self)
+    }
+
+    pub fn modify_migration<F>(self, modify: F) -> AssertionResult<Self>
+    where
+        F: FnOnce(&mut String),
+    {
+        use std::io::Write as _;
+
+        let migration_script_path = self
+            .migrations_directory
+            .path()
+            .join(self.output.generated_migration_name.as_ref().unwrap())
+            .join("migration.sql");
+
+        let new_contents = {
+            let mut contents = std::fs::read_to_string(&migration_script_path).context("Reading migration script")?;
+
+            modify(&mut contents);
+
+            contents
+        };
+
+        let mut file = std::fs::File::create(&migration_script_path)?;
+        write!(file, "{}", new_contents)?;
 
         Ok(self)
     }

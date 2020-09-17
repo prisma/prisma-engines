@@ -10,12 +10,14 @@
 //! - A migration script
 
 // use migration_connector::ImperativeMigration;
-use sha2::{Digest, Sha512};
+use sha2::{Digest, Sha256, Sha512};
 use std::{
     fs::{create_dir, read_dir, DirEntry},
     io::{self, Write as _},
     path::{Path, PathBuf},
 };
+
+use crate::FormatChecksum;
 
 /// The file name for migration scripts, not including the file extension.
 pub const MIGRATION_SCRIPT_FILENAME: &str = "migration";
@@ -95,15 +97,16 @@ impl MigrationDirectory {
         Ok(())
     }
 
-    // #[tracing::instrument]
-    // pub fn matches_applied_migration(&self, applied_migration: &ImperativeMigration) -> io::Result<bool> {
-    //     let filesystem_script = self.read_migration_script()?;
-    //     let mut hasher = Sha512::new();
-    //     hasher.update(&filesystem_script);
-    //     let filesystem_script_checksum = hasher.finalize();
+    /// Check whether the checksum of the migration script matches the provided one.
+    #[tracing::instrument]
+    pub fn matches_checksum(&self, checksum_str: &str) -> io::Result<bool> {
+        let filesystem_script = self.read_migration_script()?;
+        let mut hasher = Sha256::new();
+        hasher.update(&filesystem_script);
+        let filesystem_script_checksum: [u8; 32] = hasher.finalize().into();
 
-    //     Ok(applied_migration.checksum == filesystem_script_checksum.as_ref())
-    // }
+        Ok(checksum_str == filesystem_script_checksum.format_checksum())
+    }
 
     /// Write the migration script to the directory.
     #[tracing::instrument]

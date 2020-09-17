@@ -6,9 +6,9 @@ pub type Timestamp = chrono::DateTime<chrono::Utc>;
 
 /// Management of imperative migrations state in the database.
 #[async_trait::async_trait]
-pub trait ImperativeMigrationsPersistence {
+pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// Record that a migration is about to be applied. Returns the unique identifier for the migration.
-    async fn start_migration(&self, migration_name: &str, script: &str) -> ConnectorResult<String>;
+    async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String>;
 
     /// Increase the applied_steps_count counter, and append the given logs.
     async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
@@ -53,4 +53,11 @@ pub struct MigrationRecord {
     pub applied_steps_count: u32,
     /// The whole migration script.
     pub script: String,
+}
+
+impl MigrationRecord {
+    /// Is the migration in a failed state?
+    pub fn is_failed(&self) -> bool {
+        self.finished_at.is_none()
+    }
 }
