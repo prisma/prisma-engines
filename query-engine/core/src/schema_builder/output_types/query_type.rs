@@ -56,7 +56,7 @@ fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputFi
 /// Builds a find first item field for given model.
 fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model);
-    let field_name = ctx.pluralize_internal(camel_case(&model.name), format!("findFirst{}", model.name));
+    let field_name = format!("findFirst{}", model.name);
 
     field(
         field_name,
