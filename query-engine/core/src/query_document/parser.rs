@@ -170,11 +170,12 @@ impl QueryDocumentParser {
                 (QueryValue::String(_), InputType::Enum(et)) => Self::parse_enum(&parent_path, value, et),
                 (QueryValue::Boolean(_), InputType::Enum(et)) => Self::parse_enum(&parent_path, value, et),
 
-                // List and object handling.
+                // List handling.
                 (QueryValue::List(values), InputType::List(l)) => {
                     Self::parse_list(&parent_path, values.clone(), &l).map(ParsedInputValue::List)
                 }
-                (_, InputType::List(l)) => Self::parse_list(&parent_path, vec![value], &l).map(ParsedInputValue::List),
+
+                // Object handling
                 (QueryValue::Object(o), InputType::Object(obj)) => {
                     Self::parse_input_object(parent_path.clone(), o.clone(), obj.into_arc()).map(ParsedInputValue::Map)
                 }
