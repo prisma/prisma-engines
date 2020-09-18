@@ -112,3 +112,24 @@ pub trait DatabaseMigrationMarker: Debug + Send + Sync {
 /// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
 /// variant is a [ConnectorError](/error/enum.ConnectorError.html).
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
+
+/// Format a checksum to a hexadecimal string. This is used to checksum
+/// migration scripts with Sha256.
+pub trait FormatChecksum {
+    /// Format a checksum to a hexadecimal string.
+    fn format_checksum(&self) -> String;
+}
+
+impl FormatChecksum for [u8; 32] {
+    fn format_checksum(&self) -> String {
+        use std::fmt::Write as _;
+
+        let mut checksum_string = String::with_capacity(32 * 2);
+
+        for byte in self {
+            write!(checksum_string, "{:x}", byte).unwrap();
+        }
+
+        checksum_string
+    }
+}

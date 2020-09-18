@@ -1,4 +1,5 @@
 mod apply;
+mod apply_migrations;
 mod calculate_database_steps;
 mod create_migration;
 mod infer;
@@ -7,6 +8,7 @@ mod schema_push;
 mod unapply_migration;
 
 pub use apply::Apply;
+pub use apply_migrations::ApplyMigrations;
 pub use calculate_database_steps::CalculateDatabaseSteps;
 pub use create_migration::CreateMigration;
 pub use infer::Infer;
@@ -14,13 +16,15 @@ pub use infer_apply::InferApply;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
 
+use crate::AssertionResult;
+
 use super::assertions::SchemaAssertion;
 use super::{
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
     sql::barrel_migration_executor::BarrelMigrationExecutor,
     InferAndApplyOutput,
 };
-use migration_connector::{ImperativeMigrationsPersistence, MigrationPersistence, MigrationStep};
+use migration_connector::{ImperativeMigrationsPersistence, MigrationPersistence, MigrationRecord, MigrationStep};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyMigrationInput,
@@ -127,6 +131,10 @@ impl TestApi {
             sql_schema: self.describe_database().await.unwrap(),
             migration_output,
         }
+    }
+
+    pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
+        ApplyMigrations::new(&self.api, migrations_directory)
     }
 
     /// Convenient builder and assertions for the CreateMigration command.
@@ -428,5 +436,45 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
+    }
+}
+
+pub trait MigrationsAssertions: Sized {
+    fn assert_checksum(self, expected: &str) -> AssertionResult<Self>;
+    fn assert_migration_name(self, expected: &str) -> AssertionResult<Self>;
+    fn assert_logs(self, expected: &str) -> AssertionResult<Self>;
+    fn assert_applied_steps_count(self, count: u32) -> AssertionResult<Self>;
+    fn assert_success(self) -> AssertionResult<Self>;
+}
+
+impl MigrationsAssertions for MigrationRecord {
+    fn assert_checksum(self, expected: &str) -> AssertionResult<Self> {
+        assert_eq!(self.checksum, expected);
+
+        Ok(self)
+    }
+
+    fn assert_migration_name(self, expected: &str) -> AssertionResult<Self> {
+        assert_eq!(&self.migration_name[15..], expected);
+
+        Ok(self)
+    }
+
+    fn assert_logs(self, expected: &str) -> AssertionResult<Self> {
+        assert_eq!(self.logs, expected);
+
+        Ok(self)
+    }
+
+    fn assert_applied_steps_count(self, count: u32) -> AssertionResult<Self> {
+        assert_eq!(self.applied_steps_count, count);
+
+        Ok(self)
+    }
+
+    fn assert_success(self) -> AssertionResult<Self> {
+        assert!(self.finished_at.is_some());
+
+        Ok(self)
     }
 }

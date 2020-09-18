@@ -1,16 +1,15 @@
 use crate::{catch, component::Component, SqlError, SqlMigrationConnector};
 use futures::TryFutureExt;
-use migration_connector::{ConnectorResult, ImperativeMigrationsPersistence, MigrationRecord};
+use migration_connector::{ConnectorResult, FormatChecksum, ImperativeMigrationsPersistence, MigrationRecord};
 use quaint::ast::*;
 use sha2::{Digest, Sha256};
-use std::fmt::Write as _;
 use uuid::Uuid;
 
 const IMPERATIVE_MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
 #[async_trait::async_trait]
 impl ImperativeMigrationsPersistence for SqlMigrationConnector {
-    async fn start_migration(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
+    async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
         let conn = self.conn();
         self.flavour
             .ensure_imperative_migrations_table(conn, self.connection_info())
@@ -21,11 +20,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         let mut hasher = Sha256::new();
         hasher.update(script.as_bytes());
         let checksum: [u8; 32] = hasher.finalize().into();
-        let mut checksum_string = String::with_capacity(32 * 2);
-
-        for byte in &checksum {
-            write!(checksum_string, "{:x}", byte).unwrap();
-        }
+        let checksum_string = checksum.format_checksum();
 
         let insert = Insert::single_into(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .value("id", id.as_str())
@@ -64,16 +59,16 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(())
     }
 
-    async fn record_failed_step(&self, _id: &str, _logs: &str) -> ConnectorResult<()> {
-        // let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
-        //     .so_that(Column::from("id").equals(id.as_ref()))
-        //     .set("logs", Expression::from(Column::from("logs").concat(logs)));
+    async fn record_failed_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
+        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+            .so_that(Column::from("id").equals(id))
+            .set("logs", logs);
 
-        // catch(
-        //     self.connection_info(),
-        //     self.conn().execute(update.into()).map_err(SqlError::from),
-        // )
-        // .await?;
+        catch(
+            self.connection_info(),
+            self.conn().execute(update.into()).map_err(SqlError::from),
+        )
+        .await?;
 
         Ok(())
     }
@@ -93,6 +88,10 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     }
 
     async fn list_migrations(&self) -> ConnectorResult<Vec<MigrationRecord>> {
+        self.flavour
+            .ensure_imperative_migrations_table(self.conn(), self.connection_info())
+            .await?;
+
         let select = Select::from_table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .column("id")
             .column("checksum")
