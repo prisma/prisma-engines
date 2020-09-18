@@ -30,13 +30,15 @@ class JsonFilterSpec extends FlatSpec with Matchers with ApiSpecBase with Connec
       .toString should be("""{"data":{"findManyModel":[{"id":1}]}}""")
 
     server
-      .query("""query { findManyModel(where: { json: { not: { equals: "{}" }}}) { id }}""", project, legacy = false)
+      .query("""query { findManyModel(where: { json: { not: "{}" }}) { id }}""", project, legacy = false)
       .toString should be("""{"data":{"findManyModel":[{"id":2}]}}""")
+
+    server
+      .query("""query { findManyModel(where: { json: { not: null }}) { id }}""", project, legacy = false)
+      .toString should be("""{"data":{"findManyModel":[{"id":1},{"id":2}]}}""")
   }
 
-  "A Json field in where clause" should "not have a shorthands" in {
-    create(1, Some("{}"))
-
+  "A Json field in where clause" should "not have a shorthands for equals" in {
     server
       .queryThatMustFail(
         """query { findManyModel(where: { json: "{}" }) { id }}""",
@@ -54,25 +56,29 @@ class JsonFilterSpec extends FlatSpec with Matchers with ApiSpecBase with Connec
         errorContains = """Missing a required value at `Query.findManyModel.where.ModelWhereInput.json`""",
         legacy = false
       )
+  }
 
+  "A Json field in where clause" should "only have shorthands for nested not" in {
     server
       .queryThatMustFail(
-        """query { findManyModel(where: { json: { not: "{}" }}) { id }}""",
+        """query { findManyModel(where: { json: { not: { equals: "{}" }}}) { id }}""",
         project,
         errorCode = 2009,
         errorContains =
-          """`Value types mismatch. Have: String(\"{}\"), want: Object(NestedJsonNullableFilter)` at `Query.findManyModel.where.ModelWhereInput.json.JsonNullableFilter.not`""",
+          """`Query.findManyModel.where.ModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": String(\"{}\")}), want: Json""",
         legacy = false
       )
 
     server
       .queryThatMustFail(
-        """query { findManyModel(where: { json: { not: null }}) { id }}""",
+        """query { findManyModel(where: { json: { not: { equals: null }}}) { id }}""",
         project,
         errorCode = 2012,
-        errorContains = """Missing a required value at `Query.findManyModel.where.ModelWhereInput.json.JsonNullableFilter.not`""",
+        errorContains =
+          """`Query.findManyModel.where.ModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Null}), want: Json""",
         legacy = false
       )
+
   }
 
   def create(id: Int, json: Option[String]): Unit = {

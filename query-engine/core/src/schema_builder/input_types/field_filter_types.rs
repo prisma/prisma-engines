@@ -113,16 +113,17 @@ fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
     };
 
-    let mut not_types = vec![InputType::object(full_scalar_filter_type(ctx, sf, true))];
+    // Shorthand `not equals` filter, skips the nested object filter.
+    let mut not_types = vec![map_scalar_input_type(sf)];
 
     if sf.type_identifier != TypeIdentifier::Json {
-        // Shorthand `not equals` filter, skips the nested object filter.
-        not_types.push(map_scalar_input_type(sf));
+        // Full nested filter. Only available on non-JSON fields.
+        not_types.push(InputType::object(full_scalar_filter_type(ctx, sf, true)));
     }
 
     let not_field = input_field("not", not_types, None)
         .optional()
-        .nullable_if(!sf.is_required && sf.type_identifier != TypeIdentifier::Json);
+        .nullable_if(!sf.is_required);
 
     fields.push(not_field);
     object.set_fields(fields);
