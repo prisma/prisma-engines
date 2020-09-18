@@ -91,7 +91,31 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().filter_map(identity).collect()),
 
+        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map)? {
+            Some(order) => vec![order],
+            None => vec![],
+        }),
+
         _ => unreachable!(),
+    }
+}
+
+fn process_order_object(model: &ModelRef, object: ParsedInputMap) -> QueryGraphBuilderResult<Option<OrderBy>> {
+    // let object: ParsedInputMap = list_value.try_into()?;
+
+    match object.into_iter().next() {
+        None => Ok(None),
+        Some((field_name, sort_order)) => {
+            let field = model.fields().find_from_scalar(&field_name)?;
+            let value: PrismaValue = sort_order.try_into()?;
+            let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
+                "asc" => SortOrder::Ascending,
+                "desc" => SortOrder::Descending,
+                _ => unreachable!(),
+            };
+
+            Ok(Some(OrderBy::new(field, sort_order)))
+        }
     }
 }
 
