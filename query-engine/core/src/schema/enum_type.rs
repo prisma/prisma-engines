@@ -51,7 +51,7 @@ impl From<InternalEnum> for EnumType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DatabaseEnumType {
     pub name: String,
     pub internal_enum: InternalEnum,
