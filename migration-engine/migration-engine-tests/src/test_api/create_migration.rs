@@ -144,6 +144,10 @@ impl<'a> CreateMigrationAssertion<'a> {
 
         Ok(self)
     }
+
+    pub fn into_output(self) -> CreateMigrationOutput {
+        self.output
+    }
 }
 
 pub struct MigrationAssertion<'a> {

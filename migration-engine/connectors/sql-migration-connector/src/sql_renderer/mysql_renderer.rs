@@ -4,6 +4,7 @@ use crate::{
     flavour::MYSQL_IDENTIFIER_SIZE_LIMIT,
     flavour::{MysqlFlavour, SqlFlavour},
     sql_migration::AddColumn,
+    sql_migration::AddForeignKey,
     sql_migration::AlterColumn,
     sql_migration::AlterTable,
     sql_migration::DropColumn,
@@ -28,11 +29,32 @@ impl SqlRenderer for MysqlFlavour {
         Quoted::Backticks(name)
     }
 
-    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        QuotedWithSchema {
-            schema_name: self.schema_name(),
-            name: self.quote(name),
+    fn quote_with_schema<'a, 'b>(&'a self, _name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+        unreachable!("quote_with_schema on MySQL")
+    }
+
+    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
+        use std::fmt::Write;
+
+        let AddForeignKey { foreign_key, table } = add_foreign_key;
+        let mut add_constraint = String::with_capacity(120);
+
+        write!(add_constraint, "ALTER TABLE {table} ADD ", table = self.quote(table)).unwrap();
+
+        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
+            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
         }
+
+        write!(
+            add_constraint,
+            "FOREIGN KEY ({})",
+            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
+        )
+        .unwrap();
+
+        add_constraint.push_str(&self.render_references(&foreign_key));
+
+        add_constraint
     }
 
     fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
@@ -85,7 +107,7 @@ impl SqlRenderer for MysqlFlavour {
         } else {
             Ok(vec![format!(
                 "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
-                table_name = self.quote_with_schema(&table),
+                table_name = self.quote(&table),
                 index_name = self.quote(index_name),
                 index_new_name = self.quote(index_new_name)
             )])
@@ -145,7 +167,7 @@ impl SqlRenderer for MysqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote_with_schema(&table.name),
+            self.quote(&table.name),
             lines.join(",\n    ")
         )]
     }
@@ -177,6 +199,10 @@ impl SqlRenderer for MysqlFlavour {
                 column_name, tpe_str, nullability_str, default_str, auto_increment_str
             ),
         }
+    }
+
+    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+        vec![format!("DROP TABLE {}", self.quote(&table_name))]
     }
 
     fn render_references(&self, foreign_key: &ForeignKey) -> String {
@@ -226,7 +252,7 @@ impl SqlRenderer for MysqlFlavour {
             IndexType::Normal => "",
         };
         let index_name = self.quote(&name);
-        let table_reference = self.quote_with_schema(&create_index.table);
+        let table_reference = self.quote(&create_index.table);
 
         let columns = columns.iter().map(|c| self.quote(c));
 
@@ -294,7 +320,7 @@ impl SqlRenderer for MysqlFlavour {
     fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
         format!(
             "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
-            table = self.quote_with_schema(&drop_foreign_key.table),
+            table = self.quote(&drop_foreign_key.table),
             constraint_name = Quoted::mysql_ident(&drop_foreign_key.constraint_name),
         )
     }
@@ -310,8 +336,8 @@ impl SqlRenderer for MysqlFlavour {
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(&name),
-            new_name = self.quote_with_schema(&new_name),
+            self.quote(&name),
+            new_name = self.quote(&new_name),
         )
     }
 }
@@ -395,6 +421,6 @@ fn mysql_drop_index(renderer: &dyn SqlFlavour, table_name: &str, index_name: &st
     format!(
         "DROP INDEX {} ON {}",
         renderer.quote(index_name),
-        renderer.quote_with_schema(table_name)
+        renderer.quote(table_name)
     )
 }

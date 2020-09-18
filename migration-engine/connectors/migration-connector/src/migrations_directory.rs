@@ -16,6 +16,7 @@ use std::{
     io::{self, Write as _},
     path::{Path, PathBuf},
 };
+use thiserror::*;
 
 use crate::FormatChecksum;
 
@@ -69,10 +70,18 @@ pub fn list_migrations(migrations_directory_path: &Path) -> io::Result<Vec<Migra
 
 /// Proxy to a directory containing one migration, as returned by
 /// `create_migration_directory` and `list_migrations`.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MigrationDirectory {
     path: PathBuf,
 }
+
+#[derive(Debug, Error)]
+#[error("Failed to read migration script")]
+pub struct ReadMigrationScriptError(
+    #[source]
+    #[from]
+    io::Error,
+);
 
 impl MigrationDirectory {
     /// The `{timestamp}_{name}` formatted migration name.
@@ -85,7 +94,7 @@ impl MigrationDirectory {
     }
 
     /// Write the checksum of the migration script file to `buf`.
-    pub fn checksum(&mut self, buf: &mut Vec<u8>) -> io::Result<()> {
+    pub fn checksum(&mut self, buf: &mut Vec<u8>) -> Result<(), ReadMigrationScriptError> {
         let script = self.read_migration_script()?;
         let mut hasher = Sha512::new();
         hasher.update(&script);
@@ -99,7 +108,7 @@ impl MigrationDirectory {
 
     /// Check whether the checksum of the migration script matches the provided one.
     #[tracing::instrument]
-    pub fn matches_checksum(&self, checksum_str: &str) -> io::Result<bool> {
+    pub fn matches_checksum(&self, checksum_str: &str) -> Result<bool, ReadMigrationScriptError> {
         let filesystem_script = self.read_migration_script()?;
         let mut hasher = Sha256::new();
         hasher.update(&filesystem_script);
@@ -125,8 +134,8 @@ impl MigrationDirectory {
 
     /// Read the migration script to a string.
     #[tracing::instrument]
-    pub fn read_migration_script(&self) -> std::io::Result<String> {
-        std::fs::read_to_string(&self.path.join("migration.sql"))
+    pub fn read_migration_script(&self) -> Result<String, ReadMigrationScriptError> {
+        Ok(std::fs::read_to_string(&self.path.join("migration.sql"))?)
     }
 
     /// The filesystem path to the directory.

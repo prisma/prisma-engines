@@ -254,7 +254,8 @@ impl SqlFlavour for MysqlFlavour {
                 quaint.connection_info(),
                 quaint.raw_cmd(&script).map_err(SqlError::from),
             )
-            .await?;
+            .await
+            .map_err(|connector_error| connector_error.into_migration_failed(migration.migration_name().to_owned()))?;
         }
 
         let connection_info = quaint.connection_info().clone();
@@ -386,7 +387,11 @@ impl SqlFlavour for SqliteFlavour {
                 migration.migration_name()
             );
 
-            catch(conn.connection_info(), conn.raw_cmd(&script).map_err(SqlError::from)).await?;
+            catch(conn.connection_info(), conn.raw_cmd(&script).map_err(SqlError::from))
+                .await
+                .map_err(|connector_error| {
+                    connector_error.into_migration_failed(migration.migration_name().to_owned())
+                })?;
         }
 
         let sql_schema = catch(
@@ -609,7 +614,8 @@ impl SqlFlavour for PostgresFlavour {
                 quaint.connection_info(),
                 quaint.raw_cmd(&script).map_err(SqlError::from),
             )
-            .await?;
+            .await
+            .map_err(|connector_error| connector_error.into_migration_failed(migration.migration_name().to_owned()))?
         }
 
         let sql_schema = catch(
