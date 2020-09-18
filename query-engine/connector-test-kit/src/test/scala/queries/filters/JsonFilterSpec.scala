@@ -73,7 +73,7 @@ class JsonFilterSpec extends FlatSpec with Matchers with ApiSpecBase with Connec
       .queryThatMustFail(
         """query { findManyModel(where: { json: { not: { equals: null }}}) { id }}""",
         project,
-        errorCode = 2012,
+        errorCode = 2009,
         errorContains =
           """`Query.findManyModel.where.ModelWhereInput.json.JsonNullableFilter.not`: Value types mismatch. Have: Object({\"equals\": Null}), want: Json""",
         legacy = false
