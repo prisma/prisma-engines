@@ -55,7 +55,11 @@ fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputFi
 
 /// Builds a find first item field for given model.
 fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::many_records_arguments(ctx, &model);
+    let args = arguments::many_records_arguments(ctx, &model)
+        .into_iter()
+        .filter(|arg| arg.name != "distinct")
+        .collect();
+
     let field_name = format!("findFirst{}", model.name);
 
     field(

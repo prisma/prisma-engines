@@ -45,6 +45,20 @@ class FindFirstQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString() should be("""{"data":{"findFirstTestModel":null}}""")
   }
 
+  "FindFirst" should "not have a distinct argument" in {
+    server.queryThatMustFail(
+      s"""{
+         |  findFirstTestModel(distinct: [id]) {
+         |    id
+         |  }
+         |}""".stripMargin,
+      project,
+      errorCode = 2009,
+      errorContains = "`Argument does not exist on enclosing type.` at `Query.findFirstTestModel.distinct`",
+      legacy = false
+    )
+  }
+
   def create(id: Int, field: Option[String] = None): Unit = {
     val fieldValue = field.map(f => s""", field: "$f"""").getOrElse("")
 
