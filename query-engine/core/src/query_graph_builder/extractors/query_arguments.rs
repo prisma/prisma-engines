@@ -7,7 +7,7 @@ use connector::QueryArguments;
 use prisma_models::{
     Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder,
 };
-use std::convert::TryInto;
+use std::convert::{identity, TryInto};
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
 /// e.g. that the query schema guarantees that required fields are present.
@@ -72,18 +72,25 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-                let (field_name, sort_order) = object.into_iter().next().unwrap();
-                let field = model.fields().find_from_scalar(&field_name)?;
-                let value: PrismaValue = sort_order.try_into()?;
-                let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                    "asc" => SortOrder::Ascending,
-                    "desc" => SortOrder::Descending,
-                    _ => unreachable!(),
-                };
 
-                Ok(OrderBy::new(field, sort_order))
+                match object.into_iter().next() {
+                    None => Ok(None),
+                    Some((field_name, sort_order)) => {
+                        let field = model.fields().find_from_scalar(&field_name)?;
+                        let value: PrismaValue = sort_order.try_into()?;
+                        let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
+                            "asc" => SortOrder::Ascending,
+                            "desc" => SortOrder::Descending,
+                            _ => unreachable!(),
+                        };
+
+                        Ok(Some(OrderBy::new(field, sort_order)))
+                    }
+                }
             })
-            .collect::<QueryGraphBuilderResult<Vec<_>>>(),
+            .collect::<QueryGraphBuilderResult<Vec<_>>>()
+            .map(|results| results.into_iter().filter_map(identity).collect()),
+
         _ => unreachable!(),
     }
 }

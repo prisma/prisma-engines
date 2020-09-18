@@ -117,6 +117,51 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString should be("""{"data":{"findManyOrderTest":[{"uniqueField":3},{"uniqueField":2},{"uniqueField":1}]}}""")
   }
 
+  "Ordering with empty objects" should "be allowed but have no changed behavior" in {
+    val expected =
+      """{"data":{"findManyOrderTest":[{"uniqueField":1},{"uniqueField":2},{"uniqueField":3},{"uniqueField":4},{"uniqueField":5},{"uniqueField":6}]}}"""
+
+    val result1 = server.query(
+      """
+        |{
+        |  findManyOrderTest(orderBy: {}) {
+        |    uniqueField
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    val result2 = server.query(
+      """
+        |{
+        |  findManyOrderTest(orderBy: [{}]) {
+        |    uniqueField
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    val result3 = server.query(
+      """
+        |{
+        |  findManyOrderTest(orderBy: [{}, {}]) {
+        |    uniqueField
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result1.toString should be(expected)
+    result2.toString should be(expected)
+    result3.toString should be(expected)
+  }
+
   private def createTestData(): Unit = {
     server.query("""mutation {createOneOrderTest(data: { uniqueField: 1, nonUniqFieldA: "A", nonUniqFieldB: "A"}){ uniqueField }}""", project, legacy = false)
     server.query("""mutation {createOneOrderTest(data: { uniqueField: 2, nonUniqFieldA: "A", nonUniqFieldB: "B"}){ uniqueField }}""", project, legacy = false)
