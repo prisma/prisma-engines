@@ -1286,3 +1286,250 @@ async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[test_each_connector(ignore("mysql"))]
+async fn single_common_table_expression(api: &mut dyn TestApi) -> crate::Result<()> {
+    let cte = Select::default()
+        .value(val!(1).alias("val"))
+        .into_cte("one")
+        .column("val");
+
+    let select = Select::from_table("one").column("val").with(cte);
+
+    let res = api.conn().select(select).await?;
+    let row = res.get(0).unwrap();
+
+    if api.system() == "postgres" {
+        assert_eq!(Some(&Value::text("1")), row.at(0));
+    } else {
+        assert_eq!(Some(&Value::integer(1)), row.at(0));
+    }
+
+    Ok(())
+}
+
+#[test_each_connector(ignore("mysql"))]
+async fn multiple_common_table_expressions(api: &mut dyn TestApi) -> crate::Result<()> {
+    let cte_1 = Select::default()
+        .value(val!(1).alias("val"))
+        .into_cte("one")
+        .column("val");
+
+    let cte_2 = Select::default()
+        .value(val!(2).alias("val"))
+        .into_cte("two")
+        .column("val");
+
+    let select = Select::from_table("one")
+        .with(cte_1)
+        .with(cte_2)
+        .inner_join("two")
+        .column(("one", "val"))
+        .column(("two", "val"));
+
+    let res = api.conn().select(select).await?;
+    let row = res.get(0).unwrap();
+
+    if api.system() == "postgres" {
+        assert_eq!(Some(&Value::text("1")), row.at(0));
+        assert_eq!(Some(&Value::text("2")), row.at(1));
+    } else {
+        assert_eq!(Some(&Value::integer(1)), row.at(0));
+        assert_eq!(Some(&Value::integer(2)), row.at(1));
+    }
+
+    Ok(())
+}
+
+// A query where we compare a tuple against a query that returns tuples
+// of same size, the inclusive version.
+//
+// e.g.
+//
+// WHERE (a, b) IN (SELECT x, y FROM ..);
+//
+// SQL Server doesn't support tuple comparison, so the query is modified into a
+// common table expression, but should still return the same result.
+#[test_each_connector]
+async fn compare_tuple_in_select(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id1 varchar(3), id2 varchar(3)").await?;
+
+    let insert = Insert::single_into(&table).value("id1", "foo").value("id2", "bar");
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table).value("id1", "omg").value("id2", "lol");
+    api.conn().insert(insert.into()).await?;
+
+    // Table has values of:
+    //
+    // | id1 | id2 |
+    // +-----+-----+
+    // | foo | bar |
+    // | omg | lol |
+
+    let sel_1 = Select::default()
+        .value(val!("foo").alias("a"))
+        .value(val!("bar").alias("b"));
+
+    let sel_2 = Select::default()
+        .value(val!("mus").alias("a"))
+        .value(val!("pus").alias("b"));
+
+    let union = Union::new(sel_1).all(sel_2);
+
+    let id1 = Column::new("id1").table(table.as_str());
+    let id2 = Column::new("id2").table(table.as_str());
+
+    let row = Row::from(vec![id1, id2]);
+    let select = Select::from_table(&table).so_that(row.in_selection(union));
+
+    // WHERE (id1, id2) IN (SELECT 'foo' AS a, 'bar' AS b UNION ALL SELECT 'mus' AS a, 'pus' AS b)
+
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+
+    assert_eq!(Some(&Value::text("foo")), row.at(0));
+    assert_eq!(Some(&Value::text("bar")), row.at(1));
+
+    Ok(())
+}
+
+// A query where we compare a tuple against a query that returns tuples
+// of same size, the non-inclusive version.
+//
+// e.g.
+//
+// WHERE (a, b) NOT IN (SELECT x, y FROM ..);
+#[test_each_connector]
+async fn compare_tuple_not_in_select(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id1 varchar(3), id2 varchar(3)").await?;
+
+    let insert = Insert::single_into(&table).value("id1", "foo").value("id2", "bar");
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table).value("id1", "omg").value("id2", "lol");
+    api.conn().insert(insert.into()).await?;
+
+    // Table has values of:
+    //
+    // | id1 | id2 |
+    // +-----+-----+
+    // | foo | bar |
+    // | omg | lol |
+
+    let sel_1 = Select::default()
+        .value(val!("foo").alias("a"))
+        .value(val!("bar").alias("b"));
+
+    let sel_2 = Select::default()
+        .value(val!("mus").alias("a"))
+        .value(val!("pus").alias("b"));
+
+    let union = Union::new(sel_1).all(sel_2);
+
+    let id1 = Column::new("id1").table(table.as_str());
+    let id2 = Column::new("id2").table(table.as_str());
+
+    let row = Row::from(vec![id1, id2]);
+    let select = Select::from_table(&table).so_that(row.not_in_selection(union));
+
+    // WHERE (id1, id2) NOT IN (SELECT 'foo' AS a, 'bar' AS b UNION ALL SELECT 'mus' AS a, 'pus' AS b)
+
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+
+    assert_eq!(Some(&Value::text("omg")), row.at(0));
+    assert_eq!(Some(&Value::text("lol")), row.at(1));
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn join_with_compound_columns(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table_1 = api.create_table("id1 int, id2 int, data varchar(3)").await?;
+    let table_2 = api.create_table("id3 int, id4 int").await?;
+
+    let insert = Insert::single_into(&table_1)
+        .value("id1", 1)
+        .value("id2", 2)
+        .value("data", "foo");
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table_1)
+        .value("id1", 2)
+        .value("id2", 3)
+        .value("data", "bar");
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table_2).value("id3", 1).value("id4", 2);
+    api.conn().insert(insert.into()).await?;
+
+    let left_row = Row::from(vec![col!("id1"), col!("id2")]);
+    let right_row = Row::from(vec![col!("id3"), col!("id4")]);
+
+    let join = table_2.as_str().on(left_row.equals(right_row));
+
+    let select = Select::from_table(&table_1)
+        .column("id1")
+        .column("id2")
+        .inner_join(join);
+
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+
+    assert_eq!(Some(&Value::integer(1)), row.at(0));
+    assert_eq!(Some(&Value::integer(2)), row.at(1));
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn join_with_non_matching_compound_columns(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table_1 = api.create_table("id1 int, id2 int, data varchar(3)").await?;
+    let table_2 = api.create_table("id3 int, id4 int").await?;
+
+    let insert = Insert::single_into(&table_1)
+        .value("id1", 1)
+        .value("id2", 2)
+        .value("data", "foo");
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table_1)
+        .value("id1", 2)
+        .value("id2", 3)
+        .value("data", "bar");
+    api.conn().insert(insert.into()).await?;
+
+    let insert = Insert::single_into(&table_2).value("id3", 1).value("id4", 2);
+    api.conn().insert(insert.into()).await?;
+
+    let left_row = Row::from(vec![col!("id1"), col!("id2")]);
+    let right_row = Row::from(vec![col!("id3"), col!("id4")]);
+
+    let join = table_2.as_str().on(left_row.not_equals(right_row));
+
+    let select = Select::from_table(&table_1)
+        .column("id1")
+        .column("id2")
+        .inner_join(join);
+
+    let res = api.conn().select(select).await?;
+
+    assert_eq!(1, res.len());
+
+    let row = res.get(0).unwrap();
+
+    assert_eq!(Some(&Value::integer(2)), row.at(0));
+    assert_eq!(Some(&Value::integer(3)), row.at(1));
+
+    Ok(())
+}

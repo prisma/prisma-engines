@@ -1,4 +1,6 @@
 use crate::ast::*;
+use either::Either;
+use query::SelectQuery;
 use std::borrow::Cow;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -7,13 +9,134 @@ pub struct Expression<'a> {
     pub(crate) alias: Option<Cow<'a, str>>,
 }
 
+#[allow(dead_code)]
 impl<'a> Expression<'a> {
+    pub(crate) fn row(row: Row<'a>) -> Self {
+        Self {
+            kind: ExpressionKind::Row(row),
+            alias: None,
+        }
+    }
+
+    pub(crate) fn select(select: Select<'a>) -> Self {
+        Self::selection(SelectQuery::Select(Box::new(select)))
+    }
+
+    pub(crate) fn union(union: Union<'a>) -> Self {
+        Self::selection(SelectQuery::Union(Box::new(union)))
+    }
+
+    pub(crate) fn selection(selection: SelectQuery<'a>) -> Self {
+        Self {
+            kind: ExpressionKind::Selection(selection),
+            alias: None,
+        }
+    }
+
     #[cfg(feature = "json-1")]
     pub(crate) fn is_json_value(&self) -> bool {
         match &self.kind {
             ExpressionKind::Parameterized(Value::Json(_)) => true,
             ExpressionKind::Value(expr) => expr.is_json_value(),
             _ => false,
+        }
+    }
+
+    pub(crate) fn is_asterisk(&self) -> bool {
+        matches!(self.kind, ExpressionKind::Asterisk(_))
+    }
+
+    pub(crate) fn is_row(&self) -> bool {
+        matches!(self.kind, ExpressionKind::Row(_))
+    }
+
+    pub(crate) fn into_row(self) -> Option<Row<'a>> {
+        match self.kind {
+            ExpressionKind::Row(row) => Some(row),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn into_selection(self) -> Option<SelectQuery<'a>> {
+        match self.kind {
+            ExpressionKind::Selection(selection) => Some(selection),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn into_column(self) -> Option<Column<'a>> {
+        match self.kind {
+            ExpressionKind::Column(column) => Some(*column),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn is_selection(&self) -> bool {
+        matches!(self.kind, ExpressionKind::Selection(_))
+    }
+
+    pub(crate) fn is_column(&self) -> bool {
+        matches!(self.kind, ExpressionKind::Column(_))
+    }
+
+    /// Finds all comparisons between a tuple and a selection. If returning some
+    /// CTEs, they should be handled in the calling layer.
+    pub(crate) fn convert_tuple_selects_to_ctes(
+        self,
+        level: &mut usize,
+    ) -> (Self, Option<Vec<CommonTableExpression<'a>>>) {
+        match self.kind {
+            ExpressionKind::Selection(SelectQuery::Select(select)) => {
+                let select = select.convert_tuple_select_to_cte(level);
+
+                let expr = Expression {
+                    kind: ExpressionKind::Selection(SelectQuery::Select(Box::new(select))),
+                    alias: self.alias,
+                };
+
+                (expr, None)
+            }
+            ExpressionKind::Selection(SelectQuery::Union(union)) => {
+                let union = union.convert_tuple_selects_into_ctes(level);
+
+                let expr = Expression {
+                    kind: ExpressionKind::Selection(SelectQuery::Union(Box::new(union))),
+                    alias: self.alias,
+                };
+
+                (expr, None)
+            }
+            ExpressionKind::Compare(compare) => match compare.convert_tuple_select_to_cte(level) {
+                // Conversion happened
+                Either::Left((comp, cte)) => {
+                    let expr = Expression {
+                        kind: ExpressionKind::Compare(comp),
+                        alias: self.alias,
+                    };
+
+                    (expr, Some(vec![cte]))
+                }
+                // No conversion
+                Either::Right(compare) => {
+                    let expr = Expression {
+                        kind: ExpressionKind::Compare(compare),
+                        alias: self.alias,
+                    };
+
+                    (expr, None)
+                }
+            },
+            ExpressionKind::ConditionTree(tree) => {
+                let (tree, ctes) = tree.convert_tuple_selects_to_ctes(level);
+
+                let expr = Expression {
+                    kind: ExpressionKind::ConditionTree(tree),
+                    alias: self.alias,
+                };
+
+                (expr, ctes)
+            }
+            _ => (self, None),
         }
     }
 }
@@ -29,8 +152,8 @@ pub enum ExpressionKind<'a> {
     Column(Box<Column<'a>>),
     /// Data in a row form, e.g. (1, 2, 3)
     Row(Row<'a>),
-    /// A nested `SELECT` statement
-    Select(Box<Select<'a>>),
+    /// A nested `SELECT` or `SELECT .. UNION` statement
+    Selection(SelectQuery<'a>),
     /// A database function call
     Function(Function<'a>),
     /// A qualified asterisk to a table
@@ -104,6 +227,12 @@ where
     fn from(v: Vec<T>) -> Self {
         let row: Row<'a> = v.into();
         row.into()
+    }
+}
+
+impl<'a> From<ExpressionKind<'a>> for Expression<'a> {
+    fn from(kind: ExpressionKind<'a>) -> Self {
+        Self { kind, alias: None }
     }
 }
 

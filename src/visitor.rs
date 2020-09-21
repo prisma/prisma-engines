@@ -126,8 +126,33 @@ pub trait Visitor<'a> {
         self.visit_conditions(data.conditions)
     }
 
+    /// Database-specific modifications to the Select AST.
+    fn modify_select(select: Select<'a>) -> Select<'a> {
+        select
+    }
+
     /// A walk through a `SELECT` statement
-    fn visit_select(&mut self, select: Select<'a>) -> Result {
+    fn visit_select(&mut self, mut select: Select<'a>, top_level: bool) -> Result {
+        if top_level {
+            select = Self::modify_select(select);
+        }
+
+        let number_of_ctes = select.ctes.len();
+
+        if number_of_ctes > 0 {
+            self.write("WITH ")?;
+
+            for (i, cte) in select.ctes.into_iter().enumerate() {
+                self.visit_cte(cte)?;
+
+                if i < (number_of_ctes - 1) {
+                    self.write(", ")?;
+                }
+            }
+
+            self.write(" ")?;
+        }
+
         self.write("SELECT ")?;
 
         if select.distinct {
@@ -271,24 +296,24 @@ pub trait Visitor<'a> {
     }
 
     /// A walk through a complete `Query` statement
-    fn visit_query(&mut self, query: Query<'a>) -> Result {
+    fn visit_query(&mut self, query: Query<'a>, top_level: bool) -> Result {
         match query {
-            Query::Select(select) => self.visit_select(*select),
+            Query::Select(select) => self.visit_select(*select, top_level),
             Query::Insert(insert) => self.visit_insert(*insert),
             Query::Update(update) => self.visit_update(*update),
             Query::Delete(delete) => self.visit_delete(*delete),
-            Query::Union(union) => self.visit_union(union),
+            Query::Union(union) => self.visit_union(*union, top_level),
             Query::Raw(string) => self.write(string),
         }
     }
 
     /// A walk through a union of `SELECT` statements
-    fn visit_union(&mut self, mut ua: Union<'a>) -> Result {
+    fn visit_union(&mut self, mut ua: Union<'a>, top_level: bool) -> Result {
         let len = ua.selects.len();
         let mut types = ua.types.drain(0..);
 
         for (i, sel) in ua.selects.into_iter().enumerate() {
-            self.surround_with("(", ")", |ref mut se| se.visit_select(sel))?;
+            self.visit_select(sel, top_level)?;
 
             if i < (len - 1) {
                 let typ = types.next().unwrap();
@@ -357,7 +382,9 @@ pub trait Visitor<'a> {
             ExpressionKind::RawValue(val) => self.visit_raw_value(val.0)?,
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
-            ExpressionKind::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select))?,
+            ExpressionKind::Selection(selection) => {
+                self.surround_with("(", ")", |ref mut s| s.visit_query(Query::from(selection), false))?
+            }
             ExpressionKind::Function(function) => self.visit_function(function)?,
             ExpressionKind::Op(op) => self.visit_operation(*op)?,
             ExpressionKind::Values(values) => self.visit_values(*values)?,
@@ -407,7 +434,7 @@ pub trait Visitor<'a> {
                 None => self.delimited_identifiers(&[&*table_name])?,
             },
             TableType::Values(values) => self.visit_values(values)?,
-            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
+            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select, false))?,
         };
 
         if include_alias {
@@ -498,8 +525,8 @@ pub trait Visitor<'a> {
     /// A comparison expression
     fn visit_compare(&mut self, compare: Compare<'a>) -> Result {
         match compare {
-            Compare::Equals(left, right) => self.visit_condition_equals(*left, *right),
-            Compare::NotEquals(left, right) => self.visit_condition_not_equals(*left, *right),
+            Compare::Equals(left, right) => self.visit_equals(*left, *right),
+            Compare::NotEquals(left, right) => self.visit_not_equals(*left, *right),
             Compare::LessThan(left, right) => {
                 self.visit_expression(*left)?;
                 self.write(" < ")?;
@@ -754,7 +781,7 @@ pub trait Visitor<'a> {
         }
     }
 
-    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
+    fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
         self.visit_expression(left)?;
         self.write(" = ")?;
         self.visit_expression(right)?;
@@ -762,7 +789,7 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
-    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
+    fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
         self.visit_expression(left)?;
         self.write(" <> ")?;
         self.visit_expression(right)?;
@@ -890,5 +917,25 @@ pub trait Visitor<'a> {
         }
 
         Ok(())
+    }
+
+    fn visit_cte(&mut self, cte: CommonTableExpression<'a>) -> Result {
+        let cols = cte
+            .columns
+            .into_iter()
+            .map(|s| Column::from(s.into_owned()))
+            .collect::<Vec<_>>();
+
+        self.visit_column(Column::from(cte.identifier.into_owned()))?;
+
+        if cols.len() > 0 {
+            self.write(" ")?;
+            self.visit_row(Row::from(cols))?;
+        }
+
+        self.write(" AS ")?;
+
+        let selection = cte.selection;
+        self.surround_with("(", ")", |ref mut s| s.visit_query(Query::from(selection), false))
     }
 }

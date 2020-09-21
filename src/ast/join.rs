@@ -7,6 +7,25 @@ pub struct JoinData<'a> {
     pub(crate) conditions: ConditionTree<'a>,
 }
 
+impl<'a> JoinData<'a> {
+    /// Implement a join with no conditions.
+    pub fn all_from(table: impl Into<Table<'a>>) -> Self {
+        Self {
+            table: table.into(),
+            conditions: ConditionTree::NoCondition,
+        }
+    }
+}
+
+impl<'a, T> From<T> for JoinData<'a>
+where
+    T: Into<Table<'a>>,
+{
+    fn from(table: T) -> Self {
+        Self::all_from(table)
+    }
+}
+
 /// A representation of a `JOIN` statement.
 #[derive(Debug, PartialEq, Clone)]
 pub enum Join<'a> {

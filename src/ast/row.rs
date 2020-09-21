@@ -1,4 +1,4 @@
-use crate::ast::{Comparable, Compare, Expression};
+use crate::ast::{Column, Comparable, Compare, Expression};
 use std::borrow::Cow;
 
 /// A collection of values surrounded by parentheses.
@@ -35,6 +35,20 @@ impl<'a> Row<'a> {
 
     pub fn len(&self) -> usize {
         self.values.len()
+    }
+
+    pub(crate) fn all_columns(&self) -> bool {
+        self.values.iter().all(|v| v.is_column())
+    }
+
+    pub(crate) fn into_columns(self) -> Vec<Column<'a>> {
+        let mut columns = Vec::with_capacity(self.len());
+
+        for expr in self.values.into_iter() {
+            columns.push(expr.into_column().unwrap());
+        }
+
+        columns
     }
 }
 

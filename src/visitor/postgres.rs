@@ -27,7 +27,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             parameters: Vec::with_capacity(128),
         };
 
-        Postgres::visit_query(&mut postgres, query.into())?;
+        Postgres::visit_query(&mut postgres, query.into(), true)?;
 
         Ok((postgres.query, postgres.parameters))
     }
@@ -199,7 +199,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     #[cfg(feature = "json-1")]
-    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+    fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         let (left_is_json, right_is_json) = (left.is_json_value(), right.is_json_value());
 
         self.visit_expression(left)?;
@@ -218,14 +218,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     #[cfg(not(feature = "json-1"))]
-    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+    fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         self.visit_expression(left)?;
         self.write(" = ")?;
         self.visit_expression(right)
     }
 
     #[cfg(feature = "json-1")]
-    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+    fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         let (left_is_json, right_is_json) = (left.is_json_value(), right.is_json_value());
 
         self.visit_expression(left)?;
@@ -244,7 +244,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     }
 
     #[cfg(not(feature = "json-1"))]
-    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+    fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         self.visit_expression(left)?;
         self.write(" <> ")?;
         self.visit_expression(right)

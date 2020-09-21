@@ -1,5 +1,7 @@
-use crate::ast::{Query, Select};
-use std::fmt;
+use crate::ast::{Expression, Query, Select};
+use std::{collections::BTreeSet, fmt};
+
+use super::IntoCommonTableExpression;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub(crate) enum UnionType {
@@ -25,7 +27,13 @@ pub struct Union<'a> {
 
 impl<'a> From<Union<'a>> for Query<'a> {
     fn from(ua: Union<'a>) -> Self {
-        Query::Union(ua)
+        Query::Union(Box::new(ua))
+    }
+}
+
+impl<'a> From<Union<'a>> for Expression<'a> {
+    fn from(uaua: Union<'a>) -> Self {
+        Expression::union(uaua)
     }
 }
 
@@ -47,7 +55,7 @@ impl<'a> Union<'a> {
     /// let s2 = Select::default().value(2);
     /// let (sql, params) = Sqlite::build(Union::new(s1).all(s2))?;
     ///
-    /// assert_eq!("(SELECT ?) UNION ALL (SELECT ?)", sql);
+    /// assert_eq!("SELECT ? UNION ALL SELECT ?", sql);
     ///
     /// assert_eq!(vec![
     ///     Value::from(1),
@@ -72,7 +80,7 @@ impl<'a> Union<'a> {
     /// let s2 = Select::default().value(2);
     /// let (sql, params) = Sqlite::build(Union::new(s1).distinct(s2))?;
     ///
-    /// assert_eq!("(SELECT ?) UNION (SELECT ?)", sql);
+    /// assert_eq!("SELECT ? UNION SELECT ?", sql);
     ///
     /// assert_eq!(vec![
     ///     Value::from(1),
@@ -86,4 +94,37 @@ impl<'a> Union<'a> {
         self.types.push(UnionType::Distinct);
         self
     }
+
+    /// A list of item names in the queries, skipping the anonymous values or
+    /// columns.
+    pub(crate) fn named_selection(&self) -> Vec<String> {
+        self.selects
+            .iter()
+            .fold(BTreeSet::new(), |mut acc, select| {
+                for name in select.named_selection() {
+                    acc.insert(name);
+                }
+
+                acc
+            })
+            .into_iter()
+            .collect()
+    }
+
+    /// Finds all comparisons between tuples and selects in the queries and
+    /// converts them to common table expressions for making the query
+    /// compatible with databases not supporting tuples.
+    pub(crate) fn convert_tuple_selects_into_ctes(mut self, level: &mut usize) -> Self {
+        let mut converted = Vec::with_capacity(self.selects.len());
+
+        for select in self.selects.drain(0..) {
+            converted.push(select.convert_tuple_select_to_cte(level));
+        }
+
+        self.selects = converted;
+
+        self
+    }
 }
+
+impl<'a> IntoCommonTableExpression<'a> for Union<'a> {}

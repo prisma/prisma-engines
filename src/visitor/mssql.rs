@@ -1,14 +1,14 @@
 use super::Visitor;
 use crate::{
     ast::{
-        Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Table, TableType,
-        Using, Values,
+        Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Select, Table,
+        TableType, Using, Values,
     },
     error::{Error, ErrorKind},
     prelude::Average,
     visitor, Value,
 };
-use std::{convert::TryFrom, fmt::Write};
+use std::{convert::TryFrom, fmt::Write, iter};
 
 pub struct Mssql<'a> {
     query: String,
@@ -25,7 +25,7 @@ impl<'a> Mssql<'a> {
 
         if let Some(query) = merge.when_not_matched {
             self.write(" WHEN NOT MATCHED THEN ")?;
-            self.visit_query(query)?;
+            self.visit_query(query, true)?;
         }
 
         if let Some(columns) = merge.returning {
@@ -42,7 +42,7 @@ impl<'a> Mssql<'a> {
 
         {
             let base_query = using.base_query;
-            self.surround_with("(", ")", |ref mut s| s.visit_query(base_query))?;
+            self.surround_with("(", ")", |ref mut s| s.visit_query(base_query, true))?;
         }
 
         self.write(" AS ")?;
@@ -89,7 +89,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             order_by_set: false,
         };
 
-        Mssql::visit_query(&mut this, query.into())?;
+        Mssql::visit_query(&mut this, query.into(), true)?;
 
         Ok((this.query, this.parameters))
     }
@@ -101,6 +101,43 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
     fn add_parameter(&mut self, value: Value<'a>) {
         self.parameters.push(value)
+    }
+
+    /// Database-specific modifications to the Select AST.
+    fn modify_select(select: Select<'a>) -> Select<'a> {
+        select.convert_tuple_select_to_cte(&mut 0)
+    }
+
+    fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+        match (left.kind, right.kind) {
+            // we can't compare with tuples, so we'll convert it to an AND
+            (ExpressionKind::Row(left), ExpressionKind::Row(right)) => {
+                self.visit_multiple_tuple_comparison(left, Values::from(iter::once(right)), false)?;
+            }
+            (left_kind, right_kind) => {
+                self.visit_expression(Expression::from(left_kind))?;
+                self.write(" = ")?;
+                self.visit_expression(Expression::from(right_kind))?;
+            }
+        }
+
+        Ok(())
+    }
+
+    fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+        match (left.kind, right.kind) {
+            // we can't compare with tuples, so we'll convert it to an AND
+            (ExpressionKind::Row(left), ExpressionKind::Row(right)) => {
+                self.visit_multiple_tuple_comparison(left, Values::from(iter::once(right)), true)?;
+            }
+            (left_kind, right_kind) => {
+                self.visit_expression(Expression::from(left_kind))?;
+                self.write(" <> ")?;
+                self.visit_expression(Expression::from(right_kind))?;
+            }
+        }
+
+        Ok(())
     }
 
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
@@ -332,7 +369,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         match table.typ {
             TableType::Table(table_name) => self.delimited_identifiers(&[&*table_name])?,
             TableType::Values(values) => self.visit_values(values)?,
-            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
+            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select, false))?,
         };
 
         if include_alias {
@@ -349,7 +386,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     fn visit_average(&mut self, avg: Average<'a>) -> visitor::Result {
         self.write("AVG")?;
 
-        // SQL Server will average as a integer, so average of 0 an 1 would be
+        // SQL Server will average as an integer, so average of 0 an 1 would be
         // 0, if we don't convert the value to a decimal first.
         self.surround_with("(", ")", |ref mut s| {
             s.write("CONVERT")?;
@@ -1251,5 +1288,146 @@ mod tests {
 
         let (sql, _) = Mssql::build(query).unwrap();
         assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_cte_conversion_top_level_in() {
+        let expected_sql = indoc!(
+            r#"WITH [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b])
+            SELECT [A].* FROM [A]
+            WHERE [A].[x] IN (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y])"#
+        )
+        .replace('\n', " ");
+
+        let inner = Select::default().value(val!(1).alias("a")).value(val!(2).alias("b"));
+        let row = Row::from(vec![col!(("A", "x")), col!(("A", "y"))]);
+        let query = Select::from_table("A").so_that(row.in_selection(inner));
+
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(vec![Value::integer(1), Value::integer(2)], params);
+    }
+
+    #[test]
+    fn test_cte_conversion_top_level_not_in() {
+        let expected_sql = indoc!(
+            r#"WITH [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b])
+            SELECT [A].* FROM [A]
+            WHERE [A].[x] NOT IN (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y])"#
+        )
+        .replace('\n', " ");
+
+        let inner = Select::default().value(val!(1).alias("a")).value(val!(2).alias("b"));
+        let row = Row::from(vec![col!(("A", "x")), col!(("A", "y"))]);
+        let query = Select::from_table("A").so_that(row.not_in_selection(inner));
+
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(vec![Value::integer(1), Value::integer(2)], params);
+    }
+
+    #[test]
+    fn test_cte_conversion_in_a_tree_top_level() {
+        let expected_sql = indoc!(
+            r#"WITH [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b])
+            SELECT [A].* FROM [A]
+            WHERE ([A].[y] = @P3
+            AND [A].[z] = @P4
+            AND [A].[x] IN (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y]))"#
+        )
+        .replace('\n', " ");
+
+        let inner = Select::default().value(val!(1).alias("a")).value(val!(2).alias("b"));
+        let row = Row::from(vec![col!(("A", "x")), col!(("A", "y"))]);
+
+        let query = Select::from_table("A")
+            .so_that(("A", "y").equals("bar"))
+            .and_where(("A", "z").equals("foo"))
+            .and_where(row.in_selection(inner));
+
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected_sql, sql);
+
+        assert_eq!(
+            vec![
+                Value::integer(1),
+                Value::integer(2),
+                Value::text("bar"),
+                Value::text("foo")
+            ],
+            params
+        );
+    }
+
+    #[test]
+    fn test_cte_conversion_in_a_tree_nested() {
+        let expected_sql = indoc!(
+            r#"WITH [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b])
+            SELECT [A].* FROM [A]
+            WHERE ([A].[y] = @P3 OR ([A].[z] = @P4 AND [A].[x] IN
+            (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y])))"#
+        )
+        .replace('\n', " ");
+
+        let inner = Select::default().value(val!(1).alias("a")).value(val!(2).alias("b"));
+        let row = Row::from(vec![col!(("A", "x")), col!(("A", "y"))]);
+
+        let cond = ("A", "y")
+            .equals("bar")
+            .or(("A", "z").equals("foo").and(row.in_selection(inner)));
+
+        let query = Select::from_table("A").so_that(cond);
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected_sql, sql);
+
+        assert_eq!(
+            vec![
+                Value::integer(1),
+                Value::integer(2),
+                Value::text("bar"),
+                Value::text("foo")
+            ],
+            params
+        );
+    }
+
+    #[test]
+    fn test_multiple_cte_conversions_in_the_ast() {
+        let expected_sql = indoc!(
+            r#"WITH
+            [cte_0] AS (SELECT @P1 AS [a], @P2 AS [b]),
+            [cte_1] AS (SELECT @P3 AS [c], @P4 AS [d])
+            SELECT [A].* FROM [A]
+            WHERE ([A].[x] IN (SELECT [a] FROM [cte_0] WHERE [b] = [A].[y])
+            AND [A].[u] NOT IN (SELECT [c] FROM [cte_1] WHERE [d] = [A].[z]))"#
+        )
+        .replace('\n', " ");
+
+        let cte_0 = Select::default().value(val!(1).alias("a")).value(val!(2).alias("b"));
+        let cte_1 = Select::default().value(val!(3).alias("c")).value(val!(4).alias("d"));
+        let row_0 = Row::from(vec![col!(("A", "x")), col!(("A", "y"))]);
+        let row_1 = Row::from(vec![col!(("A", "u")), col!(("A", "z"))]);
+
+        let query = Select::from_table("A")
+            .so_that(row_0.in_selection(cte_0))
+            .and_where(row_1.not_in_selection(cte_1));
+
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected_sql, sql);
+
+        assert_eq!(
+            vec![
+                Value::integer(1),
+                Value::integer(2),
+                Value::integer(3),
+                Value::integer(4)
+            ],
+            params
+        );
     }
 }

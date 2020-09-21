@@ -13,12 +13,13 @@ pub struct Select<'a> {
     pub(crate) limit: Option<Value<'a>>,
     pub(crate) offset: Option<Value<'a>>,
     pub(crate) joins: Vec<Join<'a>>,
+    pub(crate) ctes: Vec<CommonTableExpression<'a>>,
 }
 
 impl<'a> From<Select<'a>> for Expression<'a> {
     fn from(sel: Select<'a>) -> Expression<'a> {
         Expression {
-            kind: ExpressionKind::Select(Box::new(sel)),
+            kind: ExpressionKind::Selection(SelectQuery::Select(Box::new(sel))),
             alias: None,
         }
     }
@@ -554,4 +555,99 @@ impl<'a> Select<'a> {
         self.offset = Some(Value::from(offset));
         self
     }
+
+    /// Adds a common table expression to the select.
+    ///
+    /// ```rust
+    /// # use quaint::{val, ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let cte = Select::default()
+    ///     .value(val!(1).alias("val"))
+    ///     .into_cte("one")
+    ///     .column("val");
+    ///     
+    /// let query = Select::from_table("one")
+    ///     .column("val")
+    ///     .with(cte);
+    ///
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("WITH `one` (`val`) AS (SELECT ? AS `val`) SELECT `val` FROM `one`", sql);
+    /// assert_eq!(vec![Value::from(1)], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with(mut self, cte: CommonTableExpression<'a>) -> Self {
+        self.ctes.push(cte);
+        self
+    }
+
+    /// Traverse the condition tree, looking for a comparison where the left
+    /// side is a tuple and the right side a nested `SELECT` in an `IN` or `NOT
+    /// IN` operation; converting it to a common table expression.
+    ///
+    /// So the following query:
+    ///
+    /// ```sql
+    /// SELECT * FROM A WHERE (x, y) IN (SELECT a, b FROM B)
+    /// ```
+    ///
+    /// turns into:
+    ///
+    /// ```sql
+    /// WITH cte_0 AS (SELECT a, b FROM B)
+    /// SELECT * FROM A
+    /// WHERE x IN (SELECT a FROM cte_0 WHERE b = y)
+    /// ```
+    ///
+    /// This makes possible certain tuple comparisons in databases which do not
+    /// support them, allowing the same query AST to be used throughout
+    /// different systems.
+    ///
+    /// The function traverses the whole tree, converting all matching cases.
+    /// Does nothing if any of the following rules fail:
+    ///
+    /// - Not comparing a tuple (e.g. `x IN (SELECT ...)`)
+    /// - Not using a `IN` or `NOT IN` operation
+    /// - Imbalanced number of variables (e.g. `(x, y, z) IN (SELECT a, b ...)`)
+    pub(crate) fn convert_tuple_select_to_cte(mut self, level: &mut usize) -> Self {
+        if let Some(tree) = self.conditions.take() {
+            let (tree, ctes) = tree.convert_tuple_selects_to_ctes(level);
+
+            self.conditions = Some(tree);
+
+            if let Some(ctes) = ctes {
+                self.ctes = ctes;
+            }
+        };
+
+        self
+    }
+
+    /// A list of item names in the query, skipping the anonymous values or
+    /// columns.
+    pub(crate) fn named_selection(&self) -> Vec<String> {
+        // Empty vector marks selection of everything.
+        if self.columns.len() == 1 && self.columns.first().map(|c| c.is_asterisk()).unwrap_or(false) {
+            return Vec::new();
+        }
+
+        self.columns
+            .iter()
+            .map(|expr| match &expr.kind {
+                ExpressionKind::Column(c) => c
+                    .alias
+                    .as_ref()
+                    .map(|a| a.to_string())
+                    .or_else(|| expr.alias.as_ref().map(|a| a.to_string()))
+                    .or_else(|| Some(c.name.to_string())),
+                ExpressionKind::Parameterized(_) => expr.alias.as_ref().map(|a| a.to_string()),
+                _ => None,
+            })
+            .filter(|c| c.is_some())
+            .map(|c| c.unwrap())
+            .collect()
+    }
 }
+
+impl<'a> IntoCommonTableExpression<'a> for Select<'a> {}

@@ -1,5 +1,6 @@
-use super::ExpressionKind;
+use super::{query::SelectQuery, CommonTableExpression, ExpressionKind, IntoCommonTableExpression, Row, Select};
 use crate::ast::{Column, ConditionTree, Expression};
+use either::Either;
 use std::borrow::Cow;
 
 /// For modeling comparison expressions.
@@ -44,6 +45,87 @@ pub enum Compare<'a> {
     /// Raw comparator, allows to use an operator `left <raw> right` as is,
     /// without visitor transformation in between.
     Raw(Box<Expression<'a>>, Cow<'a, str>, Box<Expression<'a>>),
+}
+
+impl<'a> Compare<'a> {
+    /// Fins a possible `(a,y) IN (SELECT x,z FROM B)`, takes the select out and
+    /// converts the comparison into `a IN (SELECT x FROM cte_n where z = y)`.
+    ///
+    /// Left side means a match and the CTE should be handled, right side is a
+    /// no-op.
+    pub(crate) fn convert_tuple_select_to_cte(
+        self,
+        level: &mut usize,
+    ) -> Either<(Self, CommonTableExpression<'a>), Self> {
+        let mut convert = |row: Row<'a>, select: SelectQuery<'a>, mut selection: Vec<String>| {
+            let mut cols = row.into_columns();
+            let ident = format!("cte_{}", level);
+
+            let cte = select.into_cte(ident.clone());
+            let comp_col = cols.remove(0);
+            let base_select = Select::from_table(ident).column(selection.remove(0));
+
+            let column_pairs = cols.into_iter().zip(selection.into_iter());
+
+            let inner_select = column_pairs.fold(base_select, |acc, (left_col, right_col)| {
+                acc.and_where(right_col.equals(left_col))
+            });
+
+            *level += 1;
+
+            (comp_col, inner_select, cte)
+        };
+
+        match self {
+            Self::In(left, right) if left.is_row() && right.is_selection() => {
+                let row = left.into_row().unwrap();
+                let select = right.into_selection().unwrap();
+                let selection = select.named_selection();
+
+                if row.len() != selection.len() {
+                    let left = Expression::row(row);
+                    let right = Expression::selection(select);
+
+                    return Either::Right(left.in_selection(right));
+                }
+
+                if row.all_columns() && row.len() > 1 {
+                    let (comp_col, inner_select, cte) = convert(row, select, selection);
+                    let cond = comp_col.in_selection(inner_select);
+
+                    Either::Left((cond, cte))
+                } else {
+                    let left = Expression::row(row);
+                    let select = Expression::selection(select);
+                    Either::Right(Self::In(Box::new(left), Box::new(select)))
+                }
+            }
+            Self::NotIn(left, right) if left.is_row() && right.is_selection() => {
+                let row = left.into_row().unwrap();
+                let select = right.into_selection().unwrap();
+                let selection = select.named_selection();
+
+                if row.len() != selection.len() {
+                    let left = Expression::row(row);
+                    let right = Expression::selection(select);
+
+                    return Either::Right(left.not_in_selection(right));
+                }
+
+                if row.all_columns() && row.len() > 1 {
+                    let (comp_col, inner_select, cte) = convert(row, select, selection);
+                    let cond = comp_col.not_in_selection(inner_select);
+
+                    Either::Left((cond, cte))
+                } else {
+                    let left = Expression::row(row);
+                    let select = Expression::selection(select);
+                    Either::Right(Self::NotIn(Box::new(left), Box::new(select)))
+                }
+            }
+            _ => Either::Right(self),
+        }
+    }
 }
 
 impl<'a> From<Compare<'a>> for ConditionTree<'a> {

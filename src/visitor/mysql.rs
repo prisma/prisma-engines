@@ -45,7 +45,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             parameters: Vec::with_capacity(128),
         };
 
-        Mysql::visit_query(&mut mysql, query.into())?;
+        Mysql::visit_query(&mut mysql, query.into(), true)?;
 
         Ok((mysql.query, mysql.parameters))
     }
@@ -204,7 +204,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.surround_with("(", ")", |ref mut s| s.visit_expression(value))
     }
 
-    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+    fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         #[cfg(feature = "json-1")]
         {
             if right.is_json_value() || left.is_json_value() {
@@ -234,7 +234,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
-    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
+    fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         #[cfg(feature = "json-1")]
         {
             if right.is_json_value() || left.is_json_value() {
