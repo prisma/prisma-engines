@@ -25,8 +25,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                         })
                     }
                     PostgresAlterColumn::SetType(_) => {
-                        if !matches!(columns.previous.column.tpe.arity, ColumnArity::List)
-                            && matches!(columns.next.column.tpe.arity, ColumnArity::List)
+                        if !matches!(columns.previous.arity(), ColumnArity::List)
+                            && matches!(columns.next.arity(), ColumnArity::List)
                         {
                             plan.push_unexecutable(UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
                                 table: columns.previous.table().name().to_owned(),
@@ -48,8 +48,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         } else {
             // Unexecutable drop and recreate.
             if columns.all_changes().arity_changed()
-                && columns.previous.column.tpe.arity.is_nullable()
-                && columns.next.column.tpe.arity.is_required()
+                && columns.previous.arity().is_nullable()
+                && columns.next.arity().is_required()
                 && !default_can_be_rendered(columns.next.default())
             {
                 plan.push_unexecutable(UnexecutableStepCheck::AddedRequiredFieldToTable {

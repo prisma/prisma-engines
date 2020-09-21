@@ -12,6 +12,7 @@ use std::{fmt, str::FromStr};
 use thiserror::Error;
 use tracing::debug;
 
+pub mod mssql;
 pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
@@ -37,6 +38,8 @@ pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
     /// Describe a database schema.
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
+    /// Get the database version.
+    async fn version(&self, schema: &str) -> SqlSchemaDescriberResult<Option<String>>;
 }
 
 #[derive(Serialize, Deserialize)]

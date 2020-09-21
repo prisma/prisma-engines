@@ -46,6 +46,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables,
         })
     }
+
+    async fn version(&self, schema: &str) -> crate::SqlSchemaDescriberResult<Option<String>> {
+        debug!("getting db version '{}'", schema);
+        Ok(self.conn.version().await.unwrap())
+    }
 }
 
 impl SqlSchemaDescriber {

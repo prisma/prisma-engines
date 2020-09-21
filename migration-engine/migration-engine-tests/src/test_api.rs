@@ -1,16 +1,22 @@
 mod apply;
+mod apply_migrations;
 mod calculate_database_steps;
+mod create_migration;
 mod infer;
 mod infer_apply;
 mod schema_push;
 mod unapply_migration;
 
 pub use apply::Apply;
+pub use apply_migrations::ApplyMigrations;
 pub use calculate_database_steps::CalculateDatabaseSteps;
+pub use create_migration::CreateMigration;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
+
+use crate::AssertionResult;
 
 use super::assertions::SchemaAssertion;
 use super::{
@@ -18,7 +24,7 @@ use super::{
     sql::barrel_migration_executor::BarrelMigrationExecutor,
     InferAndApplyOutput,
 };
-use migration_connector::{MigrationPersistence, MigrationStep};
+use migration_connector::{ImperativeMigrationsPersistence, MigrationPersistence, MigrationRecord, MigrationStep};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyMigrationInput,
@@ -27,6 +33,7 @@ use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_migration_connector::{sql_migration::SqlMigration, SqlMigrationConnector, MIGRATION_TABLE_NAME};
 use sql_schema_describer::*;
 use std::sync::Arc;
+use tempfile::TempDir;
 use test_setup::*;
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
@@ -72,6 +79,10 @@ impl TestApi {
         self.api.migration_persistence()
     }
 
+    pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
+        self.api.connector()
+    }
+
     pub fn connection_info(&self) -> &ConnectionInfo {
         &self.connection_info
     }
@@ -92,6 +103,11 @@ impl TestApi {
     /// Render a table name with the required prefixing for use with quaint query building.
     pub fn render_table_name<'a>(&self, table_name: &'a str) -> quaint::ast::Table<'a> {
         (self.schema_name().to_owned(), table_name.to_owned()).into()
+    }
+
+    /// Create a temporary directory to serve as a test migrations directory.
+    pub fn create_migrations_directory(&self) -> anyhow::Result<TempDir> {
+        Ok(tempfile::tempdir()?)
     }
 
     pub async fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
@@ -115,6 +131,20 @@ impl TestApi {
             sql_schema: self.describe_database().await.unwrap(),
             migration_output,
         }
+    }
+
+    pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
+        ApplyMigrations::new(&self.api, migrations_directory)
+    }
+
+    /// Convenient builder and assertions for the CreateMigration command.
+    pub fn create_migration<'a>(
+        &'a self,
+        name: &'a str,
+        prisma_schema: &'a str,
+        migrations_directory: &'a TempDir,
+    ) -> CreateMigration<'a> {
+        CreateMigration::new(&self.api, name, prisma_schema, migrations_directory)
     }
 
     pub fn infer_apply<'a>(&'a self, schema: &'a str) -> InferApply<'a> {
@@ -406,5 +436,45 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,
+    }
+}
+
+pub trait MigrationsAssertions: Sized {
+    fn assert_checksum(self, expected: &str) -> AssertionResult<Self>;
+    fn assert_migration_name(self, expected: &str) -> AssertionResult<Self>;
+    fn assert_logs(self, expected: &str) -> AssertionResult<Self>;
+    fn assert_applied_steps_count(self, count: u32) -> AssertionResult<Self>;
+    fn assert_success(self) -> AssertionResult<Self>;
+}
+
+impl MigrationsAssertions for MigrationRecord {
+    fn assert_checksum(self, expected: &str) -> AssertionResult<Self> {
+        assert_eq!(self.checksum, expected);
+
+        Ok(self)
+    }
+
+    fn assert_migration_name(self, expected: &str) -> AssertionResult<Self> {
+        assert_eq!(&self.migration_name[15..], expected);
+
+        Ok(self)
+    }
+
+    fn assert_logs(self, expected: &str) -> AssertionResult<Self> {
+        assert_eq!(self.logs, expected);
+
+        Ok(self)
+    }
+
+    fn assert_applied_steps_count(self, count: u32) -> AssertionResult<Self> {
+        assert_eq!(self.applied_steps_count, count);
+
+        Ok(self)
+    }
+
+    fn assert_success(self) -> AssertionResult<Self> {
+        assert!(self.finished_at.is_some());
+
+        Ok(self)
     }
 }

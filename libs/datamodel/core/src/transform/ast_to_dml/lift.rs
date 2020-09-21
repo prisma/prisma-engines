@@ -112,6 +112,13 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
+        if en.values.len() == 0 {
+            errors.push(DatamodelError::new_validation_error(
+                "An enum must have at least one value.",
+                ast_enum.span,
+            ))
+        }
+
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
         if let Err(mut err) = self.directives.enm.validate_and_apply(ast_enum, &mut en) {
@@ -294,7 +301,14 @@ impl<'a> LiftAstToDml<'a> {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
             } else {
-                Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
+                if let Some(native_type_attribute) = ast_field.directives.iter().find(|d| d.name.name.contains(".")) {
+                    return Err(DatamodelError::new_connector_error(
+                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
+                        native_type_attribute.span,
+                    ));
+                } else {
+                    Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
+                }
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))

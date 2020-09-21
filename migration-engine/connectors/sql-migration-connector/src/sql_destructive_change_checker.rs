@@ -63,7 +63,7 @@ impl SqlDestructiveChangeChecker<'_> {
     /// - The new column is required
     /// - There is no default value for the new column
     fn check_add_column(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan) {
-        let column_is_required_without_default = column.is_required() && column.default().is_none();
+        let column_is_required_without_default = column.arity().is_required() && column.default().is_none();
 
         // Optional columns and columns with a default can safely be added.
         if !column_is_required_without_default {
@@ -211,13 +211,13 @@ impl DestructiveChangeChecker<SqlMigration> for SqlDestructiveChangeChecker<'_> 
         .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }
 
-    fn pure_check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+    fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {
         let plan = self.plan(
             &database_migration.steps,
             &database_migration.before,
             &database_migration.after,
         );
 
-        Ok(plan.pure_check())
+        plan.pure_check()
     }
 }

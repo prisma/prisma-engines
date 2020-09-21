@@ -2,9 +2,10 @@ use barrel::types;
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
-use test_macros::test_each_connector;
+use test_macros::test_each_connector_mssql as test_each_connector;
 
 mod common;
+mod mssql;
 mod mysql;
 mod postgres;
 mod sqlite;
@@ -40,7 +41,7 @@ fn varchar_data_type(api: &TestApi, length: u64) -> String {
         (SqlFamily::Sqlite, _) => format!("VARCHAR({})", length),
         (SqlFamily::Mysql, "mysql8") => "varchar".to_string(),
         (SqlFamily::Mysql, _) => "varchar".to_string(),
-        (SqlFamily::Mssql, _) => format!("NVARCHAR({})", length),
+        (SqlFamily::Mssql, _) => "varchar".to_string(),
     }
 }
 
@@ -50,7 +51,7 @@ fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
         (SqlFamily::Sqlite, _) => format!("VARCHAR({})", length),
         (SqlFamily::Mysql, "mysql8") => format!("varchar({})", length),
         (SqlFamily::Mysql, _) => format!("varchar({})", length),
-        (SqlFamily::Mssql, _) => format!("NVARCHAR({})", length),
+        (SqlFamily::Mssql, _) => "varchar".into(),
     }
 }
 
@@ -162,7 +163,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
                     SqlFamily::Postgres => Some("User_city_fkey".to_owned()),
                     SqlFamily::Mysql => Some("User_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
-                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                    SqlFamily::Mssql => Some("User_city_fkey".to_owned()),
                 },
                 columns: vec!["city".to_string()],
                 referenced_columns: vec!["id".to_string()],
@@ -183,6 +184,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             migration.create_table("City", move |t| {
                 t.add_column("id", types::primary());
                 t.add_column("name", types::varchar(255));
+
                 if sql_family != SqlFamily::Sqlite {
                     t.inject_custom("constraint uniq unique (name, id)");
                 }
@@ -190,8 +192,14 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             migration.create_table("User", move |t| {
                 t.add_column("city", types::integer());
                 t.add_column("city_name", types::varchar(255));
+
                 if sql_family == SqlFamily::Mysql {
                     t.inject_custom("FOREIGN KEY(city_name, city) REFERENCES City(name, id) ON DELETE RESTRICT");
+                } else if sql_family == SqlFamily::Mssql {
+                    t.inject_custom(format!(
+                        "FOREIGN KEY(city_name, city) REFERENCES [{}].[City]([name], [id])",
+                        schema,
+                    ));
                 } else {
                     let relation_prefix = match sql_family {
                         SqlFamily::Postgres => format!("\"{}\".", &schema),
@@ -267,7 +275,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
                     (SqlFamily::Postgres, _) => Some("User_city_name_fkey".to_owned()),
                     (SqlFamily::Mysql, _) => Some("User_ibfk_1".to_owned()),
                     (SqlFamily::Sqlite, _) => None,
-                    (SqlFamily::Mssql, _) => todo!("Greetings from Redmond"),
+                    (SqlFamily::Mssql, _) => Some("User_city_name_fkey".to_owned()),
                 },
                 columns: vec!["city_name".to_string(), "city".to_string()],
                 referenced_columns: vec!["name".to_string(), "id".to_string(),],
@@ -310,18 +318,26 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
     let sql = match api.sql_family() {
         SqlFamily::Mysql => format!(
             "CREATE TABLE `{0}`.`User` (
-                    id INTEGER NOT NULL,
-                    name VARCHAR(255) NOT NULL,
-                    PRIMARY KEY(id, name)
-                )",
+                id INTEGER NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                PRIMARY KEY(id, name)
+            )",
             api.db_name()
+        ),
+        SqlFamily::Mssql => format!(
+            "CREATE TABLE [{}].[User] (
+                [id] INT NOT NULL,
+                [name] VARCHAR(255) NOT NULL,
+                CONSTRAINT [PK_User] PRIMARY KEY ([id], [name])
+            )",
+            api.schema_name(),
         ),
         _ => format!(
             "CREATE TABLE \"{0}\".\"User\" (
-                    id INTEGER NOT NULL,
-                    name VARCHAR(255) NOT NULL,
-                    PRIMARY KEY(id, name)
-                )",
+                id INTEGER NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                PRIMARY KEY(id, name)
+            )",
             api.schema_name()
         ),
     };
@@ -528,18 +544,47 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
             columns: vec!["uniq1".to_string()],
             tpe: IndexType::Unique,
         }),
-        SqlFamily::Mssql => todo!("Greetings from Redmond"),
+        SqlFamily::Mssql => expected_indices.insert(
+            0,
+            Index {
+                name: "UQ__User__CD572100A176666B".to_string(),
+                columns: vec!["uniq1".to_string()],
+                tpe: IndexType::Unique,
+            },
+        ),
     };
-    assert_eq!(
-        user_table,
-        &Table {
-            name: "User".to_string(),
-            columns: expected_columns,
-            indices: expected_indices,
-            primary_key: None,
-            foreign_keys: vec![],
+
+    match api.sql_family() {
+        SqlFamily::Mssql => {
+            assert_eq!(&user_table.name, "User");
+            assert_eq!(user_table.columns, expected_columns);
+
+            assert_eq!(user_table.indices.last().unwrap(), expected_indices.last().unwrap());
+
+            let index = user_table.indices.first().unwrap();
+            let expected_index = expected_indices.first().unwrap();
+
+            assert!(index.name.starts_with("UQ__User__"));
+            assert_eq!(index.columns, expected_index.columns);
+            assert_eq!(index.tpe, expected_index.tpe);
+
+            assert!(user_table.primary_key.is_none());
+            assert!(user_table.foreign_keys.is_empty());
         }
-    );
+        _ => {
+            assert_eq!(
+                user_table,
+                &Table {
+                    name: "User".to_string(),
+                    columns: expected_columns,
+                    indices: expected_indices,
+                    primary_key: None,
+                    foreign_keys: vec![],
+                }
+            );
+        }
+    }
+
     assert!(
         user_table.is_column_unique(&user_table.columns[0].name),
         "Column 1 should return true for is_unique"

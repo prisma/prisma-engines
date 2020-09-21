@@ -25,29 +25,47 @@ impl SqlRow {
         aggregators
             .iter()
             .flat_map(|aggregator| match aggregator {
-                Aggregator::Count => vec![AggregationResult::Count(values.pop().unwrap())],
+                Aggregator::Count => vec![AggregationResult::Count(coerce_null_to_zero_value(
+                    values.pop().unwrap(),
+                ))],
 
                 Aggregator::Average(fields) => fields
                     .iter()
-                    .map(|field| AggregationResult::Average(field.clone(), values.pop().unwrap()))
+                    .map(|field| {
+                        AggregationResult::Average(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
+                    })
                     .collect(),
 
                 Aggregator::Sum(fields) => fields
                     .iter()
-                    .map(|field| AggregationResult::Sum(field.clone(), values.pop().unwrap()))
+                    .map(|field| {
+                        AggregationResult::Sum(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
+                    })
                     .collect(),
 
                 Aggregator::Min(fields) => fields
                     .iter()
-                    .map(|field| AggregationResult::Min(field.clone(), values.pop().unwrap()))
+                    .map(|field| {
+                        AggregationResult::Min(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
+                    })
                     .collect(),
 
                 Aggregator::Max(fields) => fields
                     .iter()
-                    .map(|field| AggregationResult::Max(field.clone(), values.pop().unwrap()))
+                    .map(|field| {
+                        AggregationResult::Max(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
+                    })
                     .collect(),
             })
             .collect()
+    }
+}
+
+fn coerce_null_to_zero_value(value: PrismaValue) -> PrismaValue {
+    if let PrismaValue::Null(_) = value {
+        PrismaValue::Int(0)
+    } else {
+        value
     }
 }
 

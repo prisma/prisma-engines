@@ -1,7 +1,7 @@
-use super::{common::*, RenderedAlterColumn, SqlRenderer};
+use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
-    flavour::{SqlFlavour, SqliteFlavour},
+    flavour::SqliteFlavour,
     sql_migration::{
         AddColumn, AddForeignKey, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey,
         DropIndex, TableChange,
@@ -10,7 +10,6 @@ use crate::{
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
-use quaint::prelude::SqlFamily;
 use regex::Regex;
 use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
@@ -41,7 +40,22 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        render_create_index(self, &create_index.table, &create_index.index, self.sql_family())
+        let Index { name, columns, tpe } = &create_index.index;
+        let index_type = match tpe {
+            IndexType::Unique => "UNIQUE ",
+            IndexType::Normal => "",
+        };
+        let index_name = self.quote_with_schema(&name).to_string();
+        let table_reference = self.quote(&create_index.table).to_string();
+        let columns = columns.iter().map(|c| self.quote(c));
+
+        format!(
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+            index_type = index_type,
+            index_name = index_name,
+            table_reference = table_reference,
+            columns = columns.join(", ")
+        )
     }
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String {
@@ -51,7 +65,7 @@ impl SqlRenderer for SqliteFlavour {
         let default_str = column
             .default()
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_) | DefaultValue::SEQUENCE(_)))
-            .map(|default| format!(" DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
+            .map(|default| format!(" DEFAULT {}", self.render_default(default, column.column_type_family())))
             .unwrap_or_else(String::new);
         let auto_increment_str = if column.is_autoincrement() && column.is_single_primary_key() {
             " PRIMARY KEY AUTOINCREMENT"
@@ -104,16 +118,7 @@ impl SqlRenderer for SqliteFlavour {
         unreachable!("AddForeignKey on SQLite")
     }
 
-    fn render_alter_column(&self, _differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
-        None
-    }
-
-    fn render_alter_table(
-        &self,
-        alter_table: &AlterTable,
-        _database_info: &DatabaseInfo,
-        differ: &SqlSchemaDiffer<'_>,
-    ) -> Vec<String> {
+    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         let AlterTable { table, changes } = alter_table;
 
         let mut statements = Vec::new();
@@ -255,14 +260,13 @@ impl SqlRenderer for SqliteFlavour {
             ));
 
             // Recreate the indices
-            result.extend(
-                differ
-                    .next
-                    .table
-                    .indices
-                    .iter()
-                    .map(|index| render_create_index(self, differ.next.name(), index, SqlFamily::Sqlite)),
-            );
+            result.extend(differ.next.table.indices.iter().map(|index| {
+                self.render_create_index(&CreateIndex {
+                    table: differ.next.name().to_owned(),
+                    index: index.clone(),
+                    caused_by_create_table: false,
+                })
+            }));
         }
 
         result.push(format!(
@@ -318,8 +322,8 @@ fn copy_current_table_into_new_table(
         .column_pairs()
         .filter(|columns| {
             columns.all_changes().arity_changed()
-                && columns.next.column.tpe.arity.is_required()
-                && columns.next.column.default.is_some()
+                && columns.next.arity().is_required()
+                && columns.next.default().is_some()
         })
         .collect();
 
@@ -370,13 +374,8 @@ fn copy_current_table_into_new_table(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
                 column_name = Quoted::sqlite_ident(columns.name()),
                 default_value = flavour.render_default(
-                    columns
-                        .next
-                        .column
-                        .default
-                        .as_ref()
-                        .expect("default on required column with default"),
-                    &columns.next.column.tpe.family
+                    columns.next.default().expect("default on required column with default"),
+                    &columns.next.column_type_family()
                 )
             )
         }))

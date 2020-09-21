@@ -106,6 +106,10 @@ impl TestApi {
         self.introspection_connector.get_database_description().await.unwrap()
     }
 
+    pub async fn get_database_version(&self) -> String {
+        self.introspection_connector.get_database_version().await.unwrap()
+    }
+
     pub fn sql_family(&self) -> SqlFamily {
         self.sql_family
     }

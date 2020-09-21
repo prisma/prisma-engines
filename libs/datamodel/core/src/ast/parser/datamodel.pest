@@ -20,7 +20,7 @@ schema = { SOI ~ NEWLINE* ~ (model_declaration | enum_declaration | source_block
 // ######################################
 // Model
 // ######################################
-model_declaration = { comment_block? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive ) | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
+model_declaration = { comment_block? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( block_level_directive ) | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
 
 field_declaration = { doc_comment_and_new_line* ~ non_empty_identifier ~ LEGACY_COLON? ~ (field_type ~ ( "@" ~ directive )+ | field_type)? ~ doc_comment? ~ comment? ~ NEWLINE }
 

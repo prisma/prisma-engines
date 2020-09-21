@@ -44,6 +44,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
+
         let migration_persistence = connector.migration_persistence();
 
         let last_migration = migration_persistence.last().await?;

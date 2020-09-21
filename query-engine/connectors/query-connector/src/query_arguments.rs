@@ -61,6 +61,11 @@ impl QueryArguments {
         self.cursor.is_some() && !self.is_stable_ordering()
     }
 
+    /// A null cursor is a cursor that is used in conjunction with a nullable order by (i.e. a field is optional).
+    pub fn contains_null_cursor(&self) -> bool {
+        self.cursor.is_some() && self.order_by.iter().any(|o| !o.field.is_required)
+    }
+
     /// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model. Assumes that `model`
     /// is the same as the model used
     /// `true` if at least one unique field is present, or contains a combination of fields that is marked as unique.
