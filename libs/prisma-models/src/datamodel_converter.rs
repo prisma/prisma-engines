@@ -336,7 +336,6 @@ trait DatamodelFieldExtensions {
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
     fn internal_enum_value(&self, enum_value: &dml::EnumValue) -> InternalEnumValue;
-    // fn default_value(&self) -> Option<dml::DefaultValue>; todo this is not applicable anymore
 }
 
 impl DatamodelFieldExtensions for dml::ScalarField {
@@ -354,7 +353,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
                 _ => todo!(),
             },
             dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
-            dml::FieldType::NativeType(prisma_tpe, _native_type) => TypeIdentifier::from(*prisma_tpe),
+            dml::FieldType::NativeType(scalar_type, _) => (*scalar_type).into(),
         }
     }
 
