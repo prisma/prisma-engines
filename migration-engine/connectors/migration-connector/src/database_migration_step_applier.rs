@@ -11,6 +11,13 @@ pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
 
     /// Render steps for the CLI. Each step will contain the raw field.
     fn render_steps_pretty(&self, database_migration: &T) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>>;
+
+    /// Render the migration to a runnable script.
+    fn render_script(&self, database_migration: &T, diagnostics: &DestructiveChangeDiagnostics) -> String;
+
+    /// Apply a migration script to the database. The migration persistence is
+    /// managed by the core.
+    async fn apply_script(&self, script: &str) -> ConnectorResult<()>;
 }
 
 /// A helper struct to serialize a database migration with an additional `raw` field containing the

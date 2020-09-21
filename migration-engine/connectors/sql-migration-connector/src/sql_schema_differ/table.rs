@@ -53,7 +53,7 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn created_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'_, 'schema>> {
+    pub(crate) fn created_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.next_foreign_keys().filter(move |next_fk| {
             self.previous_foreign_keys()
                 .find(|previous_fk| super::foreign_keys_match(previous_fk, next_fk))
@@ -61,7 +61,7 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn dropped_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'_, 'schema>> {
+    pub(crate) fn dropped_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.previous_foreign_keys().filter(move |previous_fk| {
             self.next_foreign_keys()
                 .find(|next_fk| super::foreign_keys_match(previous_fk, next_fk))
@@ -88,7 +88,7 @@ impl<'schema> TableDiffer<'schema> {
     pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = (&'schema Index, &'schema Index)> + 'a {
         self.previous_indexes().filter_map(move |previous_index| {
             self.next_indexes()
-                .find(|next_index| indexes_match(previous_index, next_index) && previous_index.name != next_index.name)
+                .find(|next_index| indexes_match(previous_index, next_index))
                 .map(|renamed_index| (previous_index, renamed_index))
         })
     }
@@ -145,11 +145,11 @@ impl<'schema> TableDiffer<'schema> {
         self.next.columns()
     }
 
-    fn previous_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'a, 'schema>> + 'a {
+    fn previous_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.previous.foreign_keys()
     }
 
-    fn next_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'a, 'schema>> + 'a {
+    fn next_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
         self.next.foreign_keys()
     }
 

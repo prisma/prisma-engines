@@ -1,4 +1,4 @@
-use crate::{ConnectorResult, MigrationStep};
+use crate::{migrations_directory::MigrationDirectory, ConnectorResult, MigrationStep};
 use datamodel::Datamodel;
 
 /// The component responsible for generating a [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
@@ -17,5 +17,13 @@ pub trait DatabaseMigrationInferrer<T>: Send + Sync {
         previous: &Datamodel,
         next: &Datamodel,
         steps: &[MigrationStep],
+    ) -> ConnectorResult<T>;
+
+    /// Look at the previous migrations and the target schema, and infer a
+    /// database migration taking the database to the expected Prisma schema.
+    async fn infer_next_migration(
+        &self,
+        previous_migrations: &[MigrationDirectory],
+        target_schema: &Datamodel,
     ) -> ConnectorResult<T>;
 }

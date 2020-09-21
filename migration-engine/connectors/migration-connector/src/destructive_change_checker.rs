@@ -18,7 +18,7 @@ where
 
     /// Check the database migration for destructive or unexecutable steps
     /// without performing any IO.
-    fn pure_check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
+    fn pure_check(&self, database_migration: &T) -> DestructiveChangeDiagnostics;
 }
 
 /// The errors and warnings emitted by the [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
@@ -89,7 +89,7 @@ where
         Ok(DestructiveChangeDiagnostics::new())
     }
 
-    fn pure_check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        Ok(DestructiveChangeDiagnostics::new())
+    fn pure_check(&self, _database_migration: &T) -> DestructiveChangeDiagnostics {
+        DestructiveChangeDiagnostics::new()
     }
 }

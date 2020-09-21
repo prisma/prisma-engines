@@ -211,13 +211,13 @@ impl DestructiveChangeChecker<SqlMigration> for SqlDestructiveChangeChecker<'_> 
         .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }
 
-    fn pure_check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+    fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {
         let plan = self.plan(
             &database_migration.steps,
             &database_migration.before,
             &database_migration.after,
         );
 
-        Ok(plan.pure_check())
+        plan.pure_check()
     }
 }

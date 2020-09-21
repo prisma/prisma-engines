@@ -22,7 +22,7 @@ pub fn parse_model(token: &Token) -> Result<Model, ErrorCollection> {
                 Span::from_pest(current.as_span()),
             )),
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::directive => directives.push(parse_directive(&current)),
+            Rule::block_level_directive => directives.push(parse_directive(&current)),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
                 Err(err) => errors.push(err),

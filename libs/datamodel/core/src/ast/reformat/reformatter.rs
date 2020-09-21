@@ -5,6 +5,7 @@ use pest::Parser;
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
+use pest::iterators::Pair;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -228,7 +229,7 @@ impl<'a> Reformatter<'a> {
             &token,
             Box::new(|table, renderer, token, model_name| {
                 match token.as_rule() {
-                    Rule::directive => {
+                    Rule::block_level_directive => {
                         // model level Directives reset the table. -> .render() does that
                         table.render(renderer);
                         Self::reformat_directive(renderer, &token, "@@");
@@ -275,13 +276,37 @@ impl<'a> Reformatter<'a> {
         let mut block_name = "";
         let mut block_has_opened = false;
 
+        // sort directives
+        let directives = Self::extract_and_sort_directives(token, false);
+
+        // used to add a new line between fields and block attributes if there isn't one already
+        let mut last_line_was_empty = false;
+
         for current in token.clone().into_inner() {
             // println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
                 Rule::BLOCK_OPEN => {
                     block_has_opened = true;
                 }
-                Rule::BLOCK_CLOSE => {}
+                Rule::BLOCK_CLOSE => {
+                    // New line between fields and attributes
+                    // only if there isn't already a new line in between
+                    if directives.len() != 0 && !last_line_was_empty {
+                        table.render(renderer);
+                        table = TableFormat::new();
+                        renderer.end_line();
+                    }
+
+                    for d in &directives {
+                        the_fn(&mut table, renderer, &d, block_name);
+                        // New line after each block attribute
+                        table.render(renderer);
+                        table = TableFormat::new();
+                        renderer.maybe_end_line();
+                    }
+                }
+
+                Rule::block_level_directive => {}
 
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     // Begin.
@@ -308,6 +333,8 @@ impl<'a> Reformatter<'a> {
                 }
                 Rule::NEWLINE => {
                     if block_has_opened {
+                        last_line_was_empty = renderer.line_empty();
+
                         // do not render newlines before the block
                         // Reset the table layout on a newline.
                         table.render(renderer);
@@ -362,9 +389,64 @@ impl<'a> Reformatter<'a> {
         }
     }
 
+    fn extract_and_sort_directives<'i>(token: &'i Token, is_field_directive: bool) -> Vec<Pair<'i, Rule>> {
+        // get indices of directives and store in separate Vector
+        let mut directives = Vec::new();
+        for pair in token.clone().into_inner() {
+            if is_field_directive {
+                match pair.as_rule() {
+                    Rule::directive => directives.push(pair),
+                    _ => {}
+                }
+            } else {
+                match pair.as_rule() {
+                    Rule::block_level_directive => directives.push(pair),
+                    _ => {}
+                }
+            }
+        }
+
+        // sort directives
+        directives.sort_by(|a, b| {
+            let sort_index_a = Self::get_sort_index_of_directive(is_field_directive, a.as_str());
+            let sort_index_b = Self::get_sort_index_of_directive(is_field_directive, b.as_str());
+            sort_index_a.cmp(&sort_index_b)
+        });
+        return directives;
+    }
+
+    fn get_sort_index_of_directive(is_field_directive: bool, directive_name: &str) -> usize {
+        // this must match the order defined for rendering in libs/datamodel/core/src/transform/directives/mod.rs
+        let correct_order = if is_field_directive {
+            vec!["id", "unique", "default", "updatedAt", "map", "relation"]
+        } else {
+            vec!["id", "unique", "index", "map"]
+        };
+        return if let Some(sort_index) = correct_order.iter().position(|p| directive_name.contains(p)) {
+            sort_index
+        } else {
+            usize::MAX
+        };
+    }
+
     fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
         let field_name = &Self::get_identifier(token);
-        for current in token.clone().into_inner() {
+
+        // extract and sort directives
+        let directives = Self::extract_and_sort_directives(token, true);
+
+        // iterate through tokens and reorder directives
+        let mut count = 0;
+        let inner_pairs_with_sorted_directives = token.clone().into_inner().map(|p| match p.as_rule() {
+            Rule::directive => {
+                count = count + 1;
+                directives[count - 1].clone()
+            }
+            _ => p,
+        });
+
+        // write to target
+        for current in inner_pairs_with_sorted_directives {
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     target.write(current.as_str());
@@ -456,7 +538,6 @@ impl<'a> Reformatter<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::directive_name => {
-                    // Begin
                     if !target.line_empty() {
                         target.write(" ");
                     }
