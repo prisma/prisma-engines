@@ -1,15 +1,13 @@
 version: "3"
 services:
-  cockroach20:
+  cockroach:
     image: cockroachdb/cockroach:v20.1.5
     restart: always
-    command: start --insecure -s /cockroachfs20
-    environment:
-      COCKROACH_PORT: "5432"
+    command: start --insecure -s /cockroachfs20 
     networks:
       - databases
     ports:
-      - "5436:5432" # Database
+      - "26257:5436" # Database
       - "8036:8080" # Web UI
     tmpfs: /cockroachfs20
 
