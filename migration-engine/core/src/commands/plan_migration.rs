@@ -18,7 +18,7 @@ pub struct PlanMigrationInput {
 #[serde(rename_all = "camelCase")]
 pub struct PlanMigrationOutput {
     /// The migration steps we would generate.
-    pub migrations_steps: Vec<String>,
+    pub migration_steps: Vec<String>,
     /// Destructive change warnings for the local database. These are the
     /// warnings *for the migration that would be generated*. This does not
     /// include other potentially yet unapplied migrations.
@@ -109,7 +109,7 @@ impl<'a> MigrationCommand for PlanMigrationCommand {
             .collect();
 
         Ok(PlanMigrationOutput {
-            migrations_steps: rendered_migration_steps,
+            migration_steps: rendered_migration_steps,
             warnings,
             unexecutable_steps,
         })
