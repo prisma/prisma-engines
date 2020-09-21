@@ -10,7 +10,7 @@ use crate::{
 };
 
 impl DestructiveChangeCheckerFlavour for MysqlFlavour {
-    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
         match expand_mysql_alter_column(columns) {
             MysqlAlterColumn::DropDefault => (), // dropping a default is safe
 
@@ -22,29 +22,35 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                 // Column went from optional to required. This is unexecutable unless the table is
                 // empty or the column has no existing NULLs.
                 if columns.all_changes().arity_changed() && columns.next.arity().is_required() {
-                    plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
-                        column: columns.previous.name().to_owned(),
+                    plan.push_unexecutable(
+                        UnexecutableStepCheck::MadeOptionalFieldRequired {
+                            column: columns.previous.name().to_owned(),
+                            table: columns.previous.table().name().to_owned(),
+                        },
+                        step_index,
+                    );
+
+                    return;
+                }
+
+                if columns.all_changes().only_type_changed() && diagnose_enum_change(columns, plan, step_index) {
+                    return;
+                }
+
+                plan.push_warning(
+                    SqlMigrationWarningCheck::AlterColumn {
                         table: columns.previous.table().name().to_owned(),
-                    });
-
-                    return;
-                }
-
-                if columns.all_changes().only_type_changed() && diagnose_enum_change(columns, plan) {
-                    return;
-                }
-
-                plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
-                    table: columns.previous.table().name().to_owned(),
-                    column: columns.next.name().to_owned(),
-                });
+                        column: columns.next.name().to_owned(),
+                    },
+                    step_index,
+                );
             }
         }
     }
 }
 
 /// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.
-fn diagnose_enum_change(columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) -> bool {
+fn diagnose_enum_change(columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) -> bool {
     if let (Some(previous_enum), Some(next_enum)) = (
         columns.previous.column_type_family_as_enum(),
         columns.next.column_type_family_as_enum(),
@@ -62,10 +68,13 @@ fn diagnose_enum_change(columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckP
             .collect();
 
         if !removed_values.is_empty() {
-            plan.push_warning(SqlMigrationWarningCheck::EnumValueRemoval {
-                enm: next_enum.name.clone(),
-                values: removed_values,
-            });
+            plan.push_warning(
+                SqlMigrationWarningCheck::EnumValueRemoval {
+                    enm: next_enum.name.clone(),
+                    values: removed_values,
+                },
+                step_index,
+            );
         }
 
         return true;

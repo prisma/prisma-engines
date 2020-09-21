@@ -42,8 +42,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
         let migration_persistence = connector.new_migration_persistence();
 
         let migrations_from_filesystem =
-            migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))
-                .expect("Failed to list migrations");
+            migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
         let migrations_from_database = migration_persistence.list_migrations().await?;
 
         diagnose_migration_history(&migrations_from_database, &migrations_from_filesystem)?;

@@ -43,18 +43,24 @@ impl Component for SqlDestructiveChangeChecker<'_> {
 }
 
 impl SqlDestructiveChangeChecker<'_> {
-    fn check_table_drop(&self, table_name: &str, plan: &mut DestructiveCheckPlan) {
-        plan.push_warning(SqlMigrationWarningCheck::NonEmptyTableDrop {
-            table: table_name.to_owned(),
-        });
+    fn check_table_drop(&self, table_name: &str, plan: &mut DestructiveCheckPlan, step_index: usize) {
+        plan.push_warning(
+            SqlMigrationWarningCheck::NonEmptyTableDrop {
+                table: table_name.to_owned(),
+            },
+            step_index,
+        );
     }
 
     /// Emit a warning when we drop a column that contains non-null values.
-    fn check_column_drop(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan) {
-        plan.push_warning(SqlMigrationWarningCheck::NonEmptyColumnDrop {
-            table: column.table().name().to_owned(),
-            column: column.name().to_owned(),
-        });
+    fn check_column_drop(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
+        plan.push_warning(
+            SqlMigrationWarningCheck::NonEmptyColumnDrop {
+                table: column.table().name().to_owned(),
+                column: column.name().to_owned(),
+            },
+            step_index,
+        );
     }
 
     /// Columns cannot be added when all of the following holds:
@@ -62,7 +68,7 @@ impl SqlDestructiveChangeChecker<'_> {
     /// - There are existing rows
     /// - The new column is required
     /// - There is no default value for the new column
-    fn check_add_column(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_add_column(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
         let column_is_required_without_default = column.arity().is_required() && column.default().is_none();
 
         // Optional columns and columns with a default can safely be added.
@@ -75,13 +81,13 @@ impl SqlDestructiveChangeChecker<'_> {
             table: column.table().name().to_owned(),
         };
 
-        plan.push_unexecutable(typed_unexecutable);
+        plan.push_unexecutable(typed_unexecutable, step_index);
     }
 
     fn plan(&self, steps: &[SqlMigrationStep], before: &SqlSchema, after: &SqlSchema) -> DestructiveCheckPlan {
         let mut plan = DestructiveCheckPlan::new();
 
-        for step in steps {
+        for (step_index, step) in steps.iter().enumerate() {
             match step {
                 SqlMigrationStep::AlterTable(alter_table) => {
                     // The table in alter_table is the updated table, but we want to
@@ -96,7 +102,7 @@ impl SqlDestructiveChangeChecker<'_> {
                                     let column = find_column(before, &alter_table.table.name, &drop_column.name)
                                         .expect("Dropping of unknown column.");
 
-                                    self.check_column_drop(&column, &mut plan);
+                                    self.check_column_drop(&column, &mut plan, step_index);
                                 }
                                 TableChange::AlterColumn(ref alter_column) => {
                                     let previous_column = before_table
@@ -113,19 +119,20 @@ impl SqlDestructiveChangeChecker<'_> {
                                         flavour: self.flavour(),
                                     };
 
-                                    self.flavour().check_alter_column(&differ, &mut plan)
+                                    self.flavour().check_alter_column(&differ, &mut plan, step_index)
                                 }
                                 TableChange::AddColumn(ref add_column) => {
                                     let column = find_column(after, after_table.name(), &add_column.column.name)
                                         .expect("Could not find column in AddColumn");
 
-                                    self.check_add_column(&column, &mut plan)
+                                    self.check_add_column(&column, &mut plan, step_index)
                                 }
-                                TableChange::DropPrimaryKey { .. } => {
-                                    plan.push_warning(SqlMigrationWarningCheck::PrimaryKeyChange {
+                                TableChange::DropPrimaryKey { .. } => plan.push_warning(
+                                    SqlMigrationWarningCheck::PrimaryKeyChange {
                                         table: alter_table.table.name.clone(),
-                                    })
-                                }
+                                    },
+                                    step_index,
+                                ),
                                 _ => (),
                             }
                         }
@@ -143,42 +150,50 @@ impl SqlDestructiveChangeChecker<'_> {
                         };
 
                         if let Some(_) = differ.dropped_primary_key() {
-                            plan.push_warning(SqlMigrationWarningCheck::PrimaryKeyChange { table: name.clone() })
+                            plan.push_warning(
+                                SqlMigrationWarningCheck::PrimaryKeyChange { table: name.clone() },
+                                step_index,
+                            )
                         }
 
                         for added_column in differ.added_columns() {
-                            self.check_add_column(&added_column, &mut plan);
+                            self.check_add_column(&added_column, &mut plan, step_index);
                         }
 
                         for dropped_column in differ.dropped_columns() {
-                            self.check_column_drop(&dropped_column, &mut plan);
+                            self.check_column_drop(&dropped_column, &mut plan, step_index);
                         }
 
                         for columns in differ.column_pairs() {
-                            self.flavour().check_alter_column(&columns, &mut plan);
+                            self.flavour().check_alter_column(&columns, &mut plan, step_index);
                         }
                     }
                 }
                 SqlMigrationStep::DropTable(DropTable { name }) => {
-                    self.check_table_drop(name, &mut plan);
+                    self.check_table_drop(name, &mut plan, step_index);
                 }
                 SqlMigrationStep::CreateIndex(CreateIndex {
                     table,
                     index,
                     caused_by_create_table: false,
-                }) if index.is_unique() => plan.push_warning(SqlMigrationWarningCheck::UniqueConstraintAddition {
-                    table: table.clone(),
-                    columns: index.columns.clone(),
-                }),
+                }) if index.is_unique() => plan.push_warning(
+                    SqlMigrationWarningCheck::UniqueConstraintAddition {
+                        table: table.clone(),
+                        columns: index.columns.clone(),
+                    },
+                    step_index,
+                ),
                 SqlMigrationStep::AlterEnum(AlterEnum {
                     name,
                     created_variants: _,
                     dropped_variants,
-                }) if !dropped_variants.is_empty() => plan.push_warning(SqlMigrationWarningCheck::EnumValueRemoval {
-                    enm: name.clone(),
-                    values: dropped_variants.clone(),
-                }),
-                // do nothing
+                }) if !dropped_variants.is_empty() => plan.push_warning(
+                    SqlMigrationWarningCheck::EnumValueRemoval {
+                        enm: name.clone(),
+                        values: dropped_variants.clone(),
+                    },
+                    step_index,
+                ),
                 _ => (),
             }
         }

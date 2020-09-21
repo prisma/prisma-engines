@@ -5,6 +5,7 @@ mod create_migration;
 mod diagnose_migration_history;
 mod infer;
 mod infer_apply;
+mod plan_migration;
 mod schema_push;
 mod unapply_migration;
 
@@ -15,6 +16,7 @@ pub use create_migration::CreateMigration;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
+pub use plan_migration::PlanMigration;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
 
@@ -195,6 +197,14 @@ impl TestApi {
             api: &self.api,
             force: None,
         }
+    }
+
+    pub fn plan_migration<'a>(
+        &'a self,
+        migrations_directory: &'a TempDir,
+        prisma_schema: impl Into<String>,
+    ) -> PlanMigration<'a> {
+        PlanMigration::new(&self.api, migrations_directory, prisma_schema.into())
     }
 
     pub fn schema_push<'a>(&'a self, dm: impl Into<String>) -> SchemaPush<'a> {

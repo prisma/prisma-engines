@@ -13,6 +13,7 @@ mod initialization;
 mod migration_persistence;
 mod migrations;
 mod multi_user;
+mod plan_migration;
 mod schema_push;
 mod unapply_migration;
 

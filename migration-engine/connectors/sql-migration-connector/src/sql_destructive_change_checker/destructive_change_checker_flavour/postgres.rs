@@ -11,32 +11,39 @@ use crate::{
 use sql_schema_describer::{ColumnArity, DefaultValue};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
-    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
         let expanded = expand_postgres_alter_column(columns);
 
         if let Some(steps) = expanded {
             for step in steps {
                 // We keep the match here to keep the exhaustiveness checking for when we add variants.
                 match step {
-                    PostgresAlterColumn::SetNotNull => {
-                        plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
+                    PostgresAlterColumn::SetNotNull => plan.push_unexecutable(
+                        UnexecutableStepCheck::MadeOptionalFieldRequired {
                             column: columns.previous.name().to_owned(),
                             table: columns.previous.table().name().to_owned(),
-                        })
-                    }
+                        },
+                        step_index,
+                    ),
                     PostgresAlterColumn::SetType(_) => {
                         if !matches!(columns.previous.arity(), ColumnArity::List)
                             && matches!(columns.next.arity(), ColumnArity::List)
                         {
-                            plan.push_unexecutable(UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-                                table: columns.previous.table().name().to_owned(),
-                                column: columns.previous.name().to_owned(),
-                            })
+                            plan.push_unexecutable(
+                                UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
+                                    table: columns.previous.table().name().to_owned(),
+                                    column: columns.previous.name().to_owned(),
+                                },
+                                step_index,
+                            )
                         } else {
-                            plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
-                                table: columns.previous.table().name().to_owned(),
-                                column: columns.previous.name().to_owned(),
-                            });
+                            plan.push_warning(
+                                SqlMigrationWarningCheck::AlterColumn {
+                                    table: columns.previous.table().name().to_owned(),
+                                    column: columns.previous.name().to_owned(),
+                                },
+                                step_index,
+                            );
                         }
                     }
                     PostgresAlterColumn::SetDefault(_)
@@ -52,16 +59,22 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 && columns.next.arity().is_required()
                 && !default_can_be_rendered(columns.next.default())
             {
-                plan.push_unexecutable(UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous.name().to_owned(),
-                    table: columns.previous.table().name().to_owned(),
-                })
+                plan.push_unexecutable(
+                    UnexecutableStepCheck::AddedRequiredFieldToTable {
+                        column: columns.previous.name().to_owned(),
+                        table: columns.previous.table().name().to_owned(),
+                    },
+                    step_index,
+                )
             } else {
                 // Executable drop and recreate.
-                plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
-                    table: columns.previous.table().name().to_owned(),
-                    column: columns.next.name().to_owned(),
-                });
+                plan.push_warning(
+                    SqlMigrationWarningCheck::AlterColumn {
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.next.name().to_owned(),
+                    },
+                    step_index,
+                );
             }
         }
     }

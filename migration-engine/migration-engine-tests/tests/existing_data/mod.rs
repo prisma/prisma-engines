@@ -1,6 +1,5 @@
 mod sql_unexecutable_migrations;
 
-use migration_connector::MigrationWarning;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::{PrismaValue, TypeHint};
@@ -8,7 +7,7 @@ use quaint::ast::*;
 use sql_schema_describer::DefaultValue;
 
 #[test_each_connector]
-async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
+async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -23,25 +22,20 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
 
     let dm = "";
 
-    let InferAndApplyOutput {
-        migration_output,
-        sql_schema: final_database_schema,
-    } = api.infer_and_apply(&dm).await;
+    api.infer_apply(&dm)
+        .send()
+        .await?
+        .assert_warnings(&["You are about to drop the `Test` table, which is not empty (1 rows).".into()])?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    assert_eq!(original_database_schema, final_database_schema);
+    api.assert_schema().await?.assert_equals(&original_database_schema)?;
 
-    assert_eq!(
-        migration_output.warnings,
-        &[MigrationWarning {
-            description: "You are about to drop the `Test` table, which is not empty (1 rows).".into()
-        }]
-    );
+    Ok(())
 }
 
 #[test_each_connector]
-async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
+async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> TestResult {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -64,21 +58,16 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
             }
         "#;
 
-    let InferAndApplyOutput {
-        migration_output,
-        sql_schema: final_database_schema,
-    } = api.infer_and_apply(&dm).await;
+    api.infer_apply(&dm).send().await?.assert_warnings(&[
+        "You are about to drop the column `puppiesCount` on the `Test` table, which still contains 2 non-null values."
+            .into(),
+    ])?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    assert_eq!(original_database_schema, final_database_schema);
+    api.assert_schema().await?.assert_equals(&original_database_schema)?;
 
-    assert_eq!(
-            migration_output.warnings,
-            &[MigrationWarning {
-                description: "You are about to drop the column `puppiesCount` on the `Test` table, which still contains 2 non-null values.".to_owned(),
-            }]
-        );
+    Ok(())
 }
 
 #[test_each_connector]
@@ -137,21 +126,15 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         }
     "#;
 
-    let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
+    api.infer_apply(&dm2).send().await?.assert_warnings(&[
+        "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
+         The data in that column could be lost."
+            .into(),
+    ])?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
     api.assert_schema().await?.assert_equals(&original_database_schema)?;
-
-    assert_eq!(
-        migration_output.warnings,
-        &[MigrationWarning {
-            description:
-                "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
-                 The data in that column could be lost."
-                    .to_owned()
-        }]
-    );
 
     let data = api.dump_table("Test").await?;
     assert_eq!(data.len(), 2);
@@ -677,16 +660,11 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         }
     "#;
 
-    let response = api.infer_apply(dm2).send().await?.into_inner();
-
-    assert_eq!(
-        response.warnings,
-        &[MigrationWarning {
-            // TODO: the message should say that altering the type of a column is not guaranteed to preserve the data, but the database is going to do its best.
-            // Also think about timeouts.
-            description: "You are about to alter the column `dogs` on the `User` table, which still contains 1 non-null values. The data in that column could be lost.".to_owned()
-        }]
-    );
+    api.infer_apply(dm2).send().await?.assert_warnings(&[
+        // TODO: the message should say that altering the type of a column is not guaranteed to preserve the data, but the database is going to do its best.
+        // Also think about timeouts.
+        "You are about to alter the column `dogs` on the `User` table, which still contains 1 non-null values. The data in that column could be lost.".into()
+    ])?;
 
     let rows = api.select("User").column("dogs").send_debug().await?;
     assert_eq!(rows, &[["Integer(Some(7))"]]);
@@ -731,24 +709,24 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
         }
     "#;
 
-    let expected_warning = MigrationWarning {
-        description: "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column could be lost.".to_owned(),
-    };
+    let expected_warning = "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column could be lost.";
 
     // Apply once without forcing
     {
-        let result = api.infer_apply(dm2).send().await?.into_inner();
-
-        assert_eq!(result.warnings, &[expected_warning.clone()]);
-
+        api.infer_apply(dm2)
+            .send()
+            .await?
+            .assert_warnings(&[expected_warning.into()])?;
         api.assert_schema().await?.assert_equals(&original_schema)?;
     }
 
     // Force apply
     {
-        let result = api.infer_apply(dm2).force(Some(true)).send().await?.into_inner();
-
-        assert_eq!(result.warnings, &[expected_warning]);
+        api.infer_apply(dm2)
+            .force(Some(true))
+            .send()
+            .await?
+            .assert_warnings(&[expected_warning.into()])?;
 
         api.assert_schema().await?.assert_table("Test", |table| {
             table.assert_column("serialNumber", |col| col.assert_type_is_string())

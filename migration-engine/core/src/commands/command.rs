@@ -66,6 +66,12 @@ fn render_datamodel_error(err: &datamodel::error::ErrorCollection, schema: Optio
     }
 }
 
+impl From<ListMigrationsError> for CommandError {
+    fn from(err: ListMigrationsError) -> Self {
+        CommandError::Generic(err.into())
+    }
+}
+
 impl From<CalculatorError> for CommandError {
     fn from(error: CalculatorError) -> Self {
         CommandError::Generic(error.into())

@@ -43,8 +43,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
 
         // Load the migrations.
         let migrations_from_filesystem =
-            migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))
-                .expect("Failed to list migrations");
+            migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
         let migrations_from_database = migration_persistence.list_migrations().await?;
 
         let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
