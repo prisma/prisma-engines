@@ -57,6 +57,8 @@ impl DestructiveChangeDiagnostics {
 pub struct MigrationWarning {
     /// The user-facing warning description.
     pub description: String,
+    /// The index of the step in the migration that this warning applies to.
+    pub step_index: usize,
 }
 
 /// An error emitted by the [DestructiveChangeChecker](trait.DestructiveChangeChecker.html). Errors will
@@ -72,6 +74,8 @@ pub struct MigrationError {
 pub struct UnexecutableMigration {
     /// The user-facing problem description.
     pub description: String,
+    /// The index of the step in the migration that this message applies to.
+    pub step_index: usize,
 }
 
 /// An implementor of [DestructiveChangeChecker](trait.DestructiveChangeChecker.html) that performs no check.

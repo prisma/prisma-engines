@@ -25,7 +25,7 @@ pub use error::*;
 pub use imperative_migrations_persistence::{ImperativeMigrationsPersistence, MigrationRecord, Timestamp};
 pub use migration_applier::*;
 pub use migration_persistence::*;
-pub use migrations_directory::{create_migration_directory, list_migrations, MigrationDirectory};
+pub use migrations_directory::{create_migration_directory, list_migrations, ListMigrationsError, MigrationDirectory};
 pub use steps::MigrationStep;
 
 use std::fmt::Debug;

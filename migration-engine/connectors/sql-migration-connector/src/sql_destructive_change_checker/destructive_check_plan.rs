@@ -15,8 +15,8 @@ const DESTRUCTIVE_TIMEOUT_DURATION: Duration = Duration::from_secs(60);
 /// database inspection and renders user-facing messages based on the checks.
 #[derive(Debug)]
 pub(crate) struct DestructiveCheckPlan {
-    warnings: Vec<SqlMigrationWarningCheck>,
-    unexecutable_migrations: Vec<UnexecutableStepCheck>,
+    warnings: Vec<(SqlMigrationWarningCheck, usize)>,
+    unexecutable_migrations: Vec<(UnexecutableStepCheck, usize)>,
 }
 
 impl DestructiveCheckPlan {
@@ -27,12 +27,12 @@ impl DestructiveCheckPlan {
         }
     }
 
-    pub(super) fn push_warning(&mut self, warning: SqlMigrationWarningCheck) {
-        self.warnings.push(warning)
+    pub(super) fn push_warning(&mut self, warning: SqlMigrationWarningCheck, step_index: usize) {
+        self.warnings.push((warning, step_index))
     }
 
-    pub(super) fn push_unexecutable(&mut self, unexecutable_migration: UnexecutableStepCheck) {
-        self.unexecutable_migrations.push(unexecutable_migration)
+    pub(super) fn push_unexecutable(&mut self, unexecutable_migration: UnexecutableStepCheck, step_index: usize) {
+        self.unexecutable_migrations.push((unexecutable_migration, step_index))
     }
 
     /// Inspect the current database state to qualify and render destructive change warnings and
@@ -48,12 +48,12 @@ impl DestructiveCheckPlan {
         let mut results = DatabaseInspectionResults::default();
 
         let inspection = async {
-            for unexecutable in &self.unexecutable_migrations {
+            for (unexecutable, _idx) in &self.unexecutable_migrations {
                 self.inspect_for_check(unexecutable, &mut results, schema_name, conn)
                     .await?;
             }
 
-            for warning in &self.warnings {
+            for (warning, _idx) in &self.warnings {
                 self.inspect_for_check(warning, &mut results, schema_name, conn).await?;
             }
 
@@ -68,17 +68,21 @@ impl DestructiveCheckPlan {
 
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 
-        for unexecutable in &self.unexecutable_migrations {
+        for (unexecutable, step_index) in &self.unexecutable_migrations {
             if let Some(message) = unexecutable.evaluate(&results) {
-                diagnostics
-                    .unexecutable_migrations
-                    .push(UnexecutableMigration { description: message })
+                diagnostics.unexecutable_migrations.push(UnexecutableMigration {
+                    description: message,
+                    step_index: *step_index,
+                })
             }
         }
 
-        for warning in &self.warnings {
+        for (warning, step_index) in &self.warnings {
             if let Some(message) = warning.evaluate(&results) {
-                diagnostics.warnings.push(MigrationWarning { description: message })
+                diagnostics.warnings.push(MigrationWarning {
+                    description: message,
+                    step_index: *step_index,
+                })
             }
         }
 
@@ -119,17 +123,21 @@ impl DestructiveCheckPlan {
         let results = DatabaseInspectionResults::default();
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 
-        for unexecutable in &self.unexecutable_migrations {
+        for (unexecutable, step_index) in &self.unexecutable_migrations {
             if let Some(message) = unexecutable.evaluate(&results) {
-                diagnostics
-                    .unexecutable_migrations
-                    .push(UnexecutableMigration { description: message })
+                diagnostics.unexecutable_migrations.push(UnexecutableMigration {
+                    description: message,
+                    step_index: *step_index,
+                })
             }
         }
 
-        for warning in &self.warnings {
+        for (warning, step_index) in &self.warnings {
             if let Some(message) = warning.evaluate(&results) {
-                diagnostics.warnings.push(MigrationWarning { description: message })
+                diagnostics.warnings.push(MigrationWarning {
+                    description: message,
+                    step_index: *step_index,
+                })
             }
         }
 

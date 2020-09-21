@@ -81,15 +81,12 @@ impl SqlRenderer for PostgresFlavour {
             for column in affected_columns {
                 let sql = format!(
                     "ALTER TABLE {schema_name}.{table_name} \
-                            ALTER COLUMN {column_name} DROP DEFAULT,
                             ALTER COLUMN {column_name} TYPE {tmp_name} \
-                                USING ({column_name}::text::{tmp_name}),
-                            ALTER COLUMN {column_name} SET DEFAULT {new_enum_default}",
+                                USING ({column_name}::text::{tmp_name})",
                     schema_name = Quoted::postgres_ident(self.schema_name()),
                     table_name = Quoted::postgres_ident(column.table().name()),
                     column_name = Quoted::postgres_ident(column.name()),
                     tmp_name = Quoted::postgres_ident(&tmp_name),
-                    new_enum_default = Quoted::postgres_string(new_enum.values.first().unwrap()),
                 );
 
                 stmts.push(sql);

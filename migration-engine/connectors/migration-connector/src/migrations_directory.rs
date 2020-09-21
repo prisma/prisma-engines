@@ -9,14 +9,13 @@
 //!
 //! - A migration script
 
-// use migration_connector::ImperativeMigration;
 use sha2::{Digest, Sha256, Sha512};
 use std::{
     fs::{create_dir, read_dir, DirEntry},
     io::{self, Write as _},
     path::{Path, PathBuf},
 };
-use thiserror::*;
+use thiserror::Error;
 
 use crate::FormatChecksum;
 
@@ -51,8 +50,17 @@ pub fn create_migration_directory(
     Ok(MigrationDirectory { path: directory_path })
 }
 
+/// An IO error that occured while reading the migrations directory.
+#[derive(Debug, Error)]
+#[error("An error occured when reading the migrations directory.")]
+pub struct ListMigrationsError(
+    #[source]
+    #[from]
+    io::Error,
+);
+
 /// List the migrations present in the migration directory, lexicographically sorted by name.
-pub fn list_migrations(migrations_directory_path: &Path) -> io::Result<Vec<MigrationDirectory>> {
+pub fn list_migrations(migrations_directory_path: &Path) -> Result<Vec<MigrationDirectory>, ListMigrationsError> {
     let mut entries: Vec<MigrationDirectory> = Vec::new();
 
     for entry in read_dir(migrations_directory_path)? {

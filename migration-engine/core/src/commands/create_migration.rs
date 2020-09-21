@@ -45,12 +45,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
         let checker = engine.connector().destructive_change_checker();
 
         // Infer the migration.
-        let previous_migrations = migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))
-            .map_err(|_| {
-                CommandError::Generic(anyhow::anyhow!(
-                    "Failed to read migrations from the migrations directory."
-                ))
-            })?;
+        let previous_migrations = migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
         let target_schema = parse_datamodel(&input.prisma_schema)?;
 
         let migration = database_migration_inferrer
