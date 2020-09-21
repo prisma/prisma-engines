@@ -307,8 +307,8 @@ fn convert_scalar_filter(
 
 fn default_scalar_filter(comparable: impl Comparable<'static>, cond: ScalarCondition) -> ConditionTree<'static> {
     let condition = match cond {
-        ScalarCondition::Equals(PrismaValue::Null(_)) => comparable.is_null(),
-        ScalarCondition::NotEquals(PrismaValue::Null(_)) => comparable.is_not_null(),
+        ScalarCondition::Equals(PrismaValue::Null) => comparable.is_null(),
+        ScalarCondition::NotEquals(PrismaValue::Null) => comparable.is_not_null(),
         ScalarCondition::Equals(value) => comparable.equals(value),
         ScalarCondition::NotEquals(value) => comparable.not_equals(value),
         ScalarCondition::Contains(value) => comparable.like(format!("{}", value)),
@@ -356,8 +356,8 @@ fn insensitive_scalar_filter(comparable: impl Comparable<'static>, cond: ScalarC
     // Current workaround: We assume we can use ILIKE when we see `mode: insensitive`, because postgres is the only DB that has
     // insensitive. We need a connector context for filter building that is unexpectedly complicated to integrate.
     let condition = match cond {
-        ScalarCondition::Equals(PrismaValue::Null(_)) => comparable.is_null(),
-        ScalarCondition::NotEquals(PrismaValue::Null(_)) => comparable.is_not_null(),
+        ScalarCondition::Equals(PrismaValue::Null) => comparable.is_null(),
+        ScalarCondition::NotEquals(PrismaValue::Null) => comparable.is_not_null(),
         ScalarCondition::Equals(value) => comparable.equals(lower(value)),
         ScalarCondition::NotEquals(value) => comparable.not_equals(value),
         ScalarCondition::Contains(value) => comparable.compare_raw("ILIKE", format!("%{}%", value)),
