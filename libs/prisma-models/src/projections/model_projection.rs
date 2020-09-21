@@ -117,7 +117,7 @@ impl ModelProjection {
     /// Creates a record projection of the model projection containing only null values.
     pub fn empty_record_projection(&self) -> RecordProjection {
         self.scalar_fields()
-            .map(|f| (f.clone(), PrismaValue::null(f.type_identifier.clone())))
+            .map(|f| (f.clone(), PrismaValue::Null))
             .collect::<Vec<_>>()
             .into()
     }
