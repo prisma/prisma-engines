@@ -18,7 +18,7 @@ async fn plan_migration_with_an_up_to_date_database_returns_no_step(api: &TestAp
 
     let output = api.plan_migration(&directory, dm).send().await?.into_output();
     let expected_output = PlanMigrationOutput {
-        migrations_steps: vec![],
+        migration_steps: vec![],
         warnings: vec![],
         unexecutable_steps: vec![],
     };

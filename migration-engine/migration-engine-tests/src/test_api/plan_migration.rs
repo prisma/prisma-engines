@@ -53,11 +53,11 @@ impl std::fmt::Debug for PlanMigrationAssertion<'_> {
 impl<'a> PlanMigrationAssertion<'a> {
     pub fn assert_steps_count(self, count: usize) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.output.migrations_steps.len() == count,
+            self.output.migration_steps.len() == count,
             "Assertion failed. Expected planMigration to return {} steps, found {}.\n{:?}",
             count,
-            self.output.migrations_steps.len(),
-            self.output.migrations_steps,
+            self.output.migration_steps.len(),
+            self.output.migration_steps,
         );
 
         Ok(self)
