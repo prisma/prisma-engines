@@ -13,7 +13,13 @@ docker run --name test-mysql --network test-net \
     -e MYSQL_USER=prisma \
     -e MYSQL_DATABASE=prisma \
     -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
-    -e MYSQL_PASSWORD=prisma -d mysql
+    -e MYSQL_PASSWORD=prisma -d mysql:5.7
+
+docker run --name test-mysql-8 --network test-net \
+    -e MYSQL_USER=prisma \
+    -e MYSQL_DATABASE=prisma \
+    -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
+    -e MYSQL_PASSWORD=prisma -d mysql:8
 
 docker run --name test-mssql --network test-net \
     -e ACCEPT_EULA=Y \
@@ -22,6 +28,7 @@ docker run --name test-mssql --network test-net \
 
 docker run -w /build --network test-net -v $BUILDKITE_BUILD_CHECKOUT_PATH:/build \
     -e TEST_MYSQL=mysql://prisma:prisma@test-mysql:3306/prisma \
+    -e TEST_MYSQL8=mysql://prisma:prisma@test-mysql-8:3306/prisma \
     -e TEST_PSQL=postgres://prisma:prisma@test-postgres:5432/prisma \
     -e TEST_MSSQL="sqlserver://test-mssql:1433;user=SA;password=$MSSQL_SA_PASSWORD;trustServerCertificate=true" \
     prismagraphql/build:test cargo test --features full,json-1,uuid-0_8,chrono-0_4,tracing-log,serde-support
@@ -33,6 +40,12 @@ docker rm test-postgres
 
 docker stop test-mysql
 docker rm test-mysql
+
+docker stop test-mysql-8
+docker rm test-mysql-8
+
+docker stop test-mssql
+docker rm test-mssql
 
 docker network rm test-net
 

@@ -1,11 +1,11 @@
 use crate::tests::test_api::sqlite_test_api;
-use crate::tests::test_api::{Sqlite, TestApi};
+use crate::tests::test_api::TestApi;
 use crate::{ast::*, connector::Queryable};
 use std::str::FromStr;
 use test_macros::test_each_connector;
 
 test_type!(integer(
-    Sqlite,
+    sqlite,
     "INTEGER",
     Value::Integer(None),
     Value::integer(i8::MIN),
@@ -19,23 +19,23 @@ test_type!(integer(
 ));
 
 test_type!(real(
-    Sqlite,
+    sqlite,
     "REAL",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::from_str("1.12345").unwrap())
 ));
 
-test_type!(text(Sqlite, "TEXT", Value::Text(None), Value::text("foobar huhuu")));
+test_type!(text(sqlite, "TEXT", Value::Text(None), Value::text("foobar huhuu")));
 
 test_type!(blob(
-    Sqlite,
+    sqlite,
     "BLOB",
     Value::Bytes(None),
     Value::bytes(b"DEADBEEF".to_vec())
 ));
 
 test_type!(boolean(
-    Sqlite,
+    sqlite,
     "BOOLEAN",
     Value::Boolean(None),
     Value::boolean(true),
@@ -44,7 +44,7 @@ test_type!(boolean(
 
 #[cfg(feature = "chrono-0_4")]
 test_type!(date(
-    Sqlite,
+    sqlite,
     "DATE",
     Value::Date(None),
     Value::date(chrono::NaiveDate::from_ymd(1984, 1, 1))
@@ -52,7 +52,7 @@ test_type!(date(
 
 #[cfg(feature = "chrono-0_4")]
 test_type!(datetime(
-    Sqlite,
+    sqlite,
     "DATETIME",
     Value::DateTime(None),
     Value::datetime(chrono::DateTime::from_str("2020-07-29T09:23:44.458Z").unwrap())

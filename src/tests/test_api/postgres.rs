@@ -15,17 +15,19 @@ pub struct PostgreSql<'a> {
     conn: Quaint,
 }
 
-#[async_trait::async_trait]
-impl<'a> TestApi for PostgreSql<'a> {
-    async fn new() -> crate::Result<Self> {
+impl<'a> PostgreSql<'a> {
+    pub async fn new() -> crate::Result<PostgreSql<'a>> {
         let names = Generator::default();
         let conn = Quaint::new(&*CONN_STR).await?;
 
         Ok(Self { names, conn })
     }
+}
 
+#[async_trait::async_trait]
+impl<'a> TestApi for PostgreSql<'a> {
     fn system(&self) -> &'static str {
-        "posgres"
+        "postgres"
     }
 
     async fn create_type_table(&mut self, r#type: &str) -> crate::Result<String> {

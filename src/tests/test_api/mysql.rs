@@ -5,9 +5,14 @@ use once_cell::sync::Lazy;
 use std::env;
 
 pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL").expect("TEST_MYSQL env var"));
+pub static CONN_STR8: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL8").expect("TEST_MYSQL8 env var"));
 
 pub(crate) async fn mysql_test_api<'a>() -> crate::Result<MySql<'a>> {
-    MySql::new().await
+    MySql::new(CONN_STR.as_str()).await
+}
+
+pub(crate) async fn mysql8_test_api<'a>() -> crate::Result<MySql<'a>> {
+    MySql::new(CONN_STR8.as_str()).await
 }
 
 pub struct MySql<'a> {
@@ -15,15 +20,17 @@ pub struct MySql<'a> {
     conn: Quaint,
 }
 
-#[async_trait::async_trait]
-impl<'a> TestApi for MySql<'a> {
-    async fn new() -> crate::Result<Self> {
+impl<'a> MySql<'a> {
+    pub async fn new(conn_str: &str) -> crate::Result<MySql<'a>> {
         let names = Generator::default();
-        let conn = Quaint::new(&*CONN_STR).await?;
+        let conn = Quaint::new(conn_str).await?;
 
         Ok(Self { names, conn })
     }
+}
 
+#[async_trait::async_trait]
+impl<'a> TestApi for MySql<'a> {
     fn system(&self) -> &'static str {
         "mysql"
     }

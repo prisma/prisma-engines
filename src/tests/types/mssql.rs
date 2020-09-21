@@ -1,8 +1,8 @@
-use crate::tests::test_api::MsSql;
+use crate::tests::test_api::*;
 use std::str::FromStr;
 
 test_type!(nvarchar_limited(
-    MsSql,
+    mssql,
     "NVARCHAR(10)",
     Value::Text(None),
     Value::text("foobar"),
@@ -10,7 +10,7 @@ test_type!(nvarchar_limited(
 ));
 
 test_type!(nvarchar_max(
-    MsSql,
+    mssql,
     "NVARCHAR(max)",
     Value::Text(None),
     Value::text("foobar"),
@@ -18,7 +18,7 @@ test_type!(nvarchar_max(
 ));
 
 test_type!(ntext(
-    MsSql,
+    mssql,
     "NTEXT",
     Value::Text(None),
     Value::text("foobar"),
@@ -26,23 +26,23 @@ test_type!(ntext(
 ));
 
 test_type!(varchar_limited(
-    MsSql,
+    mssql,
     "VARCHAR(10)",
     Value::Text(None),
     Value::text("foobar"),
 ));
 
 test_type!(varchar_max(
-    MsSql,
+    mssql,
     "VARCHAR(max)",
     Value::Text(None),
     Value::text("foobar"),
 ));
 
-test_type!(text(MsSql, "TEXT", Value::Text(None), Value::text("foobar")));
+test_type!(text(mssql, "TEXT", Value::Text(None), Value::text("foobar")));
 
 test_type!(tinyint(
-    MsSql,
+    mssql,
     "tinyint",
     Value::Integer(None),
     Value::integer(u8::MIN),
@@ -50,7 +50,7 @@ test_type!(tinyint(
 ));
 
 test_type!(smallint(
-    MsSql,
+    mssql,
     "smallint",
     Value::Integer(None),
     Value::integer(i16::MIN),
@@ -58,7 +58,7 @@ test_type!(smallint(
 ));
 
 test_type!(int(
-    MsSql,
+    mssql,
     "int",
     Value::Integer(None),
     Value::integer(i32::MIN),
@@ -66,7 +66,7 @@ test_type!(int(
 ));
 
 test_type!(bigint(
-    MsSql,
+    mssql,
     "bigint",
     Value::Integer(None),
     Value::integer(i64::MIN),
@@ -74,56 +74,56 @@ test_type!(bigint(
 ));
 
 test_type!(decimal(
-    MsSql,
+    mssql,
     "decimal(10,2)",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::new(314, 2))
 ));
 
 test_type!(numeric(
-    MsSql,
+    mssql,
     "numeric(10,2)",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::new(314, 2))
 ));
 
 test_type!(money(
-    MsSql,
+    mssql,
     "money",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::new(314, 2))
 ));
 
 test_type!(smallmoney(
-    MsSql,
+    mssql,
     "smallmoney",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::new(314, 2))
 ));
 
 test_type!(float_24(
-    MsSql,
+    mssql,
     "float(24)",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::from_str("1.1234567").unwrap())
 ));
 
 test_type!(real(
-    MsSql,
+    mssql,
     "real",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::from_str("1.1234567").unwrap())
 ));
 
 test_type!(float_53(
-    MsSql,
+    mssql,
     "float(53)",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::from_str("1.123456789012345").unwrap())
 ));
 
 test_type!(boolean(
-    MsSql,
+    mssql,
     "bit",
     Value::Boolean(None),
     Value::boolean(true),
@@ -131,21 +131,21 @@ test_type!(boolean(
 ));
 
 test_type!(binary(
-    MsSql,
+    mssql,
     "binary(8)",
     Value::Bytes(None),
     Value::bytes(b"DEADBEEF".to_vec()),
 ));
 
 test_type!(varbinary(
-    MsSql,
+    mssql,
     "varbinary(8)",
     Value::Bytes(None),
     Value::bytes(b"DEADBEEF".to_vec()),
 ));
 
 test_type!(image(
-    MsSql,
+    mssql,
     "image",
     Value::Bytes(None),
     Value::bytes(b"DEADBEEF".to_vec()),
@@ -153,7 +153,7 @@ test_type!(image(
 
 #[cfg(feature = "chrono-0_4")]
 test_type!(date(
-    MsSql,
+    mssql,
     "date",
     Value::Date(None),
     Value::date(chrono::NaiveDate::from_ymd(2020, 4, 20))
@@ -161,32 +161,32 @@ test_type!(date(
 
 #[cfg(feature = "chrono-0_4")]
 test_type!(time(
-    MsSql,
+    mssql,
     "time",
     Value::Time(None),
     Value::time(chrono::NaiveTime::from_hms(16, 20, 00))
 ));
 
 #[cfg(feature = "chrono-0_4")]
-test_type!(datetime2(MsSql, "datetime2", Value::DateTime(None), {
+test_type!(datetime2(mssql, "datetime2", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
 #[cfg(feature = "chrono-0_4")]
-test_type!(datetime(MsSql, "datetime", Value::DateTime(None), {
+test_type!(datetime(mssql, "datetime", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
 #[cfg(feature = "chrono-0_4")]
-test_type!(datetimeoffset(MsSql, "datetimeoffset", Value::DateTime(None), {
+test_type!(datetimeoffset(mssql, "datetimeoffset", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
 #[cfg(feature = "chrono-0_4")]
-test_type!(smalldatetime(MsSql, "smalldatetime", Value::DateTime(None), {
+test_type!(smalldatetime(mssql, "smalldatetime", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));

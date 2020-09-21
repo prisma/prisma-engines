@@ -18,10 +18,6 @@ pub use sqlite::*;
 
 #[async_trait::async_trait]
 pub trait TestApi {
-    async fn new() -> crate::Result<Self>
-    where
-        Self: Sized;
-
     async fn create_type_table(&mut self, r#type: &str) -> crate::Result<String>;
     async fn create_table(&mut self, columns: &str) -> crate::Result<String>;
 

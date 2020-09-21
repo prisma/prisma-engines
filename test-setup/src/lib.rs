@@ -16,6 +16,7 @@ fn connector_names() -> Vec<(&'static str, Tags)> {
     vec![
         ("mssql", Tags::MSSQL),
         ("mysql", Tags::MYSQL),
+        ("mysql8", Tags::MYSQL8),
         ("postgres", Tags::POSTGRES),
         ("sqlite", Tags::SQLITE),
     ]

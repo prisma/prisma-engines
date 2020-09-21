@@ -11,16 +11,18 @@ pub struct Sqlite<'a> {
     conn: Quaint,
 }
 
-#[async_trait::async_trait]
-impl<'a> TestApi for Sqlite<'a> {
-    async fn new() -> crate::Result<Self> {
+impl<'a> Sqlite<'a> {
+    pub async fn new() -> crate::Result<Sqlite<'a>> {
         let names = Generator::default();
         let conn_str = "file:db/test.db";
         let conn = Quaint::new(&conn_str).await?;
 
         Ok(Self { names, conn })
     }
+}
 
+#[async_trait::async_trait]
+impl<'a> TestApi for Sqlite<'a> {
     fn system(&self) -> &'static str {
         "sqlite"
     }

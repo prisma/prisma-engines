@@ -7,6 +7,7 @@ bitflags! {
         const POSTGRES  = 0b00000100;
         const SQLITE    = 0b00001000;
         const MSSQL     = 0b00010000;
+        const MYSQL8    = 0b00100000;
     }
 }
 
@@ -39,6 +40,7 @@ impl FromStr for Tags {
 const TAG_NAMES: &[(&str, Tags)] = &[
     ("mssql", Tags::MSSQL),
     ("mysql", Tags::MYSQL),
+    ("mysql8", Tags::MYSQL),
     ("postgres", Tags::POSTGRES),
     ("sqlite", Tags::SQLITE),
 ];

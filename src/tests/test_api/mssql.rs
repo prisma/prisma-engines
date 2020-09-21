@@ -15,15 +15,17 @@ pub struct MsSql<'a> {
     conn: Quaint,
 }
 
-#[async_trait::async_trait]
-impl<'a> TestApi for MsSql<'a> {
-    async fn new() -> crate::Result<Self> {
+impl<'a> MsSql<'a> {
+    pub async fn new() -> crate::Result<MsSql<'a>> {
         let names = Generator::default();
         let conn = Quaint::new(&*CONN_STR).await?;
 
         Ok(Self { names, conn })
     }
+}
 
+#[async_trait::async_trait]
+impl<'a> TestApi for MsSql<'a> {
     fn system(&self) -> &'static str {
         "mssql"
     }

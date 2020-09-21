@@ -1,8 +1,8 @@
-use crate::tests::test_api::MySql;
+use crate::tests::test_api::*;
 use std::str::FromStr;
 
 test_type!(tinyint(
-    MySql,
+    mysql,
     "tinyint(4)",
     Value::Integer(None),
     Value::integer(i8::MIN),
@@ -10,7 +10,7 @@ test_type!(tinyint(
 ));
 
 test_type!(tinyint_unsigned(
-    MySql,
+    mysql,
     "tinyint(4) unsigned",
     Value::Integer(None),
     Value::integer(0),
@@ -18,7 +18,7 @@ test_type!(tinyint_unsigned(
 ));
 
 test_type!(year(
-    MySql,
+    mysql,
     "year",
     Value::Integer(None),
     Value::integer(1984),
@@ -26,7 +26,7 @@ test_type!(year(
 ));
 
 test_type!(smallint(
-    MySql,
+    mysql,
     "smallint",
     Value::Integer(None),
     Value::integer(i16::MIN),
@@ -34,7 +34,7 @@ test_type!(smallint(
 ));
 
 test_type!(smallint_unsigned(
-    MySql,
+    mysql,
     "smallint unsigned",
     Value::Integer(None),
     Value::integer(0),
@@ -42,7 +42,7 @@ test_type!(smallint_unsigned(
 ));
 
 test_type!(mediumint(
-    MySql,
+    mysql,
     "mediumint",
     Value::Integer(None),
     Value::integer(-8388608),
@@ -50,7 +50,7 @@ test_type!(mediumint(
 ));
 
 test_type!(mediumint_unsigned(
-    MySql,
+    mysql,
     "mediumint unsigned",
     Value::Integer(None),
     Value::integer(0),
@@ -58,7 +58,7 @@ test_type!(mediumint_unsigned(
 ));
 
 test_type!(int(
-    MySql,
+    mysql,
     "int",
     Value::Integer(None),
     Value::integer(i32::MIN),
@@ -66,7 +66,7 @@ test_type!(int(
 ));
 
 test_type!(int_unsigned(
-    MySql,
+    mysql,
     "int unsigned",
     Value::Integer(None),
     Value::integer(0),
@@ -74,7 +74,7 @@ test_type!(int_unsigned(
 ));
 
 test_type!(bigint(
-    MySql,
+    mysql,
     "bigint",
     Value::Integer(None),
     Value::integer(i64::MIN),
@@ -82,82 +82,82 @@ test_type!(bigint(
 ));
 
 test_type!(decimal(
-    MySql,
+    mysql,
     "decimal(10,2)",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::new(314, 2))
 ));
 
 test_type!(float(
-    MySql,
+    mysql,
     "float",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::from_str("1.1234").unwrap())
 ));
 
 test_type!(double(
-    MySql,
+    mysql,
     "double",
     Value::Real(None),
     Value::real(rust_decimal::Decimal::from_str("1.12345").unwrap())
 ));
 
 test_type!(bit64(
-    MySql,
+    mysql,
     "bit(64)",
     Value::Bytes(None),
     Value::bytes(vec![0, 0, 0, 0, 0, 6, 107, 58])
 ));
 
 test_type!(boolean(
-    MySql,
+    mysql,
     "tinyint(1)",
     Value::Boolean(None),
     Value::boolean(true),
     Value::boolean(false)
 ));
 
-test_type!(char(MySql, "char(255)", Value::Text(None), Value::text("foobar")));
+test_type!(char(mysql, "char(255)", Value::Text(None), Value::text("foobar")));
 
-test_type!(varchar(MySql, "varchar(255)", Value::Text(None), Value::text("foobar")));
-test_type!(tinytext(MySql, "tinytext", Value::Text(None), Value::text("foobar")));
-test_type!(text(MySql, "text", Value::Text(None), Value::text("foobar")));
-test_type!(longtext(MySql, "longtext", Value::Text(None), Value::text("foobar")));
-test_type!(binary(MySql, "binary(5)", Value::bytes(vec![1, 2, 3, 0, 0])));
-test_type!(varbinary(MySql, "varbinary(255)", Value::bytes(vec![1, 2, 3])));
+test_type!(varchar(mysql, "varchar(255)", Value::Text(None), Value::text("foobar")));
+test_type!(tinytext(mysql, "tinytext", Value::Text(None), Value::text("foobar")));
+test_type!(text(mysql, "text", Value::Text(None), Value::text("foobar")));
+test_type!(longtext(mysql, "longtext", Value::Text(None), Value::text("foobar")));
+test_type!(binary(mysql, "binary(5)", Value::bytes(vec![1, 2, 3, 0, 0])));
+test_type!(varbinary(mysql, "varbinary(255)", Value::bytes(vec![1, 2, 3])));
 
 test_type!(mediumtext(
-    MySql,
+    mysql,
     "mediumtext",
     Value::Text(None),
     Value::text("foobar")
 ));
 
 test_type!(tinyblob(
-    MySql,
+    mysql,
     "tinyblob",
     Value::Bytes(None),
     Value::bytes(vec![1, 2, 3])
 ));
 
 test_type!(mediumblob(
-    MySql,
+    mysql,
     "mediumblob",
     Value::Bytes(None),
     Value::bytes(vec![1, 2, 3])
 ));
 
 test_type!(longblob(
-    MySql,
+    mysql,
     "longblob",
     Value::Bytes(None),
     Value::bytes(vec![1, 2, 3])
 ));
 
-test_type!(blob(MySql, "blob", Value::Bytes(None), Value::bytes(vec![1, 2, 3])));
+test_type!(blob(mysql, "blob", Value::Bytes(None), Value::bytes(vec![1, 2, 3])));
 
 test_type!(enum(
-    MySql,
+    mysql,
     "enum('pollicle_dogs','jellicle_cats')",
     Value::Enum(None),
     Value::enum_variant("jellicle_cats"),
@@ -166,34 +166,34 @@ test_type!(enum(
 
 #[cfg(feature = "json-1")]
 test_type!(json(
-    MySql,
+    mysql,
     "json",
     Value::Json(None),
     Value::json(serde_json::json!({"this": "is", "a": "json", "number": 2}))
 ));
 
 #[cfg(feature = "chrono-0_4")]
-test_type!(date(MySql, "date", Value::Date(None), {
+test_type!(date(mysql, "date", Value::Date(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-04-20T00:00:00Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
 #[cfg(feature = "chrono-0_4")]
 test_type!(time(
-    MySql,
+    mysql,
     "time",
     Value::Time(None),
     Value::time(chrono::NaiveTime::from_hms(16, 20, 00))
 ));
 
 #[cfg(feature = "chrono-0_4")]
-test_type!(datetime(MySql, "datetime", Value::DateTime(None), {
+test_type!(datetime(mysql, "datetime", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
 #[cfg(feature = "chrono-0_4")]
-test_type!(timestamp(MySql, "timestamp", {
+test_type!(timestamp(mysql, "timestamp", {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));

@@ -173,7 +173,7 @@ macro_rules! test_type {
                 let mut rt = Builder::new().threaded_scheduler().enable_io().enable_time().build().unwrap();
 
                 rt.block_on(async {
-                    let mut setup = $db::new().await?;
+                    let mut setup = [< $db _test_api >]().await?;
                     let table = setup.create_type_table($sql_type).await?;
 
                     $(
