@@ -81,7 +81,6 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
 
         TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml => equality_filters(sf).collect(),
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
-        TypeIdentifier::Bytes => {}
     };
 
     fields.push(input_field(
@@ -173,5 +172,6 @@ fn scalar_filter_name(sf: &ScalarFieldRef, nested: bool) -> String {
         TypeIdentifier::DateTime => format!("{}DateTime{}{}Filter", nested, nullable, list),
         TypeIdentifier::Json => format!("{}Json{}{}Filter", nested, nullable, list),
         TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}Filter", nested, e, nullable, list),
+        TypeIdentifier::Xml => format!("{}Xml{}{}Filter", nested, nullable, list),
     }
 }

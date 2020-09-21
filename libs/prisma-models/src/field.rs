@@ -67,7 +67,14 @@ pub enum TypeIdentifier {
     UUID,
     Json,
     Xml,
-    Bytes,
+    DateTime,
+    // DateTime(DateType),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub enum DateType {
+    Date,
+    Time,
     DateTime,
 }
 
@@ -83,7 +90,6 @@ impl From<TypeIdentifier> for TypeHint {
             TypeIdentifier::UUID => TypeHint::UUID,
             TypeIdentifier::Int => TypeHint::Int,
             TypeIdentifier::Xml => TypeHint::Xml,
-            TypeIdentifier::Bytes => TypeHint::Bytes,
         }
     }
 }
@@ -191,9 +197,9 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::DateTime => Self::DateTime,
             ScalarType::Json => Self::Json,
             ScalarType::XML => Self::Xml,
-            ScalarType::Bytes => Self::Bytes,
             ScalarType::Decimal => Self::Float,
             ScalarType::Duration => todo!("No idea what this is supposed to be"),
+            ScalarType::Bytes => unimplemented!(),
         }
     }
 }

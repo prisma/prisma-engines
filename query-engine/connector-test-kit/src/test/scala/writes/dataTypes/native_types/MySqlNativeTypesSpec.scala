@@ -1,4 +1,4 @@
-package writes.dataTypes.native_tyes
+package writes.dataTypes.native_types
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorTag.MySqlConnectorTag

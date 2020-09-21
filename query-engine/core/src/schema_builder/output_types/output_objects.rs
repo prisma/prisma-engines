@@ -80,6 +80,7 @@ pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField
             TypeIdentifier::DateTime => OutputType::date_time(),
             TypeIdentifier::UUID => OutputType::uuid(),
             TypeIdentifier::Int => OutputType::int(),
+            TypeIdentifier::Xml => OutputType::xml(),
         },
     };
 

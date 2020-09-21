@@ -56,6 +56,7 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Json => "DateTime",
                     ScalarType::UUID => "UUID",
                     ScalarType::JsonList => "Json",
+                    ScalarType::XML => "XML",
                     ScalarType::Enum(_) => unreachable!(), // Handled separately above.
                 };
 
@@ -97,6 +98,7 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Json => "Json",
                     ScalarType::UUID => "UUID",
                     ScalarType::JsonList => "Json",
+                    ScalarType::XML => "XML",
                     ScalarType::Enum(_) => unreachable!(), // Handled separately above.
                 };
 

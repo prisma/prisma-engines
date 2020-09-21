@@ -59,6 +59,7 @@ fn scalar_update_field_type_mapper(ctx: &mut BuilderContext, field: &ScalarField
             TypeIdentifier::Json => operations_object_type(ctx, "Json", field, false),
             TypeIdentifier::DateTime => operations_object_type(ctx, "DateTime", field, false),
             TypeIdentifier::UUID => operations_object_type(ctx, "Uuid", field, false),
+            TypeIdentifier::Xml => operations_object_type(ctx, "Xml", field, false),
         };
 
         wrap_opt_input_object(typ)

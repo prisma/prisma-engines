@@ -404,6 +404,10 @@ impl InputType {
     pub fn uuid() -> InputType {
         InputType::Scalar(ScalarType::UUID)
     }
+
+    pub fn xml() -> InputType {
+        InputType::Scalar(ScalarType::XML)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -456,6 +460,10 @@ impl OutputType {
         OutputType::Scalar(ScalarType::UUID)
     }
 
+    pub fn xml() -> OutputType {
+        OutputType::Scalar(ScalarType::XML)
+    }
+
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
     pub fn as_object_type(&self) -> Option<ObjectTypeStrongRef> {
@@ -496,23 +504,25 @@ pub enum ScalarType {
     Json,
     JsonList,
     UUID,
+    XML,
 }
 
-impl From<&ScalarType> for TypeHint {
-    fn from(t: &ScalarType) -> Self {
-        match t {
-            ScalarType::String => TypeHint::String,
-            ScalarType::Int => TypeHint::Int,
-            ScalarType::Float => TypeHint::Float,
-            ScalarType::Boolean => TypeHint::Boolean,
-            ScalarType::Enum(_) => TypeHint::Enum,
-            ScalarType::DateTime => TypeHint::DateTime,
-            ScalarType::Json => TypeHint::Json,
-            ScalarType::JsonList => TypeHint::Json,
-            ScalarType::UUID => TypeHint::UUID,
-        }
-    }
-}
+// impl From<&ScalarType> for TypeHint {
+//     fn from(t: &ScalarType) -> Self {
+//         match t {
+//             ScalarType::String => TypeHint::String,
+//             ScalarType::Int => TypeHint::Int,
+//             ScalarType::Float => TypeHint::Float,
+//             ScalarType::Boolean => TypeHint::Boolean,
+//             ScalarType::Enum(_) => TypeHint::Enum,
+//             ScalarType::DateTime => TypeHint::DateTime,
+//             ScalarType::Json => TypeHint::Json,
+//             ScalarType::JsonList => TypeHint::Json,
+//             ScalarType::UUID => TypeHint::UUID,
+//             ScalarType::XML => TypeHint::String,
+//         }
+//     }
+// }
 
 impl From<EnumType> for OutputType {
     fn from(e: EnumType) -> Self {
