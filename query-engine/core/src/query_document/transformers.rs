@@ -55,7 +55,7 @@ impl TryInto<Option<ParsedInputMap>> for ParsedInputValue {
 
     fn try_into(self) -> QueryParserResult<Option<ParsedInputMap>> {
         match self {
-            ParsedInputValue::Single(PrismaValue::Null(_)) => Ok(None),
+            ParsedInputValue::Single(PrismaValue::Null) => Ok(None),
             ParsedInputValue::Map(val) => Ok(Some(val)),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
@@ -94,7 +94,7 @@ impl TryInto<Option<String>> for ParsedInputValue {
         match prisma_value {
             PrismaValue::String(s) => Ok(Some(s)),
             PrismaValue::Enum(s) => Ok(Some(s)),
-            PrismaValue::Null(_) => Ok(None),
+            PrismaValue::Null => Ok(None),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
@@ -148,7 +148,7 @@ impl TryInto<Option<f64>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::Float(d) => Ok(d.to_f64()),
-            PrismaValue::Null(_) => Ok(None),
+            PrismaValue::Null => Ok(None),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
@@ -168,7 +168,7 @@ impl TryInto<Option<bool>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::Boolean(b) => Ok(Some(b)),
-            PrismaValue::Null(_) => Ok(None),
+            PrismaValue::Null => Ok(None),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
@@ -188,7 +188,7 @@ impl TryInto<Option<DateTime<Utc>>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::DateTime(dt) => Ok(Some(dt)),
-            PrismaValue::Null(_) => Ok(None),
+            PrismaValue::Null => Ok(None),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(
@@ -208,7 +208,7 @@ impl TryInto<Option<i64>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::Int(i) => Ok(Some(i)),
-            PrismaValue::Null(_) => Ok(None),
+            PrismaValue::Null => Ok(None),
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(

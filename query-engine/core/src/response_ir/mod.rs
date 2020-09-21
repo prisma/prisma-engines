@@ -14,7 +14,7 @@ mod response;
 
 use crate::QueryValue;
 use indexmap::IndexMap;
-use prisma_models::{PrismaValue, TypeHint};
+use prisma_models::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{fmt, sync::Arc};
 
@@ -106,7 +106,7 @@ pub enum Item {
 
 impl Item {
     pub fn null() -> Self {
-        Self::Value(PrismaValue::Null(TypeHint::Unknown))
+        Self::Value(PrismaValue::Null)
     }
 
     pub fn list(inner: Vec<Item>) -> Self {
