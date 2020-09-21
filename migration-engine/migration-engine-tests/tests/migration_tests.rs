@@ -4,6 +4,7 @@ mod calculate_database_steps;
 mod create_migration;
 mod datamodel_calculator;
 mod datamodel_steps_inferrer;
+mod diagnose_migration_history;
 mod errors;
 mod existing_data;
 mod existing_databases;

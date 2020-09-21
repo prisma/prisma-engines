@@ -2,6 +2,7 @@ mod apply;
 mod apply_migrations;
 mod calculate_database_steps;
 mod create_migration;
+mod diagnose_migration_history;
 mod infer;
 mod infer_apply;
 mod schema_push;
@@ -11,6 +12,7 @@ pub use apply::Apply;
 pub use apply_migrations::ApplyMigrations;
 pub use calculate_database_steps::CalculateDatabaseSteps;
 pub use create_migration::CreateMigration;
+pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
 pub use schema_push::SchemaPush;
@@ -145,6 +147,11 @@ impl TestApi {
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
         CreateMigration::new(&self.api, name, prisma_schema, migrations_directory)
+    }
+
+    /// Builder and assertions to call the DiagnoseMigrationHistory command.
+    pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
+        DiagnoseMigrationHistory::new(&self.api, migrations_directory)
     }
 
     pub fn infer_apply<'a>(&'a self, schema: &'a str) -> InferApply<'a> {

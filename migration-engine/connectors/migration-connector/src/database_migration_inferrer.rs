@@ -26,4 +26,8 @@ pub trait DatabaseMigrationInferrer<T>: Send + Sync {
         previous_migrations: &[MigrationDirectory],
         target_schema: &Datamodel,
     ) -> ConnectorResult<T>;
+
+    /// Check that the current local database's schema matches its expected
+    /// state at the end of the passed in migrations history.
+    async fn detect_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<bool>;
 }
