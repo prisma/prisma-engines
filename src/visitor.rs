@@ -297,11 +297,6 @@ pub trait Visitor<'a> {
         unimplemented!("Merges not supported for the underlying database.")
     }
 
-    /// Visit an SQL `USING` statement.
-    fn visit_using(&mut self, _using: Using<'a>) -> Result {
-        unimplemented!("Merges not supported for the underlying database.")
-    }
-
     /// A walk through a complete `Query` statement
     fn visit_query(&mut self, mut query: Query<'a>) -> Result {
         query = self.compatibility_modifications(query);

@@ -3,7 +3,7 @@ use crate::prelude::Query;
 use crate::{
     ast::{
         Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Table, TableType,
-        Using, Values,
+        Values,
     },
     error::{Error, ErrorKind},
     prelude::Average,
@@ -261,7 +261,18 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         self.write("MERGE INTO ")?;
         self.visit_table(merge.table, true)?;
 
-        self.visit_using(merge.using)?;
+        self.write(" USING ")?;
+
+        let base_query = merge.using.base_query;
+        self.surround_with("(", ")", |ref mut s| s.visit_query(base_query))?;
+
+        self.write(" AS ")?;
+        self.visit_table(merge.using.as_table, false)?;
+
+        self.write(" ")?;
+        self.visit_row(Row::from(merge.using.columns))?;
+        self.write(" ON ")?;
+        self.visit_conditions(merge.using.on_conditions)?;
 
         if let Some(query) = merge.when_not_matched {
             self.write(" WHEN NOT MATCHED THEN ")?;
@@ -273,25 +284,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         }
 
         self.write(";")?;
-
-        Ok(())
-    }
-
-    fn visit_using(&mut self, using: Using<'a>) -> visitor::Result {
-        self.write(" USING ")?;
-
-        {
-            let base_query = using.base_query;
-            self.surround_with("(", ")", |ref mut s| s.visit_query(base_query))?;
-        }
-
-        self.write(" AS ")?;
-        self.visit_table(using.as_table, false)?;
-
-        self.write(" ")?;
-        self.visit_row(Row::from(using.columns))?;
-        self.write(" ON ")?;
-        self.visit_conditions(using.on_conditions)?;
 
         Ok(())
     }
