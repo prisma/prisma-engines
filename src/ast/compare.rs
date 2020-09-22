@@ -48,7 +48,7 @@ pub enum Compare<'a> {
 }
 
 impl<'a> Compare<'a> {
-    /// Fins a possible `(a,y) IN (SELECT x,z FROM B)`, takes the select out and
+    /// Finds a possible `(a,y) IN (SELECT x,z FROM B)`, takes the select out and
     /// converts the comparison into `a IN (SELECT x FROM cte_n where z = y)`.
     ///
     /// Left side means a match and the CTE should be handled, right side is a
