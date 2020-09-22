@@ -33,12 +33,13 @@ impl AllDirectives {
 fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
     let mut validator = DirectiveListValidator::<dml::Field>::new();
 
-    validator.add(Box::new(map::MapDirectiveValidatorForField {}));
+    // this order of field attributes is used in the formatter as well
     validator.add(Box::new(id::IdDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::FieldLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(default::DefaultDirectiveValidator {}));
-    validator.add(Box::new(relation::RelationDirectiveValidator {}));
     validator.add(Box::new(updated_at::UpdatedAtDirectiveValidator {}));
+    validator.add(Box::new(map::MapDirectiveValidatorForField {}));
+    validator.add(Box::new(relation::RelationDirectiveValidator {}));
 
     validator
 }
@@ -46,10 +47,11 @@ fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
 fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
     let mut validator = DirectiveListValidator::<dml::Model>::new();
 
-    validator.add(Box::new(map::MapDirectiveValidator {}));
+    // this order of block attributes is used in the formatter as well
+    validator.add(Box::new(id::ModelLevelIdDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelIndexDirectiveValidator {}));
-    validator.add(Box::new(id::ModelLevelIdDirectiveValidator {}));
+    validator.add(Box::new(map::MapDirectiveValidator {}));
 
     validator
 }

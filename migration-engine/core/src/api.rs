@@ -43,6 +43,7 @@ where
 // liking them in the exported class.
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
+    async fn version(&self, input: &serde_json::Value) -> CoreResult<String>;
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput>;
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
     async fn calculate_database_steps(
@@ -82,6 +83,12 @@ where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
+    async fn version(&self, input: &serde_json::Value) -> CoreResult<String> {
+        self.handle_command::<VersionCommand>(input)
+            .instrument(tracing::info_span!("Version"))
+            .await
+    }
+
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput> {
         self.handle_command::<ApplyMigrationCommand<'_>>(input)
             .instrument(tracing::info_span!(
@@ -114,7 +121,10 @@ where
 
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
         self.handle_command::<CreateMigrationCommand>(input)
-            .instrument(tracing::info_span!("CalculateDatamodel"))
+            .instrument(tracing::info_span!(
+                "CreateMigration",
+                migration_name = input.migration_name.as_str()
+            ))
             .await
     }
 

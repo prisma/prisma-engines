@@ -1,3 +1,5 @@
+use sql_schema_describer::Index;
+
 use super::{ColumnDiffer, SqlSchemaDiffer};
 use crate::sql_migration::AlterEnum;
 use std::collections::HashSet;
@@ -16,6 +18,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Return whether a column's type needs to be migrated.
     fn column_type_changed(&self, differ: &ColumnDiffer<'_>) -> bool {
         differ.previous.column_type_family() != differ.next.column_type_family()
+    }
+
+    /// Return whether an index should be renamed by the migration.
+    fn index_should_be_renamed(&self, previous: &Index, next: &Index) -> bool {
+        previous.name != next.name
     }
 
     /// Whether `AddForeignKey` steps should be generated for created tables.

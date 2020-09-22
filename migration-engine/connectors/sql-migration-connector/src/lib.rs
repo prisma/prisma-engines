@@ -11,6 +11,7 @@ mod flavour;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
 mod sql_destructive_change_checker;
+mod sql_imperative_migration_persistence;
 mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
@@ -88,6 +89,13 @@ impl MigrationConnector for SqlMigrationConnector {
         self.database_info.connection_info().sql_family().as_str()
     }
 
+    fn version(&self) -> String {
+        self.database_info
+            .database_version
+            .clone()
+            .unwrap_or("Database version information not available.".into())
+    }
+
     async fn create_database(database_str: &str) -> ConnectorResult<String> {
         Self::create_database(database_str).await
     }
@@ -126,6 +134,10 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<SqlMigration> {
         serde_json::from_value(json).ok()
+    }
+
+    fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence {
+        self
     }
 }
 

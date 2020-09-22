@@ -1,5 +1,6 @@
 use crate::{
-    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, PrimaryKey, SqlSchema, Table,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, Index, PrimaryKey, SqlSchema,
+    Table,
 };
 
 pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWalker<'a>> + 'a {
@@ -113,7 +114,15 @@ impl<'a> TableWalker<'a> {
         })
     }
 
-    pub fn foreign_keys<'b>(&'b self) -> impl Iterator<Item = ForeignKeyWalker<'b, 'a>> + 'b {
+    pub fn indexes<'b>(&'b self) -> impl Iterator<Item = IndexWalker<'a>> + 'b {
+        self.table.indices.iter().map(move |index| IndexWalker {
+            index,
+            schema: self.schema,
+            table: self.table,
+        })
+    }
+
+    pub fn foreign_keys(self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
         self.table.foreign_keys.iter().map(move |foreign_key| ForeignKeyWalker {
             foreign_key,
             table: self,
@@ -133,23 +142,23 @@ impl<'a> TableWalker<'a> {
     }
 }
 
-pub struct ForeignKeyWalker<'a, 'schema> {
-    table: &'a TableWalker<'schema>,
+pub struct ForeignKeyWalker<'schema> {
+    table: TableWalker<'schema>,
     foreign_key: &'schema ForeignKey,
 }
 
-impl<'a, 'schema> ForeignKeyWalker<'a, 'schema> {
-    pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
+impl<'a, 'schema> ForeignKeyWalker<'schema> {
+    pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'b {
         self.table()
             .columns()
             .filter(move |column| self.foreign_key.columns.contains(&column.column.name))
     }
 
-    pub fn constraint_name(&self) -> Option<&'a str> {
+    pub fn constraint_name(&self) -> Option<&'schema str> {
         self.foreign_key.constraint_name.as_deref()
     }
 
-    pub fn inner(&self) -> &'a ForeignKey {
+    pub fn inner(&self) -> &'schema ForeignKey {
         self.foreign_key
     }
 
@@ -157,7 +166,7 @@ impl<'a, 'schema> ForeignKeyWalker<'a, 'schema> {
         self.foreign_key.referenced_columns.len()
     }
 
-    pub fn referenced_table(&self) -> TableWalker<'a> {
+    pub fn referenced_table(&self) -> TableWalker<'schema> {
         TableWalker {
             schema: self.table.schema,
             table: self
@@ -168,8 +177,34 @@ impl<'a, 'schema> ForeignKeyWalker<'a, 'schema> {
         }
     }
 
-    pub fn table(&self) -> &'a TableWalker<'schema> {
-        self.table
+    pub fn table(&self) -> &TableWalker<'schema> {
+        &self.table
+    }
+}
+
+pub struct IndexWalker<'a> {
+    schema: &'a SqlSchema,
+    table: &'a Table,
+    index: &'a Index,
+}
+
+impl<'a> IndexWalker<'a> {
+    pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
+        self.index
+            .columns
+            .iter()
+            .map(move |column_name| {
+                self.table
+                    .columns
+                    .iter()
+                    .find(|column| &column.name == column_name)
+                    .expect("Failed to find column referenced in index")
+            })
+            .map(move |column| ColumnWalker {
+                schema: self.schema,
+                column,
+                table: self.table,
+            })
     }
 }
 

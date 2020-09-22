@@ -61,12 +61,15 @@ fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
     et.into()
 }
 
-/// Wraps an input object type into a list object type, if needed.
-fn wrap_list_input_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> InputType {
+/// Convenience function to return [object_type, list_object_type]
+/// (shorthand + full type) if the field is a list.
+fn list_union_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
+    let object_type = InputType::object(input);
+
     if as_list {
-        InputType::list(InputType::object(input))
+        vec![object_type.clone(), InputType::list(object_type)]
     } else {
-        InputType::object(input)
+        vec![object_type]
     }
 }
 
