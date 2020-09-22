@@ -39,6 +39,7 @@ object ConnectorConfig {
         ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_13_Host:$postgres_13_Port/db?schema=$$DB&connection_limit=1", false, "postgres13")
       case "pgbouncer" =>
         ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_11_Host:$postgres_11_Port/db?schema=$$DB&connection_limit=1", true, "pgbouncer")
+      case "yugabyte" => ConnectorConfig("postgresql", s"postgres://yugabyte:yugabyte@$yugabytedb_Host:$yugabytedb_Port/db?schema=$$DB&connection_limit=1", false, "yugabytedb")
       case "mysql"   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_7_Host:3306/$$DB?connection_limit=1", false, "mysql")
       case "mysql8"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1", false, "mysql8")
       case "mysql56"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", false, "mysql56")
@@ -120,6 +121,22 @@ object ConnectorConfig {
       5432
     } else {
       5435
+    }
+  }
+
+  lazy val yugabytedb_Host = {
+    if (EnvVars.isBuildkite) {
+      "test-db-yugabytedb"
+    } else {
+      "127.0.0.1"
+    }
+  }
+
+  lazy val yugabytedb_Port = {
+    if (EnvVars.isBuildkite) {
+      5437
+    } else {
+      5437
     }
   }
 

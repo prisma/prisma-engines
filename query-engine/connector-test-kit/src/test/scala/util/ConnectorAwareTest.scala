@@ -50,6 +50,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
     case "mongo"                                                 => ConnectorTag.MongoConnectorTag
     case "mysql" | "mysql-native"                                => ConnectorTag.MySqlConnectorTag
     case "postgres" | "postgres-native" | "postgresql"           => ConnectorTag.PostgresConnectorTag
+    case "yugabyte"                                              => ConnectorTag.PostgresConnectorTag
     case "sqlite" | "sqlite-native" | "native-integration-tests" => ConnectorTag.SQLiteConnectorTag
   }
 
