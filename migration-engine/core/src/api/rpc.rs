@@ -182,7 +182,7 @@ impl RpcApi {
                 let input: UnapplyMigrationInput = params.clone().parse()?;
                 render(executor.unapply_migration(&input).await?)
             }
-            RpcCommand::Reset => render(executor.reset(&serde_json::Value::Null).await?),
+            RpcCommand::Reset => render(executor.reset(&()).await?),
             RpcCommand::SchemaPush => {
                 let input: SchemaPushInput = params.clone().parse()?;
                 render(executor.schema_push(&input).await?)

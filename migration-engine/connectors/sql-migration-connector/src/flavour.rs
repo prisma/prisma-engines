@@ -15,7 +15,7 @@ use crate::{
     SqlError, SqlResult,
 };
 use futures::future::TryFutureExt;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
 use once_cell::sync::Lazy;
 use quaint::{
     connector::{ConnectionInfo, MysqlUrl, PostgresUrl, Queryable},
@@ -82,6 +82,11 @@ pub(crate) trait SqlFlavour:
         schema_name: &'a str,
         conn: Arc<dyn Queryable + Send + Sync>,
     ) -> SqlResult<SqlSchema>;
+
+    /// Drop the database the connector is connected to and recreate it empty.
+    /// This should not be used for other databases, temporary databases for
+    /// example.
+    async fn reset(&self, conn: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()>;
 
     /// Apply the given migration history to a temporary database, and return
     /// the final introspected SQL schema.
@@ -198,6 +203,36 @@ impl SqlFlavour for MysqlFlavour {
             db_name
         );
         catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+
+        Ok(())
+    }
+
+    async fn reset(&self, connection: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
+        let db_name = connection_info.dbname().unwrap();
+
+        catch(
+            connection_info,
+            connection
+                .raw_cmd(&format!("DROP DATABASE `{}`", db_name))
+                .map_err(SqlError::from),
+        )
+        .await?;
+
+        catch(
+            connection_info,
+            connection
+                .raw_cmd(&format!("CREATE DATABASE `{}`", db_name))
+                .map_err(SqlError::from),
+        )
+        .await?;
+
+        catch(
+            connection_info,
+            connection
+                .raw_cmd(&format!("USE `{}`", db_name))
+                .map_err(SqlError::from),
+        )
+        .await?;
 
         Ok(())
     }
@@ -350,6 +385,37 @@ impl SqlFlavour for SqliteFlavour {
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
         use std::fs::File;
         File::create(&self.file_path).expect("Failed to truncate SQLite database");
+        Ok(())
+    }
+
+    async fn reset(&self, conn: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
+        let file_path = connection_info.file_path().unwrap();
+
+        std::fs::remove_file(file_path).map_err(|err| {
+            ConnectorError::from_kind(ErrorKind::Generic(anyhow::anyhow!(
+                "Failed to delete SQLite database at `{}`. {}",
+                file_path,
+                err
+            )))
+        })?;
+
+        catch(
+            connection_info,
+            conn.execute_raw("DETACH ?", &[connection_info.schema_name().into()])
+                .map_err(SqlError::from),
+        )
+        .await?;
+
+        catch(
+            connection_info,
+            conn.execute_raw(
+                "ATTACH DATABASE ? AS ?",
+                &[file_path.into(), connection_info.schema_name().into()],
+            )
+            .map_err(SqlError::from),
+        )
+        .await?;
+
         Ok(())
     }
 
@@ -555,6 +621,26 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    async fn reset(&self, connection: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
+        catch(
+            connection_info,
+            connection
+                .raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", connection_info.schema_name()))
+                .map_err(SqlError::from),
+        )
+        .await?;
+
+        catch(
+            connection_info,
+            connection
+                .raw_cmd(&format!("CREATE SCHEMA \"{}\"", connection_info.schema_name()))
+                .map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(())
+    }
+
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Postgres
     }
@@ -645,8 +731,6 @@ fn strip_schema_param_from_url(url: &mut Url) {
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
 async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Quaint, DatabaseInfo)> {
-    use migration_connector::ErrorKind;
-
     let candidate_default_databases = &["postgres", "template1"];
 
     let mut conn = None;
