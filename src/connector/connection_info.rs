@@ -116,7 +116,7 @@ impl ConnectionInfo {
             #[cfg(feature = "mysql")]
             ConnectionInfo::Mysql(url) => url.dbname(),
             #[cfg(feature = "mssql")]
-            ConnectionInfo::Mssql(url) => url.dbname(),
+            ConnectionInfo::Mssql(url) => url.schema(),
             #[cfg(feature = "sqlite")]
             ConnectionInfo::Sqlite { db_name, .. } => db_name,
         }

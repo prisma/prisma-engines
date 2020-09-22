@@ -29,6 +29,7 @@ pub(crate) struct MssqlQueryParams {
     user: Option<String>,
     password: Option<String>,
     database: String,
+    schema: String,
     trust_server_certificate: bool,
     connection_limit: Option<usize>,
     socket_timeout: Option<Duration>,
@@ -57,6 +58,10 @@ impl MssqlUrl {
 
     pub fn dbname(&self) -> &str {
         self.query_params.database()
+    }
+
+    pub fn schema(&self) -> &str {
+        self.query_params.schema()
     }
 
     pub fn host(&self) -> &str {
@@ -95,6 +100,10 @@ impl MssqlQueryParams {
 
     fn database(&self) -> &str {
         &self.database
+    }
+
+    fn schema(&self) -> &str {
+        &self.schema
     }
 
     fn trust_server_certificate(&self) -> bool {
@@ -286,6 +295,7 @@ impl MssqlUrl {
                 let user = params.remove("user");
                 let password = params.remove("password");
                 let database = params.remove("database").unwrap_or_else(|| String::from("master"));
+                let schema = params.remove("schema").unwrap_or_else(|| String::from("dbo"));
                 let connection_limit = params.remove("connectionlimit").and_then(|param| param.parse().ok());
 
                 let connect_timeout = params
@@ -317,6 +327,7 @@ impl MssqlUrl {
                     user,
                     password,
                     database,
+                    schema,
                     trust_server_certificate,
                     connection_limit,
                     socket_timeout,

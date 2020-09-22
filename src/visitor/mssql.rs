@@ -1,10 +1,7 @@
 use super::Visitor;
 use crate::prelude::Query;
 use crate::{
-    ast::{
-        Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Table, TableType,
-        Values,
-    },
+    ast::{Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Values},
     error::{Error, ErrorKind},
     prelude::Average,
     visitor, Value,
@@ -360,25 +357,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         Ok(())
     }
 
-    /// A database table identifier
-    fn visit_table(&mut self, table: Table<'a>, include_alias: bool) -> visitor::Result {
-        match table.typ {
-            TableType::Table(table_name) => self.delimited_identifiers(&[&*table_name])?,
-            TableType::Values(values) => self.visit_values(values)?,
-            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
-        };
-
-        if include_alias {
-            if let Some(alias) = table.alias {
-                self.write(" AS ")?;
-
-                self.delimited_identifiers(&[&*alias])?;
-            };
-        }
-
-        Ok(())
-    }
-
     fn visit_average(&mut self, avg: Average<'a>) -> visitor::Result {
         self.write("AVG")?;
 
@@ -554,7 +532,7 @@ mod tests {
 
     #[test]
     fn test_select_fields_from() {
-        let expected_sql = "SELECT [paw], [nose] FROM [musti]";
+        let expected_sql = "SELECT [paw], [nose] FROM [cat].[musti]";
         let query = Select::from_table(("cat", "musti")).column("paw").column("nose");
         let (sql, params) = Mssql::build(query).unwrap();
 
