@@ -29,7 +29,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             parameters: Vec::with_capacity(128),
         };
 
-        Sqlite::visit_query(&mut sqlite, query.into(), true)?;
+        Sqlite::visit_query(&mut sqlite, query.into())?;
 
         Ok((sqlite.query, sqlite.parameters))
     }

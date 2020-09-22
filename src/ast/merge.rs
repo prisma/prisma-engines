@@ -2,8 +2,12 @@ use super::*;
 use crate::error::*;
 use std::convert::TryFrom;
 
+/// A builder for SQL `MERGE` queries.
+///
+/// Not complete and not meant for external use in this state. Made for
+/// compatibility purposes.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct Merge<'a> {
+pub struct Merge<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) using: Using<'a>,
     pub(crate) when_not_matched: Option<Query<'a>>,
@@ -11,7 +15,7 @@ pub(crate) struct Merge<'a> {
 }
 
 impl<'a> Merge<'a> {
-    pub fn new<T, U>(table: T, using: U) -> Self
+    pub(crate) fn new<T, U>(table: T, using: U) -> Self
     where
         T: Into<Table<'a>>,
         U: Into<Using<'a>>,
@@ -24,7 +28,7 @@ impl<'a> Merge<'a> {
         }
     }
 
-    pub fn when_not_matched<Q>(mut self, query: Q) -> Self
+    pub(crate) fn when_not_matched<Q>(mut self, query: Q) -> Self
     where
         Q: Into<Query<'a>>,
     {
@@ -32,7 +36,7 @@ impl<'a> Merge<'a> {
         self
     }
 
-    pub fn returning<K, I>(mut self, columns: I) -> Self
+    pub(crate) fn returning<K, I>(mut self, columns: I) -> Self
     where
         K: Into<Column<'a>>,
         I: IntoIterator<Item = K>,
@@ -42,8 +46,14 @@ impl<'a> Merge<'a> {
     }
 }
 
+impl<'a> From<Merge<'a>> for Query<'a> {
+    fn from(merge: Merge<'a>) -> Self {
+        Self::Merge(Box::new(merge))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct Using<'a> {
+pub struct Using<'a> {
     pub(crate) base_query: Query<'a>,
     pub(crate) columns: Vec<Column<'a>>,
     pub(crate) as_table: Table<'a>,
@@ -51,7 +61,7 @@ pub(crate) struct Using<'a> {
 }
 
 impl<'a> Using<'a> {
-    pub fn on<T>(mut self, conditions: T) -> Self
+    pub(crate) fn on<T>(mut self, conditions: T) -> Self
     where
         T: Into<ConditionTree<'a>>,
     {

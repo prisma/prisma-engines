@@ -45,7 +45,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             parameters: Vec::with_capacity(128),
         };
 
-        Mysql::visit_query(&mut mysql, query.into(), true)?;
+        Mysql::visit_query(&mut mysql, query.into())?;
 
         Ok((mysql.query, mysql.parameters))
     }

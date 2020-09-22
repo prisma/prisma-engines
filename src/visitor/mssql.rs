@@ -1,8 +1,9 @@
 use super::Visitor;
+use crate::prelude::Query;
 use crate::{
     ast::{
-        Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Select, Table,
-        TableType, Using, Values,
+        Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Table, TableType,
+        Using, Values,
     },
     error::{Error, ErrorKind},
     prelude::Average,
@@ -17,45 +18,6 @@ pub struct Mssql<'a> {
 }
 
 impl<'a> Mssql<'a> {
-    fn visit_merge(&mut self, merge: Merge<'a>) -> visitor::Result {
-        self.write("MERGE INTO ")?;
-        self.visit_table(merge.table, true)?;
-
-        self.visit_using(merge.using)?;
-
-        if let Some(query) = merge.when_not_matched {
-            self.write(" WHEN NOT MATCHED THEN ")?;
-            self.visit_query(query, true)?;
-        }
-
-        if let Some(columns) = merge.returning {
-            self.visit_returning(columns)?;
-        }
-
-        self.write(";")?;
-
-        Ok(())
-    }
-
-    fn visit_using(&mut self, using: Using<'a>) -> visitor::Result {
-        self.write(" USING ")?;
-
-        {
-            let base_query = using.base_query;
-            self.surround_with("(", ")", |ref mut s| s.visit_query(base_query, true))?;
-        }
-
-        self.write(" AS ")?;
-        self.visit_table(using.as_table, false)?;
-
-        self.write(" ")?;
-        self.visit_row(Row::from(using.columns))?;
-        self.write(" ON ")?;
-        self.visit_conditions(using.on_conditions)?;
-
-        Ok(())
-    }
-
     fn visit_returning(&mut self, columns: Vec<Column<'a>>) -> visitor::Result {
         let cols: Vec<_> = columns.into_iter().map(|c| c.table("Inserted")).collect();
 
@@ -89,7 +51,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             order_by_set: false,
         };
 
-        Mssql::visit_query(&mut this, query.into(), true)?;
+        Mssql::visit_query(&mut this, query.into())?;
 
         Ok((this.query, this.parameters))
     }
@@ -103,9 +65,20 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         self.parameters.push(value)
     }
 
-    /// Database-specific modifications to the Select AST.
-    fn modify_select(select: Select<'a>) -> Select<'a> {
-        select.convert_tuple_select_to_cte(&mut 0)
+    /// A point to modify an incoming query to make it compatible with the
+    /// SQL Server.
+    fn compatibility_modifications(&self, query: Query<'a>) -> Query<'a> {
+        match query {
+            // Finding possible `(a, b) (NOT) IN (SELECT x, y ...)` comparisons,
+            // and replacing them with common table expressions.
+            Query::Select(select) => select.convert_tuple_select_to_cte(&mut 0).into(),
+            // Replacing the `ON CONFLICT DO NOTHING` clause with a `MERGE` statement.
+            Query::Insert(insert) => match insert.on_conflict {
+                Some(OnConflict::DoNothing) => Merge::try_from(*insert).unwrap().into(),
+                _ => (*insert).into(),
+            },
+            _ => query,
+        }
     }
 
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
@@ -230,64 +203,95 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn visit_insert(&mut self, insert: Insert<'a>) -> visitor::Result {
-        match insert.on_conflict {
-            Some(OnConflict::DoNothing) => {
-                let merge = Merge::try_from(insert).unwrap();
-                self.visit_merge(merge)?;
-            }
-            _ => {
-                self.write("INSERT")?;
+        self.write("INSERT")?;
 
-                if let Some(table) = insert.table {
-                    self.write(" INTO ")?;
-                    self.visit_table(table, true)?;
-                }
-
-                match insert.values {
-                    Expression {
-                        kind: ExpressionKind::Row(row),
-                        ..
-                    } => {
-                        if row.values.is_empty() {
-                            self.write(" DEFAULT VALUES")?;
-                        } else {
-                            self.write(" ")?;
-                            self.visit_row(Row::from(insert.columns))?;
-
-                            if let Some(returning) = insert.returning {
-                                self.visit_returning(returning)?;
-                            }
-
-                            self.write(" VALUES ")?;
-                            self.visit_row(row)?;
-                        }
-                    }
-                    Expression {
-                        kind: ExpressionKind::Values(values),
-                        ..
-                    } => {
-                        self.write(" ")?;
-                        self.visit_row(Row::from(insert.columns))?;
-
-                        if let Some(returning) = insert.returning {
-                            self.visit_returning(returning)?;
-                        }
-
-                        self.write(" VALUES ")?;
-
-                        let values_len = values.len();
-                        for (i, row) in values.into_iter().enumerate() {
-                            self.visit_row(row)?;
-
-                            if i < (values_len - 1) {
-                                self.write(",")?;
-                            }
-                        }
-                    }
-                    expr => self.surround_with("(", ")", |ref mut s| s.visit_expression(expr))?,
-                }
-            }
+        if let Some(table) = insert.table {
+            self.write(" INTO ")?;
+            self.visit_table(table, true)?;
         }
+
+        match insert.values {
+            Expression {
+                kind: ExpressionKind::Row(row),
+                ..
+            } => {
+                if row.values.is_empty() {
+                    self.write(" DEFAULT VALUES")?;
+                } else {
+                    self.write(" ")?;
+                    self.visit_row(Row::from(insert.columns))?;
+
+                    if let Some(returning) = insert.returning {
+                        self.visit_returning(returning)?;
+                    }
+
+                    self.write(" VALUES ")?;
+                    self.visit_row(row)?;
+                }
+            }
+            Expression {
+                kind: ExpressionKind::Values(values),
+                ..
+            } => {
+                self.write(" ")?;
+                self.visit_row(Row::from(insert.columns))?;
+
+                if let Some(returning) = insert.returning {
+                    self.visit_returning(returning)?;
+                }
+
+                self.write(" VALUES ")?;
+
+                let values_len = values.len();
+                for (i, row) in values.into_iter().enumerate() {
+                    self.visit_row(row)?;
+
+                    if i < (values_len - 1) {
+                        self.write(",")?;
+                    }
+                }
+            }
+            expr => self.surround_with("(", ")", |ref mut s| s.visit_expression(expr))?,
+        }
+
+        Ok(())
+    }
+
+    fn visit_merge(&mut self, merge: Merge<'a>) -> visitor::Result {
+        self.write("MERGE INTO ")?;
+        self.visit_table(merge.table, true)?;
+
+        self.visit_using(merge.using)?;
+
+        if let Some(query) = merge.when_not_matched {
+            self.write(" WHEN NOT MATCHED THEN ")?;
+            self.visit_query(query)?;
+        }
+
+        if let Some(columns) = merge.returning {
+            self.visit_returning(columns)?;
+        }
+
+        self.write(";")?;
+
+        Ok(())
+    }
+
+    fn visit_using(&mut self, using: Using<'a>) -> visitor::Result {
+        self.write(" USING ")?;
+
+        {
+            let base_query = using.base_query;
+            self.surround_with("(", ")", |ref mut s| s.visit_query(base_query))?;
+        }
+
+        self.write(" AS ")?;
+        self.visit_table(using.as_table, false)?;
+
+        self.write(" ")?;
+        self.visit_row(Row::from(using.columns))?;
+        self.write(" ON ")?;
+        self.visit_conditions(using.on_conditions)?;
 
         Ok(())
     }
@@ -369,7 +373,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         match table.typ {
             TableType::Table(table_name) => self.delimited_identifiers(&[&*table_name])?,
             TableType::Values(values) => self.visit_values(values)?,
-            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select, false))?,
+            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
         };
 
         if include_alias {

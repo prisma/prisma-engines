@@ -27,7 +27,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             parameters: Vec::with_capacity(128),
         };
 
-        Postgres::visit_query(&mut postgres, query.into(), true)?;
+        Postgres::visit_query(&mut postgres, query.into())?;
 
         Ok((postgres.query, postgres.parameters))
     }

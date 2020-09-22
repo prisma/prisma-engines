@@ -1,4 +1,4 @@
-use crate::ast::{Delete, Insert, Select, Union, Update};
+use crate::ast::{Delete, Insert, Merge, Select, Union, Update};
 use std::borrow::Cow;
 
 use super::IntoCommonTableExpression;
@@ -6,12 +6,12 @@ use super::IntoCommonTableExpression;
 /// A database query
 #[derive(Debug, Clone, PartialEq)]
 pub enum Query<'a> {
-    /// Query for fetching data. E.g. the `SELECT` query.
     Select(Box<Select<'a>>),
     Insert(Box<Insert<'a>>),
     Update(Box<Update<'a>>),
     Delete(Box<Delete<'a>>),
     Union(Box<Union<'a>>),
+    Merge(Box<Merge<'a>>),
     Raw(Cow<'a, str>),
 }
 

@@ -60,6 +60,12 @@ pub trait Visitor<'a> {
     /// Write to the query.
     fn write<D: fmt::Display>(&mut self, s: D) -> Result;
 
+    /// A point to modify an incoming query to make it compatible with the
+    /// underlying database.
+    fn compatibility_modifications(&self, query: Query<'a>) -> Query<'a> {
+        query
+    }
+
     fn surround_with<F>(&mut self, begin: &str, end: &str, f: F) -> Result
     where
         F: FnOnce(&mut Self) -> Result,
@@ -126,17 +132,8 @@ pub trait Visitor<'a> {
         self.visit_conditions(data.conditions)
     }
 
-    /// Database-specific modifications to the Select AST.
-    fn modify_select(select: Select<'a>) -> Select<'a> {
-        select
-    }
-
     /// A walk through a `SELECT` statement
-    fn visit_select(&mut self, mut select: Select<'a>, top_level: bool) -> Result {
-        if top_level {
-            select = Self::modify_select(select);
-        }
-
+    fn visit_select(&mut self, select: Select<'a>) -> Result {
         let number_of_ctes = select.ctes.len();
 
         if number_of_ctes > 0 {
@@ -295,25 +292,45 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
+    /// Visit an SQL `MERGE` query.
+    fn visit_merge(&mut self, _merge: Merge<'a>) -> Result {
+        unimplemented!("Merges not supported for the underlying database.")
+    }
+
+    /// Visit an SQL `USING` statement.
+    fn visit_using(&mut self, _using: Using<'a>) -> Result {
+        unimplemented!("Merges not supported for the underlying database.")
+    }
+
     /// A walk through a complete `Query` statement
-    fn visit_query(&mut self, query: Query<'a>, top_level: bool) -> Result {
+    fn visit_query(&mut self, mut query: Query<'a>) -> Result {
+        query = self.compatibility_modifications(query);
+
         match query {
-            Query::Select(select) => self.visit_select(*select, top_level),
+            Query::Select(select) => self.visit_select(*select),
             Query::Insert(insert) => self.visit_insert(*insert),
             Query::Update(update) => self.visit_update(*update),
             Query::Delete(delete) => self.visit_delete(*delete),
-            Query::Union(union) => self.visit_union(*union, top_level),
+            Query::Union(union) => self.visit_union(*union),
+            Query::Merge(merge) => self.visit_merge(*merge),
             Query::Raw(string) => self.write(string),
         }
     }
 
+    fn visit_selection(&mut self, query: SelectQuery<'a>) -> Result {
+        match query {
+            SelectQuery::Select(select) => self.visit_select(*select),
+            SelectQuery::Union(union) => self.visit_union(*union),
+        }
+    }
+
     /// A walk through a union of `SELECT` statements
-    fn visit_union(&mut self, mut ua: Union<'a>, top_level: bool) -> Result {
+    fn visit_union(&mut self, mut ua: Union<'a>) -> Result {
         let len = ua.selects.len();
         let mut types = ua.types.drain(0..);
 
         for (i, sel) in ua.selects.into_iter().enumerate() {
-            self.visit_select(sel, top_level)?;
+            self.visit_select(sel)?;
 
             if i < (len - 1) {
                 let typ = types.next().unwrap();
@@ -383,7 +400,7 @@ pub trait Visitor<'a> {
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
             ExpressionKind::Selection(selection) => {
-                self.surround_with("(", ")", |ref mut s| s.visit_query(Query::from(selection), false))?
+                self.surround_with("(", ")", |ref mut s| s.visit_selection(selection))?
             }
             ExpressionKind::Function(function) => self.visit_function(function)?,
             ExpressionKind::Op(op) => self.visit_operation(*op)?,
@@ -434,7 +451,7 @@ pub trait Visitor<'a> {
                 None => self.delimited_identifiers(&[&*table_name])?,
             },
             TableType::Values(values) => self.visit_values(values)?,
-            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select, false))?,
+            TableType::Query(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(select))?,
         };
 
         if include_alias {
@@ -936,6 +953,6 @@ pub trait Visitor<'a> {
         self.write(" AS ")?;
 
         let selection = cte.selection;
-        self.surround_with("(", ")", |ref mut s| s.visit_query(Query::from(selection), false))
+        self.surround_with("(", ")", |ref mut s| s.visit_selection(selection))
     }
 }
