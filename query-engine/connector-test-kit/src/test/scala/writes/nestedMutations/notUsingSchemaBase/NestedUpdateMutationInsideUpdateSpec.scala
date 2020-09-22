@@ -712,7 +712,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 2012, // 3040,
+      errorCode = 2009, // 3040,
       errorContains =
         "`Mutation.updateNote.data.NoteUpdateInput.todos.TodoUpdateManyWithoutNotesInput.update.TodoUpdateWithWhereUniqueWithoutNotesInput.where.TodoWhereUniqueInput.unique`: A value is required but not set."
     )
