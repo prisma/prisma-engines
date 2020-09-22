@@ -407,7 +407,7 @@ pub enum InputType {
 impl PartialEq for InputType {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (InputType::Scalar(_), InputType::Scalar(_)) => true,
+            (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
             (InputType::Enum(_), InputType::Enum(_)) => true,
             (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
             (InputType::Object(obj), InputType::Object(oobj)) => obj.into_arc().name == oobj.into_arc().name,
