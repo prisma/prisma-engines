@@ -176,8 +176,7 @@ async fn plan_migration_with_past_unapplied_migrations_with_destructive_changes_
     Ok(())
 }
 
-// TODO: reenable MySQL when https://github.com/prisma/quaint/issues/187 is fixed.
-#[test_each_connector(ignore("mysql"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn plan_migration_returns_warnings_for_the_local_database_for_the_next_migration(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -227,8 +226,7 @@ async fn plan_migration_returns_warnings_for_the_local_database_for_the_next_mig
     Ok(())
 }
 
-// TODO: reenable MySQL when https://github.com/prisma/quaint/issues/187 is fixed.
-#[test_each_connector(capabilities("enums"), ignore("mysql"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(capabilities("enums"), log = "debug,sql_schema_describer=info")]
 async fn plan_migration_maps_warnings_to_the_right_steps(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
