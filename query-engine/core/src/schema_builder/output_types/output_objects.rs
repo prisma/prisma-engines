@@ -34,7 +34,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
 
 /// Computes model output type fields.
 /// Important: This requires that the cache has already been initialized.
-fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<Field> {
+fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
     model
         .fields()
         .all
@@ -50,13 +50,14 @@ pub(crate) fn map_model_object_type(ctx: &mut BuilderContext, model: &ModelRef) 
         .expect("Invariant violation: Initialized output object type for each model.")
 }
 
-pub(crate) fn map_field(ctx: &mut BuilderContext, model_field: &ModelField) -> Field {
+pub(crate) fn map_field(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputField {
     field(
         model_field.name(),
         arguments::many_records_field_arguments(ctx, &model_field),
         map_output_type(ctx, &model_field),
         None,
     )
+    .optional_if(!model_field.is_required())
 }
 
 pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputType {
@@ -85,8 +86,6 @@ pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField
 
     if model_field.is_scalar() && model_field.is_list() {
         OutputType::list(output_type)
-    } else if !model_field.is_required() {
-        OutputType::opt(output_type)
     } else {
         output_type
     }
@@ -142,7 +141,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
     ObjectTypeStrongRef::downgrade(&object)
 }
 
-pub(crate) fn count_field() -> Field {
+pub(crate) fn count_field() -> OutputField {
     field("count", vec![], OutputType::int(), None)
 }
 
@@ -153,13 +152,13 @@ pub(crate) fn numeric_aggregation_field(
     name: &str,
     model: &ModelRef,
     fixed_field_type: Option<OutputType>,
-) -> Option<Field> {
+) -> Option<OutputField> {
     let numeric_fields = collect_numeric_fields(model);
 
     if numeric_fields.is_empty() {
         None
     } else {
-        let object_type = wrap_opt_object(map_numeric_field_aggregation_object(
+        let object_type = OutputType::object(map_numeric_field_aggregation_object(
             ctx,
             model,
             name,
@@ -167,7 +166,7 @@ pub(crate) fn numeric_aggregation_field(
             fixed_field_type,
         ));
 
-        Some(field(name, vec![], object_type, None))
+        Some(field(name, vec![], object_type, None).optional())
     }
 }
 
@@ -183,7 +182,7 @@ pub(crate) fn map_numeric_field_aggregation_object(
     let name = format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix));
     return_cached_output!(ctx, &name);
 
-    let fields: Vec<Field> = fields
+    let fields: Vec<OutputField> = fields
         .into_iter()
         .map(|sf| {
             field(
@@ -194,6 +193,7 @@ pub(crate) fn map_numeric_field_aggregation_object(
                     .unwrap_or(map_output_type(ctx, &ModelField::Scalar(sf.clone()))),
                 None,
             )
+            .optional_if(!sf.is_required)
         })
         .collect();
 
@@ -214,8 +214,4 @@ fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
             _ => false,
         })
         .collect()
-}
-
-fn wrap_opt_object(o: ObjectTypeWeakRef) -> OutputType {
-    OutputType::opt(OutputType::object(o))
 }

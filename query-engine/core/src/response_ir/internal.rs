@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    CoreError, EnumType, QueryResult, RecordAggregation, RecordSelection,
+    CoreError, EnumType, OutputFieldRef, QueryResult, RecordAggregation, RecordSelection,
 };
 use connector::AggregationResult;
 use indexmap::IndexMap;
@@ -35,12 +35,11 @@ type UncheckedItemsWithParents = IndexMap<Option<RecordProjection>, Vec<Item>>;
 /// Returns a map of pairs of (parent ID, response)
 pub fn serialize_internal(
     result: QueryResult,
-    typ: &OutputTypeRef,
+    field: &OutputFieldRef,
     is_list: bool,
-    is_optional: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
-        QueryResult::RecordSelection(rs) => serialize_record_selection(rs, typ, is_list, is_optional),
+        QueryResult::RecordSelection(rs) => serialize_record_selection(rs, field, &field.field_type, is_list),
         QueryResult::RecordAggregation(ra) => serialize_aggregation(ra),
 
         QueryResult::Count(c) => {
@@ -116,17 +115,17 @@ fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result
 
 fn serialize_record_selection(
     record_selection: RecordSelection,
-    typ: &OutputTypeRef,
+    field: &OutputFieldRef,
+    typ: &OutputTypeRef, // We additionally pass the type to allow recursing into nested type definitions of a field.
     is_list: bool,
-    is_optional: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
     let name = record_selection.name.clone();
 
     match typ.borrow() {
-        OutputType::List(inner) => serialize_record_selection(record_selection, inner, true, false),
-        OutputType::Opt(inner) => serialize_record_selection(record_selection, inner, is_list, true),
+        OutputType::List(inner) => serialize_record_selection(record_selection, field, inner, true),
         OutputType::Object(obj) => {
             let result = serialize_objects(record_selection, obj.into_arc())?;
+            let is_optional = !field.is_required;
 
             // Items will be ref'ed on the top level to allow cheap clones in nested scenarios.
             match (is_list, is_optional) {
@@ -240,7 +239,7 @@ fn serialize_objects(
             let field = typ.find_field(scalar_field_name).unwrap();
 
             if !field.field_type.is_object() {
-                object.insert(scalar_field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
+                object.insert(scalar_field_name.to_owned(), serialize_scalar(&field, val)?);
             }
         }
 
@@ -290,13 +289,7 @@ fn write_nested_items(
                 let field = enclosing_type.find_field(field_name).unwrap();
                 let default = match field.field_type.borrow() {
                     OutputType::List(_) => Item::list(Vec::new()),
-                    OutputType::Opt(inner) => {
-                        if inner.is_list() {
-                            Item::list(Vec::new())
-                        } else {
-                            Item::Value(PrismaValue::Null(TypeHint::Unknown))
-                        }
-                    }
+                    _ if !field.is_required => Item::Value(PrismaValue::Null(TypeHint::Unknown)),
                     _ => panic!(
                         "Application logic invariant error: received null value for field {} which may not be null",
                         &field_name
@@ -325,7 +318,7 @@ fn process_nested_results(
         if let QueryResult::RecordSelection(ref rs) = nested_result {
             let name = rs.name.clone();
             let field = enclosing_type.find_field(&name).unwrap();
-            let result = serialize_internal(nested_result, &field.field_type, false, false)?;
+            let result = serialize_internal(nested_result, &field, false)?;
 
             nested_mapping.insert(name, result);
         }
@@ -334,10 +327,9 @@ fn process_nested_results(
     Ok(nested_mapping)
 }
 
-fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> crate::Result<Item> {
-    match (&value, typ.as_ref()) {
-        (PrismaValue::Null(_), OutputType::Opt(_)) => Ok(Item::Value(PrismaValue::Null(TypeHint::Unknown))),
-        (_, OutputType::Opt(inner)) => serialize_scalar(value, inner),
+fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
+    match (&value, field.field_type.as_ref()) {
+        (PrismaValue::Null(_), _) if !field.is_required => Ok(Item::Value(PrismaValue::Null(TypeHint::Unknown))),
         (_, OutputType::Enum(et)) => match et.borrow() {
             EnumType::Internal(ref i) => convert_enum(value, i),
             _ => unreachable!(),

@@ -205,6 +205,53 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     todoCount should be(1)
   }
 
+  "an item" should "be updated using shorthands if it already exists (by id)" in {
+    val todoId = server
+      .query(
+        """mutation {
+          |  createOneTodo(
+          |    data: {
+          |      title: "new title1"
+          |      alias: "todo1"
+          |    }
+          |  ) {
+          |    id
+          |  }
+          |}
+        """.stripMargin,
+        project,
+        legacy = false,
+      )
+      .pathAsString("data.createOneTodo.id")
+
+    todoCount should be(1)
+
+    val result = server.query(
+      s"""mutation {
+         |  upsertOneTodo(
+         |    where: {id: "$todoId"}
+         |    create: {
+         |      title: "irrelevant"
+         |      alias: "irrelevant"
+         |    }
+         |    update: {
+         |      title: "updated title"
+         |    }
+         |  ){
+         |    id
+         |    title
+         |  }
+         |}
+      """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    result.pathAsString("data.upsertOneTodo.title") should be("updated title")
+
+    todoCount should be(1)
+  }
+
   "an item" should "be updated if it already exists (by any unique argument)" in {
     val todoAlias = server
       .query(

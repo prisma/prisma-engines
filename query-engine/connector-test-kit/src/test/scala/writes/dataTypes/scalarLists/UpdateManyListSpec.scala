@@ -98,6 +98,19 @@ class UpdateManyListSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
+  "The updateMany Mutation" should "allow updates using shorthands" in {
+    test { project =>
+      server
+        .query("""mutation a { updateManyMyObjects(data:{strings: ["Alpha","Beta"] }){count}}""", project)
+        .pathAsLong("data.updateManyMyObjects.count") should be(1)
+      server.query("""{myObjects{strings}}""", project).toString should be("""{"data":{"myObjects":[{"strings":["Alpha","Beta"]}]}}""")
+      server.query("""mutation a {updateManyMyObjects(data:{strings: { set: [] }}){count}}""", project).pathAsLong("data.updateManyMyObjects.count") should be(
+        1)
+      server.query("""{myObjects{strings}}""", project).toString should be("""{"data":{"myObjects":[{"strings":[]}]}}""")
+
+    }
+  }
+
   def test(fn: Project => Unit) = {
     testDataModels.testV11 { project =>
       server.query("""mutation{createMyObject(data:{name: "Test"}){name}}""", project)

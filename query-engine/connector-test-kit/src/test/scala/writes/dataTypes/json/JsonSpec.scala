@@ -10,6 +10,7 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
       """|model Model {
          | id    String @id
          | field Json
+         | list  Json[]
          |}"""
     }
 

@@ -8,32 +8,32 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   val project: Project = ProjectDsl.fromString { """
-                                                   |model User {
-                                                   |  id         String   @id @default(cuid())
-                                                   |  unique     Int      @unique
-                                                   |  name       String?
-                                                   |  optional   String?
-                                                   |  vehicle_id String?
-                                                   |
-                                                   |  ride Vehicle? @relation(fields: [vehicle_id], references: [id])
-                                                   |}
-                                                   |
-                                                   |model Vehicle {
-                                                   |  id     String  @id @default(cuid())
-                                                   |  unique Int     @unique
-                                                   |  brand  String?
-                                                   |  parked Boolean?
-                                                   |
-                                                   |  owner  User
-                                                   |}
-                                                   |
-                                                   |model ParkingLot {
-                                                   |  id       String @id @default(cuid())
-                                                   |  unique   Int    @unique
-                                                   |  area     String?
-                                                   |  size     Float?
-                                                   |  capacity Int?
-                                                   |}""".stripMargin }
+     |model User {
+     |  id         String   @id @default(cuid())
+     |  unique     Int      @unique
+     |  name       String?
+     |  optional   String?
+     |  vehicle_id String?
+     |
+     |  ride Vehicle? @relation(fields: [vehicle_id], references: [id])
+     |}
+     |
+     |model Vehicle {
+     |  id     String  @id @default(cuid())
+     |  unique Int     @unique
+     |  brand  String?
+     |  parked Boolean?
+     |
+     |  owner  User
+     |}
+     |
+     |model ParkingLot {
+     |  id       String @id @default(cuid())
+     |  unique   Int    @unique
+     |  area     String?
+     |  size     Float?
+     |  capacity Int?
+     |}""".stripMargin }
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -50,12 +50,34 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Simple filter" should "work" in {
-    val filter = """(where: {name: { equals: "John" }})"""
+    val filter = """(where: { name: { equals: "John" }})"""
 
     userUniques(filter) should be(Vector(4))
   }
 
-  // todo Null and lists is weird
+  "Inverted simple filter" should "work" in {
+    val filter = """(where: { name: { not: { equals: "John" }}})"""
+
+    userUniques(filter) should be(Vector(1, 2, 3))
+  }
+
+  "Inverted simple filter" should "work with an implicit not equals" in {
+    val filter = """(where: { name: { not: "John" }})"""
+
+    userUniques(filter) should be(Vector(1, 2, 3))
+  }
+
+  "Simple filter" should "work with an implicit equals" in {
+    val filter = """(where: { name: "John" })"""
+
+    userUniques(filter) should be(Vector(4))
+  }
+
+  "Simple filter" should "work with an implicit equals null for a nullable field" in {
+    val filter = """(where: { name: null })"""
+
+    userUniques(filter) should be(Vector())
+  }
 
   "Using in with null" should "return all nodes with null for that field" in {
     val filter = """(where: {optional: { in: null }})"""
@@ -69,6 +91,24 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     userUniques(filter) should be(Vector(1, 2, 3, 4))
   }
 
+  "Using in" should "return all nodes with the given values for that field" in {
+    val filter = """(where: { name: { in: ["Bernd", "Paul"] }})"""
+
+    userUniques(filter) should be(Vector(1, 2))
+  }
+
+  "Using notIn" should "return all nodes not with the given values for that field" in {
+    val filter = """(where: { name: { notIn: ["Bernd", "Paul"] }})"""
+
+    userUniques(filter) should be(Vector(3, 4))
+  }
+
+  "Using notIn with null" should "return all nodes with not null values for that field" in {
+    val filter = """(where: { name: { notIn: null }})"""
+
+    userUniques(filter) should be(Vector(1, 2, 3, 4))
+  }
+
   "Relation Null filter" should "work" in {
     val filter = "(where: { ride: { is: null }})"
 
@@ -76,7 +116,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "AND filter" should "work" in {
-    val filter = """(where: {AND:[{unique: { gt: 2 }},{name: { startsWith: "P" }}]})"""
+    val filter = """(where: {AND:[{unique: { gt: 2 }},{ name: { startsWith: "P" }}]})"""
 
     userUniques(filter) should be(Vector())
   }
@@ -88,7 +128,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "OR filter" should "work" taggedAs (IgnoreMongo) in {
-    val filter = """(where: {OR:[{unique: { gt: 2 }},{name: { startsWith: "P" }}]})"""
+    val filter = """(where: {OR:[{unique: { gt: 2 }},{ name: { startsWith: "P" }}]})"""
 
     userUniques(filter) should be(Vector(1, 3, 4))
   }
@@ -106,7 +146,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "NOT filter" should "work" taggedAs (IgnoreMongo) in {
-    val filter = """(where: {NOT:{name: { startsWith: "P" }}})"""
+    val filter = """(where: { NOT:{ name: { startsWith: "P" }}})"""
 
     userUniques(filter) should be(Vector(2, 3, 4))
   }
@@ -118,19 +158,19 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Nested filter" should "work" in {
-    val filter = """(where: {ride:{ is: { brand: { startsWith: "P" }}}})"""
+    val filter = """(where: {ride: { is: { brand: { startsWith: "P" }}}})"""
 
     userUniques(filter) should be(Vector(1))
   }
 
   "Starts with filter" should "work" in {
-    val filter = """(where: {name: { startsWith: "P"}})"""
+    val filter = """(where: { name: { startsWith: "P"}})"""
 
     userUniques(filter) should be(Vector(1))
   }
 
   "Contains filter" should "work" in {
-    val filter = """(where: {name: { contains: "n" }})"""
+    val filter = """(where: { name: { contains: "n" }})"""
 
     userUniques(filter) should be(Vector(2, 4))
   }
@@ -139,6 +179,23 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     val filter = """(where: {size: { gt: 100.500000000001 }})"""
 
     lotUniques(filter) should be(Vector(1))
+  }
+
+  "Inverted filters with null" should "work for optional fields" in {
+    val filter = """(where: { name: { not: null }})"""
+
+    userUniques(filter) should be(Vector(1, 2, 3, 4))
+  }
+
+  "Inverted filters with null" should "not work for required fields" in {
+    val filter = """(where: { unique: { not: null }})"""
+
+    server.queryThatMustFail(
+      s"{ users $filter{ unique } }",
+      project,
+      errorCode = 2009,
+      errorContains = "`Query.users.where.UserWhereInput.unique.IntFilter.not`: A value is required but not set."
+    )
   }
 
   def userUniques(filter: String)    = server.query(s"{ users $filter{ unique } }", project).pathAsSeq("data.users").map(_.pathAsLong("unique")).toVector

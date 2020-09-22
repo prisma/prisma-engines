@@ -3,7 +3,7 @@ use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
+    ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
 use connector::{Filter, IdFilter};
 use prisma_models::ModelRef;
@@ -13,10 +13,6 @@ use std::{convert::TryInto, sync::Arc};
 pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     // "where"
     let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
-
-    where_arg.assert_size(1)?;
-    where_arg.assert_non_null()?;
-
     let filter = extract_unique_filter(where_arg, &model)?;
 
     // "data"

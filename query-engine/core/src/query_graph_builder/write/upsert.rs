@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
+    ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
 use connector::IdFilter;
 use prisma_models::ModelRef;
@@ -10,9 +10,6 @@ use std::{convert::TryInto, sync::Arc};
 
 pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
-
-    where_arg.assert_size(1)?;
-    where_arg.assert_non_null()?;
 
     let filter = extract_unique_filter(where_arg, &model)?;
     let model_id = model.primary_identifier();

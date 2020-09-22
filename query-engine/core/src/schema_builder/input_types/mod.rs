@@ -16,7 +16,7 @@ pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -
     return_cached_input!(ctx, &name);
 
     let mut input_object = init_input_object_type(name.clone());
-    input_object.set_one_of(true);
+    input_object.allow_at_most_one_field();
 
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(name, input_object.clone());
@@ -25,24 +25,14 @@ pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -
         .fields()
         .scalar()
         .iter()
-        .map(|sf| {
-            input_field(
-                sf.name.clone(),
-                InputType::opt(InputType::Enum(enum_type.clone())),
-                None,
-            )
-        })
+        .map(|sf| input_field(sf.name.clone(), InputType::Enum(enum_type.clone()), None).optional())
         .collect();
 
     input_object.set_fields(fields);
     Arc::downgrade(&input_object)
 }
 
-fn map_optional_input_type(field: &ScalarFieldRef) -> InputType {
-    InputType::opt(map_required_input_type(field))
-}
-
-fn map_required_input_type(field: &ScalarFieldRef) -> InputType {
+fn map_scalar_input_type(field: &ScalarFieldRef) -> InputType {
     let typ = match field.type_identifier {
         TypeIdentifier::String => InputType::string(),
         TypeIdentifier::Int => InputType::int(),
@@ -54,10 +44,10 @@ fn map_required_input_type(field: &ScalarFieldRef) -> InputType {
         TypeIdentifier::Enum(_) => map_enum_input_type(&field),
     };
 
-    match (field.is_list, field.is_required) {
-        (true, _) => InputType::list(typ),
-        (false, true) => typ,
-        (false, false) => InputType::null(typ),
+    if field.is_list {
+        InputType::list(typ)
+    } else {
+        typ
     }
 }
 
@@ -71,12 +61,15 @@ fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
     et.into()
 }
 
-/// Wraps an input object type into an option list object type.
-fn wrap_list_input_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> InputType {
+/// Convenience function to return [object_type, list_object_type]
+/// (shorthand + full type) if the field is a list.
+fn list_union_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
+    let object_type = InputType::object(input);
+
     if as_list {
-        InputType::opt(InputType::list(InputType::object(input)))
+        vec![object_type.clone(), InputType::list(object_type)]
     } else {
-        InputType::opt(InputType::object(input))
+        vec![object_type]
     }
 }
 
@@ -85,8 +78,4 @@ fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) 
         let field_names: Vec<String> = from_fields.iter().map(|field| capitalize(&field.name)).collect();
         field_names.join("")
     })
-}
-
-fn wrap_opt_input_object(o: InputObjectTypeWeakRef) -> InputType {
-    InputType::opt(InputType::object(o))
 }

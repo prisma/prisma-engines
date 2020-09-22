@@ -153,8 +153,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
       """.stripMargin,
       project,
       errorCode = 2009,
-      errorContains =
-        "Failed to validate the query `Error occurred during query validation & transformation:\\nMutation (object)\\n  ↳ updateTodo (field)\\n    ↳ data (argument)\\n      ↳ TodoUpdateInput (object)\\n        ↳ id (field)\\n          ↳ Field does not exist on enclosing type.` at `.Mutation.updateTodo.data.TodoUpdateInput.id"
+      errorContains = "`Field does not exist on enclosing type.` at `Mutation.updateTodo.data.TodoUpdateInput.id`"
     )
   }
 
@@ -193,8 +192,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
       """.stripMargin,
       project,
       errorCode = 2009,
-      errorContains =
-        "Failed to validate the query `Error occurred during query validation & transformation:\\nMutation (object)\\n  ↳ updateTodo (field)\\n    ↳ data (argument)\\n      ↳ TodoUpdateInput (object)\\n        ↳ counter (field)\\n          ↳ Field does not exist on enclosing type.` at `.Mutation.updateTodo.data.TodoUpdateInput.counter"
+      errorContains = "`Field does not exist on enclosing type.` at `Mutation.updateTodo.data.TodoUpdateInput.counter`"
     )
   }
 

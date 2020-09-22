@@ -58,6 +58,43 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
       """[{"optStr":"str1new","optInt":1,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]""")
   }
 
+  "An updateMany mutation" should "update the records matching the where clause using shorthands" in {
+    createTestModel("str1")
+    createTestModel("str2")
+
+    var result = server.query(
+      """mutation {
+        |  updateManyTestModel(
+        |    where: { optStr: "str1" }
+        |    data: { optStr: "str1new", optInt: null, optFloat: { multiply: 2 } }
+        |  ) {
+        |    count
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    result.pathAsLong("data.updateManyTestModel.count") should equal(1)
+
+    result = server.query(
+      """{
+        |  findManyTestModel(orderBy: { id: asc }) {
+        |    optStr
+        |    optInt
+        |    optFloat
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    result.pathAsJsValue("data.findManyTestModel").toString should be(
+      """[{"optStr":"str1new","optInt":null,"optFloat":null},{"optStr":"str2","optInt":null,"optFloat":null}]""")
+  }
+
   "An updateMany mutation" should "update all items if the where clause is empty" in {
     createTestModel("str1")
     createTestModel("str2", Some(2))

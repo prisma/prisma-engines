@@ -7,9 +7,9 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::Filter, QueryMode, ScalarCompare};
+use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare};
 use filter_grouping::*;
-use prisma_models::{Field, ModelRef, PrismaValue, ScalarFieldRef};
+use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
 use std::{convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
@@ -55,7 +55,7 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
-            // 2 possibilities: Either a filter group (and, or, not) with a vector, or a field name with a filter object behind.
+            // 2 possibilities: Either a filter group (and, or, not) with a vector/object, or a field name with a filter object behind.
             if let Ok(nested) = FilterGrouping::from_str(&key) {
                 let value: QueryGraphBuilderResult<Vec<Filter>> = match value {
                     ParsedInputValue::List(values) => values
@@ -76,22 +76,11 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                 })
             } else {
                 let field = model.fields().find_from_all(&key)?;
-                let mut filter_map: ParsedInputMap = value.try_into()?;
 
-                let mode = match filter_map.remove("mode") {
-                    Some(i) => parse_query_mode(i)?,
-                    None => QueryMode::Default,
-                };
-
-                let mut filters = filter_map
-                    .into_iter()
-                    .map(|(k, v)| match field {
-                        Field::Relation(rf) => relation::parse(&k, rf, v),
-                        Field::Scalar(sf) => scalar::parse(&k, sf, v, false),
-                    })
-                    .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
-
-                filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
+                let filters = match field {
+                    Field::Relation(rf) => extract_relation_filters(rf, value),
+                    Field::Scalar(sf) => extract_scalar_filters(sf, value),
+                }?;
 
                 Ok(Filter::And(filters))
             }
@@ -99,6 +88,62 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
     Ok(Filter::and(filters))
+}
+
+/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
+/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
+fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
+    match value {
+        ParsedInputValue::Single(pv) => Ok(vec![field.equals(pv)]),
+        ParsedInputValue::Map(mut filter_map) => {
+            let mode = match filter_map.remove("mode") {
+                Some(i) => parse_query_mode(i)?,
+                None => QueryMode::Default,
+            };
+
+            let mut filters = filter_map
+                .into_iter()
+                .map(|(k, v)| scalar::parse(&k, field, v, false))
+                .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+            filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
+
+            Ok(filters)
+        }
+        x => Err(QueryGraphBuilderError::InputError(format!(
+            "Invalid scalar filter input: {:?}",
+            x
+        ))),
+    }
+}
+
+/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
+/// `value` can be either a filter object (for shorthand filter notation) or an object (full filter syntax).
+fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
+    match value {
+        // Implicit is null filter (`where: { <field>: null }`)
+        ParsedInputValue::Single(PrismaValue::Null(_)) => Ok(vec![field.one_relation_is_null()]),
+
+        // Either implicit `is`, or complex filter.
+        ParsedInputValue::Map(filter_map) => {
+            // Two options: An intermediate object with `is`, `every`, etc., or directly the object to filter with implicit `is`.
+            // There are corner cases where it is unclear what object should be used, due to overlap of fields of the related model and the filter object.
+            // The parse heuristic is to first try to parse the map as the full filter object and if that fails, parse it as implicit `is` filter instead.
+            filter_map
+                .clone()
+                .into_iter()
+                .map(|(k, v)| relation::parse(&k, field, v))
+                .collect::<QueryGraphBuilderResult<Vec<_>>>()
+                .or_else(|_| {
+                    extract_filter(filter_map, &field.related_model()).map(|filter| vec![field.to_one_related(filter)])
+                })
+        }
+
+        x => Err(QueryGraphBuilderError::InputError(format!(
+            "Invalid relation filter input: {:?}",
+            x
+        ))),
+    }
 }
 
 fn parse_query_mode(input: ParsedInputValue) -> QueryGraphBuilderResult<QueryMode> {

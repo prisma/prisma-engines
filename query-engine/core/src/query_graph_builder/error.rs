@@ -67,16 +67,6 @@ impl From<&RelationFieldRef> for RelationViolation {
     }
 }
 
-// impl fmt::Display for QueryValidationError {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(
-//             f,
-//             "Error occurred during query validation & transformation:\n{}",
-//             self.format(0)
-//         )
-//     }
-// }
-
 impl From<DomainError> for QueryGraphBuilderError {
     fn from(err: DomainError) -> Self {
         QueryGraphBuilderError::DomainError(err)
