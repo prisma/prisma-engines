@@ -62,7 +62,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>>;
     async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput>;
     async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
-    async fn reset(&self, input: &serde_json::Value) -> CoreResult<serde_json::Value>;
+    async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
@@ -182,7 +182,7 @@ where
             .await
     }
 
-    async fn reset(&self, input: &serde_json::Value) -> CoreResult<serde_json::Value> {
+    async fn reset(&self, input: &()) -> CoreResult<()> {
         self.handle_command::<ResetCommand>(input)
             .instrument(tracing::info_span!("Reset"))
             .await

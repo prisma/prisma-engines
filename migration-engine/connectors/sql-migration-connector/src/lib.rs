@@ -107,7 +107,9 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        Ok(())
+        self.flavour
+            .reset(self.conn(), self.database_info.connection_info())
+            .await
     }
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
