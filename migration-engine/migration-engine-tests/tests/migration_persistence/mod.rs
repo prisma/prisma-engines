@@ -1,3 +1,5 @@
+mod imperative_migration_persistence_tests;
+
 use migration_connector::{steps::CreateEnum, *};
 use migration_engine_tests::*;
 use pretty_assertions::assert_eq;

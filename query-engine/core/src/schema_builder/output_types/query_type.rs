@@ -21,14 +21,14 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 }
 
 /// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.
-fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field> {
+fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::where_unique_argument(ctx, model).map(|arg| {
         let field_name = ctx.pluralize_internal(camel_case(&model.name), format!("findOne{}", model.name));
 
         field(
             field_name,
             vec![arg],
-            OutputType::opt(OutputType::object(output_objects::map_model_object_type(ctx, &model))),
+            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 model.clone(),
                 QueryTag::FindOne,
@@ -43,11 +43,12 @@ fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field
                 }),
             ))),
         )
+        .optional()
     })
 }
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
-fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
+fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model);
     let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
 
@@ -70,7 +71,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
 }
 
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
-fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
+fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model);
     let field_name = ctx.pluralize_internal(
         format!("aggregate{}", model.name), // Has no legacy counterpart.

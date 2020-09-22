@@ -119,7 +119,7 @@ fn serialize_decimal<S>(decimal: &Decimal, serializer: S) -> Result<S::Ok, S::Er
 where
     S: Serializer,
 {
-    decimal.to_f64().expect("Decimal is not a f64.").serialize(serializer)
+    decimal.to_string().parse::<f64>().unwrap().serialize(serializer)
 }
 
 impl PrismaValue {

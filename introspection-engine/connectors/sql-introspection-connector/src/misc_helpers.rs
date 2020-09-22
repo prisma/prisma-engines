@@ -338,7 +338,7 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
         ColumnTypeFamily::Json => ScalarType::Json,
         ColumnTypeFamily::Decimal => ScalarType::Decimal,
         ColumnTypeFamily::Binary => ScalarType::Bytes,
-        x => ScalarType::Int,
+        _x => ScalarType::Int,
     };
 
     //fixme move this out of function

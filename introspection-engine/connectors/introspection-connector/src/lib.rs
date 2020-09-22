@@ -21,6 +21,8 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
         existing_data_model: &Datamodel,
         natives_types: bool,
     ) -> ConnectorResult<IntrospectionResult>;
+
+    async fn get_database_version(&self) -> ConnectorResult<String>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]

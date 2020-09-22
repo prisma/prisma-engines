@@ -1,7 +1,7 @@
 use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
-    flavour::{PostgresFlavour, SqlFlavour},
+    flavour::PostgresFlavour,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
         AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
@@ -81,15 +81,12 @@ impl SqlRenderer for PostgresFlavour {
             for column in affected_columns {
                 let sql = format!(
                     "ALTER TABLE {schema_name}.{table_name} \
-                            ALTER COLUMN {column_name} DROP DEFAULT,
                             ALTER COLUMN {column_name} TYPE {tmp_name} \
-                                USING ({column_name}::text::{tmp_name}),
-                            ALTER COLUMN {column_name} SET DEFAULT {new_enum_default}",
+                                USING ({column_name}::text::{tmp_name})",
                     schema_name = Quoted::postgres_ident(self.schema_name()),
                     table_name = Quoted::postgres_ident(column.table().name()),
                     column_name = Quoted::postgres_ident(column.name()),
                     tmp_name = Quoted::postgres_ident(&tmp_name),
-                    new_enum_default = Quoted::postgres_string(new_enum.values.first().unwrap()),
                 );
 
                 stmts.push(sql);
@@ -281,7 +278,22 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        render_create_index(self, &create_index.table, &create_index.index, self.sql_family())
+        let Index { name, columns, tpe } = &create_index.index;
+        let index_type = match tpe {
+            IndexType::Unique => "UNIQUE ",
+            IndexType::Normal => "",
+        };
+        let index_name = self.quote(&name).to_string();
+        let table_reference = self.quote_with_schema(&create_index.table).to_string();
+        let columns = columns.iter().map(|c| self.quote(c));
+
+        format!(
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+            index_type = index_type,
+            index_name = index_name,
+            table_reference = table_reference,
+            columns = columns.join(", ")
+        )
     }
 
     fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {

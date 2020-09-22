@@ -47,6 +47,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables,
         })
     }
+
+    async fn version(&self, schema: &str) -> crate::SqlSchemaDescriberResult<Option<String>> {
+        debug!("getting db version '{}'", schema);
+        Ok(self.conn.version().await.unwrap())
+    }
 }
 
 impl SqlSchemaDescriber {
@@ -638,9 +643,10 @@ fn get_column_type<'a>(
     println!("{:?}", character_maximum_length);
 
     let (family, native_type) = match full_data_type {
-        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), PostgresType::Enum),
+        //Fixme handle Enums as a proper type
+        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), PostgresType::Integer),
         x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => {
-            (Enum(trim(x).to_owned()), PostgresType::Enum)
+            (Enum(trim(x).to_owned()), PostgresType::Integer)
         }
         "int2" | "_int2" => (Int, PostgresType::Integer),
         "int4" | "_int4" => (Int, PostgresType::Integer),

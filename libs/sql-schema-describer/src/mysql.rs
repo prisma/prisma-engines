@@ -72,6 +72,11 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             sequences: vec![],
         })
     }
+
+    async fn version(&self, schema: &str) -> crate::SqlSchemaDescriberResult<Option<String>> {
+        debug!("getting db version '{}'", schema);
+        Ok(self.conn.version().await.unwrap())
+    }
 }
 
 impl SqlSchemaDescriber {
@@ -594,9 +599,10 @@ fn get_column_type_and_enum(
         ("tinytext", _) => (ColumnTypeFamily::String, MySqlType::TinyText),
         ("mediumtext", _) => (ColumnTypeFamily::String, MySqlType::MediumText),
         ("longtext", _) => (ColumnTypeFamily::String, MySqlType::LongText),
+        //Fixme handle Enum
         ("enum", _) => (
             ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)),
-            MySqlType::Enum,
+            MySqlType::Int,
         ),
         ("json", _) => (ColumnTypeFamily::Json, MySqlType::JSON),
         ("bit", fdt) => (ColumnTypeFamily::Binary, MySqlType::Bit(extract_single_length_arg(fdt))),

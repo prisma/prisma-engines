@@ -5,19 +5,6 @@ pub(crate) enum UnexecutableStepCheck {
     AddedRequiredFieldToTable { table: String, column: String },
     MadeOptionalFieldRequired { table: String, column: String },
     MadeScalarFieldIntoArrayField { table: String, column: String },
-    // TODO:
-    // AddedUnimplementableUniqueConstraint {
-    //     table: String,
-    //     constrained_columns: Vec<String>,
-    // },
-    // DeletedUsedEnumValue {
-    //     r#enum: String,
-    //     value: String,
-    //     uses_count: Option<u64>,
-    // },
-    // PrimaryKeyChanged {
-    //     table: String,
-    // },
 }
 
 impl Check for UnexecutableStepCheck {

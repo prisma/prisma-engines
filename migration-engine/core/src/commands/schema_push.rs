@@ -3,12 +3,12 @@ use crate::parse_datamodel;
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
-pub struct SchemaPushCommand<'a> {
-    pub input: &'a SchemaPushInput,
-}
+/// Command to bring the local database in sync with the prisma schema, without
+/// interacting with the migrations directory nor the migrations table.
+pub struct SchemaPushCommand;
 
 #[async_trait::async_trait]
-impl<'a> MigrationCommand for SchemaPushCommand<'a> {
+impl<'a> MigrationCommand for SchemaPushCommand {
     type Input = SchemaPushInput;
     type Output = SchemaPushOutput;
 
@@ -58,6 +58,7 @@ impl<'a> MigrationCommand for SchemaPushCommand<'a> {
     }
 }
 
+/// Input to the `schemaPush` command.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SchemaPushInput {
@@ -67,15 +68,20 @@ pub struct SchemaPushInput {
     pub force: bool,
 }
 
+/// Output of the `schemaPush` command.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SchemaPushOutput {
+    /// How many migration steps were executed.
     pub executed_steps: u32,
+    /// Destructive change warnings.
     pub warnings: Vec<String>,
+    /// Steps that cannot be executed in the current state of the database.
     pub unexecutable: Vec<String>,
 }
 
 impl SchemaPushOutput {
+    /// Returns whether the local database schema is in sync with the prisma schema.
     pub fn had_no_changes_to_push(&self) -> bool {
         self.warnings.is_empty() && self.unexecutable.is_empty() && self.executed_steps == 0
     }

@@ -36,7 +36,7 @@ pub enum MySqlType {
     Timestamp(u32),
     Year,
     JSON,
-    Enum,
+    // Enum,
     Set,
     NotHandled,
 }

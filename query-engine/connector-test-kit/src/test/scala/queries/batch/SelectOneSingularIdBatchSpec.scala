@@ -75,7 +75,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums","ArtistId":1}}},{"errors":[{"error":"Error in query graph construction: QueryParserError(ObjectValidationError { object_name: \"Query\", inner: FieldValidationError { field_name: \"wtf\", inner: FieldNotFoundError } })","user_facing_error":{"is_panic":false,"message":"Failed to validate the query `Error occurred during query validation & transformation:\nQuery (object)\n  ↳ wtf (field)\n    ↳ Field does not exist on enclosing type.` at `.Query.wtf`","meta":{"query_validation_error":"Error occurred during query validation & transformation:\nQuery (object)\n  ↳ wtf (field)\n    ↳ Field does not exist on enclosing type.","query_position":".Query.wtf"},"error_code":"P2009"}}]},{"data":{"findOneArtist":{"ArtistId":2,"Name":"ArtistWithOneAlbumWithoutTracks"}}}]"""
+      """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums","ArtistId":1}}},{"errors":[{"error":"Error in query graph construction: QueryParserError(QueryParserError { path: QueryPath { segments: [\"Query\", \"wtf\"] }, error_kind: FieldNotFoundError })","user_facing_error":{"is_panic":false,"message":"Failed to validate the query: `Field does not exist on enclosing type.` at `Query.wtf`","meta":{"query_validation_error":"Field does not exist on enclosing type.","query_position":"Query.wtf"},"error_code":"P2009"}}]},{"data":{"findOneArtist":{"ArtistId":2,"Name":"ArtistWithOneAlbumWithoutTracks"}}}]"""
     )
   }
 

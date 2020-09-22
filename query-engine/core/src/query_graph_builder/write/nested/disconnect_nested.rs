@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    FilteredQuery, InputAssertions, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
+    FilteredQuery, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
 use connector::{Filter, IdFilter};
 use itertools::Itertools;
@@ -27,10 +27,6 @@ pub fn nested_disconnect(
             .into_iter()
             .map(|value: ParsedInputValue| {
                 let value: ParsedInputMap = value.try_into()?;
-
-                value.assert_size(1)?;
-                value.assert_non_null()?;
-
                 extract_unique_filter(value, &child_model)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
@@ -58,10 +54,6 @@ pub fn nested_disconnect(
                     .into_iter()
                     .map(|value: ParsedInputValue| {
                         let value: ParsedInputMap = value.try_into()?;
-
-                        value.assert_size(1)?;
-                        value.assert_non_null()?;
-
                         extract_unique_filter(value, &child_model)
                     })
                     .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?

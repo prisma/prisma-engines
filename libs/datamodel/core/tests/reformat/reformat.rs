@@ -75,6 +75,106 @@ model Post {
 }
 
 #[test]
+fn format_should_enforce_order_of_field_directives() {
+    let input = r#"model Post {
+  id        Int      @default(autoincrement()) @id
+  published Boolean  @map("_published") @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  megaField DateTime @map("mega_field") @id @default("_megaField") @unique @updatedAt
+}
+"#;
+    let expected = r#"model Post {
+  id        Int     @id @default(autoincrement())
+  published Boolean @default(false) @map("_published")
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  megaField DateTime @id @unique @default("_megaField") @updatedAt @map("mega_field")
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn format_should_enforce_order_of_block_directives() {
+    let input = r#"model Person {
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+  @@map("blog")
+  @@index([yearOfBirth])
+  @@unique([codeName, yearOfBirth])
+  @@id([firstName, lastName])
+}
+"#;
+    let expected = r#"model Person {
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+
+  @@id([firstName, lastName])
+  @@unique([codeName, yearOfBirth])
+  @@index([yearOfBirth])
+  @@map("blog")
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+#[ignore]
+fn format_should_put_block_directives_to_end_of_block_with_comments() {
+    let input = r#"model Blog {
+  @@id([id1, id2]) /// id comment
+  id1 Int
+  id2 Int
+  @@map("blog") /// blog comment
+}
+"#;
+    let expected = r#"model Blog {
+  id1 Int
+  id2 Int
+
+  @@map("blog") /// blog comment
+  @@id([id1, id2]) /// id comment
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn format_should_put_block_directives_to_end_of_block_without_comments() {
+    let input = r#"model Blog {
+  @@map("blog")
+  id1 Int
+  id2 Int
+  @@id([id1, id2])
+}
+"#;
+    let expected = r#"model Blog {
+  id1 Int
+  id2 Int
+
+  @@id([id1, id2])
+  @@map("blog")
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn comments_in_a_model_must_not_move() {
     let input = r#"
         model User {
@@ -255,6 +355,7 @@ model a {
   one Int
   two Int
   // bs  b[] @relation(references: [a])
+
   @@id([one, two])
 }
 
@@ -272,6 +373,7 @@ model a {
   one Int
   two Int
   // bs  b[] @relation(references: [a])
+
   @@id([one, two])
 }
 
@@ -283,6 +385,7 @@ model a {
   one Int
   two Int
   // bs  b[] @relation(references: [a])
+
   @@id([one, two])
 }
 
@@ -429,7 +532,7 @@ fn new_lines_inside_block_above_field_must_stay() {
 
 
 
-  id Int @default(autoincrement()) @id
+  id Int @id @default(autoincrement())
 }
 "#;
 
@@ -441,7 +544,7 @@ fn new_lines_inside_block_above_field_must_stay() {
 #[test]
 fn new_lines_inside_block_below_field_must_stay() {
     let input = r#"model Post {
-  id Int @default(autoincrement()) @id
+  id Int @id @default(autoincrement())
 
 
 
@@ -457,7 +560,7 @@ fn new_lines_inside_block_below_field_must_stay() {
 #[test]
 fn new_lines_inside_block_in_between_fields_must_stay() {
     let input = r#"model Post {
-  id Int @default(autoincrement()) @id
+  id Int @id @default(autoincrement())
 
 
   input String
@@ -647,16 +750,18 @@ fn model_level_directives_reset_the_table_layout() {
     let input = r#"model Post {
   id Int @id
   aVeryLongName  String
-  @@index([a])
   alsoAVeryLongName String
+
+  @@index([a])
 }
 "#;
 
     let expected = r#"model Post {
-  id            Int    @id
-  aVeryLongName String
-  @@index([a])
+  id                Int    @id
+  aVeryLongName     String
   alsoAVeryLongName String
+
+  @@index([a])
 }
 "#;
 

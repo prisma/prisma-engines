@@ -66,8 +66,7 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
          |}""",
         project = project,
         errorCode = 2009,
-        errorContains =
-          """↳ createParent (field)\n    ↳ data (argument)\n      ↳ ParentCreateInput (object)\n        ↳ id (field)\n          ↳ Value types mismatch. Have: Boolean(true), want: Scalar(String)"""
+        errorContains = """`Value types mismatch. Have: Boolean(true), want: String` at `Mutation.createParent.data.ParentCreateInput.id`"""
       )
     }
   }

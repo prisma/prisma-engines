@@ -1,29 +1,31 @@
 use super::*;
+use prisma_models::dml::DefaultValue;
 
 pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField) -> InputField {
-    let typ = field_filter_types::get_field_filter_type(ctx, field);
-    input_field(field.name().to_owned(), wrap_opt_input_object(typ), None)
+    let types = field_filter_types::get_field_filter_types(ctx, field);
+    input_field(field.name().to_owned(), types, None).optional()
 }
 
 pub(crate) fn nested_create_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
-    let input_object = create_input_objects::create_input_type(ctx, &field.related_model(), Some(field));
-    let input_object = wrap_list_input_object_type(input_object, field.is_list);
-
-    input_field("create", input_object, None)
+    let input_object_type = create_input_objects::create_input_type(ctx, &field.related_model(), Some(field));
+    input_field("create", list_union_type(input_object_type, field.is_list), None).optional()
 }
 
 pub(crate) fn nested_connect_or_create_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
-    create_input_objects::nested_connect_or_create_input_object(ctx, field).map(|input_object| {
-        let input_type = wrap_list_input_object_type(input_object, field.is_list);
-        input_field("connectOrCreate", input_type, None)
+    create_input_objects::nested_connect_or_create_input_object(ctx, field).map(|input_object_type| {
+        input_field(
+            "connectOrCreate",
+            list_union_type(input_object_type, field.is_list),
+            None,
+        )
+        .optional()
     })
 }
 
 /// Builds "upsert" field for nested updates (on relation fields).
 pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
-    update_input_objects::nested_upsert_input_object(ctx, field).map(|input_object| {
-        let input_type = wrap_list_input_object_type(input_object, field.is_list);
-        input_field("upsert", input_type, None)
+    update_input_objects::nested_upsert_input_object(ctx, field).map(|input_object_type| {
+        input_field("upsert", list_union_type(input_object_type, field.is_list), None).optional()
     })
 }
 
@@ -31,9 +33,16 @@ pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, field: &RelationFiel
 pub(crate) fn nested_delete_many_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     if field.is_list {
         let input_object = filter_input_objects::scalar_filter_object_type(ctx, &field.related_model());
-        let input_type = InputType::opt(InputType::list(InputType::object(input_object)));
+        let input_type = InputType::object(input_object);
 
-        Some(input_field("deleteMany", input_type, None))
+        Some(
+            input_field(
+                "deleteMany",
+                vec![input_type.clone(), InputType::list(input_type)],
+                None,
+            )
+            .optional(),
+        )
     } else {
         None
     }
@@ -42,8 +51,14 @@ pub(crate) fn nested_delete_many_field(ctx: &mut BuilderContext, field: &Relatio
 /// Builds "updateMany" field for nested updates (on relation fields).
 pub(crate) fn nested_update_many_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     update_input_objects::nested_update_many_input_object(ctx, field).map(|input_object| {
-        let input_type = InputType::opt(InputType::null(InputType::list(InputType::object(input_object))));
-        input_field("updateMany", input_type, None)
+        let input_type = InputType::object(input_object);
+
+        input_field(
+            "updateMany",
+            vec![input_type.clone(), InputType::list(input_type)],
+            None,
+        )
+        .optional()
     })
 }
 
@@ -61,7 +76,7 @@ pub(crate) fn nested_disconnect_input_field(ctx: &mut BuilderContext, field: &Re
     match (field.related_model().is_embedded, field.is_list, field.is_required) {
         (true, _, _) => None,
         (false, true, _) => Some(where_input_field(ctx, "disconnect", field)),
-        (false, false, false) => Some(input_field("disconnect", InputType::opt(InputType::boolean()), None)),
+        (false, false, false) => Some(input_field("disconnect", InputType::boolean(), None).optional()),
         (false, false, true) => None,
     }
 }
@@ -70,7 +85,7 @@ pub(crate) fn nested_disconnect_input_field(ctx: &mut BuilderContext, field: &Re
 pub(crate) fn nested_delete_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     match (field.is_list, field.is_required) {
         (true, _) => Some(where_input_field(ctx, "delete", field)),
-        (false, false) => Some(input_field("delete", InputType::opt(InputType::boolean()), None)),
+        (false, false) => Some(input_field("delete", InputType::boolean(), None).optional()),
         (false, true) => None,
     }
 }
@@ -85,10 +100,8 @@ pub(crate) fn nested_connect_input_field(ctx: &mut BuilderContext, field: &Relat
 }
 
 pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
-    let input_object = update_input_objects::input_object_type_nested_update(ctx, field);
-    let input_object = wrap_list_input_object_type(input_object, field.is_list);
-
-    input_field("update", input_object, None)
+    let input_object_type = update_input_objects::input_object_type_nested_update(ctx, field);
+    input_field("update", list_union_type(input_object_type, field.is_list), None).optional()
 }
 
 /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
@@ -98,12 +111,12 @@ pub(crate) fn scalar_input_fields<T, F>(
     model_name: String,
     input_object_name: T,
     prefiltered_fields: Vec<ScalarFieldRef>,
-    field_mapper: F,
+    non_list_field_mapper: F,
     with_defaults: bool,
 ) -> Vec<InputField>
 where
     T: Into<String>,
-    F: Fn(&mut BuilderContext, ScalarFieldRef) -> InputType,
+    F: Fn(&mut BuilderContext, ScalarFieldRef, Option<DefaultValue>) -> InputField,
 {
     let input_object_name = input_object_name.into();
     let mut non_list_fields: Vec<InputField> = prefiltered_fields
@@ -111,7 +124,7 @@ where
         .filter(|f| !f.is_list)
         .map(|f| {
             let default = if with_defaults { f.default_value.clone() } else { None };
-            input_field(f.name.clone(), field_mapper(ctx, f.clone()), default)
+            non_list_field_mapper(ctx, f.clone(), default)
         })
         .collect();
 
@@ -120,20 +133,21 @@ where
         .filter(|f| f.is_list)
         .map(|f| {
             let name = f.name.clone();
-            let set_name = format!("{}{}{}Input", model_name, input_object_name, f.name);
-            let input_object = match ctx.get_input_type(&set_name) {
+            let list_input_type = map_scalar_input_type(&f);
+            let set_object_name = format!("{}{}{}Input", model_name, input_object_name, f.name);
+            let input_object = match ctx.get_input_type(&set_object_name) {
                 Some(t) => t,
                 None => {
-                    let set_fields = vec![input_field("set", map_optional_input_type(&f), None)];
-                    let input_object = Arc::new(input_object_type(set_name.clone(), set_fields));
+                    let set_fields = vec![input_field("set", list_input_type.clone(), None)];
+                    let input_object = Arc::new(input_object_type(set_object_name.clone(), set_fields));
 
-                    ctx.cache_input_type(set_name, input_object.clone());
+                    ctx.cache_input_type(set_object_name, input_object.clone());
                     Arc::downgrade(&input_object)
                 }
             };
 
-            let set_input_type = InputType::opt(InputType::object(input_object));
-            input_field(name, set_input_type, None)
+            let set_input_type = InputType::object(input_object);
+            input_field(name, vec![set_input_type, list_input_type], None).optional()
         })
         .collect();
 
@@ -145,8 +159,6 @@ fn where_input_field<T>(ctx: &mut BuilderContext, name: T, field: &RelationField
 where
     T: Into<String>,
 {
-    let input_type = filter_input_objects::where_unique_object_type(ctx, &field.related_model());
-    let input_type = wrap_list_input_object_type(input_type, field.is_list);
-
-    input_field(name.into(), input_type, None)
+    let input_object_type = filter_input_objects::where_unique_object_type(ctx, &field.related_model());
+    input_field(name.into(), list_union_type(input_object_type, field.is_list), None).optional()
 }

@@ -1,21 +1,21 @@
 use super::*;
 
 #[derive(Debug)]
-pub enum DMMFObjectRenderer {
+pub enum DmmfObjectRenderer {
     Input(InputObjectTypeWeakRef),
     Output(ObjectTypeWeakRef),
 }
 
-impl Renderer for DMMFObjectRenderer {
+impl Renderer for DmmfObjectRenderer {
     fn render(&self, ctx: &mut RenderContext) {
         match &self {
-            DMMFObjectRenderer::Input(input) => self.render_input_object(input, ctx),
-            DMMFObjectRenderer::Output(output) => self.render_output_object(output, ctx),
+            DmmfObjectRenderer::Input(input) => self.render_input_object(input, ctx),
+            DmmfObjectRenderer::Output(output) => self.render_output_object(output, ctx),
         }
     }
 }
 
-impl DMMFObjectRenderer {
+impl DmmfObjectRenderer {
     fn render_input_object(&self, input_object: &InputObjectTypeWeakRef, ctx: &mut RenderContext) {
         let input_object = input_object.into_arc();
 
@@ -33,16 +33,18 @@ impl DMMFObjectRenderer {
             rendered_fields.push(render_input_field(&field, ctx));
         }
 
-        let input_type = DMMFInputType {
+        let input_type = DmmfInputType {
             name: input_object.name.clone(),
-            is_one_of: input_object.is_one_of,
+            constraints: DmmfInputTypeConstraints {
+                max_num_fields: input_object.constraints.max_num_fields.clone(),
+                min_num_fields: input_object.constraints.min_num_fields.clone(),
+            },
             fields: rendered_fields,
         };
 
         ctx.add_input_type(input_type);
     }
 
-    // WIP dedup code
     fn render_output_object(&self, output_object: &ObjectTypeWeakRef, ctx: &mut RenderContext) {
         let output_object = output_object.into_arc();
 
@@ -54,13 +56,13 @@ impl DMMFObjectRenderer {
         ctx.mark_as_rendered(output_object.name().to_owned());
 
         let fields = output_object.get_fields();
-        let mut rendered_fields: Vec<DMMFField> = Vec::with_capacity(fields.len());
+        let mut rendered_fields: Vec<DmmfOutputField> = Vec::with_capacity(fields.len());
 
         for field in fields {
             rendered_fields.push(render_output_field(&field, ctx))
         }
 
-        let output_type = DMMFOutputType {
+        let output_type = DmmfOutputType {
             name: output_object.name().to_string(),
             fields: rendered_fields,
         };

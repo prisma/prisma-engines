@@ -70,7 +70,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::Timestamp(precision) => format!("TIMESTAMP({precision})", precision = precision),
             MySqlType::Year => "YEAR".into(),
             MySqlType::JSON => "JSON".into(),
-            MySqlType::Enum => "ENUM".into(), //Fixme
+            // MySqlType::Enum => "ENUM".into(), //Fixme handle enums
             MySqlType::NotHandled => panic!("An Unhandled Datatype should not reach this point. "),
             _ => todo!(),
         };

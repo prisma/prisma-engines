@@ -10,8 +10,6 @@ use std::{
     sync::{Arc, Weak},
 };
 
-pub type OutputTypeRef = Arc<OutputType>;
-
 pub type ObjectTypeStrongRef = Arc<ObjectType>;
 pub type ObjectTypeWeakRef = Weak<ObjectType>;
 
@@ -19,7 +17,8 @@ pub type InputObjectTypeStrongRef = Arc<InputObjectType>;
 pub type InputObjectTypeWeakRef = Weak<InputObjectType>;
 
 pub type QuerySchemaRef = Arc<QuerySchema>;
-pub type FieldRef = Arc<Field>;
+pub type OutputTypeRef = Arc<OutputType>;
+pub type OutputFieldRef = Arc<OutputField>;
 pub type InputFieldRef = Arc<InputField>;
 pub type EnumTypeRef = Arc<EnumType>;
 
@@ -67,7 +66,7 @@ impl QuerySchema {
         }
     }
 
-    pub fn find_mutation_field<T>(&self, name: T) -> Option<FieldRef>
+    pub fn find_mutation_field<T>(&self, name: T) -> Option<OutputFieldRef>
     where
         T: Into<String>,
     {
@@ -79,7 +78,7 @@ impl QuerySchema {
             .cloned()
     }
 
-    pub fn find_query_field<T>(&self, name: T) -> Option<FieldRef>
+    pub fn find_query_field<T>(&self, name: T) -> Option<OutputFieldRef>
     where
         T: Into<String>,
     {
@@ -105,7 +104,7 @@ impl QuerySchema {
 pub struct ObjectType {
     name: String,
 
-    fields: OnceCell<Vec<FieldRef>>,
+    fields: OnceCell<Vec<OutputFieldRef>>,
 
     // Object types can directly map to models.
     model: Option<ModelRef>,
@@ -137,15 +136,15 @@ impl ObjectType {
         &self.name
     }
 
-    pub fn get_fields(&self) -> &Vec<FieldRef> {
+    pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
         self.fields.get().unwrap()
     }
 
-    pub fn set_fields(&self, fields: Vec<Field>) {
+    pub fn set_fields(&self, fields: Vec<OutputField>) {
         self.fields.set(fields.into_iter().map(Arc::new).collect()).unwrap();
     }
 
-    pub fn find_field(&self, name: &str) -> Option<FieldRef> {
+    pub fn find_field(&self, name: &str) -> Option<OutputFieldRef> {
         self.get_fields().into_iter().find(|f| &f.name == name).cloned()
     }
 
@@ -156,16 +155,36 @@ impl ObjectType {
 }
 
 #[derive(Debug)]
-pub struct Field {
+pub struct OutputField {
     pub name: String,
-    pub arguments: Vec<Argument>,
+
+    /// Arguments are input fields, but positioned in context of an output field
+    /// instead of being attached to an input object.
+    pub arguments: Vec<InputFieldRef>,
     pub field_type: OutputTypeRef,
+
+    /// Indicates if the presence of the field on the higher output objects.
+    /// As opposed to input fields, optional output fields are also automatically nullable.
+    pub is_required: bool,
     pub query_builder: Option<SchemaQueryBuilder>,
 }
 
-impl Field {
+impl OutputField {
     pub fn query_builder(&self) -> Option<&SchemaQueryBuilder> {
         self.query_builder.as_ref()
+    }
+
+    pub fn optional(mut self) -> Self {
+        self.is_required = false;
+        self
+    }
+
+    pub fn optional_if(self, condition: bool) -> Self {
+        if condition {
+            self.optional()
+        } else {
+            self
+        }
     }
 }
 
@@ -263,28 +282,27 @@ pub struct GenericQueryBuilder {
     // WIP
 }
 
-#[derive(Debug)]
-pub struct Argument {
-    pub name: String,
-    pub argument_type: InputType,
-    pub default_value: Option<dml::DefaultValue>,
-}
-
+#[derive(PartialEq)]
 pub struct InputObjectType {
     pub name: String,
-
-    /// If true this means that _exactly_ one of the contained fields must be specified in an incoming query.
-    /// This allows clients to handle this input type in a special way and ensure this invariant in a typesafe way.
-    pub is_one_of: bool,
-
+    pub constraints: InputObjectTypeConstraints,
     pub fields: OnceCell<Vec<InputFieldRef>>,
+}
+
+#[derive(Debug, Default, PartialEq)]
+pub struct InputObjectTypeConstraints {
+    /// The maximum number of fields that can be provided.
+    pub min_num_fields: Option<usize>,
+
+    /// The minimum number of fields that must be provided.
+    pub max_num_fields: Option<usize>,
 }
 
 impl Debug for InputObjectType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("InputObjectType")
             .field("name", &self.name)
-            .field("is_one_of", &self.is_one_of)
+            .field("constraints", &self.constraints)
             .field("fields", &"#Input Fields Cell#")
             .finish()
     }
@@ -314,40 +332,104 @@ impl InputObjectType {
         self.get_fields().into_iter().find(|f| f.name == name).cloned()
     }
 
-    pub fn set_one_of(&mut self, one_of: bool) {
-        self.is_one_of = one_of;
+    /// Allow exactly one field of the possible ones to be in the input.
+    pub fn require_exactly_one_field(&mut self) {
+        self.set_max_fields(1);
+        self.set_min_fields(1);
+    }
+
+    /// Allow at most one field of the possible ones to be in the input.
+    pub fn allow_at_most_one_field(&mut self) {
+        self.set_max_fields(1);
+        self.set_min_fields(0);
+    }
+
+    /// Allow a maximum of `max` fields to be present in the input.
+    pub fn set_max_fields(&mut self, max: usize) {
+        self.constraints.max_num_fields = Some(max);
+    }
+
+    /// Require a minimum of `min` fields to be present in the input.
+    pub fn set_min_fields(&mut self, min: usize) {
+        self.constraints.min_num_fields = Some(min);
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct InputField {
     pub name: String,
-    pub field_type: InputType,
     pub default_value: Option<dml::DefaultValue>,
+
+    /// Possible field types, represented as a union of input types, but only one can be provided at any time.
+    pub field_types: Vec<InputType>,
+
+    /// Indicates if the presence of the field on the higher input objects
+    /// is required, but doesn't state whether or not the input can be null.
+    pub is_required: bool,
 }
 
-#[derive(Debug, Clone)]
+impl InputField {
+    /// Sets the field as optional (not required to be present on the input).
+    pub fn optional(mut self) -> Self {
+        self.is_required = false;
+        self
+    }
+
+    /// Sets the field as nullable (accepting null inputs).
+    pub fn nullable(self) -> Self {
+        self.add_type(InputType::null())
+    }
+
+    /// Sets the field as nullable if the condition is true.
+    pub fn nullable_if(self, condition: bool) -> Self {
+        if condition {
+            self.nullable()
+        } else {
+            self
+        }
+    }
+
+    /// Adds possible input type to this input field's type union.
+    pub fn add_type(mut self, typ: InputType) -> Self {
+        self.field_types.push(typ);
+        self
+    }
+}
+
+#[derive(Clone)]
 pub enum InputType {
     Scalar(ScalarType),
     Enum(EnumTypeRef),
     List(Box<InputType>),
     Object(InputObjectTypeWeakRef),
+}
 
-    /// An optional input type may be provided, meaning only that the presence
-    /// of the input is required or not, but doesn't make any assumption about
-    /// whether or not the input can be null.
-    Opt(Box<InputType>),
+impl PartialEq for InputType {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (InputType::Scalar(_), InputType::Scalar(_)) => true,
+            (InputType::Enum(_), InputType::Enum(_)) => true,
+            (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
+            (InputType::Object(obj), InputType::Object(oobj)) => obj.into_arc().name == oobj.into_arc().name,
+            _ => false,
+        }
+    }
+}
 
-    /// A nullable input denotes that, if provided, a given input can be null.
-    /// This makes no assumption about if an input needs to be provided or not.
-    Null(Box<InputType>),
+impl Debug for InputType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InputType::Object(obj) => write!(f, "Object({})", obj.into_arc().name),
+            InputType::Scalar(s) => write!(f, "{:?}", s),
+            InputType::Enum(e) => write!(f, "{:?}", e),
+            InputType::List(l) => write!(f, "{:?}", l),
+        }
+    }
 }
 
 impl From<&InputType> for TypeHint {
     fn from(i: &InputType) -> Self {
         match i {
-            InputType::Opt(inner) => (&**inner).into(),
-            InputType::Null(inner) => (&**inner).into(),
             InputType::Scalar(st) => st.into(),
             InputType::Enum(_) => TypeHint::Enum,
             InputType::List(_) => TypeHint::Array,
@@ -359,14 +441,6 @@ impl From<&InputType> for TypeHint {
 impl InputType {
     pub fn list(containing: InputType) -> InputType {
         InputType::List(Box::new(containing))
-    }
-
-    pub fn opt(containing: InputType) -> InputType {
-        InputType::Opt(Box::new(containing))
-    }
-
-    pub fn null(containing: InputType) -> InputType {
-        InputType::Null(Box::new(containing))
     }
 
     pub fn object(containing: InputObjectTypeWeakRef) -> InputType {
@@ -404,6 +478,14 @@ impl InputType {
     pub fn uuid() -> InputType {
         InputType::Scalar(ScalarType::UUID)
     }
+
+    pub fn null() -> InputType {
+        InputType::Scalar(ScalarType::Null)
+    }
+
+    pub fn enum_type(containing: EnumTypeRef) -> InputType {
+        InputType::Enum(containing)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -411,17 +493,12 @@ pub enum OutputType {
     Enum(EnumTypeRef),
     List(OutputTypeRef),
     Object(ObjectTypeWeakRef),
-    Opt(OutputTypeRef),
     Scalar(ScalarType),
 }
 
 impl OutputType {
     pub fn list(containing: OutputType) -> OutputType {
         OutputType::List(Arc::new(containing))
-    }
-
-    pub fn opt(containing: OutputType) -> OutputType {
-        OutputType::Opt(Arc::new(containing))
     }
 
     pub fn object(containing: ObjectTypeWeakRef) -> OutputType {
@@ -463,14 +540,12 @@ impl OutputType {
             OutputType::Enum(_) => None,
             OutputType::List(inner) => inner.as_object_type(),
             OutputType::Object(obj) => Some(obj.into_arc()),
-            OutputType::Opt(inner) => inner.as_object_type(),
             OutputType::Scalar(_) => None,
         }
     }
 
     pub fn is_list(&self) -> bool {
         match self {
-            OutputType::Opt(inner) => inner.is_list(),
             OutputType::List(_) => true,
             _ => false,
         }
@@ -478,15 +553,15 @@ impl OutputType {
 
     pub fn is_object(&self) -> bool {
         match self {
-            OutputType::Opt(inner) => inner.is_object(),
             OutputType::Object(_) => true,
             _ => false,
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ScalarType {
+    Null,
     String,
     Int,
     Float,
@@ -501,6 +576,7 @@ pub enum ScalarType {
 impl From<&ScalarType> for TypeHint {
     fn from(t: &ScalarType) -> Self {
         match t {
+            ScalarType::Null => TypeHint::Unknown, // [DTODO] Note for MSSQL and Julius: Collecting typehints this far up isn't feasible anymore.
             ScalarType::String => TypeHint::String,
             ScalarType::Int => TypeHint::Int,
             ScalarType::Float => TypeHint::Float,

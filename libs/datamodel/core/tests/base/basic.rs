@@ -90,6 +90,7 @@ fn must_error_for_invalid_model_names() {
 fn must_error_for_invalid_enum_names() {
     let dml = r#"
     enum StringFilter {
+      one
     }
     "#;
 
@@ -97,7 +98,7 @@ fn must_error_for_invalid_enum_names() {
     errors.assert_is(DatamodelError::new_enum_validation_error(
         "The enum name `StringFilter` is invalid. It is a reserved name. Please change it. Read more at https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/data-model#naming-enums",
         "StringFilter",
-        Span::new(5, 30),
+        Span::new(5, 40),
     ));
 }
 
@@ -115,6 +116,37 @@ fn must_return_good_error_messages_for_numbers_in_enums() {
     errors.assert_is(DatamodelError::new_validation_error(
         "The name of a Enum Value must not start with a number.",
         Span::new(27, 28),
+    ));
+}
+
+#[test]
+fn must_return_good_error_message_for_empty_enum() {
+    let dml = r#"
+    enum MyEnum {
+
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_validation_error(
+        // todo error for empty enum
+        "An enum must have at least one value.",
+        Span::new(5, 25),
+    ));
+}
+
+#[test]
+fn must_return_good_error_message_for_enum_with_all_variants_commented_out() {
+    let dml = r#"
+    enum MyEnum {
+        // 1
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_validation_error(
+        "An enum must have at least one value.",
+        Span::new(5, 37),
     ));
 }
 

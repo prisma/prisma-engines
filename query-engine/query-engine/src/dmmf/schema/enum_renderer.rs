@@ -1,10 +1,10 @@
 use super::*;
 
-pub struct DMMFEnumRenderer {
+pub struct DmmfEnumRenderer {
     enum_type: EnumType,
 }
 
-impl Renderer for DMMFEnumRenderer {
+impl Renderer for DmmfEnumRenderer {
     fn render(&self, ctx: &mut RenderContext) {
         if ctx.already_rendered(self.enum_type.name()) {
             return;
@@ -12,7 +12,7 @@ impl Renderer for DMMFEnumRenderer {
 
         let values = self.format_enum_values();
 
-        let rendered = DMMFEnum {
+        let rendered = DmmfEnum {
             name: self.enum_type.name().to_owned(),
             values,
         };
@@ -21,9 +21,9 @@ impl Renderer for DMMFEnumRenderer {
     }
 }
 
-impl DMMFEnumRenderer {
-    pub fn new(enum_type: &EnumType) -> DMMFEnumRenderer {
-        DMMFEnumRenderer {
+impl DmmfEnumRenderer {
+    pub fn new(enum_type: &EnumType) -> DmmfEnumRenderer {
+        DmmfEnumRenderer {
             enum_type: enum_type.clone(),
         }
     }

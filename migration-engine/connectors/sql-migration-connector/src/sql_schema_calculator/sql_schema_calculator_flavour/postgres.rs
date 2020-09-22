@@ -54,6 +54,8 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             PostgresType::XML => "XML".to_owned(),
             PostgresType::JSON => "JSON".to_owned(),
             PostgresType::JSONB => "JSONB".to_owned(),
+            // PostgresType::Enum(name) => (format!("{}", name)),
+            PostgresType::NotHandled => unreachable!("NotHandled type should not make it into the Schema Calculator."),
         };
 
         sql::ColumnType {

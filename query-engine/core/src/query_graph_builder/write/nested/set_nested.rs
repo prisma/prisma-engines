@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_ast::*, query_graph::*, InputAssertions, ParsedInputValue};
+use crate::{query_ast::*, query_graph::*, ParsedInputValue};
 use connector::Filter;
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
@@ -24,10 +24,6 @@ pub fn nested_set(
         .into_iter()
         .map(|value: ParsedInputValue| {
             let value: ParsedInputMap = value.try_into()?;
-
-            value.assert_size(1)?;
-            value.assert_non_null()?;
-
             extract_unique_filter(value, &child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?

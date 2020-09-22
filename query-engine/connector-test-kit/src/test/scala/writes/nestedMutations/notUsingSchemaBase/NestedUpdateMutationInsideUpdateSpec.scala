@@ -652,7 +652,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     )
   }
 
-  "a many to many relation" should "handle null in unique fields" in {
+  "a many to many relation" should "reject null in unique fields" in {
     val project = SchemaDsl.fromStringV11() {
       s"""model Note {
         | id    String  @id @default(cuid())
@@ -714,7 +714,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       project,
       errorCode = 2009, // 3040,
       errorContains =
-        "Failed to validate the query `Error occurred during query validation & transformation:\\nAssertion error: You provided a null value for a where clause (or implicit nested selector). Please provide a non null value.."
+        "`Mutation.updateNote.data.NoteUpdateInput.todos.TodoUpdateManyWithoutNotesInput.update.TodoUpdateWithWhereUniqueWithoutNotesInput.where.TodoWhereUniqueInput.unique`: A value is required but not set."
     )
   }
 

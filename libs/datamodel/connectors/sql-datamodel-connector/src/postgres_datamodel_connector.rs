@@ -30,6 +30,8 @@ const UUID_TYPE_NAME: &str = "Uuid";
 const XML_TYPE_NAME: &str = "Xml";
 const JSON_TYPE_NAME: &str = "Json";
 const JSON_B_TYPE_NAME: &str = "JsonB";
+// const ENUM_TYPE_NAME: &str = "Enum";
+const NOT_HANDLED_TYPE_NAME: &str = "NotHandled";
 
 pub struct PostgresDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -292,6 +294,8 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::XML => (XML_TYPE_NAME, vec![]),
             PostgresType::JSON => (JSON_TYPE_NAME, vec![]),
             PostgresType::JSONB => (JSON_B_TYPE_NAME, vec![]),
+            // PostgresType::Enum(name) => (ENUM_TYPE_NAME, vec![]), //Fixme Arg would be the name of the Enum?
+            PostgresType::NotHandled => (NOT_HANDLED_TYPE_NAME, vec![]),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {

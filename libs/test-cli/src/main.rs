@@ -109,7 +109,7 @@ async fn main() -> anyhow::Result<()> {
                 migration_id: migration_id.clone(),
             };
 
-            api.reset(&serde_json::Value::Null).await?;
+            api.reset(&()).await?;
 
             let result = api.infer_migration_steps(&infer_input).await?;
 

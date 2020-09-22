@@ -30,7 +30,7 @@ pub enum PostgresType {
     XML,
     JSON,
     JSONB,
-    Enum,
+    // Enum(String),
     NotHandled,
 }
 

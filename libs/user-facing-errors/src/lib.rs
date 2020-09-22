@@ -19,7 +19,7 @@ pub trait UserFacingError: serde::Serialize {
     fn message(&self) -> String;
 }
 
-#[derive(Serialize, PartialEq, Debug)]
+#[derive(Serialize, Clone, PartialEq, Debug)]
 pub struct KnownError {
     pub message: String,
     pub meta: serde_json::Value,

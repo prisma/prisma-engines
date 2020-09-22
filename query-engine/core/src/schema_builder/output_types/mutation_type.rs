@@ -6,7 +6,7 @@ use prisma_models::{dml, PrismaValue};
 /// Builds the root `Mutation` type.
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
     let non_embedded_models = ctx.internal_data_model.non_embedded_models();
-    let mut fields: Vec<Field> = non_embedded_models
+    let mut fields: Vec<OutputField> = non_embedded_models
         .into_iter()
         .map(|model| {
             let mut vec = vec![create_item_field(ctx, &model)];
@@ -80,32 +80,34 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
     }
 }
 
-fn create_execute_raw_field() -> Field {
+fn create_execute_raw_field() -> OutputField {
     field(
         "executeRaw",
         vec![
-            argument("query", InputType::string(), None),
-            argument(
+            input_field("query", InputType::string(), None),
+            input_field(
                 "parameters",
-                InputType::opt(InputType::json_list()),
+                InputType::json_list(),
                 Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
-            ),
+            )
+            .optional(),
         ],
         OutputType::json(),
         None,
     )
 }
 
-fn create_query_raw_field() -> Field {
+fn create_query_raw_field() -> OutputField {
     field(
         "queryRaw",
         vec![
-            argument("query", InputType::string(), None),
-            argument(
+            input_field("query", InputType::string(), None),
+            input_field(
                 "parameters",
-                InputType::opt(InputType::json_list()),
+                InputType::json_list(),
                 Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
-            ),
+            )
+            .optional(),
         ],
         OutputType::json(),
         None,
@@ -113,7 +115,7 @@ fn create_query_raw_field() -> Field {
 }
 
 /// Builds a create mutation field (e.g. createUser) for given model.
-fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
+fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::create_arguments(ctx, model).unwrap_or_else(|| vec![]);
     let field_name = ctx.pluralize_internal(format!("create{}", model.name), format!("createOne{}", model.name));
 
@@ -135,14 +137,14 @@ fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
 }
 
 /// Builds a delete mutation field (e.g. deleteUser) for given model.
-fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field> {
+fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::delete_arguments(ctx, model).map(|args| {
         let field_name = ctx.pluralize_internal(format!("delete{}", model.name), format!("deleteOne{}", model.name));
 
         field(
             field_name,
             args,
-            OutputType::opt(OutputType::object(output_objects::map_model_object_type(ctx, &model))),
+            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 model.clone(),
                 QueryTag::DeleteOne,
@@ -154,11 +156,12 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field
                 }),
             ))),
         )
+        .optional()
     })
 }
 
 /// Builds a delete many mutation field (e.g. deleteManyUsers) for given model.
-fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
+fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let arguments = arguments::delete_many_arguments(ctx, model);
     let field_name = ctx.pluralize_internal(
         format!("deleteMany{}", pluralize(&model.name)),
@@ -183,14 +186,14 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
 }
 
 /// Builds an update mutation field (e.g. updateUser) for given model.
-fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field> {
+fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::update_arguments(ctx, model).map(|args| {
         let field_name = ctx.pluralize_internal(format!("update{}", model.name), format!("updateOne{}", model.name));
 
         field(
             field_name,
             args,
-            OutputType::opt(OutputType::object(output_objects::map_model_object_type(ctx, &model))),
+            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 model.clone(),
                 QueryTag::UpdateOne,
@@ -202,11 +205,12 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field
                 }),
             ))),
         )
+        .optional()
     })
 }
 
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
-fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
+fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let arguments = arguments::update_many_arguments(ctx, model);
     let field_name = ctx.pluralize_internal(
         format!("updateMany{}", pluralize(model.name.as_str())),
@@ -231,7 +235,7 @@ fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
 }
 
 /// Builds an upsert mutation field (e.g. upsertUser) for given model.
-fn upsert_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field> {
+fn upsert_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::upsert_arguments(ctx, model).map(|args| {
         let field_name = ctx.pluralize_internal(format!("upsert{}", model.name), format!("upsertOne{}", model.name));
 
