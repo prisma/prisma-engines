@@ -1,6 +1,6 @@
 use super::SqlSchemaDifferFlavour;
-use crate::{flavour::MysqlFlavour, sql_schema_differ::ColumnDiffer};
-use sql_schema_describer::ColumnTypeFamily;
+use crate::{flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, sql_schema_differ::ColumnDiffer};
+use sql_schema_describer::{ColumnTypeFamily, Index};
 
 /// On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
 const MARIADB_ALIASES: &[ColumnTypeFamily] = &[ColumnTypeFamily::String, ColumnTypeFamily::Json];
@@ -26,5 +26,14 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         }
 
         false
+    }
+
+    fn index_should_be_renamed(&self, previous: &Index, next: &Index) -> bool {
+        // Implements correct comparison for truncated index names.
+        if previous.name.len() == MYSQL_IDENTIFIER_SIZE_LIMIT && next.name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+            previous.name[0..MYSQL_IDENTIFIER_SIZE_LIMIT] != next.name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+        } else {
+            previous.name != next.name
+        }
     }
 }

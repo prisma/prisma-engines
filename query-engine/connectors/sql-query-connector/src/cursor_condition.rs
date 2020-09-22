@@ -42,6 +42,26 @@ static ORDER_TABLE_ALIAS: &'static str = "order_cmp";
 ///   `TestModel`.`fieldC` ASC,
 ///   `TestModel`.`fieldD` DESC;
 /// ```
+///
+/// The above assumes that all field are non-nullable. If a field is nullable, #2 conditions slighty change:
+/// ```sql
+///   -- ... The first (4 - condition) block:
+///   (
+///     (
+///       `TestModel`.`fieldA` = `order_cmp`.`fieldA`
+///       OR `order_cmp`.`fieldA` IS NULL
+///       OR `TestModel`.`fieldA` IS NULL
+///     )
+///     AND -- ...
+///   )
+///   -- ...The other blocks (3, 2) in between, then the single condition block:
+///   OR (
+///     `TestModel`.`fieldA` < `order_cmp`.`fieldA`
+///     OR `order_cmp`.`fieldA` IS NULL
+///     OR `TestModel`.`fieldA` IS NULL
+///   )
+///   -- ...
+/// ```
 pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Table<'static>>, ConditionTree<'static>) {
     match query_arguments.cursor {
         None => (None, ConditionTree::NoCondition),
@@ -69,7 +89,6 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                 .so_that(cursor_condition);
 
             let subquery_table = Table::from(order_subquery).alias(ORDER_TABLE_ALIAS);
-
             let len = order_definitions.len();
             let reverse = query_arguments.needs_reversed_order();
 
@@ -131,6 +150,7 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
         }
     }
 }
+
 // A negative `take` value signifies that values should be taken before the cursor,
 // requiring the correct comarison operator to be used to fit the reversed order.
 fn map_orderby_condition(
@@ -140,51 +160,73 @@ fn map_orderby_condition(
     include_eq: bool,
 ) -> Expression<'static> {
     let order_column = field.as_column();
+    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
 
-    match order {
+    let order_expr: Expression<'static> = match order {
         // If it's ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
         SortOrder::Ascending if reverse => {
             if include_eq {
-                order_column.less_than_or_equals(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
+                order_column.less_than_or_equals(cmp_column)
             } else {
-                order_column.less_than(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
+                order_column.less_than(cmp_column)
             }
         }
 
         // If it's DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).
         SortOrder::Descending if reverse => {
             if include_eq {
-                order_column.greater_than_or_equals(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
+                order_column.greater_than_or_equals(cmp_column)
             } else {
-                order_column.greater_than(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
+                order_column.greater_than(cmp_column)
             }
         }
 
         SortOrder::Ascending => {
             if include_eq {
-                order_column.greater_than_or_equals(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
+                order_column.greater_than_or_equals(cmp_column)
             } else {
-                order_column.greater_than(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
+                order_column.greater_than(cmp_column)
             }
         }
 
         SortOrder::Descending => {
             if include_eq {
-                order_column.less_than_or_equals(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
+                order_column.less_than_or_equals(cmp_column)
             } else {
-                order_column.less_than(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
+                order_column.less_than(cmp_column)
             }
         }
     }
-    .into()
+    .into();
+
+    // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
+    // statement over their order relative to the cursor.
+    if !field.is_required {
+        order_expr
+            .or(field.as_column().is_null())
+            .or(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())).is_null())
+            .into()
+    } else {
+        order_expr
+    }
 }
 
 fn map_equality_condition(field: &ScalarFieldRef) -> Expression<'static> {
     let order_column = field.as_column();
+    let cmp_column = Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned()));
 
-    order_column
-        .equals(Column::from((ORDER_TABLE_ALIAS, field.db_name().to_owned())))
-        .into()
+    // If we have null values in the ordering or comparison row, those are automatically included because we can't make a
+    // statement over their order relative to the cursor.
+    if !field.is_required {
+        order_column
+            .clone()
+            .equals(cmp_column.clone())
+            .or(cmp_column.is_null())
+            .or(order_column.is_null())
+            .into()
+    } else {
+        order_column.equals(cmp_column).into()
+    }
 }
 
 fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Vec<(ScalarFieldRef, SortOrder)> {

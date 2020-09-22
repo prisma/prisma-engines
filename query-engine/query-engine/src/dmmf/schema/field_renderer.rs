@@ -6,11 +6,20 @@ use query_core::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
 
 pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DmmfInputField {
     let type_references = render_input_types(&input_field.field_types, ctx);
+    let nullable = input_field
+        .field_types
+        .iter()
+        .find(|typ| match typ {
+            InputType::Scalar(ScalarType::Null) => true,
+            _ => false,
+        })
+        .is_some();
+
     let field = DmmfInputField {
         name: input_field.name.clone(),
         input_types: type_references,
         is_required: input_field.is_required,
-        is_nullable: input_field.field_types.contains(&InputType::Scalar(ScalarType::Null)),
+        is_nullable: nullable,
     };
 
     field

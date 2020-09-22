@@ -43,6 +43,7 @@ where
 // liking them in the exported class.
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
+    async fn version(&self, input: &serde_json::Value) -> CoreResult<String>;
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput>;
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
     async fn calculate_database_steps(
@@ -61,7 +62,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>>;
     async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput>;
     async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
-    async fn reset(&self, input: &serde_json::Value) -> CoreResult<serde_json::Value>;
+    async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
@@ -82,6 +83,12 @@ where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
+    async fn version(&self, input: &serde_json::Value) -> CoreResult<String> {
+        self.handle_command::<VersionCommand>(input)
+            .instrument(tracing::info_span!("Version"))
+            .await
+    }
+
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput> {
         self.handle_command::<ApplyMigrationCommand<'_>>(input)
             .instrument(tracing::info_span!(
@@ -114,7 +121,10 @@ where
 
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
         self.handle_command::<CreateMigrationCommand>(input)
-            .instrument(tracing::info_span!("CalculateDatamodel"))
+            .instrument(tracing::info_span!(
+                "CreateMigration",
+                migration_name = input.migration_name.as_str()
+            ))
             .await
     }
 
@@ -172,7 +182,7 @@ where
             .await
     }
 
-    async fn reset(&self, input: &serde_json::Value) -> CoreResult<serde_json::Value> {
+    async fn reset(&self, input: &()) -> CoreResult<()> {
         self.handle_command::<ResetCommand>(input)
             .instrument(tracing::info_span!("Reset"))
             .await

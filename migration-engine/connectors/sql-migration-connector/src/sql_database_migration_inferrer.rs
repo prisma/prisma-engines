@@ -55,6 +55,41 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
             self.flavour(),
         ))
     }
+
+    #[tracing::instrument(skip(self, previous_migrations, target_schema))]
+    async fn infer_next_migration(
+        &self,
+        previous_migrations: &[MigrationDirectory],
+        target_schema: &Datamodel,
+    ) -> ConnectorResult<SqlMigration> {
+        let current_database_schema = self
+            .flavour()
+            .sql_schema_from_migration_history(previous_migrations, self.conn(), self.connection_info())
+            .await?;
+        let expected_database_schema =
+            SqlSchemaCalculator::calculate(target_schema, self.database_info(), self.flavour());
+
+        Ok(infer(
+            current_database_schema,
+            expected_database_schema,
+            self.database_info(),
+            self.flavour(),
+        ))
+    }
+
+    async fn detect_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<bool> {
+        let expected_schema = self
+            .flavour()
+            .sql_schema_from_migration_history(applied_migrations, self.conn(), self.connection_info())
+            .await?;
+
+        let actual_schema = catch(self.connection_info(), self.describe()).await?;
+
+        let diff =
+            SqlSchemaDiffer::diff(&actual_schema, &expected_schema, self.flavour(), self.database_info()).into_steps();
+
+        Ok(!diff.is_empty())
+    }
 }
 
 fn infer(

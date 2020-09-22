@@ -9,10 +9,27 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
     ctx.cache_input_type(object_name, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
+    let object_type = InputType::object(weak_ref.clone());
+
     let mut input_fields = vec![
-        input_field("AND", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
-        input_field("OR", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
-        input_field("NOT", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
+        input_field(
+            "AND",
+            vec![object_type.clone(), InputType::list(object_type.clone())],
+            None,
+        )
+        .optional(),
+        input_field(
+            "OR",
+            vec![object_type.clone(), InputType::list(object_type.clone())],
+            None,
+        )
+        .optional(),
+        input_field(
+            "NOT",
+            vec![object_type.clone(), InputType::list(object_type.clone())],
+            None,
+        )
+        .optional(),
     ];
 
     input_fields.extend(model.fields().all.iter().filter_map(|f| match f {
@@ -32,10 +49,27 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
     ctx.cache_input_type(name, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
+    let object_type = InputType::object(weak_ref.clone());
+
     let mut fields = vec![
-        input_field("AND", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
-        input_field("OR", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
-        input_field("NOT", InputType::list(InputType::object(weak_ref.clone())), None).optional(),
+        input_field(
+            "AND",
+            vec![object_type.clone(), InputType::list(object_type.clone())],
+            None,
+        )
+        .optional(),
+        input_field(
+            "OR",
+            vec![object_type.clone(), InputType::list(object_type.clone())],
+            None,
+        )
+        .optional(),
+        input_field(
+            "NOT",
+            vec![object_type.clone(), InputType::list(object_type.clone())],
+            None,
+        )
+        .optional(),
     ];
 
     fields.extend(

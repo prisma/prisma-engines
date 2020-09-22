@@ -10,7 +10,7 @@ use crate::{
 use sql_schema_describer::ColumnArity;
 
 impl DestructiveChangeCheckerFlavour for SqliteFlavour {
-    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
         let arity_change_is_safe = match (&columns.previous.arity(), &columns.next.arity()) {
             // column became required
             (ColumnArity::Nullable, ColumnArity::Required) => false,
@@ -30,15 +30,21 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
             && columns.next.arity().is_required()
             && columns.next.default().is_none()
         {
-            plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
-                table: columns.previous.table().name().to_owned(),
-                column: columns.previous.name().to_owned(),
-            });
+            plan.push_unexecutable(
+                UnexecutableStepCheck::MadeOptionalFieldRequired {
+                    table: columns.previous.table().name().to_owned(),
+                    column: columns.previous.name().to_owned(),
+                },
+                step_index,
+            );
         }
 
-        plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
-            table: columns.previous.table().name().to_owned(),
-            column: columns.next.name().to_owned(),
-        });
+        plan.push_warning(
+            SqlMigrationWarningCheck::AlterColumn {
+                table: columns.previous.table().name().to_owned(),
+                column: columns.next.name().to_owned(),
+            },
+            step_index,
+        );
     }
 }

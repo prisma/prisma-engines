@@ -7,24 +7,25 @@ pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField) -
 }
 
 pub(crate) fn nested_create_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
-    let input_object = create_input_objects::create_input_type(ctx, &field.related_model(), Some(field));
-    let input_object = wrap_list_input_object_type(input_object, field.is_list);
-
-    input_field("create", input_object, None).optional()
+    let input_object_type = create_input_objects::create_input_type(ctx, &field.related_model(), Some(field));
+    input_field("create", list_union_type(input_object_type, field.is_list), None).optional()
 }
 
 pub(crate) fn nested_connect_or_create_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
-    create_input_objects::nested_connect_or_create_input_object(ctx, field).map(|input_object| {
-        let input_type = wrap_list_input_object_type(input_object, field.is_list);
-        input_field("connectOrCreate", input_type, None).optional()
+    create_input_objects::nested_connect_or_create_input_object(ctx, field).map(|input_object_type| {
+        input_field(
+            "connectOrCreate",
+            list_union_type(input_object_type, field.is_list),
+            None,
+        )
+        .optional()
     })
 }
 
 /// Builds "upsert" field for nested updates (on relation fields).
 pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
-    update_input_objects::nested_upsert_input_object(ctx, field).map(|input_object| {
-        let input_type = wrap_list_input_object_type(input_object, field.is_list);
-        input_field("upsert", input_type, None).optional()
+    update_input_objects::nested_upsert_input_object(ctx, field).map(|input_object_type| {
+        input_field("upsert", list_union_type(input_object_type, field.is_list), None).optional()
     })
 }
 
@@ -32,9 +33,16 @@ pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, field: &RelationFiel
 pub(crate) fn nested_delete_many_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     if field.is_list {
         let input_object = filter_input_objects::scalar_filter_object_type(ctx, &field.related_model());
-        let input_type = InputType::list(InputType::object(input_object));
+        let input_type = InputType::object(input_object);
 
-        Some(input_field("deleteMany", input_type, None).optional())
+        Some(
+            input_field(
+                "deleteMany",
+                vec![input_type.clone(), InputType::list(input_type)],
+                None,
+            )
+            .optional(),
+        )
     } else {
         None
     }
@@ -43,9 +51,14 @@ pub(crate) fn nested_delete_many_field(ctx: &mut BuilderContext, field: &Relatio
 /// Builds "updateMany" field for nested updates (on relation fields).
 pub(crate) fn nested_update_many_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     update_input_objects::nested_update_many_input_object(ctx, field).map(|input_object| {
-        input_field("updateMany", InputType::list(InputType::object(input_object)), None)
-            .optional()
-            .nullable()
+        let input_type = InputType::object(input_object);
+
+        input_field(
+            "updateMany",
+            vec![input_type.clone(), InputType::list(input_type)],
+            None,
+        )
+        .optional()
     })
 }
 
@@ -87,10 +100,8 @@ pub(crate) fn nested_connect_input_field(ctx: &mut BuilderContext, field: &Relat
 }
 
 pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
-    let input_object = update_input_objects::input_object_type_nested_update(ctx, field);
-    let input_object = wrap_list_input_object_type(input_object, field.is_list);
-
-    input_field("update", input_object, None).optional()
+    let input_object_type = update_input_objects::input_object_type_nested_update(ctx, field);
+    input_field("update", list_union_type(input_object_type, field.is_list), None).optional()
 }
 
 /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
@@ -148,8 +159,6 @@ fn where_input_field<T>(ctx: &mut BuilderContext, name: T, field: &RelationField
 where
     T: Into<String>,
 {
-    let input_type = filter_input_objects::where_unique_object_type(ctx, &field.related_model());
-    let input_type = wrap_list_input_object_type(input_type, field.is_list);
-
-    input_field(name.into(), input_type, None).optional()
+    let input_object_type = filter_input_objects::where_unique_object_type(ctx, &field.related_model());
+    input_field(name.into(), list_union_type(input_object_type, field.is_list), None).optional()
 }

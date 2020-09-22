@@ -55,7 +55,7 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
-            // 2 possibilities: Either a filter group (and, or, not) with a vector, or a field name with a filter object behind.
+            // 2 possibilities: Either a filter group (and, or, not) with a vector/object, or a field name with a filter object behind.
             if let Ok(nested) = FilterGrouping::from_str(&key) {
                 let value: QueryGraphBuilderResult<Vec<Filter>> = match value {
                     ParsedInputValue::List(values) => values

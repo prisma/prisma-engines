@@ -7,6 +7,7 @@ mod database_migration_step_applier;
 mod destructive_change_checker;
 #[allow(missing_docs)]
 mod error;
+mod imperative_migrations_persistence;
 #[allow(missing_docs)]
 mod migration_applier;
 #[allow(missing_docs)]
@@ -15,12 +16,16 @@ mod migration_persistence;
 #[allow(missing_docs)]
 pub mod steps;
 
+mod migrations_directory;
+
 pub use database_migration_inferrer::*;
 pub use database_migration_step_applier::*;
 pub use destructive_change_checker::*;
 pub use error::*;
+pub use imperative_migrations_persistence::{ImperativeMigrationsPersistence, MigrationRecord, Timestamp};
 pub use migration_applier::*;
 pub use migration_persistence::*;
+pub use migrations_directory::{create_migration_directory, list_migrations, ListMigrationsError, MigrationDirectory};
 pub use steps::MigrationStep;
 
 use std::fmt::Debug;
@@ -39,7 +44,10 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
 
-    /// Hook to perform connector-specific initialization.
+    /// The version of the underlying database.
+    fn version(&self) -> String;
+
+    /// Hook to perform connector-specific initialization. This is deprecated.
     async fn initialize(&self) -> ConnectorResult<()>;
 
     /// Create the database with the provided URL.
@@ -59,6 +67,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
+
+    /// See [ImperativeMigrationPersistence](trait.ImperativeMigrationPersistence.html).
+    fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence;
 
     /// See [DatabaseMigrationInferrer](trait.DatabaseMigrationInferrer.html).
     fn database_migration_inferrer<'a>(&'a self) -> Box<dyn DatabaseMigrationInferrer<Self::DatabaseMigration> + 'a>;
@@ -88,10 +99,37 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
 /// Marker for the associated migration type for a connector.
 pub trait DatabaseMigrationMarker: Debug + Send + Sync {
+    /// The file extension to use for migration scripts.
+    const FILE_EXTENSION: &'static str;
+
     /// Render the migration as JSON.
     fn serialize(&self) -> serde_json::Value;
+
+    /// Is the migration empty?
+    fn is_empty(&self) -> bool;
 }
 
 /// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
 /// variant is a [ConnectorError](/error/enum.ConnectorError.html).
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
+
+/// Format a checksum to a hexadecimal string. This is used to checksum
+/// migration scripts with Sha256.
+pub trait FormatChecksum {
+    /// Format a checksum to a hexadecimal string.
+    fn format_checksum(&self) -> String;
+}
+
+impl FormatChecksum for [u8; 32] {
+    fn format_checksum(&self) -> String {
+        use std::fmt::Write as _;
+
+        let mut checksum_string = String::with_capacity(32 * 2);
+
+        for byte in self {
+            write!(checksum_string, "{:x}", byte).unwrap();
+        }
+
+        checksum_string
+    }
+}

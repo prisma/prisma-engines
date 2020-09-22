@@ -22,6 +22,9 @@ pub trait Rpc {
     #[rpc(name = "getDatabaseDescription")]
     fn get_database_description(&self, input: IntrospectionInput) -> RpcFutureResult<String>;
 
+    #[rpc(name = "getDatabaseVersion")]
+    fn get_database_version(&self, input: IntrospectionInput) -> RpcFutureResult<String>;
+
     #[rpc(name = "introspect")]
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput>;
 }
@@ -38,7 +41,11 @@ impl Rpc for RpcImpl {
     }
 
     fn get_database_description(&self, input: IntrospectionInput) -> RpcFutureResult<String> {
-        Box::new(Self::get_database_description(input.schema).boxed().compat())
+        Box::new(Self::get_database_description_internal(input.schema).boxed().compat())
+    }
+
+    fn get_database_version(&self, input: IntrospectionInput) -> RpcFutureResult<String> {
+        Box::new(Self::get_database_version_internal(input.schema).boxed().compat())
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
@@ -117,9 +124,14 @@ impl RpcImpl {
         RpcImpl::catch(connector.list_databases()).await
     }
 
-    pub async fn get_database_description(schema: String) -> RpcResult<String> {
+    pub async fn get_database_description_internal(schema: String) -> RpcResult<String> {
         let (_, _, connector) = RpcImpl::load_connector(&schema).await?;
         RpcImpl::catch(connector.get_database_description()).await
+    }
+
+    pub async fn get_database_version_internal(schema: String) -> RpcResult<String> {
+        let (_, _, connector) = RpcImpl::load_connector(&schema).await?;
+        RpcImpl::catch(connector.get_database_version()).await
     }
 
     pub async fn get_database_metadata_internal(schema: String) -> RpcResult<DatabaseMetadata> {

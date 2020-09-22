@@ -22,8 +22,14 @@ impl SqlMigration {
 }
 
 impl DatabaseMigrationMarker for SqlMigration {
+    const FILE_EXTENSION: &'static str = "sql";
+
     fn serialize(&self) -> serde_json::Value {
         serde_json::to_value(self).unwrap()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.steps.is_empty()
     }
 }
 
@@ -42,6 +48,26 @@ pub enum SqlMigrationStep {
     CreateEnum(CreateEnum),
     DropEnum(DropEnum),
     AlterEnum(AlterEnum),
+}
+
+impl SqlMigrationStep {
+    pub(crate) fn description(&self) -> &str {
+        match self {
+            SqlMigrationStep::AddForeignKey(_) => "AddForeignKey",
+            SqlMigrationStep::CreateTable(_) => "CreateTable",
+            SqlMigrationStep::AlterTable(_) => "AlterTable",
+            SqlMigrationStep::DropForeignKey(_) => "DropForeignKey",
+            SqlMigrationStep::DropTable(_) => "DropTable",
+            SqlMigrationStep::RenameTable { .. } => "RenameTable",
+            SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
+            SqlMigrationStep::CreateIndex(_) => "CreateIndex",
+            SqlMigrationStep::DropIndex(_) => "DropIndex",
+            SqlMigrationStep::AlterIndex(_) => "AlterIndex",
+            SqlMigrationStep::CreateEnum(_) => "CreateEnum",
+            SqlMigrationStep::DropEnum(_) => "DropEnum",
+            SqlMigrationStep::AlterEnum(_) => "AlterEnum",
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]

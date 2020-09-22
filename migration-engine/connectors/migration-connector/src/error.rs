@@ -23,6 +23,20 @@ impl ConnectorError {
         }
     }
 
+    pub fn into_migration_failed(self, migration_name: String) -> Self {
+        let context = self.context.clone();
+        let user_facing_error = self.user_facing_error.clone();
+
+        ConnectorError {
+            user_facing_error,
+            kind: ErrorKind::MigrationFailedToApply {
+                migration_name,
+                error: self.into(),
+            },
+            context,
+        }
+    }
+
     pub fn url_parse_error(err: impl Display, url: &str) -> Self {
         ConnectorError {
             user_facing_error: None,
@@ -67,6 +81,16 @@ pub enum ErrorKind {
 
     #[error("Connect timed out")]
     ConnectTimeout,
+
+    #[error(
+        "Migration `{}` failed to apply cleanly to a temporary database. {}",
+        migration_name,
+        error
+    )]
+    MigrationFailedToApply {
+        migration_name: String,
+        error: anyhow::Error,
+    },
 
     #[error("Operation timed out")]
     Timeout,

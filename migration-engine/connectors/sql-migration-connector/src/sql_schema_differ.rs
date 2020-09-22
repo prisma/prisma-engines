@@ -379,13 +379,18 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         self.table_pairs()
             .filter(|tables| !tables_to_redefine.contains(tables.next.name()))
             .for_each(|differ| {
-                differ.index_pairs().for_each(|(previous_index, renamed_index)| {
-                    alter_indexes.push(AlterIndex {
-                        index_name: previous_index.name.clone(),
-                        index_new_name: renamed_index.name.clone(),
-                        table: differ.next.name().to_owned(),
+                differ
+                    .index_pairs()
+                    .filter(|(previous_index, next_index)| {
+                        self.flavour.index_should_be_renamed(previous_index, next_index)
                     })
-                })
+                    .for_each(|(previous_index, renamed_index)| {
+                        alter_indexes.push(AlterIndex {
+                            index_name: previous_index.name.clone(),
+                            index_new_name: renamed_index.name.clone(),
+                            table: differ.next.name().to_owned(),
+                        })
+                    })
             });
 
         alter_indexes
@@ -419,7 +424,9 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn table_is_ignored(&self, table_name: &str) -> bool {
-        table_name == MIGRATION_TABLE_NAME || self.flavour.table_should_be_ignored(&table_name)
+        table_name == MIGRATION_TABLE_NAME
+            || table_name == "_prisma_migrations"
+            || self.flavour.table_should_be_ignored(&table_name)
     }
 
     fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
@@ -475,7 +482,7 @@ fn push_foreign_keys_from_created_tables<'a>(
 
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
-fn foreign_keys_match(previous: &ForeignKeyWalker<'_, '_>, next: &ForeignKeyWalker<'_, '_>) -> bool {
+fn foreign_keys_match(previous: &ForeignKeyWalker<'_>, next: &ForeignKeyWalker<'_>) -> bool {
     // Foreign keys point to different tables.
     if previous.referenced_table().name() != next.referenced_table().name() {
         return false;

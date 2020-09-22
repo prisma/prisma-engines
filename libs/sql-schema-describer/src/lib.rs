@@ -38,6 +38,8 @@ pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
     /// Describe a database schema.
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
+    /// Get the database version.
+    async fn version(&self, schema: &str) -> SqlSchemaDescriberResult<Option<String>>;
 }
 
 #[derive(Serialize, Deserialize)]

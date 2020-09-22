@@ -1,8 +1,10 @@
 use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
+    flavour::MYSQL_IDENTIFIER_SIZE_LIMIT,
     flavour::{MysqlFlavour, SqlFlavour},
     sql_migration::AddColumn,
+    sql_migration::AddForeignKey,
     sql_migration::AlterColumn,
     sql_migration::AlterTable,
     sql_migration::DropColumn,
@@ -27,11 +29,32 @@ impl SqlRenderer for MysqlFlavour {
         Quoted::Backticks(name)
     }
 
-    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        QuotedWithSchema {
-            schema_name: self.schema_name(),
-            name: self.quote(name),
+    fn quote_with_schema<'a, 'b>(&'a self, _name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+        unreachable!("quote_with_schema on MySQL")
+    }
+
+    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
+        use std::fmt::Write;
+
+        let AddForeignKey { foreign_key, table } = add_foreign_key;
+        let mut add_constraint = String::with_capacity(120);
+
+        write!(add_constraint, "ALTER TABLE {table} ADD ", table = self.quote(table)).unwrap();
+
+        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
+            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
         }
+
+        write!(
+            add_constraint,
+            "FOREIGN KEY ({})",
+            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
+        )
+        .unwrap();
+
+        add_constraint.push_str(&self.render_references(&foreign_key));
+
+        add_constraint
     }
 
     fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
@@ -49,7 +72,6 @@ impl SqlRenderer for MysqlFlavour {
             index_name,
             index_new_name,
         } = alter_index;
-
         // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
         if database_info.is_mariadb() || database_info.is_mysql_5_6() {
             let old_index = current_schema
@@ -71,17 +93,21 @@ impl SqlRenderer for MysqlFlavour {
                     )
                 })?;
             let mut new_index = old_index.clone();
-            new_index.name = index_new_name.clone();
+            new_index.name = index_new_name.to_owned();
 
             // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
             Ok(vec![
-                render_create_index(self, table, &new_index, self.sql_family()),
+                self.render_create_index(&CreateIndex {
+                    table: table.clone(),
+                    index: new_index,
+                    caused_by_create_table: false,
+                }),
                 mysql_drop_index(self, table, index_name),
             ])
         } else {
             Ok(vec![format!(
                 "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
-                table_name = self.quote_with_schema(&table),
+                table_name = self.quote(&table),
                 index_name = self.quote(index_name),
                 index_new_name = self.quote(index_new_name)
             )])
@@ -141,8 +167,8 @@ impl SqlRenderer for MysqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote_with_schema(&table.name),
-            lines.join(",\n")
+            self.quote(&table.name),
+            lines.join(",\n    ")
         )]
     }
 
@@ -173,6 +199,10 @@ impl SqlRenderer for MysqlFlavour {
                 column_name, tpe_str, nullability_str, default_str, auto_increment_str
             ),
         }
+    }
+
+    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+        vec![format!("DROP TABLE {}", self.quote(&table_name))]
     }
 
     fn render_references(&self, foreign_key: &ForeignKey) -> String {
@@ -211,13 +241,28 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let CreateIndex {
-            table,
-            index,
-            caused_by_create_table: _,
-        } = create_index;
+        let Index { name, columns, tpe } = &create_index.index;
+        let name = if name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+            &name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+        } else {
+            &name
+        };
+        let index_type = match tpe {
+            IndexType::Unique => "UNIQUE ",
+            IndexType::Normal => "",
+        };
+        let index_name = self.quote(&name);
+        let table_reference = self.quote(&create_index.table);
 
-        render_create_index(self, table, index, self.sql_family())
+        let columns = columns.iter().map(|c| self.quote(c));
+
+        format!(
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+            index_type = index_type,
+            index_name = index_name,
+            table_reference = table_reference,
+            columns = columns.join(", ")
+        )
     }
 
     fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
@@ -239,11 +284,16 @@ impl SqlRenderer for MysqlFlavour {
                 .iter()
                 .map(|index| {
                     let tpe = if index.is_unique() { "UNIQUE " } else { "" };
+                    let index_name = if index.name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+                        &index.name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+                    } else {
+                        &index.name
+                    };
 
                     format!(
-                        "{}Index {}({})",
+                        "{}INDEX {}({})",
                         tpe,
-                        self.quote(&index.name),
+                        self.quote(&index_name),
                         index.columns.iter().map(|col| self.quote(&col)).join(",\n")
                     )
                 })
@@ -256,7 +306,7 @@ impl SqlRenderer for MysqlFlavour {
 
         Ok(format!(
             "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            table_name = self.quote_with_schema(table.name()),
+            table_name = self.quote(table.name()),
             columns = columns,
             indexes= indexes,
             primary_key = primary_key,
@@ -270,7 +320,7 @@ impl SqlRenderer for MysqlFlavour {
     fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
         format!(
             "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
-            table = self.quote_with_schema(&drop_foreign_key.table),
+            table = self.quote(&drop_foreign_key.table),
             constraint_name = Quoted::mysql_ident(&drop_foreign_key.constraint_name),
         )
     }
@@ -286,8 +336,8 @@ impl SqlRenderer for MysqlFlavour {
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(&name),
-            new_name = self.quote_with_schema(&new_name),
+            self.quote(&name),
+            new_name = self.quote(&new_name),
         )
     }
 }
@@ -371,6 +421,6 @@ fn mysql_drop_index(renderer: &dyn SqlFlavour, table_name: &str, index_name: &st
     format!(
         "DROP INDEX {} ON {}",
         renderer.quote(index_name),
-        renderer.quote_with_schema(table_name)
+        renderer.quote(table_name)
     )
 }
