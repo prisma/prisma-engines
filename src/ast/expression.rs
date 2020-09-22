@@ -3,23 +3,30 @@ use either::Either;
 use query::SelectQuery;
 use std::borrow::Cow;
 
+/// An expression that can be positioned in a query. Can be a single value or a
+/// statement that is evaluated into a value.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Expression<'a> {
     pub(crate) kind: ExpressionKind<'a>,
     pub(crate) alias: Option<Cow<'a, str>>,
 }
 
-#[allow(dead_code)]
 impl<'a> Expression<'a> {
+    /// The type of the expression, dictates how it's implemented in the query.
+    pub fn kind(&self) -> &ExpressionKind<'a> {
+        &self.kind
+    }
+
+    /// The name alias of the expression, how it can referred in the query.
+    pub fn alias(&self) -> Option<&str> {
+        self.alias.as_ref().map(|s| s.as_ref())
+    }
+
     pub(crate) fn row(row: Row<'a>) -> Self {
         Self {
             kind: ExpressionKind::Row(row),
             alias: None,
         }
-    }
-
-    pub(crate) fn select(select: Select<'a>) -> Self {
-        Self::selection(SelectQuery::Select(Box::new(select)))
     }
 
     pub(crate) fn union(union: Union<'a>) -> Self {

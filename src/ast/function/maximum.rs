@@ -1,6 +1,7 @@
 use super::Function;
 use crate::ast::Column;
 
+/// A represention of the `MAX` function in the database.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Maximum<'a> {
     pub(crate) column: Column<'a>,

@@ -24,6 +24,9 @@ use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 #[derive(Debug, Clone, PartialEq)]
 pub struct Raw<'a>(pub(crate) Value<'a>);
 
+/// Converts the value into a state to skip parameterization.
+///
+/// Must be used carefully to avoid SQL injections.
 pub trait IntoRaw<'a> {
     fn raw(self) -> Raw<'a>;
 }

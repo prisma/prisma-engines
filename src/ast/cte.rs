@@ -24,11 +24,12 @@ impl<'a> CommonTableExpression<'a> {
     }
 }
 
+/// Conversion into a common table expression.
+///
+/// Used together with the [`Select#with`] method.
+///
+/// [`Select#with`]: struct.Select.html#method.with
 pub trait IntoCommonTableExpression<'a> {
-    /// Conversion into a common table expression, used together
-    /// with the [`Select#with`] method.
-    ///
-    /// [`Select#with`]: struct.Select.html#method.with
     fn into_cte(self, identifier: impl Into<Cow<'a, str>>) -> CommonTableExpression<'a>
     where
         Self: Into<SelectQuery<'a>>,

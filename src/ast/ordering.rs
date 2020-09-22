@@ -1,8 +1,9 @@
 use crate::ast::{Column, Expression};
 
+/// Defines ordering for an `ORDER BY` statement.
 pub type OrderDefinition<'a> = (Expression<'a>, Option<Order>);
 
-/// A list of definitions for the `ORDER BY` statement
+/// A list of definitions for the `ORDER BY` statement.
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct Ordering<'a>(pub Vec<OrderDefinition<'a>>);
 

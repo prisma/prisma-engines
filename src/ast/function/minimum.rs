@@ -1,6 +1,7 @@
 use super::Function;
 use crate::ast::Column;
 
+/// A represention of the `MIN` function in the database.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Minimum<'a> {
     pub(crate) column: Column<'a>,

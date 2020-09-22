@@ -1,5 +1,8 @@
 use super::{Column, Table};
 
+/// A definition of a database index.
+///
+/// Used mainly for the transformation of a `INSERT` into a `MERGE`.
 #[derive(Debug, PartialEq, Clone)]
 pub enum IndexDefinition<'a> {
     Single(Column<'a>),

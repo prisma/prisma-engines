@@ -1,5 +1,6 @@
 use crate::ast::{Column, Expression};
 
+/// Defines a grouping for the `GROUP BY` statement.
 pub type GroupByDefinition<'a> = Expression<'a>;
 
 /// A list of definitions for the `GROUP BY` statement

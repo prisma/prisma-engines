@@ -1,6 +1,7 @@
 use super::Function;
 use crate::ast::Expression;
 
+/// A represention of the `UPPER` function in the database.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Upper<'a> {
     pub(crate) expression: Box<Expression<'a>>,
