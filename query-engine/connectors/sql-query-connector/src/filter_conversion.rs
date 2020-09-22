@@ -434,9 +434,14 @@ fn convert_value<'a>(fields: &[ScalarFieldRef], value: PrismaValue) -> Value<'a>
 }
 
 fn convert_values<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>) -> Vec<Value<'a>> {
-    fields
-        .into_iter()
-        .zip(values)
-        .map(|(field, value)| field.value(value))
-        .collect()
+    if fields.len() == values.len() {
+        fields
+            .into_iter()
+            .zip(values)
+            .map(|(field, value)| field.value(value))
+            .collect()
+    } else {
+        let field = fields.first().unwrap();
+        values.into_iter().map(|value| field.value(value)).collect()
+    }
 }
