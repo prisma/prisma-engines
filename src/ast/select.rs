@@ -577,6 +577,13 @@ impl<'a> Select<'a> {
     /// # Ok(())
     /// # }
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// Please note that for some databases, a tuple conversion can inject
+    /// expressions. These will be named in the form of `cte_n`, where `n`
+    /// represents a number from `0` to up. Using these names might cause
+    /// a panic.
     pub fn with(mut self, cte: CommonTableExpression<'a>) -> Self {
         self.ctes.push(cte);
         self
@@ -617,7 +624,14 @@ impl<'a> Select<'a> {
             self.conditions = Some(tree);
 
             if let Some(ctes) = ctes {
-                self.ctes = ctes;
+                let clashing_names = self
+                    .ctes
+                    .iter()
+                    .any(|c| ctes.iter().any(|c2| c.identifier == c2.identifier));
+
+                assert!(!clashing_names);
+
+                self.ctes.extend(ctes);
             }
         };
 
