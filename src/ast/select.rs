@@ -610,7 +610,7 @@ impl<'a> Select<'a> {
     /// - Not comparing a tuple (e.g. `x IN (SELECT ...)`)
     /// - Not using a `IN` or `NOT IN` operation
     /// - Imbalanced number of variables (e.g. `(x, y, z) IN (SELECT a, b ...)`)
-    pub(crate) fn convert_tuple_select_to_cte(mut self, level: &mut usize) -> Self {
+    pub(crate) fn convert_tuple_selects_to_ctes(mut self, level: &mut usize) -> Self {
         if let Some(tree) = self.conditions.take() {
             let (tree, ctes) = tree.convert_tuple_selects_to_ctes(level);
 

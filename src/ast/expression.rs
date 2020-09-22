@@ -94,7 +94,7 @@ impl<'a> Expression<'a> {
     ) -> (Self, Option<Vec<CommonTableExpression<'a>>>) {
         match self.kind {
             ExpressionKind::Selection(SelectQuery::Select(select)) => {
-                let select = select.convert_tuple_select_to_cte(level);
+                let select = select.convert_tuple_selects_to_ctes(level);
 
                 let expr = Expression {
                     kind: ExpressionKind::Selection(SelectQuery::Select(Box::new(select))),

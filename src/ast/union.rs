@@ -118,7 +118,7 @@ impl<'a> Union<'a> {
         let mut converted = Vec::with_capacity(self.selects.len());
 
         for select in self.selects.drain(0..) {
-            converted.push(select.convert_tuple_select_to_cte(level));
+            converted.push(select.convert_tuple_selects_to_ctes(level));
         }
 
         self.selects = converted;
