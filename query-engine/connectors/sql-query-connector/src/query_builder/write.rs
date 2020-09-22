@@ -12,14 +12,7 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
         .fields()
         .scalar()
         .into_iter()
-        .filter(|field| {
-            args.has_arg_for(&field.db_name())
-            // if  {
-            //     Some(db_name)
-            // } else {
-            //     None
-            // }
-        })
+        .filter(|field| args.has_arg_for(&field.db_name()))
         .collect();
 
     let insert = fields

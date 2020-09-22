@@ -50,32 +50,3 @@ impl<'a> From<Value<'a>> for PrismaValue {
         }
     }
 }
-
-// impl<'a> From<PrismaValue> for Value<'a> {
-//     fn from(pv: PrismaValue) -> Self {
-//         match pv {
-//             PrismaValue::String(s) => s.into(),
-//             PrismaValue::Float(f) => f.into(),
-//             PrismaValue::Boolean(b) => b.into(),
-//             PrismaValue::DateTime(d) => d.into(),
-//             PrismaValue::Enum(e) => e.into(),
-//             PrismaValue::Int(i) => (i as i64).into(),
-//             PrismaValue::Uuid(u) => u.to_string().into(),
-//             PrismaValue::List(l) => Value::Array(Some(l.into_iter().map(|x| x.into()).collect())),
-//             PrismaValue::Json(s) => Value::Json(serde_json::from_str(&s).unwrap()),
-//             PrismaValue::Null {
-//                 TypeHint::String => Value::Text(None),
-//                 TypeHint::Float => Value::Real(None),
-//                 TypeHint::Boolean => Value::Boolean(None),
-//                 TypeHint::Enum => Value::Enum(None),
-//                 TypeHint::Json => Value::Json(None),
-//                 TypeHint::DateTime => Value::DateTime(None),
-//                 TypeHint::UUID => Value::Uuid(None),
-//                 TypeHint::Int => Value::Integer(None),
-//                 TypeHint::Array => Value::Array(None),
-//                 TypeHint::Char | TypeHint::Unknown => Value::Char(None),
-//                 TypeHint::Bytes => Value::Bytes(None),
-//             },
-//         }
-//     }
-// }

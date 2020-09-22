@@ -47,6 +47,6 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Uuid(u) => u.to_string().into(),
         PrismaValue::List(l) => Value::Array(Some(l.into_iter().map(|x| convert_lossy(x)).collect())),
         PrismaValue::Json(s) => Value::Json(serde_json::from_str(&s).unwrap()),
-        PrismaValue::Null => Value::Char(None), // Can't tell which type the null is supposed to be.
+        PrismaValue::Null => Value::Integer(None), // Can't tell which type the null is supposed to be.
     }
 }
