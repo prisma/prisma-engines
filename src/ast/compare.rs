@@ -57,22 +57,42 @@ impl<'a> Compare<'a> {
         self,
         level: &mut usize,
     ) -> Either<(Self, CommonTableExpression<'a>), Self> {
-        let mut convert = |row: Row<'a>, select: SelectQuery<'a>, mut selection: Vec<String>| {
+        let mut convert = |row: Row<'a>, select: SelectQuery<'a>, mut selected_columns: Vec<String>| {
+            // Get the columns out from the row.
             let mut cols = row.into_columns();
+
+            // The name of the CTE in the query
             let ident = format!("cte_{}", level);
 
             let cte = select.into_cte(ident.clone());
+
+            // The left side column of the comparison, `*this* IN (...)`. We can
+            // support a single value comparisons in all databases, so we try to
+            // find the first value of the tuple, converting the select to hold
+            // the rest of the values in its comparison.
             let comp_col = cols.remove(0);
-            let base_select = Select::from_table(ident).column(selection.remove(0));
 
-            let column_pairs = cols.into_iter().zip(selection.into_iter());
+            // The right side `SELECT` of the comparison, replacing the original
+            // `SELECT`.  At this point we just select the first column from the
+            // original select, changing the `SELECT` into
+            // `(SELECT first_col FROM cte_n)`.
+            let base_select = Select::from_table(ident).column(selected_columns.remove(0));
 
+            // We know we have the same amount of columns on both sides,
+            let column_pairs = cols.into_iter().zip(selected_columns.into_iter());
+
+            // Adding to the new select a condition to filter out the rest of
+            // the tuple, so if our tuple is `(a, b) IN (SELECT x, y ..)`, this
+            // will then turn into `a IN (SELECT x WHERE b = y)`.
             let inner_select = column_pairs.fold(base_select, |acc, (left_col, right_col)| {
                 acc.and_where(right_col.equals(left_col))
             });
 
+            // Now we added one cte, so we must increment the count for the
+            // possible other expressions.
             *level += 1;
 
+            // Return the comparison data to the caller.
             (comp_col, inner_select, cte)
         };
 
