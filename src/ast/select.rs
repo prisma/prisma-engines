@@ -644,8 +644,7 @@ impl<'a> Select<'a> {
                 ExpressionKind::Parameterized(_) => expr.alias.as_ref().map(|a| a.to_string()),
                 _ => None,
             })
-            .filter(|c| c.is_some())
-            .map(|c| c.unwrap())
+            .filter_map(|c| c)
             .collect()
     }
 }
