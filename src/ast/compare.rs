@@ -89,7 +89,7 @@ impl<'a> Compare<'a> {
                     return Either::Right(left.in_selection(right));
                 }
 
-                if row.all_columns() && row.len() > 1 {
+                if row.is_only_columns() && row.len() > 1 {
                     let (comp_col, inner_select, cte) = convert(row, select, selection);
                     let cond = comp_col.in_selection(inner_select);
 
@@ -112,7 +112,7 @@ impl<'a> Compare<'a> {
                     return Either::Right(left.not_in_selection(right));
                 }
 
-                if row.all_columns() && row.len() > 1 {
+                if row.is_only_columns() && row.len() > 1 {
                     let (comp_col, inner_select, cte) = convert(row, select, selection);
                     let cond = comp_col.not_in_selection(inner_select);
 

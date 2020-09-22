@@ -16,14 +16,6 @@ pub struct CommonTableExpression<'a> {
 }
 
 impl<'a> CommonTableExpression<'a> {
-    pub(crate) fn new(identifier: impl Into<Cow<'a, str>>, selection: impl Into<SelectQuery<'a>>) -> Self {
-        Self {
-            identifier: identifier.into(),
-            columns: Vec::new(),
-            selection: selection.into(),
-        }
-    }
-
     /// Selects a named value from the nested expresion. The statement selects
     /// everything if this method is never called.
     pub fn column(mut self, column: impl Into<Cow<'a, str>>) -> Self {
@@ -41,6 +33,10 @@ pub trait IntoCommonTableExpression<'a> {
     where
         Self: Into<SelectQuery<'a>>,
     {
-        CommonTableExpression::new(identifier, self)
+        CommonTableExpression {
+            identifier: identifier.into(),
+            columns: Vec::new(),
+            selection: self.into(),
+        }
     }
 }
