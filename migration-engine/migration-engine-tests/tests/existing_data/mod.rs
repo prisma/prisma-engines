@@ -2,7 +2,7 @@ mod sql_unexecutable_migrations;
 
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use prisma_value::{PrismaValue, TypeHint};
+use prisma_value::PrismaValue;
 use quaint::ast::*;
 use sql_schema_describer::DefaultValue;
 
@@ -210,17 +210,14 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     row.get("name").map(|val| {
                         val.to_string()
                             .map(|val| PrismaValue::String(val))
-                            .unwrap_or(PrismaValue::Null(TypeHint::String))
+                            .unwrap_or(PrismaValue::Null)
                     })
                 })
                 .collect();
 
             assert_eq!(
                 &[
-                    first_default
-                        .as_ref()
-                        .cloned()
-                        .unwrap_or(PrismaValue::Null(TypeHint::String)),
+                    first_default.as_ref().cloned().unwrap_or(PrismaValue::Null),
                     PrismaValue::String("Waterworld".to_string())
                 ],
                 names.as_slice()
@@ -255,16 +252,13 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     row.get("name").map(|val| {
                         val.to_string()
                             .map(|val| PrismaValue::String(val))
-                            .unwrap_or(PrismaValue::Null(TypeHint::String))
+                            .unwrap_or(PrismaValue::Null)
                     })
                 })
                 .collect();
             assert_eq!(
                 &[
-                    first_default
-                        .as_ref()
-                        .cloned()
-                        .unwrap_or(PrismaValue::Null(TypeHint::String)),
+                    first_default.as_ref().cloned().unwrap_or(PrismaValue::Null),
                     PrismaValue::String("Waterworld".to_string())
                 ],
                 names.as_slice()

@@ -10,7 +10,7 @@ macro_rules! number_operation {
 
       fn $fname(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-          (PrismaValue::Null(_), _) | (_, PrismaValue::Null(_)) => PrismaValue::Null(TypeHint::Unknown),
+          (PrismaValue::Null, _) | (_, PrismaValue::Null) => PrismaValue::Null,
 
           (PrismaValue::Int(l), PrismaValue::Int(r)) => PrismaValue::Int(l $op r),
           (PrismaValue::Int(l), PrismaValue::Float(r)) => {

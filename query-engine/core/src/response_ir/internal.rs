@@ -137,7 +137,7 @@ fn serialize_record_selection(
                             if !opt {
                                 // Check that all items are non-null
                                 if items.iter().any(|item| match item {
-                                    Item::Value(PrismaValue::Null(_)) => true,
+                                    Item::Value(PrismaValue::Null) => true,
                                     _ => false,
                                 }) {
                                     return Err(CoreError::SerializationError(format!(
@@ -173,10 +173,7 @@ fn serialize_record_selection(
                                     )))
                                 }
                             } else if items.is_empty() && opt {
-                                Ok((
-                                    parent,
-                                    Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null(TypeHint::Unknown)))),
-                                ))
+                                Ok((parent, Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null)))))
                             } else if items.is_empty() && opt {
                                 Err(CoreError::SerializationError(format!(
                                     "Required field '{}' returned a null record",
@@ -289,7 +286,7 @@ fn write_nested_items(
                 let field = enclosing_type.find_field(field_name).unwrap();
                 let default = match field.field_type.borrow() {
                     OutputType::List(_) => Item::list(Vec::new()),
-                    _ if !field.is_required => Item::Value(PrismaValue::Null(TypeHint::Unknown)),
+                    _ if !field.is_required => Item::Value(PrismaValue::Null),
                     _ => panic!(
                         "Application logic invariant error: received null value for field {} which may not be null",
                         &field_name
@@ -329,7 +326,7 @@ fn process_nested_results(
 
 fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
     match (&value, field.field_type.as_ref()) {
-        (PrismaValue::Null(_), _) if !field.is_required => Ok(Item::Value(PrismaValue::Null(TypeHint::Unknown))),
+        (PrismaValue::Null, _) if !field.is_required => Ok(Item::Value(PrismaValue::Null)),
         (_, OutputType::Enum(et)) => match et.borrow() {
             EnumType::Internal(ref i) => convert_enum(value, i),
             _ => unreachable!(),

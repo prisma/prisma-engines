@@ -6,7 +6,6 @@ pub use scalar::*;
 
 use crate::prelude::*;
 use datamodel::ScalarType;
-use prisma_value::TypeHint;
 use std::{hash::Hash, sync::Arc};
 
 #[derive(Debug)]
@@ -67,21 +66,6 @@ pub enum TypeIdentifier {
     DateTime,
     UUID,
     Int,
-}
-
-impl From<TypeIdentifier> for TypeHint {
-    fn from(typ: TypeIdentifier) -> Self {
-        match typ {
-            TypeIdentifier::String => TypeHint::String,
-            TypeIdentifier::Float => TypeHint::Float,
-            TypeIdentifier::Boolean => TypeHint::Boolean,
-            TypeIdentifier::Enum(_) => TypeHint::Enum,
-            TypeIdentifier::Json => TypeHint::Json,
-            TypeIdentifier::DateTime => TypeHint::DateTime,
-            TypeIdentifier::UUID => TypeHint::UUID,
-            TypeIdentifier::Int => TypeHint::Int,
-        }
-    }
 }
 
 impl Field {
