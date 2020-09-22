@@ -32,7 +32,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
 
     let connector = match &source.active_provider {
         #[cfg(feature = "sql")]
-        provider if POSTGRES_SOURCE_NAME == provider => {
+        provider if POSTGRES_SOURCE_NAME == provider || "cockroach" == provider => {
             let mut u = url::Url::parse(&source.url().value).map_err(|url_error| {
                 Error::ConnectorError(ConnectorError::url_parse_error(url_error, &source.url().value))
             })?;
