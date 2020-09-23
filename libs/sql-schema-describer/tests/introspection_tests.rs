@@ -13,7 +13,7 @@ mod test_api;
 
 use crate::common::*;
 use crate::test_api::*;
-use native_types::{MsSqlType, MySqlType, NativeType, PostgresType, SqliteType};
+use native_types::{MsSqlType, MySqlType, NativeType, PostgresType};
 use prisma_value::PrismaValue;
 use serde_json::Value;
 
@@ -27,13 +27,13 @@ fn int_full_data_type(api: &TestApi) -> String {
     }
 }
 
-fn int_native_type(api: &TestApi) -> Value {
+fn int_native_type(api: &TestApi) -> Option<Value> {
     match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => PostgresType::Integer.to_json(),
-        (SqlFamily::Sqlite, _) => SqliteType::Int.to_json(),
-        (SqlFamily::Mysql, "mysql8") => MySqlType::Int.to_json(),
-        (SqlFamily::Mysql, _) => MySqlType::Int.to_json(),
-        (SqlFamily::Mssql, _) => MsSqlType::Int.to_json(),
+        (SqlFamily::Postgres, _) => Some(PostgresType::Integer.to_json()),
+        (SqlFamily::Sqlite, _) => None,
+        (SqlFamily::Mysql, "mysql8") => Some(MySqlType::Int.to_json()),
+        (SqlFamily::Mysql, _) => Some(MySqlType::Int.to_json()),
+        (SqlFamily::Mssql, _) => Some(MsSqlType::Int.to_json()),
     }
 }
 
@@ -67,13 +67,13 @@ fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
     }
 }
 
-fn varchar_native_type(api: &TestApi, length: u32) -> Value {
+fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
     match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => PostgresType::VarChar(length).to_json(),
-        (SqlFamily::Sqlite, _) => SqliteType::Text.to_json(),
-        (SqlFamily::Mysql, "mysql8") => MySqlType::VarChar(length).to_json(),
-        (SqlFamily::Mysql, _) => MySqlType::VarChar(length).to_json(),
-        (SqlFamily::Mssql, _) => MsSqlType::VarChar(length).to_json(),
+        (SqlFamily::Postgres, _) => Some(PostgresType::VarChar(length).to_json()),
+        (SqlFamily::Sqlite, _) => None,
+        (SqlFamily::Mysql, "mysql8") => Some(MySqlType::VarChar(length).to_json()),
+        (SqlFamily::Mysql, _) => Some(MySqlType::VarChar(length).to_json()),
+        (SqlFamily::Mssql, _) => Some(MsSqlType::VarChar(length).to_json()),
     }
 }
 

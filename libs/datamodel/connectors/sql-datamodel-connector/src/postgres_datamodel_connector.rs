@@ -30,8 +30,6 @@ const UUID_TYPE_NAME: &str = "Uuid";
 const XML_TYPE_NAME: &str = "Xml";
 const JSON_TYPE_NAME: &str = "Json";
 const JSON_B_TYPE_NAME: &str = "JsonB";
-// const ENUM_TYPE_NAME: &str = "Enum";
-const NOT_HANDLED_TYPE_NAME: &str = "NotHandled";
 
 pub struct PostgresDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -134,7 +132,7 @@ impl Connector for PostgresDatamodelConnector {
             BIG_INT_TYPE_NAME => PostgresType::BigInt,
             DECIMAL_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    PostgresType::Decimal(*first_arg as u8, *second_arg as u8)
+                    PostgresType::Decimal(*first_arg, *second_arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         DECIMAL_TYPE_NAME,
@@ -145,7 +143,7 @@ impl Connector for PostgresDatamodelConnector {
             }
             NUMERIC_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    PostgresType::Numeric(*first_arg as u8, *second_arg as u8)
+                    PostgresType::Numeric(*first_arg, *second_arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         NUMERIC_TYPE_NAME,
@@ -181,7 +179,7 @@ impl Connector for PostgresDatamodelConnector {
             BYTE_A_TYPE_NAME => PostgresType::ByteA,
             TIMESTAMP_TYPE_NAME => {
                 if let Some(arg) = args.first() {
-                    PostgresType::Timestamp(*arg as u8)
+                    PostgresType::Timestamp(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         TIMESTAMP_TYPE_NAME,
@@ -192,7 +190,7 @@ impl Connector for PostgresDatamodelConnector {
             }
             TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => {
                 if let Some(arg) = args.first() {
-                    PostgresType::TimestampWithTimeZone(*arg as u8)
+                    PostgresType::TimestampWithTimeZone(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         TIME_WITH_TIMEZONE_TYPE_NAME,
@@ -203,7 +201,7 @@ impl Connector for PostgresDatamodelConnector {
             }
             INTERVAL_TYPE_NAME => {
                 if let Some(arg) = args.first() {
-                    PostgresType::Interval(*arg as u8)
+                    PostgresType::Interval(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         INTERVAL_TYPE_NAME,
@@ -215,14 +213,14 @@ impl Connector for PostgresDatamodelConnector {
             DATE_TYPE_NAME => PostgresType::Date,
             TIME_TYPE_NAME => {
                 if let Some(arg) = args.first() {
-                    PostgresType::Time(*arg as u8)
+                    PostgresType::Time(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(TIME_TYPE_NAME, 1, 0));
                 }
             }
             TIME_WITH_TIMEZONE_TYPE_NAME => {
                 if let Some(arg) = args.first() {
-                    PostgresType::TimeWithTimeZone(*arg as u8)
+                    PostgresType::TimeWithTimeZone(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         TIME_WITH_TIMEZONE_TYPE_NAME,
@@ -294,8 +292,6 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::XML => (XML_TYPE_NAME, vec![]),
             PostgresType::JSON => (JSON_TYPE_NAME, vec![]),
             PostgresType::JSONB => (JSON_B_TYPE_NAME, vec![]),
-            // PostgresType::Enum(name) => (ENUM_TYPE_NAME, vec![]), //Fixme Arg would be the name of the Enum?
-            PostgresType::NotHandled => (NOT_HANDLED_TYPE_NAME, vec![]),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {

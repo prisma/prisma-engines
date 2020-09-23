@@ -253,7 +253,7 @@ pub struct ColumnType {
     /// The arity of the column.
     pub arity: ColumnArity,
     /// The Native type of the column.
-    pub native_type: serde_json::Value,
+    pub native_type: Option<serde_json::Value>,
 }
 
 impl ColumnType {
@@ -264,7 +264,7 @@ impl ColumnType {
             character_maximum_length: None,
             family,
             arity,
-            native_type: serde_json::Value::default(),
+            native_type: None,
         }
     }
 }

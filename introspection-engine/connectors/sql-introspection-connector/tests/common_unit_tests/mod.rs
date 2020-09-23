@@ -407,7 +407,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
-                        native_type: PostgresType::Integer.to_json(),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: true,
@@ -430,7 +430,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
-                        native_type: PostgresType::Integer.to_json(),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -454,7 +454,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
-                        native_type: PostgresType::Integer.to_json(),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: true,
@@ -676,7 +676,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Integer.to_json(),
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: true,
@@ -690,7 +690,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Text.to_json(),
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -716,7 +716,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Integer.to_json(),
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: true,
@@ -730,7 +730,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Integer.to_json(),
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -744,7 +744,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Text.to_json(),
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -833,7 +833,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
-                        native_type: PostgresType::Integer.to_json(),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: true,
@@ -847,7 +847,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
-                        native_type: PostgresType::Text.to_json(),
+                        native_type: Some(PostgresType::Text.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -861,7 +861,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
-                        native_type: PostgresType::Text.to_json(),
+                        native_type: Some(PostgresType::Text.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -992,7 +992,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Integer.to_json(),
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: true,
@@ -1006,7 +1006,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Text.to_json(),
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -1032,7 +1032,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Integer.to_json(),
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: true,
@@ -1046,7 +1046,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: PostgresType::Integer.to_json(),
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: false,

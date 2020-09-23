@@ -310,36 +310,30 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
 
 pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
+    let fdt = column.tpe.full_data_type.to_owned();
 
     match &column.tpe.family {
-        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
-        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
+        ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
+        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
-        ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
+        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
-        x => FieldType::Unsupported(x.to_string()),
+        ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
+        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
+        ColumnTypeFamily::Binary => FieldType::Unsupported(fdt), //not explicit before
+        ColumnTypeFamily::Geometric => FieldType::Unsupported(fdt), // not explicit before
+        ColumnTypeFamily::LogSequenceNumber => FieldType::Unsupported(fdt), // not explicit before
+        ColumnTypeFamily::TextSearch => FieldType::Unsupported(fdt), // not explicit before
+        ColumnTypeFamily::TransactionId => FieldType::Unsupported(fdt), // not explicit before
+        ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt), // not explicit before,
     }
 }
 
 pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, family: &SqlFamily) -> FieldType {
-    debug!("Calculating field type for '{}'", column.name);
-
-    //fixme xml and enum???
-    let scalar_type = match &column.tpe.family {
-        ColumnTypeFamily::Boolean => ScalarType::Boolean,
-        ColumnTypeFamily::DateTime => ScalarType::DateTime,
-        ColumnTypeFamily::Float => ScalarType::Float,
-        ColumnTypeFamily::Int => ScalarType::Int,
-        ColumnTypeFamily::String => ScalarType::String,
-        ColumnTypeFamily::Uuid => ScalarType::String,
-        ColumnTypeFamily::Json => ScalarType::Json,
-        ColumnTypeFamily::Decimal => ScalarType::Decimal,
-        ColumnTypeFamily::Binary => ScalarType::Bytes,
-        _x => ScalarType::Int,
-    };
+    debug!("Calculating native field type for '{}'", column.name);
+    let scalar_type = calculate_scalar_field_type(column);
 
     //fixme move this out of function
     let connector: Box<dyn Connector> = match family {
@@ -349,12 +343,16 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
         SqlFamily::Mssql => Box::new(SqlDatamodelConnectors::mssql()),
     };
 
-    println!("{:?}", column);
+    match scalar_type {
+        FieldType::Base(scal_type, _) => {
+            let native_type_instance = connector
+                .introspect_native_type(column.tpe.native_type.clone().unwrap())
+                .unwrap();
 
-    let native_type_instance = connector
-        .introspect_native_type(column.tpe.native_type.clone())
-        .unwrap();
-    FieldType::NativeType(scalar_type, native_type_instance)
+            FieldType::NativeType(scal_type, native_type_instance)
+        }
+        field_type => field_type,
+    }
 }
 
 // misc

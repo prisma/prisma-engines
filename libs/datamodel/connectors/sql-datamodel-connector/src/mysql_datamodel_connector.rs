@@ -37,8 +37,6 @@ const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const YEAR_TYPE_NAME: &str = "Year";
 const JSON_TYPE_NAME: &str = "JSON";
 const SET_TYPE_NAME: &str = "Set";
-// const ENUM_TYPE_NAME: &str = "Enum";
-const NOT_HANDLED_TYPE_NAME: &str = "NotHandled";
 
 pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -301,8 +299,6 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
             MySqlType::Set => (SET_TYPE_NAME, vec![]),
-            // MySqlType::Enum => (ENUM_TYPE_NAME, vec![]), //Fixme args for rendering would be the values???
-            MySqlType::NotHandled => (NOT_HANDLED_TYPE_NAME, vec![]),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {

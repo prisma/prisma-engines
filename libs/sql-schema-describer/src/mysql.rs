@@ -549,89 +549,81 @@ fn get_column_type_and_enum(
     column_name: &str,
     data_type: &str,
     full_data_type: &str,
+    //Fixme maybe we can get rid of this since we have the info in the native type
     character_maximum_length: Option<i64>,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
     //Fixme family mappings, length args
     // Decimal, Duration and XML are missing from ColumnTypefamily
 
-    //Fixme parse length arguments
-    println!("{}", full_data_type);
-    println!("{:?}", character_maximum_length);
     let (family, native_type) = match (data_type, full_data_type) {
-        ("int", _) => (ColumnTypeFamily::Int, MySqlType::Int),
-        ("smallint", _) => (ColumnTypeFamily::Int, MySqlType::SmallInt),
-        ("tinyint", "tinyint(1)") => (ColumnTypeFamily::Boolean, MySqlType::TinyInt),
-        ("tinyint", _) => (ColumnTypeFamily::Int, MySqlType::TinyInt),
-        ("mediumint", _) => (ColumnTypeFamily::Int, MySqlType::MediumInt),
-        ("bigint", _) => (ColumnTypeFamily::Int, MySqlType::BigInt),
+        ("int", _) => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
+        ("smallint", _) => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
+        ("tinyint", "tinyint(1)") => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
+        ("tinyint", _) => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
+        ("mediumint", _) => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
+        ("bigint", _) => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
         ("decimal", fdt) => (
             ColumnTypeFamily::Decimal,
-            MySqlType::Decimal(extract_double_length_arg(fdt).0, extract_double_length_arg(fdt).1),
+            Some(MySqlType::Decimal(extract_first_arg(fdt), extract_second_arg(fdt))),
         ),
         ("numeric", fdt) => (
             ColumnTypeFamily::Decimal,
-            MySqlType::Numeric(extract_double_length_arg(fdt).0, extract_double_length_arg(fdt).1),
+            Some(MySqlType::Numeric(extract_first_arg(fdt), extract_second_arg(fdt))),
         ),
-        ("float", _) => (ColumnTypeFamily::Float, MySqlType::Float),
-        ("double", _) => (ColumnTypeFamily::Float, MySqlType::Double),
-        ("date", _) => (ColumnTypeFamily::DateTime, MySqlType::Date),
+        ("float", _) => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
+        ("double", _) => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
+        ("date", _) => (ColumnTypeFamily::DateTime, Some(MySqlType::Date)),
         ("time", fdt) => (
             //Fixme this can either be a time or a duration -.-
             ColumnTypeFamily::DateTime,
-            MySqlType::Time(fractional_seconds(fdt)),
+            Some(MySqlType::Time(fractional_seconds(fdt))),
         ),
-        ("datetime", fdt) => (ColumnTypeFamily::DateTime, MySqlType::DateTime(fractional_seconds(fdt))),
+        ("datetime", fdt) => (
+            ColumnTypeFamily::DateTime,
+            Some(MySqlType::DateTime(fractional_seconds(fdt))),
+        ),
         ("timestamp", fdt) => (
             ColumnTypeFamily::DateTime,
-            MySqlType::Timestamp(fractional_seconds(fdt)),
+            Some(MySqlType::Timestamp(fractional_seconds(fdt))),
         ),
-        ("year", _) => (ColumnTypeFamily::Int, MySqlType::Year),
-        ("char", fdt) => (
-            ColumnTypeFamily::String,
-            MySqlType::Char(extract_single_length_arg(fdt)),
-        ),
+        ("year", _) => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
+        ("char", fdt) => (ColumnTypeFamily::String, Some(MySqlType::Char(extract_single_arg(fdt)))),
         ("varchar", fdt) => (
             ColumnTypeFamily::String,
-            MySqlType::VarChar(extract_single_length_arg(fdt)),
+            Some(MySqlType::VarChar(extract_single_arg(fdt))),
         ),
-        ("text", _) => (ColumnTypeFamily::String, MySqlType::Text),
-        ("tinytext", _) => (ColumnTypeFamily::String, MySqlType::TinyText),
-        ("mediumtext", _) => (ColumnTypeFamily::String, MySqlType::MediumText),
-        ("longtext", _) => (ColumnTypeFamily::String, MySqlType::LongText),
-        //Fixme handle Enum
-        ("enum", _) => (
-            ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)),
-            MySqlType::Int,
-        ),
-        ("json", _) => (ColumnTypeFamily::Json, MySqlType::JSON),
-        ("bit", fdt) => (ColumnTypeFamily::Binary, MySqlType::Bit(extract_single_length_arg(fdt))),
+        ("text", _) => (ColumnTypeFamily::String, Some(MySqlType::Text)),
+        ("tinytext", _) => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
+        ("mediumtext", _) => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
+        ("longtext", _) => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
+        ("enum", _) => (ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)), None),
+        ("json", _) => (ColumnTypeFamily::Json, Some(MySqlType::JSON)),
+        ("set", _) => (ColumnTypeFamily::String, None),
+        //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
+        ("bit", fdt) => (ColumnTypeFamily::Binary, Some(MySqlType::Bit(extract_single_arg(fdt)))),
         ("binary", fdt) => (
             ColumnTypeFamily::Binary,
-            MySqlType::Binary(extract_single_length_arg(fdt)),
+            Some(MySqlType::Binary(extract_single_arg(fdt))),
         ),
         ("varbinary", fdt) => (
             ColumnTypeFamily::Binary,
-            MySqlType::VarBinary(extract_single_length_arg(fdt)),
+            Some(MySqlType::VarBinary(extract_single_arg(fdt))),
         ),
-        ("blob", _) => (ColumnTypeFamily::Binary, MySqlType::Blob),
-        ("tinyblob", _) => (ColumnTypeFamily::Binary, MySqlType::TinyBlob),
-        ("mediumblob", _) => (ColumnTypeFamily::Binary, MySqlType::MediumBlob),
-        ("longblob", _) => (ColumnTypeFamily::Binary, MySqlType::LongBlob),
-        //Fixme
-        ("set", _) => (ColumnTypeFamily::String, MySqlType::NotHandled),
-        ("geometry", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
-        ("point", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
-        ("linestring", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
-        ("polygon", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
-        ("multipoint", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
-        ("multilinestring", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
-        ("multipolygon", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
-        ("geometrycollection", _) => (ColumnTypeFamily::Geometric, MySqlType::NotHandled),
-        (_, full_data_type) => (
-            ColumnTypeFamily::Unsupported(full_data_type.into()),
-            MySqlType::NotHandled,
-        ),
+        ("blob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::Blob)),
+        ("tinyblob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::TinyBlob)),
+        ("mediumblob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::MediumBlob)),
+        ("longblob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::LongBlob)),
+        //spatial
+        ("geometry", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        ("point", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        ("linestring", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        ("polygon", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        ("multipoint", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        ("multilinestring", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        ("multipolygon", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        ("geometrycollection", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        (_, fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
     };
 
     let tpe = ColumnType {
@@ -640,7 +632,7 @@ fn get_column_type_and_enum(
         character_maximum_length,
         family: family.clone(),
         arity,
-        native_type: native_type.to_json(),
+        native_type: native_type.map(|x| x.to_json()),
     };
 
     match &family {
@@ -661,20 +653,29 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     vals.split(',').map(|v| unquote_string(v)).collect()
 }
 
-fn extract_single_length_arg(full_data_type: &str) -> u32 {
+fn extract_single_arg(full_data_type: &str) -> u32 {
     let len = &full_data_type.len() - 1;
 
     let a = full_data_type[..len].split('(').last().unwrap();
     from_str::<u32>(a).unwrap()
 }
 
-fn extract_double_length_arg(full_data_type: &str) -> (u32, u32) {
+fn extract_first_arg(full_data_type: &str) -> u32 {
     let len = &full_data_type.len() - 1;
 
     let a = full_data_type[..len].split('(').last().unwrap();
     let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
 
-    (a[0], a[1])
+    a[0]
+}
+
+fn extract_second_arg(full_data_type: &str) -> u32 {
+    let len = &full_data_type.len() - 1;
+
+    let a = full_data_type[..len].split('(').last().unwrap();
+    let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
+
+    a[1]
 }
 
 // See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html

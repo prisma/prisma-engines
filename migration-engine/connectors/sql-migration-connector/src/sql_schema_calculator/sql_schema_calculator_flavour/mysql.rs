@@ -70,9 +70,12 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::Timestamp(precision) => format!("TIMESTAMP({precision})", precision = precision),
             MySqlType::Year => "YEAR".into(),
             MySqlType::JSON => "JSON".into(),
-            // MySqlType::Enum => "ENUM".into(), //Fixme handle enums
-            MySqlType::NotHandled => panic!("An Unhandled Datatype should not reach this point. "),
-            _ => todo!(),
+            MySqlType::UnsignedInt => "INTEGER UNSIGNED".into(),
+            MySqlType::UnsignedSmallInt => "SMALLINT UNSIGNED".into(),
+            MySqlType::UnsignedTinyInt => "TINYINT UNSIGNED".into(),
+            MySqlType::UnsignedMediumInt => "MEDIUMINT UNSIGNED".into(),
+            MySqlType::UnsignedBigInt => "BIGINT UNSIGNED".into(),
+            MySqlType::Set => "SET".into(),
         };
 
         sql::ColumnType {
@@ -85,7 +88,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
-            native_type: native_type_instance.serialized_native_type.clone(),
+            native_type: Some(native_type_instance.serialized_native_type.clone()),
         }
     }
 }

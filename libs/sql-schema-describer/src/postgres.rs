@@ -3,6 +3,7 @@ use super::*;
 use native_types::{NativeType, PostgresType};
 use quaint::prelude::Queryable;
 use regex::Regex;
+use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
 use tracing::debug;
 
@@ -637,56 +638,67 @@ fn get_column_type<'a>(
     let trim = |name: &'a str| name.trim_start_matches('_');
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
 
-    //Fixme take char lenght args from character max length
-    //the others need to be parsed -.-
+    println!("{}", data_type);
     println!("{}", full_data_type);
     println!("{:?}", character_maximum_length);
 
     let (family, native_type) = match full_data_type {
-        //Fixme handle Enums as a proper type
-        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), PostgresType::Integer),
-        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => {
-            (Enum(trim(x).to_owned()), PostgresType::Integer)
-        }
-        "int2" | "_int2" => (Int, PostgresType::Integer),
-        "int4" | "_int4" => (Int, PostgresType::Integer),
-        "int8" | "_int8" => (Int, PostgresType::Integer),
-        "oid" | "_oid" => (Int, PostgresType::Integer),         //Fixme
-        "float4" | "_float4" => (Float, PostgresType::Integer), //Fixme
-        "float8" | "_float8" => (Float, PostgresType::Integer), //Fixme
-        "bool" | "_bool" => (Boolean, PostgresType::Boolean),
-        "text" | "_text" => (String, PostgresType::Text),
-        "citext" | "_citext" => (String, PostgresType::Text), //Fixme
-        "varchar" | "_varchar" => (String, PostgresType::VarChar(character_maximum_length.unwrap() as u32)),
-        "date" | "_date" => (DateTime, PostgresType::Date),
-        "bytea" | "_bytea" => (Binary, PostgresType::ByteA),
-        "json" | "_json" => (Json, PostgresType::JSON),
-        "jsonb" | "_jsonb" => (Json, PostgresType::JSONB),
-        "uuid" | "_uuid" => (Uuid, PostgresType::UUID),
+        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), None),
+        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => (Enum(trim(x).to_owned()), None),
+        "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
+        "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
+        "int8" | "_int8" => (Int, Some(PostgresType::BigInt)),
+        "oid" | "_oid" => (Int, None),
+        "float4" | "_float4" => (Float, Some(PostgresType::Real)),
+        "float8" | "_float8" => (Float, Some(PostgresType::DoublePrecision)),
+        "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
+        "text" | "_text" => (String, Some(PostgresType::Text)),
+        "citext" | "_citext" => (String, None),
+        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(extract_single_arg(full_data_type)))),
+        "date" | "_date" => (DateTime, Some(PostgresType::Date)),
+        "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
+        "json" | "_json" => (Json, Some(PostgresType::JSON)),
+        "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
+        "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, PostgresType::Bit(0)), //Fixme
-        "varbit" | "_varbit" => (String, PostgresType::VarBit(0)), //Fixme
-        "bpchar" | "_bpchar" => (String, PostgresType::VarChar(0)), //Fixme
-        "interval" | "_interval" => (String, PostgresType::Interval(0)), //Fixme
-        "numeric" | "_numeric" => (Float, PostgresType::Numeric(0, 0)), //Fixme
-        "money" | "_money" => (Float, PostgresType::Integer), //Fixme
-        "pg_lsn" | "_pg_lsn" => (LogSequenceNumber, PostgresType::Integer), //Fixme
-        "time" | "_time" => (DateTime, PostgresType::Time(0)), //Fixme
-        "timetz" | "_timetz" => (DateTime, PostgresType::TimeWithTimeZone(0)), //Fixme
-        "timestamp" | "_timestamp" => (DateTime, PostgresType::Timestamp(0)), //Fixme
-        "timestamptz" | "_timestamptz" => (DateTime, PostgresType::TimestampWithTimeZone(0)), //Fixme
-        "tsquery" | "_tsquery" => (TextSearch, PostgresType::Text), //Fixme
-        "tsvector" | "_tsvector" => (TextSearch, PostgresType::Text), //Fixme
-        "txid_snapshot" | "_txid_snapshot" => (TransactionId, PostgresType::Text), //Fixme
-        "inet" | "_inet" => (String, PostgresType::Integer), //Fixme
+        "bit" | "_bit" => (String, Some(PostgresType::Bit(extract_single_arg(full_data_type)))),
+        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(extract_single_arg(full_data_type)))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::VarChar(extract_single_arg(full_data_type)))),
+        "interval" | "_interval" => (String, Some(PostgresType::Interval(extract_single_arg(full_data_type)))),
+        "numeric" | "_numeric" => (
+            Float,
+            Some(PostgresType::Numeric(
+                extract_first_arg(full_data_type),
+                extract_second_arg(full_data_type),
+            )),
+        ),
+        "money" | "_money" => (Float, None),
+        "pg_lsn" | "_pg_lsn" => (LogSequenceNumber, None),
+        "time" | "_time" => (DateTime, Some(PostgresType::Time(extract_single_arg(full_data_type)))),
+        "timetz" | "_timetz" => (
+            DateTime,
+            Some(PostgresType::TimeWithTimeZone(extract_single_arg(full_data_type))),
+        ),
+        "timestamp" | "_timestamp" => (
+            DateTime,
+            Some(PostgresType::Timestamp(extract_single_arg(full_data_type))),
+        ),
+        "timestamptz" | "_timestamptz" => (
+            DateTime,
+            Some(PostgresType::TimestampWithTimeZone(extract_single_arg(full_data_type))),
+        ),
+        "tsquery" | "_tsquery" => (TextSearch, None),
+        "tsvector" | "_tsvector" => (TextSearch, None),
+        "txid_snapshot" | "_txid_snapshot" => (TransactionId, None),
+        "inet" | "_inet" => (String, None),
         //geometric
-        "box" | "_box" => (Geometric, PostgresType::Integer), //Fixme
-        "circle" | "_circle" => (Geometric, PostgresType::Integer), //Fixme
-        "line" | "_line" => (Geometric, PostgresType::Integer), //Fixme
-        "lseg" | "_lseg" => (Geometric, PostgresType::Integer), //Fixme
-        "path" | "_path" => (Geometric, PostgresType::Integer), //Fixme
-        "polygon" | "_polygon" => (Geometric, PostgresType::Integer), //Fixme
-        data_type => (Unsupported(data_type.into()), PostgresType::NotHandled),
+        "box" | "_box" => (Unsupported(full_data_type.into()), None),
+        "circle" | "_circle" => (Unsupported(full_data_type.into()), None),
+        "line" | "_line" => (Unsupported(full_data_type.into()), None),
+        "lseg" | "_lseg" => (Unsupported(full_data_type.into()), None),
+        "path" | "_path" => (Unsupported(full_data_type.into()), None),
+        "polygon" | "_polygon" => (Unsupported(full_data_type.into()), None),
+        full_data_type => (Unsupported(full_data_type.into()), None),
     };
 
     ColumnType {
@@ -695,7 +707,7 @@ fn get_column_type<'a>(
         character_maximum_length,
         family,
         arity,
-        native_type: native_type.to_json(),
+        native_type: native_type.map(|x| x.to_json()),
     }
 }
 
@@ -707,6 +719,31 @@ static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
     )
     .unwrap()
 });
+
+fn extract_single_arg(full_data_type: &str) -> u32 {
+    let len = &full_data_type.len() - 1;
+
+    let a = full_data_type[..len].split('(').last().unwrap();
+    from_str::<u32>(a).unwrap()
+}
+
+fn extract_first_arg(full_data_type: &str) -> u32 {
+    let len = &full_data_type.len() - 1;
+
+    let a = full_data_type[..len].split('(').last().unwrap();
+    let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
+
+    a[0]
+}
+
+fn extract_second_arg(full_data_type: &str) -> u32 {
+    let len = &full_data_type.len() - 1;
+
+    let a = full_data_type[..len].split('(').last().unwrap();
+    let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
+
+    a[1]
+}
 
 /// Returns whether a particular sequence (`value`) matches the provided column info.
 /// todo this only seems to work on sequence names autogenerated by barrel???

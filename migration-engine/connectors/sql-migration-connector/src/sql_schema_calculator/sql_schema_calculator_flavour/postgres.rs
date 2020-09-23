@@ -54,8 +54,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             PostgresType::XML => "XML".to_owned(),
             PostgresType::JSON => "JSON".to_owned(),
             PostgresType::JSONB => "JSONB".to_owned(),
-            // PostgresType::Enum(name) => (format!("{}", name)),
-            PostgresType::NotHandled => unreachable!("NotHandled type should not make it into the Schema Calculator."),
         };
 
         sql::ColumnType {
@@ -68,7 +66,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
-            native_type: native_type_instance.serialized_native_type.clone(),
+            native_type: Some(native_type_instance.serialized_native_type.clone()),
         }
     }
 }
