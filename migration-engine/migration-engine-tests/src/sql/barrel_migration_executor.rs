@@ -15,7 +15,12 @@ impl BarrelMigrationExecutor<'_> {
     {
         use barrel::Migration;
 
-        let mut migration = Migration::new().schema(self.api.schema_name());
+        let mut migration = if self.api.is_sqlite() {
+            Migration::new()
+        } else {
+            Migration::new().schema(self.api.schema_name())
+        };
+
         migration_fn(&mut migration);
 
         let full_sql = migration.make_from(self.sql_variant);

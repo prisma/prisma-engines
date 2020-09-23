@@ -336,6 +336,10 @@ impl SqlRenderer for PostgresFlavour {
         format!("DROP INDEX {}", self.quote_with_schema(&drop_index.name))
     }
 
+    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+        vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
+    }
+
     fn render_redefine_tables(&self, _names: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on Postgres")
     }

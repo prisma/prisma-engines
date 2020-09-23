@@ -19,11 +19,8 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        QuotedWithSchema {
-            schema_name: self.attached_name(),
-            name: self.quote(name),
-        }
+    fn quote_with_schema<'a, 'b>(&'a self, _name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+        unreachable!("quote_with_schema on sqlite");
     }
 
     fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
@@ -45,7 +42,7 @@ impl SqlRenderer for SqliteFlavour {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
         };
-        let index_name = self.quote_with_schema(&name).to_string();
+        let index_name = self.quote(&name).to_string();
         let table_reference = self.quote(&create_index.table).to_string();
         let columns = columns.iter().map(|c| self.quote(c));
 
@@ -139,7 +136,7 @@ impl SqlRenderer for SqliteFlavour {
 
                     statements.push(format!(
                         "ALTER TABLE {table_name} ADD COLUMN {column_definition}",
-                        table_name = self.quote_with_schema(&table.name),
+                        table_name = self.quote(&table.name),
                         column_definition = col_sql,
                     ));
                 }
@@ -194,7 +191,7 @@ impl SqlRenderer for SqliteFlavour {
 
         Ok(format!(
             "CREATE TABLE {table_name} (\n{columns}{foreign_keys}{primary_key}\n)",
-            table_name = self.quote_with_schema(table.name()),
+            table_name = self.quote(table.name()),
             columns = columns,
             foreign_keys = foreign_keys,
             primary_key = primary_key,
@@ -210,7 +207,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_drop_index(&self, drop_index: &DropIndex) -> String {
-        format!("DROP INDEX {}", self.quote_with_schema(&drop_index.name))
+        format!("DROP INDEX {}", self.quote(&drop_index.name))
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
@@ -220,7 +217,7 @@ impl SqlRenderer for SqliteFlavour {
         // constraints on SQLite.
         vec![
             "PRAGMA foreign_keys=off".to_string(),
-            format!("DROP TABLE {}", self.quote_with_schema(&table_name)),
+            format!("DROP TABLE {}", self.quote(&table_name)),
             "PRAGMA foreign_keys=on".to_string(),
         ]
     }
@@ -251,11 +248,11 @@ impl SqlRenderer for SqliteFlavour {
 
             copy_current_table_into_new_table(&mut result, &differ, temporary_table.name(), self).unwrap();
 
-            result.push(format!("DROP TABLE {}", self.quote_with_schema(differ.next.name())));
+            result.push(format!("DROP TABLE {}", self.quote(differ.next.name())));
 
             result.push(format!(
                 "ALTER TABLE {old_name} RENAME TO \"{new_name}\"",
-                old_name = self.quote_with_schema(temporary_table.name()),
+                old_name = self.quote(temporary_table.name()),
                 new_name = differ.next.name()
             ));
 
@@ -270,22 +267,14 @@ impl SqlRenderer for SqliteFlavour {
             }));
         }
 
-        result.push(format!(
-            "PRAGMA {}.foreign_key_check",
-            Quoted::sqlite_ident(self.attached_name())
-        ));
-
+        result.push("PRAGMA foreign_key_check".to_string());
         result.push("PRAGMA foreign_keys=ON".to_string());
 
         result
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
-        format!(
-            "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(&name),
-            self.quote(new_name),
-        )
+        format!("ALTER TABLE {} RENAME TO {}", self.quote(&name), self.quote(new_name),)
     }
 }
 
@@ -340,12 +329,7 @@ fn copy_current_table_into_new_table(
 
     let mut query = String::with_capacity(40);
 
-    write!(
-        query,
-        "INSERT INTO {}.{} (",
-        Quoted::sqlite_ident(flavour.attached_name()),
-        Quoted::sqlite_ident(temporary_table)
-    )?;
+    write!(query, "INSERT INTO {} (", Quoted::sqlite_ident(temporary_table))?;
 
     let mut destination_columns = intersection_columns
         .iter()
@@ -390,12 +374,7 @@ fn copy_current_table_into_new_table(
         }
     }
 
-    write!(
-        query,
-        " FROM {}.{}",
-        Quoted::sqlite_ident(flavour.attached_name()),
-        Quoted::sqlite_ident(&differ.next.name())
-    )?;
+    write!(query, " FROM {}", Quoted::sqlite_ident(&differ.next.name()))?;
 
     steps.push(query);
 
