@@ -29,3 +29,6 @@ members = [
 
 [patch.crates-io]
 rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
+
+[patch."https://github.com/prisma/quaint"]
+quaint = { path = "../quaint" }

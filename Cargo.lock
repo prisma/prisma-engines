@@ -333,7 +333,7 @@ checksum = "9d67c978b1322c8031145b1f6c236fc371292f52c565bc96018b2971afcbffe1"
 [[package]]
 name = "barrel"
 version = "0.6.6-alpha.0"
-source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#366bd99ac0dc0ae5afa6a964ddc22e3f14a25f80"
+source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#b6298a4208083bfb63796cdc24ce1e4bcf7f62a8"
 
 [[package]]
 name = "base-x"
@@ -2642,13 +2642,13 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#0f57f151c0eb105d05ddfabd1cabedf209fefc16"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
  "bit-vec",
  "bytes",
  "chrono",
+ "either",
  "futures 0.3.5",
  "hex",
  "libsqlite3-sys",
