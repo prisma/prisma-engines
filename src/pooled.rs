@@ -98,8 +98,13 @@
 //! - `connectTimeout` defined in seconds (default: 5). Connecting to a
 //!   database will return a `ConnectTimeout` error if taking more than the
 //!   defined value.
-//! - `connection:imit` defines the maximum number of connections opened to the
+//! - `connectionLimit` defines the maximum number of connections opened to the
 //!   database.
+//! - `schema` the name of the lookup schema. Only stored to the connection,
+//!   must be used in every query to be effective.
+//! - `isolationLevel` the transaction isolation level. Possible values:
+//!   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
+//!   `SERIALIZABLE`.
 //!
 //! Example of a JDBC connection string:
 //!

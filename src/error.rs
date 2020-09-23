@@ -172,6 +172,10 @@ impl ErrorKind {
     pub(crate) fn conversion(msg: impl Into<Cow<'static, str>>) -> Self {
         Self::ConversionError(msg.into())
     }
+
+    pub(crate) fn database_url_is_invalid(msg: impl Into<String>) -> Self {
+        Self::DatabaseUrlIsInvalid(msg.into())
+    }
 }
 
 impl From<Error> for ErrorKind {

@@ -97,6 +97,28 @@ impl Quaint {
     /// - `connect_timeout` defined in seconds (default: 5). Connecting to a
     ///   database will return a `ConnectTimeout` error if taking more than the
     ///   defined value.
+    ///
+    /// Microsoft SQL Server:
+    ///
+    /// - `encrypt` if set to `true` encrypts all traffic over TLS. If `false`, only
+    ///   the login details are encrypted.
+    /// - `user` sets the login name.
+    /// - `password` sets the login password.
+    /// - `database` sets the database to connect to.
+    /// - `trustServerCertificate` if set to `true`, accepts any kind of certificate
+    ///   from the server.
+    /// - `socketTimeout` defined in seconds. If set, a query will return a
+    ///   `Timeout` error if it fails to resolve before given time.
+    /// - `connectTimeout` defined in seconds (default: 5). Connecting to a
+    ///   database will return a `ConnectTimeout` error if taking more than the
+    ///   defined value.
+    /// - `connectionLimit` defines the maximum number of connections opened to the
+    ///   database.
+    /// - `schema` the name of the lookup schema. Only stored to the connection,
+    ///   must be used in every query to be effective.
+    /// - `isolationLevel` the transaction isolation level. Possible values:
+    ///   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
+    ///   `SERIALIZABLE`.
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let inner = match url_str {
             #[cfg(feature = "sqlite")]

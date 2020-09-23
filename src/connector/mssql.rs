@@ -9,7 +9,14 @@ use crate::{
 };
 use async_trait::async_trait;
 use futures::lock::Mutex;
-use std::{collections::HashMap, convert::TryFrom, fmt::Write, future::Future, time::Duration};
+use std::{
+    collections::HashMap,
+    convert::TryFrom,
+    fmt::{self, Write},
+    future::Future,
+    str::FromStr,
+    time::Duration,
+};
 use tiberius::*;
 use tokio::{net::TcpStream, time::timeout};
 use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
@@ -34,6 +41,52 @@ pub(crate) struct MssqlQueryParams {
     connection_limit: Option<usize>,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
+    transaction_isolation_level: Option<IsolationLevel>,
+}
+
+#[derive(Debug, Clone, Copy)]
+/// Controls the locking and row versioning behavior of Transact-SQL statements
+/// issued by a connection to SQL Server. Read more from the [SQL Server
+/// documentation].
+///
+/// [SQL Server documentation]: https://docs.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver15
+pub enum IsolationLevel {
+    ReadUncommitted,
+    ReadCommitted,
+    RepeatableRead,
+    Snapshot,
+    Serializable,
+}
+
+impl fmt::Display for IsolationLevel {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::ReadUncommitted => write!(f, "READ UNCOMMITTED"),
+            Self::ReadCommitted => write!(f, "READ COMMITTED"),
+            Self::RepeatableRead => write!(f, "REPEATABLE READ"),
+            Self::Snapshot => write!(f, "SNAPSHOT"),
+            Self::Serializable => write!(f, "SERIALIZABLE"),
+        }
+    }
+}
+
+impl FromStr for IsolationLevel {
+    type Err = Error;
+
+    fn from_str(s: &str) -> crate::Result<Self> {
+        match s {
+            "READ UNCOMMITTED" => Ok(Self::ReadUncommitted),
+            "READ COMMITTED" => Ok(Self::ReadCommitted),
+            "REPEATABLE READ" => Ok(Self::RepeatableRead),
+            "SNAPSHOT" => Ok(Self::Snapshot),
+            "SERIALIZABLE" => Ok(Self::Serializable),
+            _ => {
+                let kind = ErrorKind::database_url_is_invalid(format!("Invalid isolation level `{}`", s));
+
+                Err(Error::builder(kind).build())
+            }
+        }
+    }
 }
 
 #[async_trait]
@@ -54,6 +107,10 @@ impl MssqlUrl {
 
     pub fn connect_timeout(&self) -> Option<Duration> {
         self.query_params.connect_timeout()
+    }
+
+    pub fn transaction_isolation_level(&self) -> Option<IsolationLevel> {
+        self.query_params.transaction_isolation_level
     }
 
     pub fn dbname(&self) -> &str {
@@ -138,11 +195,18 @@ impl Mssql {
         let client = Client::connect(config, tcp.compat_write()).await?;
         let socket_timeout = url.socket_timeout();
 
-        Ok(Self {
+        let this = Self {
             client: Mutex::new(client),
             url,
             socket_timeout,
-        })
+        };
+
+        if let Some(isolation) = this.url.transaction_isolation_level() {
+            this.raw_cmd(&format!("SET TRANSACTION ISOLATION LEVEL {}", isolation))
+                .await?;
+        };
+
+        Ok(this)
     }
 
     async fn timeout<T, F, E>(&self, f: F) -> crate::Result<T>
@@ -298,6 +362,11 @@ impl MssqlUrl {
                 let schema = params.remove("schema").unwrap_or_else(|| String::from("dbo"));
                 let connection_limit = params.remove("connectionlimit").and_then(|param| param.parse().ok());
 
+                let transaction_isolation_level = match params.remove("isolationlevel") {
+                    Some(level) => Some(IsolationLevel::from_str(&level)?),
+                    None => None,
+                };
+
                 let connect_timeout = params
                     .remove("logintimeout")
                     .or_else(|| params.remove("connecttimeout"))
@@ -332,6 +401,7 @@ impl MssqlUrl {
                     connection_limit,
                     socket_timeout,
                     connect_timeout,
+                    transaction_isolation_level,
                 })
             }
             _ => {
