@@ -1,11 +1,11 @@
 //! SQLite description.
 use super::*;
-use quaint::{ast::Value, prelude::Queryable};
-use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
+use quaint::{ast::Value, prelude::Queryable, single::Quaint};
+use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -66,7 +66,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 

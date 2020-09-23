@@ -1,5 +1,5 @@
 use migration_engine_tests::*;
-use quaint::ast as quaint_ast;
+use quaint::{ast as quaint_ast, prelude::Queryable};
 
 #[test_each_connector(tags("mariadb"))]
 async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestResult {

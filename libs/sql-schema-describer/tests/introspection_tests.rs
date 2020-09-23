@@ -1,6 +1,6 @@
 use barrel::types;
 use pretty_assertions::assert_eq;
-use quaint::prelude::SqlFamily;
+use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
 use test_macros::test_each_connector_mssql as test_each_connector;
 

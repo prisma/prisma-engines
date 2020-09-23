@@ -4,7 +4,7 @@ use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
 use quaint::{prelude::ConnectionInfo, prelude::Queryable, prelude::SqlFamily, single::Quaint};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::{path::Path, sync::Arc};
+use std::path::Path;
 
 #[derive(Debug)]
 pub(crate) struct SqliteFlavour {
@@ -41,11 +41,7 @@ impl SqlFlavour for SqliteFlavour {
         Ok(self.file_path.clone())
     }
 
-    async fn describe_schema<'a>(
-        &'a self,
-        schema_name: &'a str,
-        conn: Arc<dyn Queryable + Send + Sync>,
-    ) -> SqlResult<SqlSchema> {
+    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> SqlResult<SqlSchema> {
         Ok(sql_schema_describer::sqlite::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
@@ -157,7 +153,7 @@ impl SqlFlavour for SqliteFlavour {
 
         let sql_schema = catch(
             &conn.connection_info().clone(),
-            self.describe_schema(&self.attached_name, Arc::new(conn)),
+            self.describe_schema(&self.attached_name, conn),
         )
         .await?;
 

@@ -16,7 +16,7 @@ thiserror = "1.0.16"
 tracing = "0.1"
 
 [dependencies.quaint]
-features = ["single-postgresql", "single-mysql", "single-sqlite", "serde-support"]
+features = ["single-postgresql", "single-mysql", "single-sqlite", "serde-support", "tracing-log"]
 git = "https://github.com/prisma/quaint"
 
 [dev-dependencies]

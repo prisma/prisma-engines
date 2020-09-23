@@ -1,4 +1,5 @@
 use migration_engine_tests::sql::*;
+use quaint::prelude::Queryable;
 use std::borrow::Cow;
 
 #[test_each_connector(tags("sql"))]

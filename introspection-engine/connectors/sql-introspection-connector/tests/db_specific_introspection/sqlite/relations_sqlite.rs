@@ -1,5 +1,6 @@
 use crate::*;
 use barrel::types;
+use quaint::prelude::Queryable;
 use test_harness::*;
 
 #[test_each_connector(tags("sqlite"))]
@@ -99,7 +100,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                 Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id])
                 Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
             }
-            
+
             model Post {
                 id                      Int   @default(autoincrement()) @id
                 user_id                 Int   @unique
@@ -134,7 +135,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
                 id   Int   @default(autoincrement()) @id
                 Post Post?
             }
-            
+
             model Post {
                 id      Int   @default(autoincrement()) @id
                 user_id Int?  @unique
@@ -169,7 +170,7 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
                 email String? @unique
                 Post  Post?
             }
-            
+
             model Post {
                 id         Int     @default(autoincrement()) @id
                 user_email String? @unique
@@ -203,7 +204,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
             }
-            
+
             model Post {
                 id      Int   @default(autoincrement()) @id
                 user_id Int?
@@ -237,7 +238,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
             }
-                
+
             model Post {
                 id      Int  @default(autoincrement()) @id
                 user_id Int
@@ -423,12 +424,12 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
                 id           Int            @default(autoincrement()) @id
                 PostsToUsers PostsToUsers[]
             }
-            
+
             model Post {
                 id           Int            @default(autoincrement()) @id
                 PostsToUsers PostsToUsers[]
             }
-            
+
             model PostsToUsers {
                 id      Int    @default(autoincrement()) @id
                 user_id Int
@@ -436,7 +437,7 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
                 Post    Post   @relation(fields: [post_id], references: [id])
                 User    User   @relation(fields: [user_id], references: [id])
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -526,12 +527,12 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
         })
         .await;
 
-    let dm = r#"    
+    let dm = r#"
             model User {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
             }
-            
+
             model Post {
                 test    String
                 user_id Int    @default(autoincrement()) @id

@@ -1,5 +1,6 @@
 use crate::*;
 use barrel::types;
+use quaint::prelude::Queryable;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
@@ -92,7 +93,7 @@ async fn remapping_fk_columns_with_invalid_characters_should_work(api: &TestApi)
                 id   Int    @default(autoincrement()) @id
                 User User[]
             }
-            
+
             model User {
                 id      Int  @default(autoincrement()) @id
                 post_id Int  @map("post id")
@@ -127,15 +128,15 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
                 user_id         Int             @unique
                 User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
-            
+
             model User_with_Space {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post?
-                
+
                 @@map("User with Space")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -170,19 +171,19 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
                 user_id         Int
                 user_name       String
                 User_with_Space User_with_Space @relation(fields: [user_id, user_name], references: [id, name])
-                
+
                 @@unique([user_id, user_name], name: "post_user_unique")
             }
-            
+
             model User_with_Space {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post?
-                
+
                 @@map("User with Space")
                 @@unique([id, name], name: "user_unique")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -217,18 +218,18 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
                 user_id   Int
                 user_name String
                 User      User   @relation(fields: [user_id, user_name], references: [id, name_that_is_invalid])
-                
+
                 @@unique([user_id, user_name], name: "post_user_unique")
             }
-            
+
             model User {
                 id                   Int    @default(autoincrement()) @id
                 name_that_is_invalid String @map("name-that-is-invalid")
                 Post                 Post?
-                
+
                 @@unique([id, name_that_is_invalid], name: "user_unique")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

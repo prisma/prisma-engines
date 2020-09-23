@@ -1,5 +1,5 @@
 use migration_engine_tests::*;
-use quaint::ast as quaint_ast;
+use quaint::{ast as quaint_ast, prelude::Queryable};
 
 #[test_each_connector]
 async fn unapply_must_work(api: &TestApi) -> TestResult {

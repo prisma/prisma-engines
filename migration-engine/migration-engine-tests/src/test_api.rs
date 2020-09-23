@@ -35,10 +35,12 @@ use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyMigrationInput,
 };
-use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
+use quaint::{
+    prelude::{ConnectionInfo, Queryable, SqlFamily},
+    single::Quaint,
+};
 use sql_migration_connector::{sql_migration::SqlMigration, SqlMigrationConnector, MIGRATION_TABLE_NAME};
 use sql_schema_describer::*;
-use std::sync::Arc;
 use tempfile::TempDir;
 use test_setup::*;
 
@@ -47,7 +49,7 @@ use test_setup::*;
 pub struct TestApi {
     /// More precise than SqlFamily.
     connector_name: &'static str,
-    database: Arc<dyn Queryable + Send + Sync + 'static>,
+    database: Quaint,
     api: MigrationApi<SqlMigrationConnector, SqlMigration>,
     connection_info: ConnectionInfo,
 }
@@ -61,7 +63,7 @@ impl TestApi {
         self.connection_info.schema_name()
     }
 
-    pub fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
+    pub fn database(&self) -> &Quaint {
         &self.database
     }
 
@@ -230,7 +232,7 @@ impl TestApi {
     }
 
     fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {
-        let db = Arc::clone(&self.database);
+        let db = self.database.clone();
         match self.api.connector_type() {
             "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
             "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
@@ -341,7 +343,7 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "mysql_8",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -354,7 +356,7 @@ pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "mysql_5_6",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -367,7 +369,7 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "mysql",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -380,7 +382,7 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "mysql_mariadb",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -393,7 +395,7 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres9",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -406,7 +408,7 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -419,7 +421,7 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres11",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -432,7 +434,7 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres12",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -445,7 +447,7 @@ pub async fn postgres13_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres13",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }
@@ -457,7 +459,7 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "sqlite",
         connection_info,
-        database: Arc::clone(&connector.database),
+        database: connector.database.clone(),
         api: test_api(connector).await,
     }
 }

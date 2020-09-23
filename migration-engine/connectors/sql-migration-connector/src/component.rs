@@ -17,7 +17,7 @@ pub(crate) trait Component {
     }
 
     fn conn(&self) -> &dyn Queryable {
-        self.connector().database.as_ref()
+        &self.connector().database
     }
 
     fn database_info(&self) -> &DatabaseInfo {

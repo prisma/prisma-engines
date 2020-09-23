@@ -2,12 +2,11 @@ use super::misc_helpers::*;
 use datamodel::Datamodel;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
+    prelude::{ConnectionInfo, SqlFamily},
     single::Quaint,
 };
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::sync::Arc;
 use test_setup::*;
 
 pub type TestResult = Result<(), anyhow::Error>;
@@ -16,7 +15,7 @@ pub struct TestApi {
     db_name: &'static str,
     connection_info: quaint::prelude::ConnectionInfo,
     sql_family: SqlFamily,
-    database: Arc<dyn Queryable + Send + Sync + 'static>,
+    database: Quaint,
     introspection_connector: SqlIntrospectionConnector,
 }
 
@@ -25,7 +24,7 @@ impl TestApi {
         self.introspection_connector.list_databases().await.unwrap()
     }
 
-    pub fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
+    pub fn database(&self) -> &Quaint {
         &self.database
     }
 
@@ -33,14 +32,14 @@ impl TestApi {
         match &self.connection_info {
             ConnectionInfo::Mssql(_) => todo!("implement MSSQL"),
             ConnectionInfo::Postgres(url) => {
-                let sql_schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(&self.database))
+                let sql_schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(self.database.clone())
                     .describe(url.schema())
                     .await?;
 
                 Ok(sql_schema)
             }
             ConnectionInfo::Mysql(_url) => {
-                let sql_schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&self.database))
+                let sql_schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(self.database.clone())
                     .describe(self.connection_info.schema_name())
                     .await?;
 
@@ -50,7 +49,7 @@ impl TestApi {
                 file_path: _,
                 db_name: _,
             } => {
-                let sql_schema = sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&self.database))
+                let sql_schema = sql_schema_describer::sqlite::SqlSchemaDescriber::new(self.database.clone())
                     .describe(self.connection_info.schema_name())
                     .await?;
 
@@ -121,7 +120,7 @@ impl TestApi {
     pub fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
             schema_name: self.schema_name().to_owned(),
-            database: Arc::clone(&self.database),
+            database: self.database.clone(),
             sql_variant: match self.sql_family {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
@@ -145,7 +144,7 @@ pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
     TestApi {
         connection_info: conn.connection_info().to_owned(),
         db_name,
-        database: Arc::new(conn),
+        database: conn,
         sql_family: SqlFamily::Mysql,
         introspection_connector,
     }
@@ -161,7 +160,7 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
     TestApi {
         connection_info: conn.connection_info().to_owned(),
         db_name,
-        database: Arc::new(conn),
+        database: conn,
         sql_family: SqlFamily::Mysql,
         introspection_connector,
     }
@@ -177,7 +176,7 @@ pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
     TestApi {
         connection_info: conn.connection_info().to_owned(),
         db_name,
-        database: Arc::new(conn),
+        database: conn,
         sql_family: SqlFamily::Mysql,
         introspection_connector,
     }
@@ -193,7 +192,7 @@ pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
     TestApi {
         db_name,
         connection_info: conn.connection_info().to_owned(),
-        database: Arc::new(conn),
+        database: conn,
         sql_family: SqlFamily::Mysql,
         introspection_connector,
     }
@@ -229,7 +228,7 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str) ->
     TestApi {
         connection_info,
         db_name,
-        database: Arc::new(database),
+        database,
         sql_family: SqlFamily::Postgres,
         introspection_connector,
     }
@@ -244,7 +243,7 @@ pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
     TestApi {
         db_name,
         connection_info: database.connection_info().to_owned(),
-        database: Arc::new(database),
+        database,
         sql_family: SqlFamily::Sqlite,
         introspection_connector,
     }

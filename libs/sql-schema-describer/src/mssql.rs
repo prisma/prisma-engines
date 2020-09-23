@@ -1,18 +1,17 @@
 use super::*;
 use once_cell::sync::Lazy;
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
-    sync::Arc,
 };
 
 static DEFAULT_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
 static DEFAULT_NON_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -60,7 +59,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 }
 
 impl SqlSchemaDescriber {
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> Self {
+    pub fn new(conn: Quaint) -> Self {
         Self { conn }
     }
 

@@ -1,4 +1,5 @@
 use migration_engine_tests::*;
+use quaint::prelude::Queryable;
 use sql_schema_describer::{ColumnArity, ColumnTypeFamily};
 use std::fmt::Write;
 
