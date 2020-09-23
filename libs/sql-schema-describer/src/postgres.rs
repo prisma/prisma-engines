@@ -340,7 +340,6 @@ impl SqlSchemaDescriber {
             JOIN pg_attribute att2 on
                 att2.attrelid = con.conrelid and att2.attnum = con.parent
             ORDER BY con_id, con.colidx"#;
-        debug!("describing table foreign keys, SQL: '{}'", sql);
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID, which we will have to combine into corresponding foreign key
@@ -480,7 +479,6 @@ impl SqlSchemaDescriber {
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname, rawIndex.indkeyidx
         ORDER BY rawIndex.indkeyidx
         "#;
-        debug!("Getting indices: {}", sql);
         let rows = self
             .conn
             .query_raw(&sql, &[schema.into()])

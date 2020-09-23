@@ -315,8 +315,6 @@ impl SqlSchemaDescriber {
             ORDER BY index_name, seq_in_index
         "#;
 
-        debug!("describing indices, SQL: {}", sql);
-
         let rows = self
             .conn
             .query_raw(sql, &[schema.into()])
@@ -445,8 +443,6 @@ impl SqlSchemaDescriber {
             ORDER BY
                 ordinal_position
         "#;
-
-        debug!("describing table foreign keys, SQL: '{}'", sql);
 
         let result_set = self
             .conn

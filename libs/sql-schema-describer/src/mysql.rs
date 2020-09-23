@@ -339,7 +339,6 @@ async fn get_all_indexes(
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
-    debug!("describing indices, SQL: {}", sql);
     let rows = conn
         .query_raw(sql, &[schema_name.into()])
         .await
@@ -451,8 +450,6 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             AND referenced_column_name IS NOT NULL
         ORDER BY ordinal_position
     ";
-
-    debug!("describing table foreign keys, SQL: '{}'", sql);
 
     let result_set = conn
         .query_raw(sql, &[schema_name.into(), schema_name.into()])

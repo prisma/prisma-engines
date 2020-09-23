@@ -359,7 +359,6 @@ impl SqlSchemaDescriber {
 
     async fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
-        debug!("describing table indices, SQL: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
 
@@ -384,7 +383,6 @@ impl SqlSchemaDescriber {
             };
 
             let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
-            debug!("describing table index '{}', SQL: '{}'", name, sql);
             let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
             debug!("Got index description results: {:?}", result_set);
             for row in result_set.into_iter() {
