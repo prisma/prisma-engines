@@ -333,7 +333,7 @@ checksum = "9d67c978b1322c8031145b1f6c236fc371292f52c565bc96018b2971afcbffe1"
 [[package]]
 name = "barrel"
 version = "0.6.6-alpha.0"
-source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#f424a8f882a9f0647259b9ec404a707f25e05d83"
+source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#366bd99ac0dc0ae5afa6a964ddc22e3f14a25f80"
 
 [[package]]
 name = "base-x"
