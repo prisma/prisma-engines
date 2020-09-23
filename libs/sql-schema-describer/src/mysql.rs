@@ -1,7 +1,7 @@
 use super::*;
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
+use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap, HashSet};
-use std::{borrow::Cow, sync::Arc};
 use tracing::debug;
 
 fn is_mariadb(version: &str) -> bool {
@@ -24,7 +24,7 @@ impl Flavour {
 }
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -53,9 +53,9 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = get_all_columns(self.conn.as_ref(), schema, &flavour).await;
-        let mut indexes = get_all_indexes(self.conn.as_ref(), schema).await;
-        let mut fks = get_foreign_keys(self.conn.as_ref(), schema).await;
+        let mut columns = get_all_columns(&self.conn, schema, &flavour).await;
+        let mut indexes = get_all_indexes(&self.conn, schema).await;
+        let mut fks = get_foreign_keys(&self.conn, schema).await;
 
         let mut enums = vec![];
         for table_name in &table_names {
@@ -79,7 +79,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
@@ -339,7 +339,6 @@ async fn get_all_indexes(
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
-    debug!("describing indices, SQL: {}", sql);
     let rows = conn
         .query_raw(sql, &[schema_name.into()])
         .await
@@ -451,8 +450,6 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             AND referenced_column_name IS NOT NULL
         ORDER BY ordinal_position
     ";
-
-    debug!("describing table foreign keys, SQL: '{}'", sql);
 
     let result_set = conn
         .query_raw(sql, &[schema_name.into(), schema_name.into()])

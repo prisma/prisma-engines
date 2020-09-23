@@ -1,5 +1,6 @@
 use crate::*;
 use barrel::types;
+use quaint::prelude::Queryable;
 use test_harness::*;
 
 #[test_each_connector(tags("sqlite"))]
@@ -149,7 +150,7 @@ async fn introspecting_a_table_with_datetime_default_values_should_work(api: &Te
              id     Int       @id @default(autoincrement())
              name   String
              joined DateTime? @default(dbgenerated())
-           }        
+           }
        "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -318,13 +319,13 @@ async fn introspecting_a_table_with_partial_indexes_should_ignore_them(api: &Tes
         .await;
 
     let partial = format!(
-        r#"CREATE UNIQUE INDEX "{}"."idx_pages_unique_staticId_partial"  on pages (staticId) WHERE isLatest = true;"#,
+        r#"CREATE UNIQUE INDEX "{}"."idx_pages_unique_staticId_partial" on pages (staticId) WHERE isLatest = true;"#,
         api.schema_name(),
     );
     api.database().raw_cmd(&partial).await.unwrap();
 
     let non_partial = format!(
-        r#"CREATE UNIQUE INDEX "{}"."idx_pages_unique_staticId_non_partial"  on pages (other);"#,
+        r#"CREATE UNIQUE INDEX "{}"."idx_pages_unique_staticId_non_partial" on pages (other);"#,
         api.schema_name(),
     );
     api.database().execute_raw(&non_partial, &[]).await.unwrap();
@@ -332,10 +333,10 @@ async fn introspecting_a_table_with_partial_indexes_should_ignore_them(api: &Tes
     let dm = r#"
             model Pages {
               id       Int     @id @default(autoincrement())
-              staticid Int     
+              staticid Int
               islatest Boolean
               other    Int     @unique
-            }      
+            }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

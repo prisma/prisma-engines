@@ -1,11 +1,11 @@
 //! SQLite description.
 use super::*;
-use quaint::{ast::Value, prelude::Queryable};
-use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
+use quaint::{ast::Value, prelude::Queryable, single::Quaint};
+use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -66,7 +66,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
@@ -359,7 +359,6 @@ impl SqlSchemaDescriber {
 
     async fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
-        debug!("describing table indices, SQL: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
 
@@ -384,7 +383,6 @@ impl SqlSchemaDescriber {
             };
 
             let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
-            debug!("describing table index '{}', SQL: '{}'", name, sql);
             let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
             debug!("Got index description results: {:?}", result_set);
             for row in result_set.into_iter() {

@@ -3,7 +3,7 @@ mod sql_unexecutable_migrations;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::ast::*;
+use quaint::{ast::*, prelude::Queryable};
 use sql_schema_describer::DefaultValue;
 
 #[test_each_connector]
