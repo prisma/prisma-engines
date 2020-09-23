@@ -104,8 +104,8 @@ model User {
 }
 
 model Test {
-  id     Int   @id  @default(1) @updatedAt @map("_id")
-  blogId Int?  @unique @default(1)
+  id     Int  @id @default(1) @updatedAt @map("_id")
+  blogId Int? @unique @default(1)
 }
 "#;
 
@@ -151,6 +151,7 @@ model Blog {
   id    Int    @default(1)
   name  String
   posts Post[]
+
   @@id([id])
   @@unique([name])
   @@index([id, name])

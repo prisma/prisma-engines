@@ -422,7 +422,10 @@ impl<'a> Reformatter<'a> {
         } else {
             vec!["id", "unique", "index", "map"]
         };
-        return if let Some(sort_index) = correct_order.iter().position(|p| directive_name.contains(p)) {
+        return if let Some(sort_index) = correct_order
+            .iter()
+            .position(|p| directive_name.starts_with(p) || directive_name.starts_with(&format!("@@{}", p)))
+        {
             sort_index
         } else {
             usize::MAX
