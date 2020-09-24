@@ -315,7 +315,30 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
     match &column.tpe.family {
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
-        ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
+        ColumnTypeFamily::Decimal => FieldType::Unsupported(fdt),
+        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
+        ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
+        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
+        ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
+        ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
+        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
+        ColumnTypeFamily::Binary => FieldType::Unsupported(fdt), //not explicit before
+        ColumnTypeFamily::Geometric => FieldType::Unsupported(fdt), // not explicit before
+        ColumnTypeFamily::LogSequenceNumber => FieldType::Unsupported(fdt), // not explicit before
+        ColumnTypeFamily::TextSearch => FieldType::Unsupported(fdt), // not explicit before
+        ColumnTypeFamily::TransactionId => FieldType::Unsupported(fdt), // not explicit before
+        ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt), // not explicit before,
+    }
+}
+
+pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> FieldType {
+    debug!("Calculating field type for '{}'", column.name);
+    let fdt = column.tpe.full_data_type.to_owned();
+
+    match &column.tpe.family {
+        ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
+        ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Decimal, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
@@ -333,7 +356,7 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
 
 pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, family: &SqlFamily) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name);
-    let scalar_type = calculate_scalar_field_type(column);
+    let scalar_type = calculate_scalar_field_type_for_native_type(column);
 
     //fixme move this out of function
     let connector: Box<dyn Connector> = match family {
