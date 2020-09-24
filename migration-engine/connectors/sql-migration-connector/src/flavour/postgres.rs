@@ -2,7 +2,7 @@ use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
 use quaint::{connector::PostgresUrl, prelude::SqlFamily};
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::collections::HashMap;
 use url::Url;
 
@@ -60,8 +60,11 @@ impl SqlFlavour for PostgresFlavour {
         sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
             .await
-            .map_err(anyhow::Error::from)
-            .map_err(ConnectorError::query_error)
+            .map_err(|err| match err {
+                SqlSchemaDescriberError::UnknownError => {
+                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occured in sql-schema-describer"))
+                }
+            })
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {

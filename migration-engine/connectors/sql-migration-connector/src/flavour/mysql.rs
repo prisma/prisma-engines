@@ -7,7 +7,7 @@ use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
 use quaint::{connector::MysqlUrl, prelude::SqlFamily};
 use regex::RegexSet;
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use url::Url;
 
 #[derive(Debug)]
@@ -62,8 +62,11 @@ impl SqlFlavour for MysqlFlavour {
         sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
             .await
-            .map_err(anyhow::Error::from)
-            .map_err(ConnectorError::query_error)
+            .map_err(|err| match err {
+                SqlSchemaDescriberError::UnknownError => {
+                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occured in sql-schema-describer"))
+                }
+            })
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
