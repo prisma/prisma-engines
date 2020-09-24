@@ -176,6 +176,9 @@ async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestRes
     .to_owned();
 
     let result = dbg!(api.re_introspect(&dm).await);
+
+    println!("{}", dm);
+    println!("{}", result);
     assert_eq!(dm.replace(" ", ""), result.replace(" ", ""));
 
     Ok(())
