@@ -1,34 +1,6 @@
 use crate::*;
 use test_harness::*;
 
-// ("smallint", "Int", "SmallInt", "int2"),
-// ("int", "Int", "Integer", "int4"),
-// ("bigint", "Int", "BigInt", "int8"),
-// ("decimal", "Decimal", "Decimal(4, 2)", "numeric"),
-// ("numeric", "Decimal", "Numeric(4, 2)", "numeric"),
-// ("real", "Float", "Real", "float4"),
-// ("doublePrecision", "Float", "DoublePrecision", "float8"),
-// ("smallSerial", "Int", "SmallSerial", "int2"),
-// ("serial", "Int", "Serial", "int4"),
-// ("bigSerial", "Int", "BigSerial", "int8"),
-// ("varChar", "String", "VarChar(200)", "varchar"),
-// ("char", "String", "Char(200)", "bpchar"),
-// ("text", "String", "Text", "text"),
-// ("bytea", "Bytes", "ByteA", "bytea"),
-// ("ts", "DateTime", "Timestamp(0)", "timestamp"),
-// ("tstz", "DateTime", "TimestampWithTimeZone(0)", "timestamptz"),
-// ("date", "DateTime", "Date", "date"),
-// ("time", "DateTime", "Time(2)", "time"),
-// ("timetz", "DateTime", "TimeWithTimeZone(2)", "timetz"),
-// ("interval", "Duration", "Interval(2)", "interval"),
-// ("bool", "Boolean", "Boolean", "bool"),
-// ("bit", "String", "Bit(1)", "bit"),
-// ("varbit", "String", "VarBit(1)", "varbit"),
-// ("uuid", "String", "Uuid", "uuid"),
-// ("xml", "XML", "Xml", "xml"),
-// ("json", "Json", "Json", "json"),
-// ("jsonb", "Json", "JsonB", "jsonb"),
-
 const TYPES: &'static [(&str, &str)] = &[
     //fieldname, db datatype
     ("smallint", "SmallInt"),
@@ -150,42 +122,43 @@ async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestRes
         })
         .await;
 
-    let dm = r#"model Blog {
-  id                             Int            @id
-  int                            Int
-  smallint                       Int
-  tinyint                        Int
-  mediumint                      Int
-  bigint                         Int
-  decimal                        Float
-  numeric                        Float
-  float                          Float
-  double                         Float
-  bits                           Int
-  chars                          String
-  varchars                       String
+    let dm = r#"datasource postgres {		        
+    provider        = "postgres"		       
+    url             = "postgres://localhost/test"		         
+ }"#;
+
+    let types = r#"
+    model Blog {
+  id              Int      @id
+  smallint        Int
+  int             Int
+  bigint          Int
+  decimal         Float
+  numeric         Float
+  real            Float
+  doublePrecision Float
+  smallSerial     Int      @default(autoincrement())
+  serial          Int      @default(autoincrement())
+  bigSerial       Int      @default(autoincrement())
+  varChar         String
+  char            String
+  text            String
   // This type is currently not supported.
-  // binary                      binary(230)
+  // bytea        bytea
+  ts              DateTime
+  tstz            DateTime
+  date            DateTime
+  time            DateTime
+  timetz          DateTime
+  interval        String
+  bool            Boolean
+  bit             String
+  varbit          String
+  uuid            String
   // This type is currently not supported.
-  // varbinary                   varbinary(150)
-  // This type is currently not supported.
-  // tinyBlob                    tinyblob
-  // This type is currently not supported.
-  // blob                        blob
-  // This type is currently not supported.
-  // mediumBlob                  mediumblob
-  // This type is currently not supported.
-  // longBlob                    longblob
-  tinytext                       String
-  text                           String
-  mediumText                     String
-  longText                       String
-  date                           DateTime
-  timeWithPrecision              DateTime
-  timeWithPrecision_no_precision DateTime
-  dateTimeWithPrecision          DateTime
-  timestampWithPrecision         DateTime       @default(now())
-  year                           Int
+  // xml          xml
+  json            Json
+  jsonb           Json
 }
 "#
     .to_owned();
@@ -194,7 +167,7 @@ async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestRes
 
     println!("EXPECTATION: \n {}", dm);
     println!("RESULT: \n {}", result);
-    assert_eq!(dm.replace(" ", ""), result.replace(" ", ""));
+    assert_eq!(result.replace(" ", "").contains(&types.replace(" ", "")), true);
 
     Ok(())
 }
