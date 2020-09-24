@@ -24,6 +24,32 @@ fn comments_must_work_in_models() {
 }
 
 #[test]
+fn free_floating_doc_comments_must_work_in_models() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String
+        /// documentation comment
+    }
+    "#;
+
+    // must not crash
+    let _ = parse(dml);
+}
+
+#[test]
+fn free_floating_doc_comments_must_work_in_enums() {
+    let dml = r#"
+    enum Role {
+      USER
+      /// documentation comment
+    }"#;
+
+    // must not crash
+    let _ = parse(dml);
+}
+
+#[test]
 fn comments_must_work_in_enums() {
     let dml = r#"
     // Line 1
