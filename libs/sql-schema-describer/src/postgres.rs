@@ -3,7 +3,6 @@ use super::*;
 use native_types::{NativeType, PostgresType};
 use quaint::prelude::Queryable;
 use regex::Regex;
-use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
 use tracing::debug;
 
@@ -148,11 +147,15 @@ impl SqlSchemaDescriber {
                 column_name,
                 data_type,
                 udt_name as full_data_type,
-                character_maximum_length,
                 column_default,
                 is_nullable,
                 is_identity,
-                data_type
+                data_type, 
+                character_maximum_length,
+                numeric_precision,
+                numeric_scale,
+                numeric_precision_radix,
+                datetime_precision
             FROM information_schema.columns
             WHERE table_schema = $1
             ORDER BY ordinal_position
@@ -179,7 +182,6 @@ impl SqlSchemaDescriber {
                 .get("full_data_type")
                 .and_then(|x| x.to_string())
                 .expect("get full_data_type aka udt_name");
-            let character_maximum_length = col.get("character_maximum_length").and_then(|x| x.as_i64());
             let is_identity_str = col
                 .get("is_identity")
                 .and_then(|x| x.to_string())
@@ -209,12 +211,26 @@ impl SqlSchemaDescriber {
                 ColumnArity::Nullable
             };
 
+            let character_maximum_length = col
+                .get("character_maximum_length")
+                .and_then(|x| x.as_i64().map(|x| x as u32));
+            let numeric_precision = col.get("numeric_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+            let numeric_precision_radix = col
+                .get("numeric_precision_radix")
+                .and_then(|x| x.as_i64().map(|x| x as u32));
+            let numeric_scale = col.get("numeric_scale").and_then(|x| x.as_i64().map(|x| x as u32));
+            let time_precision = col.get("datetime_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+
             let tpe = get_column_type(
                 data_type.as_ref(),
                 &full_data_type,
-                character_maximum_length,
                 arity,
                 enums,
+                character_maximum_length,
+                numeric_precision,
+                numeric_precision_radix,
+                numeric_scale,
+                time_precision,
             );
 
             let default = match col.get("column_default") {
@@ -630,17 +646,20 @@ struct IndexRow {
 fn get_column_type<'a>(
     data_type: &str,
     full_data_type: &'a str,
-    character_maximum_length: Option<i64>,
     arity: ColumnArity,
     enums: &[Enum],
+    character_maximum_length: Option<u32>,
+    numeric_precision: Option<u32>,
+    numeric_precision_radix: Option<u32>,
+    numeric_scale: Option<u32>,
+    time_precision: Option<u32>,
 ) -> ColumnType {
     use ColumnTypeFamily::*;
     let trim = |name: &'a str| name.trim_start_matches('_');
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
 
-    println!("{}", data_type);
-    println!("{}", full_data_type);
-    println!("{:?}", character_maximum_length);
+    println!("DT {}", data_type);
+    println!("FDT {}", full_data_type);
 
     let (family, native_type) = match full_data_type {
         x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), None),
@@ -654,38 +673,32 @@ fn get_column_type<'a>(
         "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
         "text" | "_text" => (String, Some(PostgresType::Text)),
         "citext" | "_citext" => (String, None),
-        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(extract_single_arg(full_data_type)))),
+        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(character_maximum_length.unwrap()))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
         "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, Some(PostgresType::Bit(extract_single_arg(full_data_type)))),
-        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(extract_single_arg(full_data_type)))),
-        "bpchar" | "_bpchar" => (String, Some(PostgresType::VarChar(extract_single_arg(full_data_type)))),
-        "interval" | "_interval" => (String, Some(PostgresType::Interval(extract_single_arg(full_data_type)))),
+        "bit" | "_bit" => (String, Some(PostgresType::Bit(character_maximum_length.unwrap()))),
+        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(character_maximum_length.unwrap()))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::VarChar(character_maximum_length.unwrap()))),
+        "interval" | "_interval" => (String, Some(PostgresType::Interval(time_precision.unwrap()))),
         "numeric" | "_numeric" => (
             Float,
             Some(PostgresType::Numeric(
-                extract_first_arg(full_data_type),
-                extract_second_arg(full_data_type),
+                numeric_precision.unwrap(),
+                numeric_scale.unwrap(),
             )),
         ),
         "money" | "_money" => (Float, None),
         "pg_lsn" | "_pg_lsn" => (LogSequenceNumber, None),
-        "time" | "_time" => (DateTime, Some(PostgresType::Time(extract_single_arg(full_data_type)))),
-        "timetz" | "_timetz" => (
-            DateTime,
-            Some(PostgresType::TimeWithTimeZone(extract_single_arg(full_data_type))),
-        ),
-        "timestamp" | "_timestamp" => (
-            DateTime,
-            Some(PostgresType::Timestamp(extract_single_arg(full_data_type))),
-        ),
+        "time" | "_time" => (DateTime, Some(PostgresType::Time(time_precision.unwrap()))),
+        "timetz" | "_timetz" => (DateTime, Some(PostgresType::TimeWithTimeZone(time_precision.unwrap()))),
+        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(time_precision.unwrap()))),
         "timestamptz" | "_timestamptz" => (
             DateTime,
-            Some(PostgresType::TimestampWithTimeZone(extract_single_arg(full_data_type))),
+            Some(PostgresType::TimestampWithTimeZone(time_precision.unwrap())),
         ),
         "tsquery" | "_tsquery" => (TextSearch, None),
         "tsvector" | "_tsvector" => (TextSearch, None),
@@ -719,31 +732,6 @@ static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
     )
     .unwrap()
 });
-
-fn extract_single_arg(full_data_type: &str) -> u32 {
-    let len = &full_data_type.len() - 1;
-
-    let a = full_data_type[..len].split('(').last().unwrap();
-    from_str::<u32>(a).unwrap()
-}
-
-fn extract_first_arg(full_data_type: &str) -> u32 {
-    let len = &full_data_type.len() - 1;
-
-    let a = full_data_type[..len].split('(').last().unwrap();
-    let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
-
-    a[0]
-}
-
-fn extract_second_arg(full_data_type: &str) -> u32 {
-    let len = &full_data_type.len() - 1;
-
-    let a = full_data_type[..len].split('(').last().unwrap();
-    let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
-
-    a[1]
-}
 
 /// Returns whether a particular sequence (`value`) matches the provided column info.
 /// todo this only seems to work on sequence names autogenerated by barrel???

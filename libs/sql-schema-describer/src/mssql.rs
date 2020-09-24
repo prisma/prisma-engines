@@ -204,7 +204,9 @@ impl SqlSchemaDescriber {
 
             let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
 
-            let character_maximum_length = col.get("character_maximum_length").and_then(|x| x.as_i64());
+            let character_maximum_length = col
+                .get("character_maximum_length")
+                .and_then(|x| x.as_i64().map(|x| x as u32));
 
             let is_nullable = col
                 .get("is_nullable")
@@ -550,7 +552,7 @@ impl SqlSchemaDescriber {
     fn get_column_type(
         &self,
         data_type: &str,
-        character_maximum_length: Option<i64>,
+        character_maximum_length: Option<u32>,
         arity: ColumnArity,
     ) -> ColumnType {
         use ColumnTypeFamily::*;

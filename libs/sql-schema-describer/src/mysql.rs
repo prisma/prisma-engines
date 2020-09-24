@@ -221,7 +221,9 @@ async fn get_all_columns(
             .get("full_data_type")
             .and_then(|x| x.to_string())
             .expect("get full_data_type aka column_type");
-        let character_maximum_length = col.get("character_maximum_length").and_then(|x| x.as_i64());
+        let character_maximum_length = col
+            .get("character_maximum_length")
+            .and_then(|x| x.as_i64().map(|x| x as u32));
         let is_nullable = col
             .get("is_nullable")
             .and_then(|x| x.to_string())
@@ -544,13 +546,14 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
         .collect()
 }
 
+//Fixme use precision from information schema instead of parsing
 fn get_column_type_and_enum(
     table: &str,
     column_name: &str,
     data_type: &str,
     full_data_type: &str,
     //Fixme maybe we can get rid of this since we have the info in the native type
-    character_maximum_length: Option<i64>,
+    character_maximum_length: Option<u32>,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
     //Fixme family mappings

@@ -1,63 +1,86 @@
 use crate::*;
 use test_harness::*;
 
+// ("smallint", "Int", "SmallInt", "int2"),
+// ("int", "Int", "Integer", "int4"),
+// ("bigint", "Int", "BigInt", "int8"),
+// ("decimal", "Decimal", "Decimal(4, 2)", "numeric"),
+// ("numeric", "Decimal", "Numeric(4, 2)", "numeric"),
+// ("real", "Float", "Real", "float4"),
+// ("doublePrecision", "Float", "DoublePrecision", "float8"),
+// ("smallSerial", "Int", "SmallSerial", "int2"),
+// ("serial", "Int", "Serial", "int4"),
+// ("bigSerial", "Int", "BigSerial", "int8"),
+// ("varChar", "String", "VarChar(200)", "varchar"),
+// ("char", "String", "Char(200)", "bpchar"),
+// ("text", "String", "Text", "text"),
+// ("bytea", "Bytes", "ByteA", "bytea"),
+// ("ts", "DateTime", "Timestamp(0)", "timestamp"),
+// ("tstz", "DateTime", "TimestampWithTimeZone(0)", "timestamptz"),
+// ("date", "DateTime", "Date", "date"),
+// ("time", "DateTime", "Time(2)", "time"),
+// ("timetz", "DateTime", "TimeWithTimeZone(2)", "timetz"),
+// ("interval", "Duration", "Interval(2)", "interval"),
+// ("bool", "Boolean", "Boolean", "bool"),
+// ("bit", "String", "Bit(1)", "bit"),
+// ("varbit", "String", "VarBit(1)", "varbit"),
+// ("uuid", "String", "Uuid", "uuid"),
+// ("xml", "XML", "Xml", "xml"),
+// ("json", "Json", "Json", "json"),
+// ("jsonb", "Json", "JsonB", "jsonb"),
+
 const TYPES: &'static [(&str, &str)] = &[
     //fieldname, db datatype
-    ("int", "int(11)"),
     ("smallint", "SmallInt"),
-    ("tinyint", "TinyInt"),
-    ("mediumint", "MediumInt"),
+    ("int", "Integer"),
     ("bigint", "BigInt"),
-    ("decimal", "Decimal(5, 3)"),
-    ("numeric", "Decimal(4,1)"),
-    ("float", "Float"),
-    ("double", "Double"),
-    ("bits", "Bit(10)"),
-    ("chars", "Char(10)"),
-    ("varchars", "VarChar(500)"),
-    ("binary", "Binary(230)"),
-    ("varbinary", "VarBinary(150)"),
-    ("tinyBlob", "TinyBlob"),
-    ("blob", "Blob"),
-    ("mediumBlob", "MediumBlob"),
-    ("longBlob", "LongBlob"),
-    ("tinytext", "TinyText"),
+    ("decimal", "Decimal(4, 2)"),
+    ("numeric", "Numeric(4, 2)"),
+    ("real", "Real"),
+    ("doublePrecision", "Double Precision"),
+    ("smallSerial", "SmallSerial"),
+    ("serial", "Serial"),
+    ("bigSerial", "BigSerial"),
+    ("varChar", "VarChar(200)"),
+    ("char", "Char(200)"),
     ("text", "Text"),
-    ("mediumText", "MediumText"),
-    ("longText", "LongText"),
+    ("bytea", "ByteA"),
+    ("ts", "Timestamp(0)"),
+    ("tstz", "Timestamptz(0)"),
     ("date", "Date"),
-    ("timeWithPrecision", "Time(3)"),
-    ("timeWithPrecision_no_precision", "DateTime"),
-    ("dateTimeWithPrecision", "Datetime(3)"),
-    ("timestampWithPrecision", "Timestamp(3)"),
-    ("year", "Year"),
+    ("time", "Time(2)"),
+    ("timetz", "Timetz(2)"),
+    ("interval", "Interval(2)"),
+    ("bool", "Boolean"),
+    ("bit", "Bit(1)"),
+    ("varbit", "VarBit(1)"),
+    ("uuid", "Uuid"),
+    ("xml", "Xml"),
+    ("json", "Json"),
+    ("jsonb", "JsonB"),
 ];
 
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
-        .map(|(name, db_type)| format!("`{}` {} Not Null", name, db_type))
+        .map(|(name, db_type)| format!("\"{}\" {} Not Null", name, db_type))
         .collect();
 
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute_with_schema(
-            move |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.inject_custom("id Integer Primary Key");
-                    for column in &columns {
-                        t.inject_custom(column);
-                    }
-                });
-            },
-            api.db_name(),
-        )
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
+                t.inject_custom("id Integer Primary Key");
+                for column in &columns {
+                    t.inject_custom(column);
+                }
+            });
+        })
         .await;
 
-    let mut dm = r#"datasource mysql {		        
-    provider        = "mysql"		       
-    url             = "mysql://localhost/test"		         
+    let mut dm = r#"datasource postgres {		        
+    provider        = "postgres"		       
+    url             = "postgres://localhost/test"		         
     previewFeatures = ["nativeTypes"]		          
  }
 "#
@@ -113,22 +136,18 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
 async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
-        .map(|(name, data_type)| format!("`{}` {} Not Null", name, data_type))
+        .map(|(name, data_type)| format!("\"{}\" {} Not Null", name, data_type))
         .collect();
 
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute_with_schema(
-            move |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.inject_custom("id Integer Primary Key");
-                    for column in &columns {
-                        t.inject_custom(column);
-                    }
-                });
-            },
-            api.db_name(),
-        )
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
+                t.inject_custom("id Integer Primary Key");
+                for column in &columns {
+                    t.inject_custom(column);
+                }
+            });
+        })
         .await;
 
     let dm = r#"model Blog {
