@@ -59,36 +59,36 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
     .to_owned();
 
     let types = r#"
-      model Blog {
-  id                             Int      @id @mysql.Int
-  int                            Int      @mysql.Int
-  smallint                       Int      @mysql.SmallInt
-  tinyint                        Int      @mysql.TinyInt
-  mediumint                      Int      @mysql.MediumInt
-  bigint                         Int      @mysql.BigInt
-  decimal                        Decimal  @mysql.Decimal(5, 3)
-  numeric                        Decimal  @mysql.Decimal(4, 1)
-  float                          Float    @mysql.Float
-  double                         Float    @mysql.Double
-  bits                           Bytes    @mysql.Bit(10)
-  chars                          String   @mysql.Char(10)
-  varchars                       String   @mysql.VarChar(500)
-  binary                         Bytes    @mysql.Binary(230)
-  varbinary                      Bytes    @mysql.VarBinary(150)
-  tinyBlob                       Bytes    @mysql.TinyBlob
-  blob                           Bytes    @mysql.Blob
-  mediumBlob                     Bytes    @mysql.MediumBlob
-  longBlob                       Bytes    @mysql.LongBlob
-  tinytext                       String   @mysql.TinyText
-  text                           String   @mysql.Text
-  mediumText                     String   @mysql.MediumText
-  longText                       String   @mysql.LongText
-  date                           DateTime @mysql.Date
-  timeWithPrecision              DateTime @mysql.Time(3)
-  timeWithPrecision_no_precision DateTime @mysql.Datetime
-  dateTimeWithPrecision          DateTime @mysql.Datetime(3)
-  timestampWithPrecision         DateTime @default(now()) @mysql.Timestamp(3)
-  year                           Int      @mysql.Year
+            model Blog {
+  id              Int      @id @postgres.Integer
+  smallint        Int      @postgres.SmallInt
+  int             Int      @postgres.Integer
+  bigint          Int      @postgres.BigInt
+  decimal         Float    @postgres.Numeric(4, 2)
+  numeric         Float    @postgres.Numeric(4, 2)
+  real            Float    @postgres.Real
+  doublePrecision Float    @postgres.DoublePrecision
+  smallSerial     Int      @default(autoincrement()) @postgres.SmallInt
+  serial          Int      @default(autoincrement()) @postgres.Integer
+  bigSerial       Int      @default(autoincrement()) @postgres.BigInt
+  varChar         String   @postgres.VarChar(200)
+  char            String   @postgres.VarChar(200)
+  text            String   @postgres.Text
+  bytea           Bytes    @postgres.ByteA
+  ts              DateTime @postgres.Timestamp(0)
+  tstz            DateTime @postgres.TimestampWithTimeZone(0)
+  date            DateTime @postgres.Date
+  time            DateTime @postgres.Time(2)
+  timetz          DateTime @postgres.TimeWithTimeZone(2)
+  interval        String   @postgres.Interval(2)
+  bool            Boolean  @postgres.Boolean
+  bit             String   @postgres.Bit(1)
+  varbit          String   @postgres.VarBit(1)
+  uuid            String   @postgres.Uuid
+  // This type is currently not supported.
+  // xml          xml
+  json            Json     @postgres.Json
+  jsonb           Json     @postgres.JsonB
 }
 "#;
 

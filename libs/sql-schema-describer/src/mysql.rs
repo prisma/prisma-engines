@@ -1,7 +1,6 @@
 use super::*;
 use native_types::{MySqlType, NativeType};
 use quaint::prelude::Queryable;
-use serde_json::from_str;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::{borrow::Cow, sync::Arc};
 use tracing::debug;
@@ -190,6 +189,9 @@ async fn get_all_columns(
                 data_type data_type,
                 column_type full_data_type,
                 character_maximum_length character_maximum_length,
+                numeric_precision numeric_precision,
+                numeric_scale numeric_scale,
+                datetime_precision datetime_precision,
                 column_default column_default,
                 is_nullable is_nullable,
                 extra extra,
@@ -221,9 +223,7 @@ async fn get_all_columns(
             .get("full_data_type")
             .and_then(|x| x.to_string())
             .expect("get full_data_type aka column_type");
-        let character_maximum_length = col
-            .get("character_maximum_length")
-            .and_then(|x| x.as_i64().map(|x| x as u32));
+
         let is_nullable = col
             .get("is_nullable")
             .and_then(|x| x.to_string())
@@ -241,14 +241,26 @@ async fn get_all_columns(
             ColumnArity::Nullable
         };
 
-        let (tpe, enum_option) = get_column_type_and_enum(
-            &table_name,
-            &name,
-            &data_type,
-            &full_data_type,
+        println!("{:?}", col);
+
+        let character_maximum_length = col
+            .get("character_maximum_length")
+            .and_then(|x| x.as_i64().map(|x| x as u32));
+        let numeric_precision = col.get("numeric_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+
+        let numeric_scale = col.get("numeric_scale").and_then(|x| x.as_i64().map(|x| x as u32));
+        let time_precision = col.get("datetime_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+
+        let precision = Precision {
             character_maximum_length,
-            arity,
-        );
+            numeric_precision,
+            numeric_precision_radix: None,
+            numeric_scale,
+            time_precision,
+        };
+
+        let (tpe, enum_option) =
+            get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, precision, arity);
         let extra = col
             .get("extra")
             .and_then(|x| x.to_string())
@@ -552,12 +564,14 @@ fn get_column_type_and_enum(
     column_name: &str,
     data_type: &str,
     full_data_type: &str,
-    //Fixme maybe we can get rid of this since we have the info in the native type
-    character_maximum_length: Option<u32>,
+    precision: Precision,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
     //Fixme family mappings
     // Decimal, Duration and XML are missing from ColumnTypefamily
+    println!("{}", data_type);
+    println!("{}", full_data_type);
+    println!("{:?}", precision);
 
     let (family, native_type) = match (data_type, full_data_type) {
         ("int", _) => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
@@ -568,19 +582,28 @@ fn get_column_type_and_enum(
         ("bigint", _) => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
         ("decimal", fdt) => (
             ColumnTypeFamily::Decimal,
-            Some(MySqlType::Decimal(extract_first_arg(fdt), extract_second_arg(fdt))),
+            Some(MySqlType::Decimal(
+                precision.numeric_precision(),
+                precision.numeric_scale(),
+            )),
         ),
         ("numeric", fdt) => (
             ColumnTypeFamily::Decimal,
-            Some(MySqlType::Numeric(extract_first_arg(fdt), extract_second_arg(fdt))),
+            Some(MySqlType::Numeric(
+                precision.numeric_precision(),
+                precision.numeric_scale(),
+            )),
         ),
         ("float", _) => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
         ("double", _) => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
 
-        ("char", fdt) => (ColumnTypeFamily::String, Some(MySqlType::Char(extract_single_arg(fdt)))),
+        ("char", fdt) => (
+            ColumnTypeFamily::String,
+            Some(MySqlType::Char(precision.character_max_length())),
+        ),
         ("varchar", fdt) => (
             ColumnTypeFamily::String,
-            Some(MySqlType::VarChar(extract_single_arg(fdt))),
+            Some(MySqlType::VarChar(precision.character_max_length())),
         ),
         ("text", _) => (ColumnTypeFamily::String, Some(MySqlType::Text)),
         ("tinytext", _) => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
@@ -594,26 +617,29 @@ fn get_column_type_and_enum(
         ("time", fdt) => (
             //Fixme this can either be a time or a duration -.-
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::Time(fractional_seconds(fdt))),
+            Some(MySqlType::Time(precision.time_precision())),
         ),
         ("datetime", fdt) => (
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::DateTime(fractional_seconds(fdt))),
+            Some(MySqlType::DateTime(precision.time_precision())),
         ),
         ("timestamp", fdt) => (
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::Timestamp(fractional_seconds(fdt))),
+            Some(MySqlType::Timestamp(precision.time_precision())),
         ),
         ("year", _) => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
         //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
-        ("bit", fdt) => (ColumnTypeFamily::Binary, Some(MySqlType::Bit(extract_single_arg(fdt)))),
+        ("bit", fdt) => (
+            ColumnTypeFamily::Binary,
+            Some(MySqlType::Bit(precision.numeric_precision())),
+        ),
         ("binary", fdt) => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::Binary(extract_single_arg(fdt))),
+            Some(MySqlType::Binary(precision.character_max_length())),
         ),
         ("varbinary", fdt) => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::VarBinary(extract_single_arg(fdt))),
+            Some(MySqlType::VarBinary(precision.character_max_length())),
         ),
         ("blob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::Blob)),
         ("tinyblob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::TinyBlob)),
@@ -634,7 +660,7 @@ fn get_column_type_and_enum(
     let tpe = ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
-        character_maximum_length,
+        character_maximum_length: precision.character_maximum_length,
         family: family.clone(),
         arity,
         native_type: native_type.map(|x| x.to_json()),
@@ -656,31 +682,6 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
     vals.split(',').map(|v| unquote_string(v)).collect()
-}
-
-fn extract_single_arg(full_data_type: &str) -> u32 {
-    let len = &full_data_type.len() - 1;
-
-    let a = full_data_type[..len].split('(').last().unwrap();
-    from_str::<u32>(a).unwrap()
-}
-
-fn extract_first_arg(full_data_type: &str) -> u32 {
-    let len = &full_data_type.len() - 1;
-
-    let a = full_data_type[..len].split('(').last().unwrap();
-    let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
-
-    a[0]
-}
-
-fn extract_second_arg(full_data_type: &str) -> u32 {
-    let len = &full_data_type.len() - 1;
-
-    let a = full_data_type[..len].split('(').last().unwrap();
-    let a: Vec<u32> = a.split(',').map(|v| from_str::<u32>(v).unwrap()).collect();
-
-    a[1]
 }
 
 // See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
@@ -708,17 +709,4 @@ fn default_is_current_timestamp(default_str: &str) -> bool {
         Lazy::new(|| Regex::new(r#"(?i)current_timestamp(\([0-9]*\))?"#).unwrap());
 
     MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
-}
-
-/// Extracts optional fractional seconds precision.
-fn fractional_seconds(type_str: &str) -> u32 {
-    //can be between 0->6, defaults to 0 on MySQL
-    //https://dev.mysql.com/doc/refman/8.0/en/date-and-time-type-syntax.html
-
-    static MYSQL_CURRENT_TIMESTAMP_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0123456])\).*"#).unwrap());
-
-    MYSQL_CURRENT_TIMESTAMP_RE
-        .captures(type_str)
-        .and_then(|cap| cap.get(1).map(|fraction| from_str::<u32>(fraction.as_str()).unwrap()))
-        .unwrap_or(0)
 }

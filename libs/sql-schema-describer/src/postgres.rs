@@ -221,17 +221,15 @@ impl SqlSchemaDescriber {
             let numeric_scale = col.get("numeric_scale").and_then(|x| x.as_i64().map(|x| x as u32));
             let time_precision = col.get("datetime_precision").and_then(|x| x.as_i64().map(|x| x as u32));
 
-            let tpe = get_column_type(
-                data_type.as_ref(),
-                &full_data_type,
-                arity,
-                enums,
+            let precision = Precision {
                 character_maximum_length,
                 numeric_precision,
                 numeric_precision_radix,
                 numeric_scale,
                 time_precision,
-            );
+            };
+
+            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums, precision);
 
             let default = match col.get("column_default") {
                 None => None,
@@ -648,11 +646,7 @@ fn get_column_type<'a>(
     full_data_type: &'a str,
     arity: ColumnArity,
     enums: &[Enum],
-    character_maximum_length: Option<u32>,
-    numeric_precision: Option<u32>,
-    numeric_precision_radix: Option<u32>,
-    numeric_scale: Option<u32>,
-    time_precision: Option<u32>,
+    precision: Precision,
 ) -> ColumnType {
     use ColumnTypeFamily::*;
     let trim = |name: &'a str| name.trim_start_matches('_');
@@ -673,32 +667,35 @@ fn get_column_type<'a>(
         "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
         "text" | "_text" => (String, Some(PostgresType::Text)),
         "citext" | "_citext" => (String, None),
-        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(character_maximum_length.unwrap()))),
+        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
         "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, Some(PostgresType::Bit(character_maximum_length.unwrap()))),
-        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(character_maximum_length.unwrap()))),
-        "bpchar" | "_bpchar" => (String, Some(PostgresType::VarChar(character_maximum_length.unwrap()))),
-        "interval" | "_interval" => (String, Some(PostgresType::Interval(time_precision.unwrap()))),
+        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
+        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
+        "interval" | "_interval" => (String, Some(PostgresType::Interval(precision.time_precision()))),
         "numeric" | "_numeric" => (
             Float,
             Some(PostgresType::Numeric(
-                numeric_precision.unwrap(),
-                numeric_scale.unwrap(),
+                precision.numeric_precision(),
+                precision.numeric_scale(),
             )),
         ),
         "money" | "_money" => (Float, None),
         "pg_lsn" | "_pg_lsn" => (LogSequenceNumber, None),
-        "time" | "_time" => (DateTime, Some(PostgresType::Time(time_precision.unwrap()))),
-        "timetz" | "_timetz" => (DateTime, Some(PostgresType::TimeWithTimeZone(time_precision.unwrap()))),
-        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(time_precision.unwrap()))),
+        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision()))),
+        "timetz" | "_timetz" => (
+            DateTime,
+            Some(PostgresType::TimeWithTimeZone(precision.time_precision())),
+        ),
+        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision()))),
         "timestamptz" | "_timestamptz" => (
             DateTime,
-            Some(PostgresType::TimestampWithTimeZone(time_precision.unwrap())),
+            Some(PostgresType::TimestampWithTimeZone(precision.time_precision())),
         ),
         "tsquery" | "_tsquery" => (TextSearch, None),
         "tsvector" | "_tsvector" => (TextSearch, None),
@@ -717,7 +714,7 @@ fn get_column_type<'a>(
     ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
-        character_maximum_length,
+        character_maximum_length: precision.character_maximum_length, //Fixme can this always return precision?
         family,
         arity,
         native_type: native_type.map(|x| x.to_json()),

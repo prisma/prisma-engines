@@ -500,6 +500,34 @@ pub fn unquote_string(val: &str) -> String {
         .into()
 }
 
+#[derive(Debug)]
+struct Precision {
+    character_maximum_length: Option<u32>,
+    numeric_precision: Option<u32>,
+    numeric_precision_radix: Option<u32>,
+    numeric_scale: Option<u32>,
+    time_precision: Option<u32>,
+}
+
+impl Precision {
+    fn numeric_precision(&self) -> u32 {
+        //fixme use radix
+        self.numeric_precision.unwrap()
+    }
+
+    fn character_max_length(&self) -> u32 {
+        self.character_maximum_length.unwrap()
+    }
+
+    fn numeric_scale(&self) -> u32 {
+        self.numeric_scale.unwrap()
+    }
+
+    fn time_precision(&self) -> u32 {
+        self.time_precision.unwrap()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
