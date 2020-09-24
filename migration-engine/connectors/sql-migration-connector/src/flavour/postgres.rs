@@ -177,24 +177,28 @@ impl SqlFlavour for PostgresFlavour {
 
         tracing::debug!("Connecting to temporary database at {}", temporary_database_url);
 
-        let temporary_database = crate::connect(&temporary_database_url).await?;
+        let sql_schema = {
+            let temporary_database = crate::connect(&temporary_database_url).await?;
 
-        temporary_database.raw_cmd(&create_schema).await?;
+            temporary_database.raw_cmd(&create_schema).await?;
 
-        for migration in migrations {
-            let script = migration.read_migration_script()?;
+            for migration in migrations {
+                let script = migration.read_migration_script()?;
 
-            tracing::debug!(
-                "Applying migration `{}` to temporary database.",
-                migration.migration_name()
-            );
+                tracing::debug!(
+                    "Applying migration `{}` to temporary database.",
+                    migration.migration_name()
+                );
 
-            temporary_database.raw_cmd(&script).await.map_err(|connector_error| {
-                connector_error.into_migration_failed(migration.migration_name().to_owned())
-            })?;
-        }
+                temporary_database.raw_cmd(&script).await.map_err(|connector_error| {
+                    connector_error.into_migration_failed(migration.migration_name().to_owned())
+                })?;
+            }
 
-        let sql_schema = self.describe_schema(&temporary_database).await?;
+            // the connection to the temporary database is dropped at the end of
+            // the block.
+            self.describe_schema(&temporary_database).await?
+        };
 
         connection.raw_cmd(&drop_database).await?;
 
