@@ -1,11 +1,13 @@
+use crate::SqlError;
 use migration_connector::ConnectorResult;
 use quaint::{
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
 
-use crate::SqlError;
-
+/// An internal helper for the SQL connector. It wraps a `Quaint` struct and
+/// exposes a similar API, with additional error handling to return
+/// `ConnectorResult`s.
 #[derive(Clone, Debug)]
 pub(crate) struct Connection(Quaint);
 
