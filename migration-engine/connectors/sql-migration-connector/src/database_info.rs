@@ -1,10 +1,11 @@
-use super::SqlResult;
 use datamodel::{walkers::walk_scalar_fields, Datamodel};
-use migration_connector::MigrationError;
+use migration_connector::{ConnectorResult, MigrationError};
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
+
+use crate::error::SqlError;
 
 #[derive(Debug, Clone)]
 pub struct DatabaseInfo {
@@ -13,8 +14,12 @@ pub struct DatabaseInfo {
 }
 
 impl DatabaseInfo {
-    pub(crate) async fn new(connection: &Quaint, connection_info: ConnectionInfo) -> SqlResult<Self> {
-        let database_version = connection.version().await?;
+    pub(crate) async fn new(connection: &Quaint, connection_info: ConnectionInfo) -> ConnectorResult<Self> {
+        let database_version = connection
+            .version()
+            .await
+            .map_err(SqlError::from)
+            .map_err(|err| err.into_connector_error(&connection_info))?;
 
         Ok(DatabaseInfo {
             connection_info,

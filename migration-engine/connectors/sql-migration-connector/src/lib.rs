@@ -19,7 +19,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::Connection;
-use error::{SqlError, SqlResult};
+use error::SqlError;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use component::Component;
@@ -150,9 +150,7 @@ async fn connect(database_str: &str) -> ConnectorResult<(Connection, DatabaseInf
         .map_err(SqlError::from)
         .map_err(|err: SqlError| err.into_connector_error(&connection_info))?;
 
-    let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone())
-        .await
-        .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
+    let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone()).await?;
 
     Ok((Connection::new(connection), database_info))
 }

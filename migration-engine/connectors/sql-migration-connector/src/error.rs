@@ -6,8 +6,6 @@ use user_facing_errors::{
     migration_engine::MigrateSystemDatabase, quaint::render_quaint_error, query_engine::DatabaseConstraint, KnownError,
 };
 
-pub type SqlResult<T> = Result<T, SqlError>;
-
 #[derive(Debug, Error)]
 pub enum SqlError {
     #[error(transparent)]
