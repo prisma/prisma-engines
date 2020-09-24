@@ -145,9 +145,7 @@ impl SqlFlavour for MysqlFlavour {
         let temp_database = crate::connect(&temporary_database_url).await?;
 
         for migration in migrations {
-            let script = migration
-                .read_migration_script()
-                .expect("failed to read migration script");
+            let script = migration.read_migration_script()?;
 
             tracing::debug!(
                 "Applying migration `{}` to temporary database.",

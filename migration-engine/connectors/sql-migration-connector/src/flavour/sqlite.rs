@@ -126,9 +126,7 @@ impl SqlFlavour for SqliteFlavour {
         let conn = crate::connect(&database_url).await?;
 
         for migration in migrations {
-            let script = migration
-                .read_migration_script()
-                .expect("failed to read migration script");
+            let script = migration.read_migration_script()?;
 
             tracing::debug!(
                 "Applying migration `{}` to temporary database.",

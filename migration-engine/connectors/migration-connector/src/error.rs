@@ -1,3 +1,4 @@
+use crate::migrations_directory::ReadMigrationScriptError;
 use std::fmt::Display;
 use thiserror::Error;
 use tracing_error::SpanTrace;
@@ -108,4 +109,15 @@ pub enum ErrorKind {
 
     #[error("Unique constraint violation.")]
     UniqueConstraintViolation { field_name: String },
+}
+
+impl From<ReadMigrationScriptError> for ConnectorError {
+    fn from(err: ReadMigrationScriptError) -> Self {
+        let context = err.1.clone();
+        ConnectorError {
+            user_facing_error: None,
+            kind: ErrorKind::Generic(err.into()),
+            context,
+        }
+    }
 }

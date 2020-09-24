@@ -1,11 +1,10 @@
+use crate::error::SqlError;
 use datamodel::{walkers::walk_scalar_fields, Datamodel};
 use migration_connector::{ConnectorResult, MigrationError};
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
-
-use crate::error::SqlError;
 
 #[derive(Debug, Clone)]
 pub struct DatabaseInfo {

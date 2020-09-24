@@ -182,9 +182,7 @@ impl SqlFlavour for PostgresFlavour {
         temporary_database.raw_cmd(&create_schema).await?;
 
         for migration in migrations {
-            let script = migration
-                .read_migration_script()
-                .expect("failed to read migration script");
+            let script = migration.read_migration_script()?;
 
             tracing::debug!(
                 "Applying migration `{}` to temporary database.",
