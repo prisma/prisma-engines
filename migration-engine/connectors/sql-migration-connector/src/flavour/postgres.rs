@@ -136,18 +136,14 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
+        let schema_name = connection.connection_info().schema_name();
+
         connection
-            .raw_cmd(&format!(
-                "DROP SCHEMA \"{}\" CASCADE",
-                connection.connection_info().schema_name()
-            ))
+            .raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name))
             .await?;
 
         connection
-            .raw_cmd(&format!(
-                "CREATE SCHEMA \"{}\"",
-                connection.connection_info().schema_name()
-            ))
+            .raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name))
             .await?;
 
         Ok(())
