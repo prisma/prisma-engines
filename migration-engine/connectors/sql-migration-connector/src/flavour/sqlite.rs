@@ -1,6 +1,5 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection, SqlError};
-use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
@@ -42,13 +41,11 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        Ok(
-            sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
-                .describe(connection.connection_info().schema_name())
-                .map_err(SqlError::from)
-                .map_err(|err| err.into_connector_error(connection.connection_info()))
-                .await?,
-        )
+        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
+            .describe(connection.connection_info().schema_name())
+            .await
+            .map_err(SqlError::from)
+            .map_err(|err| err.into_connector_error(connection.connection_info()))
     }
 
     async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
@@ -126,7 +123,7 @@ impl SqlFlavour for SqliteFlavour {
 
         tracing::debug!("Applying migrations to temporary SQLite database at `{}`", database_url);
 
-        let (conn, _) = crate::connect(&database_url).await?;
+        let conn = crate::connect(&database_url).await?;
 
         for migration in migrations {
             let script = migration

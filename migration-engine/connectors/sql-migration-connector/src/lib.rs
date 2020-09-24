@@ -42,7 +42,8 @@ pub struct SqlMigrationConnector {
 
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
-        let (connection, database_info) = connect(database_str).await?;
+        let connection = connect(database_str).await?;
+        let database_info = DatabaseInfo::new(connection.quaint(), connection.connection_info().clone()).await?;
         let flavour = flavour::from_connection_info(database_info.connection_info());
 
         flavour.check_database_info(&database_info)?;
@@ -141,7 +142,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 }
 
-async fn connect(database_str: &str) -> ConnectorResult<(Connection, DatabaseInfo)> {
+async fn connect(database_str: &str) -> ConnectorResult<Connection> {
     let connection_info =
         ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
@@ -150,7 +151,5 @@ async fn connect(database_str: &str) -> ConnectorResult<(Connection, DatabaseInf
         .map_err(SqlError::from)
         .map_err(|err: SqlError| err.into_connector_error(&connection_info))?;
 
-    let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone()).await?;
-
-    Ok((Connection::new(connection), database_info))
+    Ok(Connection::new(connection))
 }

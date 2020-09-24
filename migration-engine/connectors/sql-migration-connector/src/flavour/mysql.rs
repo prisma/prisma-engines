@@ -3,7 +3,6 @@ use crate::{
     connect, connection_wrapper::Connection, database_info::DatabaseInfo, error::CheckDatabaseInfoResult,
     error::SystemDatabase, SqlError,
 };
-use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
 use quaint::{connector::MysqlUrl, prelude::SqlFamily};
@@ -46,7 +45,7 @@ impl SqlFlavour for MysqlFlavour {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
 
-        let (conn, _) = connect(&url.to_string()).await?;
+        let conn = connect(&url.to_string()).await?;
         let db_name = self.0.dbname();
 
         let query = format!(
@@ -60,13 +59,11 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        Ok(
-            sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
-                .describe(connection.connection_info().schema_name())
-                .map_err(SqlError::from)
-                .map_err(|err| err.into_connector_error(connection.connection_info()))
-                .await?,
-        )
+        sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
+            .describe(connection.connection_info().schema_name())
+            .await
+            .map_err(SqlError::from)
+            .map_err(|err| err.into_connector_error(connection.connection_info()))
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
@@ -97,8 +94,7 @@ impl SqlFlavour for MysqlFlavour {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
 
-        let (conn, _) = connect(&url.to_string()).await?;
-
+        let conn = connect(&url.to_string()).await?;
         let db_name = self.0.dbname();
 
         let query = format!("DROP DATABASE IF EXISTS `{}`", db_name);
@@ -146,7 +142,7 @@ impl SqlFlavour for MysqlFlavour {
 
         tracing::debug!("Connecting to temporary database at {:?}", temporary_database_url);
 
-        let (temp_database, _database_info) = crate::connect(&temporary_database_url).await?;
+        let temp_database = crate::connect(&temporary_database_url).await?;
 
         for migration in migrations {
             let script = migration

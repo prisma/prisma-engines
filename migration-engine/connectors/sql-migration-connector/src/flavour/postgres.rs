@@ -1,6 +1,5 @@
 use super::SqlFlavour;
-use crate::{connect, connection_wrapper::Connection, database_info::DatabaseInfo, SqlError};
-use futures::TryFutureExt;
+use crate::{connect, connection_wrapper::Connection, SqlError};
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
 use quaint::{connector::PostgresUrl, prelude::SqlFamily};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
@@ -24,7 +23,7 @@ impl SqlFlavour for PostgresFlavour {
 
         strip_schema_param_from_url(&mut url);
 
-        let (conn, _) = create_postgres_admin_conn(url.clone()).await?;
+        let conn = create_postgres_admin_conn(url.clone()).await?;
 
         let query = format!("CREATE DATABASE \"{}\"", db_name);
 
@@ -44,7 +43,7 @@ impl SqlFlavour for PostgresFlavour {
         // Now create the schema
         url.set_path(&format!("/{}", db_name));
 
-        let (conn, _) = connect(&url.to_string()).await?;
+        let conn = connect(&url.to_string()).await?;
 
         let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", &self.schema_name());
 
@@ -58,13 +57,11 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        Ok(
-            sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone())
-                .describe(connection.connection_info().schema_name())
-                .map_err(SqlError::from)
-                .map_err(|err| err.into_connector_error(connection.connection_info()))
-                .await?,
-        )
+        sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone())
+            .describe(connection.connection_info().schema_name())
+            .await
+            .map_err(SqlError::from)
+            .map_err(|err| err.into_connector_error(connection.connection_info()))
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
@@ -117,7 +114,7 @@ impl SqlFlavour for PostgresFlavour {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
         strip_schema_param_from_url(&mut url);
-        let (conn, _) = create_postgres_admin_conn(url.clone()).await?;
+        let conn = create_postgres_admin_conn(url.clone()).await?;
         let schema = self.0.schema();
         let db_name = self.0.dbname();
 
@@ -127,7 +124,7 @@ impl SqlFlavour for PostgresFlavour {
         // Now create the schema
         url.set_path(&format!("/{}", db_name));
 
-        let (conn, _) = connect(&url.to_string()).await?;
+        let conn = connect(&url.to_string()).await?;
 
         let drop_and_recreate_schema = format!(
             "DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;\nCREATE SCHEMA \"{schema}\";",
@@ -180,7 +177,7 @@ impl SqlFlavour for PostgresFlavour {
 
         tracing::debug!("Connecting to temporary database at {}", temporary_database_url);
 
-        let (temporary_database, _database_info) = crate::connect(&temporary_database_url).await?;
+        let temporary_database = crate::connect(&temporary_database_url).await?;
 
         temporary_database.raw_cmd(&create_schema).await?;
 
@@ -217,7 +214,7 @@ fn strip_schema_param_from_url(url: &mut Url) {
 
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
-async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection, DatabaseInfo)> {
+async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection> {
     let candidate_default_databases = &["postgres", "template1"];
 
     let mut conn = None;
