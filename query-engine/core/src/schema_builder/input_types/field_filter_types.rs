@@ -2,16 +2,50 @@ use super::*;
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
-/// Builds filter type for the given model field.
-pub(crate) fn get_field_filter_type(ctx: &mut BuilderContext, field: &ModelField) -> InputObjectTypeWeakRef {
+/// Builds filter types for the given model field.
+pub(crate) fn get_field_filter_types(ctx: &mut BuilderContext, field: &ModelField) -> Vec<InputType> {
     match field {
-        ModelField::Relation(rf) => relation_filter_type(ctx, rf),
-        ModelField::Scalar(sf) if field.is_list() => scalar_list_filter_type(ctx, sf),
-        ModelField::Scalar(sf) => scalar_filter_type(ctx, sf, false),
+        ModelField::Relation(rf) => {
+            let mut types = vec![InputType::object(full_relation_filter(ctx, rf))];
+            types.extend(mto1_relation_filter_shorthand_types(ctx, rf));
+            types
+        }
+        ModelField::Scalar(sf) if field.is_list() => vec![InputType::object(scalar_list_filter_type(ctx, sf))],
+        ModelField::Scalar(sf) => {
+            let mut types = vec![InputType::object(full_scalar_filter_type(ctx, sf, false))];
+
+            if sf.type_identifier != TypeIdentifier::Json {
+                types.push(map_scalar_input_type(sf)); // Scalar equality shorthand
+
+                if !sf.is_required {
+                    types.push(InputType::null()); // Scalar null-equality shorthand
+                }
+            }
+
+            types
+        }
     }
 }
 
-fn relation_filter_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
+/// Builds shorthand relation equality (`is`) filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
+/// If the field is also not required, null is also added as possible type.
+fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Vec<InputType> {
+    let mut types = vec![];
+
+    if !rf.is_list {
+        let related_model = rf.related_model();
+        let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
+        types.push(InputType::object(related_input_type));
+
+        if !rf.is_required {
+            types.push(InputType::null());
+        }
+    }
+
+    types
+}
+
+fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
     let list = if rf.is_list { "List" } else { "" };
@@ -23,22 +57,18 @@ fn relation_filter_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
 
     let fields = if rf.is_list {
         vec![
-            input_field("every", wrap_opt_input_object(related_input_type.clone()), None),
-            input_field("some", wrap_opt_input_object(related_input_type.clone()), None),
-            input_field("none", wrap_opt_input_object(related_input_type.clone()), None),
+            input_field("every", InputType::object(related_input_type.clone()), None).optional(),
+            input_field("some", InputType::object(related_input_type.clone()), None).optional(),
+            input_field("none", InputType::object(related_input_type.clone()), None).optional(),
         ]
     } else {
         vec![
-            input_field(
-                "is",
-                InputType::opt(InputType::null(InputType::object(related_input_type.clone()))),
-                None,
-            ),
-            input_field(
-                "isNot",
-                InputType::opt(InputType::null(InputType::object(related_input_type))),
-                None,
-            ),
+            input_field("is", InputType::object(related_input_type.clone()), None)
+                .optional()
+                .nullable_if(!rf.is_required),
+            input_field("isNot", InputType::object(related_input_type), None)
+                .optional()
+                .nullable_if(!rf.is_required),
         ]
     };
 
@@ -59,7 +89,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     Arc::downgrade(&object)
 }
 
-fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: bool) -> InputObjectTypeWeakRef {
+fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: bool) -> InputObjectTypeWeakRef {
     let name = scalar_filter_name(sf, nested);
     return_cached_input!(ctx, &name);
 
@@ -83,51 +113,64 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
     };
 
-    fields.push(input_field(
-        "not",
-        InputType::opt(InputType::null(InputType::object(scalar_filter_type(ctx, sf, true)))),
-        None,
-    ));
+    // Shorthand `not equals` filter, skips the nested object filter.
+    let mut not_types = vec![map_scalar_input_type(sf)];
 
+    if sf.type_identifier != TypeIdentifier::Json {
+        // Full nested filter. Only available on non-JSON fields.
+        not_types.push(InputType::object(full_scalar_filter_type(ctx, sf, true)));
+    }
+
+    let not_field = input_field("not", not_types, None)
+        .optional()
+        .nullable_if(!sf.is_required);
+
+    fields.push(not_field);
     object.set_fields(fields);
+
     Arc::downgrade(&object)
 }
 
 fn equality_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = map_optional_input_type(sf);
-
-    vec![input_field("equals", mapped_type.clone(), None)].into_iter()
+    vec![input_field("equals", map_scalar_input_type(sf), None)
+        .optional()
+        .nullable_if(!sf.is_required)]
+    .into_iter()
 }
 
 fn inclusion_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = if sf.is_required {
-        InputType::opt(InputType::list(map_required_input_type(sf)))
-    } else {
-        InputType::opt(InputType::null(InputType::list(map_required_input_type(sf))))
-    };
+    let typ = InputType::list(map_scalar_input_type(sf));
 
-    vec![input_field("in", mapped_type.clone(), None)].into_iter()
+    vec![
+        input_field("in", typ.clone(), None)
+            .optional()
+            .nullable_if(!sf.is_required),
+        input_field("notIn", typ, None) // Kept for legacy reasons!
+            .optional()
+            .nullable_if(!sf.is_required),
+    ]
+    .into_iter()
 }
 
 fn alphanumeric_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = map_optional_input_type(sf);
+    let mapped_type = map_scalar_input_type(sf);
 
     vec![
-        input_field("lt", mapped_type.clone(), None),
-        input_field("lte", mapped_type.clone(), None),
-        input_field("gt", mapped_type.clone(), None),
-        input_field("gte", mapped_type.clone(), None),
+        input_field("lt", mapped_type.clone(), None).optional(),
+        input_field("lte", mapped_type.clone(), None).optional(),
+        input_field("gt", mapped_type.clone(), None).optional(),
+        input_field("gte", mapped_type.clone(), None).optional(),
     ]
     .into_iter()
 }
 
 fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = map_optional_input_type(sf);
+    let mapped_type = map_scalar_input_type(sf);
 
     vec![
-        input_field("contains", mapped_type.clone(), None),
-        input_field("startsWith", mapped_type.clone(), None),
-        input_field("endsWith", mapped_type.clone(), None),
+        input_field("contains", mapped_type.clone(), None).optional(),
+        input_field("startsWith", mapped_type.clone(), None).optional(),
+        input_field("endsWith", mapped_type.clone(), None).optional(),
     ]
     .into_iter()
 }
@@ -146,9 +189,10 @@ fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = 
 
         let field = input_field(
             "mode",
-            InputType::Opt(Box::new(InputType::Enum(enum_type))),
+            InputType::enum_type(enum_type),
             Some(DefaultValue::Single(PrismaValue::Enum("default".to_owned()))),
-        );
+        )
+        .optional();
 
         vec![field]
     } else {

@@ -12,7 +12,7 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
     s"""
       |model ScalarModel {
-      |  id           String @id @default(cuid())
+      |  id           String     @id @default(cuid())
       |  optStrings   String[]
       |  optInts      Int[]
       |  optFloats    Float[]
@@ -36,7 +36,6 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def beforeEach(): Unit = database.truncateProjectTables(project)
 
   "A Create Mutation" should "create and return items with listvalues" in {
-
     val res = server.query(
       s"""mutation {
          |  createScalarModel(data: {
@@ -61,8 +60,32 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""{"data":{"scalarModels":[{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}]}}""".parseJson)
   }
 
-  "A Create Mutation" should "create and return items with empty listvalues" in {
+  "A Create Mutation" should "create and return items with listvalues with shorthand notation" in {
+    val res = server.query(
+      s"""mutation {
+         |  createScalarModel(data: {
+         |    optStrings: ["lala${TroubleCharacters.value}"],
+         |    optInts: [1337, 12],
+         |    optFloats: [1.234, 1.45],
+         |    optBooleans: [true,false],
+         |    optEnums: [A,A],
+         |    optDateTimes: ["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],
+         |  }){optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }
+         |}""",
+      project = project
+    )
 
+    res should be(
+      s"""{"data":{"createScalarModel":{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}}}""".parseJson)
+
+    val queryRes: JsValue =
+      server.query("""{ scalarModels{optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }}""", project = project)
+
+    queryRes should be(
+      s"""{"data":{"scalarModels":[{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}]}}""".parseJson)
+  }
+
+  "A Create Mutation" should "create and return items with empty listvalues" in {
     val res = server.query(
       s"""mutation {
          |  createScalarModel(data: {
@@ -82,20 +105,16 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A Create Mutation with an empty scalar list update input object" should "return a detailed error" in {
-
     val res = server.queryThatMustFail(
       s"""mutation {
          |  createScalarModel(data: {
          |    optStrings: {},
-         |  }){optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }
+         |  }){ optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }
          |}""",
       project = project,
-      errorCode = 2013,
-      errorContains = """Missing the required argument `set` for field `optStrings` on `ScalarModel`"""
-    )
-
-    res.pathAsString("errors.[0].user_facing_error.message") should be(
-      """Missing the required argument `set` for field `optStrings` on `ScalarModel`."""
+      errorCode = 2009,
+      errorContains =
+        """`Mutation.createScalarModel.data.ScalarModelCreateInput.optStrings.ScalarModelCreateoptStringsInput.set`: A value is required but not set."""
     )
   }
 

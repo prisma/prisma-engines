@@ -3,7 +3,7 @@ use crate::query_graph_builder::write::utils::coerce_vec;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    InputAssertions, ParsedInputMap, ParsedInputValue,
+    ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, IdFilter};
 use prisma_models::RelationFieldRef;
@@ -104,10 +104,6 @@ pub fn nested_upsert(
         // Read child(ren) node
         let filter: Filter = if parent_relation_field.is_list {
             let where_input: ParsedInputMap = as_map.remove("where").expect("where argument is missing").try_into()?;
-
-            where_input.assert_size(1)?;
-            where_input.assert_non_null()?;
-
             extract_unique_filter(where_input, &child_model)?
         } else {
             Filter::empty()

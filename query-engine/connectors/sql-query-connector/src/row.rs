@@ -62,7 +62,7 @@ impl SqlRow {
 }
 
 fn coerce_null_to_zero_value(value: PrismaValue) -> PrismaValue {
-    if let PrismaValue::Null(_) = value {
+    if let PrismaValue::Null = value {
         PrismaValue::Int(0)
     } else {
         value
@@ -121,7 +121,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
     Ok(match type_identifier {
         TypeIdentifier::Boolean => match p_value {
             // Value::Array(vec) => PrismaValue::Boolean(b),
-            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            value if value.is_null() => PrismaValue::Null,
             Value::Integer(Some(i)) => PrismaValue::Boolean(i != 0),
             Value::Boolean(Some(b)) => PrismaValue::Boolean(b),
             _ => {
@@ -130,7 +130,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             }
         },
         TypeIdentifier::Enum(_) => match p_value {
-            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            value if value.is_null() => PrismaValue::Null,
             Value::Enum(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
             Value::Text(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
             _ => {
@@ -140,7 +140,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
         },
 
         TypeIdentifier::Json => match p_value {
-            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            value if value.is_null() => PrismaValue::Null,
             Value::Text(Some(json)) => PrismaValue::Json(json.into()),
             Value::Json(Some(json)) => PrismaValue::Json(json.to_string()),
             _ => {
@@ -149,7 +149,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             }
         },
         TypeIdentifier::UUID => match p_value {
-            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            value if value.is_null() => PrismaValue::Null,
             Value::Text(Some(uuid)) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
             Value::Uuid(Some(uuid)) => PrismaValue::Uuid(uuid),
             _ => {
@@ -158,7 +158,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             }
         },
         TypeIdentifier::DateTime => match p_value {
-            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            value if value.is_null() => PrismaValue::Null,
             Value::DateTime(Some(dt)) => PrismaValue::DateTime(dt),
             Value::Integer(Some(ts)) => {
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
@@ -196,7 +196,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             }
         },
         TypeIdentifier::Float => match p_value {
-            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            value if value.is_null() => PrismaValue::Null,
             Value::Real(Some(f)) => PrismaValue::Float(f.normalize()),
             Value::Integer(Some(i)) => {
                 // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
@@ -228,7 +228,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             other => PrismaValue::from(other),
         },
         TypeIdentifier::String => match p_value {
-            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            value if value.is_null() => PrismaValue::Null,
             Value::Uuid(Some(uuid)) => PrismaValue::String(uuid.to_string()),
             Value::Json(Some(json_value)) => {
                 PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))

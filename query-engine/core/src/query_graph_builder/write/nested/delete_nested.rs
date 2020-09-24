@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    InputAssertions, ParsedInputMap, ParsedInputValue,
+    ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, RecordFilter};
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
@@ -34,10 +34,6 @@ pub fn nested_delete(
             .into_iter()
             .map(|value: ParsedInputValue| {
                 let value: ParsedInputMap = value.try_into()?;
-
-                value.assert_size(1)?;
-                value.assert_non_null()?;
-
                 extract_unique_filter(value, &child_model)
             })
             .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;

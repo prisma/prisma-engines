@@ -4,6 +4,7 @@ mod test_api;
 use crate::mysql::*;
 use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 use test_api::*;
 use test_macros::*;

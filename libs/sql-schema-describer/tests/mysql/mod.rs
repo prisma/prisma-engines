@@ -24,5 +24,5 @@ pub async fn get_mysql_describer_for_schema(sql: &str, schema: &str) -> mysql::S
             .expect("executing migration statement");
     }
 
-    mysql::SqlSchemaDescriber::new(Arc::new(conn))
+    mysql::SqlSchemaDescriber::new(conn)
 }

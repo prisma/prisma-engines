@@ -132,7 +132,7 @@ pub struct QueryParsingFailed {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2009",
-    message = "Failed to validate the query `${query_validation_error}` at `${query_position}`"
+    message = "Failed to validate the query: `${query_validation_error}` at `${query_position}`"
 )]
 pub struct QueryValidationFailed {
     /// Error(s) encountered when trying to validate a query in the query engine

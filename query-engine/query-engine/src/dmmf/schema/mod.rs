@@ -6,7 +6,7 @@ mod object_renderer;
 mod schema_renderer;
 mod type_renderer;
 
-use crate::dmmf::DMMFMapping;
+use crate::dmmf::DmmfMapping;
 use enum_renderer::*;
 use field_renderer::*;
 use object_renderer::*;
@@ -20,10 +20,10 @@ use type_renderer::*;
 
 pub use ast::*;
 
-pub struct DMMFQuerySchemaRenderer;
+pub struct DmmfQuerySchemaRenderer;
 
-impl QuerySchemaRenderer<(DMMFSchema, Vec<DMMFMapping>)> for DMMFQuerySchemaRenderer {
-    fn render(query_schema: QuerySchemaRef) -> (DMMFSchema, Vec<DMMFMapping>) {
+impl QuerySchemaRenderer<(DmmfSchema, Vec<DmmfMapping>)> for DmmfQuerySchemaRenderer {
+    fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, Vec<DmmfMapping>) {
         let mut ctx = RenderContext::new();
         ctx.mark_to_be_rendered(&query_schema);
 
@@ -41,10 +41,10 @@ impl QuerySchemaRenderer<(DMMFSchema, Vec<DMMFMapping>)> for DMMFQuerySchemaRend
 
 pub struct RenderContext {
     /// Aggregator for query schema
-    schema: DMMFSchema,
+    schema: DmmfSchema,
 
     /// Aggregator for mappings
-    mappings: Vec<DMMFMapping>,
+    mappings: Vec<DmmfMapping>,
 
     /// Prevents double rendering of elements that are referenced multiple times.
     /// Names of input / output types / enums / models are globally unique.
@@ -58,14 +58,14 @@ pub struct RenderContext {
 impl RenderContext {
     pub fn new() -> Self {
         RenderContext {
-            schema: DMMFSchema::new(),
+            schema: DmmfSchema::default(),
             mappings: vec![],
             rendered: HashSet::new(),
             next_pass: Vec::new(),
         }
     }
 
-    pub fn finalize(self) -> (DMMFSchema, Vec<DMMFMapping>) {
+    pub fn finalize(self) -> (DmmfSchema, Vec<DmmfMapping>) {
         let mut schema = self.schema;
 
         schema.root_query_type = "Query".into();
@@ -82,17 +82,17 @@ impl RenderContext {
         self.rendered.insert(cache_key);
     }
 
-    pub fn add_enum(&mut self, name: String, dmmf_enum: DMMFEnum) {
+    pub fn add_enum(&mut self, name: String, dmmf_enum: DmmfEnum) {
         self.schema.enums.push(dmmf_enum);
         self.mark_as_rendered(name);
     }
 
-    pub fn add_input_type(&mut self, input_type: DMMFInputType) {
+    pub fn add_input_type(&mut self, input_type: DmmfInputType) {
         self.mark_as_rendered(input_type.name.clone());
         self.schema.input_types.push(input_type);
     }
 
-    pub fn add_output_type(&mut self, output_type: DMMFOutputType) {
+    pub fn add_output_type(&mut self, output_type: DmmfOutputType) {
         self.mark_as_rendered(output_type.name.clone());
         self.schema.output_types.push(output_type);
     }
@@ -106,7 +106,7 @@ impl RenderContext {
             match mapping {
                 Some(ref existing) => existing.add_operation(tag_str, name.clone()),
                 None => {
-                    let new_mapping = DMMFMapping::new(model_name);
+                    let new_mapping = DmmfMapping::new(model_name);
 
                     new_mapping.add_operation(tag_str, name.clone());
                     self.mappings.push(new_mapping);
@@ -136,7 +136,7 @@ trait IntoRenderer {
 
 impl IntoRenderer for QuerySchemaRef {
     fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DMMFSchemaRenderer::new(Arc::clone(self)))
+        Box::new(DmmfSchemaRenderer::new(Arc::clone(self)))
     }
 
     fn is_already_rendered(&self, _ctx: &RenderContext) -> bool {
@@ -146,7 +146,7 @@ impl IntoRenderer for QuerySchemaRef {
 
 impl<'a> IntoRenderer for &'a EnumType {
     fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DMMFEnumRenderer::new(self))
+        Box::new(DmmfEnumRenderer::new(self))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
@@ -156,7 +156,7 @@ impl<'a> IntoRenderer for &'a EnumType {
 
 impl IntoRenderer for InputObjectTypeWeakRef {
     fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DMMFObjectRenderer::Input(Weak::clone(self)))
+        Box::new(DmmfObjectRenderer::Input(Weak::clone(self)))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
@@ -166,7 +166,7 @@ impl IntoRenderer for InputObjectTypeWeakRef {
 
 impl IntoRenderer for ObjectTypeWeakRef {
     fn into_renderer(&self) -> Box<dyn Renderer> {
-        Box::new(DMMFObjectRenderer::Output(Weak::clone(self)))
+        Box::new(DmmfObjectRenderer::Output(Weak::clone(self)))
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {

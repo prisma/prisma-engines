@@ -5,6 +5,7 @@ mod test_api;
 use crate::{common::*, postgres::*};
 use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 use test_api::*;
 use test_macros::test_each_connector;

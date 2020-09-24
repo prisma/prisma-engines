@@ -86,6 +86,11 @@ fn format_should_enforce_order_of_field_directives() {
 model User {
   megaField DateTime @map("mega_field") @id @default("_megaField") @unique @updatedAt
 }
+
+model Test {
+  id     Int   @id @map("_id") @default(1) @updatedAt
+  blogId Int?  @unique @default(1)
+}
 "#;
     let expected = r#"model Post {
   id        Int     @id @default(autoincrement())
@@ -96,6 +101,11 @@ model User {
 
 model User {
   megaField DateTime @id @unique @default("_megaField") @updatedAt @map("mega_field")
+}
+
+model Test {
+  id     Int  @id @default(1) @updatedAt @map("_id")
+  blogId Int? @unique @default(1)
 }
 "#;
 
@@ -114,6 +124,16 @@ fn format_should_enforce_order_of_block_directives() {
   @@unique([codeName, yearOfBirth])
   @@id([firstName, lastName])
 }
+
+model Blog {
+  id    Int    @default(1)
+  name  String
+  posts Post[]
+  @@id([id])
+  @@index([id, name])
+  @@unique([name])
+  @@map("blog")
+}
 "#;
     let expected = r#"model Person {
   firstName   String
@@ -124,6 +144,17 @@ fn format_should_enforce_order_of_block_directives() {
   @@id([firstName, lastName])
   @@unique([codeName, yearOfBirth])
   @@index([yearOfBirth])
+  @@map("blog")
+}
+
+model Blog {
+  id    Int    @default(1)
+  name  String
+  posts Post[]
+
+  @@id([id])
+  @@unique([name])
+  @@index([id, name])
   @@map("blog")
 }
 "#;

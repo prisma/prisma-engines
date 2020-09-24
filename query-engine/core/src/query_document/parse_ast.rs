@@ -1,7 +1,6 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
-use super::{QueryParserError, QueryParserResult};
-use crate::FieldRef;
+use crate::OutputFieldRef;
 use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 
@@ -20,7 +19,7 @@ pub struct ParsedField {
     pub nested_fields: Option<ParsedObject>,
 
     /// Associated schema field
-    pub schema_field: FieldRef,
+    pub schema_field: OutputFieldRef,
 }
 
 /// Indicator for a query that should be ran as-is in the database, as plain
@@ -75,104 +74,5 @@ pub trait ArgumentListLookup {
 impl ArgumentListLookup for Vec<ParsedArgument> {
     fn lookup(&mut self, name: &str) -> Option<ParsedArgument> {
         self.iter().position(|arg| arg.name == name).map(|pos| self.remove(pos))
-    }
-}
-
-/// Note: Assertions should live on the schema level and run through the validation as any other check.
-///       This requires a slightly larger refactoring.
-pub trait InputAssertions: Sized {
-    /// Asserts the exact size of the underlying input.
-    fn assert_size(&self, size: usize) -> QueryParserResult<()>;
-
-    /// Asserts that the given value is non-null. The exact definition of what is considered
-    /// null or non-null is dependent on the implementor.
-    fn assert_non_null(&self) -> QueryParserResult<()>;
-}
-
-impl InputAssertions for ParsedInputValue {
-    fn assert_size(&self, size: usize) -> QueryParserResult<()> {
-        match self {
-            Self::List(v) => v.assert_size(size)?,
-            Self::Map(m) => m.assert_size(size)?,
-            _ => unimplemented!(),
-        };
-
-        Ok(())
-    }
-
-    fn assert_non_null(&self) -> QueryParserResult<()> {
-        match self {
-            Self::List(v) => v.assert_non_null()?,
-            Self::Map(m) => m.assert_non_null()?,
-            Self::Single(v) => v.assert_non_null()?,
-            Self::OrderBy(_) => (),
-            Self::ScalarField(_) => (),
-        };
-
-        Ok(())
-    }
-}
-
-impl InputAssertions for ParsedInputMap {
-    fn assert_size(&self, size: usize) -> QueryParserResult<()> {
-        if self.len() != size {
-            Err(QueryParserError::AssertionError(format!(
-                "Expected object to have exactly {} key-value pairs, got: {} {}",
-                size,
-                self.len(),
-                Some(self.iter().map(|v| v.0.as_str()).collect::<Vec<&str>>().join(", "))
-                    .filter(|s| !s.is_empty())
-                    .map(|s| format!("({})", s))
-                    .unwrap_or_else(String::new)
-            )))
-        } else {
-            Ok(())
-        }
-    }
-
-    fn assert_non_null(&self) -> QueryParserResult<()> {
-        for (_, value) in self.iter() {
-            value.assert_non_null()?;
-        }
-
-        Ok(())
-    }
-}
-
-impl InputAssertions for Vec<ParsedInputValue> {
-    fn assert_size(&self, size: usize) -> QueryParserResult<()> {
-        if self.len() != size {
-            Err(QueryParserError::AssertionError(format!(
-                "Expected list to have exactly {} input values, got: {}.",
-                size,
-                self.len()
-            )))
-        } else {
-            Ok(())
-        }
-    }
-
-    /// Asserts that all elements are non-null
-    fn assert_non_null(&self) -> QueryParserResult<()> {
-        for input in self.iter() {
-            input.assert_non_null()?;
-        }
-
-        Ok(())
-    }
-}
-
-impl InputAssertions for PrismaValue {
-    fn assert_size(&self, _size: usize) -> QueryParserResult<()> {
-        unimplemented!()
-    }
-
-    fn assert_non_null(&self) -> QueryParserResult<()> {
-        match self {
-            PrismaValue::Null(_) => Err(QueryParserError::AssertionError(format!(
-                "You provided a null value for a where clause (or implicit nested selector). Please provide a non null value.",
-            ))),
-            _ => Ok(())
-        }
     }
 }

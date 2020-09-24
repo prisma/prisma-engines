@@ -11,19 +11,19 @@ use std::{cell::RefCell, collections::HashMap};
 pub struct DataModelMetaFormat {
     #[serde(rename = "datamodel")]
     pub data_model: serde_json::Value,
-    pub schema: DMMFSchema,
-    pub mappings: Vec<DMMFMapping>,
+    pub schema: DmmfSchema,
+    pub mappings: Vec<DmmfMapping>,
 }
 
 #[derive(Debug)]
-pub struct DMMFMapping {
+pub struct DmmfMapping {
     model_name: String,
     operations: RefCell<HashMap<String, String>>,
 }
 
-impl DMMFMapping {
+impl DmmfMapping {
     fn new(model_name: String) -> Self {
-        DMMFMapping {
+        DmmfMapping {
             model_name,
             operations: RefCell::new(HashMap::new()),
         }
@@ -42,8 +42,8 @@ impl DMMFMapping {
     }
 }
 
-/// Serializes a DMMFMapping into a single map.
-impl Serialize for DMMFMapping {
+/// Serializes a DmmfMapping into a single map.
+impl Serialize for DmmfMapping {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -72,7 +72,7 @@ impl Serialize for DMMFMapping {
 }
 
 pub fn render_dmmf(dml: &datamodel::Datamodel, query_schema: QuerySchemaRef) -> DataModelMetaFormat {
-    let (schema, mappings) = DMMFQuerySchemaRenderer::render(query_schema);
+    let (schema, mappings) = DmmfQuerySchemaRenderer::render(query_schema);
     let datamodel_json = datamodel::json::dmmf::render_to_dmmf_value(&dml);
 
     DataModelMetaFormat {

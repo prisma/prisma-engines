@@ -34,14 +34,12 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
   // We cannot express that we expect exactly one field in the WhereUniqueInput in GraphQL, we therefore will error at runtime
   // and hint at the correct way to use the api
 
-  "Providing 0 unique fields" should "error" in {
+  "Providing zero unique fields" should "error" in {
     server.queryThatMustFail(
       s"""query{user(where: {}){unique}}""",
       project,
       errorCode = 2009, // 3040,
-      errorContains =
-        """Failed to validate the query `Error occurred during query validation & transformation:\nAssertion error: Expected object to have exactly 1 key-value pairs, got: 0""",
-      // """You provided an invalid argument for the where selector on User. Please provide exactly one unique field and value."""
+      errorContains = """`Expected exactly one field to be present, got 0.` at `Query.user.where.UserWhereUniqueInput`""",
     )
   }
 
@@ -54,7 +52,7 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""query{user(where: {id:"wrong", email: "test@test.com"}){unique}}""",
       project,
       errorCode = 2009, // 3045,
-      errorContains = """Expected at most 1 fields to be present, got 2"""
+      errorContains = """`Expected exactly one field to be present, got 2.` at `Query.user.where.UserWhereUniqueInput`"""
       // """You provided more than one field for the unique selector on User. If you want that behavior you can use the many query and combine fields with AND / OR."""
     )
   }

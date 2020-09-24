@@ -80,7 +80,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Scalar filter" should "work" in {
-    server.query(query = """{posts(where:{title: {equals: "post 2"}}){title}}""", project).toString should be("""{"data":{"posts":[{"title":"post 2"}]}}""")
+    server.query(query = """{posts(where: { title: {equals: "post 2"}}){title}}""", project).toString should be("""{"data":{"posts":[{"title":"post 2"}]}}""")
   }
 
   "1 level 1-relation filter" should "work" in {
@@ -98,8 +98,28 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     server.query("""mutation { createOnePost(data: { title: "Post 4" popularity: 5 }) { title } }""", project, legacy = false)
 
-    server.query(query = """{posts(where:{blog:{isNot: null}}){title}}""", project).toString should be(
+    server.query(query = """{posts(where:{blog: { is: null}}){title}}""", project).toString should be("""{"data":{"posts":[{"title":"Post 4"}]}}""")
+
+    server.query(query = """{posts(where:{blog: { isNot: null}}){title}}""", project).toString should be(
       """{"data":{"posts":[{"title":"post 1"},{"title":"post 2"},{"title":"post 3"}]}}""")
+  }
+
+  "1 level 1-relation filter" should "allow implicit `is` and allow nulls (if the field is optional)" in {
+    server.query(query = """{posts(where: { blog: { name: { equals: "blog 1" }}}){title}}""", project).toString should be(
+      """{"data":{"posts":[{"title":"post 1"}]}}""")
+
+    server.query(query = """{blogs(where: { post: { popularity: { gte: 100 }}}){name}}""", project).toString should be(
+      """{"data":{"blogs":[{"name":"blog 2"},{"name":"blog 3"}]}}""")
+
+    server.query(query = """{blogs(where: { post: { popularity: { gte: 500 }}}){name}}""", project).toString should be(
+      """{"data":{"blogs":[{"name":"blog 3"}]}}""")
+
+    server.query(query = """{posts(where: { blog: { name: { equals: "blog 1" }}}){title}}""", project).toString should be(
+      """{"data":{"posts":[{"title":"post 1"}]}}""")
+
+    server.query("""mutation { createOnePost(data: { title: "Post 4" popularity: 5 }) { title } }""", project, legacy = false)
+
+    server.query(query = """{posts(where: { blog: null }){title}}""", project).toString should be("""{"data":{"posts":[{"title":"Post 4"}]}}""")
   }
 
   "2 level 1-relation filter" should "work" in {

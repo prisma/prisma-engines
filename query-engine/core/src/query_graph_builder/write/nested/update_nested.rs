@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    InputAssertions, ParsedInputValue,
+    ParsedInputValue,
 };
 use connector::{Filter, RecordFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
@@ -40,9 +40,6 @@ pub fn nested_update(
             // The update itself operates on the record found by the read check.
             let mut map: ParsedInputMap = value.try_into()?;
             let where_arg: ParsedInputMap = map.remove("where").unwrap().try_into()?;
-
-            where_arg.assert_size(1)?;
-            where_arg.assert_non_null()?;
 
             let filter = extract_unique_filter(where_arg, &child_model)?;
             let data_value = map.remove("data").unwrap();

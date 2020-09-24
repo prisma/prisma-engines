@@ -78,6 +78,79 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     readResult.pathAsJsValue("data.findManyTestModel").toString should equal(s"""[{"id":"$id"}]""")
   }
 
+  "An updateOne mutation" should "update an item with shorthand notation" taggedAs IgnoreSQLite in {
+    val project = ProjectDsl.fromString {
+      """
+        |model TestModel {
+        |  id          String  @id @default(cuid())
+        |  optString   String?
+        |  optInt      Int?
+        |  optFloat    Float?
+        |  optBoolean  Boolean?
+        |  optDateTime DateTime?
+        |}
+      """.stripMargin
+    }
+    database.setup(project)
+
+    val createResult = server.query(
+      """
+        |mutation {
+        |  createOneTestModel(data: {}) {
+        |    id
+        |  }
+        |}
+      """.stripMargin,
+      project = project,
+      legacy = false,
+    )
+
+    val id = createResult.pathAsString("data.createOneTestModel.id")
+    val updateResult = server.query(
+      s"""
+         |mutation {
+         |  updateOneTestModel(
+         |    where: { id: "$id" }
+         |    data: {
+         |      optString: "test${TroubleCharacters.value}",
+         |      optInt: 1337,
+         |      optFloat: 1.234,
+         |      optBoolean: true,
+         |      optDateTime: "2016-07-31T23:59:01.000Z",
+         |    }
+         |  ) {
+         |    optString
+         |    optInt
+         |    optFloat
+         |    optBoolean
+         |    optDateTime
+         |  }
+         |}
+         |
+      """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    updateResult.pathAsJsValue("data.updateOneTestModel") should be(
+      Json.parse(
+        s"""{"optString":"test${TroubleCharacters.value}","optInt":1337,"optFloat":1.234,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01.000Z"}"""))
+
+    val readResult = server.query(
+      s"""
+         |{
+         |  findManyTestModel {
+         |    id
+         |  }
+         |}
+       """.stripMargin,
+      project,
+      legacy = false,
+    )
+
+    readResult.pathAsJsValue("data.findManyTestModel").toString should equal(s"""[{"id":"$id"}]""")
+  }
+
   "An updateOne mutation" should "update an item by a unique field" in {
     val project = ProjectDsl.fromString {
       """

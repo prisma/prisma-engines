@@ -197,9 +197,9 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       filterDaughterNull,
       project,
-      errorCode = 2012,
+      errorCode = 2009,
       errorContains =
-        "Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanRelationFilter.is.HumanWhereInput.daughters.HumanListRelationFilter.none`"
+        "`Query.songs.where.SongWhereInput.creator.HumanRelationFilter.is.HumanWhereInput.daughters.HumanListRelationFilter.none`: A value is required but not set."
     )
   }
 
@@ -285,9 +285,9 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       filterGroupies,
       project,
-      errorCode = 2012,
+      errorCode = 2009,
       errorContains =
-        """Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanRelationFilter.is.HumanWhereInput.fans.HumanListRelationFilter.every.HumanWhereInput.fans.HumanListRelationFilter.some`"""
+        """`Query.songs.where.SongWhereInput.creator.HumanRelationFilter.is.HumanWhereInput.fans.HumanListRelationFilter.every.HumanWhereInput.fans.HumanListRelationFilter.some`: A value is required but not set."""
     )
   }
 

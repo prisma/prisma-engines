@@ -46,7 +46,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project,
         errorCode = 2009,
         errorContains =
-          """ ↳ ChildUpdateOneWithoutParentOptInput (object)\n            ↳ deleteMany (field)\n              ↳ Field does not exist on enclosing type.` at `.Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.deleteMany`"""
+          """`Field does not exist on enclosing type.` at `Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.deleteMany`"""
       )
     }
   }
@@ -190,7 +190,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     }
   }
 
-  "a PM to C1!  relation " should "work with empty Filter" in {
+  "a PM to C1! relation " should "work with empty Filter" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
@@ -205,9 +205,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  updateParent(
          |    where: $parent1Id
          |    data:{
-         |    childrenOpt: {deleteMany: [
-         |    {}
-         |    ]}
+         |    childrenOpt: { deleteMany: [{}] }
          |  }){
          |    childrenOpt {
          |      c

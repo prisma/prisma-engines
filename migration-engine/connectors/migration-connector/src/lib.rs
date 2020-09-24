@@ -25,7 +25,7 @@ pub use error::*;
 pub use imperative_migrations_persistence::{ImperativeMigrationsPersistence, MigrationRecord, Timestamp};
 pub use migration_applier::*;
 pub use migration_persistence::*;
-pub use migrations_directory::{create_migration_directory, list_migrations, MigrationDirectory};
+pub use migrations_directory::{create_migration_directory, list_migrations, ListMigrationsError, MigrationDirectory};
 pub use steps::MigrationStep;
 
 use std::fmt::Debug;
@@ -47,7 +47,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// The version of the underlying database.
     fn version(&self) -> String;
 
-    /// Hook to perform connector-specific initialization.
+    /// Hook to perform connector-specific initialization. This is deprecated.
     async fn initialize(&self) -> ConnectorResult<()>;
 
     /// Create the database with the provided URL.

@@ -1,12 +1,12 @@
 //! Postgres description.
 use super::*;
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
-use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -55,7 +55,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
@@ -340,7 +340,6 @@ impl SqlSchemaDescriber {
             JOIN pg_attribute att2 on
                 att2.attrelid = con.conrelid and att2.attnum = con.parent
             ORDER BY con_id, con.colidx"#;
-        debug!("describing table foreign keys, SQL: '{}'", sql);
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID, which we will have to combine into corresponding foreign key
@@ -480,7 +479,6 @@ impl SqlSchemaDescriber {
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname, rawIndex.indkeyidx
         ORDER BY rawIndex.indkeyidx
         "#;
-        debug!("Getting indices: {}", sql);
         let rows = self
             .conn
             .query_raw(&sql, &[schema.into()])

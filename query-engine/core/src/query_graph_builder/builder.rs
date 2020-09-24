@@ -77,7 +77,6 @@ impl QueryGraphBuilder {
     /// Maps a write operation to one or more queries.
     fn map_write_operation(&self, write_selection: Selection) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
         let mutation_object = self.query_schema.mutation();
-
         let (mut graph, ir_ser) = Self::process(write_selection, &mutation_object)?;
 
         if let QueryType::Graph(ref mut graph) = graph {
@@ -92,7 +91,7 @@ impl QueryGraphBuilder {
         object: &ObjectTypeStrongRef,
     ) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
         let mut selections = vec![selection];
-        let mut parsed_object = QueryDocumentParser::parse_object(&selections, object)?;
+        let mut parsed_object = QueryDocumentParser::parse_object(QueryPath::default(), &selections, object)?;
 
         let parsed_field = parsed_object.fields.pop().unwrap();
         let result_info = Self::derive_serializer(&selections.pop().unwrap(), &parsed_field);
@@ -127,7 +126,7 @@ impl QueryGraphBuilder {
                 .alias()
                 .clone()
                 .unwrap_or_else(|| selection.name().to_string()),
-            output_type: field.schema_field.field_type.clone(),
+            output_field: field.schema_field.clone(),
         }
     }
 }

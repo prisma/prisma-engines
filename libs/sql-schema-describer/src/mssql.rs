@@ -1,18 +1,17 @@
 use super::*;
 use once_cell::sync::Lazy;
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
-    sync::Arc,
 };
 
 static DEFAULT_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
 static DEFAULT_NON_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -60,7 +59,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 }
 
 impl SqlSchemaDescriber {
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> Self {
+    pub fn new(conn: Quaint) -> Self {
         Self { conn }
     }
 
@@ -316,8 +315,6 @@ impl SqlSchemaDescriber {
             ORDER BY index_name, seq_in_index
         "#;
 
-        debug!("describing indices, SQL: {}", sql);
-
         let rows = self
             .conn
             .query_raw(sql, &[schema.into()])
@@ -446,8 +443,6 @@ impl SqlSchemaDescriber {
             ORDER BY
                 ordinal_position
         "#;
-
-        debug!("describing table foreign keys, SQL: '{}'", sql);
 
         let result_set = self
             .conn

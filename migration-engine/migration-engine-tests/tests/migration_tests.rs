@@ -4,6 +4,7 @@ mod calculate_database_steps;
 mod create_migration;
 mod datamodel_calculator;
 mod datamodel_steps_inferrer;
+mod diagnose_migration_history;
 mod errors;
 mod existing_data;
 mod existing_databases;
@@ -12,13 +13,15 @@ mod initialization;
 mod migration_persistence;
 mod migrations;
 mod multi_user;
+mod plan_migration;
+mod reset;
 mod schema_push;
 mod unapply_migration;
 
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::prelude::SqlFamily;
+use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
 
 #[test_each_connector]

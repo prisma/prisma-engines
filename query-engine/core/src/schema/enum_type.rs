@@ -1,6 +1,6 @@
 use prisma_models::{InternalEnum, ScalarFieldRef};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum EnumType {
     /// Generic, prisma-application specific string enum.
     /// Semantics are defined by the component interpreting the contents.
@@ -23,7 +23,7 @@ impl EnumType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct StringEnumType {
     pub name: String,
     pub values: Vec<String>,
@@ -48,7 +48,7 @@ impl From<InternalEnum> for EnumType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct FieldRefEnumType {
     pub name: String,
     pub values: Vec<(String, ScalarFieldRef)>,
