@@ -5,6 +5,7 @@ mod test_api;
 use barrel::{types, Migration};
 use common::*;
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 use sqlite::*;
 use test_api::{sqlite_test_api, TestApi, TestResult};

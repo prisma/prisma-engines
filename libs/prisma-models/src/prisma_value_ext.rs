@@ -13,7 +13,7 @@ impl PrismaValueExtensions for PrismaValue {
     fn coerce(self, to_type: &TypeIdentifier) -> crate::Result<PrismaValue> {
         let coerced = match (self, to_type) {
             // Trivial cases
-            (PrismaValue::Null(_), identifier) => PrismaValue::null(identifier.clone()),
+            (PrismaValue::Null, _) => PrismaValue::Null,
             (val @ PrismaValue::String(_), TypeIdentifier::String) => val,
             (val @ PrismaValue::Int(_), TypeIdentifier::Int) => val,
             (val @ PrismaValue::Float(_), TypeIdentifier::Float) => val,

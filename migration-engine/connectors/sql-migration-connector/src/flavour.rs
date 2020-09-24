@@ -24,7 +24,7 @@ use quaint::{
     single::Quaint,
 };
 use sql_schema_describer::SqlSchema;
-use std::{fmt::Debug, sync::Arc};
+use std::fmt::Debug;
 
 /// The maximum size of identifiers on MySQL, in bytes.
 ///
@@ -76,11 +76,7 @@ pub(crate) trait SqlFlavour:
     async fn qe_setup(&self, database_url: &str) -> ConnectorResult<()>;
 
     /// Introspect the SQL schema.
-    async fn describe_schema<'a>(
-        &'a self,
-        schema_name: &'a str,
-        conn: Arc<dyn Queryable + Send + Sync>,
-    ) -> SqlResult<SqlSchema>;
+    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> SqlResult<SqlSchema>;
 
     /// Drop the database the connector is connected to and recreate it empty.
     /// This should not be used for other databases, temporary databases for

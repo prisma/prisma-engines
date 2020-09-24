@@ -5,7 +5,6 @@ use quaint::{
     single::Quaint,
 };
 use sql_schema_describer::SqlSchemaDescriberBackend;
-use std::sync::Arc;
 use std::time::Duration;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
@@ -25,11 +24,9 @@ pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBack
     let connection_info = wrapper.connection_info().to_owned();
 
     let describer: Box<dyn SqlSchemaDescriberBackend> = match connection_info.sql_family() {
-        SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::new(
-            wrapper,
-        ))),
-        SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::new(wrapper))),
-        SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::new(wrapper))),
+        SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(wrapper)),
+        SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(wrapper)),
+        SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(wrapper)),
         SqlFamily::Mssql => todo!("Greetings from Redmond"),
     };
 

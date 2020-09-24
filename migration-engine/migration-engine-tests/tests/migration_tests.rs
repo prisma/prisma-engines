@@ -21,7 +21,7 @@ mod unapply_migration;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::prelude::SqlFamily;
+use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
 
 #[test_each_connector]

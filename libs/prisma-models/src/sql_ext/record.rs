@@ -1,5 +1,5 @@
-use crate::{error::DomainError, ModelProjection, RecordProjection};
-use quaint::connector::ResultSet;
+use crate::{error::DomainError, ModelProjection, RecordProjection, ScalarFieldExt};
+use quaint::{connector::ResultSet, Value};
 use std::convert::TryFrom;
 
 impl TryFrom<(&ModelProjection, ResultSet)> for RecordProjection {
@@ -37,5 +37,15 @@ impl TryFrom<(&ModelProjection, ResultSet)> for RecordProjection {
                 "RecordProjection".to_owned(),
             ))
         }
+    }
+}
+
+pub trait RecordProjectionExt {
+    fn db_values<'a>(&self) -> Vec<Value<'a>>;
+}
+
+impl RecordProjectionExt for RecordProjection {
+    fn db_values<'a>(&self) -> Vec<Value<'a>> {
+        self.pairs.iter().map(|(f, v)| f.value(v.clone())).collect()
     }
 }

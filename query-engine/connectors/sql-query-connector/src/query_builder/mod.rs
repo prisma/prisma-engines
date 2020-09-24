@@ -4,7 +4,7 @@ pub mod write;
 pub use read::*;
 pub use write::*;
 
-use prisma_models::RecordProjection;
+use prisma_models::{RecordProjection, RecordProjectionExt};
 use quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
 
 const PARAMETER_LIMIT: usize = 10000;
@@ -34,7 +34,7 @@ pub(super) fn conditions<'a>(
     let mut values = Values::empty();
 
     for proj in records.into_iter() {
-        let vals: Vec<_> = proj.values().collect();
+        let vals: Vec<_> = proj.db_values();
         values.push(vals)
     }
 

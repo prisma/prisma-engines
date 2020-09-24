@@ -67,7 +67,7 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
         None => (None, ConditionTree::NoCondition),
         Some(ref cursor) => {
             let cursor_fields: Vec<_> = cursor.fields().collect();
-            let cursor_values: Vec<_> = cursor.values().collect();
+            let cursor_values: Vec<_> = cursor.pairs.iter().map(|(f, v)| f.value(v.clone())).collect();
             let cursor_columns: Vec<_> = cursor_fields.as_slice().as_columns().collect();
             let cursor_row = Row::from(cursor_columns);
 

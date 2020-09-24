@@ -1,6 +1,7 @@
 use crate::*;
 use barrel::types;
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use test_harness::*;
 
 #[test_each_connector(tags("sqlite"))]
