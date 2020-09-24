@@ -6,7 +6,7 @@ use crate::{
 use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
-use quaint::{connector::MysqlUrl, prelude::SqlFamily, single::Quaint};
+use quaint::{connector::MysqlUrl, prelude::SqlFamily};
 use regex::RegexSet;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use url::Url;
@@ -59,12 +59,14 @@ impl SqlFlavour for MysqlFlavour {
         Ok(db_name.to_owned())
     }
 
-    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> ConnectorResult<SqlSchema> {
-        Ok(sql_schema_describer::mysql::SqlSchemaDescriber::new(conn.clone())
-            .describe(schema_name)
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(conn.connection_info()))
-            .await?)
+    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
+        Ok(
+            sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
+                .describe(connection.connection_info().schema_name())
+                .map_err(SqlError::from)
+                .map_err(|err| err.into_connector_error(connection.connection_info()))
+                .await?,
+        )
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
@@ -161,10 +163,7 @@ impl SqlFlavour for MysqlFlavour {
             })?;
         }
 
-        let schema_name = temp_database.connection_info().schema_name();
-        let sql_schema = self
-            .describe_schema(schema_name, temp_database.quaint().clone())
-            .await?;
+        let sql_schema = self.describe_schema(&temp_database).await?;
 
         connection.raw_cmd(&drop_database).await?;
 

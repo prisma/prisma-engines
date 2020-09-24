@@ -2,7 +2,7 @@ use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection, database_info::DatabaseInfo, SqlError};
 use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
-use quaint::{connector::PostgresUrl, prelude::SqlFamily, single::Quaint};
+use quaint::{connector::PostgresUrl, prelude::SqlFamily};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
 use url::Url;
@@ -57,20 +57,22 @@ impl SqlFlavour for PostgresFlavour {
         Ok(db_name.to_owned())
     }
 
-    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> ConnectorResult<SqlSchema> {
-        let connection_info = conn.connection_info();
-        Ok(sql_schema_describer::postgres::SqlSchemaDescriber::new(conn.clone())
-            .describe(schema_name)
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(connection_info))
-            .await?)
+    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
+        Ok(
+            sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone())
+                .describe(connection.connection_info().schema_name())
+                .map_err(SqlError::from)
+                .map_err(|err| err.into_connector_error(connection.connection_info()))
+                .await?,
+        )
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
+        let schema_name = connection.connection_info().schema_name();
         let schema_exists_result = connection
             .query_raw(
                 "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1)",
-                &[connection.connection_info().schema_name().into()],
+                &[schema_name.into()],
             )
             .await?;
 
@@ -83,14 +85,11 @@ impl SqlFlavour for PostgresFlavour {
 
         tracing::debug!(
             "Detected that the `{schema_name}` schema does not exist on the target database. Attempting to create it.",
-            schema_name = connection.connection_info().schema_name(),
+            schema_name = schema_name,
         );
 
         connection
-            .raw_cmd(&format!(
-                "CREATE SCHEMA \"{}\"",
-                connection.connection_info().schema_name()
-            ))
+            .raw_cmd(&format!("CREATE SCHEMA \"{}\"", schema_name))
             .await?;
 
         Ok(())
@@ -200,9 +199,7 @@ impl SqlFlavour for PostgresFlavour {
             })?;
         }
 
-        let sql_schema = self
-            .describe_schema(self.schema_name(), temporary_database.quaint().clone())
-            .await?;
+        let sql_schema = self.describe_schema(&temporary_database).await?;
 
         connection.raw_cmd(&drop_database).await?;
 

@@ -211,7 +211,7 @@ impl SqlDestructiveChangeChecker<'_> {
     ) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(steps, before, after);
 
-        plan.execute(self.schema_name(), self.conn()).await
+        plan.execute(self.conn()).await
     }
 }
 
@@ -224,7 +224,7 @@ impl DestructiveChangeChecker<SqlMigration> for SqlDestructiveChangeChecker<'_> 
             &database_migration.after,
         );
 
-        plan.execute(self.schema_name(), self.conn()).await
+        plan.execute(self.conn()).await
     }
 
     fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {

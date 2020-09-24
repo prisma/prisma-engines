@@ -2,7 +2,7 @@ use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection, SqlError};
 use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
-use quaint::{prelude::SqlFamily, single::Quaint};
+use quaint::prelude::SqlFamily;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::path::Path;
 
@@ -41,12 +41,14 @@ impl SqlFlavour for SqliteFlavour {
         Ok(self.file_path.clone())
     }
 
-    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> ConnectorResult<SqlSchema> {
-        Ok(sql_schema_describer::sqlite::SqlSchemaDescriber::new(conn.clone())
-            .describe(schema_name)
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(conn.connection_info()))
-            .await?)
+    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
+        Ok(
+            sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
+                .describe(connection.connection_info().schema_name())
+                .map_err(SqlError::from)
+                .map_err(|err| err.into_connector_error(connection.connection_info()))
+                .await?,
+        )
     }
 
     async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
@@ -141,7 +143,7 @@ impl SqlFlavour for SqliteFlavour {
             })?;
         }
 
-        let sql_schema = self.describe_schema(&self.attached_name, conn.quaint().clone()).await?;
+        let sql_schema = self.describe_schema(&conn).await?;
 
         Ok(sql_schema)
     }

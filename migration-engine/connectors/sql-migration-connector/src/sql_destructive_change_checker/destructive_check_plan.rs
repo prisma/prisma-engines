@@ -40,22 +40,17 @@ impl DestructiveCheckPlan {
     /// errors.
     ///
     /// For example, dropping a table that has 0 rows can be considered safe.
-    #[tracing::instrument(skip(conn, schema_name), level = "debug")]
-    pub(super) async fn execute(
-        &self,
-        schema_name: &str,
-        conn: &Connection,
-    ) -> ConnectorResult<DestructiveChangeDiagnostics> {
+    #[tracing::instrument(skip(conn), level = "debug")]
+    pub(super) async fn execute(&self, conn: &Connection) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let mut results = DatabaseInspectionResults::default();
 
         let inspection = async {
             for (unexecutable, _idx) in &self.unexecutable_migrations {
-                self.inspect_for_check(unexecutable, &mut results, schema_name, conn)
-                    .await?;
+                self.inspect_for_check(unexecutable, &mut results, conn).await?;
             }
 
             for (warning, _idx) in &self.warnings {
-                self.inspect_for_check(warning, &mut results, schema_name, conn).await?;
+                self.inspect_for_check(warning, &mut results, conn).await?;
             }
 
             Ok::<(), ConnectorError>(())
@@ -95,19 +90,18 @@ impl DestructiveCheckPlan {
         &self,
         check: &(dyn Check + Send + Sync + 'static),
         results: &mut DatabaseInspectionResults,
-        schema_name: &str,
         conn: &Connection,
     ) -> ConnectorResult<()> {
         if let Some(table) = check.needed_table_row_count() {
             if results.get_row_count(table).is_none() {
-                let count = count_rows_in_table(table, schema_name, conn).await?;
+                let count = count_rows_in_table(table, conn).await?;
                 results.set_row_count(table.to_owned(), count)
             }
         }
 
         if let Some((table, column)) = check.needed_column_value_count() {
             if let (_, None) = results.get_row_and_non_null_value_count(table, column) {
-                let count = count_values_in_column(column, table, schema_name, conn).await?;
+                let count = count_values_in_column(column, table, conn).await?;
                 results.set_value_count(table.to_owned().into(), column.to_owned().into(), count);
             }
         }
@@ -146,10 +140,10 @@ impl DestructiveCheckPlan {
     }
 }
 
-async fn count_rows_in_table(table_name: &str, schema_name: &str, conn: &Connection) -> ConnectorResult<i64> {
+async fn count_rows_in_table(table_name: &str, conn: &Connection) -> ConnectorResult<i64> {
     use quaint::ast::*;
 
-    let query = Select::from_table((schema_name, table_name)).value(count(asterisk()));
+    let query = Select::from_table((conn.connection_info().schema_name(), table_name)).value(count(asterisk()));
     let result_set = conn.query(query).await?;
     let rows_count = result_set
         .first()
@@ -171,15 +165,10 @@ async fn count_rows_in_table(table_name: &str, schema_name: &str, conn: &Connect
     Ok(rows_count)
 }
 
-async fn count_values_in_column(
-    column_name: &str,
-    table: &str,
-    schema_name: &str,
-    conn: &Connection,
-) -> ConnectorResult<i64> {
+async fn count_values_in_column(column_name: &str, table: &str, conn: &Connection) -> ConnectorResult<i64> {
     use quaint::ast::*;
 
-    let query = Select::from_table((schema_name, table))
+    let query = Select::from_table((conn.connection_info().schema_name(), table))
         .value(count(quaint::ast::Column::new(column_name)))
         .so_that(column_name.is_not_null());
 

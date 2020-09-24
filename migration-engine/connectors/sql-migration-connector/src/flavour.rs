@@ -20,7 +20,7 @@ use crate::{
     sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
 use migration_connector::{ConnectorResult, MigrationDirectory};
-use quaint::{connector::ConnectionInfo, prelude::SqlFamily, single::Quaint};
+use quaint::{connector::ConnectionInfo, prelude::SqlFamily};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
 
@@ -70,7 +70,7 @@ pub(crate) trait SqlFlavour:
     async fn qe_setup(&self, database_url: &str) -> ConnectorResult<()>;
 
     /// Introspect the SQL schema.
-    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> ConnectorResult<SqlSchema>;
+    async fn describe_schema<'a>(&'a self, conn: &Connection) -> ConnectorResult<SqlSchema>;
 
     /// Drop the database and recreate it empty.
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;

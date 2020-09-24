@@ -77,10 +77,7 @@ impl SqlMigrationConnector {
     }
 
     async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
-        let conn = self.connection.quaint().clone();
-        let schema_name = self.schema_name();
-
-        self.flavour.describe_schema(schema_name, conn).await
+        self.flavour.describe_schema(&self.connection).await
     }
 }
 
