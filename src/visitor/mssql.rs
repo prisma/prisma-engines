@@ -179,7 +179,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 self.visit_parameterized(limit)?;
                 self.write(" ROWS ONLY")
             }
-            (None, Some(offset)) => {
+            (None, Some(offset)) if self.order_by_set || offset.as_i64().map(|i| i > 0).unwrap_or(false) => {
                 add_ordering(self)?;
 
                 self.write(" OFFSET ")?;
@@ -195,7 +195,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 self.visit_parameterized(limit)?;
                 self.write(" ROWS ONLY")
             }
-            (None, None) => Ok(()),
+            (None, _) => Ok(()),
         }
     }
 
