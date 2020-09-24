@@ -1,8 +1,8 @@
 use super::SqlFlavour;
-use crate::{catch, connect, SqlError, SqlResult};
+use crate::{connect, connection_wrapper::Connection, SqlError};
 use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
-use quaint::{prelude::ConnectionInfo, prelude::Queryable, prelude::SqlFamily, single::Quaint};
+use quaint::{prelude::SqlFamily, single::Quaint};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::path::Path;
 
@@ -41,21 +41,19 @@ impl SqlFlavour for SqliteFlavour {
         Ok(self.file_path.clone())
     }
 
-    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> SqlResult<SqlSchema> {
-        Ok(sql_schema_describer::sqlite::SqlSchemaDescriber::new(conn)
+    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> ConnectorResult<SqlSchema> {
+        Ok(sql_schema_describer::sqlite::SqlSchemaDescriber::new(conn.clone())
             .describe(schema_name)
+            .map_err(SqlError::from)
+            .map_err(|err| err.into_connector_error(conn.connection_info()))
             .await?)
     }
 
-    async fn ensure_connection_validity(&self, _connection: &Quaint) -> ConnectorResult<()> {
+    async fn ensure_connection_validity(&self, _connection: Connection<'_>) -> ConnectorResult<()> {
         Ok(())
     }
 
-    async fn ensure_imperative_migrations_table(
-        &self,
-        connection: &dyn Queryable,
-        connection_info: &ConnectionInfo,
-    ) -> ConnectorResult<()> {
+    async fn ensure_imperative_migrations_table(&self, connection: Connection<'_>) -> ConnectorResult<()> {
         let sql = format!(
             r#"
             CREATE TABLE IF NOT EXISTS "{}"."_prisma_migrations" (
@@ -69,11 +67,11 @@ impl SqlFlavour for SqliteFlavour {
                 "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
                 "script"                TEXT NOT NULL
             );
-        "#,
+            "#,
             self.attached_name()
         );
 
-        catch(connection_info, connection.raw_cmd(&sql).map_err(SqlError::from)).await
+        connection.raw_cmd(sql).await
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
@@ -82,8 +80,8 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
-    async fn reset(&self, conn: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
-        let file_path = connection_info.file_path().unwrap();
+    async fn reset(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+        let file_path = connection.connection_info().file_path().unwrap();
 
         std::fs::remove_file(file_path).map_err(|err| {
             ConnectorError::from_kind(ErrorKind::Generic(anyhow::anyhow!(
@@ -93,22 +91,16 @@ impl SqlFlavour for SqliteFlavour {
             )))
         })?;
 
-        catch(
-            connection_info,
-            conn.execute_raw("DETACH ?", &[connection_info.schema_name().into()])
-                .map_err(SqlError::from),
-        )
-        .await?;
+        connection
+            .execute_raw("DETACH ?", &[connection.connection_info().schema_name().into()])
+            .await?;
 
-        catch(
-            connection_info,
-            conn.execute_raw(
+        connection
+            .execute_raw(
                 "ATTACH DATABASE ? AS ?",
-                &[file_path.into(), connection_info.schema_name().into()],
+                &[file_path.into(), connection.connection_info().schema_name().into()],
             )
-            .map_err(SqlError::from),
-        )
-        .await?;
+            .await?;
 
         Ok(())
     }
@@ -117,12 +109,11 @@ impl SqlFlavour for SqliteFlavour {
         SqlFamily::Sqlite
     }
 
-    #[tracing::instrument(skip(self, migrations, _connection, _connection_info))]
+    #[tracing::instrument(skip(self, migrations, _connection))]
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        _connection: &dyn Queryable,
-        _connection_info: &ConnectionInfo,
+        _connection: Connection<'_>,
     ) -> ConnectorResult<SqlSchema> {
         let temp_dir = tempfile::tempdir().expect("Failed to create temporary directory.");
         let database_url = format!(
@@ -133,9 +124,8 @@ impl SqlFlavour for SqliteFlavour {
 
         tracing::debug!("Applying migrations to temporary SQLite database at `{}`", database_url);
 
-        let connection_info = ConnectionInfo::from_url(&database_url)
-            .map_err(|err| ConnectorError::url_parse_error(err, &database_url))?;
-        let conn = catch(&connection_info, Quaint::new(&database_url).map_err(SqlError::from)).await?;
+        let (conn, _) = crate::connect(&database_url).await?;
+        let conn = Connection::new(&conn);
 
         for migration in migrations {
             let script = migration
@@ -147,18 +137,12 @@ impl SqlFlavour for SqliteFlavour {
                 migration.migration_name()
             );
 
-            catch(conn.connection_info(), conn.raw_cmd(&script).map_err(SqlError::from))
-                .await
-                .map_err(|connector_error| {
-                    connector_error.into_migration_failed(migration.migration_name().to_owned())
-                })?;
+            conn.raw_cmd(&script).await.map_err(|connector_error| {
+                connector_error.into_migration_failed(migration.migration_name().to_owned())
+            })?;
         }
 
-        let sql_schema = catch(
-            &conn.connection_info().clone(),
-            self.describe_schema(&self.attached_name, conn),
-        )
-        .await?;
+        let sql_schema = self.describe_schema(&self.attached_name, conn.quaint().clone()).await?;
 
         Ok(sql_schema)
     }

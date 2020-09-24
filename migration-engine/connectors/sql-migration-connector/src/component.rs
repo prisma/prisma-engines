@@ -1,5 +1,6 @@
-use crate::{flavour::SqlFlavour, DatabaseInfo, SqlMigrationConnector, SqlResult};
-use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
+use crate::{connection_wrapper::Connection, flavour::SqlFlavour, DatabaseInfo, SqlMigrationConnector};
+use migration_connector::ConnectorResult;
+use quaint::prelude::{ConnectionInfo, SqlFamily};
 use sql_schema_describer::SqlSchema;
 
 /// Implemented by the components of the connector that contain a reference to the connector (like
@@ -16,15 +17,15 @@ pub(crate) trait Component {
         self.connector().database_info.connection_info()
     }
 
-    fn conn(&self) -> &dyn Queryable {
-        &self.connector().database
+    fn conn(&self) -> Connection<'_> {
+        Connection::new(&self.connector().database)
     }
 
     fn database_info(&self) -> &DatabaseInfo {
         &self.connector().database_info
     }
 
-    async fn describe(&self) -> SqlResult<SqlSchema> {
+    async fn describe(&self) -> ConnectorResult<SqlSchema> {
         self.connector().describe_schema().await
     }
 

@@ -2,9 +2,10 @@ use super::{
     check::Check, database_inspection_results::DatabaseInspectionResults,
     unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarningCheck,
 };
-use crate::{SqlError, SqlResult};
-use migration_connector::{DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration};
-use quaint::prelude::Queryable;
+use crate::connection_wrapper::Connection;
+use migration_connector::{
+    ConnectorError, ConnectorResult, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
+};
 use std::time::Duration;
 use tokio::time::{timeout, Elapsed};
 
@@ -43,8 +44,8 @@ impl DestructiveCheckPlan {
     pub(super) async fn execute(
         &self,
         schema_name: &str,
-        conn: &dyn Queryable,
-    ) -> SqlResult<DestructiveChangeDiagnostics> {
+        conn: Connection<'_>,
+    ) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let mut results = DatabaseInspectionResults::default();
 
         let inspection = async {
@@ -57,7 +58,7 @@ impl DestructiveCheckPlan {
                 self.inspect_for_check(warning, &mut results, schema_name, conn).await?;
             }
 
-            Ok::<(), SqlError>(())
+            Ok::<(), ConnectorError>(())
         };
 
         // Ignore the timeout error, we will still return useful warnings.
@@ -95,8 +96,8 @@ impl DestructiveCheckPlan {
         check: &(dyn Check + Send + Sync + 'static),
         results: &mut DatabaseInspectionResults,
         schema_name: &str,
-        conn: &dyn Queryable,
-    ) -> SqlResult<()> {
+        conn: Connection<'_>,
+    ) -> ConnectorResult<()> {
         if let Some(table) = check.needed_table_row_count() {
             if results.get_row_count(table).is_none() {
                 let count = count_rows_in_table(table, schema_name, conn).await?;
@@ -145,15 +146,15 @@ impl DestructiveCheckPlan {
     }
 }
 
-async fn count_rows_in_table(table_name: &str, schema_name: &str, conn: &dyn Queryable) -> SqlResult<i64> {
+async fn count_rows_in_table(table_name: &str, schema_name: &str, conn: Connection<'_>) -> ConnectorResult<i64> {
     use quaint::ast::*;
 
     let query = Select::from_table((schema_name, table_name)).value(count(asterisk()));
-    let result_set = conn.query(query.into()).await?;
+    let result_set = conn.query(query).await?;
     let rows_count = result_set
         .first()
         .ok_or_else(|| {
-            SqlError::Generic(anyhow::anyhow!(
+            ConnectorError::generic(anyhow::anyhow!(
                 "No row was returned when checking for existing rows in the `{}` table.",
                 table_name
             ))
@@ -161,7 +162,7 @@ async fn count_rows_in_table(table_name: &str, schema_name: &str, conn: &dyn Que
         .at(0)
         .and_then(|value| value.as_i64())
         .ok_or_else(|| {
-            SqlError::Generic(anyhow::anyhow!(
+            ConnectorError::generic(anyhow::anyhow!(
                 "No count was returned when checking for existing rows in the `{}` table.",
                 table_name
             ))
@@ -174,30 +175,26 @@ async fn count_values_in_column(
     column_name: &str,
     table: &str,
     schema_name: &str,
-    conn: &dyn Queryable,
-) -> SqlResult<i64> {
+    conn: Connection<'_>,
+) -> ConnectorResult<i64> {
     use quaint::ast::*;
 
     let query = Select::from_table((schema_name, table))
         .value(count(quaint::ast::Column::new(column_name)))
         .so_that(column_name.is_not_null());
 
-    let values_count: i64 = conn
-        .query(query.into())
-        .await
-        .map_err(SqlError::from)
-        .and_then(|result_set| {
-            result_set
-                .first()
-                .as_ref()
-                .and_then(|row| row.at(0))
-                .and_then(|count| count.as_i64())
-                .ok_or_else(|| {
-                    SqlError::Generic(anyhow::anyhow!(
-                        "Unexpected result set shape when checking dropped columns."
-                    ))
-                })
-        })?;
+    let values_count: i64 = conn.query(query).await.and_then(|result_set| {
+        result_set
+            .first()
+            .as_ref()
+            .and_then(|row| row.at(0))
+            .and_then(|count| count.as_i64())
+            .ok_or_else(|| {
+                ConnectorError::generic(anyhow::anyhow!(
+                    "Unexpected result set shape when checking dropped columns."
+                ))
+            })
+    })?;
 
     Ok(values_count)
 }

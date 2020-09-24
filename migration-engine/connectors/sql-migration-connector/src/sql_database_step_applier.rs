@@ -1,17 +1,14 @@
 use crate::{
-    catch,
     database_info::DatabaseInfo,
     sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
     sql_schema_differ::SqlSchemaDiffer,
-    Component, SqlError, SqlFlavour, SqlResult,
+    Component, SqlFlavour,
 };
-use futures::TryFutureExt;
 use migration_connector::{
     ConnectorError, ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier,
     DestructiveChangeDiagnostics, PrettyDatabaseMigrationStep,
 };
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
-use tracing_futures::Instrument;
 
 pub struct SqlDatabaseStepApplier<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -25,18 +22,16 @@ impl Component for SqlDatabaseStepApplier<'_> {
 
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
+    #[tracing::instrument(skip(self, database_migration))]
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        let fut = self
-            .apply_next_step(
-                &database_migration.steps,
-                index,
-                self.flavour(),
-                &database_migration.before,
-                &database_migration.after,
-            )
-            .instrument(tracing::debug_span!("ApplySqlStep", index));
-
-        crate::catch(self.connection_info(), fut).await
+        self.apply_next_step(
+            &database_migration.steps,
+            index,
+            self.flavour(),
+            &database_migration.before,
+            &database_migration.after,
+        )
+        .await
     }
 
     fn render_steps_pretty(
@@ -103,11 +98,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     }
 
     async fn apply_script(&self, script: &str) -> ConnectorResult<()> {
-        catch(
-            self.connection_info(),
-            self.conn().raw_cmd(script).map_err(SqlError::from),
-        )
-        .await
+        self.conn().raw_cmd(script).await
     }
 }
 
@@ -119,7 +110,7 @@ impl SqlDatabaseStepApplier<'_> {
         renderer: &(dyn SqlFlavour + Send + Sync),
         current_schema: &SqlSchema,
         next_schema: &SqlSchema,
-    ) -> SqlResult<bool> {
+    ) -> ConnectorResult<bool> {
         let has_this_one = steps.get(index).is_some();
 
         if !has_this_one {
@@ -130,7 +121,7 @@ impl SqlDatabaseStepApplier<'_> {
         tracing::debug!(?step);
 
         for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema, next_schema)
-            .map_err(SqlError::Generic)?
+            .map_err(|err| ConnectorError::generic(err))?
         {
             tracing::debug!(index, %sql_string);
 

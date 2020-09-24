@@ -5,6 +5,7 @@
 pub mod sql_migration;
 
 mod component;
+mod connection_wrapper;
 mod database_info;
 mod error;
 mod flavour;
@@ -17,6 +18,7 @@ mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
 
+use connection_wrapper::Connection;
 pub use error::{SqlError, SqlResult};
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
@@ -41,10 +43,11 @@ pub struct SqlMigrationConnector {
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let (connection, database_info) = connect(database_str).await?;
+        let conn = Connection::new(&connection);
         let flavour = flavour::from_connection_info(database_info.connection_info());
 
         flavour.check_database_info(&database_info)?;
-        flavour.ensure_connection_validity(&connection).await?;
+        flavour.ensure_connection_validity(conn).await?;
 
         Ok(Self {
             flavour,
@@ -69,7 +72,7 @@ impl SqlMigrationConnector {
         flavour.qe_setup(database_str).await
     }
 
-    async fn describe_schema(&self) -> SqlResult<SqlSchema> {
+    async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         let conn = self.connector().database.clone();
         let schema_name = self.schema_name();
 
@@ -103,9 +106,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        self.flavour
-            .reset(self.conn(), self.database_info.connection_info())
-            .await
+        self.flavour.reset(self.conn()).await
     }
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
@@ -136,16 +137,6 @@ impl MigrationConnector for SqlMigrationConnector {
 
     fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence {
         self
-    }
-}
-
-pub(crate) async fn catch<O>(
-    connection_info: &ConnectionInfo,
-    fut: impl std::future::Future<Output = Result<O, SqlError>>,
-) -> Result<O, ConnectorError> {
-    match fut.await {
-        Ok(o) => Ok(o),
-        Err(sql_error) => Err(sql_error.into_connector_error(connection_info)),
     }
 }
 

@@ -1,5 +1,5 @@
 use super::SqlFlavour;
-use crate::{catch, connect, SqlError, SqlResult};
+use crate::{connect, connection_wrapper::Connection, SqlError, SqlResult};
 use futures::TryFutureExt;
 use migration_connector::{ConnectorResult, MigrationDirectory};
 use quaint::{connector::MssqlUrl, prelude::ConnectionInfo, prelude::Queryable, prelude::SqlFamily, single::Quaint};
@@ -41,15 +41,15 @@ impl MssqlFlavour {
 impl SqlFlavour for MssqlFlavour {
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
         let (db_name, master_uri) = Self::master_url(jdbc_string);
-        let (conn, _) = connect(&master_uri.to_string()).await?;
+        let conn = connect(&master_uri.to_string()).await?;
 
         let query = format!("CREATE DATABASE [{}]", db_name);
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+        conn.raw_cmd(&query).await?;
 
-        let (conn, _) = connect(jdbc_string).await?;
+        let conn = connect(jdbc_string).await?;
 
         let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name());
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+        conn.raw_cmd(&query).await?;
 
         Ok(db_name)
     }
@@ -60,7 +60,8 @@ impl SqlFlavour for MssqlFlavour {
             .await?)
     }
 
-    async fn reset(&self, connection: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
+    async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
+        let schema_name = connection.connection_info().schema_name();
         let drop_fks = format!(
             r#"
             DECLARE @stmt NVARCHAR(max)
@@ -75,7 +76,7 @@ impl SqlFlavour for MssqlFlavour {
 
             EXEC SP_EXECUTESQL @stmt
             "#,
-            connection_info.schema_name()
+            schema_name
         );
 
         let drop_tables = format!(
@@ -92,16 +93,11 @@ impl SqlFlavour for MssqlFlavour {
 
             EXEC SP_EXECUTESQL @stmt
             "#,
-            connection_info.schema_name()
+            schema_name
         );
 
-        catch(connection_info, connection.raw_cmd(&drop_fks).map_err(SqlError::from)).await?;
-
-        catch(
-            connection_info,
-            connection.raw_cmd(&drop_tables).map_err(SqlError::from),
-        )
-        .await?;
+        connection.raw_cmd(&drop_fks).await?;
+        connection.raw_cmd(&drop_tables).await?;
 
         Ok(())
     }

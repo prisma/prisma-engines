@@ -24,18 +24,14 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let fut = async {
-            let current_database_schema: SqlSchema = self.describe().await?;
-            let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info(), self.flavour());
-            Ok(infer(
-                current_database_schema,
-                expected_database_schema,
-                self.database_info(),
-                self.flavour(),
-            ))
-        };
-
-        catch(&self.connection_info(), fut).await
+        let current_database_schema: SqlSchema = self.describe().await?;
+        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info(), self.flavour());
+        Ok(infer(
+            current_database_schema,
+            expected_database_schema,
+            self.database_info(),
+            self.flavour(),
+        ))
     }
 
     /// Infer the database migration steps, skipping the schema describer and assuming an empty database.
@@ -77,7 +73,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
     ) -> ConnectorResult<SqlMigration> {
         let current_database_schema = self
             .flavour()
-            .sql_schema_from_migration_history(previous_migrations, self.conn(), self.connection_info())
+            .sql_schema_from_migration_history(previous_migrations, self.conn())
             .await?;
         let expected_database_schema =
             SqlSchemaCalculator::calculate(target_schema, self.database_info(), self.flavour());
@@ -93,10 +89,10 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
     async fn detect_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<bool> {
         let expected_schema = self
             .flavour()
-            .sql_schema_from_migration_history(applied_migrations, self.conn(), self.connection_info())
+            .sql_schema_from_migration_history(applied_migrations, self.conn())
             .await?;
 
-        let actual_schema = catch(self.connection_info(), self.describe()).await?;
+        let actual_schema = self.describe().await?;
 
         let diff =
             SqlSchemaDiffer::diff(&actual_schema, &expected_schema, self.flavour(), self.database_info()).into_steps();

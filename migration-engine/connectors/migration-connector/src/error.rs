@@ -23,6 +23,14 @@ impl ConnectorError {
         }
     }
 
+    pub fn generic(error: anyhow::Error) -> Self {
+        ConnectorError {
+            user_facing_error: None,
+            kind: ErrorKind::Generic(error),
+            context: SpanTrace::capture(),
+        }
+    }
+
     pub fn into_migration_failed(self, migration_name: String) -> Self {
         let context = self.context.clone();
         let user_facing_error = self.user_facing_error.clone();
