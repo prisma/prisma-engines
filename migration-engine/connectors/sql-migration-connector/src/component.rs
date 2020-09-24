@@ -17,8 +17,8 @@ pub(crate) trait Component {
         self.connector().database_info.connection_info()
     }
 
-    fn conn(&self) -> Connection<'_> {
-        Connection::new(&self.connector().database)
+    fn conn(&self) -> &Connection {
+        &self.connector().connection
     }
 
     fn database_info(&self) -> &DatabaseInfo {

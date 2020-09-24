@@ -47,7 +47,6 @@ impl SqlFlavour for MysqlFlavour {
         url.set_path("/mysql");
 
         let (conn, _) = connect(&url.to_string()).await?;
-        let conn = Connection::new(&conn);
         let db_name = self.0.dbname();
 
         let query = format!(
@@ -68,13 +67,13 @@ impl SqlFlavour for MysqlFlavour {
             .await?)
     }
 
-    async fn ensure_connection_validity(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         connection.raw_cmd("SELECT 1").await?;
 
         Ok(())
     }
 
-    async fn ensure_imperative_migrations_table(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = r#"
             CREATE TABLE IF NOT EXISTS _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -97,7 +96,6 @@ impl SqlFlavour for MysqlFlavour {
         url.set_path("/mysql");
 
         let (conn, _) = connect(&url.to_string()).await?;
-        let conn = Connection::new(&conn);
 
         let db_name = self.0.dbname();
 
@@ -113,7 +111,7 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
-    async fn reset(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let db_name = connection.connection_info().dbname().unwrap();
 
         connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
@@ -131,7 +129,7 @@ impl SqlFlavour for MysqlFlavour {
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        connection: Connection<'_>,
+        connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
         let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
@@ -146,9 +144,7 @@ impl SqlFlavour for MysqlFlavour {
 
         tracing::debug!("Connecting to temporary database at {:?}", temporary_database_url);
 
-        let (quaint, _database_info) = crate::connect(&temporary_database_url).await?;
-
-        let temp_database = Connection::new(&quaint);
+        let (temp_database, _database_info) = crate::connect(&temporary_database_url).await?;
 
         for migration in migrations {
             let script = migration
@@ -165,9 +161,10 @@ impl SqlFlavour for MysqlFlavour {
             })?;
         }
 
-        let connection_info = quaint.connection_info().clone();
-
-        let sql_schema = self.describe_schema(connection_info.schema_name(), quaint).await?;
+        let schema_name = temp_database.connection_info().schema_name();
+        let sql_schema = self
+            .describe_schema(schema_name, temp_database.quaint().clone())
+            .await?;
 
         connection.raw_cmd(&drop_database).await?;
 

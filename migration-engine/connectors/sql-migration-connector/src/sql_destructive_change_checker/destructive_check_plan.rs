@@ -44,7 +44,7 @@ impl DestructiveCheckPlan {
     pub(super) async fn execute(
         &self,
         schema_name: &str,
-        conn: Connection<'_>,
+        conn: &Connection,
     ) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let mut results = DatabaseInspectionResults::default();
 
@@ -96,7 +96,7 @@ impl DestructiveCheckPlan {
         check: &(dyn Check + Send + Sync + 'static),
         results: &mut DatabaseInspectionResults,
         schema_name: &str,
-        conn: Connection<'_>,
+        conn: &Connection,
     ) -> ConnectorResult<()> {
         if let Some(table) = check.needed_table_row_count() {
             if results.get_row_count(table).is_none() {
@@ -146,7 +146,7 @@ impl DestructiveCheckPlan {
     }
 }
 
-async fn count_rows_in_table(table_name: &str, schema_name: &str, conn: Connection<'_>) -> ConnectorResult<i64> {
+async fn count_rows_in_table(table_name: &str, schema_name: &str, conn: &Connection) -> ConnectorResult<i64> {
     use quaint::ast::*;
 
     let query = Select::from_table((schema_name, table_name)).value(count(asterisk()));
@@ -175,7 +175,7 @@ async fn count_values_in_column(
     column_name: &str,
     table: &str,
     schema_name: &str,
-    conn: Connection<'_>,
+    conn: &Connection,
 ) -> ConnectorResult<i64> {
     use quaint::ast::*;
 

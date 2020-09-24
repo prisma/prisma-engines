@@ -343,7 +343,7 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "mysql_8",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -356,7 +356,7 @@ pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "mysql_5_6",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -369,7 +369,7 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "mysql",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -382,7 +382,7 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "mysql_mariadb",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -395,7 +395,7 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres9",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -408,7 +408,7 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -421,7 +421,7 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres11",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -434,7 +434,7 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres12",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -447,7 +447,7 @@ pub async fn postgres13_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "postgres13",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }
@@ -459,7 +459,7 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
     TestApi {
         connector_name: "sqlite",
         connection_info,
-        database: connector.database.clone(),
+        database: connector.quaint().clone(),
         api: test_api(connector).await,
     }
 }

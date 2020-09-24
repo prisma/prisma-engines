@@ -19,7 +19,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::Connection;
-pub use error::{SqlError, SqlResult};
+use error::{SqlError, SqlResult};
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use component::Component;
@@ -35,24 +35,23 @@ use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 
 pub struct SqlMigrationConnector {
-    pub database: Quaint,
-    pub database_info: DatabaseInfo,
+    connection: Connection,
+    database_info: DatabaseInfo,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
 }
 
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let (connection, database_info) = connect(database_str).await?;
-        let conn = Connection::new(&connection);
         let flavour = flavour::from_connection_info(database_info.connection_info());
 
         flavour.check_database_info(&database_info)?;
-        flavour.ensure_connection_validity(conn).await?;
+        flavour.ensure_connection_validity(&connection).await?;
 
         Ok(Self {
             flavour,
             database_info,
-            database: connection,
+            connection,
         })
     }
 
@@ -72,8 +71,13 @@ impl SqlMigrationConnector {
         flavour.qe_setup(database_str).await
     }
 
+    /// For tests.
+    pub fn quaint(&self) -> &Quaint {
+        self.connection.quaint()
+    }
+
     async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
-        let conn = self.connector().database.clone();
+        let conn = self.connection.quaint().clone();
         let schema_name = self.schema_name();
 
         self.flavour.describe_schema(schema_name, conn).await
@@ -140,7 +144,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 }
 
-async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> {
+async fn connect(database_str: &str) -> ConnectorResult<(Connection, DatabaseInfo)> {
     let connection_info =
         ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
@@ -153,5 +157,5 @@ async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> 
         .await
         .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 
-    Ok((connection, database_info))
+    Ok((Connection::new(connection), database_info))
 }

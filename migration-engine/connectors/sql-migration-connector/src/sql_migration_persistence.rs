@@ -170,7 +170,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
 
 /// Returns the last 2 applied migrations, or a shorter vec in absence of applied migrations.
 async fn last_applied_migrations(
-    conn: Connection<'_>,
+    conn: &Connection,
     table: Table<'_>,
 ) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
     let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());

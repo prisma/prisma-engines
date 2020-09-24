@@ -25,7 +25,6 @@ impl SqlFlavour for PostgresFlavour {
         strip_schema_param_from_url(&mut url);
 
         let (conn, _) = create_postgres_admin_conn(url.clone()).await?;
-        let conn = Connection::new(&conn);
 
         let query = format!("CREATE DATABASE \"{}\"", db_name);
 
@@ -46,7 +45,6 @@ impl SqlFlavour for PostgresFlavour {
         url.set_path(&format!("/{}", db_name));
 
         let (conn, _) = connect(&url.to_string()).await?;
-        let conn = Connection::new(&conn);
 
         let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", &self.schema_name());
 
@@ -68,7 +66,7 @@ impl SqlFlavour for PostgresFlavour {
             .await?)
     }
 
-    async fn ensure_connection_validity(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         let schema_exists_result = connection
             .query_raw(
                 "SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1)",
@@ -98,7 +96,7 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
-    async fn ensure_imperative_migrations_table(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = r#"
             CREATE TABLE IF NOT EXISTS _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -121,7 +119,6 @@ impl SqlFlavour for PostgresFlavour {
 
         strip_schema_param_from_url(&mut url);
         let (conn, _) = create_postgres_admin_conn(url.clone()).await?;
-        let conn = Connection::new(&conn);
         let schema = self.0.schema();
         let db_name = self.0.dbname();
 
@@ -132,7 +129,6 @@ impl SqlFlavour for PostgresFlavour {
         url.set_path(&format!("/{}", db_name));
 
         let (conn, _) = connect(&url.to_string()).await?;
-        let conn = Connection::new(&conn);
 
         let drop_and_recreate_schema = format!(
             "DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;\nCREATE SCHEMA \"{schema}\";",
@@ -143,7 +139,7 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
-    async fn reset(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         connection
             .raw_cmd(&format!(
                 "DROP SCHEMA \"{}\" CASCADE",
@@ -169,7 +165,7 @@ impl SqlFlavour for PostgresFlavour {
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        connection: Connection<'_>,
+        connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         let database_name = format!("prisma_migrations_shadow_database_{}", uuid::Uuid::new_v4());
         let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", database_name);
@@ -185,8 +181,7 @@ impl SqlFlavour for PostgresFlavour {
 
         tracing::debug!("Connecting to temporary database at {}", temporary_database_url);
 
-        let (quaint, _database_info) = crate::connect(&temporary_database_url).await?;
-        let temporary_database = Connection::new(&quaint);
+        let (temporary_database, _database_info) = crate::connect(&temporary_database_url).await?;
 
         temporary_database.raw_cmd(&create_schema).await?;
 
@@ -205,7 +200,9 @@ impl SqlFlavour for PostgresFlavour {
             })?;
         }
 
-        let sql_schema = self.describe_schema(self.schema_name(), quaint).await?;
+        let sql_schema = self
+            .describe_schema(self.schema_name(), temporary_database.quaint().clone())
+            .await?;
 
         connection.raw_cmd(&drop_database).await?;
 
@@ -223,7 +220,7 @@ fn strip_schema_param_from_url(url: &mut Url) {
 
 /// Try to connect as an admin to a postgres database. We try to pick a default database from which
 /// we can create another database.
-async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Quaint, DatabaseInfo)> {
+async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Connection, DatabaseInfo)> {
     let candidate_default_databases = &["postgres", "template1"];
 
     let mut conn = None;

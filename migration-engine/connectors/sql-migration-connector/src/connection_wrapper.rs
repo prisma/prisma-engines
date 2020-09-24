@@ -6,11 +6,11 @@ use quaint::{
 
 use crate::SqlError;
 
-#[derive(Clone, Copy, Debug)]
-pub(crate) struct Connection<'a>(&'a Quaint);
+#[derive(Clone, Debug)]
+pub(crate) struct Connection(Quaint);
 
-impl<'a> Connection<'a> {
-    pub(crate) fn new(quaint: &'a Quaint) -> Self {
+impl Connection {
+    pub(crate) fn new(quaint: Quaint) -> Self {
         Connection(quaint)
     }
 
@@ -35,7 +35,7 @@ impl<'a> Connection<'a> {
     }
 
     pub(crate) fn quaint(&self) -> &Quaint {
-        self.0
+        &self.0
     }
 
     pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> ConnectorResult<ResultSet> {

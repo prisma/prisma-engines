@@ -58,10 +58,10 @@ pub(crate) trait SqlFlavour:
     /// Check a connection to make sure it is usable by the migration engine.
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
-    async fn ensure_connection_validity(&self, connection: Connection<'_>) -> ConnectorResult<()>;
+    async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Make sure that the `_prisma_migrations` table exists.
-    async fn ensure_imperative_migrations_table(&self, connection: Connection<'_>) -> ConnectorResult<()>;
+    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Create a database for the given URL on the server, if applicable.
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
@@ -73,13 +73,13 @@ pub(crate) trait SqlFlavour:
     async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> ConnectorResult<SqlSchema>;
 
     /// Drop the database and recreate it empty.
-    async fn reset(&self, connection: Connection<'_>) -> ConnectorResult<()>;
+    async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Apply the given migration history to a temporary database, and return
     /// the final introspected SQL schema.
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        connection: Connection<'_>,
+        connection: &Connection,
     ) -> ConnectorResult<SqlSchema>;
 }

@@ -49,11 +49,11 @@ impl SqlFlavour for SqliteFlavour {
             .await?)
     }
 
-    async fn ensure_connection_validity(&self, _connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
         Ok(())
     }
 
-    async fn ensure_imperative_migrations_table(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = format!(
             r#"
             CREATE TABLE IF NOT EXISTS "{}"."_prisma_migrations" (
@@ -80,7 +80,7 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
-    async fn reset(&self, connection: Connection<'_>) -> ConnectorResult<()> {
+    async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let file_path = connection.connection_info().file_path().unwrap();
 
         std::fs::remove_file(file_path).map_err(|err| {
@@ -113,7 +113,7 @@ impl SqlFlavour for SqliteFlavour {
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        _connection: Connection<'_>,
+        _connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         let temp_dir = tempfile::tempdir().expect("Failed to create temporary directory.");
         let database_url = format!(
@@ -125,7 +125,6 @@ impl SqlFlavour for SqliteFlavour {
         tracing::debug!("Applying migrations to temporary SQLite database at `{}`", database_url);
 
         let (conn, _) = crate::connect(&database_url).await?;
-        let conn = Connection::new(&conn);
 
         for migration in migrations {
             let script = migration
