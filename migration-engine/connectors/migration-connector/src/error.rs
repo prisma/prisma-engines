@@ -46,6 +46,16 @@ impl ConnectorError {
         }
     }
 
+    pub fn query_error(error: anyhow::Error) -> Self {
+        let kind = ErrorKind::QueryError(error);
+
+        ConnectorError {
+            user_facing_error: None,
+            kind,
+            context: SpanTrace::capture(),
+        }
+    }
+
     pub fn url_parse_error(err: impl Display, url: &str) -> Self {
         ConnectorError {
             user_facing_error: None,

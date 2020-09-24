@@ -1,7 +1,7 @@
 use super::SqlFlavour;
 use crate::{
     connect, connection_wrapper::Connection, database_info::DatabaseInfo, error::CheckDatabaseInfoResult,
-    error::SystemDatabase, SqlError,
+    error::SystemDatabase,
 };
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
@@ -62,8 +62,8 @@ impl SqlFlavour for MysqlFlavour {
         sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
             .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(connection.connection_info()))
+            .map_err(anyhow::Error::from)
+            .map_err(ConnectorError::query_error)
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {

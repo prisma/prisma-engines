@@ -19,7 +19,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::Connection;
-use error::SqlError;
+use error::quaint_error_to_connector_error;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use component::Component;
@@ -148,8 +148,7 @@ async fn connect(database_str: &str) -> ConnectorResult<Connection> {
 
     let connection = Quaint::new(database_str)
         .await
-        .map_err(SqlError::from)
-        .map_err(|err: SqlError| err.into_connector_error(&connection_info))?;
+        .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
 
     Ok(Connection::new(connection))
 }

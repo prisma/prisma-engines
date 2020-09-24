@@ -1,5 +1,5 @@
 use super::SqlFlavour;
-use crate::{connect, connection_wrapper::Connection, SqlError};
+use crate::{connect, connection_wrapper::Connection};
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
 use quaint::{connector::PostgresUrl, prelude::SqlFamily};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
@@ -60,8 +60,8 @@ impl SqlFlavour for PostgresFlavour {
         sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
             .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(connection.connection_info()))
+            .map_err(anyhow::Error::from)
+            .map_err(ConnectorError::query_error)
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {

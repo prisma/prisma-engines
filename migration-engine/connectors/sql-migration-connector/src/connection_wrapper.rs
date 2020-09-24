@@ -1,4 +1,4 @@
-use crate::SqlError;
+use crate::error::quaint_error_to_connector_error;
 use migration_connector::ConnectorResult;
 use quaint::{
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
@@ -24,16 +24,14 @@ impl Connection {
         self.0
             .execute(query.into())
             .await
-            .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(self.0.connection_info()))
+            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
     }
 
     pub(crate) async fn execute_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> ConnectorResult<u64> {
         self.0
             .execute_raw(sql, params)
             .await
-            .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(self.0.connection_info()))
+            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
     }
 
     pub(crate) fn quaint(&self) -> &Quaint {
@@ -44,23 +42,20 @@ impl Connection {
         self.0
             .query(query.into())
             .await
-            .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(self.0.connection_info()))
+            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
     }
 
     pub(crate) async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> ConnectorResult<ResultSet> {
         self.0
             .query_raw(sql, params)
             .await
-            .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(self.0.connection_info()))
+            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
     }
 
     pub(crate) async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
         self.0
             .raw_cmd(sql)
             .await
-            .map_err(SqlError::from)
-            .map_err(|sql_error| sql_error.into_connector_error(self.0.connection_info()))
+            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
     }
 }

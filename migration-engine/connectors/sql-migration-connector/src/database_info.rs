@@ -1,4 +1,4 @@
-use crate::error::SqlError;
+use crate::error::quaint_error_to_connector_error;
 use datamodel::{walkers::walk_scalar_fields, Datamodel};
 use migration_connector::{ConnectorResult, MigrationError};
 use quaint::{
@@ -17,8 +17,7 @@ impl DatabaseInfo {
         let database_version = connection
             .version()
             .await
-            .map_err(SqlError::from)
-            .map_err(|err| err.into_connector_error(&connection_info))?;
+            .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
 
         Ok(DatabaseInfo {
             connection_info,
