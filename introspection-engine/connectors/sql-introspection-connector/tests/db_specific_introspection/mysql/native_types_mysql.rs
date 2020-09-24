@@ -55,52 +55,57 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
         )
         .await;
 
-    let dm = r#"
-       model Blog {
-         id                             Int      @id
-         int                            Int
-         smallint                       Int
-         tinyint                        Int
-         mediumint                      Int
-         bigint                         Int
-         // This type is currently not supported.
-         // decimal                     decimal
-         // This type is currently not supported.
-         // numeric                     decimal
-         float                          Float
-         double                         Float
-         // This type is currently not supported.
-         // bits                        bytes
-         chars                          String
-         varchars                       String
-         // This type is currently not supported.
-         // binary                      bytes
-         // This type is currently not supported.
-         // varbinary                   bytes
-         // This type is currently not supported.
-         // tinyBlob                    bytes
-         // This type is currently not supported.
-         // blob                        bytes
-         // This type is currently not supported.
-         // mediumBlob                  bytes
-         // This type is currently not supported.
-         // longBlob                    bytes
-         tinytext                       String
-         text                           String
-         mediumText                     String
-         longText                       String
-         date                           DateTime
-         timeWithPrecision              DateTime
-         timeWithPrecision_no_precision DateTime
-         dateTimeWithPrecision          DateTime
-         timestampWithPrecision         DateTime @default(now())
-         year                           Int
-    }
-    "#
+    let mut dm = r#"datasource mysql {		        
+    provider        = "mysql"		       
+    url             = "mysql://localhost/test"		         
+    previewFeatures = ["nativeTypes"]		          
+ }
+"#
     .to_owned();
 
+    let types = r#"
+      model Blog {
+  id                             Int      @id @mysql.Int
+  int                            Int      @mysql.Int
+  smallint                       Int      @mysql.SmallInt
+  tinyint                        Int      @mysql.TinyInt
+  mediumint                      Int      @mysql.MediumInt
+  bigint                         Int      @mysql.BigInt
+  decimal                        Decimal  @mysql.Decimal(5, 3)
+  numeric                        Decimal  @mysql.Decimal(4, 1)
+  float                          Float    @mysql.Float
+  double                         Float    @mysql.Double
+  bits                           Bytes    @mysql.Bit(10)
+  chars                          String   @mysql.Char(10)
+  varchars                       String   @mysql.VarChar(500)
+  binary                         Bytes    @mysql.Binary(230)
+  varbinary                      Bytes    @mysql.VarBinary(150)
+  tinyBlob                       Bytes    @mysql.TinyBlob
+  blob                           Bytes    @mysql.Blob
+  mediumBlob                     Bytes    @mysql.MediumBlob
+  longBlob                       Bytes    @mysql.LongBlob
+  tinytext                       String   @mysql.TinyText
+  text                           String   @mysql.Text
+  mediumText                     String   @mysql.MediumText
+  longText                       String   @mysql.LongText
+  date                           DateTime @mysql.Date
+  timeWithPrecision              DateTime @mysql.Time(3)
+  timeWithPrecision_no_precision DateTime @mysql.Datetime
+  dateTimeWithPrecision          DateTime @mysql.Datetime(3)
+  timestampWithPrecision         DateTime @default(now()) @mysql.Timestamp(3)
+  year                           Int      @mysql.Year
+}
+"#;
+
+    //Fixme parsing can't handle native types yet???
     let result = dbg!(api.re_introspect(&dm).await);
-    assert_eq!(dm.replace(" ", ""), result.replace(" ", ""));
+
+    dm.push_str(types);
+
+    println!("EXPECTATION: \n {}", dm);
+    println!("RESULT: \n {}", result);
+    //Fixme mysql 8 is missing the default(now())
+    assert_eq!(result.replace(" ", "").contains(&types.replace(" ", "")), true);
 
     Ok(())
 }
@@ -127,58 +132,52 @@ async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestRes
         )
         .await;
 
-    let dm = r#"datasource mysql {
-   provider = "mysql"
-   url      = "mysql://localhost/test"
- }
- 
- model Blog {
-       id                             Int      @id
-   int                            Int
-   smallint                       Int
-   tinyint                        Int
-   mediumint                      Int
-   bigint                         Int
-   // This type is currently not supported.
-   // decimal                     decimal
-   // This type is currently not supported.
-   // numeric                     decimal
-   float                          Float
-   double                         Float
-   // This type is currently not supported.
-   // bits                        bytes
-   chars                          String
-   varchars                       String
-   // This type is currently not supported.
-   // binary                      bytes
-   // This type is currently not supported.
-   // varbinary                   bytes
-   // This type is currently not supported.
-   // tinyBlob                    bytes
-   // This type is currently not supported.
-   // blob                        bytes
-   // This type is currently not supported.
-   // mediumBlob                  bytes
-   // This type is currently not supported.
-   // longBlob                    bytes
-   tinytext                       String
-   text                           String
-   mediumText                     String
-   longText                       String
-   date                           DateTime
-   timeWithPrecision              DateTime
-   timeWithPrecision_no_precision DateTime
-   dateTimeWithPrecision          DateTime
-   timestampWithPrecision         DateTime
-   year                           Int
- }
-    "#
+    let dm = r#"model Blog {
+  id                             Int            @id
+  int                            Int
+  smallint                       Int
+  tinyint                        Int
+  mediumint                      Int
+  bigint                         Int
+  decimal                        Float
+  numeric                        Float
+  float                          Float
+  double                         Float
+  bits                           Int
+  chars                          String
+  varchars                       String
+  // This type is currently not supported.
+  // binary                      binary(230)
+  // This type is currently not supported.
+  // varbinary                   varbinary(150)
+  // This type is currently not supported.
+  // tinyBlob                    tinyblob
+  // This type is currently not supported.
+  // blob                        blob
+  // This type is currently not supported.
+  // mediumBlob                  mediumblob
+  // This type is currently not supported.
+  // longBlob                    longblob
+  tinytext                       String
+  text                           String
+  mediumText                     String
+  longText                       String
+  date                           DateTime
+  timeWithPrecision              DateTime
+  timeWithPrecision_no_precision DateTime
+  dateTimeWithPrecision          DateTime
+  timestampWithPrecision         DateTime       @default(now())
+  year                           Int
+}
+"#
     .to_owned();
+
+    //Fixme mysql 8 is missing the default(now())
 
     let result = dbg!(api.re_introspect(&dm).await);
 
-    println!("{}", dm);
-    println!("{}", result);
+    println!("EXPECTATION: \n {}", dm);
+    println!("RESULT: \n {}", result);
     assert_eq!(dm.replace(" ", ""), result.replace(" ", ""));
 
     Ok(())

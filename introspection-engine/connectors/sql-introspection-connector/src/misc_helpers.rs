@@ -133,7 +133,7 @@ pub(crate) fn calculate_scalar_field(
     let field_type = if native_types {
         calculate_scalar_field_type_with_native_types(column, family)
     } else {
-        calculate_scalar_field_type(column)
+        calculate_scalar_field_type(column, family)
     };
 
     let (is_commented_out, documentation) = match field_type {
@@ -308,14 +308,31 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
     }
 }
 
-pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
+pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
     let fdt = column.tpe.full_data_type.to_owned();
 
+    let is_mysql_bit = {
+        if family.is_mysql() {
+            let datamodel_connector = SqlDatamodelConnectors::mysql();
+
+            match &column.tpe.native_type {
+                None => false,
+                Some(native_type) => {
+                    let tpe = datamodel_connector.introspect_native_type(native_type.clone()).unwrap();
+                    tpe.name == "Bit"
+                }
+            }
+        } else {
+            false
+        }
+    };
+
     match &column.tpe.family {
+        _ if is_mysql_bit => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
-        ColumnTypeFamily::Decimal => FieldType::Unsupported(fdt),
+        ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
@@ -345,12 +362,12 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
-        ColumnTypeFamily::Binary => FieldType::Unsupported(fdt), //not explicit before
-        ColumnTypeFamily::Geometric => FieldType::Unsupported(fdt), // not explicit before
-        ColumnTypeFamily::LogSequenceNumber => FieldType::Unsupported(fdt), // not explicit before
-        ColumnTypeFamily::TextSearch => FieldType::Unsupported(fdt), // not explicit before
-        ColumnTypeFamily::TransactionId => FieldType::Unsupported(fdt), // not explicit before
-        ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt), // not explicit before,
+        ColumnTypeFamily::Binary => FieldType::Base(ScalarType::Bytes, None),
+        ColumnTypeFamily::Geometric => FieldType::Unsupported(fdt),
+        ColumnTypeFamily::LogSequenceNumber => FieldType::Unsupported(fdt),
+        ColumnTypeFamily::TextSearch => FieldType::Unsupported(fdt),
+        ColumnTypeFamily::TransactionId => FieldType::Unsupported(fdt),
+        ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }
 
