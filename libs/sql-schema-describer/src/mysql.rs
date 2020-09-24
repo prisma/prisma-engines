@@ -553,7 +553,7 @@ fn get_column_type_and_enum(
     character_maximum_length: Option<i64>,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
-    //Fixme family mappings, length args
+    //Fixme family mappings
     // Decimal, Duration and XML are missing from ColumnTypefamily
 
     let (family, native_type) = match (data_type, full_data_type) {
@@ -573,6 +573,20 @@ fn get_column_type_and_enum(
         ),
         ("float", _) => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
         ("double", _) => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
+
+        ("char", fdt) => (ColumnTypeFamily::String, Some(MySqlType::Char(extract_single_arg(fdt)))),
+        ("varchar", fdt) => (
+            ColumnTypeFamily::String,
+            Some(MySqlType::VarChar(extract_single_arg(fdt))),
+        ),
+        ("text", _) => (ColumnTypeFamily::String, Some(MySqlType::Text)),
+        ("tinytext", _) => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
+        ("mediumtext", _) => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
+        ("longtext", _) => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
+        ("enum", _) => (ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)), None),
+        ("json", _) => (ColumnTypeFamily::Json, Some(MySqlType::JSON)),
+        ("set", _) => (ColumnTypeFamily::String, None),
+        //temporal
         ("date", _) => (ColumnTypeFamily::DateTime, Some(MySqlType::Date)),
         ("time", fdt) => (
             //Fixme this can either be a time or a duration -.-
@@ -588,18 +602,6 @@ fn get_column_type_and_enum(
             Some(MySqlType::Timestamp(fractional_seconds(fdt))),
         ),
         ("year", _) => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
-        ("char", fdt) => (ColumnTypeFamily::String, Some(MySqlType::Char(extract_single_arg(fdt)))),
-        ("varchar", fdt) => (
-            ColumnTypeFamily::String,
-            Some(MySqlType::VarChar(extract_single_arg(fdt))),
-        ),
-        ("text", _) => (ColumnTypeFamily::String, Some(MySqlType::Text)),
-        ("tinytext", _) => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
-        ("mediumtext", _) => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
-        ("longtext", _) => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
-        ("enum", _) => (ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)), None),
-        ("json", _) => (ColumnTypeFamily::Json, Some(MySqlType::JSON)),
-        ("set", _) => (ColumnTypeFamily::String, None),
         //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
         ("bit", fdt) => (ColumnTypeFamily::Binary, Some(MySqlType::Bit(extract_single_arg(fdt)))),
         ("binary", fdt) => (
