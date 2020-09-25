@@ -397,7 +397,7 @@ pub struct ForeignKey {
     pub referenced_columns: Vec<String>,
     /// Action on deletion.
     pub on_delete_action: ForeignKeyAction,
-    /// Action on deletion.
+    /// Action on update.
     pub on_update_action: ForeignKeyAction,
 }
 
