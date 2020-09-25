@@ -1,5 +1,3 @@
-#![deny(rust_2018_idioms)]
-
 mod directives;
 mod enum_values;
 mod enums;
