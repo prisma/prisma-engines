@@ -96,6 +96,11 @@ impl DatasourceLoader {
             .map(|x| &x.1);
 
         let (env_var_for_url, url) = match (url_args.as_str_from_env(), override_url) {
+            (Err(err), _)
+                if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
+            {
+                return Err(err)
+            }
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
                 (None, format!("{}://", providers.first().unwrap()))
