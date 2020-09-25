@@ -56,8 +56,9 @@ impl SqlFlavour for SqliteFlavour {
         connection: &dyn Queryable,
         connection_info: &ConnectionInfo,
     ) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
+        let sql = format!(
+            r#"
+            CREATE TABLE IF NOT EXISTS "{}"."_prisma_migrations" (
                 "id"                    TEXT PRIMARY KEY NOT NULL,
                 "checksum"              TEXT NOT NULL,
                 "finished_at"           DATETIME,
@@ -68,9 +69,11 @@ impl SqlFlavour for SqliteFlavour {
                 "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
                 "script"                TEXT NOT NULL
             );
-        "#;
+        "#,
+            self.attached_name()
+        );
 
-        catch(connection_info, connection.raw_cmd(sql).map_err(SqlError::from)).await
+        catch(connection_info, connection.raw_cmd(&sql).map_err(SqlError::from)).await
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
