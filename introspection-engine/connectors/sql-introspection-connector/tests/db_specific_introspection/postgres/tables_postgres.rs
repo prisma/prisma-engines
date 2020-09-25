@@ -1,6 +1,7 @@
 use crate::*;
 use barrel::types;
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
@@ -54,7 +55,7 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) {
                 provider = "postgres"
                 url = "postgresql://asdlj"
             }
-    
+
             model Blog {
                 id      Int @id @default(autoincrement())
                 json    Json
@@ -429,7 +430,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 int_static              Int?        @default(2)
                 int_serial              Int        @default(autoincrement())
                 int_function            Int?        @default(dbgenerated())
-                int_sequence            Int?        @default(dbgenerated())    
+                int_sequence            Int?        @default(dbgenerated())
                 float_static            Float?      @default(1.43)
                 boolean_static          Boolean?    @default(true)
                 datetime_now_current    DateTime?   @default(now())
@@ -565,10 +566,10 @@ async fn introspecting_a_table_with_partial_indexes_should_ignore_them(api: &Tes
     let dm = r#"
             model pages {
               id       Int     @id
-              staticid Int     
+              staticid Int
               islatest Boolean
               other    Int     @unique
-            }      
+            }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

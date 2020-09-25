@@ -9,7 +9,6 @@ use once_cell::sync::Lazy;
 use quaint::{connector::MysqlUrl, prelude::ConnectionInfo, prelude::Queryable, prelude::SqlFamily, single::Quaint};
 use regex::RegexSet;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::sync::Arc;
 use url::Url;
 
 #[derive(Debug)]
@@ -59,11 +58,7 @@ impl SqlFlavour for MysqlFlavour {
         Ok(db_name.to_owned())
     }
 
-    async fn describe_schema<'a>(
-        &'a self,
-        schema_name: &'a str,
-        conn: Arc<dyn Queryable + Send + Sync>,
-    ) -> SqlResult<SqlSchema> {
+    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> SqlResult<SqlSchema> {
         Ok(sql_schema_describer::mysql::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
@@ -211,7 +206,7 @@ impl SqlFlavour for MysqlFlavour {
 
         let sql_schema = catch(
             &connection_info,
-            self.describe_schema(connection_info.schema_name(), Arc::new(quaint)),
+            self.describe_schema(connection_info.schema_name(), quaint),
         )
         .await?;
 

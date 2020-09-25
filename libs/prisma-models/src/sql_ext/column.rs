@@ -1,4 +1,4 @@
-use crate::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField};
+use crate::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, ScalarFieldExt};
 use itertools::Itertools;
 use quaint::ast::{Column, Row};
 use std::convert::AsRef;
@@ -156,7 +156,7 @@ where
         let column = Column::from(((db, table), col));
 
         match sf.default_value.as_ref().and_then(|d| d.get()) {
-            Some(default) => column.default(default),
+            Some(default) => column.default(sf.value(default)),
             None => column.default(quaint::ast::DefaultValue::Generated),
         }
     }

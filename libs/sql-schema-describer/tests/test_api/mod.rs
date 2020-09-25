@@ -6,7 +6,6 @@ use quaint::{
     single::Quaint,
 };
 use sql_schema_describer::*;
-use std::sync::Arc;
 use test_setup::*;
 
 pub type TestResult = anyhow::Result<()>;
@@ -17,12 +16,12 @@ pub struct TestApi {
     db_name: &'static str,
     connection_info: quaint::prelude::ConnectionInfo,
     sql_family: SqlFamily,
-    database: Arc<dyn Queryable + Send + Sync + 'static>,
+    database: Quaint,
 }
 
 impl TestApi {
     pub(crate) async fn describe(&self) -> Result<SqlSchema, anyhow::Error> {
-        let db = Arc::clone(&self.database);
+        let db = self.database.clone();
         let describer: Box<dyn sql_schema_describer::SqlSchemaDescriberBackend> = match self.sql_family() {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
             SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
@@ -37,7 +36,7 @@ impl TestApi {
         self.db_name
     }
 
-    pub(crate) fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
+    pub(crate) fn database(&self) -> &Quaint {
         &self.database
     }
 
@@ -57,7 +56,7 @@ impl TestApi {
     pub(crate) fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
             schema_name: self.schema_name().to_owned(),
-            database: Arc::clone(&self.database),
+            database: self.database.clone(),
             sql_variant: match self.sql_family {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
@@ -81,7 +80,7 @@ pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
         connector_name: "mysql5.7",
         connection_info: conn.connection_info().to_owned(),
         db_name,
-        database: Arc::new(conn),
+        database: conn,
         sql_family: SqlFamily::Mysql,
     }
 }
@@ -95,7 +94,7 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
         connector_name: "mysql8",
         connection_info: conn.connection_info().to_owned(),
         db_name,
-        database: Arc::new(conn),
+        database: conn,
         sql_family: SqlFamily::Mysql,
     }
 }
@@ -109,7 +108,7 @@ pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
         connector_name: "mysql_5_6",
         connection_info: conn.connection_info().to_owned(),
         db_name,
-        database: Arc::new(conn),
+        database: conn,
         sql_family: SqlFamily::Mysql,
     }
 }
@@ -123,7 +122,7 @@ pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
         connector_name: "mysql_mariadb",
         db_name,
         connection_info: conn.connection_info().to_owned(),
-        database: Arc::new(conn),
+        database: conn,
         sql_family: SqlFamily::Mysql,
     }
 }
@@ -164,7 +163,7 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str, co
         connector_name,
         connection_info,
         db_name,
-        database: Arc::new(database),
+        database,
         sql_family: SqlFamily::Postgres,
     }
 }
@@ -179,7 +178,7 @@ pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
         connector_name: "sqlite3",
         db_name,
         connection_info: database.connection_info().to_owned(),
-        database: Arc::new(database),
+        database,
         sql_family: SqlFamily::Sqlite,
     }
 }
@@ -241,13 +240,13 @@ pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
         connector_name: "mssql2019",
         db_name: schema,
         connection_info,
-        database: Arc::new(database),
+        database,
         sql_family: SqlFamily::Mssql,
     }
 }
 
 pub struct BarrelMigrationExecutor {
-    pub(super) database: Arc<dyn Queryable + Send + Sync>,
+    pub(super) database: Quaint,
     pub(super) sql_variant: barrel::backend::SqlVariant,
     pub(super) schema_name: String,
 }
@@ -272,7 +271,7 @@ impl BarrelMigrationExecutor {
     }
 }
 
-async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
+async fn run_full_sql(database: &Quaint, full_sql: &str) {
     for sql in full_sql.split(";") {
         if sql != "" {
             database.query_raw(&sql, &[]).await.unwrap();

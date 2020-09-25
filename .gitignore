@@ -3,6 +3,7 @@ db/*
 build/
 .DS_Store
 current_connector
+prisma-gpg-private.asc
 
 *.class
 *.log

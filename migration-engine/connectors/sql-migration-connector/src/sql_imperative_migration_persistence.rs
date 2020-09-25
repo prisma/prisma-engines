@@ -22,7 +22,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         let checksum: [u8; 32] = hasher.finalize().into();
         let checksum_string = checksum.format_checksum();
 
-        let insert = Insert::single_into(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+        let insert = Insert::single_into((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .value("id", id.as_str())
             .value("checksum", checksum_string.as_str())
             // We need this line because MySQL can't default a text field to an empty string
@@ -42,7 +42,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
         use quaint::ast::*;
 
-        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+        let update = Update::table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .so_that(Column::from("id").equals(id))
             .set(
                 "applied_steps_count",
@@ -60,7 +60,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     }
 
     async fn record_failed_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
-        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+        let update = Update::table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .so_that(Column::from("id").equals(id))
             .set("logs", logs);
 
@@ -74,7 +74,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     }
 
     async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()> {
-        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+        let update = Update::table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .so_that(Column::from("id").equals(id))
             .set("finished_at", chrono::Utc::now()); // TODO maybe use a database generated timestamp
 
@@ -92,7 +92,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .ensure_imperative_migrations_table(self.conn(), self.connection_info())
             .await?;
 
-        let select = Select::from_table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+        let select = Select::from_table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .column("id")
             .column("checksum")
             .column("finished_at")

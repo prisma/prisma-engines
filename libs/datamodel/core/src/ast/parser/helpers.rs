@@ -5,7 +5,7 @@ pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
 pub fn parsing_catch_all(token: &Token, kind: &str) {
     match token.as_rule() {
-        Rule::comment | Rule::comment_and_new_line | Rule::comment_block => {}
+        Rule::comment | Rule::comment_and_new_line | Rule::comment_block | Rule::doc_comment_and_new_line => {}
         x => unreachable!(
             "Encountered impossible {} during parsing: {:?} {:?}",
             kind,

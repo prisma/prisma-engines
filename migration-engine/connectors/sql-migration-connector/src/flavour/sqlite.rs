@@ -4,7 +4,7 @@ use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
 use quaint::{prelude::ConnectionInfo, prelude::Queryable, prelude::SqlFamily, single::Quaint};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::{path::Path, sync::Arc};
+use std::path::Path;
 
 #[derive(Debug)]
 pub(crate) struct SqliteFlavour {
@@ -41,11 +41,7 @@ impl SqlFlavour for SqliteFlavour {
         Ok(self.file_path.clone())
     }
 
-    async fn describe_schema<'a>(
-        &'a self,
-        schema_name: &'a str,
-        conn: Arc<dyn Queryable + Send + Sync>,
-    ) -> SqlResult<SqlSchema> {
+    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> SqlResult<SqlSchema> {
         Ok(sql_schema_describer::sqlite::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
@@ -60,8 +56,9 @@ impl SqlFlavour for SqliteFlavour {
         connection: &dyn Queryable,
         connection_info: &ConnectionInfo,
     ) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
+        let sql = format!(
+            r#"
+            CREATE TABLE IF NOT EXISTS "{}"."_prisma_migrations" (
                 "id"                    TEXT PRIMARY KEY NOT NULL,
                 "checksum"              TEXT NOT NULL,
                 "finished_at"           DATETIME,
@@ -72,9 +69,11 @@ impl SqlFlavour for SqliteFlavour {
                 "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
                 "script"                TEXT NOT NULL
             );
-        "#;
+        "#,
+            self.attached_name()
+        );
 
-        catch(connection_info, connection.raw_cmd(sql).map_err(SqlError::from)).await
+        catch(connection_info, connection.raw_cmd(&sql).map_err(SqlError::from)).await
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
@@ -157,7 +156,7 @@ impl SqlFlavour for SqliteFlavour {
 
         let sql_schema = catch(
             &conn.connection_info().clone(),
-            self.describe_schema(&self.attached_name, Arc::new(conn)),
+            self.describe_schema(&self.attached_name, conn),
         )
         .await?;
 

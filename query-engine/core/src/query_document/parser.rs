@@ -2,7 +2,6 @@ use super::*;
 use crate::schema::*;
 use chrono::prelude::*;
 use indexmap::IndexMap;
-use prisma_models::TypeHint;
 use prisma_value::PrismaValue;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, sync::Arc};
@@ -153,7 +152,7 @@ impl QueryDocumentParser {
             let result = match (&value, input_type) {
                 // Null handling
                 (QueryValue::Null, InputType::Scalar(ScalarType::Null)) => {
-                    Ok(ParsedInputValue::Single(PrismaValue::null(TypeHint::Unknown)))
+                    Ok(ParsedInputValue::Single(PrismaValue::Null))
                 }
                 (QueryValue::Null, _) => Err(QueryParserError {
                     path: parent_path.clone(),

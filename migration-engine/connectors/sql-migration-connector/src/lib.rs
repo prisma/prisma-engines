@@ -24,20 +24,16 @@ use component::Component;
 use database_info::DatabaseInfo;
 use flavour::SqlFlavour;
 use migration_connector::*;
-use quaint::{
-    prelude::{ConnectionInfo, Queryable},
-    single::Quaint,
-};
+use quaint::{prelude::ConnectionInfo, single::Quaint};
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_change_checker::*;
 use sql_migration::SqlMigration;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
-use std::sync::Arc;
 
 pub struct SqlMigrationConnector {
-    pub database: Arc<dyn Queryable + Send + Sync + 'static>,
+    pub database: Quaint,
     pub database_info: DatabaseInfo,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
 }
@@ -53,7 +49,7 @@ impl SqlMigrationConnector {
         Ok(Self {
             flavour,
             database_info,
-            database: Arc::new(connection),
+            database: connection,
         })
     }
 
