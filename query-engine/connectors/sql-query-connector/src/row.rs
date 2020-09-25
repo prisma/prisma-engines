@@ -236,17 +236,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             other => PrismaValue::from(other),
         },
 
-        TypeIdentifier::Xml => match p_value {
-            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
-            Value::Text(Some(xml)) => PrismaValue::Xml(xml.into()),
-            _ => {
-                let error = io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "XML value not stored as text or XML-native type",
-                );
-                return Err(SqlError::ConversionError(error.into()));
-            }
-        },
+        TypeIdentifier::Xml => todo!(),
     })
 }
 

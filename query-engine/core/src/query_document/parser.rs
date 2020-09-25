@@ -229,9 +229,7 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::Json) => {
                 Ok(PrismaValue::Json(Self::parse_json(parent_path, &s).map(|_| s)?))
             }
-            (QueryValue::String(s), ScalarType::XML) => {
-                Ok(PrismaValue::Xml(Self::parse_xml(parent_path, &s).map(|_| s)?))
-            }
+            (QueryValue::String(s), ScalarType::XML) => todo!(),
             (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(parent_path, &s),
             (QueryValue::String(s), ScalarType::UUID) => {
                 Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
