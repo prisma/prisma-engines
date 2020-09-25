@@ -40,6 +40,7 @@ pub struct DmmfInputTypeConstraints {
 pub struct DmmfOutputType {
     pub name: String,
     pub fields: Vec<DmmfOutputField>,
+    pub is_model_type: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

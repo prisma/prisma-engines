@@ -152,6 +152,10 @@ impl ObjectType {
     pub fn is_empty(&self) -> bool {
         self.get_fields().is_empty()
     }
+
+    pub fn model(&self) -> Option<&ModelRef> {
+        self.model.as_ref()
+    }
 }
 
 #[derive(Debug)]

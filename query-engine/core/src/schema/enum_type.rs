@@ -45,7 +45,7 @@ impl StringEnumType {
 impl From<InternalEnum> for EnumType {
     fn from(internal_enum: InternalEnum) -> EnumType {
         EnumType::Database(DatabaseEnumType {
-            name: format!("{}DatabaseEnumType", internal_enum.name),
+            name: internal_enum.name.clone(),
             internal_enum,
         })
     }

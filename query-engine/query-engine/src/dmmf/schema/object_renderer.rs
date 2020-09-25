@@ -65,6 +65,7 @@ impl DmmfObjectRenderer {
         let output_type = DmmfOutputType {
             name: output_object.name().to_string(),
             fields: rendered_fields,
+            is_model_type: output_object.model().is_some(),
         };
 
         ctx.add_output_type(output_type);

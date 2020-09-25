@@ -33,7 +33,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
 }
 
 fn model_output_type_name(model: &ModelRef) -> String {
-    format!("{}OutputType", model.name.clone())
+    model.name.clone()
 }
 
 /// Computes model output type fields.
