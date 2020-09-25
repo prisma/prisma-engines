@@ -50,6 +50,23 @@ fn free_floating_doc_comments_must_work_in_enums() {
 }
 
 #[test]
+fn doc_comments_must_work_on_block_attributes() {
+    let dml = r#"
+    model Blog {
+      id1 Int
+      id2 Int
+      @@id([id1, id2]) /// Documentation comment block attribute
+    }"#;
+
+    // must not crash
+    let schema = parse(dml);
+    schema
+      .assert_has_model("Blog")
+      .assert_has_id_fields(&["id1", "id2"])
+      .assert_with_documentation("Documentation comment block attribute");
+}
+
+#[test]
 fn comments_must_work_in_enums() {
     let dml = r#"
     // Line 1
