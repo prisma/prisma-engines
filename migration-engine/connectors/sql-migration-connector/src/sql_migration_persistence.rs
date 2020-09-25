@@ -19,35 +19,6 @@ impl Component for SqlMigrationPersistence<'_> {
 #[async_trait::async_trait]
 impl MigrationPersistence for SqlMigrationPersistence<'_> {
     async fn init(&self) -> Result<(), ConnectorError> {
-<<<<<<< HEAD
-        let fut = async {
-            let sql_str = match self.sql_family() {
-                SqlFamily::Sqlite => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_sqlite);
-                    m.make_from(barrel::SqlVariant::Sqlite)
-                }
-                SqlFamily::Postgres => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_postgres);
-                    m.schema(self.schema_name()).make_from(barrel::SqlVariant::Pg)
-                }
-                SqlFamily::Mysql => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_mysql);
-                    m.make_from(barrel::SqlVariant::Mysql)
-                }
-                SqlFamily::Mssql => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_mssql);
-                    m.make_from(barrel::SqlVariant::Mssql)
-                }
-            };
-
-            self.conn().raw_cmd(&sql_str).await.ok();
-
-            Ok(())
-=======
         let sql_str = match self.sql_family() {
             SqlFamily::Sqlite => {
                 let mut m = barrel::Migration::new().schema(self.schema_name());
@@ -64,8 +35,11 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                 m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_mysql);
                 m.make_from(barrel::SqlVariant::Mysql)
             }
-            SqlFamily::Mssql => todo!("Greetings from Detroit^H Redmond"),
->>>>>>> 105750539... Simplify error handling in sql-migration-connector
+            SqlFamily::Mssql => {
+                let mut m = barrel::Migration::new().schema(self.schema_name());
+                m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_mssql);
+                m.make_from(barrel::SqlVariant::Mssql)
+            }
         };
 
         self.conn().raw_cmd(&sql_str).await.ok();

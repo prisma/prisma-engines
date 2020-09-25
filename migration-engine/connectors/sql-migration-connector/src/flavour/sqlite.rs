@@ -73,7 +73,7 @@ impl SqlFlavour for SqliteFlavour {
             self.attached_name()
         );
 
-        connection.raw_cmd(sql).await
+        connection.raw_cmd(&sql).await
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
