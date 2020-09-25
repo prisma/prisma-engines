@@ -13,7 +13,7 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
                     || differ.added_columns().filter(|col| col.arity().is_required()).next().is_some()
                     || differ.column_pairs().filter(|columns| columns.all_changes().iter().next().is_some()).next().is_some()
                     // ALTER INDEX does not exist on SQLite
-                    || differ.index_pairs().filter(|(previous, next)| self.index_should_be_renamed(previous, next)).next().is_some()
+                    || differ.index_pairs().filter(|(previous, next)| self.index_should_be_renamed(previous.index, next.index)).next().is_some()
                     || differ.created_foreign_keys().next().is_some()
                     || differ.dropped_foreign_keys().next().is_some()
             })

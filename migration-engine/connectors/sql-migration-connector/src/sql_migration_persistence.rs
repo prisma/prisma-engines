@@ -41,7 +41,11 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                     m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_mysql);
                     m.make_from(barrel::SqlVariant::Mysql)
                 }
-                SqlFamily::Mssql => todo!("Greetings from Detroit^H Redmond"),
+                SqlFamily::Mssql => {
+                    let mut m = barrel::Migration::new().schema(self.schema_name());
+                    m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_mssql);
+                    m.make_from(barrel::SqlVariant::Mssql)
+                }
             };
 
             self.conn().raw_cmd(&sql_str).await.ok();
@@ -122,7 +126,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
 
                 cloned.revision = usize::try_from(id).unwrap();
             }
-            SqlFamily::Postgres => {
+            SqlFamily::Postgres | SqlFamily::Mssql => {
                 let returning_insert = Insert::from(insert).returning(&["revision"]);
                 let result_set = self.conn().query(returning_insert.into()).await.unwrap();
 
@@ -130,7 +134,6 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                     cloned.revision = row["revision"].as_i64().unwrap() as usize;
                 }
             }
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         }
 
         Ok(cloned)
@@ -183,26 +186,41 @@ async fn last_applied_migrations(
 }
 
 fn migration_table_setup_sqlite(t: &mut barrel::Table) {
-    migration_table_setup(t, types::date(), types::custom("TEXT"));
+    migration_table_setup(t, types::text(), types::custom("DATETIME"), types::custom("TEXT"));
 }
 
 fn migration_table_setup_postgres(t: &mut barrel::Table) {
-    migration_table_setup(t, types::custom("timestamp(3)"), types::custom("TEXT"));
+    migration_table_setup(t, types::text(), types::custom("timestamp(3)"), types::custom("TEXT"));
 }
 
 fn migration_table_setup_mysql(t: &mut barrel::Table) {
-    migration_table_setup(t, types::custom("datetime(3)"), types::custom("LONGTEXT"));
+    migration_table_setup(
+        t,
+        types::text(),
+        types::custom("datetime(3)"),
+        types::custom("LONGTEXT"),
+    );
+}
+
+fn migration_table_setup_mssql(t: &mut barrel::Table) {
+    migration_table_setup(
+        t,
+        types::custom("nvarchar(max)"),
+        types::custom("datetime2"),
+        types::custom("nvarchar(max)"),
+    );
 }
 
 fn migration_table_setup(
     t: &mut barrel::Table,
+    text_type: barrel::types::Type,
     datetime_type: barrel::types::Type,
     unlimited_text_type: barrel::types::Type,
 ) {
     t.add_column(REVISION_COLUMN, types::primary());
-    t.add_column(NAME_COLUMN, types::text());
+    t.add_column(NAME_COLUMN, text_type.clone());
     t.add_column(DATAMODEL_COLUMN, unlimited_text_type.clone());
-    t.add_column(STATUS_COLUMN, types::text());
+    t.add_column(STATUS_COLUMN, text_type.clone());
     t.add_column(APPLIED_COLUMN, types::integer());
     t.add_column(ROLLED_BACK_COLUMN, types::integer());
     t.add_column(DATAMODEL_STEPS_COLUMN, unlimited_text_type.clone());

@@ -326,12 +326,6 @@ dependencies = [
 
 [[package]]
 name = "barrel"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d67c978b1322c8031145b1f6c236fc371292f52c565bc96018b2971afcbffe1"
-
-[[package]]
-name = "barrel"
 version = "0.6.6-alpha.0"
 source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#b6298a4208083bfb63796cdc24ce1e4bcf7f62a8"
 
@@ -1906,7 +1900,7 @@ name = "migration-engine-tests"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "barrel 0.6.5",
+ "barrel",
  "chrono",
  "datamodel",
  "futures 0.3.5",
@@ -2642,7 +2636,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#b3c3ce08aca802724e132cc75cd217ee8c283759"
+source = "git+https://github.com/prisma/quaint#f8ed5bf4510eb2e6cf1c102897d9ce4b87de0a91"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -3183,7 +3177,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "barrel 0.6.5",
+ "barrel",
  "datamodel",
  "introspection-connector",
  "once_cell",
@@ -3210,7 +3204,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "barrel 0.6.5",
+ "barrel",
  "chrono",
  "datamodel",
  "datamodel-connector",
@@ -3268,7 +3262,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "barrel 0.6.6-alpha.0",
+ "barrel",
  "futures 0.3.5",
  "once_cell",
  "pretty_assertions",

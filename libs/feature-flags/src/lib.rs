@@ -56,7 +56,14 @@ macro_rules! flags {
 // `connectOrCreate`: `connectOrCreate` nested query in the QE.
 // `insensitiveFilters`: Case insensitive scalar filters for supported DBs.
 // `atomicNumberOperations`: New and expanded number operations for updates.
-flags!(transaction, connectOrCreate, insensitiveFilters, atomicNumberOperations);
+// `microsoftSqlServer`: Support for Microsoft SQL Server databases
+flags!(
+    transaction,
+    connectOrCreate,
+    insensitiveFilters,
+    atomicNumberOperations,
+    microsoftSqlServer
+);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.

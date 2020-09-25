@@ -1,7 +1,7 @@
 use super::column::ColumnDiffer;
 use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
 use sql_schema_describer::{
-    walkers::{ColumnWalker, ForeignKeyWalker, TableWalker},
+    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     Index, PrimaryKey,
 };
 
@@ -69,26 +69,26 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn created_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
+    pub(crate) fn created_indexes<'a>(&'a self) -> impl Iterator<Item = IndexWalker<'schema>> + 'a {
         self.next_indexes().filter(move |next_index| {
             !self
                 .previous_indexes()
-                .any(move |previous_index| indexes_match(previous_index, next_index))
+                .any(move |previous_index| indexes_match(previous_index.index, next_index.index))
         })
     }
 
-    pub(crate) fn dropped_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
+    pub(crate) fn dropped_indexes<'a>(&'a self) -> impl Iterator<Item = IndexWalker<'schema>> + 'a {
         self.previous_indexes().filter(move |previous_index| {
             !self
                 .next_indexes()
-                .any(|next_index| indexes_match(previous_index, next_index))
+                .any(|next_index| indexes_match(previous_index.index, next_index.index))
         })
     }
 
-    pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = (&'schema Index, &'schema Index)> + 'a {
+    pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = (IndexWalker<'schema>, IndexWalker<'schema>)> + 'a {
         self.previous_indexes().filter_map(move |previous_index| {
             self.next_indexes()
-                .find(|next_index| indexes_match(previous_index, next_index))
+                .find(|next_index| indexes_match(previous_index.index, next_index.index))
                 .map(|renamed_index| (previous_index, renamed_index))
         })
     }
@@ -153,12 +153,12 @@ impl<'schema> TableDiffer<'schema> {
         self.next.foreign_keys()
     }
 
-    fn previous_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
-        self.previous.table.indices.iter()
+    fn previous_indexes<'a>(&'a self) -> impl Iterator<Item = IndexWalker<'schema>> + 'a {
+        self.previous.indexes()
     }
 
-    fn next_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
-        self.next.table.indices.iter()
+    fn next_indexes<'a>(&'a self) -> impl Iterator<Item = IndexWalker<'schema>> + 'a {
+        self.next.indexes()
     }
 }
 

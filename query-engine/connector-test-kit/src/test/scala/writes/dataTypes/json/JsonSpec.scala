@@ -5,7 +5,7 @@ import util.ConnectorTag.MySqlConnectorTag
 import util._
 
 class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
-  "Using a json field" should "work" taggedAs (IgnoreMySql, IgnoreSQLite) in {
+  "Using a json field" should "work" taggedAs (IgnoreMySql, IgnoreSQLite, IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       """|model Model {
          | id    String @id

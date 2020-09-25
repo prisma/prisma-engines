@@ -43,6 +43,7 @@ object ConnectorCapabilities {
   lazy val sqlite: ConnectorCapabilities   = ConnectorCapabilities(sqlShared)
   lazy val postgres: ConnectorCapabilities = ConnectorCapabilities(sqlShared + ScalarListsCapability + EnumCapability)
   lazy val mysql: ConnectorCapabilities    = ConnectorCapabilities(sqlShared + EnumCapability)
+  lazy val mssql: ConnectorCapabilities   = ConnectorCapabilities(sqlShared)
 
   private lazy val sqlShared: Set[ConnectorCapability] = {
     Set(

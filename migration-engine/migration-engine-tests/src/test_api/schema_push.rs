@@ -29,6 +29,7 @@ impl<'a> SchemaPush<'a> {
         let input = SchemaPushInput {
             schema: self.schema,
             force: self.force,
+            assume_empty: false,
         };
 
         let output = self.api.schema_push(&input).await?;

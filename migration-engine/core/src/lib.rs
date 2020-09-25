@@ -13,7 +13,7 @@ pub use error::CoreResult;
 
 use commands::{CommandError, CommandResult};
 use datamodel::{
-    common::provider_names::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,
 };
 use error::Error;
@@ -56,7 +56,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
             SqlMigrationConnector::new(u.as_str()).await?
         }
         #[cfg(feature = "sql")]
-        provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
+        provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
             SqlMigrationConnector::new(&source.url().value).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
@@ -77,7 +77,15 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
         .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
 
     match &source.active_provider {
-        provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
+        provider
+            if [
+                MYSQL_SOURCE_NAME,
+                POSTGRES_SOURCE_NAME,
+                SQLITE_SOURCE_NAME,
+                MSSQL_SOURCE_NAME,
+            ]
+            .contains(&provider.as_str()) =>
+        {
             Ok(SqlMigrationConnector::create_database(&source.url().value).await?)
         }
         x => unimplemented!("Connector {} is not supported yet", x),
@@ -94,7 +102,15 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
 
     match &source.active_provider {
-        provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
+        provider
+            if [
+                MYSQL_SOURCE_NAME,
+                POSTGRES_SOURCE_NAME,
+                SQLITE_SOURCE_NAME,
+                MSSQL_SOURCE_NAME,
+            ]
+            .contains(&provider.as_str()) =>
+        {
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
         }
         x => unimplemented!("Connector {} is not supported yet", x),

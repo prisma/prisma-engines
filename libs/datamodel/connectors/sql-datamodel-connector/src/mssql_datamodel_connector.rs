@@ -9,7 +9,12 @@ pub struct MsSqlDatamodelConnector {
 
 impl MsSqlDatamodelConnector {
     pub fn new() -> MsSqlDatamodelConnector {
-        let capabilities = vec![];
+        let capabilities = vec![
+            ConnectorCapability::AutoIncrementAllowedOnNonId,
+            ConnectorCapability::AutoIncrementMultipleAllowed,
+            ConnectorCapability::AutoIncrementNonIndexedAllowed,
+        ];
+
         let constructors: Vec<NativeTypeConstructor> = vec![];
 
         MsSqlDatamodelConnector {

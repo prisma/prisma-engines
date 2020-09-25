@@ -11,7 +11,8 @@ pub enum Tags {
     Sqlite = 0b1000,
     Mysql8 = 0b00010000,
     Mysql56 = 0b00100000,
-    Mssql2009 = 0b01000000,
+    Mssql2017 = 0b10000000,
+    Mssql2019 = 0b01000000,
 }
 
 impl Tags {
@@ -45,7 +46,8 @@ impl StdError for UnknownTagError {}
 static TAG_NAMES: Lazy<Vec<(&str, BitFlags<Tags>)>> = Lazy::new(|| {
     vec![
         ("mariadb", Tags::Mariadb.into()),
-        ("mssql_2019", Tags::Mssql2009.into()),
+        ("mssql_2017", Tags::Mssql2017.into()),
+        ("mssql_2019", Tags::Mssql2019.into()),
         ("mysql", Tags::Mysql.into()),
         ("mysql_5_6", Tags::Mysql56.into()),
         ("mysql_8", Tags::Mysql8.into()),

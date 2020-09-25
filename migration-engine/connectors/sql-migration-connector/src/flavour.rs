@@ -4,10 +4,12 @@
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
 
+mod mssql;
 mod mysql;
 mod postgres;
 mod sqlite;
 
+pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
@@ -39,7 +41,7 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
             file_path: file_path.clone(),
             attached_name: db_name.clone(),
         }),
-        ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond!"),
+        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour(url.clone())),
     }
 }
 

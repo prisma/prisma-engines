@@ -30,7 +30,7 @@ features = ["single"]
 git = "https://github.com/prisma/quaint"
 
 [dev-dependencies]
-barrel = {version = "0.6.5-alpha.0", features = ["sqlite3", "mysql", "pg"]}
+barrel = {git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], branch = "mssql-support"}
 pretty_assertions = "0.6.1"
 test-macros = {path = "../../../libs/test-macros"}
 test-setup = {path = "../../../libs/test-setup"}

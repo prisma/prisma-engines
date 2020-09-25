@@ -41,6 +41,10 @@ pub async fn get_many_records(
     let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
     let mut records = ManyRecords::new(field_names);
 
+    if let Some(0) = query_arguments.take {
+        return Ok(records);
+    };
+
     // Todo: This can't work for all cases. Cursor-based pagination will not work, because it relies on the ordering
     // to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.
     // The can_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
@@ -97,17 +101,13 @@ pub async fn get_related_m2m_record_ids(
     let relation = from_field.relation();
     let table = relation.as_table();
 
-    let from_column_names: Vec<_> = from_field.related_field().m2m_column_names();
-    let to_column_names: Vec<_> = from_field.m2m_column_names();
-    let from_columns: Vec<Column<'static>> = from_column_names
-        .iter()
-        .map(|name| Column::from(name.clone()))
-        .collect();
+    let from_columns: Vec<_> = from_field.related_field().m2m_columns();
+    let to_columns: Vec<_> = from_field.m2m_columns();
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .columns(from_column_names.into_iter().chain(to_column_names.into_iter()))
-        .so_that(query_builder::conditions(&from_columns, from_record_ids));
+        .so_that(query_builder::conditions(&from_columns, from_record_ids))
+        .columns(from_columns.into_iter().chain(to_columns.into_iter()));
 
     let parent_model_id = from_field.model().primary_identifier();
     let child_model_id = from_field.related_model().primary_identifier();

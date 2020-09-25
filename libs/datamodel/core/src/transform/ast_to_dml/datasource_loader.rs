@@ -1,4 +1,3 @@
-#[cfg(feature = "mssql")]
 use super::builtin_datasource_providers::MsSqlDatasourceProvider;
 use super::{
     super::helpers::*,
@@ -197,7 +196,6 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(MySqlDatasourceProvider::new()),
         Box::new(PostgresDatasourceProvider::new()),
         Box::new(SqliteDatasourceProvider::new()),
-        #[cfg(feature = "mssql")]
         Box::new(MsSqlDatasourceProvider::new()),
     ]
 }

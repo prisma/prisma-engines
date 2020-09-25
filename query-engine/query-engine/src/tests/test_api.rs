@@ -51,6 +51,7 @@ impl TestApi {
             .schema_push(&SchemaPushInput {
                 schema: datamodel_string,
                 force: true,
+                assume_empty: true,
             })
             .await?;
 
@@ -74,7 +75,7 @@ impl TestApi {
             ConnectionInfo::Postgres(..) => visitor::Postgres::build(query),
             ConnectionInfo::Mysql(..) => visitor::Mysql::build(query),
             ConnectionInfo::Sqlite { .. } => visitor::Sqlite::build(query),
-            ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond"),
+            ConnectionInfo::Mssql(_) => visitor::Mssql::build(query),
         }
     }
 }
@@ -241,8 +242,43 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
     }
 }
 
+pub async fn mssql_2017_test_api(db_name: &str) -> TestApi {
+    let url = mssql_2017_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+
+    let migration_api = MigrationApi::new(mssql_migration_connector(&url).await).await.unwrap();
+
+    let config = mssql_2017_test_config(db_name);
+
+    TestApi {
+        connection_info,
+        migration_api,
+        config,
+    }
+}
+
+pub async fn mssql_2019_test_api(db_name: &str) -> TestApi {
+    let url = mssql_2019_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+
+    let migration_api = MigrationApi::new(mssql_migration_connector(&url).await).await.unwrap();
+
+    let config = mssql_2019_test_config(db_name);
+
+    TestApi {
+        connection_info,
+        migration_api,
+        config,
+    }
+}
+
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
+    SqlMigrationConnector::new(url_str).await.unwrap()
+}
+
+pub(super) async fn mssql_migration_connector(url_str: &str) -> SqlMigrationConnector {
+    create_mssql_database(url_str).await.unwrap();
     SqlMigrationConnector::new(url_str).await.unwrap()
 }
 

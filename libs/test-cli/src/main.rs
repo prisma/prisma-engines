@@ -98,8 +98,12 @@ async fn main() -> anyhow::Result<()> {
                 (None, false) => anyhow::bail!("{}", "either --stdin or --file-path is required".bold().red()),
             };
 
-            let api = migration_core::migration_api(&datamodel_string).await?;
+            migration_core::migration_api(&datamodel_string)
+                .await?
+                .reset(&())
+                .await?;
 
+            let api = migration_core::migration_api(&datamodel_string).await?;
             let migration_id = "test-cli-migration".to_owned();
 
             let infer_input = migration_core::InferMigrationStepsInput {
@@ -108,8 +112,6 @@ async fn main() -> anyhow::Result<()> {
                 datamodel: datamodel_string.clone(),
                 migration_id: migration_id.clone(),
             };
-
-            api.reset(&()).await?;
 
             let result = api.infer_migration_steps(&infer_input).await?;
 
@@ -236,6 +238,7 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
         .schema_push(&SchemaPushInput {
             schema,
             force: cmd.force,
+            assume_empty: false,
         })
         .await?;
 

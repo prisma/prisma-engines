@@ -15,7 +15,7 @@ user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["s
 
 anyhow = "1.0.26"
 async-trait = "0.1.17"
-barrel = { version = "0.6.5", features = ["sqlite3", "mysql", "pg"] }
+barrel = {git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], branch = "mssql-support"}
 chrono = { version = "0.4" }
 enumflags2 = "0.6.0"
 futures = "0.3.5"
