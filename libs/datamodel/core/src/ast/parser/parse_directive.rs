@@ -3,17 +3,21 @@ use super::{
     parse_expression::parse_arg_value,
     Rule,
 };
+use crate::ast::parser::parse_comments::{doc_comments_to_string, parse_doc_comment};
 use crate::ast::*;
 
 pub fn parse_directive(token: &Token) -> Directive {
     let mut name: Option<Identifier> = None;
     let mut arguments: Vec<Argument> = vec![];
+    let mut comments: Vec<String> = Vec::new();
 
     for current in token.relevant_children() {
+        println!("rule: {:?} str: {:?}", current.as_rule(), current.as_str());
         match current.as_rule() {
             Rule::directive => return parse_directive(&current),
             Rule::directive_name => name = Some(current.to_id()),
             Rule::directive_arguments => parse_directive_args(&current, &mut arguments),
+            Rule::doc_comment => comments.push(parse_doc_comment(&current)),
             _ => parsing_catch_all(&current, "directive"),
         }
     }
@@ -22,7 +26,9 @@ pub fn parse_directive(token: &Token) -> Directive {
         Some(name) => Directive {
             name,
             arguments,
+            documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
+            is_commented_out: false,
         },
         _ => panic!("Encountered impossible type during parsing: {:?}", token.as_str()),
     }

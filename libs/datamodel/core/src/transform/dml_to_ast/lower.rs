@@ -100,7 +100,7 @@ impl<'a> LowerDmlToAst<'a> {
                             Span::empty(),
                         )));
                     }
-                    directives.push(ast::Directive::new(new_directive_name.as_str(), arguments));
+                    directives.push(ast::Directive::new(new_directive_name.as_str(), None, arguments));
                 }
             }
         }
