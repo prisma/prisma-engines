@@ -186,7 +186,7 @@ async fn last_applied_migrations(
 }
 
 fn migration_table_setup_sqlite(t: &mut barrel::Table) {
-    migration_table_setup(t, types::text(), types::date(), types::custom("TEXT"));
+    migration_table_setup(t, types::text(), types::custom("DATETIME"), types::custom("TEXT"));
 }
 
 fn migration_table_setup_postgres(t: &mut barrel::Table) {
