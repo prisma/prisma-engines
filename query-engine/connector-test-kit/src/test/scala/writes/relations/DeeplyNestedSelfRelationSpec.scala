@@ -74,13 +74,13 @@ class DeeplyNestedSelfRelationSpec extends FlatSpec with Matchers with ApiSpecBa
   "Regression #249" should "not fail" ignore {
     val project = SchemaDsl.fromStringV11() { """
                                                 |model User {
-                                                |  id       String @default(cuid()) @id
+                                                |  id       String @id @default(cuid())
                                                 |  name     String
                                                 |  comments Comment[]
                                                 |}
                                                 |
                                                 |model Comment {
-                                                |  id         String    @default(cuid()) @id
+                                                |  id         String    @id @default(cuid())
                                                 |  createdAt  DateTime  @default(now())
                                                 |  updatedAt  DateTime  @updatedAt
                                                 |  value      String
