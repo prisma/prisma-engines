@@ -251,17 +251,25 @@ impl QueryDocumentParser {
         }
     }
 
-    pub fn parse_datetime(path: &QueryPath, s: &str) -> QueryParserResult<DateTime<Utc>> {
-        let fmt = "%Y-%m-%dT%H:%M:%S%.3f";
-        Utc.datetime_from_str(s.trim_end_matches('Z'), fmt)
-            .map(|dt| DateTime::<Utc>::from_utc(dt.naive_utc(), Utc))
-            .map_err(|err| QueryParserError {
-                path: path.clone(),
-                error_kind: QueryParserErrorKind::ValueParseError(format!(
-                    "Invalid DateTime: {} DateTime must adhere to format: %Y-%m-%dT%H:%M:%S%.3f",
-                    err
-                )),
-            })
+    pub fn parse_datetime(path: &QueryPath, s: &str) -> QueryParserResult<DateTime<FixedOffset>> {
+        DateTime::parse_from_rfc3339(s).map_err(|err| QueryParserError {
+            path: path.clone(),
+            error_kind: QueryParserErrorKind::ValueParseError(format!(
+                "Invalid DateTime: {} (must be ISO 8601 compatible)",
+                err
+            )),
+        })
+
+        // let fmt = "%Y-%m-%dT%H:%M:%S%.3f";
+        // Utc.datetime_from_str(s.trim_end_matches('Z'), fmt)
+        //     .map(|dt| DateTime::<Utc>::from_utc(dt.naive_utc(), Utc))
+        //     .map_err(|err| QueryParserError {
+        //         path: path.clone(),
+        //         error_kind: QueryParserErrorKind::ValueParseError(format!(
+        //             "Invalid DateTime: {} DateTime must adhere to format: %Y-%m-%dT%H:%M:%S%.3f",
+        //             err
+        //         )),
+        //     })
     }
 
     // [DTODO] This is likely incorrect or at least using the wrong abstractions.

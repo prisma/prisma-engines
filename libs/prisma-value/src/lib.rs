@@ -34,14 +34,15 @@ pub enum PrismaValue {
     Xml(String),
 
     #[serde(serialize_with = "serialize_date")]
-    DateTime(DateTime<Utc>),
+    DateTime(DateTime<FixedOffset>),
 
     #[serde(serialize_with = "serialize_decimal")]
     Float(Decimal),
 }
 
-pub fn stringify_date(date: &DateTime<Utc>) -> String {
-    format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ"))
+pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
+    // format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ"))
+    date.to_rfc3339()
 }
 
 impl TryFrom<serde_json::Value> for PrismaValue {
@@ -87,7 +88,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
     }
 }
 
-fn serialize_date<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_date<S>(date: &DateTime<FixedOffset>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
@@ -135,7 +136,7 @@ impl PrismaValue {
     }
 
     pub fn new_datetime(datetime: &str) -> PrismaValue {
-        PrismaValue::DateTime(DateTime::<Utc>::from_str(datetime).unwrap())
+        PrismaValue::DateTime(DateTime::parse_from_rfc3339(datetime).unwrap())
     }
 }
 

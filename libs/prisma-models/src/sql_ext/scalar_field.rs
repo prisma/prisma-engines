@@ -1,3 +1,4 @@
+use chrono::Utc;
 use prisma_value::PrismaValue;
 use quaint::ast::Value;
 
@@ -13,7 +14,7 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::String(s), _) => s.into(),
             (PrismaValue::Float(f), _) => f.into(),
             (PrismaValue::Boolean(b), _) => b.into(),
-            (PrismaValue::DateTime(d), _) => d.into(),
+            (PrismaValue::DateTime(d), _) => d.with_timezone(&Utc).into(),
             (PrismaValue::Enum(e), _) => e.into(),
             (PrismaValue::Int(i), _) => (i as i64).into(),
             (PrismaValue::Uuid(u), _) => u.to_string().into(),
@@ -42,7 +43,7 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::String(s) => s.into(),
         PrismaValue::Float(f) => f.into(),
         PrismaValue::Boolean(b) => b.into(),
-        PrismaValue::DateTime(d) => d.into(),
+        PrismaValue::DateTime(d) => d.with_timezone(&Utc).into(),
         PrismaValue::Enum(e) => e.into(),
         PrismaValue::Int(i) => (i as i64).into(),
         PrismaValue::Uuid(u) => u.to_string().into(),

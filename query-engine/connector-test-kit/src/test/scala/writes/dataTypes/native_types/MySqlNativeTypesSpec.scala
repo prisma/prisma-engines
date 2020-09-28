@@ -152,9 +152,9 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
        |mutation {
        |  createOneModel(
        |    data: {
-       |      date: "1973-12-30"
-       |      time: "15:30:00"
-       |      dtime: "1973-12-30 15:30:00"
+       |      date: "2016-09-24T00:00:00.000Z"
+       |      time: "0000-00-00T12:29:32.342Z"
+       |      dtime: "2016-09-24T12:29:32.342Z"
        |      ts: "19731230153000"
        |      year: 1973
        |    }
