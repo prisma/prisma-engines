@@ -249,6 +249,7 @@ impl ModelQueryBuilder {
 #[derive(Debug, Clone, PartialEq)]
 pub enum QueryTag {
     FindOne,
+    FindFirst,
     FindMany,
     CreateOne,
     UpdateOne,
@@ -263,6 +264,7 @@ impl fmt::Display for QueryTag {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
             QueryTag::FindOne => "findOne",
+            QueryTag::FindFirst => "findFirst",
             QueryTag::FindMany => "findMany",
             QueryTag::CreateOne => "createOne",
             QueryTag::UpdateOne => "updateOne",

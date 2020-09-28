@@ -4,6 +4,7 @@ use super::{ColumnDiffer, SqlSchemaDiffer};
 use crate::sql_migration::AlterEnum;
 use std::collections::HashSet;
 
+mod mssql;
 mod mysql;
 mod postgres;
 mod sqlite;

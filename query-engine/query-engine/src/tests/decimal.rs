@@ -1,7 +1,7 @@
 use super::test_api::*;
 use indoc::indoc;
 use serde_json::json;
-use test_macros::*;
+use test_macros::test_each_connector_mssql as test_each_connector;
 
 static MODEL: &str = indoc! {"
     model Transaction {

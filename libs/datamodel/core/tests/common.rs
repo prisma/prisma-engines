@@ -336,6 +336,13 @@ pub fn parse_error(datamodel_string: &str) -> ErrorCollection {
     }
 }
 
+pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> ErrorCollection {
+    match datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string) {
+        Ok(_) => panic!("Expected an error when parsing schema."),
+        Err(errs) => errs,
+    }
+}
+
 pub const SQLITE_SOURCE: &'static str = r#"
     datasource db {
         provider = "sqlite"

@@ -79,6 +79,7 @@ fn database_schema_is_serializable() {
                     columns: vec!["column3".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::NoAction,
                 }],
             },
@@ -345,6 +346,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     columns: vec!["column1".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
@@ -352,6 +354,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     columns: vec!["column2".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::Restrict,
                 },
                 ForeignKey {
@@ -359,6 +362,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     columns: vec!["column3".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
@@ -366,6 +370,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     columns: vec!["column4".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::SetNull,
                 },
                 ForeignKey {
@@ -373,6 +378,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     columns: vec!["column5".to_string()],
                     referenced_table: "table2".to_string(),
                     referenced_columns: vec!["id".to_string()],
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::SetDefault,
                 },
             ],

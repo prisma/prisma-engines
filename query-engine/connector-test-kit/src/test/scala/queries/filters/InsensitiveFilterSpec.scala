@@ -41,7 +41,7 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.pathAsString("data.createOneTestModel.id")
   }
 
-  "Case insensitive filters" should "work with string matchers" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql) in {
+  "Case insensitive filters" should "work with string matchers" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql, IgnoreMsSql) in {
     create("a test")
     create("A Test")
     create("b test")
@@ -96,7 +96,7 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.toString() should be("""{"data":{"findManyTestModel":[{"str":"a test"},{"str":"A Test"},{"str":"b test"}]}}""")
   }
 
-  "Case insensitive filters" should "work with negated string matchers" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql) in {
+  "Case insensitive filters" should "work with negated string matchers" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql, IgnoreMsSql) in {
     create("a test")
     create("A Test")
     create("b test")
@@ -153,7 +153,7 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.toString() should be("""{"data":{"findManyTestModel":[]}}""")
   }
 
-  "Case insensitive filters" should "work with comparator operations" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql) in {
+  "Case insensitive filters" should "work with comparator operations" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql, IgnoreMsSql) in {
     // Note: Postgres collations order characters differently than, say, using .sort in most programming languages,
     // which is why the results of <, >, etc. are non-obvious at a glance.
     create("A")
@@ -217,7 +217,7 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.toString() should be("""{"data":{"findManyTestModel":[{"str":"A"}]}}""")
   }
 
-  "Case insensitive filters" should "work with list containment operations" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql) in {
+  "Case insensitive filters" should "work with list containment operations" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql, IgnoreMsSql) in {
     // Note: Postgres collations order characters differently than, say, using .sort in most programming languages,
     // which is why the results of <, >, etc. are non-obvious at a glance.
     create("A")

@@ -34,4 +34,3 @@ native-types = { path = "../../native-types" }
 
 [features]
 default = []
-mssql = ["datamodel-connector/mssql"]

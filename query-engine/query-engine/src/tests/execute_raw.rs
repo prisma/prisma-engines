@@ -4,7 +4,7 @@ use indoc::indoc;
 use quaint::ast::*;
 use quaint::connector::{ConnectionInfo, SqlFamily};
 use serde_json::json;
-use test_macros::*;
+use test_macros::test_each_connector_mssql as test_each_connector;
 
 static TODO: &str = indoc! {"
     model Todo {
@@ -48,6 +48,7 @@ fn query_raw(query: &str, params: Vec<Value>) -> String {
 
 #[test_each_connector]
 async fn select_1(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = indoc! {r#"
@@ -60,6 +61,7 @@ async fn select_1(api: &TestApi) -> anyhow::Result<()> {
 
     let column_name = match api.connection_info() {
         ConnectionInfo::Postgres(_) => "?column?",
+        ConnectionInfo::Mssql(_) => "",
         _ => "1",
     };
 
@@ -77,6 +79,7 @@ async fn select_1(api: &TestApi) -> anyhow::Result<()> {
 
 #[test_each_connector]
 async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = match api.connection_info() {
@@ -85,6 +88,16 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
                 mutation {
                     queryRaw(
                         query: "SELECT ($1)::text",
+                        parameters: "[\"foo\"]"
+                    )
+                }
+            "#}
+        }
+        ConnectionInfo::Mssql(_) => {
+            indoc! {r#"
+                mutation {
+                    queryRaw(
+                        query: "SELECT @P1",
                         parameters: "[\"foo\"]"
                     )
                 }
@@ -104,6 +117,7 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
 
     let column_name = match api.connection_info() {
         ConnectionInfo::Postgres(_) => "text",
+        ConnectionInfo::Mssql(_) => "",
         _ => "?",
     };
 
@@ -121,6 +135,7 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
 
 #[test_each_connector]
 async fn querying_model_tables(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -150,6 +165,7 @@ async fn querying_model_tables(api: &TestApi) -> anyhow::Result<()> {
 
 #[test_each_connector]
 async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let dt = DateTime::parse_from_rfc3339("1996-12-19T16:39:57+00:00")?;
@@ -206,6 +222,7 @@ async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
 
 #[test_each_connector]
 async fn querying_model_tables_with_alias(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -233,6 +250,7 @@ async fn querying_model_tables_with_alias(api: &TestApi) -> anyhow::Result<()> {
 
 #[test_each_connector]
 async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -263,6 +281,7 @@ async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> any
 
 #[test_each_connector(tags("postgres"))]
 async fn arrays(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = "SELECT ARRAY_AGG(columnInfos.attname) AS postgres_array FROM pg_attribute columnInfos";
@@ -278,6 +297,7 @@ async fn arrays(api: &TestApi) -> anyhow::Result<()> {
 
 #[test_each_connector]
 async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
     let result = query_engine.request(query_raw("SELECT * FROM ", vec![])).await;
     let error_code = result["errors"][0]["user_facing_error"]["meta"]["code"].as_str();
@@ -286,7 +306,7 @@ async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow:
         ConnectionInfo::Postgres(..) => assert_eq!(Some("42601"), error_code),
         ConnectionInfo::Mysql(..) => assert_eq!(Some("1064"), error_code),
         ConnectionInfo::Sqlite { .. } => assert_eq!(Some("1"), error_code),
-        ConnectionInfo::Mssql(..) => todo!("Greetings from Redmond"),
+        ConnectionInfo::Mssql(..) => assert_eq!(Some("102"), error_code),
     }
 
     Ok(())
@@ -294,6 +314,7 @@ async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow:
 
 #[test_each_connector]
 async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -314,8 +335,8 @@ async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Res
     match api.connection_info() {
         ConnectionInfo::Postgres(..) => assert_eq!(Some("23505"), error_code),
         ConnectionInfo::Mysql(..) => assert_eq!(Some("1062"), error_code),
-        ConnectionInfo::Mssql(..) => todo!("Greetings from Redmond"),
         ConnectionInfo::Sqlite { .. } => assert_eq!(Some("1555"), error_code),
+        ConnectionInfo::Mssql { .. } => assert_eq!(Some("2627"), error_code),
     }
 
     Ok(())

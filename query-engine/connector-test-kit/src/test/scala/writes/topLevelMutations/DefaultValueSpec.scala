@@ -63,7 +63,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.toString should be(s"""{"data":{"createService":{"name":"issue1820","int":1}}}""")
   }
 
-  "The default value" should "work for enums" taggedAs IgnoreSQLite in {
+  "The default value" should "work for enums" taggedAs (IgnoreSQLite, IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       """
         |enum IsActive{
@@ -133,7 +133,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.pathAsString("data.createUser.updatedAt") should be("2001-01-01T00:00:00.000Z")
   }
 
-  "Remapped enum default values" should "work" taggedAs (IgnoreSQLite) in {
+  "Remapped enum default values" should "work" taggedAs (IgnoreSQLite, IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       """
         |model User {

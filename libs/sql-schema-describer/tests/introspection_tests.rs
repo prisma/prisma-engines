@@ -169,6 +169,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
                 referenced_columns: vec!["id".to_string()],
                 referenced_table: "City".to_string(),
                 on_delete_action,
+                on_update_action: ForeignKeyAction::NoAction,
             }],
         }
     );
@@ -281,6 +282,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
                 referenced_columns: vec!["name".to_string(), "id".to_string(),],
                 referenced_table: "City".to_string(),
                 on_delete_action,
+                on_update_action: ForeignKeyAction::NoAction,
             },],
         }
     );

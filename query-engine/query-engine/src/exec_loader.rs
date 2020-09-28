@@ -2,7 +2,7 @@ use crate::{PrismaError, PrismaResult};
 use connector::Connector;
 
 use datamodel::{
-    common::provider_names::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Datasource,
 };
 use query_core::executor::{InterpretingExecutor, QueryExecutor};
@@ -11,9 +11,6 @@ use url::Url;
 
 #[cfg(feature = "sql")]
 use sql_connector::*;
-
-#[cfg(all(feature = "sql", feature = "mssql"))]
-use datamodel::common::provider_names::MSSQL_SOURCE_NAME;
 
 pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     match source.active_provider.as_str() {
@@ -26,8 +23,18 @@ pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
         #[cfg(feature = "sql")]
         POSTGRES_SOURCE_NAME => postgres(source).await,
 
-        #[cfg(all(feature = "sql", feature = "mssql"))]
-        MSSQL_SOURCE_NAME => mssql(source).await,
+        #[cfg(feature = "sql")]
+        MSSQL_SOURCE_NAME => {
+            if !feature_flags::get().microsoftSqlServer {
+                let error = query_core::CoreError::UnsupportedFeatureError(
+                    "Microsoft SQL Server (experimental feature, needs to be enabled)".into(),
+                );
+
+                return Err(PrismaError::CoreError(error));
+            }
+
+            mssql(source).await
+        }
 
         x => Err(PrismaError::ConfigurationError(format!(
             "Unsupported connector type: {}",
@@ -89,7 +96,7 @@ async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
     Ok((db_name, sql_executor(mysql, false)))
 }
 
-#[cfg(all(feature = "sql", feature = "mssql"))]
+#[cfg(feature = "sql")]
 async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading SQL Server connector...");
 
@@ -108,7 +115,7 @@ async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
         })
         .collect();
 
-    let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
+    let db_name = params.remove("schema").unwrap_or_else(|| String::from("dbo"));
 
     trace!("Loaded SQL Server connector.");
     Ok((db_name, sql_executor(mssql, false)))

@@ -6,7 +6,6 @@ use query_core::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
 
 pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderContext) -> DmmfInputField {
     let type_references = render_input_types(&input_field.field_types, ctx);
-
     let nullable = input_field
         .field_types
         .iter()

@@ -24,7 +24,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                |      create: {c: "c1", c_1: "c", c_2: "1"}
                |    }
                |  }){
-               |  
+               |
                |    ${t.parent.selection}
                |    childReq{
                |       ${t.child.selection}
@@ -75,7 +75,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                |      create: {c: "c1", c_1: "c", c_2: "1"}
                |    }
                |  }){
-               |  
+               |
                |    ${t.parent.selection}
                |    childOpt{
                |       ${t.child.selection}
@@ -146,7 +146,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |    childrenOpt: {
            |        update:  [
            |          { where: $childIdentifier, data: { non_unique: { set: "updated" } }}
-           |        ]  
+           |        ]
            |      }
            |  }){
            |    childrenOpt (orderBy: { c: asc } ){
@@ -179,7 +179,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                |      create: [{c: "c1", c_1: "c", c_2: "1"},{c: "c2", c_1: "c", c_2: "2"}]
                |    }
                |  }){
-               |  
+               |
                |    ${t.parent.selection}
                |    childrenOpt{
                |       ${t.child.selection}
@@ -200,7 +200,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |    childrenOpt: {
            |        update:  [
            |          {where: $childIdentifier, data: {non_unique: { set: "updated" }}}
-           |        ]  
+           |        ]
            |      }
            |  }){
            |    childrenOpt (orderBy: { c: asc } ){

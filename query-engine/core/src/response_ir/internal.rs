@@ -162,16 +162,8 @@ fn serialize_record_selection(
                                 items.reverse();
                                 let first = items.pop().unwrap();
 
-                                // [DTODO] Workaround for incredibly hard to follow 1:m read relation issue that produces multiple identical records.
-                                if items.iter().all(|i| i == &first) {
-                                    Ok((parent, Item::Ref(ItemRef::new(items.pop().unwrap()))))
-                                } else {
-                                    Err(CoreError::SerializationError(format!(
-                                        "Expected at most 1 item for '{}', got {}",
-                                        name,
-                                        items.len() + 1
-                                    )))
-                                }
+                                // Simple return the first record in the list.
+                                Ok((parent, Item::Ref(ItemRef::new(first))))
                             } else if items.is_empty() && opt {
                                 Ok((parent, Item::Ref(ItemRef::new(Item::Value(PrismaValue::Null)))))
                             } else if items.is_empty() && opt {

@@ -17,8 +17,29 @@ pub struct DiagnoseMigrationHistoryInput {
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DiagnoseMigrationHistoryOutput {
-    /// Issues detected after examining the migrations history.
-    pub history_problems: Vec<HistoryDiagnostic>,
+    /// Whether drift between the expected schema and the dev database could be
+    /// detected. `None` if the dev database has the expected schema.
+    pub drift: Option<DriftDiagnostic>,
+    /// The current status of the migration history of the database relative to
+    /// migrations directory. `None` if they are in sync and up to date.
+    pub history: Option<HistoryDiagnostic>,
+    /// The names of the migrations that are currently in a failed state in the
+    /// database.
+    pub failed_migration_names: Vec<String>,
+    /// The names of the migrations for which the checksum of the script in the
+    /// migration directory does not match the checksum of the applied migration
+    /// in the database.
+    pub edited_migration_names: Vec<String>,
+}
+
+impl DiagnoseMigrationHistoryOutput {
+    /// True if no problem was found
+    pub fn is_empty(&self) -> bool {
+        self.drift.is_none()
+            && self.history.is_none()
+            && self.failed_migration_names.is_empty()
+            && self.edited_migration_names.is_empty()
+    }
 }
 
 /// Read the contents of the migrations directory and the migrations table, and
@@ -99,7 +120,10 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
         };
 
         Ok(DiagnoseMigrationHistoryOutput {
-            history_problems: diagnostics.into(),
+            drift: diagnostics.drift(),
+            history: diagnostics.history(),
+            failed_migration_names: diagnostics.failed_migration_names(),
+            edited_migration_names: diagnostics.edited_migration_names(),
         })
     }
 }
@@ -156,74 +180,51 @@ impl<'a> Diagnostics<'a> {
             .map(|(_, migration)| migration.migration_name().to_owned())
             .collect()
     }
-}
 
-impl From<Diagnostics<'_>> for Vec<HistoryDiagnostic> {
-    fn from(diagnostics: Diagnostics<'_>) -> Self {
-        let mut problems = Vec::new();
-
-        match (
-            diagnostics.fs_migrations_not_in_db.len(),
-            diagnostics.db_migrations_not_in_fs.len(),
-        ) {
-            (0, 0) => (),
-            (_, 0) => problems.push(HistoryDiagnostic::DatabaseIsBehind {
-                unapplied_migration_names: diagnostics.fs_migration_names(),
+    fn history(&self) -> Option<HistoryDiagnostic> {
+        match (self.fs_migrations_not_in_db.len(), self.db_migrations_not_in_fs.len()) {
+            (0, 0) => None,
+            (_, 0) => Some(HistoryDiagnostic::DatabaseIsBehind {
+                unapplied_migration_names: self.fs_migration_names(),
             }),
-            (0, _) => problems.push(HistoryDiagnostic::MigrationsDirectoryIsBehind {
-                unpersisted_migration_names: diagnostics.db_migration_names(),
+            (0, _) => Some(HistoryDiagnostic::MigrationsDirectoryIsBehind {
+                unpersisted_migration_names: self.db_migration_names(),
             }),
-            (_, _) => problems.push(HistoryDiagnostic::HistoriesDiverge {
-                last_common_migration_name: diagnostics.fs_migrations_not_in_db.first().and_then(|(idx, _)| {
+            (_, _) => Some(HistoryDiagnostic::HistoriesDiverge {
+                last_common_migration_name: self.fs_migrations_not_in_db.first().and_then(|(idx, _)| {
                     if *idx == 0 {
                         None
                     } else {
-                        Some(diagnostics.fs_migrations[idx - 1].migration_name().to_owned())
+                        Some(self.fs_migrations[idx - 1].migration_name().to_owned())
                     }
                 }),
-                unpersisted_migration_names: diagnostics.db_migration_names(),
-                unapplied_migration_names: diagnostics.fs_migration_names(),
+                unpersisted_migration_names: self.db_migration_names(),
+                unapplied_migration_names: self.fs_migration_names(),
             }),
         }
+    }
 
-        if !diagnostics.edited_migrations.is_empty() {
-            problems.push(HistoryDiagnostic::MigrationsEdited {
-                edited_migration_names: diagnostics.edited_migration_names(),
-            })
+    fn drift(&self) -> Option<DriftDiagnostic> {
+        if self.drift_detected {
+            return Some(DriftDiagnostic::DriftDetected);
         }
 
-        if !diagnostics.failed_migrations.is_empty() {
-            problems.push(HistoryDiagnostic::MigrationsFailed {
-                failed_migration_names: diagnostics.failed_migration_names(),
-            })
+        if let Some((migration_name, error)) = &self.migration_failed_to_apply {
+            return Some(DriftDiagnostic::MigrationFailedToApply {
+                migration_name: migration_name.clone(),
+                error: error.clone(),
+            });
         }
 
-        if diagnostics.drift_detected {
-            problems.push(HistoryDiagnostic::DriftDetected)
-        }
-
-        if let Some((migration_name, error)) = diagnostics.migration_failed_to_apply {
-            problems.push(HistoryDiagnostic::MigrationFailedToApply { migration_name, error });
-        }
-
-        problems
+        None
     }
 }
 
-/// A diagnostic returned by `diagnoseMigrationHistory`.
+/// A diagnostic returned by `diagnoseMigrationHistory` when looking at the
+/// database migration history in relation to the migrations directory.
 #[derive(Debug, PartialEq, Serialize)]
 #[serde(tag = "diagnostic", rename_all = "camelCase")]
 pub enum HistoryDiagnostic {
-    /// Migration scripts were edited.
-    MigrationsEdited {
-        /// The names of the migration directories in the migrations directory.
-        edited_migration_names: Vec<String>,
-    },
-    /// There are migrations in the database that are not completely applied/failed to apply.
-    MigrationsFailed {
-        /// The names of the migrations.
-        failed_migration_names: Vec<String>,
-    },
     /// There are migrations in the migrations directory that have not been applied to the database yet.
     DatabaseIsBehind {
         /// The names of the migrations.
@@ -247,10 +248,18 @@ pub enum HistoryDiagnostic {
         /// directory but have not been applied to the database.
         unapplied_migration_names: Vec<String>,
     },
+}
+
+/// A diagnostic returned by `diagnoseMigrationHistory` when trying to determine
+/// whether the development database has the expected schema at its stage in
+/// history.
+#[derive(Debug, PartialEq, Serialize)]
+#[serde(tag = "diagnostic", rename_all = "camelCase")]
+pub enum DriftDiagnostic {
     /// The database schema of the current database does not match what would be
     /// expected at its stage in the migration history.
     DriftDetected,
-    /// When a migration fails to apply to a temporary database.
+    /// When a migration fails to apply cleanly to a temporary database.
     MigrationFailedToApply {
         /// The name of the migration that failed.
         migration_name: String,
