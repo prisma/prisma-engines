@@ -562,13 +562,13 @@ async fn re_introspecting_multiple_changed_relation_names(api: &TestApi) {
 
     let input_dm = r#"
             model Employee {
-                  id                                            Int         @default(autoincrement()) @id
+                  id                                            Int         @id @default(autoincrement())
                   A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
                   Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
             }
 
             model Schedule {
-                  id                                            Int         @default(autoincrement()) @id
+                  id                                            Int         @id @default(autoincrement())
                   morningEmployeeId                             Int
                   eveningEmployeeId                             Int
                   Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
@@ -578,13 +578,13 @@ async fn re_introspecting_multiple_changed_relation_names(api: &TestApi) {
 
     let final_dm = r#"
              model Employee {
-                  id                                            Int         @default(autoincrement()) @id
+                  id                                            Int         @id @default(autoincrement())
                   A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
                   Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
             }
 
             model Schedule {
-                  id                                            Int         @default(autoincrement()) @id
+                  id                                            Int         @id @default(autoincrement())
                   morningEmployeeId                             Int
                   eveningEmployeeId                             Int
                   Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
@@ -1114,13 +1114,13 @@ async fn re_introspecting_multiple_many_to_many_on_same_model(api: &TestApi) {
 
     let input_dm = r#"
               model B {
-                id              Int @default(autoincrement()) @id
+                id              Int @id @default(autoincrement())
                 custom_A        A[]
                 special_A       A[] @relation("AToB2")
               }
 
               model A {
-                id              Int @default(autoincrement()) @id
+                id              Int @id @default(autoincrement())
                 custom_B        B[]
                 special_B       B[] @relation("AToB2")
               }
@@ -1128,19 +1128,19 @@ async fn re_introspecting_multiple_many_to_many_on_same_model(api: &TestApi) {
 
     let final_dm = r#"
               model B {
-                id              Int @default(autoincrement()) @id
+                id              Int @id @default(autoincrement())
                 custom_A        A[]
                 special_A       A[] @relation("AToB2")
               }
 
               model A {
-                id              Int @default(autoincrement()) @id
+                id              Int @id @default(autoincrement())
                 custom_B        B[]
                 special_B       B[] @relation("AToB2")
               }
 
               model Unrelated {
-                id Int @default(autoincrement()) @id
+                id Int @id @default(autoincrement())
               }
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
