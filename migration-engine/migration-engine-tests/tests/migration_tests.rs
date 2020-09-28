@@ -2088,7 +2088,7 @@ async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
         createdAt   DateTime  @default(dbgenerated())
         email       String?
         firstName   String    @default("")
-        id          Int       @default(autoincrement()) @id
+        id          Int       @id @default(autoincrement())
         lastName    String    @default("")
         password    String?
         updatedAt   DateTime  @default(dbgenerated())
