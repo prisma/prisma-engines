@@ -415,7 +415,7 @@ impl<'a> Reformatter<'a> {
         return directives;
     }
 
-    fn get_sort_index_of_directive(is_field_directive: bool, directive_name: &str) -> usize {
+    pub fn get_sort_index_of_directive(is_field_directive: bool, directive_name: &str) -> usize {
         // this must match the order defined for rendering in libs/datamodel/core/src/transform/directives/mod.rs
         let correct_order = if is_field_directive {
             vec!["id", "unique", "default", "updatedAt", "map", "relation"]
