@@ -3220,7 +3220,6 @@ dependencies = [
  "sha2 0.9.1",
  "sql-schema-describer",
  "tempfile",
- "thiserror",
  "tokio",
  "tracing",
  "tracing-error",

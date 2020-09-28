@@ -51,9 +51,9 @@ pub fn create_migration_directory(
     Ok(MigrationDirectory { path: directory_path })
 }
 
-/// An IO error that occured while reading the migrations directory.
+/// An IO error that occurred while reading the migrations directory.
 #[derive(Debug, Error)]
-#[error("An error occured when reading the migrations directory.")]
+#[error("An error occurred when reading the migrations directory.")]
 pub struct ListMigrationsError(
     #[source]
     #[from]

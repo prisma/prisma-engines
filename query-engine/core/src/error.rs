@@ -91,13 +91,11 @@ impl From<CoreError> for user_facing_errors::Error {
                         user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
                             path: format!("{}", query_parser_error.path),
                         })
-                        .unwrap()
                     }
                     _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
                         query_validation_error: format!("{}", query_parser_error.error_kind),
                         query_position: format!("{}", query_parser_error.path),
-                    })
-                    .unwrap(),
+                    }),
                 };
 
                 known_error.into()
@@ -111,7 +109,6 @@ impl From<CoreError> for user_facing_errors::Error {
                 field_name,
                 object_name,
             })
-            .unwrap()
             .into(),
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(RelationViolation {
                 model_a_name,
@@ -129,7 +126,6 @@ impl From<CoreError> for user_facing_errors::Error {
                 model_b_name,
                 relation_name,
             })
-            .unwrap()
             .into(),
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(details))
             | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
@@ -137,12 +133,9 @@ impl From<CoreError> for user_facing_errors::Error {
             )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::ConnectedRecordsNotFound {
                 details,
             })
-            .unwrap()
             .into(),
             CoreError::QueryGraphBuilderError(QueryGraphBuilderError::InputError(details)) => {
-                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InputError { details })
-                    .unwrap()
-                    .into()
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InputError { details }).into()
             }
             CoreError::InterpreterError(InterpreterError::InterpretationError(msg, Some(cause))) => {
                 match cause.as_ref() {
@@ -157,7 +150,6 @@ impl From<CoreError> for user_facing_errors::Error {
                         model_b_name: model_b_name.clone(),
                         relation_name: relation_name.clone(),
                     })
-                    .unwrap()
                     .into(),
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordsNotConnected {
                         parent_name,
@@ -168,12 +160,10 @@ impl From<CoreError> for user_facing_errors::Error {
                         child_name: child_name.clone(),
                         relation_name: relation_name.clone(),
                     })
-                    .unwrap()
                     .into(),
                     _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::InterpretationError {
                         details: format!("{}: {}", msg, cause),
                     })
-                    .unwrap()
                     .into(),
                 }
             }
