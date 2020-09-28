@@ -64,7 +64,7 @@ impl SqlFlavour for MysqlFlavour {
             .await
             .map_err(|err| match err {
                 SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occured in sql-schema-describer"))
+                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
                 }
             })
     }
