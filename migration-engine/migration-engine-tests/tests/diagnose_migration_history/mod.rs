@@ -1,5 +1,5 @@
 use crate::*;
-use migration_core::commands::HistoryDiagnostic;
+use migration_core::commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic};
 use pretty_assertions::assert_eq;
 
 #[test_each_connector]
@@ -7,9 +7,9 @@ async fn diagnose_migrations_history_on_an_empty_database_without_migration_retu
     api: &TestApi,
 ) -> TestResult {
     let directory = api.create_migrations_directory()?;
-    let result = api.diagnose_migration_history(&directory).send().await?.into_output();
+    let output = api.diagnose_migration_history(&directory).send().await?.into_output();
 
-    assert_eq!(result.history_problems, &[]);
+    assert!(output.is_empty());
 
     Ok(())
 }
@@ -42,9 +42,9 @@ async fn diagnose_migrations_history_after_two_migrations_happy_path(api: &TestA
         .await?
         .assert_applied_migrations(&["initial", "second-migration"])?;
 
-    let result = api.diagnose_migration_history(&directory).send().await?.into_output();
+    let output = api.diagnose_migration_history(&directory).send().await?.into_output();
 
-    assert_eq!(result.history_problems, &[]);
+    assert!(output.is_empty());
 
     Ok(())
 }
@@ -77,8 +77,17 @@ async fn diagnose_migration_history_detects_drift(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2).send().await?;
 
-    let result = api.diagnose_migration_history(&directory).send().await?.into_output();
-    assert_eq!(result.history_problems, &[HistoryDiagnostic::DriftDetected]);
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        failed_migration_names,
+        edited_migration_names,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+
+    assert_eq!(drift, Some(DriftDiagnostic::DriftDetected));
+    assert!(history.is_none());
+    assert!(failed_migration_names.is_empty());
+    assert!(edited_migration_names.is_empty());
 
     Ok(())
 }
@@ -117,13 +126,21 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
         .generated_migration_name
         .unwrap();
 
-    let result = api.diagnose_migration_history(&directory).send().await?.into_output();
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        failed_migration_names,
+        edited_migration_names,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
+    assert!(drift.is_none());
+    assert!(failed_migration_names.is_empty());
+    assert!(edited_migration_names.is_empty());
     assert_eq!(
-        result.history_problems,
-        &[HistoryDiagnostic::DatabaseIsBehind {
+        history,
+        Some(HistoryDiagnostic::DatabaseIsBehind {
             unapplied_migration_names: vec![name],
-        }]
+        })
     );
 
     Ok(())
@@ -166,16 +183,21 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
     let second_migration_folder_path = directory.path().join(&name);
     std::fs::remove_dir_all(&second_migration_folder_path)?;
 
-    let result = api.diagnose_migration_history(&directory).send().await?.into_output();
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        failed_migration_names,
+        edited_migration_names,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
+    assert!(failed_migration_names.is_empty());
+    assert!(edited_migration_names.is_empty());
+    assert_eq!(drift, Some(DriftDiagnostic::DriftDetected));
     assert_eq!(
-        result.history_problems,
-        &[
-            HistoryDiagnostic::MigrationsDirectoryIsBehind {
-                unpersisted_migration_names: vec![name],
-            },
-            HistoryDiagnostic::DriftDetected
-        ]
+        history,
+        Some(HistoryDiagnostic::MigrationsDirectoryIsBehind {
+            unpersisted_migration_names: vec![name],
+        })
     );
 
     Ok(())
@@ -242,18 +264,23 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
         .generated_migration_name
         .unwrap();
 
-    let result = api.diagnose_migration_history(&directory).send().await?.into_output();
+    let DiagnoseMigrationHistoryOutput {
+        history,
+        drift,
+        failed_migration_names,
+        edited_migration_names,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
+    assert!(failed_migration_names.is_empty());
+    assert!(edited_migration_names.is_empty());
+    assert_eq!(drift, Some(DriftDiagnostic::DriftDetected));
     assert_eq!(
-        result.history_problems,
-        &[
-            HistoryDiagnostic::HistoriesDiverge {
-                unapplied_migration_names: vec![unapplied_migration_name],
-                unpersisted_migration_names: vec![deleted_migration_name],
-                last_common_migration_name: Some(first_migration_name),
-            },
-            HistoryDiagnostic::DriftDetected
-        ]
+        history,
+        Some(HistoryDiagnostic::HistoriesDiverge {
+            unapplied_migration_names: vec![unapplied_migration_name],
+            unpersisted_migration_names: vec![deleted_migration_name],
+            last_common_migration_name: Some(first_migration_name),
+        })
     );
 
     Ok(())
@@ -295,14 +322,17 @@ async fn diagnose_migrations_history_can_detect_edited_migrations(api: &TestApi)
         .generated_migration_name
         .unwrap();
 
-    let result = api.diagnose_migration_history(&directory).send().await?.into_output();
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        edited_migration_names,
+        failed_migration_names,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
-    assert_eq!(
-        result.history_problems,
-        &[HistoryDiagnostic::MigrationsEdited {
-            edited_migration_names: vec![initial_migration_name],
-        }]
-    );
+    assert!(drift.is_none());
+    assert!(history.is_none());
+    assert!(failed_migration_names.is_empty());
+    assert_eq!(edited_migration_names, &[initial_migration_name]);
 
     Ok(())
 }
@@ -344,24 +374,24 @@ async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly
         .generated_migration_name
         .unwrap();
 
-    let result = api.diagnose_migration_history(&directory).send().await?.into_output();
+    let DiagnoseMigrationHistoryOutput {
+        failed_migration_names,
+        edited_migration_names,
+        history,
+        drift,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
-    assert_eq!(result.history_problems.len(), 2);
+    assert_eq!(edited_migration_names, &[initial_migration_name.as_str()]);
+    assert!(failed_migration_names.is_empty());
+    assert_eq!(history, None);
 
-    assert!(result.history_problems.iter().any(|diagnostic| matches!(
-        diagnostic,
-        HistoryDiagnostic::MigrationsEdited {
-            edited_migration_names,
-        } if edited_migration_names == &[initial_migration_name.clone()]
-    )));
-
-    assert!(result.history_problems.iter().any(|diagnostic| matches!(
-        diagnostic,
-        HistoryDiagnostic::MigrationFailedToApply {
-            migration_name,
-            error
-        } if migration_name == &initial_migration_name && (error.contains("yolo") || error.contains("YOLO"))
-    )));
+    match &drift {
+        Some(DriftDiagnostic::MigrationFailedToApply { error, migration_name }) => {
+            assert_eq!(migration_name.as_str(), initial_migration_name.as_str());
+            assert!(error.contains("yolo") || error.contains("YOLO"))
+        }
+        _ => panic!("assertion failed"),
+    }
 
     Ok(())
 }
