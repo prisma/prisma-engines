@@ -1,5 +1,8 @@
 use super::*;
-use crate::{AggregateRecordsBuilder, Builder, Query, QueryGraph, ReadManyRecordsBuilder, ReadOneRecordBuilder};
+use crate::{
+    AggregateRecordsBuilder, Builder, Query, QueryGraph, ReadFirstRecordBuilder, ReadManyRecordsBuilder,
+    ReadOneRecordBuilder,
+};
 
 /// Builds the root `Query` type.
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
@@ -7,9 +10,13 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
     let fields = non_embedded_models
         .into_iter()
         .map(|model| {
-            let mut vec = vec![all_items_field(ctx, &model), aggregation_field(ctx, &model)];
+            let mut vec = vec![
+                find_first_field(ctx, &model),
+                all_items_field(ctx, &model),
+                aggregation_field(ctx, &model),
+            ];
 
-            append_opt(&mut vec, single_item_field(ctx, &model));
+            append_opt(&mut vec, find_one_field(ctx, &model));
             vec
         })
         .flatten()
@@ -21,7 +28,8 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 }
 
 /// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.
-fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
+/// Find one unique semantics.
+fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::where_unique_argument(ctx, model).map(|arg| {
         let field_name = ctx.pluralize_internal(camel_case(&model.name), format!("findOne{}", model.name));
 
@@ -36,8 +44,6 @@ fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
                     let mut graph = QueryGraph::new();
                     let query = ReadOneRecordBuilder::new(parsed_field, model).build()?;
 
-                    // Todo: This (and all following query graph validations) should be unified in the query graph builders mod.
-                    // callers should not have to care about calling validations explicitly.
                     graph.create_node(Query::Read(query));
                     Ok(graph)
                 }),
@@ -45,6 +51,30 @@ fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         )
         .optional()
     })
+}
+
+/// Builds a find first item field for given model.
+fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+    let args = arguments::many_records_arguments(ctx, &model);
+    let field_name = format!("findFirst{}", model.name);
+
+    field(
+        field_name,
+        args,
+        OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+        Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
+            model.clone(),
+            QueryTag::FindFirst,
+            Box::new(|model, parsed_field| {
+                let mut graph = QueryGraph::new();
+                let query = ReadFirstRecordBuilder(ReadManyRecordsBuilder::new(parsed_field, model)).build()?;
+
+                graph.create_node(Query::Read(query));
+                Ok(graph)
+            }),
+        ))),
+    )
+    .optional()
 }
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.

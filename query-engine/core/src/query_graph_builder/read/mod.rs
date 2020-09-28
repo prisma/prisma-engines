@@ -1,9 +1,11 @@
 mod aggregate;
+mod first;
 mod many;
 mod one;
 mod related;
 
 pub use aggregate::*;
+pub use first::*;
 pub use many::*;
 pub use one::*;
 pub use related::*;
@@ -15,6 +17,7 @@ use std::sync::Arc;
 
 pub enum ReadQueryBuilder {
     ReadOneRecordBuilder(ReadOneRecordBuilder),
+    ReadFirstRecordBuilder(ReadFirstRecordBuilder),
     ReadManyRecordsBuilder(ReadManyRecordsBuilder),
     ReadRelatedRecordsBuilder(ReadRelatedRecordsBuilder),
     AggregateRecordsBuilder(AggregateRecordsBuilder),
@@ -24,6 +27,7 @@ impl Builder<ReadQuery> for ReadQueryBuilder {
     fn build(self) -> QueryGraphBuilderResult<ReadQuery> {
         match self {
             ReadQueryBuilder::ReadOneRecordBuilder(b) => b.build(),
+            ReadQueryBuilder::ReadFirstRecordBuilder(b) => b.build(),
             ReadQueryBuilder::ReadManyRecordsBuilder(b) => b.build(),
             ReadQueryBuilder::ReadRelatedRecordsBuilder(b) => b.build(),
             ReadQueryBuilder::AggregateRecordsBuilder(b) => b.build(),

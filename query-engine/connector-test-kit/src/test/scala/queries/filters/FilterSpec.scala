@@ -146,7 +146,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "NOT filter" should "work" taggedAs (IgnoreMongo) in {
-    val filter = """(where: { NOT:{ name: { startsWith: "P" }}})"""
+    val filter = """(where: {NOT:{ name: { startsWith: "P" }}})"""
 
     userUniques(filter) should be(Vector(2, 3, 4))
   }
