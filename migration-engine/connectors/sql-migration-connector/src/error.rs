@@ -3,7 +3,7 @@ use quaint::{
     error::{Error as QuaintError, ErrorKind as QuaintKind},
     prelude::ConnectionInfo,
 };
-use thiserror::Error;
+use std::{error::Error, fmt::Display};
 use tracing_error::SpanTrace;
 use user_facing_errors::{migration_engine::MigrateSystemDatabase, quaint::render_quaint_error, KnownError};
 
@@ -45,9 +45,16 @@ pub(crate) fn quaint_error_to_connector_error(error: QuaintError, connection_inf
 
 pub(crate) type CheckDatabaseInfoResult = Result<(), SystemDatabase>;
 
-#[derive(Debug, Error)]
-#[error("The `{0}` database is a system database, it should not be altered with prisma migrate. Please connect to another database.")]
+#[derive(Debug)]
 pub(crate) struct SystemDatabase(pub(crate) String);
+
+impl Display for SystemDatabase {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "The `{}` database is a system database, it should not be altered with prisma migrate. Please connect to another database.", self.0)
+    }
+}
+
+impl Error for SystemDatabase {}
 
 impl From<SystemDatabase> for ConnectorError {
     fn from(err: SystemDatabase) -> ConnectorError {
@@ -56,7 +63,7 @@ impl From<SystemDatabase> for ConnectorError {
         };
 
         ConnectorError {
-            user_facing_error: Some(KnownError::new(user_facing).unwrap()),
+            user_facing_error: Some(KnownError::new(user_facing)),
             kind: ErrorKind::Generic(err.into()),
             context: SpanTrace::capture(),
         }
