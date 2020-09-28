@@ -10,7 +10,7 @@ pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavo
 use crate::{
     sql_migration::{AlterEnum, CreateIndex, DropTable, SqlMigrationStep, TableChange},
     sql_schema_differ::{ColumnDiffer, TableDiffer},
-    Component, SqlMigration, SqlResult,
+    Component, SqlMigration,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
@@ -208,23 +208,23 @@ impl SqlDestructiveChangeChecker<'_> {
         steps: &[SqlMigrationStep],
         before: &SqlSchema,
         after: &SqlSchema,
-    ) -> SqlResult<DestructiveChangeDiagnostics> {
+    ) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(steps, before, after);
 
-        plan.execute(self.schema_name(), self.conn()).await
+        plan.execute(self.conn()).await
     }
 }
 
 #[async_trait::async_trait]
 impl DestructiveChangeChecker<SqlMigration> for SqlDestructiveChangeChecker<'_> {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        self.check_impl(
+        let plan = self.plan(
             &database_migration.steps,
             &database_migration.before,
             &database_migration.after,
-        )
-        .await
-        .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
+        );
+
+        plan.execute(self.conn()).await
     }
 
     fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {

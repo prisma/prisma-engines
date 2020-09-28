@@ -1,14 +1,13 @@
 use super::SqlFlavour;
 use crate::{
-    catch, connect, database_info::DatabaseInfo, error::CheckDatabaseInfoResult, error::SystemDatabase, SqlError,
-    SqlResult,
+    connect, connection_wrapper::Connection, database_info::DatabaseInfo, error::CheckDatabaseInfoResult,
+    error::SystemDatabase,
 };
-use futures::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
-use quaint::{connector::MysqlUrl, prelude::ConnectionInfo, prelude::Queryable, prelude::SqlFamily, single::Quaint};
+use quaint::{connector::MysqlUrl, prelude::SqlFamily};
 use regex::RegexSet;
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use url::Url;
 
 #[derive(Debug)]
@@ -46,39 +45,37 @@ impl SqlFlavour for MysqlFlavour {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
 
-        let (conn, _) = connect(&url.to_string()).await?;
+        let conn = connect(&url.to_string()).await?;
         let db_name = self.0.dbname();
 
         let query = format!(
             "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
             db_name
         );
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+
+        conn.raw_cmd(&query).await?;
 
         Ok(db_name.to_owned())
     }
 
-    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> SqlResult<SqlSchema> {
-        Ok(sql_schema_describer::mysql::SqlSchemaDescriber::new(conn)
-            .describe(schema_name)
-            .await?)
+    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
+        sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
+            .describe(connection.connection_info().schema_name())
+            .await
+            .map_err(|err| match err {
+                SqlSchemaDescriberError::UnknownError => {
+                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occured in sql-schema-describer"))
+                }
+            })
     }
 
-    async fn ensure_connection_validity(&self, connection: &Quaint) -> ConnectorResult<()> {
-        catch(
-            connection.connection_info(),
-            connection.raw_cmd("SELECT 1").map_err(SqlError::from),
-        )
-        .await?;
+    async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("SELECT 1").await?;
 
         Ok(())
     }
 
-    async fn ensure_imperative_migrations_table(
-        &self,
-        connection: &dyn Queryable,
-        connection_info: &ConnectionInfo,
-    ) -> ConnectorResult<()> {
+    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = r#"
             CREATE TABLE IF NOT EXISTS _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -93,55 +90,34 @@ impl SqlFlavour for MysqlFlavour {
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         "#;
 
-        catch(connection_info, connection.raw_cmd(sql).map_err(SqlError::from)).await
+        connection.raw_cmd(sql).await
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
 
-        let (conn, _) = connect(&url.to_string()).await?;
-
+        let conn = connect(&url.to_string()).await?;
         let db_name = self.0.dbname();
 
         let query = format!("DROP DATABASE IF EXISTS `{}`", db_name);
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+        conn.raw_cmd(&query).await?;
 
         let query = format!(
             "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
             db_name
         );
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+        conn.raw_cmd(&query).await?;
 
         Ok(())
     }
 
-    async fn reset(&self, connection: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
-        let db_name = connection_info.dbname().unwrap();
+    async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
+        let db_name = connection.connection_info().dbname().unwrap();
 
-        catch(
-            connection_info,
-            connection
-                .raw_cmd(&format!("DROP DATABASE `{}`", db_name))
-                .map_err(SqlError::from),
-        )
-        .await?;
-
-        catch(
-            connection_info,
-            connection
-                .raw_cmd(&format!("CREATE DATABASE `{}`", db_name))
-                .map_err(SqlError::from),
-        )
-        .await?;
-
-        catch(
-            connection_info,
-            connection
-                .raw_cmd(&format!("USE `{}`", db_name))
-                .map_err(SqlError::from),
-        )
-        .await?;
+        connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
+        connection.raw_cmd(&format!("CREATE DATABASE `{}`", db_name)).await?;
+        connection.raw_cmd(&format!("USE `{}`", db_name)).await?;
 
         Ok(())
     }
@@ -150,27 +126,18 @@ impl SqlFlavour for MysqlFlavour {
         SqlFamily::Mysql
     }
 
-    #[tracing::instrument(skip(self, migrations, connection, connection_info))]
+    #[tracing::instrument(skip(self, migrations, connection))]
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        connection: &dyn Queryable,
-        connection_info: &ConnectionInfo,
+        connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
         let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
         let create_database = format!("CREATE DATABASE `{}`", database_name);
 
-        catch(
-            connection_info,
-            connection.raw_cmd(&drop_database).map_err(SqlError::from),
-        )
-        .await?;
-        catch(
-            connection_info,
-            connection.raw_cmd(&create_database).map_err(SqlError::from),
-        )
-        .await?;
+        connection.raw_cmd(&drop_database).await?;
+        connection.raw_cmd(&create_database).await?;
 
         let mut temporary_database_url = self.0.url().clone();
         temporary_database_url.set_path(&format!("/{}", database_name));
@@ -178,43 +145,24 @@ impl SqlFlavour for MysqlFlavour {
 
         tracing::debug!("Connecting to temporary database at {:?}", temporary_database_url);
 
-        let quaint = catch(
-            connection_info,
-            Quaint::new(&temporary_database_url).map_err(SqlError::from),
-        )
-        .await?;
+        let temp_database = crate::connect(&temporary_database_url).await?;
 
         for migration in migrations {
-            let script = migration
-                .read_migration_script()
-                .expect("failed to read migration script");
+            let script = migration.read_migration_script()?;
 
             tracing::debug!(
                 "Applying migration `{}` to temporary database.",
                 migration.migration_name()
             );
 
-            catch(
-                quaint.connection_info(),
-                quaint.raw_cmd(&script).map_err(SqlError::from),
-            )
-            .await
-            .map_err(|connector_error| connector_error.into_migration_failed(migration.migration_name().to_owned()))?;
+            temp_database.raw_cmd(&script).await.map_err(|connector_error| {
+                connector_error.into_migration_failed(migration.migration_name().to_owned())
+            })?;
         }
 
-        let connection_info = quaint.connection_info().clone();
+        let sql_schema = self.describe_schema(&temp_database).await?;
 
-        let sql_schema = catch(
-            &connection_info,
-            self.describe_schema(connection_info.schema_name(), quaint),
-        )
-        .await?;
-
-        catch(
-            &connection_info,
-            connection.raw_cmd(&drop_database).map_err(SqlError::from),
-        )
-        .await?;
+        connection.raw_cmd(&drop_database).await?;
 
         Ok(sql_schema)
     }

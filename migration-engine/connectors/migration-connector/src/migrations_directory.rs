@@ -16,6 +16,7 @@ use std::{
     path::{Path, PathBuf},
 };
 use thiserror::Error;
+use tracing_error::SpanTrace;
 
 use crate::FormatChecksum;
 
@@ -85,11 +86,13 @@ pub struct MigrationDirectory {
 
 #[derive(Debug, Error)]
 #[error("Failed to read migration script")]
-pub struct ReadMigrationScriptError(
-    #[source]
-    #[from]
-    io::Error,
-);
+pub struct ReadMigrationScriptError(#[source] pub(crate) io::Error, pub(crate) SpanTrace);
+
+impl From<io::Error> for ReadMigrationScriptError {
+    fn from(err: io::Error) -> Self {
+        ReadMigrationScriptError(err, SpanTrace::capture())
+    }
+}
 
 impl MigrationDirectory {
     /// The `{timestamp}_{name}` formatted migration name.

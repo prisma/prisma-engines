@@ -1,14 +1,9 @@
-use crate::{Component, SqlError};
+use crate::{connection_wrapper::Connection, Component};
 use barrel::types;
 use chrono::*;
-use futures::TryFutureExt;
 use migration_connector::*;
 use quaint::ast::*;
-use quaint::{
-    connector::ResultSet,
-    error::Error as QuaintError,
-    prelude::{Queryable, SqlFamily},
-};
+use quaint::{connector::ResultSet, prelude::SqlFamily};
 use std::convert::TryFrom;
 
 pub struct SqlMigrationPersistence<'a> {
@@ -24,81 +19,64 @@ impl Component for SqlMigrationPersistence<'_> {
 #[async_trait::async_trait]
 impl MigrationPersistence for SqlMigrationPersistence<'_> {
     async fn init(&self) -> Result<(), ConnectorError> {
-        let fut = async {
-            let sql_str = match self.sql_family() {
-                SqlFamily::Sqlite => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_sqlite);
-                    m.make_from(barrel::SqlVariant::Sqlite)
-                }
-                SqlFamily::Postgres => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_postgres);
-                    m.schema(self.schema_name()).make_from(barrel::SqlVariant::Pg)
-                }
-                SqlFamily::Mysql => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_mysql);
-                    m.make_from(barrel::SqlVariant::Mysql)
-                }
-                SqlFamily::Mssql => {
-                    let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_mssql);
-                    m.make_from(barrel::SqlVariant::Mssql)
-                }
-            };
-
-            self.conn().raw_cmd(&sql_str).await.ok();
-
-            Ok(())
+        let sql_str = match self.sql_family() {
+            SqlFamily::Sqlite => {
+                let mut m = barrel::Migration::new().schema(self.schema_name());
+                m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_sqlite);
+                m.make_from(barrel::SqlVariant::Sqlite)
+            }
+            SqlFamily::Postgres => {
+                let mut m = barrel::Migration::new().schema(self.schema_name());
+                m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_postgres);
+                m.schema(self.schema_name()).make_from(barrel::SqlVariant::Pg)
+            }
+            SqlFamily::Mysql => {
+                let mut m = barrel::Migration::new().schema(self.schema_name());
+                m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_mysql);
+                m.make_from(barrel::SqlVariant::Mysql)
+            }
+            SqlFamily::Mssql => {
+                let mut m = barrel::Migration::new().schema(self.schema_name());
+                m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_mssql);
+                m.make_from(barrel::SqlVariant::Mssql)
+            }
         };
 
-        crate::catch(self.connection_info(), fut).await
+        self.conn().raw_cmd(&sql_str).await.ok();
+
+        Ok(())
     }
 
-    async fn reset(&self) -> Result<(), ConnectorError> {
+    async fn reset(&self) -> ConnectorResult<()> {
         use quaint::ast::Delete;
 
-        crate::catch(self.connection_info(), async {
-            self.conn()
-                .query(Delete::from_table((self.schema_name(), MIGRATION_TABLE_NAME)).into())
-                .await
-                .ok();
+        self.conn()
+            .query(Delete::from_table((self.schema_name(), MIGRATION_TABLE_NAME)))
+            .await
+            .ok();
 
-            Ok(())
-        })
-        .await
+        Ok(())
     }
 
     async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
-        crate::catch(
-            self.connection_info(),
-            last_applied_migrations(self.conn(), self.table()).map_err(SqlError::from),
-        )
-        .await
+        last_applied_migrations(self.conn(), self.table()).await
     }
 
-    async fn load_all(&self) -> Result<Vec<Migration>, ConnectorError> {
-        crate::catch(self.connection_info(), async {
-            let query = Select::from_table(self.table()).order_by(REVISION_COLUMN.ascend());
+    async fn load_all(&self) -> ConnectorResult<Vec<Migration>> {
+        let query = Select::from_table(self.table()).order_by(REVISION_COLUMN.ascend());
+        let result_set = self.conn().query(query).await?;
 
-            let result_set = self.conn().query(query.into()).await?;
-            Ok(parse_rows_new(result_set))
-        })
-        .await
+        Ok(parse_rows_new(result_set))
     }
 
-    async fn by_name(&self, name: &str) -> Result<Option<Migration>, ConnectorError> {
-        crate::catch(self.connection_info(), async {
-            let conditions = NAME_COLUMN.equals(name);
-            let query = Select::from_table(self.table())
-                .so_that(conditions)
-                .order_by(REVISION_COLUMN.descend());
+    async fn by_name(&self, name: &str) -> ConnectorResult<Option<Migration>> {
+        let conditions = NAME_COLUMN.equals(name);
+        let query = Select::from_table(self.table())
+            .so_that(conditions)
+            .order_by(REVISION_COLUMN.descend());
+        let result_set = self.conn().query(query).await?;
 
-            let result_set = self.conn().query(query.into()).await?;
-            Ok(parse_rows_new(result_set).into_iter().next())
-        })
-        .await
+        Ok(parse_rows_new(result_set).into_iter().next())
     }
 
     async fn create(&self, migration: Migration) -> Result<Migration, ConnectorError> {
@@ -121,14 +99,14 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
 
         match self.sql_family() {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
-                let result_set = self.conn().insert(insert.into()).await.unwrap();
+                let result_set = self.conn().query(insert).await.unwrap();
                 let id = result_set.last_insert_id().unwrap();
 
                 cloned.revision = usize::try_from(id).unwrap();
             }
             SqlFamily::Postgres | SqlFamily::Mssql => {
                 let returning_insert = Insert::from(insert).returning(&["revision"]);
-                let result_set = self.conn().query(returning_insert.into()).await.unwrap();
+                let result_set = self.conn().query(returning_insert).await.unwrap();
 
                 if let Some(row) = result_set.into_iter().next() {
                     cloned.revision = row["revision"].as_i64().unwrap() as usize;
@@ -140,45 +118,42 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
     }
 
     async fn update(&self, params: &MigrationUpdateParams) -> Result<(), ConnectorError> {
-        crate::catch(self.connection_info(), async {
-            let finished_at_value = match params.finished_at {
-                Some(x) => self.convert_datetime(x),
-                None => Value::from(Option::<DateTime<Utc>>::None),
-            };
-            let errors_json = serde_json::to_string(&params.errors).unwrap();
-            let query = Update::table(self.table())
-                .set(NAME_COLUMN, params.new_name.clone())
-                .set(STATUS_COLUMN, params.status.code())
-                .set(APPLIED_COLUMN, params.applied)
-                .set(ROLLED_BACK_COLUMN, params.rolled_back)
-                .set(ERRORS_COLUMN, errors_json)
-                .set(FINISHED_AT_COLUMN, finished_at_value)
-                .so_that(
-                    NAME_COLUMN
-                        .equals(params.name.clone())
-                        .and(REVISION_COLUMN.equals(params.revision)),
-                );
+        let finished_at_value = match params.finished_at {
+            Some(x) => self.convert_datetime(x),
+            None => Value::from(Option::<DateTime<Utc>>::None),
+        };
+        let errors_json = serde_json::to_string(&params.errors).unwrap();
+        let query = Update::table(self.table())
+            .set(NAME_COLUMN, params.new_name.clone())
+            .set(STATUS_COLUMN, params.status.code())
+            .set(APPLIED_COLUMN, params.applied)
+            .set(ROLLED_BACK_COLUMN, params.rolled_back)
+            .set(ERRORS_COLUMN, errors_json)
+            .set(FINISHED_AT_COLUMN, finished_at_value)
+            .so_that(
+                NAME_COLUMN
+                    .equals(params.name.clone())
+                    .and(REVISION_COLUMN.equals(params.revision)),
+            );
 
-            self.conn().query(query.into()).await?;
+        self.conn().query(query).await?;
 
-            Ok(())
-        })
-        .await
+        Ok(())
     }
 }
 
 /// Returns the last 2 applied migrations, or a shorter vec in absence of applied migrations.
 async fn last_applied_migrations(
-    conn: &dyn Queryable,
+    conn: &Connection,
     table: Table<'_>,
-) -> Result<(Option<Migration>, Option<Migration>), QuaintError> {
+) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
     let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());
     let query = Select::from_table(table)
         .so_that(conditions)
         .order_by(REVISION_COLUMN.descend())
         .limit(2);
 
-    let result_set = conn.query(query.into()).await?;
+    let result_set = conn.query(query).await?;
     let mut rows = parse_rows_new(result_set).into_iter();
     let last = rows.next();
     let second_to_last = rows.next();

@@ -1,3 +1,4 @@
+use crate::migrations_directory::ReadMigrationScriptError;
 use std::fmt::Display;
 use thiserror::Error;
 use tracing_error::SpanTrace;
@@ -23,6 +24,14 @@ impl ConnectorError {
         }
     }
 
+    pub fn generic(error: anyhow::Error) -> Self {
+        ConnectorError {
+            user_facing_error: None,
+            kind: ErrorKind::Generic(error),
+            context: SpanTrace::capture(),
+        }
+    }
+
     pub fn into_migration_failed(self, migration_name: String) -> Self {
         let context = self.context.clone();
         let user_facing_error = self.user_facing_error.clone();
@@ -34,6 +43,16 @@ impl ConnectorError {
                 error: self.into(),
             },
             context,
+        }
+    }
+
+    pub fn query_error(error: anyhow::Error) -> Self {
+        let kind = ErrorKind::QueryError(error);
+
+        ConnectorError {
+            user_facing_error: None,
+            kind,
+            context: SpanTrace::capture(),
         }
     }
 
@@ -100,4 +119,15 @@ pub enum ErrorKind {
 
     #[error("Unique constraint violation.")]
     UniqueConstraintViolation { field_name: String },
+}
+
+impl From<ReadMigrationScriptError> for ConnectorError {
+    fn from(err: ReadMigrationScriptError) -> Self {
+        let context = err.1.clone();
+        ConnectorError {
+            user_facing_error: None,
+            kind: ErrorKind::Generic(err.into()),
+            context,
+        }
+    }
 }

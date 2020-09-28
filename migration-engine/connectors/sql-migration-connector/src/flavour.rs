@@ -15,16 +15,12 @@ pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
 
 use crate::{
-    database_info::DatabaseInfo, error::CheckDatabaseInfoResult,
+    connection_wrapper::Connection, database_info::DatabaseInfo, error::CheckDatabaseInfoResult,
     sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
-    sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour, SqlResult,
+    sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
 use migration_connector::{ConnectorResult, MigrationDirectory};
-use quaint::{
-    connector::{ConnectionInfo, Queryable},
-    prelude::SqlFamily,
-    single::Quaint,
-};
+use quaint::{connector::ConnectionInfo, prelude::SqlFamily};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
 
@@ -62,14 +58,10 @@ pub(crate) trait SqlFlavour:
     /// Check a connection to make sure it is usable by the migration engine.
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
-    async fn ensure_connection_validity(&self, connection: &Quaint) -> ConnectorResult<()>;
+    async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Make sure that the `_prisma_migrations` table exists.
-    async fn ensure_imperative_migrations_table(
-        &self,
-        connection: &dyn Queryable,
-        connection_info: &ConnectionInfo,
-    ) -> ConnectorResult<()>;
+    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Create a database for the given URL on the server, if applicable.
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
@@ -78,19 +70,16 @@ pub(crate) trait SqlFlavour:
     async fn qe_setup(&self, database_url: &str) -> ConnectorResult<()>;
 
     /// Introspect the SQL schema.
-    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> SqlResult<SqlSchema>;
+    async fn describe_schema<'a>(&'a self, conn: &Connection) -> ConnectorResult<SqlSchema>;
 
-    /// Drop the database the connector is connected to and recreate it empty.
-    /// This should not be used for other databases, temporary databases for
-    /// example.
-    async fn reset(&self, conn: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()>;
+    /// Drop the database and recreate it empty.
+    async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Apply the given migration history to a temporary database, and return
     /// the final introspected SQL schema.
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        connection: &dyn Queryable,
-        connection_info: &ConnectionInfo,
+        connection: &Connection,
     ) -> ConnectorResult<SqlSchema>;
 }

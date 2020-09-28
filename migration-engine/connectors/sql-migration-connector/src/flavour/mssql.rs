@@ -1,9 +1,8 @@
 use super::SqlFlavour;
-use crate::{catch, connect, SqlError, SqlResult};
-use futures::TryFutureExt;
-use migration_connector::{ConnectorResult, MigrationDirectory};
-use quaint::{connector::MssqlUrl, prelude::ConnectionInfo, prelude::Queryable, prelude::SqlFamily, single::Quaint};
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+use crate::{connect, connection_wrapper::Connection};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use quaint::{connector::MssqlUrl, prelude::SqlFamily};
+use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -41,26 +40,32 @@ impl MssqlFlavour {
 impl SqlFlavour for MssqlFlavour {
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
         let (db_name, master_uri) = Self::master_url(jdbc_string);
-        let (conn, _) = connect(&master_uri.to_string()).await?;
+        let conn = connect(&master_uri.to_string()).await?;
 
         let query = format!("CREATE DATABASE [{}]", db_name);
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+        conn.raw_cmd(&query).await?;
 
-        let (conn, _) = connect(jdbc_string).await?;
+        let conn = connect(jdbc_string).await?;
 
         let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name());
-        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
+        conn.raw_cmd(&query).await?;
 
         Ok(db_name)
     }
 
-    async fn describe_schema<'a>(&'a self, schema_name: &'a str, conn: Quaint) -> SqlResult<SqlSchema> {
-        Ok(sql_schema_describer::mssql::SqlSchemaDescriber::new(conn)
-            .describe(schema_name)
-            .await?)
+    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
+        sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.quaint().clone())
+            .describe(connection.connection_info().schema_name())
+            .await
+            .map_err(|err| match err {
+                SqlSchemaDescriberError::UnknownError => {
+                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occured in sql-schema-describer"))
+                }
+            })
     }
 
-    async fn reset(&self, connection: &dyn Queryable, connection_info: &ConnectionInfo) -> ConnectorResult<()> {
+    async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
+        let schema_name = connection.connection_info().schema_name();
         let drop_fks = format!(
             r#"
             DECLARE @stmt NVARCHAR(max)
@@ -75,7 +80,7 @@ impl SqlFlavour for MssqlFlavour {
 
             EXEC SP_EXECUTESQL @stmt
             "#,
-            connection_info.schema_name()
+            schema_name
         );
 
         let drop_tables = format!(
@@ -92,23 +97,18 @@ impl SqlFlavour for MssqlFlavour {
 
             EXEC SP_EXECUTESQL @stmt
             "#,
-            connection_info.schema_name()
+            schema_name
         );
 
-        catch(connection_info, connection.raw_cmd(&drop_fks).map_err(SqlError::from)).await?;
-
-        catch(
-            connection_info,
-            connection.raw_cmd(&drop_tables).map_err(SqlError::from),
-        )
-        .await?;
+        connection.raw_cmd(&drop_fks).await?;
+        connection.raw_cmd(&drop_tables).await?;
 
         Ok(())
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
         let (db_name, master_uri) = Self::master_url(database_str);
-        let (conn, info) = connect(&master_uri).await?;
+        let conn = connect(&master_uri).await?;
 
         // Without these, our poor connection gets deadlocks if other schemas
         // are modified while we introspect.
@@ -119,16 +119,15 @@ impl SqlFlavour for MssqlFlavour {
 
         conn.raw_cmd(&allow_snapshot_isolation).await.unwrap();
 
-        self.reset(&conn, info.connection_info()).await?;
+        self.reset(&conn).await?;
 
         conn.raw_cmd(&format!(
             "DROP SCHEMA IF EXISTS {}",
-            info.connection_info().schema_name()
+            conn.connection_info().schema_name()
         ))
-        .await
-        .unwrap();
+        .await?;
 
-        conn.raw_cmd(&format!("CREATE SCHEMA {}", info.connection_info().schema_name()))
+        conn.raw_cmd(&format!("CREATE SCHEMA {}", conn.connection_info().schema_name()))
             .await
             .unwrap();
 
@@ -139,21 +138,13 @@ impl SqlFlavour for MssqlFlavour {
         SqlFamily::Mssql
     }
 
-    async fn ensure_connection_validity(&self, connection: &Quaint) -> ConnectorResult<()> {
-        catch(
-            connection.connection_info(),
-            connection.raw_cmd("SELECT 1").map_err(SqlError::from),
-        )
-        .await?;
+    async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("SELECT 1").await?;
 
         Ok(())
     }
 
-    async fn ensure_imperative_migrations_table(
-        &self,
-        connection: &dyn Queryable,
-        connection_info: &ConnectionInfo,
-    ) -> ConnectorResult<()> {
+    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = r#"
             CREATE TABLE IF NOT EXISTS [_prisma_migrations] (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -168,14 +159,13 @@ impl SqlFlavour for MssqlFlavour {
             );
         "#;
 
-        catch(connection_info, connection.raw_cmd(sql).map_err(SqlError::from)).await
+        connection.raw_cmd(sql).await
     }
 
     async fn sql_schema_from_migration_history(
         &self,
         _: &[MigrationDirectory],
-        _: &dyn Queryable,
-        _: &ConnectionInfo,
+        _: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         todo!("Needs the connection string crate, so leaving it unimplemented for now")
     }
