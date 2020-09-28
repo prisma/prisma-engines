@@ -143,7 +143,7 @@ fn internal_escaped_values_are_rendered_correctly() {
     let expected_dm = indoc!(
         r#"
         model FilmQuote {
-          id Int @default("xyz\\Datasource\\Model") @id
+          id Int @id @default("xyz\\Datasource\\Model")
         }
         "#
     );

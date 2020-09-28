@@ -14,9 +14,9 @@ fn test_parser_renderer_via_dml() {
   posts     Post[]   @relation("author")
   profile   Profile?
 
-  @@map("user")
   @@unique([email, name])
   @@unique([name, email])
+  @@map("user")
 }
 
 model Profile {
@@ -87,6 +87,106 @@ enum CategoryEnum {
     print!("{}", rendered);
 
     assert_eq!(input, rendered);
+}
+
+#[test]
+fn test_parser_renderer_order_of_field_directives_via_dml() {
+    let input = r#"model Post {
+  id        Int      @default(autoincrement()) @id
+  published Boolean  @map("_published") @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  id Int @id
+  megaField DateTime @map("mega_field") @default(now()) @unique @updatedAt
+  Post Post[]
+}
+
+model Test {
+  id     Int   @id @map("_id") @default(1)
+  blogId Int?  @unique @default(1)
+}
+"#;
+    let expected = r#"model Post {
+  id        Int     @id @default(autoincrement())
+  published Boolean @default(false) @map("_published")
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  id        Int      @id
+  megaField DateTime @unique @default(now()) @updatedAt @map("mega_field")
+  Post      Post[]
+}
+
+model Test {
+  id     Int  @id @default(1) @map("_id")
+  blogId Int? @unique @default(1)
+}
+"#;
+
+    let dml = parse(input);
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+
+    print!("{}", rendered);
+
+    assert_eq!(expected, rendered);
+}
+
+#[test]
+fn test_parser_renderer_order_of_block_directives_via_dml() {
+    let input = r#"model Person {
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+  @@map("blog")
+  @@index([yearOfBirth])
+  @@unique([codeName, yearOfBirth])
+  @@id([firstName, lastName])
+}
+
+model Blog {
+  id   Int    @default(1)
+  name String
+  @@id([id])
+  @@index([id, name])
+  @@unique([name])
+  @@map("blog")
+}
+"#;
+    let expected = r#"model Person {
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+
+  @@id([firstName, lastName])
+  @@unique([codeName, yearOfBirth])
+  @@index([yearOfBirth])
+  @@map("blog")
+}
+
+model Blog {
+  id   Int    @default(1)
+  name String
+
+  @@id([id])
+  @@unique([name])
+  @@index([id, name])
+  @@map("blog")
+}
+"#;
+
+    let dml = parse(input);
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+
+    print!("{}", rendered);
+
+    assert_eq!(expected, rendered);
 }
 
 #[test]

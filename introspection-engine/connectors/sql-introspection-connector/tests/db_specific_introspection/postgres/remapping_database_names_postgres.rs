@@ -90,12 +90,12 @@ async fn remapping_fk_columns_with_invalid_characters_should_work(api: &TestApi)
         .await;
     let dm = r#"
             model Post {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 User User[]
             }
 
             model User {
-                id      Int  @default(autoincrement()) @id
+                id      Int  @id @default(autoincrement())
                 post_id Int  @map("post id")
                 Post    Post @relation(fields: [post_id], references: [id])
             }
@@ -124,13 +124,13 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id              Int             @default(autoincrement()) @id
+                id              Int             @id @default(autoincrement())
                 user_id         Int             @unique
                 User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
 
             model User_with_Space {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 name String
                 Post Post?
 
@@ -167,7 +167,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id              Int             @default(autoincrement()) @id
+                id              Int             @id @default(autoincrement())
                 user_id         Int
                 user_name       String
                 User_with_Space User_with_Space @relation(fields: [user_id, user_name], references: [id, name])
@@ -176,7 +176,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
             }
 
             model User_with_Space {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 name String
                 Post Post?
 
@@ -214,7 +214,7 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id        Int    @default(autoincrement()) @id
+                id        Int    @id @default(autoincrement())
                 user_id   Int
                 user_name String
                 User      User   @relation(fields: [user_id, user_name], references: [id, name_that_is_invalid])
@@ -223,7 +223,7 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
             }
 
             model User {
-                id                   Int    @default(autoincrement()) @id
+                id                   Int    @id @default(autoincrement())
                 name_that_is_invalid String @map("name-that-is-invalid")
                 Post                 Post?
 
@@ -251,7 +251,7 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   color
         }
 
@@ -281,7 +281,7 @@ async fn remapping_enum_values_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   color
         }
 
@@ -337,7 +337,7 @@ async fn remapping_enum_default_values_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   color   @default(b_lack)
         }
 

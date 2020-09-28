@@ -323,6 +323,7 @@ pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
                 err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
                     .unwrap();
             }
+
             panic!("Datamodel parsing failed. Please see error above.")
         }
     }
