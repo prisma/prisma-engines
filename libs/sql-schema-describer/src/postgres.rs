@@ -665,9 +665,6 @@ fn get_column_type<'a>(
     let trim = |name: &'a str| name.trim_start_matches('_');
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
 
-    println!("DT {}", data_type);
-    println!("FDT {}", full_data_type);
-
     let (family, native_type) = match full_data_type {
         x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), None),
         x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => (Enum(trim(x).to_owned()), None),
@@ -727,7 +724,7 @@ fn get_column_type<'a>(
     ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
-        character_maximum_length: precision.character_maximum_length, //Fixme can this always return precision?
+        character_maximum_length: precision.character_maximum_length,
         family,
         arity,
         native_type: native_type.map(|x| x.to_json()),

@@ -13,7 +13,7 @@ mod test_api;
 
 use crate::common::*;
 use crate::test_api::*;
-use native_types::{DataLength, MssqlType, MySqlType, NativeType, PostgresType};
+use native_types::{MySqlType, NativeType, PostgresType};
 use prisma_value::PrismaValue;
 use serde_json::Value;
 

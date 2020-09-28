@@ -1,6 +1,7 @@
 use super::*;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint};
+use serde_json::from_str;
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use tracing::debug;
@@ -240,8 +241,6 @@ async fn get_all_columns(
         } else {
             ColumnArity::Nullable
         };
-
-        println!("{:?}", col);
 
         let character_maximum_length = col
             .get("character_maximum_length")
@@ -571,7 +570,6 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
         .collect()
 }
 
-//Fixme use precision from information schema instead of parsing
 fn get_column_type_and_enum(
     table: &str,
     column_name: &str,
@@ -580,8 +578,6 @@ fn get_column_type_and_enum(
     precision: Precision,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
-    //Fixme family mappings
-    // Decimal, Duration and XML are missing from ColumnTypefamily
     println!("{}", data_type);
     println!("{}", full_data_type);
     println!("{:?}", precision);
@@ -589,7 +585,7 @@ fn get_column_type_and_enum(
     let (family, native_type) = match data_type {
         "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
         "smallint" => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
-        "tinyint" if precision.numeric_precision == Some(1) => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
+        "tinyint" if extract_single_arg(full_data_type) == 1 => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
         "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
         "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
         "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
@@ -689,6 +685,13 @@ fn get_column_type_and_enum(
         ),
         _ => (tpe, None),
     }
+}
+
+fn extract_single_arg(full_data_type: &str) -> u32 {
+    let len = &full_data_type.len() - 1;
+
+    let a = full_data_type[..len].split('(').last().unwrap();
+    from_str::<u32>(a).unwrap()
 }
 
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
