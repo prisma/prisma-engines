@@ -322,7 +322,6 @@ pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
             for err in errs.to_iter() {
                 err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
                     .unwrap();
-                println!("error: {:?}", err);
             }
 
             panic!("Datamodel parsing failed. Please see error above.")
