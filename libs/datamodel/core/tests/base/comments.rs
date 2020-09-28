@@ -59,11 +59,7 @@ fn doc_comments_must_work_on_block_attributes() {
     }"#;
 
     // must not crash
-    let schema = parse(dml);
-    schema
-        .assert_has_model("Blog")
-        .assert_has_id_fields(&["id1", "id2"])
-        .assert_with_documentation("Documentation comment block attribute");
+    let _ = parse(dml);
 }
 
 #[test]

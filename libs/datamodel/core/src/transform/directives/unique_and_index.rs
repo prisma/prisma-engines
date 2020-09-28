@@ -57,7 +57,7 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let dml::Field::ScalarField(sf) = field {
             if sf.is_unique {
-                return Ok(vec![ast::Directive::new(self.directive_name(), None, vec![])]);
+                return Ok(vec![ast::Directive::new(self.directive_name(), vec![])]);
             }
         }
         Ok(vec![])
@@ -259,7 +259,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
                     args.push(ast::Argument::new_string("name", &name));
                 }
 
-                ast::Directive::new(self.directive_name(), None, args)
+                ast::Directive::new(self.directive_name(), args)
             })
             .collect();
 

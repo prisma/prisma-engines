@@ -54,7 +54,6 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
         if let Some(default_value) = field.default_value() {
             return Ok(vec![ast::Directive::new(
                 self.directive_name(),
-                None,
                 vec![ast::Argument::new("", lower_default_value(default_value.clone()))],
             )]);
         }

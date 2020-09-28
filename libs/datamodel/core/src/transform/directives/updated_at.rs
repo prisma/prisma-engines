@@ -37,7 +37,7 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if field.is_updated_at() {
-            Ok(vec![ast::Directive::new(self.directive_name(), None, Vec::new())])
+            Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())])
         } else {
             Ok(vec![])
         }

@@ -86,7 +86,6 @@ fn internal_serialize(obj: &dyn WithDatabaseName) -> Result<Vec<ast::Directive>,
     match obj.database_name() {
         Some(db_name) => Ok(vec![ast::Directive::new(
             DIRECTIVE_NAME,
-            None,
             vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
                 String::from(db_name),
                 Span::empty(),

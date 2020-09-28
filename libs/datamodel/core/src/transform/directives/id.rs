@@ -37,7 +37,7 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let dml::Field::ScalarField(sf) = field {
             if sf.is_id {
-                return Ok(vec![ast::Directive::new(self.directive_name(), None, Vec::new())]);
+                return Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())]);
             }
         }
         Ok(vec![])
@@ -143,7 +143,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
                     .collect(),
             ));
 
-            return Ok(vec![ast::Directive::new(self.directive_name(), None, args)]);
+            return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
         }
 
         Ok(vec![])
