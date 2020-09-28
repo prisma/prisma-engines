@@ -430,8 +430,8 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         // It's tolerant though, and you can assign any data type you like to columns
         "int" => ColumnTypeFamily::Int,
         "integer" => ColumnTypeFamily::Int,
-        "real" => ColumnTypeFamily::Float,
-        "float" => ColumnTypeFamily::Float,
+        "real" => ColumnTypeFamily::Decimal,
+        "float" => ColumnTypeFamily::Decimal,
         "serial" => ColumnTypeFamily::Int,
         "boolean" => ColumnTypeFamily::Boolean,
         "text" => ColumnTypeFamily::String,

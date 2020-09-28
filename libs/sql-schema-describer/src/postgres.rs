@@ -689,7 +689,7 @@ fn get_column_type<'a>(
         "bpchar" | "_bpchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
         "interval" | "_interval" => (String, Some(PostgresType::Interval(precision.time_precision()))),
         "numeric" | "_numeric" => (
-            Float,
+            Decimal,
             Some(PostgresType::Numeric(
                 precision.numeric_precision(),
                 precision.numeric_scale(),
