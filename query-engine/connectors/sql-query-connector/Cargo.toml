@@ -49,6 +49,3 @@ git = "https://github.com/prisma/cuid-rust"
 [dependencies.user-facing-errors]
 features = ["sql"]
 path = "../../../libs/user-facing-errors"
-
-[features]
-mssql = ["datamodel/mssql"]

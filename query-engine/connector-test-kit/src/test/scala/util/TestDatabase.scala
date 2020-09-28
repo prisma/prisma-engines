@@ -30,6 +30,7 @@ case class MigrationEngine(project: Project) {
     val input = SchemaPushInput(
       schema = project.dataModelWithDataSourceConfig,
       force = true,
+      assumeEmpty = true
     )
 
     val _: JsValue = sendRpcCall[SchemaPushInput, JsValue]("schemaPush", input)
@@ -90,6 +91,7 @@ case class MigrationEngine(project: Project) {
 case class SchemaPushInput(
   schema: String,
   force: Boolean,
+  assumeEmpty: Boolean,
 )
 
 case class SchemaPushOutput(

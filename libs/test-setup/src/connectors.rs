@@ -34,6 +34,10 @@ fn mysql_5_6_capabilities() -> BitFlags<Capabilities> {
     Capabilities::Enums.into()
 }
 
+fn mssql_2017_capabilities() -> BitFlags<Capabilities> {
+    BitFlags::empty()
+}
+
 fn mssql_2019_capabilities() -> BitFlags<Capabilities> {
     BitFlags::empty()
 }
@@ -51,7 +55,11 @@ fn infer_capabilities(tags: BitFlags<Tags>) -> BitFlags<Capabilities> {
         return mysql_capabilities();
     }
 
-    if tags.intersects(Tags::Mssql2009) {
+    if tags.intersects(Tags::Mssql2017) {
+        return mssql_2017_capabilities();
+    }
+
+    if tags.intersects(Tags::Mssql2019) {
         return mssql_2019_capabilities();
     }
 
@@ -77,7 +85,8 @@ pub static CONNECTORS_MSSQL: Lazy<Connectors> = Lazy::new(|| {
     // tests on Apple.
     let names = if cfg!(not(target_os = "macos")) {
         let mut names = connector_names();
-        names.push(("mssql_2019", Tags::Mssql2009.into()));
+        names.push(("mssql_2017", Tags::Mssql2017.into()));
+        names.push(("mssql_2019", Tags::Mssql2019.into()));
         names
     } else {
         connector_names()

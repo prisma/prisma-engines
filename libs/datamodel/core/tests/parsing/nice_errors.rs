@@ -174,6 +174,82 @@ fn nice_error_legacy_model_decl() {
 }
 
 #[test]
+fn nice_error_in_case_of_literal_type_in_env_var() {
+    let source = r#"
+    datasource ds {
+      provider = "postgresql"
+      url = env(DATABASE_URL)
+    }
+    "#;
+
+    let error = parse_error_and_ignore_datasource_urls(source);
+
+    error.assert_is(DatamodelError::new_type_mismatch_error(
+        "String",
+        "literal",
+        "DATABASE_URL",
+        Span::new(67, 79),
+    ));
+}
+
+#[test]
+fn nice_error_in_case_of_bool_type_in_env_var() {
+    let source = r#"
+    datasource ds {
+      provider = "postgresql"
+      url = env(true)
+    }
+    "#;
+
+    let error = parse_error_and_ignore_datasource_urls(source);
+
+    error.assert_is(DatamodelError::new_type_mismatch_error(
+        "String",
+        "boolean",
+        "true",
+        Span::new(67, 71),
+    ));
+}
+
+#[test]
+fn nice_error_in_case_of_numeric_type_in_env_var() {
+    let source = r#"
+    datasource ds {
+      provider = "postgresql"
+      url = env(4)
+    }
+    "#;
+
+    let error = parse_error_and_ignore_datasource_urls(source);
+
+    error.assert_is(DatamodelError::new_type_mismatch_error(
+        "String",
+        "numeric",
+        "4",
+        Span::new(67, 68),
+    ));
+}
+
+#[test]
+fn nice_error_in_case_of_array_type_in_env_var() {
+    let source = r#"
+    datasource ds {
+      provider = "postgresql"
+      url = env([DATABASE_URL])
+    }
+    "#;
+
+    let error = parse_error_and_ignore_datasource_urls(source);
+
+    error.assert_is(DatamodelError::new_type_mismatch_error(
+        "String",
+        "array",
+        "(array)",
+        Span::new(67, 81),
+    ));
+}
+
+#[test]
 fn optional_list_fields_must_error() {
     let dml = r#"
     model User {

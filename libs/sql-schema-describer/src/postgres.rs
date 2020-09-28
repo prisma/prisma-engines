@@ -309,6 +309,7 @@ impl SqlSchemaDescriber {
                 cl.relname as "parent_table",
                 att.attname as "parent_column",
                 con.confdeltype,
+                con.confupdtype,
                 conname as constraint_name,
                 child,
                 parent,
@@ -323,7 +324,8 @@ impl SqlSchemaDescriber {
                     con1.confrelid,
                     con1.conrelid,
                     con1.conname,
-                    con1.confdeltype
+                    con1.confdeltype,
+                    con1.confupdtype
                 FROM
                     pg_class cl
                     join pg_namespace ns on cl.relnamespace = ns.oid
@@ -373,11 +375,23 @@ impl SqlSchemaDescriber {
                 .get("confdeltype")
                 .and_then(|x| x.as_char())
                 .expect("get confdeltype");
+            let confupdtype = row
+                .get("confupdtype")
+                .and_then(|x| x.as_char())
+                .expect("get confupdtype");
             let constraint_name = row
                 .get("constraint_name")
                 .and_then(|x| x.to_string())
                 .expect("get constraint_name");
             let on_delete_action = match confdeltype {
+                'a' => ForeignKeyAction::NoAction,
+                'r' => ForeignKeyAction::Restrict,
+                'c' => ForeignKeyAction::Cascade,
+                'n' => ForeignKeyAction::SetNull,
+                'd' => ForeignKeyAction::SetDefault,
+                _ => panic!(format!("unrecognized foreign key action '{}'", confdeltype)),
+            };
+            let on_update_action = match confupdtype {
                 'a' => ForeignKeyAction::NoAction,
                 'r' => ForeignKeyAction::Restrict,
                 'c' => ForeignKeyAction::Cascade,
@@ -397,6 +411,7 @@ impl SqlSchemaDescriber {
                         referenced_table,
                         referenced_columns: vec![referenced_column],
                         on_delete_action,
+                        on_update_action,
                     };
                     intermediate_fks.insert(id, (table_name, fk));
                 }

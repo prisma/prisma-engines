@@ -5,6 +5,7 @@
 pub mod sql_migration;
 
 mod component;
+mod connection_wrapper;
 mod database_info;
 mod error;
 mod flavour;
@@ -17,7 +18,8 @@ mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
 
-pub use error::{SqlError, SqlResult};
+use connection_wrapper::Connection;
+use error::quaint_error_to_connector_error;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use component::Component;
@@ -33,14 +35,15 @@ use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 
 pub struct SqlMigrationConnector {
-    pub database: Quaint,
-    pub database_info: DatabaseInfo,
+    connection: Connection,
+    database_info: DatabaseInfo,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
 }
 
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
-        let (connection, database_info) = connect(database_str).await?;
+        let connection = connect(database_str).await?;
+        let database_info = DatabaseInfo::new(connection.quaint(), connection.connection_info().clone()).await?;
         let flavour = flavour::from_connection_info(database_info.connection_info());
 
         flavour.check_database_info(&database_info)?;
@@ -49,7 +52,7 @@ impl SqlMigrationConnector {
         Ok(Self {
             flavour,
             database_info,
-            database: connection,
+            connection,
         })
     }
 
@@ -69,11 +72,13 @@ impl SqlMigrationConnector {
         flavour.qe_setup(database_str).await
     }
 
-    async fn describe_schema(&self) -> SqlResult<SqlSchema> {
-        let conn = self.connector().database.clone();
-        let schema_name = self.schema_name();
+    /// For tests.
+    pub fn quaint(&self) -> &Quaint {
+        self.connection.quaint()
+    }
 
-        self.flavour.describe_schema(schema_name, conn).await
+    async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
+        self.flavour.describe_schema(&self.connection).await
     }
 }
 
@@ -103,9 +108,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        self.flavour
-            .reset(self.conn(), self.database_info.connection_info())
-            .await
+        self.flavour.reset(self.conn()).await
     }
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
@@ -139,28 +142,13 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 }
 
-pub(crate) async fn catch<O>(
-    connection_info: &ConnectionInfo,
-    fut: impl std::future::Future<Output = Result<O, SqlError>>,
-) -> Result<O, ConnectorError> {
-    match fut.await {
-        Ok(o) => Ok(o),
-        Err(sql_error) => Err(sql_error.into_connector_error(connection_info)),
-    }
-}
-
-async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> {
+async fn connect(database_str: &str) -> ConnectorResult<Connection> {
     let connection_info =
         ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
     let connection = Quaint::new(database_str)
         .await
-        .map_err(SqlError::from)
-        .map_err(|err: SqlError| err.into_connector_error(&connection_info))?;
+        .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
 
-    let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone())
-        .await
-        .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
-
-    Ok((connection, database_info))
+    Ok(Connection::new(connection))
 }

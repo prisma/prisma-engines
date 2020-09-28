@@ -813,6 +813,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
@@ -820,6 +821,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_cascade".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
@@ -827,6 +829,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_restrict".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::Restrict,
                 },
                 ForeignKey {
@@ -834,6 +837,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_set_default".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::SetDefault,
                 },
                 ForeignKey {
@@ -841,6 +845,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_set_null".into()],
                     referenced_columns: vec!["id".into()],
                     referenced_table: "City".into(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::SetNull,
                 },
             ],

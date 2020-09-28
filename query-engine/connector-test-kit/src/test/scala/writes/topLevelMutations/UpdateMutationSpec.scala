@@ -196,7 +196,7 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     updateResult.pathAsString("data.updateOneTestModel.strField") should equal("updated")
   }
 
-  "An updateOne mutation" should "update enums" taggedAs IgnoreSQLite in {
+  "An updateOne mutation" should "update enums" taggedAs (IgnoreMsSql, IgnoreSQLite) in {
     val project = ProjectDsl.fromString {
       """
         |model TestModel {

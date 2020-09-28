@@ -250,3 +250,27 @@ pub async fn postgres13_test_api(db_name: &str) -> TestApi {
         provider: "postgres",
     }
 }
+
+pub async fn _mssql_2017_test_api(db_name: &str) -> TestApi {
+    let url = test_setup::mssql_2019_url(db_name);
+    test_setup::create_mssql_database(&url).await.unwrap();
+
+    TestApi {
+        connector_name: "mssql2019",
+        connection: Quaint::new(&url).await.unwrap(),
+        database_string: url,
+        provider: "sqlserver",
+    }
+}
+
+pub async fn _mssql_2019_test_api(db_name: &str) -> TestApi {
+    let url = test_setup::mssql_2019_url(db_name);
+    test_setup::create_mssql_database(&url).await.unwrap();
+
+    TestApi {
+        connector_name: "mssql2019",
+        connection: Quaint::new(&url).await.unwrap(),
+        database_string: url,
+        provider: "sqlserver",
+    }
+}

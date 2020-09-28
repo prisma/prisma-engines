@@ -26,7 +26,11 @@ impl<'a> MigrationCommand for SchemaPushCommand {
         let applier = connector.database_migration_step_applier();
         let checker = connector.destructive_change_checker();
 
-        let database_migration = inferrer.infer(&schema, &schema, &[]).await?;
+        let database_migration = if input.assume_empty {
+            inferrer.infer_from_empty(&schema)?
+        } else {
+            inferrer.infer(&schema, &schema, &[]).await?
+        };
 
         let checks = checker.check(&database_migration).await?;
 
@@ -66,6 +70,9 @@ pub struct SchemaPushInput {
     pub schema: String,
     /// Push the schema ignoring destructive change warnings.
     pub force: bool,
+    /// Expect the schema to be empty, skipping describing the existing schema.
+    #[serde(default)]
+    pub assume_empty: bool,
 }
 
 /// Output of the `schemaPush` command.

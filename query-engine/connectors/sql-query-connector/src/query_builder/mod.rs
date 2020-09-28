@@ -7,7 +7,7 @@ pub use write::*;
 use prisma_models::{RecordProjection, RecordProjectionExt};
 use quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
 
-const PARAMETER_LIMIT: usize = 10000;
+const PARAMETER_LIMIT: usize = 2000;
 
 pub(super) fn chunked_conditions<F, Q>(
     columns: &[Column<'static>],

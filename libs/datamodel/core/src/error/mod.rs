@@ -117,7 +117,7 @@ pub enum DatamodelError {
     EnumValidationError { message: String, enum_name: String, span: Span },
 
     #[error("Error validating: {}", message)]
-    ValidationError { message: String, span: Span  },
+    ValidationError { message: String, span: Span },
 }
 
 #[rustfmt::skip]

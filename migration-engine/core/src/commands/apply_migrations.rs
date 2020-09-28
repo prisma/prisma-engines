@@ -2,7 +2,7 @@ use std::path::Path;
 
 use super::{CommandError, CommandResult, MigrationCommand};
 use crate::migration_engine::MigrationEngine;
-use migration_connector::{MigrationDirectory, MigrationRecord};
+use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord};
 use serde::{Deserialize, Serialize};
 
 /// The input to the `ApplyMigrations` command.
@@ -63,7 +63,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
         for unapplied_migration in unapplied_migrations {
             let script = unapplied_migration
                 .read_migration_script()
-                .expect("Failed to read the migration script.");
+                .map_err(ConnectorError::from)?;
 
             tracing::info!(
                 script = script.as_str(),

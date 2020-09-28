@@ -610,12 +610,13 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
-                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                    SqlFamily::Mssql => Some("A_b_fkey".to_owned()),
                 },
                 columns: vec!["b".to_owned()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade,
+                on_update_action: ForeignKeyAction::NoAction,
             })
     })?;
 
@@ -682,12 +683,13 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                SqlFamily::Mssql => Some("A_b_fkey".to_owned()),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::Cascade,
+            on_update_action: ForeignKeyAction::NoAction,
         }]
     );
 }
@@ -791,24 +793,26 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                     SqlFamily::Postgres => Some("A_bid_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
-                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                    SqlFamily::Mssql => Some("A_bid_fkey".to_owned()),
                 },
                 columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::Cascade, // required relations can't set ON DELETE SET NULL
+                on_update_action: ForeignKeyAction::NoAction,
             },
             ForeignKey {
                 constraint_name: match api.sql_family() {
                     SqlFamily::Postgres => Some("A_cid_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
-                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                    SqlFamily::Mssql => Some("A_cid_fkey".to_owned()),
                 },
                 columns: vec![c_column.name.clone()],
                 referenced_table: "C".to_string(),
                 referenced_columns: vec!["id".to_string()],
                 on_delete_action: ForeignKeyAction::SetNull,
+                on_update_action: ForeignKeyAction::NoAction,
             }
         ]
     );
@@ -841,12 +845,13 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("A_b_column_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                SqlFamily::Mssql => Some("A_b_column_fkey".to_owned()),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::Cascade,
+            on_update_action: ForeignKeyAction::NoAction,
         }]
     );
 }
@@ -875,12 +880,13 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
                 SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                SqlFamily::Mssql => Some("A_b_id_fkey".to_owned()),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::Cascade,
+            on_update_action: ForeignKeyAction::NoAction,
         }]
     );
 }
@@ -948,12 +954,13 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
                 SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                SqlFamily::Mssql => Some("A_b_id_fkey".to_owned()),
             },
             columns: vec!["b_id".to_string()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::Cascade,
+            on_update_action: ForeignKeyAction::NoAction,
         }]
     );
 
@@ -977,12 +984,13 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
                 SqlFamily::Postgres => Some("B_a_id_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
                 SqlFamily::Mysql => Some("B_ibfk_1".to_owned()),
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                SqlFamily::Mssql => Some("B_a_id_fkey".to_owned()),
             },
             columns: vec!["a_id".to_string()],
             referenced_table: "A".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::Cascade,
+            on_update_action: ForeignKeyAction::NoAction,
         }]
     );
 

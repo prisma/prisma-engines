@@ -1,4 +1,3 @@
-#[cfg(feature = "mssql")]
 use super::builtin_datasource_providers::MsSqlDatasourceProvider;
 use super::{
     super::helpers::*,
@@ -97,6 +96,11 @@ impl DatasourceLoader {
             .map(|x| &x.1);
 
         let (env_var_for_url, url) = match (url_args.as_str_from_env(), override_url) {
+            (Err(err), _)
+                if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
+            {
+                return Err(err)
+            }
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
                 (None, format!("{}://", providers.first().unwrap()))
@@ -197,7 +201,6 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(MySqlDatasourceProvider::new()),
         Box::new(PostgresDatasourceProvider::new()),
         Box::new(SqliteDatasourceProvider::new()),
-        #[cfg(feature = "mssql")]
         Box::new(MsSqlDatasourceProvider::new()),
     ]
 }
