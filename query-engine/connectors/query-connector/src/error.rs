@@ -15,19 +15,21 @@ pub struct ConnectorError {
 impl ConnectorError {
     pub fn from_kind(kind: ErrorKind) -> Self {
         let user_facing_error = match &kind {
-            ErrorKind::NullConstraintViolation { constraint } => Some(
-                KnownError::new(user_facing_errors::query_engine::NullConstraintViolation {
+            ErrorKind::NullConstraintViolation { constraint } => Some(KnownError::new(
+                user_facing_errors::query_engine::NullConstraintViolation {
                     constraint: constraint.to_owned(),
-                })
-                .unwrap(),
-            ),
-            ErrorKind::TableDoesNotExist { table } => Some(
-                KnownError::new(user_facing_errors::query_engine::TableDoesNotExist { table: table.clone() }).unwrap(),
-            ),
-            ErrorKind::ColumnDoesNotExist { column } => Some(
-                KnownError::new(user_facing_errors::query_engine::ColumnDoesNotExist { column: column.clone() })
-                    .unwrap(),
-            ),
+                },
+            )),
+            ErrorKind::TableDoesNotExist { table } => {
+                Some(KnownError::new(user_facing_errors::query_engine::TableDoesNotExist {
+                    table: table.clone(),
+                }))
+            }
+            ErrorKind::ColumnDoesNotExist { column } => {
+                Some(KnownError::new(user_facing_errors::query_engine::ColumnDoesNotExist {
+                    column: column.clone(),
+                }))
+            }
             _ => None,
         };
 

@@ -134,17 +134,15 @@ impl SqlError {
                 }
             }
             SqlError::SchemaInconsistent { explanation } => ConnectorError {
-                user_facing_error: KnownError::new(DatabaseSchemaInconsistent {
+                user_facing_error: Some(KnownError::new(DatabaseSchemaInconsistent {
                     explanation: explanation.to_owned(),
-                })
-                .ok(),
+                })),
                 kind: ErrorKind::DatabaseSchemaInconsistent { explanation },
             },
             SqlError::DatabaseUrlIsInvalid(reason) => {
-                let user_facing_error = KnownError::new(common::InvalidDatabaseString {
+                let user_facing_error = Some(KnownError::new(common::InvalidDatabaseString {
                     details: reason.clone(),
-                })
-                .ok();
+                }));
 
                 ConnectorError {
                     user_facing_error,

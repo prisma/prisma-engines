@@ -113,12 +113,11 @@ impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &quaint::prelude::ConnectionInfo) -> ConnectorError {
         match self {
             SqlError::UniqueConstraintViolation { constraint } => ConnectorError {
-                user_facing_error: user_facing_errors::KnownError::new(
+                user_facing_error: Some(user_facing_errors::KnownError::new(
                     user_facing_errors::query_engine::UniqueKeyViolation {
                         constraint: constraint.clone(),
                     },
-                )
-                .ok(),
+                )),
                 kind: ErrorKind::UniqueConstraintViolation { constraint },
             },
             SqlError::NullConstraintViolation { constraint } => {
@@ -173,13 +172,12 @@ impl SqlError {
                 }
             }
             SqlError::RawError { code, message } => ConnectorError {
-                user_facing_error: user_facing_errors::KnownError::new(
+                user_facing_error: Some(user_facing_errors::KnownError::new(
                     user_facing_errors::query_engine::RawQueryFailed {
                         code: code.clone(),
                         message: message.clone(),
                     },
-                )
-                .ok(),
+                )),
                 kind: ErrorKind::RawError { code, message },
             },
         }
