@@ -136,8 +136,10 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     val project = ProjectDsl.fromString {
       """
         |model Model {
-        |  id   String   @id @default(cuid())
-        |  bool Boolean @test.Boolean
+        |  id    String  @id @default(cuid())
+        |  bool  Boolean @test.Boolean
+        |  json  Json    @test.Json
+        |  jsonb Json    @test.JsonB
         |}"""
     }
 
@@ -149,16 +151,20 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |  createOneModel(
          |    data: {
          |      bool: true
+         |      json: "{}"
+         |      jsonb: "{\\"a\\": \\"b\\"}"
          |    }
          |  ) {
          |    bool
+         |    json
+         |    jsonb
          |  }
          |}""".stripMargin,
       project,
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"bool":true}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"bool":true,"json":"{}","jsonb":"{\"a\":\"b\"}"}}}""")
   }
 
   "Postgres native date types" should "work" ignore {
