@@ -33,7 +33,7 @@ fn int_native_type(api: &TestApi) -> Option<Value> {
         (SqlFamily::Sqlite, _) => None,
         (SqlFamily::Mysql, "mysql8") => Some(MySqlType::Int.to_json()),
         (SqlFamily::Mysql, _) => Some(MySqlType::Int.to_json()),
-        (SqlFamily::Mssql, _) => Some(MssqlType::Int.to_json()),
+        (SqlFamily::Mssql, _) => None,
     }
 }
 
@@ -73,7 +73,7 @@ fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
         (SqlFamily::Sqlite, _) => None,
         (SqlFamily::Mysql, "mysql8") => Some(MySqlType::VarChar(length).to_json()),
         (SqlFamily::Mysql, _) => Some(MySqlType::VarChar(length).to_json()),
-        (SqlFamily::Mssql, _) => Some(MssqlType::VarChar(DataLength::Limited(length as u16)).to_json()),
+        (SqlFamily::Mssql, _) => None,
     }
 }
 
