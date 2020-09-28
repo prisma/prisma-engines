@@ -1,3 +1,4 @@
+mod mssql;
 mod mysql;
 mod postgres;
 mod sqlite;
@@ -5,7 +6,7 @@ mod sqlite;
 use super::SqlSchemaCalculator;
 use datamodel::{walkers::ScalarFieldWalker, ScalarType};
 use datamodel_connector::NativeTypeInstance;
-use sql_schema_describer::{self as sql};
+use sql_schema_describer as sql;
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
     fn calculate_enums(&self, _calculator: &SqlSchemaCalculator<'_>) -> Vec<sql::Enum> {

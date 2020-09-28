@@ -5,6 +5,7 @@ use crate::mysql::*;
 use barrel::{types, Migration};
 use native_types::{MySqlType, NativeType};
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 use test_api::*;
 use test_macros::*;
@@ -727,22 +728,22 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                 Index {
                     name: "city".to_owned(),
                     columns: vec!["city".to_owned(),],
-                    tpe: IndexType::Normal
+                    tpe: IndexType::Normal,
                 },
                 Index {
                     name: "city_cascade".to_owned(),
                     columns: vec!["city_cascade".to_owned(),],
-                    tpe: IndexType::Normal
+                    tpe: IndexType::Normal,
                 },
                 Index {
                     name: "city_restrict".to_owned(),
                     columns: vec!["city_restrict".to_owned(),],
-                    tpe: IndexType::Normal
+                    tpe: IndexType::Normal,
                 },
                 Index {
                     name: "city_set_null".to_owned(),
                     columns: vec!["city_set_null".to_owned(),],
-                    tpe: IndexType::Normal
+                    tpe: IndexType::Normal,
                 }
             ],
             primary_key: Some(PrimaryKey {
@@ -757,6 +758,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::NoAction,
+                    on_update_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
                     constraint_name: Some("User_ibfk_2".to_owned()),
@@ -764,6 +766,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::Cascade,
+                    on_update_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
                     constraint_name: Some("User_ibfk_3".to_owned()),
@@ -771,6 +774,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::Restrict,
+                    on_update_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
                     constraint_name: Some("User_ibfk_4".to_owned()),
@@ -778,6 +782,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
                     on_delete_action: ForeignKeyAction::SetNull,
+                    on_update_action: ForeignKeyAction::NoAction,
                 },
             ],
         }
@@ -806,7 +811,7 @@ async fn mysql_multi_field_indexes_must_be_inferred() {
         &[Index {
             name: "age_and_name_index".into(),
             columns: vec!["name".to_owned(), "age".to_owned()],
-            tpe: IndexType::Unique
+            tpe: IndexType::Unique,
         }]
     );
 }
@@ -844,7 +849,7 @@ async fn mysql_join_table_unique_indexes_must_be_inferred() {
         &[Index {
             name: "cat_and_human_index".into(),
             columns: vec!["cat".to_owned(), "human".to_owned()],
-            tpe: IndexType::Unique
+            tpe: IndexType::Unique,
         }]
     );
 }
@@ -884,6 +889,7 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
             referenced_table: "User".into(),
             referenced_columns: vec!["id".into()],
             on_delete_action: ForeignKeyAction::Cascade,
+            on_update_action: ForeignKeyAction::NoAction,
         }]
     );
 
@@ -915,6 +921,7 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
             referenced_table: "User".into(),
             referenced_columns: vec!["id".into()],
             on_delete_action: ForeignKeyAction::Restrict,
+            on_update_action: ForeignKeyAction::NoAction,
         }]
     );
 }

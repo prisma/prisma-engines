@@ -1,6 +1,6 @@
 use barrel::types;
 use pretty_assertions::assert_eq;
-use quaint::prelude::SqlFamily;
+use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
 use test_macros::test_each_connector_mssql as test_each_connector;
 
@@ -194,6 +194,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
                 referenced_columns: vec!["id".to_string()],
                 referenced_table: "City".to_string(),
                 on_delete_action,
+                on_update_action: ForeignKeyAction::NoAction,
             }],
         }
     );
@@ -308,6 +309,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
                 referenced_columns: vec!["name".to_string(), "id".to_string(),],
                 referenced_table: "City".to_string(),
                 on_delete_action,
+                on_update_action: ForeignKeyAction::NoAction,
             },],
         }
     );

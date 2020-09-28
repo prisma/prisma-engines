@@ -196,7 +196,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Updating a non-unique field of type Int with autoincrement" should "work" taggedAs (IgnoreSQLite, IgnoreMySql) in {
+  "Updating a non-unique field of type Int with autoincrement" should "work" taggedAs (IgnoreSQLite, IgnoreMySql, IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       s"""
          |model Todo {

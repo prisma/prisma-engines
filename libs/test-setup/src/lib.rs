@@ -150,11 +150,22 @@ pub fn mariadb_url(db_name: &str) -> String {
     )
 }
 
+pub fn mssql_2017_url(db_name: &str) -> String {
+    let (host, port) = db_host_mssql_2017();
+
+    format!(
+        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;sockettimeout=15;isolationLevel=READ UNCOMMITTED",
+        db_name = db_name,
+        host = host,
+        port = port,
+    )
+}
+
 pub fn mssql_2019_url(db_name: &str) -> String {
     let (host, port) = db_host_mssql_2019();
 
     format!(
-        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;sockettimeout=15",
+        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;sockettimeout=15;isolationLevel=READ UNCOMMITTED",
         db_name = db_name,
         host = host,
         port = port,
@@ -228,6 +239,13 @@ fn db_host_and_port_mariadb() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-mariadb", 3306),
         Err(_) => ("127.0.0.1", 3308),
+    }
+}
+
+fn db_host_mssql_2017() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-mssql-2017", 1433),
+        Err(_) => ("127.0.0.1", 1434),
     }
 }
 
@@ -378,6 +396,32 @@ pub fn sqlite_test_config(db_name: &str) -> String {
         }}
     "#,
         sqlite_test_file(db_name)
+    )
+}
+
+pub fn mssql_2017_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "sqlserver"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        mssql_2017_url(db_name),
+    )
+}
+
+pub fn mssql_2019_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "sqlserver"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        mssql_2019_url(db_name),
     )
 }
 

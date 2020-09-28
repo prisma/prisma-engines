@@ -183,9 +183,9 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
 }
 
 pub struct IndexWalker<'a> {
-    schema: &'a SqlSchema,
-    table: &'a Table,
-    index: &'a Index,
+    pub schema: &'a SqlSchema,
+    pub table: &'a Table,
+    pub index: &'a Index,
 }
 
 impl<'a> IndexWalker<'a> {
@@ -205,6 +205,10 @@ impl<'a> IndexWalker<'a> {
                 column,
                 table: self.table,
             })
+    }
+
+    pub fn has_nullable_columns(&self) -> bool {
+        self.columns().any(|c| c.arity().is_nullable())
     }
 }
 

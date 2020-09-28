@@ -7,7 +7,6 @@ version = "0.1.0"
 [features]
 default = ["sql", "graphql"]
 graphql = ["graphql-parser"]
-mssql = ["datamodel/mssql", "sql-connector/mssql"]
 sql = ["sql-connector"]
 
 [dependencies]

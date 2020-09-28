@@ -1,8 +1,8 @@
 use super::*;
 use native_types::{MySqlType, NativeType};
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
+use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap, HashSet};
-use std::{borrow::Cow, sync::Arc};
 use tracing::debug;
 
 fn is_mariadb(version: &str) -> bool {
@@ -25,7 +25,7 @@ impl Flavour {
 }
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -54,9 +54,9 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = get_all_columns(self.conn.as_ref(), schema, &flavour).await;
-        let mut indexes = get_all_indexes(self.conn.as_ref(), schema).await;
-        let mut fks = get_foreign_keys(self.conn.as_ref(), schema).await;
+        let mut columns = get_all_columns(&self.conn, schema, &flavour).await;
+        let mut indexes = get_all_indexes(&self.conn, schema).await;
+        let mut fks = get_foreign_keys(&self.conn, schema).await;
 
         let mut enums = vec![];
         for table_name in &table_names {
@@ -80,7 +80,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
@@ -359,7 +359,6 @@ async fn get_all_indexes(
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
-    debug!("describing indices, SQL: {}", sql);
     let rows = conn
         .query_raw(sql, &[schema_name.into()])
         .await
@@ -461,7 +460,8 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             kcu.referenced_column_name referenced_column_name,
             kcu.ordinal_position ordinal_position,
             kcu.table_name table_name,
-            rc.delete_rule delete_rule
+            rc.delete_rule delete_rule,
+            rc.update_rule update_rule
         FROM information_schema.key_column_usage AS kcu
         INNER JOIN information_schema.referential_constraints AS rc ON
         kcu.constraint_name = rc.constraint_name
@@ -471,8 +471,6 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             AND referenced_column_name IS NOT NULL
         ORDER BY ordinal_position
     ";
-
-    debug!("describing table foreign keys, SQL: '{}'", sql);
 
     let result_set = conn
         .query_raw(sql, &[schema_name.into(), schema_name.into()])
@@ -519,6 +517,20 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             "no action" => ForeignKeyAction::NoAction,
             s => panic!(format!("Unrecognized on delete action '{}'", s)),
         };
+        let on_update_action = match row
+            .get("update_rule")
+            .and_then(|x| x.to_string())
+            .expect("get update_rule")
+            .to_lowercase()
+            .as_str()
+        {
+            "cascade" => ForeignKeyAction::Cascade,
+            "set null" => ForeignKeyAction::SetNull,
+            "set default" => ForeignKeyAction::SetDefault,
+            "restrict" => ForeignKeyAction::Restrict,
+            "no action" => ForeignKeyAction::NoAction,
+            s => panic!(format!("Unrecognized on update action '{}'", s)),
+        };
 
         let intermediate_fks = map.entry(table_name).or_default();
 
@@ -541,6 +553,7 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
                     referenced_table,
                     referenced_columns: vec![referenced_column],
                     on_delete_action,
+                    on_update_action,
                 };
                 intermediate_fks.insert(constraint_name, fk);
             }
@@ -573,88 +586,88 @@ fn get_column_type_and_enum(
     println!("{}", full_data_type);
     println!("{:?}", precision);
 
-    let (family, native_type) = match (data_type, full_data_type) {
-        ("int", _) => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
-        ("smallint", _) => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
-        ("tinyint", "tinyint(1)") => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
-        ("tinyint", _) => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
-        ("mediumint", _) => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
-        ("bigint", _) => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
-        ("decimal", fdt) => (
+    let (family, native_type) = match data_type {
+        "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
+        "smallint" => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
+        "tinyint" if precision.numeric_precision == Some(1) => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
+        "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
+        "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
+        "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
+        "decimal" => (
             ColumnTypeFamily::Decimal,
             Some(MySqlType::Decimal(
                 precision.numeric_precision(),
                 precision.numeric_scale(),
             )),
         ),
-        ("numeric", fdt) => (
+        "numeric" => (
             ColumnTypeFamily::Decimal,
             Some(MySqlType::Numeric(
                 precision.numeric_precision(),
                 precision.numeric_scale(),
             )),
         ),
-        ("float", _) => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
-        ("double", _) => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
+        "float" => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
+        "double" => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
 
-        ("char", fdt) => (
+        "char" => (
             ColumnTypeFamily::String,
             Some(MySqlType::Char(precision.character_max_length())),
         ),
-        ("varchar", fdt) => (
+        "varchar" => (
             ColumnTypeFamily::String,
             Some(MySqlType::VarChar(precision.character_max_length())),
         ),
-        ("text", _) => (ColumnTypeFamily::String, Some(MySqlType::Text)),
-        ("tinytext", _) => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
-        ("mediumtext", _) => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
-        ("longtext", _) => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
-        ("enum", _) => (ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)), None),
-        ("json", _) => (ColumnTypeFamily::Json, Some(MySqlType::JSON)),
-        ("set", _) => (ColumnTypeFamily::String, None),
+        "text" => (ColumnTypeFamily::String, Some(MySqlType::Text)),
+        "tinytext" => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
+        "mediumtext" => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
+        "longtext" => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
+        "enum" => (ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)), None),
+        "json" => (ColumnTypeFamily::Json, Some(MySqlType::JSON)),
+        "set" => (ColumnTypeFamily::String, None),
         //temporal
-        ("date", _) => (ColumnTypeFamily::DateTime, Some(MySqlType::Date)),
-        ("time", fdt) => (
+        "date" => (ColumnTypeFamily::DateTime, Some(MySqlType::Date)),
+        "time" => (
             //Fixme this can either be a time or a duration -.-
             ColumnTypeFamily::DateTime,
             Some(MySqlType::Time(precision.time_precision())),
         ),
-        ("datetime", fdt) => (
+        "datetime" => (
             ColumnTypeFamily::DateTime,
             Some(MySqlType::DateTime(precision.time_precision())),
         ),
-        ("timestamp", fdt) => (
+        "timestamp" => (
             ColumnTypeFamily::DateTime,
             Some(MySqlType::Timestamp(precision.time_precision())),
         ),
-        ("year", _) => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
+        "year" => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
         //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
-        ("bit", fdt) => (
+        "bit" => (
             ColumnTypeFamily::Binary,
             Some(MySqlType::Bit(precision.numeric_precision())),
         ),
-        ("binary", fdt) => (
+        "binary" => (
             ColumnTypeFamily::Binary,
             Some(MySqlType::Binary(precision.character_max_length())),
         ),
-        ("varbinary", fdt) => (
+        "varbinary" => (
             ColumnTypeFamily::Binary,
             Some(MySqlType::VarBinary(precision.character_max_length())),
         ),
-        ("blob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::Blob)),
-        ("tinyblob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::TinyBlob)),
-        ("mediumblob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::MediumBlob)),
-        ("longblob", _) => (ColumnTypeFamily::Binary, Some(MySqlType::LongBlob)),
+        "blob" => (ColumnTypeFamily::Binary, Some(MySqlType::Blob)),
+        "tinyblob" => (ColumnTypeFamily::Binary, Some(MySqlType::TinyBlob)),
+        "mediumblob" => (ColumnTypeFamily::Binary, Some(MySqlType::MediumBlob)),
+        "longblob" => (ColumnTypeFamily::Binary, Some(MySqlType::LongBlob)),
         //spatial
-        ("geometry", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
-        ("point", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
-        ("linestring", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
-        ("polygon", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
-        ("multipoint", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
-        ("multilinestring", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
-        ("multipolygon", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
-        ("geometrycollection", fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
-        (_, fdt) => (ColumnTypeFamily::Unsupported(fdt.into()), None),
+        "geometry" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "point" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "linestring" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "polygon" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "multipoint" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "multilinestring" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "multipolygon" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "geometrycollection" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        _ => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
     };
 
     let tpe = ColumnType {

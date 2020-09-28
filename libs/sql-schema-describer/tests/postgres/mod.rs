@@ -34,5 +34,5 @@ pub async fn get_postgres_describer(sql: &str, db_name: &str) -> postgres::SqlSc
         client.raw_cmd(statement).await.expect("executing migration statement");
     }
 
-    postgres::SqlSchemaDescriber::new(Arc::new(client))
+    postgres::SqlSchemaDescriber::new(client)
 }

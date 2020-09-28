@@ -52,7 +52,7 @@ impl SqlRenderer for MysqlFlavour {
         )
         .unwrap();
 
-        add_constraint.push_str(&self.render_references(&foreign_key));
+        add_constraint.push_str(&self.render_references(&table, &foreign_key));
 
         add_constraint
     }
@@ -101,6 +101,7 @@ impl SqlRenderer for MysqlFlavour {
                     table: table.clone(),
                     index: new_index,
                     caused_by_create_table: false,
+                    contains_nullable_columns: false,
                 }),
                 mysql_drop_index(self, table, index_name),
             ])
@@ -201,11 +202,7 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote(&table_name))]
-    }
-
-    fn render_references(&self, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, _table: &str, foreign_key: &ForeignKey) -> String {
         let referenced_columns = foreign_key
             .referenced_columns
             .iter()
@@ -308,7 +305,7 @@ impl SqlRenderer for MysqlFlavour {
             "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
             table_name = self.quote(table.name()),
             columns = columns,
-            indexes= indexes,
+            indexes = indexes,
             primary_key = primary_key,
         ))
     }
@@ -327,6 +324,10 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_drop_index(&self, drop_index: &DropIndex) -> String {
         mysql_drop_index(self, &drop_index.table, &drop_index.name)
+    }
+
+    fn render_drop_table(&self, table_name: &str) -> Vec<String> {
+        vec![format!("DROP TABLE {}", self.quote(&table_name))]
     }
 
     fn render_redefine_tables(&self, _names: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {

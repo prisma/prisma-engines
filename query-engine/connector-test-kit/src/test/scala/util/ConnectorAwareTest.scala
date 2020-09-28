@@ -19,9 +19,12 @@ object IgnoreMongo extends Tag("ignore.mongo") with AssociatedWithConnectorTags 
 object IgnoreSQLite extends Tag("ignore.sqlite") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.SQLiteConnectorTag
 }
+object IgnoreMsSql extends Tag("ignore.mssql") with AssociatedWithConnectorTags {
+  override def tag = ConnectorTag.MsSqlConnectorTag
+}
 
 object IgnoreSet {
-  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMongo, IgnoreSQLite)
+  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMongo, IgnoreSQLite, IgnoreMsSql)
 
   def byName(name: String): Option[AssociatedWithConnectorTags] = ignoreConnectorTags.find(_.name == name)
 }
@@ -35,6 +38,7 @@ object ConnectorTag extends Enum[ConnectorTag] {
   object Mysql56ConnectorTag          extends RelationalConnectorTag
   object PostgresConnectorTag         extends RelationalConnectorTag
   object SQLiteConnectorTag           extends RelationalConnectorTag
+  object MsSqlConnectorTag            extends RelationalConnectorTag
   sealed trait DocumentConnectorTag   extends ConnectorTag
   object MongoConnectorTag            extends DocumentConnectorTag
 }
@@ -51,6 +55,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
     case "mysql" | "mysql-native"                                => ConnectorTag.MySqlConnectorTag
     case "postgres" | "postgres-native" | "postgresql"           => ConnectorTag.PostgresConnectorTag
     case "sqlite" | "sqlite-native" | "native-integration-tests" => ConnectorTag.SQLiteConnectorTag
+    case "sqlserver"                                             => ConnectorTag.MsSqlConnectorTag
   }
 
   def capabilities: ConnectorCapabilities               = connectorConfig.capabilities

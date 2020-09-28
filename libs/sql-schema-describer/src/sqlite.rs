@@ -1,11 +1,11 @@
 //! SQLite description.
 use super::*;
-use quaint::{ast::Value, prelude::Queryable};
-use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
+use quaint::{ast::Value, prelude::Queryable, single::Quaint};
+use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -66,7 +66,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
 impl SqlSchemaDescriber {
     /// Constructor.
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> SqlSchemaDescriber {
+    pub fn new(conn: Quaint) -> SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
@@ -264,6 +264,7 @@ impl SqlSchemaDescriber {
             pub referenced_table: String,
             pub referenced_columns: HashMap<i64, String>,
             pub on_delete_action: ForeignKeyAction,
+            pub on_update_action: ForeignKeyAction,
         }
 
         let sql = format!(r#"PRAGMA "{}".foreign_key_list("{}");"#, schema, table);
@@ -311,11 +312,26 @@ impl SqlSchemaDescriber {
                         "cascade" => ForeignKeyAction::Cascade,
                         s => panic!(format!("Unrecognized on delete action '{}'", s)),
                     };
+                    let on_update_action = match row
+                        .get("on_update")
+                        .and_then(|x| x.to_string())
+                        .expect("on_update")
+                        .to_lowercase()
+                        .as_str()
+                    {
+                        "no action" => ForeignKeyAction::NoAction,
+                        "restrict" => ForeignKeyAction::Restrict,
+                        "set null" => ForeignKeyAction::SetNull,
+                        "set default" => ForeignKeyAction::SetDefault,
+                        "cascade" => ForeignKeyAction::Cascade,
+                        s => panic!(format!("Unrecognized on update action '{}'", s)),
+                    };
                     let fk = IntermediateForeignKey {
                         columns,
                         referenced_table,
                         referenced_columns,
                         on_delete_action,
+                        on_update_action,
                     };
                     intermediate_fks.insert(id, fk);
                 }
@@ -346,6 +362,7 @@ impl SqlSchemaDescriber {
                     referenced_table: intermediate_fk.referenced_table.to_owned(),
                     referenced_columns,
                     on_delete_action: intermediate_fk.on_delete_action.to_owned(),
+                    on_update_action: intermediate_fk.on_update_action.to_owned(),
 
                     // Not relevant in SQLite since we cannot ALTER or DROP foreign keys by
                     // constraint name.
@@ -363,7 +380,6 @@ impl SqlSchemaDescriber {
 
     async fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
-        debug!("describing table indices, SQL: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
 
@@ -388,7 +404,6 @@ impl SqlSchemaDescriber {
             };
 
             let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
-            debug!("describing table index '{}', SQL: '{}'", name, sql);
             let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
             debug!("Got index description results: {:?}", result_set);
             for row in result_set.into_iter() {

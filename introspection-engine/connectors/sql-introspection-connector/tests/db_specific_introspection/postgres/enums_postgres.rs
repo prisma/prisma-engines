@@ -1,5 +1,6 @@
 use crate::*;
 use barrel::types;
+use quaint::prelude::Queryable;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]

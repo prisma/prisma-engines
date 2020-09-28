@@ -1,10 +1,10 @@
 package queries.relations
 
 import org.scalatest.{FlatSpec, Matchers}
-import util.{ApiSpecBase, ProjectDsl}
+import util.{ApiSpecBase, IgnoreMsSql, ProjectDsl}
 
 class RelatedNullQueries extends FlatSpec with Matchers with ApiSpecBase {
-  "Querying a single-field 1:n relation with nulls" should "ignore related records connected with null" in {
+  "Querying a single-field 1:n relation with nulls" should "ignore related records connected with null" taggedAs (IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       s"""
          |model ModelA {
@@ -39,7 +39,7 @@ class RelatedNullQueries extends FlatSpec with Matchers with ApiSpecBase {
     result.toString should be("{\"data\":{\"createModelA\":{\"id\":\"1\",\"bs\":[]}}}")
   }
 
-  "Querying a multi-field 1:n relation with nulls" should "ignore related records connected with any null in the relation fields" in {
+  "Querying a multi-field 1:n relation with nulls" should "ignore related records connected with any null in the relation fields" taggedAs (IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       s"""
          |model ModelA {
@@ -94,7 +94,7 @@ class RelatedNullQueries extends FlatSpec with Matchers with ApiSpecBase {
     result2.toString should be("{\"data\":{\"createModelA\":{\"id\":\"2\",\"bs\":[]}}}")
   }
 
-  "Querying a single-field 1:1 relation inlined on the child with null" should "not find a related record" in {
+  "Querying a single-field 1:1 relation inlined on the child with null" should "not find a related record" taggedAs (IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       s"""
          |model ModelA {
@@ -129,7 +129,7 @@ class RelatedNullQueries extends FlatSpec with Matchers with ApiSpecBase {
     result.toString should be("{\"data\":{\"createModelA\":{\"id\":\"1\",\"b\":null}}}")
   }
 
-  "Querying a single-field 1:1 relation inlined on the parent with null" should "not find a related record" in {
+  "Querying a single-field 1:1 relation inlined on the parent with null" should "not find a related record" taggedAs (IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       s"""
          |model ModelA {

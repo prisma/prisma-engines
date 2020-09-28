@@ -191,10 +191,10 @@ impl WriteArgs {
                         let p: Option<PrismaValue> = val.clone().try_into().ok();
                         match p {
                             Some(p) => p,
-                            None => PrismaValue::null(field.type_identifier.clone()),
+                            None => PrismaValue::Null,
                         }
                     }
-                    None => PrismaValue::null(field.type_identifier.clone()),
+                    None => PrismaValue::Null,
                 };
 
                 (field.clone(), val.clone())

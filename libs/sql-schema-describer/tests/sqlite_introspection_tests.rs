@@ -5,6 +5,7 @@ mod test_api;
 use barrel::{types, Migration};
 use common::*;
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 use sqlite::*;
 use test_api::{sqlite_test_api, TestApi, TestResult};
@@ -240,6 +241,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::NoAction,
                 },
                 ForeignKey {
@@ -247,6 +249,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_cascade".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::Cascade,
                 },
                 ForeignKey {
@@ -254,6 +257,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_restrict".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::Restrict,
                 },
                 ForeignKey {
@@ -261,6 +265,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_set_default".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::SetDefault,
                 },
                 ForeignKey {
@@ -268,6 +273,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     columns: vec!["city_set_null".to_string()],
                     referenced_columns: vec!["id".to_string()],
                     referenced_table: "City".to_string(),
+                    on_update_action: ForeignKeyAction::NoAction,
                     on_delete_action: ForeignKeyAction::SetNull,
                 },
             ],

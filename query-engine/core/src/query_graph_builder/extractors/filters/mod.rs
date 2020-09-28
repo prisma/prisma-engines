@@ -122,7 +122,7 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
 fn extract_relation_filters(field: &RelationFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
     match value {
         // Implicit is null filter (`where: { <field>: null }`)
-        ParsedInputValue::Single(PrismaValue::Null(_)) => Ok(vec![field.one_relation_is_null()]),
+        ParsedInputValue::Single(PrismaValue::Null) => Ok(vec![field.one_relation_is_null()]),
 
         // Either implicit `is`, or complex filter.
         ParsedInputValue::Map(filter_map) => {

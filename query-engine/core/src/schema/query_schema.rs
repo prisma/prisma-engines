@@ -2,7 +2,7 @@ use super::*;
 use crate::{ParsedField, QueryGraph, QueryGraphBuilderResult};
 use fmt::Debug;
 use once_cell::sync::OnceCell;
-use prisma_models::{dml, InternalDataModelRef, ModelRef, TypeHint};
+use prisma_models::{dml, InternalDataModelRef, ModelRef};
 use std::{
     borrow::Borrow,
     boxed::Box,
@@ -407,7 +407,7 @@ pub enum InputType {
 impl PartialEq for InputType {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (InputType::Scalar(_), InputType::Scalar(_)) => true,
+            (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
             (InputType::Enum(_), InputType::Enum(_)) => true,
             (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
             (InputType::Object(obj), InputType::Object(oobj)) => obj.into_arc().name == oobj.into_arc().name,
@@ -423,17 +423,6 @@ impl Debug for InputType {
             InputType::Scalar(s) => write!(f, "{:?}", s),
             InputType::Enum(e) => write!(f, "{:?}", e),
             InputType::List(l) => write!(f, "{:?}", l),
-        }
-    }
-}
-
-impl From<&InputType> for TypeHint {
-    fn from(i: &InputType) -> Self {
-        match i {
-            InputType::Scalar(st) => st.into(),
-            InputType::Enum(_) => TypeHint::Enum,
-            InputType::List(_) => TypeHint::Array,
-            InputType::Object(_) => TypeHint::Unknown,
         }
     }
 }
@@ -571,23 +560,6 @@ pub enum ScalarType {
     Json,
     JsonList,
     UUID,
-}
-
-impl From<&ScalarType> for TypeHint {
-    fn from(t: &ScalarType) -> Self {
-        match t {
-            ScalarType::Null => TypeHint::Unknown, // [DTODO] Note for MSSQL and Julius: Collecting typehints this far up isn't feasible anymore.
-            ScalarType::String => TypeHint::String,
-            ScalarType::Int => TypeHint::Int,
-            ScalarType::Float => TypeHint::Float,
-            ScalarType::Boolean => TypeHint::Boolean,
-            ScalarType::Enum(_) => TypeHint::Enum,
-            ScalarType::DateTime => TypeHint::DateTime,
-            ScalarType::Json => TypeHint::Json,
-            ScalarType::JsonList => TypeHint::Json,
-            ScalarType::UUID => TypeHint::UUID,
-        }
-    }
 }
 
 impl From<EnumType> for OutputType {

@@ -1,46 +1,54 @@
 use serde::*;
 use serde_json::Value;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum MsSqlType {
-    Int,
-    // UnsignedInt,
-    // SmallInt,
-    // UnsignedSmallInt,
-    // TinyInt,
-    // UnsignedTinyInt,
-    // MediumInt,
-    // UnsignedMediumInt,
-    // BigInt,
-    // Decimal(u32, u32),
-    // Numeric(u32, u32),
-    // UnsignedBigInt,
-    // Float,
-    // Double,
-    // Bit(u32),
-    // Char(u32),
-    VarChar(u32),
-    // Binary(u32),
-    // VarBinary(u32),
-    // TinyBlob,
-    // Blob,
-    // MediumBlob,
-    // LongBlob,
-    // TinyText,
-    // Text,
-    // MediumText,
-    // LongText,
-    // Date,
-    // Time(u32),
-    // DateTime(u32),
-    // Timestamp(u32),
-    // Year,
-    // JSON,
-    // Enum,
-    NotHandled,
+use std::fmt;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Copy)]
+pub enum DataLength {
+    Limited(u16),
+    Max,
 }
 
-impl super::NativeType for MsSqlType {
+impl fmt::Display for DataLength {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Limited(length) => write!(f, "{}", length),
+            Self::Max => write!(f, "max"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum MssqlType {
+    TinyInt,
+    SmallInt,
+    Int,
+    BigInt,
+    Decimal(u8, u8),
+    Numeric(u8, u8),
+    Money,
+    SmallMoney,
+    Bit,
+    Float(u8),
+    Real,
+    Date,
+    Time,
+    Datetime,
+    Datetime2,
+    DatetimeOffset,
+    SmallDatetime,
+    Char(DataLength),
+    VarChar(DataLength),
+    Text,
+    NVarChar(DataLength),
+    NText,
+    Binary(DataLength),
+    VarBinary(DataLength),
+    Image,
+    XML,
+}
+
+impl super::NativeType for MssqlType {
     fn to_json(&self) -> Value {
         serde_json::to_value(&self).expect(&format!("Serializing the native type to json failed: {:?}", &self))
     }

@@ -1,18 +1,17 @@
 use super::*;
 use once_cell::sync::Lazy;
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
-    sync::Arc,
 };
 
 static DEFAULT_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
 static DEFAULT_NON_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
 
 pub struct SqlSchemaDescriber {
-    conn: Arc<dyn Queryable + Send + Sync + 'static>,
+    conn: Quaint,
 }
 
 #[async_trait::async_trait]
@@ -60,7 +59,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 }
 
 impl SqlSchemaDescriber {
-    pub fn new(conn: Arc<dyn Queryable + Send + Sync + 'static>) -> Self {
+    pub fn new(conn: Quaint) -> Self {
         Self { conn }
     }
 
@@ -89,8 +88,12 @@ impl SqlSchemaDescriber {
 
         let select = r#"
             SELECT table_name
-            FROM information_schema.tables
+            FROM information_schema.tables t
+            INNER JOIN sys.tables st
+                ON TABLE_NAME = st.name
+                AND SCHEMA_ID(t.TABLE_SCHEMA) = st.schema_id
             WHERE table_schema = @P1
+            AND st.is_ms_shipped = 'false'
             AND table_type = 'BASE TABLE'
             ORDER BY table_name ASC
         "#;
@@ -176,9 +179,12 @@ impl SqlSchemaDescriber {
                 is_nullable,
                 columnproperty(object_id(@P1 + '.' + table_name), column_name, 'IsIdentity') is_identity,
                 table_name
-            FROM information_schema.columns
+            FROM information_schema.columns c
+            INNER JOIN sys.tables t
+            ON c.TABLE_NAME = t.name AND SCHEMA_ID(c.TABLE_SCHEMA) = t.schema_id
             WHERE table_schema = @P1
-            ORDER BY ordinal_position;
+            AND t.is_ms_shipped = 'false'
+            ORDER BY ordinal_position
         "#;
 
         let mut map = HashMap::new();
@@ -319,8 +325,6 @@ impl SqlSchemaDescriber {
             ORDER BY index_name, seq_in_index
         "#;
 
-        debug!("describing indices, SQL: {}", sql);
-
         let rows = self
             .conn
             .query_raw(sql, &[schema.into()])
@@ -424,6 +428,7 @@ impl SqlSchemaDescriber {
                 parent_column.name AS column_name,
                 referenced_column.name AS referenced_column_name,
                 rc.delete_rule AS delete_rule,
+                rc.update_rule AS update_rule,
                 kcu.ordinal_position AS ordinal_position
             FROM
                 sys.foreign_key_columns AS fk
@@ -446,11 +451,11 @@ impl SqlSchemaDescriber {
                 AND parent_table.name = kcu.table_name
                 AND kcu.table_schema = @P1
                 AND referenced_column.name IS NOT NULL
+            WHERE parent_table.is_ms_shipped = 'false'
+            AND referenced_table.is_ms_shipped = 'false'
             ORDER BY
                 ordinal_position
         "#;
-
-        debug!("describing table foreign keys, SQL: '{}'", sql);
 
         let result_set = self
             .conn
@@ -506,6 +511,21 @@ impl SqlSchemaDescriber {
                 s => panic!(format!("Unrecognized on delete action '{}'", s)),
             };
 
+            let on_update_action = match row
+                .get("update_rule")
+                .and_then(|x| x.to_string())
+                .expect("get update_rule")
+                .to_lowercase()
+                .as_str()
+            {
+                "cascade" => ForeignKeyAction::Cascade,
+                "set null" => ForeignKeyAction::SetNull,
+                "set default" => ForeignKeyAction::SetDefault,
+                "restrict" => ForeignKeyAction::Restrict,
+                "no action" => ForeignKeyAction::NoAction,
+                s => panic!(format!("Unrecognized on delete action '{}'", s)),
+            };
+
             let intermediate_fks = map.entry(table_name).or_default();
 
             match intermediate_fks.get_mut(&constraint_name) {
@@ -531,6 +551,7 @@ impl SqlSchemaDescriber {
                         referenced_table,
                         referenced_columns: vec![referenced_column],
                         on_delete_action,
+                        on_update_action,
                     };
 
                     intermediate_fks.insert(constraint_name, fk);

@@ -25,5 +25,5 @@ pub async fn get_sqlite_describer(sql: &str, db_name: &str) -> sqlite::SqlSchema
         conn.query_raw(statement, &[]).await.expect("executing migration");
     }
 
-    sqlite::SqlSchemaDescriber::new(Arc::new(conn))
+    sqlite::SqlSchemaDescriber::new(conn)
 }
