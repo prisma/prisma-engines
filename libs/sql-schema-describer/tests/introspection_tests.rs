@@ -13,7 +13,7 @@ mod test_api;
 
 use crate::common::*;
 use crate::test_api::*;
-use native_types::{MsSqlType, MySqlType, NativeType, PostgresType};
+use native_types::{DataLength, MssqlType, MySqlType, NativeType, PostgresType};
 use prisma_value::PrismaValue;
 use serde_json::Value;
 
@@ -33,7 +33,7 @@ fn int_native_type(api: &TestApi) -> Option<Value> {
         (SqlFamily::Sqlite, _) => None,
         (SqlFamily::Mysql, "mysql8") => Some(MySqlType::Int.to_json()),
         (SqlFamily::Mysql, _) => Some(MySqlType::Int.to_json()),
-        (SqlFamily::Mssql, _) => Some(MsSqlType::Int.to_json()),
+        (SqlFamily::Mssql, _) => Some(MssqlType::Int.to_json()),
     }
 }
 
@@ -73,7 +73,7 @@ fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
         (SqlFamily::Sqlite, _) => None,
         (SqlFamily::Mysql, "mysql8") => Some(MySqlType::VarChar(length).to_json()),
         (SqlFamily::Mysql, _) => Some(MySqlType::VarChar(length).to_json()),
-        (SqlFamily::Mssql, _) => Some(MsSqlType::VarChar(length).to_json()),
+        (SqlFamily::Mssql, _) => Some(MssqlType::VarChar(DataLength::Limited(length as u16)).to_json()),
     }
 }
 

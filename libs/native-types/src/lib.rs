@@ -5,6 +5,7 @@ mod mysql;
 mod native_type;
 mod postgres;
 
+pub use mssql::DataLength;
 pub use mssql::MssqlType;
 pub use mysql::MySqlType;
 pub use native_type::NativeType;
