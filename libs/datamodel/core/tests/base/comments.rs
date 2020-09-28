@@ -63,6 +63,19 @@ fn doc_comments_must_work_on_block_attributes() {
 }
 
 #[test]
+fn comments_must_work_on_block_attributes() {
+    let dml = r#"
+    model Blog {
+      id1 Int
+      id2 Int
+      @@id([id1, id2]) // Documentation comment block attribute
+    }"#;
+
+    // must not crash
+    let _ = parse(dml);
+}
+
+#[test]
 fn comments_must_work_in_enums() {
     let dml = r#"
     // Line 1
