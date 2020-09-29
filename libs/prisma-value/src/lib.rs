@@ -24,25 +24,31 @@ pub enum PrismaValue {
     Boolean(bool),
     Enum(String),
     Int(i64),
-
-    #[serde(serialize_with = "serialize_null")]
-    Null,
-
     Uuid(Uuid),
     List(PrismaListValue),
     Json(String),
     Xml(String),
+
+    #[serde(serialize_with = "serialize_null")]
+    Null,
 
     #[serde(serialize_with = "serialize_date")]
     DateTime(DateTime<FixedOffset>),
 
     #[serde(serialize_with = "serialize_decimal")]
     Float(Decimal),
+
+    #[serde(serialize_with = "serialize_bytes")]
+    Bytes(Vec<u8>),
 }
 
 pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
     // format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ"))
     date.to_rfc3339()
+}
+
+pub fn encode_bytes(bytes: &[u8]) -> String {
+    base64::encode(bytes)
 }
 
 impl TryFrom<serde_json::Value> for PrismaValue {
@@ -93,6 +99,13 @@ where
     S: Serializer,
 {
     stringify_date(date).serialize(serializer)
+}
+
+fn serialize_bytes<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    encode_bytes(bytes).serialize(serializer)
 }
 
 fn serialize_null<S>(serializer: S) -> Result<S::Ok, S::Error>
@@ -157,6 +170,7 @@ impl fmt::Display for PrismaValue {
                 let as_string = format!("{:?}", x);
                 as_string.fmt(f)
             }
+            PrismaValue::Bytes(b) => encode_bytes(b).fmt(f),
         }
     }
 }

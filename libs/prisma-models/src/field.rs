@@ -67,7 +67,7 @@ pub enum TypeIdentifier {
     Json,
     Xml,
     DateTime,
-    // DateTime(DateType),
+    Bytes,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -182,7 +182,7 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::XML => Self::Xml,
             ScalarType::Decimal => Self::Float,
             ScalarType::Duration => todo!("No idea what this is supposed to be"),
-            ScalarType::Bytes => unimplemented!(),
+            ScalarType::Bytes => Self::Bytes,
         }
     }
 }

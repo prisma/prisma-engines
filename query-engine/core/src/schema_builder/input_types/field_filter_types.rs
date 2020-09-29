@@ -111,6 +111,7 @@ fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested
 
         TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml => equality_filters(sf).collect(),
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
+        TypeIdentifier::Bytes => equality_filters(sf).collect(),
     };
 
     // Shorthand `not equals` filter, skips the nested object filter.
@@ -217,5 +218,6 @@ fn scalar_filter_name(sf: &ScalarFieldRef, nested: bool) -> String {
         TypeIdentifier::Json => format!("{}Json{}{}Filter", nested, nullable, list),
         TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}Filter", nested, e, nullable, list),
         TypeIdentifier::Xml => format!("{}Xml{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Bytes => format!("{}Bytes{}{}Filter", nested, nullable, list),
     }
 }

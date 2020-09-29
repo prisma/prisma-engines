@@ -51,7 +51,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"bInt":5294967295}}}""")
   }
 
   "Postgres native decimal types" should "work" in {
@@ -144,6 +144,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |model Model {
         |  id    String  @id @default(cuid())
         |  bool  Boolean @test.Boolean
+        |  byteA Bytes   @test.ByteA
         |  json  Json    @test.Json
         |  jsonb Json    @test.JsonB
         |}"""
@@ -157,11 +158,13 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |  createOneModel(
          |    data: {
          |      bool: true
+         |      byteA: "dGVzdA=="
          |      json: "{}"
          |      jsonb: "{\\"a\\": \\"b\\"}"
          |    }
          |  ) {
          |    bool
+         |    byteA
          |    json
          |    jsonb
          |  }
@@ -170,7 +173,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"bool":true,"json":"{}","jsonb":"{\"a\":\"b\"}"}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"bool":true,"byteA":"dGVzdA==","json":"{}","jsonb":"{\"a\":\"b\"}"}}}""")
   }
 
   "Postgres native date types" should "work" ignore {

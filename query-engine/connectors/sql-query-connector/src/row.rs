@@ -235,7 +235,14 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             }
             other => PrismaValue::from(other),
         },
-
+        TypeIdentifier::Bytes => match p_value {
+            value if value.is_null() => PrismaValue::Null,
+            Value::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
+            _ => {
+                let error = io::Error::new(io::ErrorKind::InvalidData, "Byte-type value not stored as bytes.");
+                return Err(SqlError::ConversionError(error.into()));
+            }
+        },
         TypeIdentifier::Xml => todo!(),
     })
 }

@@ -474,6 +474,10 @@ impl InputType {
         InputType::Scalar(ScalarType::XML)
     }
 
+    pub fn bytes() -> InputType {
+        InputType::Scalar(ScalarType::Bytes)
+    }
+
     pub fn null() -> InputType {
         InputType::Scalar(ScalarType::Null)
     }
@@ -532,6 +536,10 @@ impl OutputType {
         OutputType::Scalar(ScalarType::XML)
     }
 
+    pub fn bytes() -> OutputType {
+        OutputType::Scalar(ScalarType::Bytes)
+    }
+
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
     pub fn as_object_type(&self) -> Option<ObjectTypeStrongRef> {
@@ -571,6 +579,7 @@ pub enum ScalarType {
     JsonList,
     UUID,
     XML,
+    Bytes,
 }
 
 impl From<EnumType> for OutputType {

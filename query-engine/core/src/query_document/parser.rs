@@ -234,6 +234,7 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::UUID) => {
                 Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
             }
+            (QueryValue::String(s), ScalarType::Bytes) => Self::parse_bytes(parent_path, s),
             (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(Decimal::from(i))),
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
@@ -270,6 +271,18 @@ impl QueryDocumentParser {
         //             err
         //         )),
         //     })
+    }
+
+    pub fn parse_bytes(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
+        base64::decode(&s)
+            .map(PrismaValue::Bytes)
+            .map_err(|_| QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(format!(
+                    "'{}' is not a valid base64 encoded string.",
+                    s
+                )),
+            })
     }
 
     // [DTODO] This is likely incorrect or at least using the wrong abstractions.

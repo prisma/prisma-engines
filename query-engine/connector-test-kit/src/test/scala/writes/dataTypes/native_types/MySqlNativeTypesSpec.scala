@@ -184,7 +184,54 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
     res.toString should be("""{"data":{"createOneModel":{"field":"{\"a\":\"b\"}"}}}""")
   }
 
+  "MySQL native binary types" should "work" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model Model {
+        |  id    String @id @default(cuid())
+        |  bit   Bytes @test.Bit(8)
+        |  bin   Bytes @test.Binary(4)
+        |  vBin  Bytes @test.VarBinary(5)
+        |  blob  Bytes @test.Blob
+        |  tBlob Bytes @test.TinyBlob
+        |  mBlob Bytes @test.MediumBlob
+        |  lBlob Bytes @test.LongBlob
+        |}"""
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      s"""
+         |mutation {
+         |  createOneModel(
+         |    data: {
+         |      bit: "dA=="
+         |      bin: "dGVzdA=="
+         |      vBin: "dGVzdA=="
+         |      blob: "dGVzdA=="
+         |      tBlob: "dGVzdA=="
+         |      mBlob: "dGVzdA=="
+         |      lBlob: "dGVzdA=="
+         |    }
+         |  ) {
+         |    bit
+         |    bin
+         |    vBin
+         |    blob
+         |    tBlob
+         |    mBlob
+         |    lBlob
+         |  }
+         |}""".stripMargin,
+      project,
+      legacy = false
+    )
+
+    res.toString should be(
+      """{"data":{"createOneModel":{"bit":"dA==","bin":"dGVzdA==","vBin":"dGVzdA==","blob":"dGVzdA==","tBlob":"dGVzdA==","mBlob":"dGVzdA==","lBlob":"dGVzdA=="}}}""")
+  }
+
   // XML
   // JSON?
-  // Bytes
 }

@@ -62,6 +62,7 @@ fn non_list_scalar_update_field_mapper(
         TypeIdentifier::DateTime => InputType::object(operations_object_type(ctx, "DateTime", field, false)),
         TypeIdentifier::UUID => InputType::object(operations_object_type(ctx, "Uuid", field, false)),
         TypeIdentifier::Xml => InputType::object(operations_object_type(ctx, "Xml", field, false)),
+        TypeIdentifier::Bytes => InputType::object(operations_object_type(ctx, "Bytes", field, false)),
     };
 
     let input_field = if field.type_identifier != TypeIdentifier::Json {

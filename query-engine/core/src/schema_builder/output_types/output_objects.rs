@@ -82,6 +82,7 @@ pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField
             TypeIdentifier::UUID => OutputType::uuid(),
             TypeIdentifier::Int => OutputType::int(),
             TypeIdentifier::Xml => OutputType::xml(),
+            TypeIdentifier::Bytes => OutputType::bytes(),
         },
     };
 
