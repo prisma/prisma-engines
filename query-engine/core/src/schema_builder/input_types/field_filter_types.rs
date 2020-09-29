@@ -178,10 +178,7 @@ fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
 fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = InputField> {
     // Limit query mode field to the topmost filter level.
     // Only build mode field for connectors with insensitive filter support.
-    let fields = if feature_flags::get().insensitiveFilters
-        && !nested
-        && ctx.capabilities.contains(ConnectorCapability::InsensitiveFilters)
-    {
+    let fields = if !nested && ctx.capabilities.contains(ConnectorCapability::InsensitiveFilters) {
         let enum_type = Arc::new(string_enum_type(
             "QueryMode",
             vec!["default".to_owned(), "insensitive".to_owned()],
