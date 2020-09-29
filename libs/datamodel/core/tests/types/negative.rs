@@ -127,7 +127,7 @@ fn should_fail_on_native_type_with_invalid_datasource_name() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The prefix pg is invalid. It must equal the name of an existing datasource e.g. db. Did you mean to use db.BigInt?",
+        "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.BigInt?",
         ast::Span::new(222, 231),
     ));
 }
