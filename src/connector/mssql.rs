@@ -329,7 +329,7 @@ impl MssqlUrl {
 
         match parts.next() {
             Some(host_part) => {
-                let url = Url::parse(host_part)?;
+                let url = Url::parse(&host_part.replace("jdbc:sqlserver://", "sqlserver://"))?;
 
                 let params: crate::Result<HashMap<String, String>> = parts
                     .filter(|kv| kv != &"")
