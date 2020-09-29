@@ -332,7 +332,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::Boolean => "boolean".to_string(),
             Self::String => "string".to_string(),
             Self::DateTime => "dateTime".to_string(),
-            Self::Binary => "bytes".to_string(),
+            Self::Binary => "binary".to_string(),
             Self::Json => "json".to_string(),
             Self::Uuid => "uuid".to_string(),
             Self::Geometric => "geometric".to_string(),
@@ -513,7 +513,9 @@ struct Precision {
 
 impl Precision {
     fn numeric_precision(&self) -> u32 {
-        //fixme use radix
+        // Fixme
+        // How do we express radix?
+        // base 10 or 2 usually with 2 for bits?
         self.numeric_precision.unwrap()
     }
 

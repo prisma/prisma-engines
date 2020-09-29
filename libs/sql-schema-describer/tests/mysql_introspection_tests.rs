@@ -393,7 +393,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(3),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::Set.to_json()),
+                native_type: None,
             },
 
             default: None,

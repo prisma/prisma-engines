@@ -578,9 +578,9 @@ fn get_column_type_and_enum(
     precision: Precision,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
-    println!("{}", data_type);
-    println!("{}", full_data_type);
-    println!("{:?}", precision);
+    // println!("{}", data_type);
+    // println!("{}", full_data_type);
+    // println!("{:?}", precision);
 
     let (family, native_type) = match data_type {
         "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),

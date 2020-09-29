@@ -75,7 +75,6 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::UnsignedTinyInt => "TINYINT UNSIGNED".into(),
             MySqlType::UnsignedMediumInt => "MEDIUMINT UNSIGNED".into(),
             MySqlType::UnsignedBigInt => "BIGINT UNSIGNED".into(),
-            MySqlType::Set => "SET".into(),
         };
 
         sql::ColumnType {
