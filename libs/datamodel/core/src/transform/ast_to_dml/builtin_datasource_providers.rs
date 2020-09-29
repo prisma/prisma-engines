@@ -104,7 +104,7 @@ impl DatasourceProvider for MsSqlDatasourceProvider {
     }
 
     fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
-        validate_url(name, "sqlserver://", url)
+        validate_url(name, "sqlserver://", url).or_else(|_| validate_url(name, "jdbc:sqlserver://", url))
     }
 
     fn connector(&self) -> Box<dyn Connector> {

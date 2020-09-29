@@ -102,7 +102,7 @@ async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
 
     let mssql = Mssql::from_source(source).await?;
 
-    let mut splitted = source.url().value.split(";");
+    let mut splitted = source.url().value.split(";").filter(|kv| kv != &"");
     splitted.next();
 
     let mut params: HashMap<String, String> = splitted
