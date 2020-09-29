@@ -228,11 +228,13 @@ impl<'a> LiftAstToDml<'a> {
                 if type_specifications_with_invalid_datasource_name.len() > 0 {
                     let incorrect_type_specification =
                         type_specifications_with_invalid_datasource_name.first().unwrap();
-                    let given_prefix = incorrect_type_specification.name.name.split(".").next().unwrap();
+                    let mut type_specification_name_split = incorrect_type_specification.name.name.split(".");
+                    let given_prefix = type_specification_name_split.next().unwrap();
                     return Err(DatamodelError::new_connector_error(
                         &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
                             given_prefix: String::from(given_prefix),
                             expected_prefix: String::from(datasource_name),
+                            suggestion: format!("{}{}", prefix, type_specification_name_split.next().unwrap()),
                         })
                         .to_string(),
                         incorrect_type_specification.span,
