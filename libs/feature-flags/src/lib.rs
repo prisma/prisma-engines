@@ -56,12 +56,7 @@ macro_rules! flags {
 // `connectOrCreate`: `connectOrCreate` nested query in the QE.
 // `atomicNumberOperations`: New and expanded number operations for updates.
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases
-flags!(
-    transaction,
-    connectOrCreate,
-    atomicNumberOperations,
-    microsoftSqlServer
-);
+flags!(transaction, connectOrCreate, atomicNumberOperations, microsoftSqlServer);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.
