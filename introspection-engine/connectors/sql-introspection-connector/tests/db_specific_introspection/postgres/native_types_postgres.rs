@@ -64,15 +64,15 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
   smallint        Int      @postgres.SmallInt
   int             Int      @postgres.Integer
   bigint          Int      @postgres.BigInt
-  decimal         Float    @postgres.Numeric(4, 2)
-  numeric         Float    @postgres.Numeric(4, 2)
+  decimal         Decimal  @postgres.Numeric(4, 2)
+  numeric         Decimal  @postgres.Numeric(4, 2)
   real            Float    @postgres.Real
   doublePrecision Float    @postgres.DoublePrecision
   smallSerial     Int      @default(autoincrement()) @postgres.SmallInt
   serial          Int      @default(autoincrement()) @postgres.Integer
   bigSerial       Int      @default(autoincrement()) @postgres.BigInt
   varChar         String   @postgres.VarChar(200)
-  char            String   @postgres.VarChar(200)
+  char            String   @postgres.Char(200)
   text            String   @postgres.Text
   bytea           Bytes    @postgres.ByteA
   ts              DateTime @postgres.Timestamp(0)
@@ -80,7 +80,7 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
   date            DateTime @postgres.Date
   time            DateTime @postgres.Time(2)
   timetz          DateTime @postgres.TimeWithTimeZone(2)
-  interval        String   @postgres.Interval(2)
+  interval        Duration @postgres.Interval(2)
   bool            Boolean  @postgres.Boolean
   bit             String   @postgres.Bit(1)
   varbit          String   @postgres.VarBit(1)
@@ -92,13 +92,13 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
 }
 "#;
 
-    //Fixme parsing can't handle native types yet???
     let result = dbg!(api.re_introspect(&dm).await);
 
+    //Fixme parsing can't handle native types yet???
     dm.push_str(types);
-
     println!("EXPECTATION: \n {}", dm);
     println!("RESULT: \n {}", result);
+
     assert_eq!(result.replace(" ", "").contains(&types.replace(" ", "")), true);
 
     Ok(())
@@ -122,10 +122,11 @@ async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestRes
         })
         .await;
 
-    let dm = r#"datasource postgres {		        
+    let mut dm = r#"datasource postgres {		        
     provider        = "postgres"		       
     url             = "postgres://localhost/test"		         
- }"#;
+ }"#
+    .to_owned();
 
     let types = r#"
     model Blog {
@@ -164,6 +165,8 @@ async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestRes
     .to_owned();
 
     let result = dbg!(api.re_introspect(&dm).await);
+
+    dm.push_str(&types);
 
     println!("EXPECTATION: \n {}", dm);
     println!("RESULT: \n {}", result);

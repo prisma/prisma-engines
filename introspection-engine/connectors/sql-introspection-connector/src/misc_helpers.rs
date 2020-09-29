@@ -328,14 +328,32 @@ pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -
         }
     };
 
+    let is_postgres_interval = {
+        if family.is_postgres() {
+            let datamodel_connector = SqlDatamodelConnectors::postgres();
+
+            match &column.tpe.native_type {
+                None => false,
+                Some(native_type) => {
+                    let tpe = datamodel_connector.introspect_native_type(native_type.clone()).unwrap();
+                    tpe.name == "Interval"
+                }
+            }
+        } else {
+            false
+        }
+    };
+
     match &column.tpe.family {
         _ if is_mysql_bit => FieldType::Base(ScalarType::Int, None),
+        _ if is_postgres_interval => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
+        ColumnTypeFamily::Duration => FieldType::Base(ScalarType::DateTime, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
@@ -359,6 +377,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
+        ColumnTypeFamily::Duration => FieldType::Base(ScalarType::Duration, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),

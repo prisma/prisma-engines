@@ -263,6 +263,10 @@ impl SqlSchemaDescriber {
                                 Some(float_value) => DefaultValue::VALUE(float_value),
                                 None => DefaultValue::DBGENERATED(default_string),
                             },
+                            ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                                Some(float_value) => DefaultValue::VALUE(float_value),
+                                None => DefaultValue::DBGENERATED(default_string),
+                            },
                             ColumnTypeFamily::Boolean => match parse_int(&default_string) {
                                 Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
                                 Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
@@ -282,8 +286,8 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
+                            ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
-                            _ => DefaultValue::DBGENERATED(default_string),
                         })
                     }
                 },

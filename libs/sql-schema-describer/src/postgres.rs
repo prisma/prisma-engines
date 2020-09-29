@@ -296,6 +296,7 @@ impl SqlSchemaDescriber {
                                     DefaultValue::DBGENERATED(default_string)
                                 }
                             }
+                            ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                         })
                     }
@@ -678,6 +679,7 @@ fn get_column_type<'a>(
         "text" | "_text" => (String, Some(PostgresType::Text)),
         "citext" | "_citext" => (String, None),
         "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_max_length()))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
@@ -686,8 +688,6 @@ fn get_column_type<'a>(
         // bit and varbit should be binary, but are currently mapped to strings.
         "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
         "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),
-        "bpchar" | "_bpchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
-        "interval" | "_interval" => (String, Some(PostgresType::Interval(precision.time_precision()))),
         "numeric" | "_numeric" => (
             Decimal,
             Some(PostgresType::Numeric(
@@ -702,6 +702,7 @@ fn get_column_type<'a>(
             DateTime,
             Some(PostgresType::TimeWithTimeZone(precision.time_precision())),
         ),
+        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision()))),
         "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision()))),
         "timestamptz" | "_timestamptz" => (
             DateTime,
