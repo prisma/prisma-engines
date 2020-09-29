@@ -31,6 +31,16 @@ pub enum ErrorKind {
     ConnectorNotSupportedForNativeTypes { connector_name: String },
 
     #[error(
+        "Native types prefix {} is not compatible with the datasource used in this schema, expected prefix {}.",
+        given_prefix,
+        expected_prefix
+    )]
+    InvalidPrefixForNativeTypes {
+        given_prefix: String,
+        expected_prefix: String,
+    },
+
+    #[error(
         "Native type {} is not compatible with declared field type {}, expected field type {}.",
         native_type,
         field_type,
