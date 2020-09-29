@@ -17,6 +17,12 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
         |  tInt Int    @test.TinyInt
         |  mInt Int    @test.MediumInt
         |  bInt Int    @test.BigInt
+        |
+        |  inc_int  Int @default(autoincrement()) @test.Int
+        |  inc_sInt Int @default(autoincrement()) @test.SmallInt
+        |  inc_tInt Int @default(autoincrement()) @test.TinyInt
+        |  inc_mInt Int @default(autoincrement()) @test.MediumInt
+        |  inc_bInt Int @default(autoincrement()) @test.BigInt
         |}"""
     }
 
@@ -39,6 +45,11 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
          |    tInt
          |    mInt
          |    bInt
+         |    inc_int
+         |    inc_sInt
+         |    inc_tInt
+         |    inc_mInt
+         |    inc_bInt
          |  }
          |}""".stripMargin,
       project,

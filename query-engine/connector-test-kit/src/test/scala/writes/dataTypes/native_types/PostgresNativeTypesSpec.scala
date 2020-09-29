@@ -11,13 +11,16 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     val project = ProjectDsl.fromString {
       """
         |model Model {
-        |  id      String @id @default(cuid())
-        |  int     Int    @test.Integer
-        |  sInt    Int    @test.SmallInt
-        |  bInt    Int    @test.BigInt
-        |  serial  Int    @default(autoincrement()) @test.Serial
-        |  sSerial Int    @default(autoincrement()) @test.SmallSerial
-        |  bSerial Int    @default(autoincrement()) @test.BigSerial
+        |  id       String @id @default(cuid())
+        |  int      Int    @test.Integer
+        |  sInt     Int    @test.SmallInt
+        |  bInt     Int    @test.BigInt
+        |  serial   Int    @default(autoincrement()) @test.Serial
+        |  sSerial  Int    @default(autoincrement()) @test.SmallSerial
+        |  bSerial  Int    @default(autoincrement()) @test.BigSerial
+        |  inc_int  Int    @default(autoincrement()) @test.Integer
+        |  inc_sInt Int    @default(autoincrement()) @test.SmallInt
+        |  inc_bInt Int    @default(autoincrement()) @test.BigInt
         |}"""
     }
 
@@ -39,6 +42,9 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |    serial
          |    sSerial
          |    bSerial
+         |    inc_int
+         |    inc_sint
+         |    inc_bint
          |  }
          |}""".stripMargin,
       project,
