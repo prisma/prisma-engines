@@ -16,7 +16,7 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   Book_color
             color2  Book_color2
         }
@@ -57,7 +57,7 @@ async fn introspecting_a_table_with_an_enum_default_value_that_is_an_empty_strin
 
     let dm = r#"
         model Book {
-            id      Int         @default(autoincrement()) @id
+            id      Int         @id @default(autoincrement())
             color   Book_color  @default(EMPTY_ENUM_VALUE)
         }
 
@@ -86,7 +86,7 @@ async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_d
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color2  Book_color2
             color   Book_color
         }
@@ -128,7 +128,7 @@ async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestAp
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   Book_color   @default(black)
         }
 

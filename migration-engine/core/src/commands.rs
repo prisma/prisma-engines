@@ -36,7 +36,8 @@ pub use command::{CommandError, CommandResult, MigrationCommand};
 pub use create_migration::{CreateMigrationCommand, CreateMigrationInput, CreateMigrationOutput};
 pub use debug_panic::DebugPanicCommand;
 pub use diagnose_migration_history::{
-    DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, HistoryDiagnostic,
+    DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
+    HistoryDiagnostic,
 };
 pub use get_database_version::*;
 pub use infer_migration_steps::*;

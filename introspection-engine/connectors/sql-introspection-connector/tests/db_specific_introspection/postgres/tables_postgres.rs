@@ -196,7 +196,7 @@ async fn introspecting_a_table_with_datetime_default_values_should_work(api: &Te
         .await;
     let dm = r#"
             model User {
-                id                  Int       @default(autoincrement()) @id
+                id                  Int       @id @default(autoincrement())
                 name                String
                 current_timestamp   DateTime? @default(now())
                 now                 DateTime? @default(now())
@@ -301,7 +301,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
         })
         .await;
 
-    let dm = "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n\nmodel User {\n  id      Int    @default(autoincrement()) @id\n  // Post Post[]\n}\n";
+    let dm = "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n\nmodel User {\n  id      Int    @id @default(autoincrement())\n  // Post Post[]\n}\n";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
@@ -421,7 +421,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
 
     let dm = r#"
             model Test {
-                id                      Int         @default(autoincrement()) @id
+                id                      Int         @id @default(autoincrement())
                 string_static_text      String?     @default("test")
                 string_static_text_null String?
                 string_static_char      String?     @default("test")

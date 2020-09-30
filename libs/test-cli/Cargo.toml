@@ -12,7 +12,7 @@ colored = "1.9.2"
 structopt = "0.3.8"
 migration-core = { path = "../../migration-engine/core" }
 introspection-core = { path = "../../introspection-engine/core"}
-tokio = "=0.2.13"
+tokio = "0.2.13"
 serde_json = "1.0.44"
 tracing = "0.1.15"
 tracing-subscriber = "0.2.6"

@@ -25,7 +25,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
 
     let dm = r#"
             model User {
-                id   Int   @default(autoincrement()) @id
+                id   Int   @id @default(autoincrement())
                 age  Int
                 Post Post?
                 
@@ -33,7 +33,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
             }
             
             model Post {
-                id       Int   @default(autoincrement()) @id
+                id       Int   @id @default(autoincrement())
                 user_id  Int?
                 user_age Int?
                 User     User? @relation(fields: [user_id, user_age], references: [id, age])
@@ -69,7 +69,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
 
     let dm = r#"
             model User {
-                id   Int   @default(autoincrement()) @id
+                id   Int   @id @default(autoincrement())
                 age  Int
                 Post Post?
                 
@@ -77,7 +77,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
             }
             
             model Post {
-                id       Int  @default(autoincrement()) @id
+                id       Int  @id @default(autoincrement())
                 user_id  Int
                 user_age Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age])
@@ -112,7 +112,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
 
     let dm = r#"
              model User {
-                  id   Int    @default(autoincrement()) @id
+                  id   Int    @id @default(autoincrement())
                   age  Int
                   Post Post[]
                       
@@ -120,7 +120,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
             }
                     
             model Post {
-                  id       Int   @default(autoincrement()) @id
+                  id       Int   @id @default(autoincrement())
                   user_id  Int?
                   user_age Int?
                   User     User? @relation(fields: [user_id, user_age], references: [id, age])
@@ -156,7 +156,7 @@ async fn compound_foreign_keys_should_work_for_duplicate_one_to_many_relations(a
 
     let dm = r#"
             model User {
-                id                                              Int    @default(autoincrement()) @id
+                id                                              Int    @id @default(autoincrement())
                 age                                             Int
                 Post_Post_other_user_id_other_user_ageToUser    Post[] @relation("Post_other_user_id_other_user_ageToUser")
                 Post_Post_user_id_user_ageToUser                Post[] @relation("Post_user_id_user_ageToUser")
@@ -165,7 +165,7 @@ async fn compound_foreign_keys_should_work_for_duplicate_one_to_many_relations(a
             }
                       
             model Post {
-               id                                               Int   @default(autoincrement()) @id
+               id                                               Int   @id @default(autoincrement())
                user_id                                          Int?
                user_age                                         Int?
                other_user_id                                    Int?
@@ -201,7 +201,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
 
     let dm = r#"
             model User {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 age  Int
                 Post Post[]
                 
@@ -209,7 +209,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
             }
             
             model Post {
-                id       Int  @default(autoincrement()) @id
+                id       Int  @id @default(autoincrement())
                 user_id  Int
                 user_age Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age])
@@ -238,7 +238,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
 
     let dm = r#"
             model Person {
-                id           Int      @default(autoincrement()) @id
+                id           Int      @id @default(autoincrement())
                 age          Int
                 partner_id   Int
                 partner_age  Int
@@ -272,7 +272,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
 
     let dm = r#"
             model Person {
-                id           Int      @default(autoincrement()) @id
+                id           Int      @id @default(autoincrement())
                 age          Int
                 partner_id   Int?
                 partner_age  Int?
@@ -306,7 +306,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 
     let dm = r#"
             model Person {
-              id           Int      @default(autoincrement()) @id
+              id           Int      @id @default(autoincrement())
               age          Int
               partner_id   Int      @default(0)
               partner_age  Int      @default(0)
@@ -390,7 +390,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
 
     let dm = r#"
             model User {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 age  Int
                 Post Post[]
                 
@@ -398,7 +398,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
             }
             
             model Post {
-                id       Int  @default(autoincrement()) @id
+                id       Int  @id @default(autoincrement())
                 user_id  Int
                 user_age Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age])

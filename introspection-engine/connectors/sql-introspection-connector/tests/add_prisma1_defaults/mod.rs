@@ -13,7 +13,7 @@ async fn add_cuid_default_for_postgres(api: &TestApi) {
 
     let dm = r#"
             model Book {
-                id  String @default(cuid()) @id
+                id  String @id @default(cuid())
             }
         "#;
 
@@ -57,7 +57,7 @@ async fn add_cuid_default_for_mysql(api: &TestApi) {
 
     let dm = r#"
             model Book {
-                id  String @default(cuid()) @id
+                id  String @id @default(cuid())
             }
         "#;
     let result = dbg!(api.introspect().await);

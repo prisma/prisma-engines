@@ -12,12 +12,10 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
             ..
         }) => user_facing_error.into(),
         Error::CommandError(CommandError::IntrospectionResultEmpty(connection_string)) => {
-            KnownError::new(IntrospectionResultEmpty { connection_string })
-                .unwrap()
-                .into()
+            KnownError::new(IntrospectionResultEmpty { connection_string }).into()
         }
         Error::CommandError(CommandError::ReceivedBadDatamodel(full_error)) => {
-            KnownError::new(SchemaParserError { full_error }).unwrap().into()
+            KnownError::new(SchemaParserError { full_error }).into()
         }
         _ => UserFacingError::from_dyn_error(&crate_error),
     }

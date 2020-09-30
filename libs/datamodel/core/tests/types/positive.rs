@@ -44,6 +44,36 @@ fn should_recursively_apply_a_custom_type() {
 }
 
 #[test]
+fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
+    let dml = r#"
+        datasource db {
+            provider        = "postgres"
+            url             = env("DATABASE_URL")
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model User {
+            id   Int @id
+            name Int    @default(autoincrement()) @db.SmallInt
+        }
+
+    "#;
+
+    let datamodel = parse(dml);
+
+    let user_model = datamodel.assert_has_model("User");
+
+    user_model
+        .assert_has_scalar_field("name")
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_autoincrement()));
+
+    let sft = user_model.assert_has_scalar_field("name").assert_native_type();
+
+    let postgres_type: PostgresType = sft.deserialize_native_type();
+    assert_eq!(postgres_type, PostgresType::SmallInt);
+}
+
+#[test]
 fn should_be_able_to_handle_multiple_types() {
     let dml = r#"
     type ID = String @id @default(cuid())

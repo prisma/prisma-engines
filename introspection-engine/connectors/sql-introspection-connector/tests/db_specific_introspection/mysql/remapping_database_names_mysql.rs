@@ -90,13 +90,13 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id              Int             @default(autoincrement()) @id
+                id              Int             @id @default(autoincrement())
                 user_id         Int             @unique
                 User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
                   
             model User_with_Space {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 name String
                 Post Post?
                         
@@ -127,7 +127,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 
     let dm = r#"
             model Post_With_Space {
-                id      Int  @default(autoincrement()) @id
+                id      Int  @id @default(autoincrement())
                 user_id Int  @unique
                 User    User @relation(fields: [user_id], references: [id])
                 
@@ -135,7 +135,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
             }
             
             model User {
-                id              Int              @default(autoincrement()) @id
+                id              Int              @id @default(autoincrement())
                 name            String
                 Post_With_Space Post_With_Space?
             }          
@@ -167,7 +167,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id              Int             @default(autoincrement()) @id
+                id              Int             @id @default(autoincrement())
                 user_id         Int
                 user_age        Int
                 User_with_Space User_with_Space @relation(fields: [user_id, user_age], references: [id, age])
@@ -176,7 +176,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
             }
                       
             model User_with_Space {
-                id   Int   @default(autoincrement()) @id
+                id   Int   @id @default(autoincrement())
                 age  Int
                 Post Post?
                             
@@ -211,7 +211,7 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#" 
             model Post {
-                id       Int  @default(autoincrement()) @id
+                id       Int  @id @default(autoincrement())
                 user_id  Int
                 user_age Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
@@ -220,7 +220,7 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
             }
                       
             model User {
-                id                  Int   @default(autoincrement()) @id
+                id                  Int   @id @default(autoincrement())
                 age_that_is_invalid Int   @map("age-that-is-invalid")
                 Post                Post?
                             
@@ -244,7 +244,7 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
 
     let dm = r#"
         model MySQLBook {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   MySQLBook_color? @map("1color")
             @@map("123MySQLBook")
         }
@@ -272,7 +272,7 @@ async fn remapping_enum_values_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   Book_color?
         }
 
@@ -299,7 +299,7 @@ async fn remapping_enum_default_values_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   Book_color   @default(b_lack)
         }
 

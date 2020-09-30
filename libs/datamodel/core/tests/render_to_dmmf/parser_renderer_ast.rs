@@ -10,9 +10,9 @@ fn test_parser_renderer_via_ast() {
   posts     Post[]   @relation(onDelete: CASCADE)
   profile   Profile?
 
-  @@map("user")
   @@unique([email, name])
   @@unique([name, email])
+  @@map("user")
 }
 
 model Profile {
@@ -129,6 +129,94 @@ model Blog {
 "#;
 
     assert_rendered(input, input);
+}
+
+#[test]
+fn test_parser_renderer_order_of_field_directives_via_ast() {
+    let input = r#"model Post {
+  id        Int      @default(autoincrement()) @id
+  published Boolean  @map("_published") @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  megaField DateTime @map("mega_field") @id @default("10.02.1010") @unique @updatedAt
+}
+
+model Test {
+  id     Int   @id @map("_id") @default(1) @updatedAt
+  blogId Int?  @unique @default(1)
+}
+"#;
+    let expected = r#"model Post {
+  id        Int     @id @default(autoincrement())
+  published Boolean @default(false) @map("_published")
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}
+
+model User {
+  megaField DateTime @id @unique @default("10.02.1010") @updatedAt @map("mega_field")
+}
+
+model Test {
+  id     Int  @id @default(1) @updatedAt @map("_id")
+  blogId Int? @unique @default(1)
+}
+"#;
+
+    assert_rendered(input, expected);
+}
+
+#[test]
+fn test_parser_renderer_order_of_block_directives_via_ast() {
+    let input = r#"model Person {
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+  @@map("blog")
+  @@index([yearOfBirth])
+  @@unique([codeName, yearOfBirth])
+  @@id([firstName, lastName])
+}
+
+model Blog {
+  id    Int    @default(1)
+  name  String
+  posts Post[]
+  @@id([id])
+  @@index([id, name])
+  @@unique([name])
+  @@map("blog")
+}
+"#;
+
+    let expected = r#"model Person {
+  firstName   String
+  lastName    String
+  codeName    String
+  yearOfBirth Int
+
+  @@id([firstName, lastName])
+  @@unique([codeName, yearOfBirth])
+  @@index([yearOfBirth])
+  @@map("blog")
+}
+
+model Blog {
+  id    Int    @default(1)
+  name  String
+  posts Post[]
+
+  @@id([id])
+  @@unique([name])
+  @@index([id, name])
+  @@map("blog")
+}
+"#;
+    assert_rendered(input, expected);
 }
 
 #[test]

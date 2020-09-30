@@ -17,6 +17,6 @@ impl<'a> MigrationCommand for ResetCommand {
     {
         engine.reset().await?;
 
-        Ok(Default::default())
+        Ok(())
     }
 }

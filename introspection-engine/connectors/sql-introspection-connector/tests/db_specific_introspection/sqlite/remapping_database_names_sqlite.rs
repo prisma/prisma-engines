@@ -90,7 +90,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model User_with_Space {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 name String
                 Post Post?
             
@@ -98,7 +98,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
             }
                     
             model Post {
-                id              Int             @default(autoincrement()) @id
+                id              Int             @id @default(autoincrement())
                 user_id         Int             @unique
                 User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
@@ -131,7 +131,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model User_with_Space {
-                id   Int   @default(autoincrement()) @id
+                id   Int   @id @default(autoincrement())
                 age  Int
                 Post Post?
                   
@@ -140,7 +140,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
             }
                       
             model Post {
-                id              Int             @default(autoincrement()) @id
+                id              Int             @id @default(autoincrement())
                 user_id         Int
                 user_age        Int
                 User_with_Space User_with_Space  @relation(fields: [user_id, user_age], references: [id, age])
@@ -175,7 +175,7 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model User {
-                id                  Int   @default(autoincrement()) @id
+                id                  Int   @id @default(autoincrement())
                 age_that_is_invalid Int   @map("age-that-is-invalid")
                 Post                Post?
                     
@@ -183,7 +183,7 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
             }
                 
             model Post {
-                id       Int  @default(autoincrement()) @id
+                id       Int  @id @default(autoincrement())
                 user_id  Int
                 user_age Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])

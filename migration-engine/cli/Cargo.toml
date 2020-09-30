@@ -17,7 +17,7 @@ json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 serde_json = "1.0"
 structopt = "0.3.8"
 thiserror = "1.0.9"
-tokio = { version = "=0.2.13", features = ["macros"] }
+tokio = { version = "0.2.13", features = ["macros"] }
 tracing = "0.1"
 tracing-subscriber = "0.2"
 tracing-error = "0.1.2"

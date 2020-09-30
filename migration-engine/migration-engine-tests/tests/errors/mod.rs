@@ -2,7 +2,7 @@ use migration_connector::steps::{DeleteModel, MigrationStep};
 use migration_core::api::{render_error, RpcApi};
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use quaint::prelude::*;
+use quaint::prelude::Queryable;
 use serde_json::json;
 use url::Url;
 
