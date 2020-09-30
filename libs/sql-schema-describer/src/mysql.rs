@@ -586,7 +586,9 @@ fn get_column_type_and_enum(
     let (family, native_type) = match data_type {
         "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
         "smallint" => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
-        "tinyint" if extract_single_arg(full_data_type) == 1 => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
+        "tinyint" if extract_precision(full_data_type) == Some(1) => {
+            (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt))
+        }
         "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
         "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
         "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
@@ -688,11 +690,13 @@ fn get_column_type_and_enum(
     }
 }
 
-fn extract_single_arg(full_data_type: &str) -> u32 {
-    let len = &full_data_type.len() - 1;
+fn extract_precision(input: &str) -> Option<u32> {
+    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(<precision>([1-9])\)"#).unwrap());
 
-    let a = full_data_type[..len].split('(').last().unwrap();
-    from_str::<u32>(a).unwrap()
+    RE.captures(input).and_then(|cap| {
+        cap.name("precision")
+            .map(|precision| from_str::<u32>(precision.as_str()).unwrap())
+    })
 }
 
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
