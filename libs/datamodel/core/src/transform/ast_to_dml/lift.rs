@@ -311,7 +311,7 @@ impl<'a> LiftAstToDml<'a> {
                     if constructor.name == "Serial" && connector_string.eq("postgresql") {
                         if let Some(default_attribute) = ast_field.directives.iter().find(|d| d.name.name == "default")
                         {
-                            if let Some(default_arg) = default_attribute
+                            if let Some(_) = default_attribute
                                 .arguments
                                 .iter()
                                 .find(|a| a.value.render_to_string() == "autoincrement()")

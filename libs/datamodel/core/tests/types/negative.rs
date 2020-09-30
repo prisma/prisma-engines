@@ -177,7 +177,7 @@ fn should_fail_on_serial_native_type_and_default_autoincrement() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "The native type serial translates to an Integer column with an auto-incrementing counter as default. The field attribute @default(autoincrement()) translates to the serial type underneath. Please remove one of the two attributes.",
-        ast::Span::new(222, 240),
+        ast::Span::new(244, 253),
     ));
 }
 
