@@ -517,21 +517,27 @@ struct Precision {
 impl Precision {
     fn numeric_precision(&self) -> u32 {
         // Fixme
-        // How do we express radix?
-        // base 10 or 2 usually with 2 for bits?
-        self.numeric_precision.unwrap()
+        // Do we need to express radix?
+        // base 10 for numeric types usually
+        // base 2 for bits usually
+        // on Postgres `decimal_column decimal` will not return precision
+        // on Postgres `decimal_array_column decimal(30,5)[]` will also not return numeric precision
+        // workaround https://stackoverflow.com/questions/57336645/how-to-get-array-elements-numeric-precision-numeric-scale-and-datetime-pr
+        self.numeric_precision.unwrap_or(65)
     }
 
     fn character_max_length(&self) -> u32 {
-        self.character_maximum_length.unwrap()
+        // on Postgres `char_array_column char(8)[]` will also not return character_max_length
+        self.character_maximum_length.unwrap_or(64000)
     }
 
     fn numeric_scale(&self) -> u32 {
-        self.numeric_scale.unwrap()
+        // see numeric precision
+        self.numeric_scale.unwrap_or(30)
     }
 
     fn time_precision(&self) -> u32 {
-        self.time_precision.unwrap()
+        self.time_precision.unwrap_or(6)
     }
 }
 
