@@ -43,16 +43,22 @@ impl<'a> TestApi for MySql<'a> {
     async fn create_table(&mut self, columns: &str) -> crate::Result<String> {
         let name = self.get_name();
 
-        let create = format!(
-            r##"
-            CREATE TEMPORARY TABLE `{}` ({}) ENGINE=InnoDB DEFAULT CHARSET=latin1
-            "##,
-            name, columns,
-        );
+        let (name, create) = self.render_create_table(&name, columns);
 
         self.conn().raw_cmd(&create).await?;
 
         Ok(name)
+    }
+
+    fn render_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {
+        let create = format!(
+            r##"
+            CREATE TEMPORARY TABLE `{}` ({}) ENGINE=InnoDB DEFAULT CHARSET=latin1
+            "##,
+            table_name, columns,
+        );
+
+        (table_name.to_string(), create)
     }
 
     async fn create_index(&mut self, table: &str, columns: &str) -> crate::Result<String> {

@@ -19,6 +19,7 @@ pub use sqlite::*;
 #[async_trait::async_trait]
 pub trait TestApi {
     async fn create_type_table(&mut self, r#type: &str) -> crate::Result<String>;
+    fn render_create_table(&mut self, table_name: &str, columns: &str) -> (String, String);
     async fn create_table(&mut self, columns: &str) -> crate::Result<String>;
 
     async fn create_index(&mut self, table: &str, columns: &str) -> crate::Result<String>;

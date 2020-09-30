@@ -36,14 +36,9 @@ impl<'a> TestApi for MsSql<'a> {
     }
 
     async fn create_table(&mut self, columns: &str) -> crate::Result<String> {
-        let name = format!("##{}", self.get_name());
+        let name = self.get_name();
 
-        let create = format!(
-            r##"
-            CREATE TABLE {} ({})
-            "##,
-            name, columns,
-        );
+        let (name, create) = self.render_create_table(&name, columns);
 
         self.conn().raw_cmd(&create).await?;
 
@@ -67,6 +62,18 @@ impl<'a> TestApi for MsSql<'a> {
 
     fn conn(&self) -> &Quaint {
         &self.conn
+    }
+
+    fn render_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {
+        let table_name = format!("##{}", table_name);
+        let create = format!(
+            r##"
+            CREATE TABLE {} ({})
+            "##,
+            table_name, columns,
+        );
+
+        (table_name, create)
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {
