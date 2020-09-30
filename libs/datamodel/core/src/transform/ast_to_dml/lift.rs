@@ -307,23 +307,6 @@ impl<'a> LiftAstToDml<'a> {
                         ));
                     }
 
-                    // check for unnecessary native type
-                    if constructor.name == "Serial" && connector_string.eq("postgresql") {
-                        if let Some(default_attribute) = ast_field.directives.iter().find(|d| d.name.name == "default")
-                        {
-                            if let Some(_) = default_attribute
-                                .arguments
-                                .iter()
-                                .find(|a| a.value.render_to_string() == "autoincrement()")
-                            {
-                                return Err(DatamodelError::new_connector_error(
-                                    "The native type serial translates to an Integer column with an auto-incrementing counter as default. The field attribute @default(autoincrement()) translates to the serial type underneath. Please remove one of the two attributes.",
-                                    type_specification.unwrap().span,
-                                ));
-                            }
-                        }
-                    }
-
                     let parse_native_type_result = connector.parse_native_type(x, args);
                     match parse_native_type_result {
                         Err(connector_error) => {
