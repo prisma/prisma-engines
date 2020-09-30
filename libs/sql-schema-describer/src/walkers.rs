@@ -75,7 +75,7 @@ impl<'a> ColumnWalker<'a> {
     pub fn is_single_primary_key(&self) -> bool {
         self.table()
             .primary_key()
-            .map(|pk| pk.columns == &[self.name()])
+            .map(|pk| pk.columns == [self.name()])
             .unwrap_or(false)
     }
 
