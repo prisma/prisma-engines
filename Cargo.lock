@@ -70,6 +70,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ahash"
+version = "0.2.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6f33b5018f120946c1dcf279194f238a9f146725593ead1c08fa47ff22b0b5d3"
+dependencies = [
+ "const-random",
+]
+
+[[package]]
 name = "aho-corasick"
 version = "0.7.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -303,6 +312,12 @@ dependencies = [
  "libc",
  "winapi 0.3.9",
 ]
+
+[[package]]
+name = "autocfg"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d49d90015b3c36167a20fe2810c5cd875ad504b39cff3d4eae7977e6b7c1cb2"
 
 [[package]]
 name = "autocfg"
@@ -572,6 +587,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "const-random"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f1af9ac737b2dd2d577701e59fd09ba34822f6f2ebdb30a7647405d9e55e16a"
+dependencies = [
+ "const-random-macro",
+ "proc-macro-hack",
+]
+
+[[package]]
+name = "const-random-macro"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25e4c606eb459dd29f7c57b2e0879f2b6f14ee130918c2b78ccb58a9624e6c7a"
+dependencies = [
+ "getrandom",
+ "proc-macro-hack",
+]
+
+[[package]]
 name = "const_fn"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -666,7 +701,7 @@ version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "058ed274caafc1f60c4997b5fc07bf7dc7cca454af7c6e81edffe5f33f70dace"
 dependencies = [
- "autocfg",
+ "autocfg 1.0.1",
  "cfg-if",
  "crossbeam-utils",
  "lazy_static",
@@ -692,7 +727,7 @@ version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3c7c73a2d1e9fc0886a08b93e98eb643461230d5f1925e4036204d5f2e261a8"
 dependencies = [
- "autocfg",
+ "autocfg 1.0.1",
  "cfg-if",
  "lazy_static",
 ]
@@ -1298,6 +1333,16 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e6073d0ca812575946eb5f35ff68dbe519907b25c42530389ff946dc84c6ead"
+dependencies = [
+ "ahash",
+ "autocfg 0.1.7",
+]
+
+[[package]]
+name = "hashbrown"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "00d63df3d41950fb462ed38308eea019113ad1508da725bbedcd0fa5a85ef5f7"
@@ -1426,8 +1471,8 @@ version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55e2e4c765aa53a0424761bf9f41aa7a6ac1efa87238f59560640e27fca028f2"
 dependencies = [
- "autocfg",
- "hashbrown",
+ "autocfg 1.0.1",
+ "hashbrown 0.9.0",
  "serde",
 ]
 
@@ -1755,6 +1800,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "lru"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "35c456c123957de3a220cd03786e0d86aa542a88b46029973b542f426da6ef34"
+dependencies = [
+ "hashbrown 0.6.3",
+]
+
+[[package]]
 name = "lru-cache"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1814,7 +1868,7 @@ version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c198b026e1bbf08a937e94c6c60f9ec4a2267f5b0d2eec9c1b21b061ce2be55f"
 dependencies = [
- "autocfg",
+ "autocfg 1.0.1",
 ]
 
 [[package]]
@@ -2024,9 +2078,9 @@ dependencies = [
 
 [[package]]
 name = "mysql_async"
-version = "0.23.1"
+version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2437d3b8ce11d743be7adfbdc5092f6046141b78677b1e3bc9e914d3d1a4c744"
+checksum = "9bb4fbd44aa66654185a75981e3d1ddc8a5315dd1c7a6250cc7f272c686e5395"
 dependencies = [
  "bytes",
  "crossbeam",
@@ -2034,6 +2088,7 @@ dependencies = [
  "futures-sink",
  "futures-util",
  "lazy_static",
+ "lru",
  "mio-named-pipes",
  "mysql_common",
  "native-tls",
@@ -2044,7 +2099,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-tls",
- "tokio-util 0.2.0",
+ "tokio-util",
  "twox-hash",
  "url 2.1.1",
 ]
@@ -2122,7 +2177,7 @@ version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "090c7f9998ee0ff65aa5b723e4009f7b217707f1fb5ea551329cc4d6231fb304"
 dependencies = [
- "autocfg",
+ "autocfg 1.0.1",
  "num-integer",
  "num-traits",
 ]
@@ -2133,7 +2188,7 @@ version = "0.1.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d59457e662d541ba17869cf51cf177c0b5f0cbf476c66bdc90bf1edac4f875b"
 dependencies = [
- "autocfg",
+ "autocfg 1.0.1",
  "num-traits",
 ]
 
@@ -2143,7 +2198,7 @@ version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac267bcc07f48ee5f8935ab0d24f316fb722d7a1292e2913f0cc196b29ffd611"
 dependencies = [
- "autocfg",
+ "autocfg 1.0.1",
 ]
 
 [[package]]
@@ -2206,7 +2261,7 @@ version = "0.9.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a842db4709b604f0fe5d1170ae3565899be2ad3d9cbc72dedc789ac0511f78de"
 dependencies = [
- "autocfg",
+ "autocfg 1.0.1",
  "cc",
  "libc",
  "pkg-config",
@@ -2636,7 +2691,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#f8ed5bf4510eb2e6cf1c102897d9ce4b87de0a91"
+source = "git+https://github.com/prisma/quaint#10fec24650f8b31c533a3d701d2c4842b634cd0f"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -2666,7 +2721,7 @@ dependencies = [
  "tiberius",
  "tokio",
  "tokio-postgres",
- "tokio-util 0.3.1",
+ "tokio-util",
  "tracing",
  "tracing-core",
  "url 2.1.1",
@@ -3530,8 +3585,8 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.4.8"
-source = "git+https://github.com/prisma/tiberius?branch=pgbouncer-mode-hack#245c31750c3b39e879f509f0a470ac45db9c2e2d"
+version = "0.4.9"
+source = "git+https://github.com/prisma/tiberius?branch=pgbouncer-mode-hack#4db88abc6ac4eae8cad0d490fef28fd208ca6081"
 dependencies = [
  "async-native-tls",
  "async-stream",
@@ -3551,7 +3606,7 @@ dependencies = [
  "rust_decimal",
  "thiserror",
  "tokio",
- "tokio-util 0.3.1",
+ "tokio-util",
  "tracing",
  "uuid",
  "winauth",
@@ -3649,9 +3704,9 @@ checksum = "238ce071d267c5710f9d31451efec16c5ee22de34df17cc05e56cbc92e967117"
 
 [[package]]
 name = "tokio"
-version = "0.2.13"
+version = "0.2.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fa5e81d6bc4e67fe889d5783bd2a128ab2e0cfa487e0be16b6a8d177b101616"
+checksum = "5d34ca54d84bf2b5b4d7d31e901a8464f7b60ac145a284fba25ceb801f2ddccd"
 dependencies = [
  "bytes",
  "fnv",
@@ -3697,7 +3752,7 @@ dependencies = [
  "postgres-protocol",
  "postgres-types",
  "tokio",
- "tokio-util 0.3.1",
+ "tokio-util",
 ]
 
 [[package]]
@@ -3707,20 +3762,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a70f4fcd7b3b24fb194f837560168208f669ca8cb70d0c4b862944452396343"
 dependencies = [
  "native-tls",
- "tokio",
-]
-
-[[package]]
-name = "tokio-util"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "571da51182ec208780505a32528fc5512a8fe1443ab960b3f2f3ef093cd16930"
-dependencies = [
- "bytes",
- "futures-core",
- "futures-sink",
- "log",
- "pin-project-lite",
  "tokio",
 ]
 

@@ -337,8 +337,7 @@ async fn diagnose_migrations_history_can_detect_edited_migrations(api: &TestApi)
     Ok(())
 }
 
-// TODO: reenable on MySQL when https://github.com/prisma/quaint/issues/187 is fixed.
-#[test_each_connector(ignore("mysql"))]
+#[test_each_connector]
 async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 

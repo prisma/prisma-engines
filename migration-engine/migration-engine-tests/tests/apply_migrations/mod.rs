@@ -121,13 +121,10 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
     let first = first.assert_migration_name("initial")?.assert_applied_steps_count(1)?;
     assert!(!first.is_failed());
 
-    // Bug: https://github.com/prisma/quaint/issues/187
-    if !api.is_mysql() {
-        assert!(second.is_failed());
-        second
-            .assert_migration_name("second-migration")?
-            .assert_applied_steps_count(0)?;
-    }
+    assert!(second.is_failed());
+    second
+        .assert_migration_name("second-migration")?
+        .assert_applied_steps_count(0)?;
 
     Ok(())
 }

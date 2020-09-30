@@ -26,4 +26,4 @@ futures = "0.3"
 pretty_assertions = "0.6"
 test-macros = { path = "../test-macros" }
 test-setup = { path = "../test-setup" }
-tokio = {version = "=0.2.13", features = ["rt-threaded", "macros"]}
+tokio = {version = "0.2.13", features = ["rt-threaded", "macros"]}

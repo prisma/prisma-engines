@@ -227,15 +227,15 @@ impl SqlRenderer for MssqlFlavour {
         // null.
         let constraints = table
             .indexes()
-            .filter(|index| index.index.is_unique() && !index.has_nullable_columns())
+            .filter(|index| index.index_type().is_unique() && !index.has_nullable_columns())
             .collect::<Vec<_>>();
 
         let constraints = if !constraints.is_empty() {
             let constraints = constraints
                 .iter()
                 .map(|index| {
-                    let name = index.index.name.replace('.', "_");
-                    let columns = index.index.columns.iter().map(|col| self.quote(&col));
+                    let name = index.name().replace('.', "_");
+                    let columns = index.columns().map(|col| self.quote(col.name()));
 
                     format!("CONSTRAINT {} UNIQUE ({})", name, columns.join(","))
                 })
