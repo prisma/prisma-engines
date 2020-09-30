@@ -8,7 +8,7 @@ class BytesSpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = ProjectDsl.fromString {
       """|model Model {
          | id    Int    @id
-         | field Bytes?
+         | field Bytes? @default("dGVzdA==")
          |}"""
     }
 
@@ -20,7 +20,6 @@ class BytesSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  createOneModel(
          |    data: {
          |      id: 1
-         |      field: "dGVzdA=="
          |    }
          |  ) {
          |    field

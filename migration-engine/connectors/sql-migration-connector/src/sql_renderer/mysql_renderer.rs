@@ -183,6 +183,8 @@ impl SqlRenderer for MysqlFlavour {
                 !matches!(default, DefaultValue::DBGENERATED(_) | DefaultValue::SEQUENCE(_))
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
+                    // We do not want to render binary defaults because they are not supported by MySQL.
+                    && !matches!(column.column_type_family(), ColumnTypeFamily::Binary)
             })
             .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column_type_family())))
             .unwrap_or_else(String::new);

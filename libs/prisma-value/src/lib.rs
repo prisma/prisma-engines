@@ -43,12 +43,15 @@ pub enum PrismaValue {
 }
 
 pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
-    // format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ"))
     date.to_rfc3339()
 }
 
 pub fn encode_bytes(bytes: &[u8]) -> String {
     base64::encode(bytes)
+}
+
+pub fn decode_bytes(s: &str) -> PrismaValueResult<Vec<u8>> {
+    base64::decode(s).map_err(|_| ConversionFailure::new("base64 encoded bytes", "PrismaValue::Bytes"))
 }
 
 impl TryFrom<serde_json::Value> for PrismaValue {

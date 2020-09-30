@@ -11,9 +11,6 @@ use uuid::Uuid;
 
 pub struct QueryDocumentParser;
 
-// Todo:
-// - Use error collections instead of letting first error win.
-// - UUID ids are not encoded in any useful way in the schema.
 impl QueryDocumentParser {
     /// Parses and validates a set of selections against a schema (output) object.
     /// On an output object, optional types designate whether or not an output field can be nulled.
@@ -229,7 +226,7 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::Json) => {
                 Ok(PrismaValue::Json(Self::parse_json(parent_path, &s).map(|_| s)?))
             }
-            (QueryValue::String(_), ScalarType::XML) => todo!(),
+            (QueryValue::String(s), ScalarType::XML) => Ok(PrismaValue::Xml(s)),
             (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(parent_path, &s),
             (QueryValue::String(s), ScalarType::UUID) => {
                 Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
@@ -263,7 +260,7 @@ impl QueryDocumentParser {
     }
 
     pub fn parse_bytes(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
-        base64::decode(&s)
+        prisma_value::decode_bytes(&s)
             .map(PrismaValue::Bytes)
             .map_err(|_| QueryParserError {
                 path: path.clone(),

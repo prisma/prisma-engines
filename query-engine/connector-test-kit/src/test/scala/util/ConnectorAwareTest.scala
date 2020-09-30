@@ -13,6 +13,9 @@ object IgnorePostgres extends Tag("ignore.postgres") with AssociatedWithConnecto
 object IgnoreMySql extends Tag("ignore.mysql") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.MySqlConnectorTag
 }
+object IgnoreMySql56 extends Tag("ignore.mysql56") with AssociatedWithConnectorTags {
+  override def tag = ConnectorTag.Mysql56ConnectorTag
+}
 object IgnoreMongo extends Tag("ignore.mongo") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.MongoConnectorTag
 }
