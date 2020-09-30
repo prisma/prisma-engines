@@ -267,6 +267,17 @@ impl ColumnType {
             native_type: None,
         }
     }
+
+    pub fn with_full_data_type(family: ColumnTypeFamily, arity: ColumnArity, full_data_type: String) -> Self {
+        ColumnType {
+            data_type: "".to_string(),
+            full_data_type,
+            character_maximum_length: None,
+            family,
+            arity,
+            native_type: None,
+        }
+    }
 }
 
 /// Enumeration of column type families.

@@ -28,6 +28,14 @@ fn a_data_model_can_be_generated_from_a_schema() {
         ColumnTypeFamily::TransactionId,
     ];
 
+    fn unsupported(family: ColumnTypeFamily) -> (FieldType, bool, Option<String>) {
+        (
+            FieldType::Unsupported(family.to_string()),
+            true,
+            Some("This type is currently not supported.".to_string()),
+        )
+    }
+
     let ref_data_model = Datamodel {
         models: vec![Model {
             database_name: None,
@@ -53,11 +61,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
                         ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
                         ColumnTypeFamily::Json => (FieldType::Base(ScalarType::Json, None), false, None),
-                        x => (
-                            FieldType::Unsupported(x.to_string()),
-                            true,
-                            Some("This type is currently not supported.".to_string()),
-                        ),
+                       x => unsupported(x.to_owned()),
                     };
                     Field::ScalarField(ScalarField {
                         name: col_type.to_string(),
@@ -85,7 +89,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                 .iter()
                 .map(|family| Column {
                     name: family.to_string(),
-                    tpe: ColumnType::pure(family.to_owned(), ColumnArity::Nullable),
+                    tpe: ColumnType::with_full_data_type(family.to_owned(), ColumnArity::Nullable, family.to_string()),
                     default: None,
                     auto_increment: false,
                 })
@@ -1210,7 +1214,9 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     let expected_dm =
         datamodel::render_schema_ast_to_string(&datamodel::parse_schema_ast(&expected_dm).unwrap()).unwrap();
 
-    let mut introspected_dm = calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false)?.data_model;
+    println!("{:?}", schema);
+
+    let mut introspected_dm = calculate_datamodel(&schema, &sql_family, &Datamodel::new(), false)?.data_model;
     introspected_dm.models.sort_by(|a, b| b.name.cmp(&a.name));
 
     let introspected_dm_string = datamodel::render_datamodel_to_string(&introspected_dm).unwrap();
