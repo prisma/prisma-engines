@@ -110,6 +110,29 @@ fn should_fail_on_custom_related_types() {
 }
 
 #[test]
+fn should_fail_on_native_type_with_invalid_datasource_name() {
+    let dml = r#"
+        datasource db {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.BigInt?",
+        ast::Span::new(222, 231),
+    ));
+}
+
+#[test]
 fn should_fail_on_native_type_with_invalid_number_of_arguments() {
     let dml = r#"
         datasource pg {

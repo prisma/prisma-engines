@@ -219,6 +219,28 @@ impl<'a> LiftAstToDml<'a> {
                     .filter(|dir| dir.name.name.starts_with(&prefix))
                     .collect_vec();
 
+                let type_specifications_with_invalid_datasource_name = ast_field
+                    .directives
+                    .iter()
+                    .filter(|dir| dir.name.name.contains(".") && !dir.name.name.starts_with(&prefix))
+                    .collect_vec();
+
+                if type_specifications_with_invalid_datasource_name.len() > 0 {
+                    let incorrect_type_specification =
+                        type_specifications_with_invalid_datasource_name.first().unwrap();
+                    let mut type_specification_name_split = incorrect_type_specification.name.name.split(".");
+                    let given_prefix = type_specification_name_split.next().unwrap();
+                    return Err(DatamodelError::new_connector_error(
+                        &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
+                            given_prefix: String::from(given_prefix),
+                            expected_prefix: String::from(datasource_name),
+                            suggestion: format!("{}{}", prefix, type_specification_name_split.next().unwrap()),
+                        })
+                        .to_string(),
+                        incorrect_type_specification.span,
+                    ));
+                }
+
                 let type_specification = type_specifications.first();
 
                 if type_specifications.len() > 1 {

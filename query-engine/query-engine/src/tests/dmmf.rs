@@ -1,3 +1,8 @@
+use crate::{
+    cli::CliCommand,
+    opt::{CliOpt, PrismaOpt, Subcommand},
+    PrismaResult,
+};
 use datamodel::transform::ast_to_dml::reserved_model_names::TypeNameValidator;
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
@@ -92,6 +97,75 @@ fn list_of_reserved_model_names_must_be_up_to_date() {
             types_that_should_be_reserved.join(",\n")
         )
     }
+}
+
+#[test]
+#[serial]
+fn must_not_fail_if_no_datasource_is_defined() {
+    let schema = r#"
+        model Blog {
+            blogId String @id
+        }
+    "#;
+
+    test_dmmf_cli_command(schema).unwrap();
+}
+
+#[test]
+#[serial]
+fn must_not_fail_if_an_invalid_datasource_url_is_provided() {
+    let schema = r#"
+        datasource pg {
+            provider = "postgresql"
+            url      = "mysql:://"            
+        }
+        
+        model Blog {
+            blogId String @id
+        }
+    "#;
+
+    test_dmmf_cli_command(schema).unwrap();
+}
+
+#[test]
+#[serial]
+fn must_fail_if_the_schema_is_invalid() {
+    let schema = r#"
+        // invalid because of field type
+        model Blog {
+            blogId StringyString @id
+        }
+    "#;
+
+    assert!(test_dmmf_cli_command(schema).is_err());
+}
+
+fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
+    feature_flags::initialize(&[]).unwrap();
+
+    let prisma_opt = PrismaOpt {
+        host: "".to_string(),
+        datamodel: Some(schema.to_string()),
+        datamodel_path: None,
+        enable_debug_mode: false,
+        enable_raw_queries: false,
+        enable_playground: false,
+        legacy: false,
+        log_format: None,
+        overwrite_datasources: None,
+        port: 123,
+        raw_feature_flags: vec![],
+        unix_path: None,
+        subcommand: Some(Subcommand::Cli(CliOpt::Dmmf)),
+    };
+
+    let cli_cmd = CliCommand::from_opt(&prisma_opt)?.unwrap();
+
+    let result = test_setup::runtime::run_with_tokio(cli_cmd.execute());
+    result?;
+
+    Ok(())
 }
 
 fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {

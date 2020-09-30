@@ -14,9 +14,7 @@ pub fn render_error(crate_error: CoreError) -> Error {
             ..
         })) => user_facing_error.into(),
         CoreError::CommandError(CommandError::ReceivedBadDatamodel(full_error)) => {
-            KnownError::new(user_facing_errors::common::SchemaParserError { full_error })
-                .unwrap()
-                .into()
+            KnownError::new(user_facing_errors::common::SchemaParserError { full_error }).into()
         }
         _ => Error::from_dyn_error(&crate_error),
     }

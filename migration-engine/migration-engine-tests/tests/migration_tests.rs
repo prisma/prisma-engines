@@ -1174,7 +1174,7 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
     // Group is a reserved keyword
     let dm = r#"
             model Group {
-                id          String  @default(cuid()) @id
+                id          String  @id @default(cuid())
                 parent_id   String?
                 parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
                 childGroups Group[] @relation(name: "ChildGroups")
@@ -1195,18 +1195,18 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
     // test case for https://github.com/prisma/lift/issues/148
     let dm_1 = r#"
             model User {
-                id        String  @default(cuid()) @id
+                id        String  @id @default(cuid())
             }
 
             model Profile {
-                id        String  @default(cuid()) @id
+                id        String  @id @default(cuid())
                 userId    String
                 user      User    @relation(fields: userId, references: id)
                 skills    Skill[]
             }
 
             model Skill {
-                id          String  @default(cuid()) @id
+                id          String  @id @default(cuid())
                 profiles    Profile[]
             }
         "#;
@@ -1222,19 +1222,19 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 
     let dm_2 = r#"
             model User {
-                id        String  @default(cuid()) @id
+                id        String  @id @default(cuid())
                 someField String?
             }
 
             model Profile {
-                id        String  @default(cuid()) @id
+                id        String  @id @default(cuid())
                 userId    String
                 user      User    @relation(fields: userId, references: id)
                 skills    Skill[]
             }
 
             model Skill {
-                id          String  @default(cuid()) @id
+                id          String  @id @default(cuid())
                 profiles    Profile[]
             }
         "#;
@@ -1255,13 +1255,13 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm_1 = r#"
             model User {
-                id        String  @default(cuid()) @id
+                id        String  @id @default(cuid())
                 address_id String @map("address_name")
                 address   Address @relation(fields: [address_id], references: [id])
             }
 
             model Address {
-                id        String  @default(cuid()) @id
+                id        String  @id @default(cuid())
                 street    String
             }
         "#;
@@ -1273,11 +1273,11 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
 
     let dm_2 = r#"
             model User {
-                id        String  @default(cuid()) @id
+                id        String  @id @default(cuid())
             }
 
             model Address {
-                id        String  @default(cuid()) @id
+                id        String  @id @default(cuid())
                 street    String
             }
         "#;
@@ -2088,7 +2088,7 @@ async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
         createdAt   DateTime  @default(dbgenerated())
         email       String?
         firstName   String    @default("")
-        id          Int       @default(autoincrement()) @id
+        id          Int       @id @default(autoincrement())
         lastName    String    @default("")
         password    String?
         updatedAt   DateTime  @default(dbgenerated())
@@ -2141,7 +2141,7 @@ async fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_c
 async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model model1 {
-            id              String        @default(cuid()) @id
+            id              String        @id @default(cuid())
             a               String
             b               String
             c               String

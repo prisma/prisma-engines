@@ -250,7 +250,7 @@ async fn introspecting_a_table_with_optional_autoincrement_should_work(api: &Tes
 
     let dm = r#"
         model Book {
-            book_id      Int     @default(autoincrement()) @id
+            book_id      Int     @id @default(autoincrement())
         }
     "#;
 
@@ -284,7 +284,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
 
     let dm = r#"
             model Test {
-                id                                  Int         @default(autoincrement()) @id
+                id                                  Int         @id @default(autoincrement())
                 string_static_char                  String?     @default("test")
                 string_static_null                  String?
                 string_static_text                  String?     @default("test")

@@ -144,7 +144,7 @@ async fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts
 async fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
-            id     Int    @default(autoincrement()) @id
+            id     Int    @id @default(autoincrement())
             email  String @unique
             name   String
 
@@ -161,7 +161,7 @@ async fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: &T
 async fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
-            id     Int    @default(autoincrement()) @id
+            id     Int    @id @default(autoincrement())
             email  String
             name   String
 

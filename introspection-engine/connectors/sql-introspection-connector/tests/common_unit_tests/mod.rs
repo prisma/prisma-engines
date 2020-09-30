@@ -1159,13 +1159,13 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     let expected_dm = if sql_family.is_mysql() {
         r#"
         model User {
-            id                           Int     @default(autoincrement()) @id
+            id                           Int     @id @default(autoincrement())
             Event_EventToUser            Event[]
             Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
         }
 
         model Event {
-            id                           Int    @default(autoincrement()) @id
+            id                           Int    @id @default(autoincrement())
             hostId                       Int
             User_EventToUser             User   @relation(fields: [hostId], references: [id])
             User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
@@ -1176,13 +1176,13 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     } else {
         r#"
         model User {
-            id                           Int     @default(autoincrement()) @id
+            id                           Int     @id @default(autoincrement())
             Event_EventToUser            Event[]
             Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
         }
 
         model Event {
-            id                           Int    @default(autoincrement()) @id
+            id                           Int    @id @default(autoincrement())
             hostId                       Int
             User_EventToUser             User   @relation(fields: [hostId], references: [id])
             User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
@@ -1245,7 +1245,7 @@ async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: 
         User_A_Friendship  User[] @relation("Friendship")
         User_B_Frenemyship User[] @relation("Frenemyship")
         User_B_Friendship  User[] @relation("Friendship")
-        id                 Int    @default(autoincrement()) @id
+        id                 Int    @id @default(autoincrement())
     }
     "#;
 

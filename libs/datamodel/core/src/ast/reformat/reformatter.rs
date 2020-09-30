@@ -4,6 +4,7 @@ use pest::Parser;
 // We have to use RefCell as rust cannot
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
+use crate::ast::helper::get_sort_index_of_directive;
 use crate::common::WritableString;
 use pest::iterators::Pair;
 
@@ -408,28 +409,11 @@ impl<'a> Reformatter<'a> {
 
         // sort directives
         directives.sort_by(|a, b| {
-            let sort_index_a = Self::get_sort_index_of_directive(is_field_directive, a.as_str());
-            let sort_index_b = Self::get_sort_index_of_directive(is_field_directive, b.as_str());
+            let sort_index_a = get_sort_index_of_directive(is_field_directive, a.as_str());
+            let sort_index_b = get_sort_index_of_directive(is_field_directive, b.as_str());
             sort_index_a.cmp(&sort_index_b)
         });
         return directives;
-    }
-
-    fn get_sort_index_of_directive(is_field_directive: bool, directive_name: &str) -> usize {
-        // this must match the order defined for rendering in libs/datamodel/core/src/transform/directives/mod.rs
-        let correct_order = if is_field_directive {
-            vec!["id", "unique", "default", "updatedAt", "map", "relation"]
-        } else {
-            vec!["id", "unique", "index", "map"]
-        };
-        if let Some(sort_index) = correct_order
-            .iter()
-            .position(|p| directive_name.starts_with(p) || directive_name.starts_with(&format!("@@{}", p)))
-        {
-            sort_index
-        } else {
-            usize::MAX
-        }
     }
 
     fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
