@@ -85,11 +85,11 @@ const CREATE_ONE_TYPES_QUERY: &str = indoc! {
                 binary_bits_varying: "0101110"
                 # binary_bytea: "test"
                 binary_uuid: "111142ec-880b-4062-913d-8eac479ab957"
-                time_timestamp: "2020-03-02T08:00:00.000"
-                time_timestamptz: "2020-03-02T08:00:00.000"
-                time_date: "2020-03-05T00:00:00.000"
-                time_time: "2020-03-05T08:00:00.000"
-                time_timetz: "2020-03-05T08:00:00.000"
+                time_timestamp: "2020-03-02T08:00:00+00:00"
+                time_timestamptz: "2020-03-02T08:00:00+00:00"
+                time_date: "2020-03-05T00:00:00+00:00"
+                time_time: "2020-03-05T08:00:00+00:00"
+                time_timetz: "2020-03-05T08:00:00+00:00"
                 # time_interval: "3 hours"
                 boolean_boolean: true
                 # network_cidr: "192.168.100.14/24"
@@ -171,11 +171,11 @@ fn create_one_types_response() -> serde_json::Value {
                 "binary_bits": "0101110",
                 "binary_bits_varying": "0101110",
                 "binary_uuid": "111142ec-880b-4062-913d-8eac479ab957",
-                "time_timestamp": "2020-03-02T08:00:00.000Z",
-                "time_timestamptz": "2020-03-02T08:00:00.000Z",
-                "time_date": "2020-03-05T00:00:00.000Z",
-                "time_time": "1970-01-01T08:00:00.000Z",
-                "time_timetz": "1970-01-01T08:00:00.000Z",
+                "time_timestamp": "2020-03-02T08:00:00+00:00",
+                "time_timestamptz": "2020-03-02T08:00:00+00:00",
+                "time_date": "2020-03-05T00:00:00+00:00",
+                "time_time": "1970-01-01T08:00:00+00:00",
+                "time_timetz": "1970-01-01T08:00:00+00:00",
                 "boolean_boolean": true,
                 "network_inet": "192.168.100.14",
                 "json_json": "{\"isJson\":true}",
@@ -363,11 +363,11 @@ const CREATE_ONE_ARRAY_TYPES_QUERY: &str = indoc!(
                 binary_bits: { set: ["10100011"] }
                 binary_bits_varying: { set: ["01000"] }
                 binary_uuid: { set: ["111142ec-880b-4062-913d-8eac479ab957"] }
-                time_timestamp: { set: ["2020-03-02T08:00:00.000"] }
-                time_timestamptz: { set: ["2020-03-02T08:00:00.000"] }
-                time_date: { set: ["2020-03-05T00:00:00.000"] }
-                time_time: { set: ["2020-03-05T08:00:00.000"] }
-                time_timetz: { set: ["2020-03-05T08:00:00.000"] }
+                time_timestamp: { set: ["2020-03-02T08:00:00+00:00"] }
+                time_timestamptz: { set: ["2020-03-02T08:00:00+00:00"] }
+                time_date: { set: ["2020-03-05T00:00:00+00:00"] }
+                time_time: { set: ["2020-03-05T08:00:00+00:00"] }
+                time_timetz: { set: ["2020-03-05T08:00:00+00:00"] }
                 boolean_boolean: { set: [true, true, false, true] }
                 network_inet: { set: ["192.168.100.14"] }
                 json_json: { set: ["{ \"isJson\": true }"] }
@@ -420,11 +420,11 @@ fn create_one_array_types_response() -> serde_json::Value {
                 "binary_bits": ["10100011"],
                 "binary_bits_varying": ["01000"],
                 "binary_uuid": ["111142ec-880b-4062-913d-8eac479ab957"],
-                "time_timestamp": ["2020-03-02T08:00:00.000Z"],
-                "time_timestamptz": ["2020-03-02T08:00:00.000Z"],
-                "time_date": ["2020-03-05T00:00:00.000Z"],
-                "time_time": ["1970-01-01T08:00:00.000Z"],
-                "time_timetz": ["1970-01-01T08:00:00.000Z"],
+                "time_timestamp": ["2020-03-02T08:00:00+00:00"],
+                "time_timestamptz": ["2020-03-02T08:00:00+00:00"],
+                "time_date": ["2020-03-05T00:00:00+00:00"],
+                "time_time": ["1970-01-01T08:00:00+00:00"],
+                "time_timetz": ["1970-01-01T08:00:00+00:00"],
                 "boolean_boolean": [true, true, false, true],
                 "network_inet": ["192.168.100.14"],
                 "json_json": ["{\"isJson\":true}"],
@@ -497,11 +497,11 @@ async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
         ("bit(7)", "\"1111000\""),
         ("bit varying(80)", "\"1111000\""),
         ("uuid", "\"111142ec-880b-4062-913d-8eac479ab957\""),
-        ("timestamp", "\"2019-01-28T00:03:20.001Z\""),
-        ("timestamptz", "\"2019-01-28T00:03:20.001Z\""),
-        ("date", "\"2020-01-08T00:00:00.000Z\""),
-        ("time", "\"1970-01-01T12:33:00.050Z\""),
-        ("timetz", "\"1970-01-01T12:33:00.050Z\""),
+        ("timestamp", "\"2019-01-28T00:03:20.001+00:00\""),
+        ("timestamptz", "\"2019-01-28T00:03:20.001+00:00\""),
+        ("date", "\"2020-01-08T00:00:00+00:00\""),
+        ("time", "\"1970-01-01T12:33:00.050+00:00\""),
+        ("timetz", "\"1970-01-01T12:33:00.050+00:00\""),
         ("boolean", "true"),
         ("inet", "\"127.0.0.4\""),
         // ("json", "\"{ \\\"isThisPrimaryKeyReallyJSON\\\": true }\""),
@@ -576,11 +576,11 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
                     binary_bits: { equals: "0101110" }
                     binary_bits_varying: { equals: "0101110" }
                     binary_uuid: { equals: "111142ec-880b-4062-913d-8eac479ab957" }
-                    time_timestamp: { equals: "2020-03-02T08:00:00.000" }
-                    time_timestamptz: { equals: "2020-03-02T08:00:00.000" }
-                    time_date: { equals: "2020-03-05T00:00:00.000" }
-                    time_time: { equals: "2020-03-05T08:00:00.000" }
-                    time_timetz: { equals: "2020-03-05T08:00:00.000" }
+                    time_timestamp: { equals: "2020-03-02T08:00:00+00:00" }
+                    time_timestamptz: { equals: "2020-03-02T08:00:00+00:00" }
+                    time_date: { equals: "2020-03-05T00:00:00+00:00" }
+                    time_time: { equals: "2020-03-05T08:00:00+00:00" }
+                    time_timetz: { equals: "2020-03-05T08:00:00+00:00" }
                     boolean_boolean: { equals: true }
                     network_inet: { equals: "192.168.100.14" }
                     json_json: { equals: "{ \"isJson\": true }" }
@@ -721,11 +721,11 @@ async fn postgres_db_level_defaults_work(api: &TestApi) -> TestResult {
                 "binary_bits": "1110000",
                 "binary_bits_varying": "1010",
                 "binary_uuid": "111142ec-880b-4062-913d-8eac479ab957",
-                "time_timestamp": "2020-03-20T10:15:00.000Z",
-                "time_timestamptz": "2020-03-20T08:15:00.000Z",
-                "time_date": "2010-01-18T00:00:00.000Z",
-                "time_time": "1970-01-01T08:09:10.000Z",
-                "time_timetz": "1970-01-01T08:09:10.000Z",
+                "time_timestamp": "2020-03-20T10:15:00+00:00",
+                "time_timestamptz": "2020-03-20T08:15:00+00:00",
+                "time_date": "2010-01-18T00:00:00+00:00",
+                "time_time": "1970-01-01T08:09:10+00:00",
+                "time_timetz": "1970-01-01T08:09:10+00:00",
                 "boolean_boolean": true,
                 "network_inet": "127.0.0.3",
                 "json_json": "{\"name\":null}",
@@ -841,11 +841,11 @@ async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
                 "binary_bits": ["11110000", "00001111"],
                 "binary_bits_varying": ["1111", "0000"],
                 "binary_uuid": ["1db27d16-bda5-4b06-8709-ceef793ead2b", "c4e29dfd-f566-412a-b823-c5eab4778678"],
-                "time_timestamp": ["2018-09-09T12:00:01.000Z", "2020-09-09T16:00:00.000Z"],
-                "time_timestamptz": ["2018-09-09T12:00:01.000Z", "2020-09-09T16:00:00.000Z"],
-                "time_date": ["2020-03-23T00:00:00.000Z", "2020-03-24T00:00:00.000Z"],
-                "time_time": ["1970-01-01T12:30:00.000Z", "1970-01-01T13:30:00.000Z"],
-                "time_timetz": ["1970-01-01T12:30:00.000Z", "1970-01-01T13:30:00.000Z"],
+                "time_timestamp": ["2018-09-09T12:00:01+00:00", "2020-09-09T16:00:00+00:00"],
+                "time_timestamptz": ["2018-09-09T12:00:01+00:00", "2020-09-09T16:00:00+00:00"],
+                "time_date": ["2020-03-23T00:00:00+00:00", "2020-03-24T00:00:00+00:00"],
+                "time_time": ["1970-01-01T12:30:00+00:00", "1970-01-01T13:30:00+00:00"],
+                "time_timetz": ["1970-01-01T12:30:00+00:00", "1970-01-01T13:30:00+00:00"],
                 "boolean_boolean": [true, true, true, false],
                 "network_inet": ["127.0.0.3", "127.0.0.4"],
                 "json_json": ["true", "[]", "{\"isJson\":true}"],
@@ -947,7 +947,7 @@ async fn serial_columns_can_be_optional(api: &TestApi) -> TestResult {
             "createOnetimestamps": {
                 "id": 1,
                 "serial": 1,
-                "time_date": "2020-03-10T00:00:00.000Z",
+                "time_date": "2020-03-10T00:00:00+00:00",
                 "bigserial": 1,
             },
         },
