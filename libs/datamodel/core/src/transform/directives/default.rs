@@ -27,6 +27,13 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
                     .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
 
                 sf.default_value = Some(dv);
+            } else if let dml::FieldType::NativeType(scalar_type, _) = sf.field_type {
+                let dv = args
+                    .default_arg("value")?
+                    .as_default_value_for_scalar_type(scalar_type)
+                    .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
+
+                sf.default_value = Some(dv);
             } else if let dml::FieldType::Enum(_) = sf.field_type {
                 let default_arg = args.default_arg("value")?;
 
