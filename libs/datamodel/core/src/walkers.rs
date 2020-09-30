@@ -334,6 +334,10 @@ impl<'a> IndexWalker<'a> {
                 .expect("index on unknown model field")
         })
     }
+
+    pub fn is_unique(&self) -> bool {
+        self.index.is_unique()
+    }
 }
 
 #[derive(Debug)]

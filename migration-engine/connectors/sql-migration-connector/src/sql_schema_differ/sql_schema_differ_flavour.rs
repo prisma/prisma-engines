@@ -1,4 +1,4 @@
-use sql_schema_describer::Index;
+use sql_schema_describer::walkers::IndexWalker;
 
 use super::{ColumnDiffer, SqlSchemaDiffer};
 use crate::sql_migration::AlterEnum;
@@ -22,8 +22,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Return whether an index should be renamed by the migration.
-    fn index_should_be_renamed(&self, previous: &Index, next: &Index) -> bool {
-        previous.name != next.name
+    fn index_should_be_renamed(&self, previous: &IndexWalker<'_>, next: &IndexWalker<'_>) -> bool {
+        previous.name() != next.name()
     }
 
     /// Whether `AddForeignKey` steps should be generated for created tables.

@@ -2,7 +2,7 @@ use super::SqlSchemaDifferFlavour;
 use crate::{flavour::PostgresFlavour, sql_migration::AlterEnum, sql_schema_differ::SqlSchemaDiffer};
 use once_cell::sync::Lazy;
 use regex::RegexSet;
-use sql_schema_describer::Index;
+use sql_schema_describer::walkers::IndexWalker;
 
 /// The maximum length of postgres identifiers, in bytes.
 ///
@@ -29,12 +29,13 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .collect()
     }
 
-    fn index_should_be_renamed(&self, previous: &Index, next: &Index) -> bool {
+    fn index_should_be_renamed(&self, previous: &IndexWalker<'_>, next: &IndexWalker<'_>) -> bool {
         // Implements correct comparison for truncated index names.
-        if previous.name.len() == POSTGRES_IDENTIFIER_SIZE_LIMIT && next.name.len() > POSTGRES_IDENTIFIER_SIZE_LIMIT {
-            previous.name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT] != next.name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT]
+        if previous.name().len() == POSTGRES_IDENTIFIER_SIZE_LIMIT && next.name().len() > POSTGRES_IDENTIFIER_SIZE_LIMIT
+        {
+            previous.name()[0..POSTGRES_IDENTIFIER_SIZE_LIMIT] != next.name()[0..POSTGRES_IDENTIFIER_SIZE_LIMIT]
         } else {
-            previous.name != next.name
+            previous.name() != next.name()
         }
     }
 

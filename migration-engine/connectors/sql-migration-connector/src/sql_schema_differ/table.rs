@@ -2,7 +2,7 @@ use super::column::ColumnDiffer;
 use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
-    Index, PrimaryKey,
+    PrimaryKey,
 };
 
 pub(crate) struct TableDiffer<'a> {
@@ -73,7 +73,7 @@ impl<'schema> TableDiffer<'schema> {
         self.next_indexes().filter(move |next_index| {
             !self
                 .previous_indexes()
-                .any(move |previous_index| indexes_match(previous_index.index, next_index.index))
+                .any(move |previous_index| indexes_match(&previous_index, next_index))
         })
     }
 
@@ -81,14 +81,14 @@ impl<'schema> TableDiffer<'schema> {
         self.previous_indexes().filter(move |previous_index| {
             !self
                 .next_indexes()
-                .any(|next_index| indexes_match(previous_index.index, next_index.index))
+                .any(|next_index| indexes_match(previous_index, &next_index))
         })
     }
 
     pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = (IndexWalker<'schema>, IndexWalker<'schema>)> + 'a {
         self.previous_indexes().filter_map(move |previous_index| {
             self.next_indexes()
-                .find(|next_index| indexes_match(previous_index.index, next_index.index))
+                .find(|next_index| indexes_match(&previous_index, next_index))
                 .map(|renamed_index| (previous_index, renamed_index))
         })
     }
@@ -167,6 +167,6 @@ pub(crate) fn columns_match(a: &ColumnWalker<'_>, b: &ColumnWalker<'_>) -> bool 
 }
 
 /// Compare two SQL indexes and return whether they only differ by name.
-fn indexes_match(first: &Index, second: &Index) -> bool {
-    first.columns == second.columns && first.tpe == second.tpe
+fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
+    first.column_names() == second.column_names() && first.index_type() == second.index_type()
 }

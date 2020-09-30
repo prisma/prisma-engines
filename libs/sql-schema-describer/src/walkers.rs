@@ -1,6 +1,6 @@
 use crate::{
-    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, Index, PrimaryKey, SqlSchema,
-    Table,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, Index, IndexType, PrimaryKey,
+    SqlSchema, Table,
 };
 
 pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWalker<'a>> + 'a {
@@ -148,6 +148,10 @@ pub struct ForeignKeyWalker<'schema> {
 }
 
 impl<'a, 'schema> ForeignKeyWalker<'schema> {
+    pub fn constrained_column_names(&self) -> &[String] {
+        &self.foreign_key.columns
+    }
+
     pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'b {
         self.table()
             .columns()
@@ -183,12 +187,16 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
 }
 
 pub struct IndexWalker<'a> {
-    pub schema: &'a SqlSchema,
-    pub table: &'a Table,
-    pub index: &'a Index,
+    schema: &'a SqlSchema,
+    table: &'a Table,
+    index: &'a Index,
 }
 
 impl<'a> IndexWalker<'a> {
+    pub fn column_names(&self) -> &[String] {
+        &self.index.columns
+    }
+
     pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
         self.index
             .columns
@@ -209,6 +217,18 @@ impl<'a> IndexWalker<'a> {
 
     pub fn has_nullable_columns(&self) -> bool {
         self.columns().any(|c| c.arity().is_nullable())
+    }
+
+    pub fn index(&self) -> &Index {
+        &self.index
+    }
+
+    pub fn index_type(&self) -> &IndexType {
+        &self.index.tpe
+    }
+
+    pub fn name(&self) -> &str {
+        &self.index.name
     }
 }
 
