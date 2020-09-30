@@ -1,5 +1,7 @@
-use sql_schema_describer::*;
+use sql_schema_describer::walkers::{IndexWalker, TableWalker};
 
-pub(super) fn index_covers_fk(table: &Table, index: &Index) -> bool {
-    table.foreign_keys.iter().any(|fk| fk.columns == index.columns)
+pub(super) fn index_covers_fk(table: &TableWalker<'_>, index: &IndexWalker<'_>) -> bool {
+    table
+        .foreign_keys()
+        .any(|fk| fk.constrained_column_names() == index.column_names())
 }
