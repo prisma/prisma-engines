@@ -43,15 +43,16 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |    sSerial
          |    bSerial
          |    inc_int
-         |    inc_sint
-         |    inc_bint
+         |    inc_sInt
+         |    inc_bInt
          |  }
          |}""".stripMargin,
       project,
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"bInt":5294967295}}}""")
+    res.toString should be(
+      """{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"bInt":5294967295,"serial":1,"sSerial":1,"bSerial":1,"inc_int":1,"inc_sInt":1,"inc_bInt":1}}}""")
   }
 
   "Postgres native decimal types" should "work" in {
@@ -176,16 +177,14 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     res.toString should be("""{"data":{"createOneModel":{"bool":true,"byteA":"dGVzdA==","json":"{}","jsonb":"{\"a\":\"b\"}"}}}""")
   }
 
-  "Postgres native date types" should "work" ignore {
+  "Postgres native date types" should "work" in {
     val project = ProjectDsl.fromString {
       """
         |model Model {
         |  id     String   @id @default(cuid())
         |  date   DateTime @test.Date
-        |  time   DateTime @test.Time
-        |  timeTz DateTime @test.TimeWithTimeZone
-        |  ts     DateTime @test.Timestamp
-        |  tsTz   DateTime @test.TimestampWithTimeZone
+        |  time   DateTime @test.Time(3)
+        |  ts     DateTime @test.Timestamp(3)
         |}"""
     }
 
@@ -197,27 +196,22 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
        |  createOneModel(
        |    data: {
        |      date: "2016-09-24T00:00:00.000Z"
-       |      time: "0000-00-00T12:29:32.342Z"
-       |      timeTz: "0000-00-00T12:29:32.342Z"
-       |      ts: "19731230153000"
-       |      tsTz: "19731230153000"
+       |      time: "1111-11-11T13:02:20.321Z"
+       |      ts: "2016-09-24T14:01:30.213Z"
        |    }
        |  ) {
        |    date
        |    time
-       |    timeTz
        |    ts
-       |    tsTz
        |  }
        |}""".stripMargin,
       project,
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"field":"{\"a\":\"b\"}"}}}""")
+    res.toString should be(
+      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","time":"1970-01-01T13:02:20.321+00:00","ts":"2016-09-24T14:01:30.213+00:00"}}}""")
   }
 
   // XML
-  // JSON?
-  // Bytes
 }

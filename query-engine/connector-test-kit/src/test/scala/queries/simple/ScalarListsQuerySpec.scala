@@ -212,7 +212,7 @@ class ScalarListsQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val fieldName   = "datetimes"
     val inputValue  = """"2018-01-01T00:00:00.000Z""""
-    val outputValue = inputValue
+    val outputValue = """"2018-01-01T00:00:00+00:00""""
 
     val project = SchemaDsl.fromStringV11() {
       s"""model Model{

@@ -8,55 +8,54 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
   override def runOnlyForConnectors: Set[ConnectorTag] = Set(MySqlConnectorTag)
 
   "MySQL native int types" should "work" in {
-    val project = ProjectDsl.fromString {
-      """
+    // MySQL only allows one autoinc column, so loop through all to test them.
+    for ((fieldName, annotation) <- Seq(("inc_int", "@test.Int"),
+                                        ("inc_sInt", "@test.SmallInt"),
+                                        ("inc_tInt", "@test.TinyInt"),
+                                        ("inc_mInt", "@test.MediumInt"),
+                                        ("inc_bInt", "@test.BigInt"))) {
+
+      val project = ProjectDsl.fromString {
+        s"""
         |model Model {
-        |  id   String @id @default(cuid())
-        |  int  Int    @test.Int
-        |  sInt Int    @test.SmallInt
-        |  tInt Int    @test.TinyInt
-        |  mInt Int    @test.MediumInt
-        |  bInt Int    @test.BigInt
-        |
-        |  inc_int  Int @default(autoincrement()) @test.Int
-        |  inc_sInt Int @default(autoincrement()) @test.SmallInt
-        |  inc_tInt Int @default(autoincrement()) @test.TinyInt
-        |  inc_mInt Int @default(autoincrement()) @test.MediumInt
-        |  inc_bInt Int @default(autoincrement()) @test.BigInt
+        |  $fieldName Int @id @default(autoincrement()) $annotation
+        |  int      Int   @test.Int
+        |  sInt     Int   @test.SmallInt
+        |  tInt     Int   @test.TinyInt
+        |  mInt     Int   @test.MediumInt
+        |  bInt     Int   @test.BigInt
         |}"""
+      }
+
+      println(project.dataModel)
+      database.setup(project)
+
+      val res = server.query(
+        s"""
+           |mutation {
+           |  createOneModel(
+           |    data: {
+           |      int: 2147483647
+           |      sInt: 32767
+           |      tInt: 127
+           |      mInt: 8388607
+           |      bInt: 5294967295
+           |    }
+           |  ) {
+           |    int
+           |    sInt
+           |    tInt
+           |    mInt
+           |    bInt
+           |    $fieldName
+           |  }
+           |}""".stripMargin,
+        project,
+        legacy = false
+      )
+
+      res.toString should be(s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":127,"mInt":8388607,"bInt":5294967295,"$fieldName":1}}}""")
     }
-
-    database.setup(project)
-
-    val res = server.query(
-      s"""
-         |mutation {
-         |  createOneModel(
-         |    data: {
-         |      int: 2147483647
-         |      sInt: 32767
-         |      tInt: 127
-         |      mInt: 8388607
-         |      bInt: 5294967295
-         |    }
-         |  ) {
-         |    int
-         |    sInt
-         |    tInt
-         |    mInt
-         |    bInt
-         |    inc_int
-         |    inc_sInt
-         |    inc_tInt
-         |    inc_mInt
-         |    inc_bInt
-         |  }
-         |}""".stripMargin,
-      project,
-      legacy = false
-    )
-
-    res.toString should be("""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":127,"mInt":8388607,"bInt":5294967295}}}""")
   }
 
   "MySQL native decimal types" should "work" in {
@@ -143,7 +142,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
       """{"data":{"createOneModel":{"char":"1234567890","vChar":"12345678910","tText":"tiny text","text":"text","mText":"medium text","ltext":"long text"}}}""")
   }
 
-  "MySQL native date types" should "work" ignore {
+  "MySQL native date types" should "work" in {
     val project = ProjectDsl.fromString {
       """
         |model Model {
@@ -164,9 +163,9 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
        |  createOneModel(
        |    data: {
        |      date: "2016-09-24T00:00:00.000Z"
-       |      time: "0000-00-00T12:29:32.342Z"
+       |      time: "2016-09-24T13:14:15.123Z"
        |      dtime: "2016-09-24T12:29:32.342Z"
-       |      ts: "19731230153000"
+       |      ts: "2016-09-24T12:29:32.342Z"
        |      year: 1973
        |    }
        |  ) {
@@ -181,7 +180,8 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"field":"{\"a\":\"b\"}"}}}""")
+    res.toString should be(
+      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","time":"1970-01-01T13:14:15.123+00:00","dtime":"2016-09-24T12:29:32+00:00","ts":"2016-09-24T12:29:32+00:00","year":1973}}}""")
   }
 
   "MySQL native binary types" should "work" in {

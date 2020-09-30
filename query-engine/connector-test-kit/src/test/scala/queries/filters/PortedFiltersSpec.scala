@@ -66,11 +66,11 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   //region Recursion
   "A filter query" should "support the AND filter in one recursion level" in {
-    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id4", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id4", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res =
       server.query(
@@ -113,12 +113,12 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the AND filter in two recursion levels" in {
-    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id4", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id6", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id4", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id6", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res =
       server.query(
@@ -169,11 +169,11 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the OR filter in one recursion level" taggedAs (IgnoreMongo) in {
-    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id4", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id4", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res =
       server.query(
@@ -200,12 +200,12 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the OR filter in two recursion levels" taggedAs (IgnoreMongo) in {
-    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id4", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id6", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id4", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id6", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res =
       server.query(
@@ -238,9 +238,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   //region null
   "A filter query" should "support filtering on null" in {
-    createTest("id1", optString = null, 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", optString = "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", optString = null, 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", optString = null, 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", optString = "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", optString = null, 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val filterOnNull = server.query("""{scalarModels(where: { optString: { equals: null }}, orderBy: { id: asc }){ idTest }}""", project = project)
     val filterOnNull2 =
@@ -292,9 +292,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   //region String
 
   "A filter query" should "support the equality filter on strings" in {
-    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optString: { equals: "bar" }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { equals: "bar" }}){idTest}}""", project = project)
@@ -304,9 +304,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not-equality filter on strings" in {
-    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: { optString: { not: { equals: "bar" }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not: { equals: "bar" }}}, orderBy: { id: asc }){idTest}}""",
@@ -317,9 +317,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the contains filter on strings" in {
-    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optString: {contains: "bara" }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { contains: "bara" }}){idTest}}""", project = project)
@@ -329,9 +329,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not contains filter on strings" in {
-    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optString: { not: { contains: "bara" }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -343,9 +343,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the startsWith filter on strings" in {
-    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: { optString: { startsWith: "bar" }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { startsWith: "bar" }}){idTest}}""", project = project)
@@ -355,9 +355,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not startsWith filter on strings" in {
-    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: { optString: { not: { startsWith: "bar" }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -371,9 +371,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the endsWith filter on strings" in {
-    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: { optString: { endsWith: "bara" }}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { endsWith: "bara" }}, orderBy: { id: asc }){idTest}}""",
@@ -384,9 +384,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not endsWith filter on strings" in {
-    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: { optString: { not: { endsWith: "bara" }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -400,9 +400,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the lt filter on strings" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: { optString: { lt: "2" }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { lt: "2" }}){idTest}}""", project = project)
@@ -412,9 +412,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the lte filter on strings" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: { optString: { lte: "2" }}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -425,9 +425,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the gt filter on strings" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optString: { gt: "2" }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { gt: "2" }}){idTest}}""", project = project)
@@ -437,9 +437,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the gte filter on strings" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optString: { gte: "2" }},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -450,9 +450,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the in filter on strings" in {
-    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "ab", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "abc", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "ab", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "abc", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val resA  = server.query("""{scalarModels(where: {optString: { in: ["a"] }}){idTest}}""", project = project)
     val resA2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { in: ["a"]}}){idTest}}""", project = project)
@@ -477,9 +477,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not in filter on strings" in {
-    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "ab", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "abc", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "ab", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "abc", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val resA = server.query("""{scalarModels(where: {optString: { not: { in: ["a"] }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val resA2 =
@@ -502,9 +502,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   //region Integer
 
   "A filter query" should "support the equality filter on integers" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: { optInt: { equals: 1 }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { equals: 1 }}){idTest}}""", project = project)
@@ -514,9 +514,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not equality filter on integers" in {
-    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optInt: { not: { equals: 1 }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -528,9 +528,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the lt filter on integers" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optInt: { lt: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { lt: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
@@ -540,9 +540,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the lte filter on integers" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optInt: { lte: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { lte: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
@@ -552,9 +552,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the gt filter on integers" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optInt: { gt: 2 }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { gt: 2 }}){idTest}}""", project = project)
@@ -564,9 +564,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the gte filter on integers" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optInt: { gte: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { gte: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
@@ -576,9 +576,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the in filter on integers" in {
-    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optInt: { in: [1] }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { in: [1] }}){idTest}}""", project = project)
@@ -588,9 +588,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not in filter on integers" in {
-    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optInt: { not: { in: [1] }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -604,9 +604,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   //region Float
 
   "A filter query" should "support the equality filter on float" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optFloat: { equals: 1 }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optFloat: { equals: 1 }}){idTest}}""", project = project)
@@ -616,9 +616,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not equality filter on float" in {
-    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optFloat: { not: { equals: 1 }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -630,9 +630,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the lt filter on floats" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optFloat: { lt: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optFloat: { lt: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
@@ -642,9 +642,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the lte filter on floats" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optFloat: { lte: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -655,9 +655,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the gt filter on floats" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optFloat: { gt: 2 }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optFloat: { gt: 2 }}){idTest}}""", project = project)
@@ -667,9 +667,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the gte filter on floats" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optFloat: { gte: 2 }},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -680,9 +680,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the in filter on floats" in {
-    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optFloat: { in: [1] }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optFloat: { in: [1] }}){idTest}}""", project = project)
@@ -692,9 +692,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not in filter on floats" in {
-    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optFloat: { not: { in: [1] }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -709,9 +709,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   // region Boolean
 
   "A filter query" should "support the equality filter on booleans" in {
-    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optBoolean: { equals: true }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optBoolean: { equals: true }}){idTest}}""", project = project)
@@ -721,9 +721,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not-equality filter on booleans" in {
-    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
-    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
+    createTest("id1", "bar", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optBoolean: { not: { equals: true }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -738,12 +738,12 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   //region DateTime
 
   "A filter query" should "support the equality filter on DateTime" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342Z")
 
-    val res = server.query("""{scalarModels(where: {optDateTime: { equals: "2016-09-24T12:29:32.342" }}){idTest}}""", project = project)
-    val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optDateTime: { equals: "2016-09-24T12:29:32.342" }}){idTest}}""",
+    val res = server.query("""{scalarModels(where: {optDateTime: { equals: "2016-09-24T12:29:32.342Z" }}){idTest}}""", project = project)
+    val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optDateTime: { equals: "2016-09-24T12:29:32.342Z" }}){idTest}}""",
                             project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
@@ -751,9 +751,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not equality filter on DateTime" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342Z")
 
     val res =
       server.query("""{scalarModels(where: {optDateTime: { not: { equals: "2016-09-24T12:29:32.342Z" }}},orderBy: { id: asc }){idTest}}""", project = project)
@@ -768,9 +768,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the lt filter on DateTime" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optDateTime: { lt: "2016-09-24T12:29:32.342Z" }}){idTest}}""", project = project)
     val res2 =
@@ -781,9 +781,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the lte filter on DateTime" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342Z")
 
     val res =
       server.query("""{scalarModels(where: {optDateTime: { lte: "2016-09-24T12:29:32.342Z" }},orderBy: { id: asc }){idTest}}""", project = project)
@@ -798,9 +798,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the gt filter on DateTime" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optDateTime: { gt: "2016-09-24T12:29:32.342Z" }}){idTest}}""", project = project)
     val res2 =
@@ -811,9 +811,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the gte filter on DateTime" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342Z")
 
     val res =
       server.query("""{scalarModels(where: {optDateTime: { gte: "2016-09-24T12:29:32.342Z" }},orderBy: { id: asc }){idTest}}""", project = project)
@@ -828,9 +828,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the in filter on DateTime" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optDateTime: { in: ["2016-09-24T12:29:32.342Z"] }}){idTest}}""", project = project)
     val res2 =
@@ -841,9 +841,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not in filter on DateTime" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342Z")
 
     val res =
       server.query("""{scalarModels(where: {optDateTime: { not: { in: ["2016-09-24T12:29:32.342Z"] }}},orderBy: { id: asc }){idTest}}""", project = project)
@@ -861,9 +861,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   //region Enum
 
   "A filter query" should "support the equality filter on Enum" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optEnum: { equals: A }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optEnum: { equals: A }}){idTest}}""", project = project)
@@ -873,9 +873,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not equality filter on Enum" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optEnum: { not: { equals: A }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -887,9 +887,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the in filter on Enum" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342Z")
 
     val res  = server.query("""{scalarModels(where: {optEnum: { in: [A] }}){idTest}}""", project = project)
     val res2 = server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optEnum: { in: [A] }}){idTest}}""", project = project)
@@ -899,9 +899,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A filter query" should "support the not in filter on Enum" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342Z")
 
     val res = server.query("""{scalarModels(where: {optEnum: { not: { in: [A] }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
@@ -913,9 +913,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
   //endregion
 
   "A filter query" should "should treat NOT and not filters equally" in {
-    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
-    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
-    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342Z")
+    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342Z")
+    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342Z")
 
     val res = server.query(
       """
