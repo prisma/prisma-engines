@@ -457,7 +457,7 @@ impl GetRow for PostgresRow {
 
 impl ToColumnNames for PostgresStatement {
     fn to_column_names(&self) -> Vec<String> {
-        self.columns().into_iter().map(|c| c.name().into()).collect()
+        self.columns().iter().map(|c| c.name().into()).collect()
     }
 }
 
@@ -517,7 +517,7 @@ impl<'a> ToSql for Value<'a> {
             #[cfg(feature = "uuid-0_8")]
             (Value::Array(values), &PostgresType::UUID_ARRAY) => values.as_ref().map(|values| {
                 let parsed_uuid: Vec<Uuid> = values
-                    .into_iter()
+                    .iter()
                     .filter_map(|v| v.to_string().and_then(|v| v.parse().ok()))
                     .collect();
                 parsed_uuid.to_sql(ty, out)
@@ -531,7 +531,7 @@ impl<'a> ToSql for Value<'a> {
             (Value::Array(values), &PostgresType::INET_ARRAY) | (Value::Array(values), &PostgresType::CIDR_ARRAY) => {
                 values.as_ref().map(|values| {
                     let parsed_ip_addr: Vec<std::net::IpAddr> = values
-                        .into_iter()
+                        .iter()
                         .filter_map(|v| v.to_string().and_then(|s| s.parse().ok()))
                         .collect();
                     parsed_ip_addr.to_sql(ty, out)
@@ -551,7 +551,7 @@ impl<'a> ToSql for Value<'a> {
             (Value::Array(values), &PostgresType::BIT_ARRAY) | (Value::Array(values), &PostgresType::VARBIT_ARRAY) => {
                 values.as_ref().map(|values| {
                     let bitvecs: Vec<BitVec> = values
-                        .into_iter()
+                        .iter()
                         .filter_map(|val| val.as_str().map(|s| string_to_bits(s)))
                         .collect::<crate::Result<Vec<_>>>()?;
 

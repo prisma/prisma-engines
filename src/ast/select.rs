@@ -4,7 +4,7 @@ use crate::ast::*;
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select<'a> {
     pub(crate) distinct: bool,
-    pub(crate) tables: Vec<Box<Table<'a>>>,
+    pub(crate) tables: Vec<Table<'a>>,
     pub(crate) columns: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
     pub(crate) ordering: Ordering<'a>,
@@ -102,7 +102,7 @@ impl<'a> Select<'a> {
         T: Into<Table<'a>>,
     {
         Select {
-            tables: vec![Box::new(table.into())],
+            tables: vec![table.into()],
             ..Default::default()
         }
     }
@@ -127,7 +127,7 @@ impl<'a> Select<'a> {
     where
         T: Into<Table<'a>>,
     {
-        self.tables.push(Box::new(table.into()));
+        self.tables.push(table.into());
         self
     }
 
@@ -565,7 +565,7 @@ impl<'a> Select<'a> {
     ///     .value(val!(1).alias("val"))
     ///     .into_cte("one")
     ///     .column("val");
-    ///     
+    ///
     /// let query = Select::from_table("one")
     ///     .column("val")
     ///     .with(cte);

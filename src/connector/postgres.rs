@@ -222,7 +222,7 @@ impl PostgresUrl {
     }
 
     pub(crate) fn cache(&self) -> LruCache<String, Statement> {
-        if self.query_params.pg_bouncer == true {
+        if self.query_params.pg_bouncer {
             LruCache::new(0)
         } else {
             LruCache::new(self.query_params.statement_cache_size)

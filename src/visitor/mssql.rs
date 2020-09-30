@@ -163,7 +163,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         let add_ordering = |this: &mut Self| {
             if !this.order_by_set {
                 this.write(" ORDER BY ")?;
-                this.visit_ordering(Ordering::new(vec![((1.raw().into(), None))]))?;
+                this.visit_ordering(Ordering::new(vec![(1.raw().into(), None)]))?;
             }
 
             Ok::<(), crate::error::Error>(())

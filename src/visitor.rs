@@ -181,7 +181,7 @@ pub trait Visitor<'a> {
                                 self.write(".*")?;
                             }
                             None => {
-                                self.visit_table(*table.clone(), false)?;
+                                self.visit_table(table.clone(), false)?;
                                 self.write(".*")?;
                             }
                         },
@@ -198,7 +198,7 @@ pub trait Visitor<'a> {
                     self.write(", ")?;
                 }
 
-                self.visit_table(*table, true)?;
+                self.visit_table(table, true)?;
             }
 
             if !select.joins.is_empty() {

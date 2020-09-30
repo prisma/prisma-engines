@@ -8,7 +8,7 @@ impl From<rusqlite::Error> for Error {
             rusqlite::Error::ToSqlConversionFailure(error) => match error.downcast::<Error>() {
                 Ok(error) => *error,
                 Err(error) => {
-                    let mut builder = Error::builder(ErrorKind::QueryError(error.into()));
+                    let mut builder = Error::builder(ErrorKind::QueryError(error));
 
                     builder.set_original_message("Could not interpret parameters in an SQLite query.");
 
@@ -44,7 +44,7 @@ impl From<rusqlite::Error> for Error {
 
                 let field_names: Vec<String> = splitted[1]
                     .split(", ")
-                    .map(|s| s.split(".").last().unwrap())
+                    .map(|s| s.split('.').last().unwrap())
                     .map(|s| s.to_string())
                     .collect();
 
@@ -69,7 +69,7 @@ impl From<rusqlite::Error> for Error {
 
                 let field_names: Vec<String> = splitted[1]
                     .split(", ")
-                    .map(|s| s.split(".").last().unwrap())
+                    .map(|s| s.split('.').last().unwrap())
                     .map(|s| s.to_string())
                     .collect();
 
@@ -94,7 +94,7 @@ impl From<rusqlite::Error> for Error {
 
                 let field_names: Vec<String> = splitted[1]
                     .split(", ")
-                    .map(|s| s.split(".").last().unwrap())
+                    .map(|s| s.split('.').last().unwrap())
                     .map(|s| s.to_string())
                     .collect();
 

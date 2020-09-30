@@ -195,13 +195,13 @@ impl<'a> ToColumnNames for SqliteRows<'a> {
 impl<'a> ToSql for Value<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match self {
-            Value::Integer(integer) => integer.map(|i| ToSqlOutput::from(i)),
+            Value::Integer(integer) => integer.map(ToSqlOutput::from),
             Value::Real(d) => {
                 d.map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("Decimal is not a f64.")))
             }
             Value::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             Value::Enum(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
-            Value::Boolean(boo) => boo.map(|boo| ToSqlOutput::from(boo)),
+            Value::Boolean(boo) => boo.map(ToSqlOutput::from),
             Value::Char(c) => c.map(|c| ToSqlOutput::from(c as u8)),
             Value::Bytes(bytes) => bytes.as_ref().map(|bytes| ToSqlOutput::from(bytes.as_ref())),
             #[cfg(feature = "array")]
