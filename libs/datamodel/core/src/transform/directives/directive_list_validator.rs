@@ -52,7 +52,6 @@ impl<T: 'static> DirectiveListValidator<T> {
         for directive in ast.directives() {
             match self.known_directives.get(&directive.name.name) {
                 Some(validator) => {
-                    println!("directive validator: {:?}", directive);
                     let mut arguments = Arguments::new(&directive.arguments, directive.span);
 
                     let directive_count = directive_counts.get(&directive.name.name).unwrap();
@@ -72,8 +71,6 @@ impl<T: 'static> DirectiveListValidator<T> {
                     }
 
                     let directive_validation_result = validator.validate_and_apply(&mut arguments, t);
-
-                    println!("directive validation result {:?}", directive_validation_result);
 
                     match directive_validation_result {
                         Err(DatamodelError::ArgumentNotFound { argument_name, span }) => {
