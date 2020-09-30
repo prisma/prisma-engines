@@ -579,9 +579,9 @@ fn get_column_type_and_enum(
     precision: Precision,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
-    // println!("{}", data_type);
-    // println!("{}", full_data_type);
-    // println!("{:?}", precision);
+    println!("DT: {}", data_type);
+    println!("FDT: {}", full_data_type);
+    println!("Precision: {:?}", precision);
 
     let (family, native_type) = match data_type {
         "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
@@ -691,12 +691,9 @@ fn get_column_type_and_enum(
 }
 
 fn extract_precision(input: &str) -> Option<u32> {
-    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(<precision>([1-9])\)"#).unwrap());
-
-    RE.captures(input).and_then(|cap| {
-        cap.name("precision")
-            .map(|precision| from_str::<u32>(precision.as_str()).unwrap())
-    })
+    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
+    RE.captures(input)
+        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
 }
 
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
