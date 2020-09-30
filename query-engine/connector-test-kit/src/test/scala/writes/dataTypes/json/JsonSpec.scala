@@ -10,7 +10,6 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
       """|model Model {
          | id    String @id
          | field Json
-         | list  Json[]
          |}"""
     }
 
@@ -40,7 +39,7 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  updateOneModel(
          |    where: { id: "A" }
          |    data: {
-         |      id: { set: "1" }
+         |      field: "{\\"b\\":\\"a\\"}"
          |    }
          |  ) {
          |    field
@@ -50,6 +49,6 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString should be("""{"data":{"updateOneModel":{"field":"{\"a\":\"b\"}"}}}""")
+    res.toString should be("""{"data":{"updateOneModel":{"field":"{\"b\":\"a\"}"}}}""")
   }
 }

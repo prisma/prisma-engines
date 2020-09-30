@@ -296,6 +296,7 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Float => "REAL",
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::String => "TEXT",
+        ColumnTypeFamily::Binary => "BLOB",
         x => unimplemented!("{:?} not handled yet", x),
     }
 }

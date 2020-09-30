@@ -367,6 +367,7 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::String => format!("text {}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
         ColumnTypeFamily::Json => format!("jsonb {}", array),
+        ColumnTypeFamily::Binary => format!("bytea {}", array),
         x => unimplemented!("{:?} not handled yet", x),
     }
 }

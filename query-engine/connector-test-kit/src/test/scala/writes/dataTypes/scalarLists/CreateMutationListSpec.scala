@@ -51,13 +51,13 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res should be(
-      s"""{"data":{"createScalarModel":{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}}}""".parseJson)
+      s"""{"data":{"createScalarModel":{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01+00:00","2017-07-31T23:59:01+00:00"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}}}""".parseJson)
 
     val queryRes: JsValue =
       server.query("""{ scalarModels{optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }}""", project = project)
 
     queryRes should be(
-      s"""{"data":{"scalarModels":[{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}]}}""".parseJson)
+      s"""{"data":{"scalarModels":[{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01+00:00","2017-07-31T23:59:01+00:00"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}]}}""".parseJson)
   }
 
   "A Create Mutation" should "create and return items with listvalues with shorthand notation" in {
@@ -76,13 +76,13 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res should be(
-      s"""{"data":{"createScalarModel":{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}}}""".parseJson)
+      s"""{"data":{"createScalarModel":{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01+00:00","2017-07-31T23:59:01+00:00"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}}}""".parseJson)
 
     val queryRes: JsValue =
       server.query("""{ scalarModels{optStrings, optInts, optFloats, optBooleans, optEnums, optDateTimes }}""", project = project)
 
     queryRes should be(
-      s"""{"data":{"scalarModels":[{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01.000Z","2017-07-31T23:59:01.000Z"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}]}}""".parseJson)
+      s"""{"data":{"scalarModels":[{"optEnums":["A","A"],"optBooleans":[true,false],"optDateTimes":["2016-07-31T23:59:01+00:00","2017-07-31T23:59:01+00:00"],"optStrings":["lala${TroubleCharacters.value}"],"optInts":[1337,12],"optFloats":[1.234,1.45]}]}}""".parseJson)
   }
 
   "A Create Mutation" should "create and return items with empty listvalues" in {

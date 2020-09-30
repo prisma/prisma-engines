@@ -408,6 +408,7 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
             format!("ENUM({})", variants).into()
         }
         ColumnTypeFamily::Json => "json".into(),
+        ColumnTypeFamily::Binary => "mediumblob".into(),
         x => unimplemented!("{:?} not handled yet", x),
     }
 }
