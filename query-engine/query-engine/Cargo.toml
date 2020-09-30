@@ -11,7 +11,7 @@ sql = ["sql-connector"]
 
 [dependencies]
 futures = "0.3"
-tokio = {version = "=0.2.13", features = ["rt-threaded", "macros"]}
+tokio = {version = "0.2.13", features = ["rt-threaded", "macros"]}
 
 anyhow = "1.0"
 async-std = {version = "1.6.2", features = ["attributes", "tokio02"]}
@@ -55,7 +55,7 @@ indoc = "0.3"
 introspection-core = {path = "../../introspection-engine/core"}
 migration-connector = {path = "../../migration-engine/connectors/migration-connector"}
 migration-core = {path = "../../migration-engine/core"}
-quaint = {git = "https://github.com/prisma/quaint", features = ["full", "tracing-log"]}
+quaint = { git = "https://github.com/prisma/quaint", features = ["full", "tracing-log"] }
 serial_test = "*"
 sql-migration-connector = {path = "../../migration-engine/connectors/sql-migration-connector"}
 test-macros = {path = "../../libs/test-macros"}

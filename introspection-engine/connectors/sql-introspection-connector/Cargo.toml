@@ -20,7 +20,7 @@ serde = {version = "1", features = ["derive"]}
 serde_json = "1.0"
 sql-schema-describer = {path = "../../../libs/sql-schema-describer"}
 thiserror = "1.0.9"
-tokio = {version = "=0.2.13", features = ["rt-threaded", "time"]}
+tokio = {version = "0.2.13", features = ["rt-threaded", "time"]}
 tracing = "0.1.10"
 tracing-futures = "0.2.0"
 user-facing-errors = {path = "../../../libs/user-facing-errors", features = ["sql"]}
