@@ -33,7 +33,7 @@ const TYPES: &'static [(&str, &str)] = &[
     ("year", "Year"),
 ];
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql_5_6", "mariadb"))]
 async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
@@ -104,13 +104,12 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
 
     println!("EXPECTATION: \n {}", dm);
     println!("RESULT: \n {}", result);
-    //Fixme mysql 8 is missing the default(now())
     assert_eq!(result.replace(" ", "").contains(&types.replace(" ", "")), true);
 
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql_5_6", "mariadb"))]
 async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
@@ -171,9 +170,6 @@ async fn introspecting_native_type_columns_feature_off(api: &TestApi) -> TestRes
 }
 "#
     .to_owned();
-
-    //Fixme mysql 8 is missing the default(now())
-
     let result = dbg!(api.re_introspect(&dm).await);
 
     println!("EXPECTATION: \n {}", dm);
