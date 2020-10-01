@@ -71,9 +71,9 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
         chrono::Utc::now().signed_duration_since(first_migration.started_at);
 
     assert!(duration_since_started_at >= Duration::seconds(0));
-    assert!(duration_since_started_at < Duration::seconds(1));
+    assert!(duration_since_started_at < Duration::seconds(10));
     assert!(duration_between_started_at_and_finished_at >= Duration::seconds(0));
-    assert!(duration_between_started_at_and_finished_at < Duration::seconds(1));
+    assert!(duration_between_started_at_and_finished_at < Duration::seconds(10));
 
     Ok(())
 }
@@ -112,9 +112,9 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
         chrono::Utc::now().signed_duration_since(first_migration.started_at);
 
     assert!(duration_since_started_at >= Duration::seconds(0));
-    assert!(duration_since_started_at < Duration::seconds(1));
+    assert!(duration_since_started_at < Duration::seconds(10));
     assert!(duration_between_started_at_and_finished_at >= Duration::seconds(0));
-    assert!(duration_between_started_at_and_finished_at < Duration::seconds(1));
+    assert!(duration_between_started_at_and_finished_at < Duration::seconds(10));
 
     Ok(())
 }
@@ -165,9 +165,9 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
             chrono::Utc::now().signed_duration_since(first_migration.started_at);
 
         assert!(duration_since_started_at >= Duration::seconds(0));
-        assert!(duration_since_started_at < Duration::seconds(1));
+        assert!(duration_since_started_at < Duration::seconds(10));
         assert!(duration_between_started_at_and_finished_at >= Duration::seconds(0));
-        assert!(duration_between_started_at_and_finished_at < Duration::seconds(1));
+        assert!(duration_between_started_at_and_finished_at < Duration::seconds(10));
     }
 
     // Second migration assertions
@@ -189,7 +189,7 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
         let duration_since_started_at = chrono::Utc::now().signed_duration_since(second_migration.started_at);
 
         assert!(duration_since_started_at >= Duration::seconds(0));
-        assert!(duration_since_started_at < Duration::seconds(1));
+        assert!(duration_since_started_at < Duration::seconds(10));
     }
 
     Ok(())
