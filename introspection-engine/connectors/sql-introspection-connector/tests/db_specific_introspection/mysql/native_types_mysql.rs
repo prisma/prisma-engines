@@ -90,7 +90,7 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
   longText                       String   @mysql.LongText
   date                           DateTime @mysql.Date
   timeWithPrecision              DateTime @mysql.Time(3)
-  timeWithPrecision_no_precision DateTime @mysql.Datetime
+  timeWithPrecision_no_precision DateTime @mysql.Datetime(0)
   dateTimeWithPrecision          DateTime @mysql.Datetime(3)
   timestampWithPrecision         DateTime @default(now()) @mysql.Timestamp(3)
   year                           Int      @mysql.Year
