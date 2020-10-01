@@ -13,6 +13,9 @@ object IgnorePostgres extends Tag("ignore.postgres") with AssociatedWithConnecto
 object IgnoreMySql extends Tag("ignore.mysql") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.MySqlConnectorTag
 }
+object IgnoreMySql56 extends Tag("ignore.mysql56") with AssociatedWithConnectorTags {
+  override def tag = ConnectorTag.Mysql56ConnectorTag
+}
 object IgnoreMongo extends Tag("ignore.mongo") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.MongoConnectorTag
 }
@@ -24,7 +27,7 @@ object IgnoreMsSql extends Tag("ignore.mssql") with AssociatedWithConnectorTags 
 }
 
 object IgnoreSet {
-  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMongo, IgnoreSQLite, IgnoreMsSql)
+  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMySql56, IgnoreMongo, IgnoreSQLite, IgnoreMsSql)
 
   def byName(name: String): Option[AssociatedWithConnectorTags] = ignoreConnectorTags.find(_.name == name)
 }
@@ -49,13 +52,13 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   lazy val connectorConfig = ConnectorConfig.instance
   lazy val connector       = connectorConfig.provider
 
-  // TODO: cleanup those providers once we have moved everything
   lazy val connectorTag = connector match {
-    case "mongo"                                                 => ConnectorTag.MongoConnectorTag
-    case "mysql" | "mysql-native"                                => ConnectorTag.MySqlConnectorTag
-    case "postgres" | "postgres-native" | "postgresql"           => ConnectorTag.PostgresConnectorTag
-    case "sqlite" | "sqlite-native" | "native-integration-tests" => ConnectorTag.SQLiteConnectorTag
-    case "sqlserver"                                             => ConnectorTag.MsSqlConnectorTag
+    case "mongo"                   => ConnectorTag.MongoConnectorTag
+    case "mysql56"                 => ConnectorTag.Mysql56ConnectorTag
+    case "mysql"                   => ConnectorTag.MySqlConnectorTag
+    case "postgres" | "postgresql" => ConnectorTag.PostgresConnectorTag
+    case "sqlite"                  => ConnectorTag.SQLiteConnectorTag
+    case "sqlserver"               => ConnectorTag.MsSqlConnectorTag
   }
 
   def capabilities: ConnectorCapabilities               = connectorConfig.capabilities

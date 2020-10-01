@@ -3257,6 +3257,7 @@ dependencies = [
  "datamodel",
  "datamodel-connector",
  "enumflags2",
+ "hex",
  "migration-connector",
  "native-types",
  "once_cell",

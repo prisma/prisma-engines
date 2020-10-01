@@ -350,6 +350,8 @@ impl DatamodelFieldExtensions for dml::ScalarField {
                 dml::ScalarType::Int => TypeIdentifier::Int,
                 dml::ScalarType::String => TypeIdentifier::String,
                 dml::ScalarType::Json => TypeIdentifier::Json,
+                dml::ScalarType::Bytes => TypeIdentifier::Bytes,
+                dml::ScalarType::XML => TypeIdentifier::Xml,
                 _ => todo!(),
             },
             dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
