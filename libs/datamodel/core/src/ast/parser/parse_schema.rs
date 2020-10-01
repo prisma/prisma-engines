@@ -20,8 +20,8 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection
         Ok(mut datamodel_wrapped) => {
             let datamodel = datamodel_wrapped.next().unwrap();
             let mut top_level_definitions: Vec<Top> = vec![];
-
             for current in datamodel.relevant_children() {
+                println!("rule: {:?}, str: {:?}", current.as_rule(), current);
                 match current.as_rule() {
                     Rule::model_declaration => match parse_model(&current) {
                         Ok(model) => top_level_definitions.push(Top::Model(model)),
@@ -47,7 +47,7 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection
                         Span::from_pest(current.as_span()),
                     )),
                     Rule::arbitrary_block => errors.push(DatamodelError::new_validation_error(
-                        &format!("This block is invalid. It does not start with any known Prisma schema keyword."),
+                        &format!("This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'."),
                         Span::from_pest(current.as_span()),
                     )),
                     _ => parsing_catch_all(&current, "datamodel"),

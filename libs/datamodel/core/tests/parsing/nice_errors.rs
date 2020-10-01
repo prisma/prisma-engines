@@ -13,7 +13,7 @@ fn nice_error_for_missing_model_keyword() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "This block is invalid. It does not start with any known Prisma schema keyword.",
+        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.",
         Span::new(5, 36),
     ));
 }
@@ -31,7 +31,7 @@ fn nice_error_for_missing_model_keyword_2() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "This block is invalid. It does not start with any known Prisma schema keyword.",
+        "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.",
         Span::new(47, 70),
     ));
 }
