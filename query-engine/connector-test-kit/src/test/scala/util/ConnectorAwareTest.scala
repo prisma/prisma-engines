@@ -32,18 +32,25 @@ object IgnoreSet {
   def byName(name: String): Option[AssociatedWithConnectorTags] = ignoreConnectorTags.find(_.name == name)
 }
 
-sealed trait ConnectorTag extends EnumEntry
+sealed trait ConnectorTag extends EnumEntry {
+  def superTags(): Seq[ConnectorTag] = Seq()
+}
+
 object ConnectorTag extends Enum[ConnectorTag] {
   def values = findValues
 
   sealed trait RelationalConnectorTag extends ConnectorTag
-  object MySqlConnectorTag            extends RelationalConnectorTag
-  object Mysql56ConnectorTag          extends RelationalConnectorTag
-  object PostgresConnectorTag         extends RelationalConnectorTag
-  object SQLiteConnectorTag           extends RelationalConnectorTag
-  object MsSqlConnectorTag            extends RelationalConnectorTag
-  sealed trait DocumentConnectorTag   extends ConnectorTag
-  object MongoConnectorTag            extends DocumentConnectorTag
+
+  object MySqlConnectorTag extends RelationalConnectorTag
+  object Mysql56ConnectorTag extends RelationalConnectorTag {
+    override def superTags() = Seq(MySqlConnectorTag)
+  }
+
+  object PostgresConnectorTag       extends RelationalConnectorTag
+  object SQLiteConnectorTag         extends RelationalConnectorTag
+  object MsSqlConnectorTag          extends RelationalConnectorTag
+  sealed trait DocumentConnectorTag extends ConnectorTag
+  object MongoConnectorTag          extends DocumentConnectorTag
 }
 
 trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
@@ -124,7 +131,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
         ignoreTag <- IgnoreSet.byName(tagName)
       } yield ignoreTag.tag
 
-      val isIgnored = connectorTagsToIgnore.contains(connectorTag)
+      val isIgnored = connectorTagsToIgnore.contains(connectorTag) || connectorTag.superTags().exists(st => connectorTagsToIgnore.contains(st))
       if (isIgnored) {
         tagNames ++ Set("org.scalatest.Ignore")
       } else {
