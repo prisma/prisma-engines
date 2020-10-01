@@ -239,7 +239,7 @@ impl SqlSchemaDescriber {
                 .and_then(|x| x.as_bool())
                 .expect("get is_identity");
 
-            let entry = map.entry(table_name).or_insert(Vec::new());
+            let entry = map.entry(table_name).or_insert_with(Vec::new);
 
             let default = match col.get("column_default") {
                 None => None,
