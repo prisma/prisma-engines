@@ -9,7 +9,8 @@
             "dataType": "integer",
             "fullDataType": "int",
             "family": "int",
-          "arity": "nullable"
+            "arity": "nullable",
+            "nativeType": "Integer"
           },
           "default": null,
           "autoIncrement": false

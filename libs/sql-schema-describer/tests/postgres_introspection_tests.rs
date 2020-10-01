@@ -774,7 +774,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
-                        native_type: Some(PostgresType::ByteA.to_json()),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
 
                     default: None,
@@ -789,7 +789,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::ByteA.to_json()),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -803,7 +803,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::ByteA.to_json()),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -817,7 +817,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::ByteA.to_json()),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -831,7 +831,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::ByteA.to_json()),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -845,7 +845,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
-                        native_type: Some(PostgresType::ByteA.to_json()),
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: false,

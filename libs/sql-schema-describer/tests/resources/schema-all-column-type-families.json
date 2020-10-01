@@ -9,7 +9,7 @@
             "dataType": "raw type",
             "fullDataType": "full raw type",
             "family": "int",
-          "arity": "nullable"
+            "arity": "nullable"
           },
           "default": null,
           "autoIncrement": false
