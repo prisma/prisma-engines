@@ -3,7 +3,7 @@ use user_facing_error_macros::*;
 
 /// [spec](https://github.com/prisma/specs/tree/master/errors#p3000-database-creation-failed)
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P3000", message = "Failed to create database: ${database_error}")]
+#[user_facing(code = "P3000", message = "Failed to create database: {database_error}")]
 pub struct DatabaseCreationFailed {
     pub database_error: String,
 }
@@ -12,7 +12,7 @@ pub struct DatabaseCreationFailed {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3001",
-    message = "Migration possible with destructive changes and possible data loss: ${migration_engine_destructive_details}"
+    message = "Migration possible with destructive changes and possible data loss: {migration_engine_destructive_details}"
 )]
 pub struct DestructiveMigrationDetected {
     pub migration_engine_destructive_details: String,
@@ -21,7 +21,7 @@ pub struct DestructiveMigrationDetected {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3002",
-    message = "The attempted migration was rolled back: ${database_error}"
+    message = "The attempted migration was rolled back: {database_error}"
 )]
 struct MigrationRollback {
     pub database_error: String,
@@ -38,7 +38,7 @@ pub struct DatabaseMigrationFormatChanged;
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3004",
-    message = "The `${database_name}` database is a system database, it should not be altered with prisma migrate. Please connect to another database."
+    message = "The `{database_name}` database is a system database, it should not be altered with prisma migrate. Please connect to another database."
 )]
 pub struct MigrateSystemDatabase {
     pub database_name: String,
