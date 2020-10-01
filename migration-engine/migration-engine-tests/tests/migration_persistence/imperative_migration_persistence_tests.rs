@@ -78,7 +78,6 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-//Fixme this seems flaky
 #[test_each_connector]
 async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();

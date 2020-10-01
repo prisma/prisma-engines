@@ -547,8 +547,8 @@ impl Precision {
         self.numeric_scale.unwrap_or(30)
     }
 
-    fn time_precision(&self) -> u32 {
-        self.time_precision.unwrap_or(6)
+    fn time_precision(&self) -> Option<u32> {
+        self.time_precision
     }
 }
 

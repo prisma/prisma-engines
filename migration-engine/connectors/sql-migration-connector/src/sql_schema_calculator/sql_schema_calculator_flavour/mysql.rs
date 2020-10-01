@@ -41,6 +41,13 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
     ) -> sql::ColumnType {
         let mysql_type: MySqlType = native_type_instance.deserialize_native_type();
 
+        fn render(input: Option<u32>) -> String {
+            match input {
+                None => "".to_string(),
+                Some(arg) => format!("({})", arg).to_string(),
+            }
+        }
+
         let data_type: String = match mysql_type {
             MySqlType::Int => "INTEGER".into(),
             MySqlType::SmallInt => "SMALLINT".into(),
@@ -65,9 +72,9 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::MediumText => "MEDIUMTEXT".into(),
             MySqlType::LongText => "LONGTEXT".into(),
             MySqlType::Date => "DATE".into(),
-            MySqlType::Time(precision) => format!("TIME({precision})", precision = precision),
-            MySqlType::DateTime(precision) => format!("DATETIME({precision})", precision = precision),
-            MySqlType::Timestamp(precision) => format!("TIMESTAMP({precision})", precision = precision),
+            MySqlType::Time(precision) => format!("TIME{}", render(precision)),
+            MySqlType::DateTime(precision) => format!("DATETIME{}", render(precision)),
+            MySqlType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)),
             MySqlType::Year => "YEAR".into(),
             MySqlType::JSON => "JSON".into(),
             MySqlType::UnsignedInt => "INTEGER UNSIGNED".into(),

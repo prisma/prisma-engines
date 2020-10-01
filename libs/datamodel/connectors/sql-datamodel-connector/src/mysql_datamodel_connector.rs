@@ -231,9 +231,9 @@ impl Connector for MySqlDatamodelConnector {
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
-            TIME_TYPE_NAME => MySqlType::Time(args.first().map(|i| *i).unwrap_or(0)),
-            DATETIME_TYPE_NAME => MySqlType::DateTime(args.first().map(|i| *i).unwrap_or(0)),
-            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().map(|i| *i).unwrap_or(0)),
+            TIME_TYPE_NAME => MySqlType::Time(args.first().cloned()),
+            DATETIME_TYPE_NAME => MySqlType::DateTime(args.first().cloned()),
+            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().cloned()),
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
             x => unreachable!(format!(
@@ -280,21 +280,19 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::MediumText => (MEDIUM_TEXT_TYPE_NAME, vec![]),
             MySqlType::LongText => (LONG_TEXT_TYPE_NAME, vec![]),
             MySqlType::Date => (DATE_TYPE_NAME, vec![]),
-            MySqlType::Time(x) => match x {
-                0 => (TIME_TYPE_NAME, vec![]),
-                arg => (TIME_TYPE_NAME, vec![arg]),
-            },
-            MySqlType::DateTime(x) => match x {
-                0 => (DATETIME_TYPE_NAME, vec![]),
-                arg => (DATETIME_TYPE_NAME, vec![arg]),
-            },
-            MySqlType::Timestamp(x) => match x {
-                0 => (TIMESTAMP_TYPE_NAME, vec![]),
-                arg => (TIMESTAMP_TYPE_NAME, vec![arg]),
-            },
+            MySqlType::Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
+            MySqlType::DateTime(x) => (DATETIME_TYPE_NAME, arg_vec_from_opt(x)),
+            MySqlType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
         };
+
+        fn arg_vec_from_opt(input: Option<u32>) -> Vec<u32> {
+            match input {
+                Some(arg) => vec![arg],
+                None => vec![],
+            }
+        }
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))

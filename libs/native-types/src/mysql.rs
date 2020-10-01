@@ -31,9 +31,9 @@ pub enum MySqlType {
     MediumText,
     LongText,
     Date,
-    Time(u32),
-    DateTime(u32),
-    Timestamp(u32),
+    Time(Option<u32>),
+    DateTime(Option<u32>),
+    Timestamp(Option<u32>),
     Year,
     JSON,
 }
