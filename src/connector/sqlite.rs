@@ -105,15 +105,15 @@ impl TryFrom<&str> for Sqlite {
 
     fn try_from(path: &str) -> crate::Result<Self> {
         let params = SqliteParams::try_from(path)?;
-        let file_path = params.file_path;
 
-        let conn = rusqlite::Connection::open(file_path.as_str())?;
+        let conn = rusqlite::Connection::open_in_memory()?;
 
         if let Some(timeout) = params.socket_timeout {
             conn.busy_timeout(timeout)?;
         };
 
         let client = Mutex::new(conn);
+        let file_path = params.file_path;
 
         Ok(Sqlite { client, file_path })
     }
