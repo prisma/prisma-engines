@@ -323,7 +323,7 @@ async fn all_mssql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "varchar".to_string(),
                 full_data_type: "varchar".to_string(),
-                character_maximum_length: None,
+                character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -365,7 +365,7 @@ async fn all_mssql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "nvarchar".to_string(),
                 full_data_type: "nvarchar".to_string(),
-                character_maximum_length: None,
+                character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -421,7 +421,7 @@ async fn all_mssql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "varbinary".to_string(),
                 full_data_type: "varbinary".to_string(),
-                character_maximum_length: None,
+                character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: None,
