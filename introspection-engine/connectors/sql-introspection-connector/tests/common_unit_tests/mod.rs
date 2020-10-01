@@ -1214,8 +1214,6 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     let expected_dm =
         datamodel::render_schema_ast_to_string(&datamodel::parse_schema_ast(&expected_dm).unwrap()).unwrap();
 
-    println!("{:?}", schema);
-
     let mut introspected_dm = calculate_datamodel(&schema, &sql_family, &Datamodel::new(), false)?.data_model;
     introspected_dm.models.sort_by(|a, b| b.name.cmp(&a.name));
 
