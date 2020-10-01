@@ -239,7 +239,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::Time(0).to_json()),
+                native_type: Some(MySqlType::Time(Some(0)).to_json()),
             },
 
             default: None,
@@ -253,7 +253,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::DateTime(0).to_json()),
+                native_type: Some(MySqlType::DateTime(Some(0)).to_json()),
             },
 
             default: None,
@@ -267,7 +267,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::Timestamp(0).to_json()),
+                native_type: Some(MySqlType::Timestamp(Some(0)).to_json()),
             },
 
             default: Some(DefaultValue::NOW),

@@ -192,5 +192,5 @@ fn should_handle_type_specifications_on_mysql() {
     let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
 
     let mysql_type: MySqlType = sft.deserialize_native_type();
-    assert_eq!(mysql_type, MySqlType::DateTime(6));
+    assert_eq!(mysql_type, MySqlType::DateTime(Some(6)));
 }

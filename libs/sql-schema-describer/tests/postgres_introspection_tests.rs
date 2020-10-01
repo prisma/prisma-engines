@@ -425,7 +425,7 @@ async fn all_postgres_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Duration,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Interval(6).to_json()),
+                native_type: Some(PostgresType::Interval(Some(6)).to_json()),
             },
 
             default: None,
@@ -571,7 +571,7 @@ async fn all_postgres_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Time(6).to_json()),
+                native_type: Some(PostgresType::Time(Some(6)).to_json()),
             },
 
             default: None,
@@ -586,7 +586,7 @@ async fn all_postgres_column_types_must_work() {
 
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::TimeWithTimeZone(6).to_json()),
+                native_type: Some(PostgresType::TimeWithTimeZone(Some(6)).to_json()),
             },
 
             default: None,
@@ -601,7 +601,7 @@ async fn all_postgres_column_types_must_work() {
 
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Timestamp(6).to_json()),
+                native_type: Some(PostgresType::Timestamp(Some(6)).to_json()),
             },
 
             default: None,
@@ -616,7 +616,7 @@ async fn all_postgres_column_types_must_work() {
 
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::TimestampWithTimeZone(6).to_json()),
+                native_type: Some(PostgresType::TimestampWithTimeZone(Some(6)).to_json()),
             },
 
             default: None,
