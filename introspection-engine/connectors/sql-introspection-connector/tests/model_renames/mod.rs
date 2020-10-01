@@ -12,7 +12,7 @@ async fn introspecting_a_table_with_reserved_name_should_rename(api: &TestApi) {
         })
         .await;
 
-    let dm = "/// This model has been renamed to \'RenamedStringFilter\' during introspection, because the original name \'StringFilter\' is reserved.\nmodel RenamedStringFilter {\n  id Int @default(autoincrement()) @id\n\n  @@map(\"StringFilter\")\n}\n";
+    let dm = "/// This model has been renamed to \'RenamedStringFilter\' during introspection, because the original name \'StringFilter\' is reserved.\nmodel RenamedStringFilter {\n  id Int @id @default(autoincrement())\n\n  @@map(\"StringFilter\")\n}\n";
     let result = api.introspect().await;
 
     assert_eq!(&result, dm);
@@ -28,7 +28,7 @@ async fn reserved_names_case_sensitivity(api: &TestApi) {
         })
         .await;
 
-    let dm = "model query {\n  id Int @default(autoincrement()) @id\n}\n";
+    let dm = "model query {\n  id Int @id @default(autoincrement())\n}\n";
     let result = api.introspect().await;
 
     assert_eq!(&result, dm);

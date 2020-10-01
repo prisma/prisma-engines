@@ -110,6 +110,29 @@ fn should_fail_on_custom_related_types() {
 }
 
 #[test]
+fn should_fail_on_native_type_with_invalid_datasource_name() {
+    let dml = r#"
+        datasource db {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.BigInt?",
+        ast::Span::new(222, 231),
+    ));
+}
+
+#[test]
 fn should_fail_on_native_type_with_invalid_number_of_arguments() {
     let dml = r#"
         datasource pg {
@@ -132,6 +155,29 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
         1,
         0,
         ast::Span::new(259, 271),
+    ));
+}
+
+#[test]
+fn should_fail_on_serial_native_type_and_default_autoincrement() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id      Int @id
+            serial  Int @default(autoincrement()) @pg.Serial
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_directive_validation_error(
+        "The native type serial translates to an Integer column with an auto-incrementing counter as default. The field attribute @default(autoincrement()) translates to the serial type underneath. Please remove one of the two attributes.",
+        "default", ast::Span::new(218, 242),
     ));
 }
 

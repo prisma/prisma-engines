@@ -63,7 +63,7 @@ enum_value_declaration = { doc_comment_and_new_line* ~ (non_empty_identifier ~ (
 // ######################################
 // Directives
 // ######################################
-block_level_directive = { "@@" ~ directive ~ NEWLINE }
+block_level_directive = { "@@" ~ directive ~ doc_comment? ~ comment? ~ NEWLINE }
 // A directive may have no arguments at all.
 directive = { (directive_name ~ directive_arguments | directive_name) }
 // This is a poor-mans version of name spacing. Not used right now. Unclear if we need it going forward.

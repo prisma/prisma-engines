@@ -24,7 +24,7 @@ rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgboun
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"
 thiserror = "1.0"
-tokio = {version = "=0.2.13"}
+tokio = {version = "0.2.13"}
 tracing = "0.1"
 user-facing-errors = {path = "../../libs/user-facing-errors"}
 uuid = "0.8"

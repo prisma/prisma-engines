@@ -290,13 +290,13 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 for walker in walker.indexes() {
                     let contains_nullable_columns = walker.has_nullable_columns();
 
-                    if family.is_mssql() && walker.index.is_unique() && !contains_nullable_columns {
+                    if family.is_mssql() && walker.index_type().is_unique() && !contains_nullable_columns {
                         continue;
                     }
 
                     steps.push(CreateIndex {
                         table: table.name.clone(),
-                        index: walker.index.clone(),
+                        index: walker.index().clone(),
                         caused_by_create_table: true,
                         contains_nullable_columns,
                     });
@@ -311,7 +311,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.created_indexes() {
                 steps.push(CreateIndex {
                     table: tables.next.name().to_owned(),
-                    index: index.index.clone(),
+                    index: index.index().clone(),
                     caused_by_create_table: false,
                     contains_nullable_columns: index.has_nullable_columns(),
                 })
@@ -328,12 +328,13 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.flavour.sql_family().is_mysql() && index::index_covers_fk(&tables.previous.table, index.index) {
+                if self.flavour.sql_family().is_mysql() && index::index_covers_fk(&tables.previous, &index) {
                     continue;
                 }
+
                 drop_indexes.push(DropIndex {
                     table: tables.previous.name().to_owned(),
-                    name: index.index.name.clone(),
+                    name: index.name().to_owned(),
                 })
             }
         }
@@ -390,13 +391,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 differ
                     .index_pairs()
                     .filter(|(previous_index, next_index)| {
-                        self.flavour
-                            .index_should_be_renamed(previous_index.index, next_index.index)
+                        self.flavour.index_should_be_renamed(&previous_index, &next_index)
                     })
                     .for_each(|(previous_index, renamed_index)| {
                         alter_indexes.push(AlterIndex {
-                            index_name: previous_index.index.name.clone(),
-                            index_new_name: renamed_index.index.name.clone(),
+                            index_name: previous_index.name().to_owned(),
+                            index_new_name: renamed_index.name().to_owned(),
                             table: differ.next.name().to_owned(),
                         })
                     })

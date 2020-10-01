@@ -17,6 +17,7 @@ mod span;
 mod top;
 mod traits;
 
+mod helper;
 pub mod parser;
 pub mod reformat;
 pub mod renderer;

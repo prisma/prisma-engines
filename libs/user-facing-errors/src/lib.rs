@@ -27,12 +27,12 @@ pub struct KnownError {
 }
 
 impl KnownError {
-    pub fn new<T: UserFacingError>(inner: T) -> Result<KnownError, serde_json::Error> {
-        Ok(KnownError {
+    pub fn new<T: UserFacingError>(inner: T) -> KnownError {
+        KnownError {
             message: inner.message(),
-            meta: serde_json::to_value(&inner)?,
+            meta: serde_json::to_value(&inner).expect("Failed to render user facing error metadata to JSON"),
             error_code: T::ERROR_CODE,
-        })
+        }
     }
 }
 

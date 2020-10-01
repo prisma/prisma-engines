@@ -57,19 +57,19 @@ pub struct PrismaOpt {
     /// The unix socket path to listen on
     // NOTE: this is mutually exclusive with port.
     #[structopt(long, short, env)]
-    unix_path: Option<String>,
+    pub unix_path: Option<String>,
 
     /// Path to the Prisma datamodel file
     #[structopt(long, env = "PRISMA_DML_PATH", parse(from_os_str = load_datamodel_file))]
-    datamodel_path: Option<String>,
+    pub datamodel_path: Option<String>,
 
     /// Base64 encoded Prisma datamodel
     #[structopt(long, env = "PRISMA_DML", parse(try_from_str = parse_base64_string))]
-    datamodel: Option<String>,
+    pub datamodel: Option<String>,
 
     /// Base64 encoded datasource urls, overwriting the ones in the schema
     #[structopt(long, env, parse(try_from_str = parse_base64_string))]
-    overwrite_datasources: Option<String>,
+    pub overwrite_datasources: Option<String>,
 
     /// Switches query schema generation to Prisma 1 compatible mode.
     #[structopt(long, short)]
@@ -89,7 +89,7 @@ pub struct PrismaOpt {
 
     /// Set the log format.
     #[structopt(long = "log-format", env = "RUST_LOG_FORMAT")]
-    log_format: Option<String>,
+    pub log_format: Option<String>,
 
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,

@@ -21,7 +21,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out_sqlite(api:
         })
         .await;
 
-    let dm = "model User {\n  id      Int    @default(autoincrement()) @id\n  // Post Post[]\n}\n\n// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n";
+    let dm = "model User {\n  id      Int    @id @default(autoincrement())\n  // Post Post[]\n}\n\n// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
@@ -80,7 +80,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out_mysql(api: 
         })
         .await;
 
-    let dm = "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n\n  // @@index([user_id], name: \"user_id\")\n// }\n\nmodel User {\n  id      Int    @default(autoincrement()) @id\n  // Post Post[]\n}\n";
+    let dm = "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n\n  // @@index([user_id], name: \"user_id\")\n// }\n\nmodel User {\n  id      Int    @id @default(autoincrement())\n  // Post Post[]\n}\n";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
@@ -105,7 +105,7 @@ async fn introspecting_an_enum_with_an_invalid_value_should_work(api: &TestApi) 
     assert_eq!(&warnings, "[{\"code\":4,\"message\":\"These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` directive.\",\"affected\":[{\"enm\":\"status\",\"value\":\"1\"}]}]");
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model News {\n  id     Int    @default(autoincrement()) @id\n  status status @default(UNDEFINED)\n}\n\nenum status {\n  // 1 @map(\"1\")\n  UNDEFINED\n}\n");
+    assert_eq!(&result, "model News {\n  id     Int    @id @default(autoincrement())\n  status status @default(UNDEFINED)\n}\n\nenum status {\n  // 1 @map(\"1\")\n  UNDEFINED\n}\n");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -127,7 +127,7 @@ async fn introspecting_an_enum_with_an_invalid_value_as_default_should_work(api:
     assert_eq!(&warnings, "[{\"code\":4,\"message\":\"These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` directive.\",\"affected\":[{\"enm\":\"status\",\"value\":\"1\"}]}]");
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model News {\n  id     Int    @default(autoincrement()) @id\n  status status @default(dbgenerated())\n}\n\nenum status {\n  // 1 @map(\"1\")\n  UNDEFINED\n}\n");
+    assert_eq!(&result, "model News {\n  id     Int    @id @default(autoincrement())\n  status status @default(dbgenerated())\n}\n\nenum status {\n  // 1 @map(\"1\")\n  UNDEFINED\n}\n");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -198,7 +198,7 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
     );
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}\n");
+    assert_eq!(&result, "model Test {\n  id             Int      @id @default(autoincrement())\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}\n");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -212,7 +212,7 @@ async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
         })
         .await;
 
-    let dm = "model User {\n  // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 String @map(\"1\")\n  last Int    @default(autoincrement()) @id\n}\n";
+    let dm = "model User {\n  // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 String @map(\"1\")\n  last Int    @id @default(autoincrement())\n}\n";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
@@ -241,5 +241,5 @@ async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
 //     );
 //
 //     let result = dbg!(api.introspect().await);
-//     assert_eq!(&result, "model Post {\n  id     Int   @default(autoincrement()) @id\n  user_1 Int?\n  User   User? @relation(fields: [user_1], references: [1])\n}\n\nmodel User {\n  id   Int    @default(autoincrement()) @id\n  // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 Int    @map(\"1\") @unique\n  Post Post[]\n}\n");
+//     assert_eq!(&result, "model Post {\n  id     Int   @id @default(autoincrement())\n  user_1 Int?\n  User   User? @relation(fields: [user_1], references: [1])\n}\n\nmodel User {\n  id   Int    @id @default(autoincrement())\n  // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 Int    @map(\"1\") @unique\n  Post Post[]\n}\n");
 // }

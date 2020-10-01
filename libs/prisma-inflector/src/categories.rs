@@ -1,7 +1,7 @@
-pub static CATEGORY_EX_ICES: &'static [&'static str] = &["codex", "murex", "silex"];
-pub static CATEGORY_IX_ICES: &'static [&'static str] = &["radix", "helix"];
+pub const CATEGORY_EX_ICES: &[&str] = &["codex", "murex", "silex"];
+pub const CATEGORY_IX_ICES: &[&str] = &["radix", "helix"];
 
-pub static CATEGORY_UM_A: &'static [&'static str] = &[
+pub const CATEGORY_UM_A: &[&str] = &[
     "bacterium",
     "agendum",
     "desideratum",
@@ -13,7 +13,7 @@ pub static CATEGORY_UM_A: &'static [&'static str] = &[
     "candelabrum",
 ];
 
-pub static CATEGORY_US_I: &'static [&'static str] = &[
+pub const CATEGORY_US_I: &[&str] = &[
     "alumnus",
     "alveolus",
     "bacillus",
@@ -25,7 +25,7 @@ pub static CATEGORY_US_I: &'static [&'static str] = &[
     "thesaurus",
 ];
 
-pub static CATEGORY_ON_A: &'static [&'static str] = &[
+pub const CATEGORY_ON_A: &[&str] = &[
     "criterion",
     "perihelion",
     "aphelion",
@@ -37,9 +37,9 @@ pub static CATEGORY_ON_A: &'static [&'static str] = &[
     "hyperbaton",
 ];
 
-pub static CATEGORY_A_AE: &'static [&'static str] = &["alumna", "alga", "vertebra", "persona"];
+pub const CATEGORY_A_AE: &[&str] = &["alumna", "alga", "vertebra", "persona"];
 
-pub static CATEGORY_O_OS: &'static [&'static str] = &[
+pub const CATEGORY_O_OS: &[&str] = &[
     "albino",
     "archipelago",
     "armadillo",
@@ -72,7 +72,7 @@ pub static CATEGORY_O_OS: &'static [&'static str] = &[
     "zero",
 ];
 
-pub static CATEGORY_O_I: &'static [&'static str] = &[
+pub const CATEGORY_O_I: &[&str] = &[
     "solo",
     "soprano",
     "basso",
@@ -83,9 +83,9 @@ pub static CATEGORY_O_I: &'static [&'static str] = &[
     "virtuoso",
 ];
 
-pub static CATEGORY_EN_INA: &'static [&'static str] = &["stamen", "foramen", "lumen"];
+pub const CATEGORY_EN_INA: &[&str] = &["stamen", "foramen", "lumen"];
 
-pub static CATEGORY_A_ATA: &'static [&'static str] = &[
+pub const CATEGORY_A_ATA: &[&str] = &[
     "anathema",
     "enema",
     "oedema",
@@ -111,9 +111,9 @@ pub static CATEGORY_A_ATA: &'static [&'static str] = &[
     "miasma",
 ];
 
-pub static CATEGORY_IS_IDES: &'static [&'static str] = &["iris", "clitoris"];
+pub const CATEGORY_IS_IDES: &[&str] = &["iris", "clitoris"];
 
-pub static CATEGORY_US_US: &'static [&'static str] = &[
+pub const CATEGORY_US_US: &[&str] = &[
     "apparatus",
     "impetus",
     "prospectus",
@@ -126,16 +126,16 @@ pub static CATEGORY_US_US: &'static [&'static str] = &[
     "hiatus",
 ];
 
-pub static CATEGORY_NONE_I: &'static [&'static str] = &["afreet", "afrit", "efreet"];
-pub static CATEGORY_NONE_IM: &'static [&'static str] = &["cherub", "goy", "seraph"];
+pub const CATEGORY_NONE_I: &[&str] = &["afreet", "afrit", "efreet"];
+pub const CATEGORY_NONE_IM: &[&str] = &["cherub", "goy", "seraph"];
 
-pub static CATEGORY_EX_EXES: &'static [&'static str] = &[
+pub const CATEGORY_EX_EXES: &[&str] = &[
     "apex", "latex", "vertex", "cortex", "pontifex", "vortex", "index", "simplex",
 ];
 
-pub static CATEGORY_IX_IXES: &'static [&'static str] = &["appendix"];
+pub const CATEGORY_IX_IXES: &[&str] = &["appendix"];
 
-pub static CATEGORY_S_ES: &'static [&'static str] = &[
+pub const CATEGORY_S_ES: &[&str] = &[
     "acropolis",
     "chaos",
     "lens",
@@ -168,7 +168,7 @@ pub static CATEGORY_S_ES: &'static [&'static str] = &[
     "trellis",
 ];
 
-pub static CATEGORY_MAN_MANS: &'static [&'static str] = &[
+pub const CATEGORY_MAN_MANS: &[&str] = &[
     "human",
     "Alabaman",
     "Bahaman",

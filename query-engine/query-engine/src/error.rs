@@ -60,10 +60,9 @@ impl PrismaError {
                 let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
                 write!(full_error, "\nValidation Error Count: {}", errors.to_iter().len())?;
 
-                user_facing_errors::Error::from(
-                    user_facing_errors::KnownError::new(user_facing_errors::common::SchemaParserError { full_error })
-                        .unwrap(),
-                )
+                user_facing_errors::Error::from(user_facing_errors::KnownError::new(
+                    user_facing_errors::common::SchemaParserError { full_error },
+                ))
             }
             other => user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string()),
         };

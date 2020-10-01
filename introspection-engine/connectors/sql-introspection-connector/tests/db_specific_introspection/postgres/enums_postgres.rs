@@ -23,7 +23,7 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   color
             color2  color2
         }
@@ -71,7 +71,7 @@ async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_d
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color2  color2
             color   color
         }
@@ -121,7 +121,7 @@ async fn introspecting_a_table_enums_array_should_work(api: &TestApi) {
         }
 
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   color[]
         }
 
@@ -152,7 +152,7 @@ async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestAp
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   color   @default(black)
         }
 
@@ -183,7 +183,7 @@ async fn introspecting_a_table_with_enum_default_values_should_work_2(api: &Test
 
     let dm = r#"
         model Book {
-            id      Int     @default(autoincrement()) @id
+            id      Int     @id @default(autoincrement())
             color   color   @default(black)
         }
 
@@ -214,7 +214,7 @@ async fn introspecting_a_table_with_enum_default_values_that_look_like_booleans_
 
     let dm = r#"
         model News {
-            id          Int     @default(autoincrement()) @id
+            id          Int     @id @default(autoincrement())
             confirmed   truth   @default(true)
         }
 
@@ -246,7 +246,7 @@ async fn introspecting_a_table_with_an_enum_default_value_that_is_an_empty_strin
 
     let dm = r#"
         model News {
-            id          Int         @default(autoincrement()) @id
+            id          Int         @id @default(autoincrement())
             content     strings     @default(EMPTY_ENUM_VALUE)
         }
 

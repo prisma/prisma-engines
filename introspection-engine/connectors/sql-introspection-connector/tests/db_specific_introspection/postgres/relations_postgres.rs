@@ -54,14 +54,14 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
 
     let dm = r#"
             model Post {
-            id                      Int   @default(autoincrement()) @id
+            id                      Int   @id @default(autoincrement())
             user_id                 Int   @unique
             User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id])
             User_PostToUser_post_id User? @relation("PostToUser_post_id")
         }
 
         model User {
-            id                      Int   @default(autoincrement()) @id
+            id                      Int   @id @default(autoincrement())
             post_id                 Int   @unique
             Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id])
             Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
@@ -87,13 +87,13 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"
                model Post {
-                id      Int   @default(autoincrement()) @id
+                id      Int  @id @default(autoincrement())
                 user_id Int?  @unique
                 User    User? @relation(fields: [user_id], references: [id])
             }
 
             model User {
-                id   Int   @default(autoincrement()) @id
+                id   Int   @id @default(autoincrement())
                 Post Post?
             }
         "#;
@@ -118,13 +118,13 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
         .await;
     let dm = r#"
             model Post {
-                id         Int     @default(autoincrement()) @id
+                id         Int     @id @default(autoincrement())
                 user_email String? @unique
                 User       User?   @relation(fields: [user_email], references: [email])
             }
 
             model User {
-                id    Int     @default(autoincrement()) @id
+                id    Int     @id @default(autoincrement())
                 email String? @unique
                 Post  Post?
             }
@@ -149,13 +149,13 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"
              model Post {
-                id      Int   @default(autoincrement()) @id
+                id      Int   @id @default(autoincrement())
                 user_id Int?
                 User    User? @relation(fields: [user_id], references: [id])
             }
 
             model User {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 Post Post[]
             }
         "#;
@@ -191,13 +191,13 @@ async fn introspecting_duplicate_fks_should_ignore_one_of_them(api: &TestApi) {
 
     let dm = r#"
              model Post {
-                 id      Int   @default(autoincrement()) @id
+                 id      Int   @id @default(autoincrement())
                  user_id Int?
                  User    User? @relation("Post_user_idToUser", fields: [user_id], references: [id])
              }
 
              model User {
-                 id   Int    @default(autoincrement()) @id
+                 id   Int    @id @default(autoincrement())
                  Post Post[] @relation("Post_user_idToUser")
              }
         "#;
@@ -221,13 +221,13 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"
             model Post {
-                id      Int  @default(autoincrement()) @id
+                id      Int  @id @default(autoincrement())
                 user_id Int
                 User    User @relation(fields: [user_id], references: [id])
             }
 
             model User {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 Post Post[]
             }
        "#;
@@ -278,12 +278,12 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
         .unwrap();
 
     let dm = r#"model Post {
-  id   Int    @default(autoincrement()) @id
+  id   Int    @id @default(autoincrement())
   User User[]
 }
 
 model User {
-  id   Int    @default(autoincrement()) @id
+  id   Int    @id @default(autoincrement())
   Post Post[]
 }
 "#;
@@ -397,7 +397,7 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
 
     let dm = r#"
             model Post {
-                id           Int            @default(autoincrement()) @id
+                id           Int            @id @default(autoincrement())
                 PostsToUsers PostsToUsers[]
             }
 
@@ -410,7 +410,7 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
             }
 
             model User {
-                id           Int            @default(autoincrement()) @id
+                id           Int            @id @default(autoincrement())
                 PostsToUsers PostsToUsers[]
             }
         "#;
@@ -433,7 +433,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"
             model User {
-                id                                  Int    @default(autoincrement()) @id
+                id                                  Int    @id @default(autoincrement())
                 recruited_by                        Int?
                 direct_report                       Int?
                 User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id])
@@ -496,13 +496,13 @@ async fn introspecting_default_values_on_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id      Int   @default(autoincrement()) @id
+                id      Int   @id @default(autoincrement())
                 user_id Int?  @default(0)
                 User    User? @relation(fields: [user_id], references: [id])
             }
 
             model User {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 Post Post[]
             }
         "#;
@@ -533,7 +533,7 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
             }
 
             model User {
-                id   Int    @default(autoincrement()) @id
+                id   Int    @id @default(autoincrement())
                 Post Post[]
             }
         "#;

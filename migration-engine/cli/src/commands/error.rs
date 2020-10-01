@@ -16,7 +16,7 @@ pub enum CliError {
         exit_code: i32,
     },
 
-    #[error("Unknown error occured: {0}")]
+    #[error("Unknown error occurred: {0}")]
     Other(anyhow::Error),
 }
 

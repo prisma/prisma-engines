@@ -512,7 +512,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
 
     let dm1 = r#"
         model User {
-            id           String  @default(cuid()) @id
+            id           String  @id @default(cuid())
             name         String?
             email        String  @unique
             kindle_email String? @unique
@@ -531,7 +531,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
 
     let dm2 = r#"
         model User {
-            id           String  @default(cuid()) @id
+            id           String  @id @default(cuid())
             name         String?
             email        String  @unique
             kindle_email String? @unique

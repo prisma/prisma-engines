@@ -3,6 +3,8 @@ mod table;
 
 use crate::ast;
 
+use crate::ast::helper::get_sort_index_of_directive;
+use crate::ast::Directive;
 pub use string_builder::StringBuilder;
 pub use table::TableFormat;
 
@@ -154,7 +156,8 @@ impl<'a> Renderer<'a> {
         if !field.directives.is_empty() {
             let mut attributes_builder = StringBuilder::new();
 
-            for directive in &field.directives {
+            let directives = Self::sort_directives(field.directives.clone(), true);
+            for directive in directives {
                 Self::render_field_directive(&mut attributes_builder, &directive);
             }
 
@@ -189,7 +192,9 @@ impl<'a> Renderer<'a> {
 
         if !model.directives.is_empty() {
             self.end_line();
-            for directive in &model.directives {
+            // sort directives
+            let directives = Self::sort_directives(model.directives.clone(), false);
+            for directive in directives {
                 self.render_block_directive(&directive, comment_out.clone());
             }
         }
@@ -197,6 +202,16 @@ impl<'a> Renderer<'a> {
         self.indent_down();
         self.write(format!("{}{}", comment_out.clone(), "}").as_ref());
         self.end_line();
+    }
+
+    fn sort_directives(mut directives: Vec<Directive>, is_field_directive: bool) -> Vec<Directive> {
+        // sort directives
+        directives.sort_by(|a, b| {
+            let sort_index_a = get_sort_index_of_directive(is_field_directive, a.name.name.as_str());
+            let sort_index_b = get_sort_index_of_directive(is_field_directive, b.name.name.as_str());
+            sort_index_a.cmp(&sort_index_b)
+        });
+        return directives;
     }
 
     fn render_enum(&mut self, enm: &ast::Enum) {
@@ -237,7 +252,8 @@ impl<'a> Renderer<'a> {
 
         if !enm.directives.is_empty() {
             self.end_line();
-            for directive in &enm.directives {
+            let directives = Self::sort_directives(enm.directives.clone(), false);
+            for directive in directives {
                 self.write(" ");
                 self.render_block_directive(&directive, "".to_string());
             }
@@ -273,7 +289,8 @@ impl<'a> Renderer<'a> {
         if !field.directives.is_empty() {
             let mut attributes_builder = StringBuilder::new();
 
-            for directive in &field.directives {
+            let directives = Self::sort_directives(field.directives.clone(), true);
+            for directive in directives {
                 attributes_builder.write(&" ");
                 Self::render_field_directive(&mut attributes_builder, &directive);
             }
