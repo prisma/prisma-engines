@@ -14,12 +14,14 @@ const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 /// Is responsible for loading and validating Datasources defined in an AST.
 pub struct DatasourceLoader {
     source_definitions: Vec<Box<dyn DatasourceProvider>>,
+    preview_features: Vec<&'static str>
 }
 
 impl DatasourceLoader {
     pub fn new() -> Self {
         Self {
             source_definitions: get_builtin_datasource_providers(),
+            preview_features: get_built_in_preview_features(),
         }
     }
 
@@ -134,7 +136,16 @@ impl DatasourceLoader {
 
         let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
         let preview_features = match preview_features_arg.ok() {
-            Some(x) => x.as_array().to_str_vec()?,
+            Some(x) => {
+                let args = x.as_array().to_str_vec()?;
+                if let Some(unknown_preview_feature) = args.iter().find(|pf| !self.preview_features.contains(&pf.as_str())) {
+                    return Err(DatamodelError::new_datasource_preview_feature_not_known_error(
+                        unknown_preview_feature,
+                        x.span()
+                    ))
+                }
+                args
+            },
             None => Vec::new(),
         };
 
@@ -202,5 +213,11 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(PostgresDatasourceProvider::new()),
         Box::new(SqliteDatasourceProvider::new()),
         Box::new(MsSqlDatasourceProvider::new()),
+    ]
+}
+
+fn get_built_in_preview_features() -> Vec<&'static str> {
+    vec![
+        "nativeTypes"
     ]
 }

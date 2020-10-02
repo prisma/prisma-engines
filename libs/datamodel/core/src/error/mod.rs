@@ -74,6 +74,9 @@ pub enum DatamodelError {
     #[error("Datasource provider not known: \"{}\".", source_name)]
     DatasourceProviderNotKnownError { source_name: String, span: Span },
 
+    #[error("Preview feature not known: \"{}\".", preview_feature)]
+    DatasourcePreviewFeatureNotKnownError { preview_feature: String, span: Span },
+
     #[error("\"{}\" is not a valid value for {}.", raw_value, literal_type)]
     LiteralParseError { literal_type: String, raw_value: String, span: Span },
 
@@ -339,6 +342,10 @@ impl DatamodelError {
         DatamodelError::DatasourceProviderNotKnownError { source_name: String::from(source_name), span }
     }
 
+    pub fn new_datasource_preview_feature_not_known_error(preview_feature: &str, span: Span) -> DatamodelError {
+        DatamodelError::DatasourcePreviewFeatureNotKnownError { preview_feature: String::from(preview_feature), span}
+    }
+
     pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
         DatamodelError::ValueParserError {
             expected_type: String::from(expected_type),
@@ -394,6 +401,7 @@ impl DatamodelError {
             DatamodelError::SourceValidationError {span, ..} => *span,
             DatamodelError::EnumValidationError {span, ..} => *span,
             DatamodelError::ConnectorError { span, .. } => *span,
+            DatamodelError::DatasourcePreviewFeatureNotKnownError {span, ..} => *span,
         }
     }
     pub fn description(&self) -> String {

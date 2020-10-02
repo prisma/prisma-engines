@@ -17,6 +17,28 @@ fn nice_error_for_missing_model_keyword() {
         Span::new(5, 36),
     ));
 }
+
+#[test]
+fn nice_error_for_unknown_datasource_preview_feature() {
+    let dml = r#"
+    datasource ds {
+        provider = "postgres"
+        url = "DATASOURCE_URL"
+        previewFeatures = ["foo"]
+    }
+
+    model User {
+        id Int @id
+    }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_datasource_preview_feature_not_known_error("foo",
+        Span::new(108, 115),
+    ));
+}
+
 #[test]
 fn nice_error_for_missing_model_keyword_2() {
     let dml = r#"
