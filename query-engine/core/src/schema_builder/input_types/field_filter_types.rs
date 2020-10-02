@@ -109,9 +109,10 @@ fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested
             .chain(alphanumeric_filters(sf))
             .collect(),
 
-        TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml => equality_filters(sf).collect(),
+        TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
+            equality_filters(sf).collect()
+        }
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
-        TypeIdentifier::Bytes => equality_filters(sf).collect(),
     };
 
     // Shorthand `not equals` filter, skips the nested object filter.
