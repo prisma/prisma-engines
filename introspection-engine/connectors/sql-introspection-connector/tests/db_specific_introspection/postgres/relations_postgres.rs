@@ -588,37 +588,6 @@ async fn introspecting_default_values_on_relations_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-            });
-            migration.create_table("Post", |t| {
-                t.add_column("test", types::text());
-                t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") Primary Key");
-            });
-        })
-        .await;
-
-    let dm = r#"
-            model Post {
-                test    String
-                user_id Int    @id
-                User    User   @relation(fields: [user_id], references: [id])
-            }
-
-            model User {
-                id   Int    @id @default(autoincrement())
-                Post Post[]
-            }
-        "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
 async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

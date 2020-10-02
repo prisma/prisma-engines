@@ -530,7 +530,7 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                 id   Int    @id @default(autoincrement())
-                Post Post[]
+                Post Post?
             }
 
             model Post {
