@@ -44,8 +44,8 @@ object ConnectorConfig {
       case "mysql8"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1", false, "mysql8")
       case "mysql56"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", false, "mysql56")
       case "mariadb" => ConnectorConfig("mysql", s"mysql://root:prisma@$mariadb_Host:$mariadb_Port/$$DB?connection_limit=1", false, "mariadb")
-      case "mssql2017" => ConnectorConfig("sqlserver", s"sqlserver://$mssql_2017_Host:$mssql_2017_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", false, "mssql2017")
-      case "mssql2019" => ConnectorConfig("sqlserver", s"sqlserver://$mssql_2019_Host:$mssql_2019_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", false, "mssql2019")
+      case "mssql2017" => ConnectorConfig("sqlserver", s"sqlserver://$mssql_2017_Host:$mssql_2017_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED;encrypt=DANGER_PLAINTEXT", false, "mssql2017")
+      case "mssql2019" => ConnectorConfig("sqlserver", s"sqlserver://$mssql_2019_Host:$mssql_2019_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED;encrypt=DANGER_PLAINTEXT", false, "mssql2019")
       case x         => sys.error(s"Connector $x is not supported yet.")
     }
   }
