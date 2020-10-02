@@ -184,10 +184,7 @@ fn database_schema_is_serializable_for_every_column_type_family() {
         ColumnTypeFamily::Binary,
         ColumnTypeFamily::Json,
         ColumnTypeFamily::Uuid,
-        ColumnTypeFamily::Geometric,
-        ColumnTypeFamily::LogSequenceNumber,
-        ColumnTypeFamily::TextSearch,
-        ColumnTypeFamily::TransactionId,
+        ColumnTypeFamily::Unsupported("test".into()),
     ]
     .iter()
     .enumerate()

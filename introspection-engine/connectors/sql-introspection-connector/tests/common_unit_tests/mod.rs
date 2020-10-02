@@ -22,15 +22,12 @@ fn a_data_model_can_be_generated_from_a_schema() {
         ColumnTypeFamily::Binary,
         ColumnTypeFamily::Json,
         ColumnTypeFamily::Uuid,
-        ColumnTypeFamily::Geometric,
-        ColumnTypeFamily::LogSequenceNumber,
-        ColumnTypeFamily::TextSearch,
-        ColumnTypeFamily::TransactionId,
+        ColumnTypeFamily::Unsupported("test".into()),
     ];
 
-    fn unsupported(family: ColumnTypeFamily) -> (FieldType, bool, Option<String>) {
+    fn unsupported(full_data_type: String) -> (FieldType, bool, Option<String>) {
         (
-            FieldType::Unsupported(family.to_string()),
+            FieldType::Unsupported(full_data_type),
             true,
             Some("This type is currently not supported.".to_string()),
         )
@@ -61,7 +58,10 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
                         ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
                         ColumnTypeFamily::Json => (FieldType::Base(ScalarType::Json, None), false, None),
-                       x => unsupported(x.to_owned()),
+                        ColumnTypeFamily::Decimal => (FieldType::Base(ScalarType::Float, None), false, None),
+                        ColumnTypeFamily::Duration => (FieldType::Base(ScalarType::Duration, None), false, None),
+                        ColumnTypeFamily::Binary => (FieldType::Base(ScalarType::Bytes, None), false, None),
+                       ColumnTypeFamily::Unsupported(x) => unsupported(x.to_owned()),
                     };
                     Field::ScalarField(ScalarField {
                         name: col_type.to_string(),
