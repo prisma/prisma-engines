@@ -260,7 +260,6 @@ impl TestApi {
 
     pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
         let schema = self.describe_database().await?;
-
         Ok(SchemaAssertion(schema))
     }
 

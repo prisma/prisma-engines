@@ -24,6 +24,14 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
         let postgres_type: PostgresType = native_type_instance.deserialize_native_type();
+
+        fn render(input: Option<u32>) -> String {
+            match input {
+                None => "".to_string(),
+                Some(arg) => format!("({})", arg).to_string(),
+            }
+        }
+
         let data_type = match postgres_type {
             PostgresType::SmallInt => "SMALLINT".to_owned(),
             PostgresType::Integer => "INTEGER".to_owned(),
@@ -39,14 +47,12 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             PostgresType::Char(size) => format!("CHAR({})", size),
             PostgresType::Text => "TEXT".to_owned(),
             PostgresType::ByteA => "BYTEA".to_owned(),
-            PostgresType::Timestamp(precision) => format!("TIMESTAMP({})", precision),
-            PostgresType::TimestampWithTimeZone(precision) => {
-                format!("TIMESTAMP({precision}) WITH TIME ZONE", precision = precision)
-            }
+            PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)),
+            PostgresType::TimestampWithTimeZone(precision) => format!("TIMESTAMP{} WITH TIME ZONE", render(precision)),
             PostgresType::Date => "DATE".to_owned(),
-            PostgresType::Time(precision) => format!("TIME({precision})", precision = precision),
-            PostgresType::TimeWithTimeZone(precision) => format!("TIMETZ({precision})", precision = precision),
-            PostgresType::Interval(precision) => format!("INTERVAL({precision})", precision = precision),
+            PostgresType::Time(precision) => format!("TIME{}", render(precision)),
+            PostgresType::TimeWithTimeZone(precision) => format!("TIMETZ{}", render(precision)),
+            PostgresType::Interval(precision) => format!("INTERVAL{}", render(precision)),
             PostgresType::Boolean => "BOOLEAN".to_owned(),
             PostgresType::Bit(size) => format!("BIT({})", size),
             PostgresType::VarBit(size) => format!("VARBIT({})", size),
@@ -66,6 +72,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
+            native_type: Some(native_type_instance.serialized_native_type.clone()),
         }
     }
 }

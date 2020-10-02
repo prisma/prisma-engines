@@ -8,6 +8,7 @@ use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 use std::{fmt, str::FromStr};
 use thiserror::Error;
 use tracing::debug;
@@ -246,11 +247,13 @@ pub struct ColumnType {
     /// The full SQL data type.
     pub full_data_type: String,
     /// The maximum length for character or string bit types if specified.
-    pub character_maximum_length: Option<i64>,
+    pub character_maximum_length: Option<u32>,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
     /// The arity of the column.
     pub arity: ColumnArity,
+    /// The Native type of the column.
+    pub native_type: Option<serde_json::Value>,
 }
 
 impl ColumnType {
@@ -261,6 +264,18 @@ impl ColumnType {
             character_maximum_length: None,
             family,
             arity,
+            native_type: None,
+        }
+    }
+
+    pub fn with_full_data_type(family: ColumnTypeFamily, arity: ColumnArity, full_data_type: String) -> Self {
+        ColumnType {
+            data_type: "".to_string(),
+            full_data_type,
+            character_maximum_length: None,
+            family,
+            arity,
+            native_type: None,
         }
     }
 }
@@ -274,12 +289,16 @@ pub enum ColumnTypeFamily {
     Int,
     /// Floating point types.
     Float,
+    /// Decimal Types.
+    Decimal,
     /// Boolean types.
     Boolean,
     /// String types.
     String,
     /// DateTime types.
     DateTime,
+    /// DateTime types.
+    Duration,
     /// Binary types.
     Binary,
     /// JSON types.
@@ -322,9 +341,11 @@ impl fmt::Display for ColumnTypeFamily {
         let str = match self {
             Self::Int => "int".to_string(),
             Self::Float => "float".to_string(),
+            Self::Decimal => "decimal".to_string(),
             Self::Boolean => "boolean".to_string(),
             Self::String => "string".to_string(),
             Self::DateTime => "dateTime".to_string(),
+            Self::Duration => "duration".to_string(),
             Self::Binary => "binary".to_string(),
             Self::Json => "json".to_string(),
             Self::Uuid => "uuid".to_string(),
@@ -493,6 +514,42 @@ pub fn unquote_string(val: &str) -> String {
         .trim_end_matches('"')
         .trim_end_matches('\\')
         .into()
+}
+
+#[derive(Debug)]
+struct Precision {
+    character_maximum_length: Option<u32>,
+    numeric_precision: Option<u32>,
+    numeric_precision_radix: Option<u32>,
+    numeric_scale: Option<u32>,
+    time_precision: Option<u32>,
+}
+
+impl Precision {
+    fn numeric_precision(&self) -> u32 {
+        // Fixme
+        // Do we need to express radix?
+        // base 10 for numeric types usually
+        // base 2 for bits usually
+        // on Postgres `decimal_column decimal` will not return precision
+        // on Postgres `decimal_array_column decimal(30,5)[]` will also not return numeric precision
+        // workaround https://stackoverflow.com/questions/57336645/how-to-get-array-elements-numeric-precision-numeric-scale-and-datetime-pr
+        self.numeric_precision.unwrap_or(65)
+    }
+
+    fn character_max_length(&self) -> u32 {
+        // on Postgres `char_array_column char(8)[]` will also not return character_max_length
+        self.character_maximum_length.unwrap_or(64000)
+    }
+
+    fn numeric_scale(&self) -> u32 {
+        // see numeric precision
+        self.numeric_scale.unwrap_or(30)
+    }
+
+    fn time_precision(&self) -> Option<u32> {
+        self.time_precision
+    }
 }
 
 #[cfg(test)]

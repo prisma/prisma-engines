@@ -100,15 +100,21 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         let description = serde_json::to_string(&sql_schema).unwrap();
         Ok(description)
     }
-
-    async fn introspect(&self, previous_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult> {
+    async fn introspect(
+        &self,
+        previous_data_model: &Datamodel,
+        native_types: bool,
+    ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
 
         let family = self.connection_info.sql_family();
 
-        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family, &previous_data_model)
-            .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))?;
+        let introspection_result =
+            calculate_datamodel::calculate_datamodel(&sql_schema, &family, &previous_data_model, native_types)
+                .map_err(|sql_introspection_error| {
+                    sql_introspection_error.into_connector_error(&self.connection_info)
+                })?;
 
         tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 

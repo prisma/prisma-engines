@@ -41,6 +41,13 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
     ) -> sql::ColumnType {
         let mysql_type: MySqlType = native_type_instance.deserialize_native_type();
 
+        fn render(input: Option<u32>) -> String {
+            match input {
+                None => "".to_string(),
+                Some(arg) => format!("({})", arg).to_string(),
+            }
+        }
+
         let data_type: String = match mysql_type {
             MySqlType::Int => "INTEGER".into(),
             MySqlType::SmallInt => "SMALLINT".into(),
@@ -65,15 +72,16 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::MediumText => "MEDIUMTEXT".into(),
             MySqlType::LongText => "LONGTEXT".into(),
             MySqlType::Date => "DATE".into(),
-            MySqlType::Time(Some(precision)) => format!("TIME({precision})", precision = precision),
-            MySqlType::Time(None) => "TIME".into(),
-            MySqlType::DateTime(Some(precision)) => format!("DATETIME({precision})", precision = precision),
-            MySqlType::DateTime(None) => "DATETIME".into(),
-            MySqlType::Timestamp(Some(precision)) => format!("TIMESTAMP({precision})", precision = precision),
-            MySqlType::Timestamp(None) => "TIMESTAMP".into(),
+            MySqlType::Time(precision) => format!("TIME{}", render(precision)),
+            MySqlType::DateTime(precision) => format!("DATETIME{}", render(precision)),
+            MySqlType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)),
             MySqlType::Year => "YEAR".into(),
             MySqlType::JSON => "JSON".into(),
-            _ => todo!(),
+            MySqlType::UnsignedInt => "INTEGER UNSIGNED".into(),
+            MySqlType::UnsignedSmallInt => "SMALLINT UNSIGNED".into(),
+            MySqlType::UnsignedTinyInt => "TINYINT UNSIGNED".into(),
+            MySqlType::UnsignedMediumInt => "MEDIUMINT UNSIGNED".into(),
+            MySqlType::UnsignedBigInt => "BIGINT UNSIGNED".into(),
         };
 
         sql::ColumnType {
@@ -86,6 +94,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
+            native_type: Some(native_type_instance.serialized_native_type.clone()),
         }
     }
 }

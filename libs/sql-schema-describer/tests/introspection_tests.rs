@@ -13,7 +13,9 @@ mod test_api;
 
 use crate::common::*;
 use crate::test_api::*;
+use native_types::{MySqlType, NativeType, PostgresType};
 use prisma_value::PrismaValue;
+use serde_json::Value;
 
 fn int_full_data_type(api: &TestApi) -> String {
     match (api.sql_family(), api.connector_name()) {
@@ -22,6 +24,16 @@ fn int_full_data_type(api: &TestApi) -> String {
         (SqlFamily::Mysql, "mysql8") => "int".to_string(),
         (SqlFamily::Mysql, _) => "int(11)".to_string(),
         (SqlFamily::Mssql, _) => "int".to_string(),
+    }
+}
+
+fn int_native_type(api: &TestApi) -> Option<Value> {
+    match (api.sql_family(), api.connector_name()) {
+        (SqlFamily::Postgres, _) => Some(PostgresType::Integer.to_json()),
+        (SqlFamily::Sqlite, _) => None,
+        (SqlFamily::Mysql, "mysql8") => Some(MySqlType::Int.to_json()),
+        (SqlFamily::Mysql, _) => Some(MySqlType::Int.to_json()),
+        (SqlFamily::Mssql, _) => None,
     }
 }
 
@@ -55,6 +67,16 @@ fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
     }
 }
 
+fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
+    match (api.sql_family(), api.connector_name()) {
+        (SqlFamily::Postgres, _) => Some(PostgresType::VarChar(length).to_json()),
+        (SqlFamily::Sqlite, _) => None,
+        (SqlFamily::Mysql, "mysql8") => Some(MySqlType::VarChar(length).to_json()),
+        (SqlFamily::Mysql, _) => Some(MySqlType::VarChar(length).to_json()),
+        (SqlFamily::Mssql, _) => None,
+    }
+}
+
 #[test_each_connector]
 async fn is_required_must_work(api: &TestApi) {
     api.barrel()
@@ -77,6 +99,7 @@ async fn is_required_must_work(api: &TestApi) {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: int_native_type(api),
             },
             default: None,
             auto_increment: false,
@@ -90,6 +113,7 @@ async fn is_required_must_work(api: &TestApi) {
 
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Nullable,
+                native_type: int_native_type(api),
             },
             default: None,
             auto_increment: false,
@@ -132,6 +156,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
 
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
+            native_type: int_native_type(api),
         },
         default: None,
         auto_increment: false,
@@ -226,6 +251,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
 
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: int_native_type(api),
             },
             default: None,
             auto_increment: false,
@@ -242,6 +268,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
                 },
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: varchar_native_type(api, 255),
             },
             default: None,
             auto_increment: false,
@@ -308,6 +335,7 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
 
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
+            native_type: int_native_type(api),
         },
         default: None,
         auto_increment: false,
@@ -358,6 +386,7 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
 
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: int_native_type(api),
             },
             default: None,
             auto_increment: false,
@@ -374,6 +403,7 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
                 },
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: varchar_native_type(api, 255),
             },
             default: None,
             auto_increment: false,
@@ -428,6 +458,7 @@ async fn indices_must_work(api: &TestApi) {
 
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: int_native_type(api),
             },
 
             default,
@@ -442,6 +473,7 @@ async fn indices_must_work(api: &TestApi) {
 
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: int_native_type(api),
             },
             default: None,
             auto_increment: false,
@@ -503,6 +535,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
 
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: int_native_type(api),
             },
             default: None,
             auto_increment: false,
@@ -516,6 +549,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
 
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: int_native_type(api),
             },
 
             default: None,
@@ -619,6 +653,7 @@ async fn defaults_must_work(api: &TestApi) {
 
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Nullable,
+            native_type: int_native_type(api),
         },
 
         default: Some(default),

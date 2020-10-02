@@ -3,6 +3,7 @@ use datamodel::{
     dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
     RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
 };
+use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::connector::SqlFamily;
@@ -26,6 +27,14 @@ fn a_data_model_can_be_generated_from_a_schema() {
         ColumnTypeFamily::TextSearch,
         ColumnTypeFamily::TransactionId,
     ];
+
+    fn unsupported(family: ColumnTypeFamily) -> (FieldType, bool, Option<String>) {
+        (
+            FieldType::Unsupported(family.to_string()),
+            true,
+            Some("This type is currently not supported.".to_string()),
+        )
+    }
 
     let ref_data_model = Datamodel {
         models: vec![Model {
@@ -52,11 +61,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
                         ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
                         ColumnTypeFamily::Json => (FieldType::Base(ScalarType::Json, None), false, None),
-                        x => (
-                            FieldType::Unsupported(x.to_string()),
-                            true,
-                            Some("This type is currently not supported.".to_string()),
-                        ),
+                       x => unsupported(x.to_owned()),
                     };
                     Field::ScalarField(ScalarField {
                         name: col_type.to_string(),
@@ -84,7 +89,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                 .iter()
                 .map(|family| Column {
                     name: family.to_string(),
-                    tpe: ColumnType::pure(family.to_owned(), ColumnArity::Nullable),
+                    tpe: ColumnType::with_full_data_type(family.to_owned(), ColumnArity::Nullable, family.to_string()),
                     default: None,
                     auto_increment: false,
                 })
@@ -97,7 +102,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -178,7 +183,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -309,7 +314,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -406,6 +411,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: true,
@@ -428,6 +434,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -451,6 +458,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: true,
@@ -472,7 +480,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -542,7 +550,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -672,6 +680,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: true,
@@ -685,6 +694,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -710,6 +720,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: true,
@@ -723,6 +734,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -736,6 +748,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -762,7 +775,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, expected_data_model);
 }
@@ -825,6 +838,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: true,
@@ -838,6 +852,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Text.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -851,6 +866,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
 
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Text.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -872,7 +888,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -981,6 +997,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: true,
@@ -994,6 +1011,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Text.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -1019,6 +1037,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: true,
@@ -1032,6 +1051,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -1057,7 +1077,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -1098,7 +1118,7 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         sequences: vec![],
     };
     let introspection_result =
-        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -1194,7 +1214,7 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
     let expected_dm =
         datamodel::render_schema_ast_to_string(&datamodel::parse_schema_ast(&expected_dm).unwrap()).unwrap();
 
-    let mut introspected_dm = calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new())?.data_model;
+    let mut introspected_dm = calculate_datamodel(&schema, &sql_family, &Datamodel::new(), false)?.data_model;
     introspected_dm.models.sort_by(|a, b| b.name.cmp(&a.name));
 
     let introspected_dm_string = datamodel::render_datamodel_to_string(&introspected_dm).unwrap();
@@ -1253,7 +1273,7 @@ async fn many_to_many_relation_field_names_do_not_conflict_with_themselves(api: 
     let expected_dm =
         datamodel::render_schema_ast_to_string(&datamodel::parse_schema_ast(&expected_dm).unwrap()).unwrap();
 
-    let mut introspected_dm = calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new())?.data_model;
+    let mut introspected_dm = calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false)?.data_model;
     introspected_dm.models.sort_by(|a, b| b.name.cmp(&a.name));
     for model in &mut introspected_dm.models {
         model.fields.sort_by(|a, b| a.name().cmp(b.name()));

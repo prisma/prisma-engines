@@ -9,7 +9,8 @@
             "dataType": "integer",
             "fullDataType": "int",
             "family": "int",
-          "arity": "required"
+            "arity": "required",
+            "nativeType": "Integer"
           },
           "default": null,
           "autoIncrement": true
@@ -20,7 +21,10 @@
             "dataType": "varchar(255)",
             "fullDataType": "varchar(255)",
             "family": "string",
-          "arity": "nullable"
+            "arity": "nullable",
+            "nativeType": {
+                "VarChar": 255
+            }
           },
           "default": {
             "VALUE": "default value"
@@ -33,7 +37,8 @@
             "dataType": "integer",
             "fullDataType": "integer",
             "family": "int",
-          "arity": "required"
+            "arity": "required",
+            "nativeType": "Integer"
           },
           "default": null,
           "autoIncrement": false
@@ -76,7 +81,8 @@
             "dataType": "integer",
             "fullDataType": "integer",
             "family": "int",
-          "arity": "required"
+            "arity": "required",
+            "nativeType": "Integer"
           },
           "default": null,
           "autoIncrement": true

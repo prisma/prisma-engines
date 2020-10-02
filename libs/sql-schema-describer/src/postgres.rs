@@ -1,5 +1,6 @@
 //! Postgres description.
 use super::*;
+use native_types::{NativeType, PostgresType};
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
@@ -146,11 +147,15 @@ impl SqlSchemaDescriber {
                 column_name,
                 data_type,
                 udt_name as full_data_type,
-                character_maximum_length,
                 column_default,
                 is_nullable,
                 is_identity,
-                data_type
+                data_type, 
+                character_maximum_length,
+                numeric_precision,
+                numeric_scale,
+                numeric_precision_radix,
+                datetime_precision
             FROM information_schema.columns
             WHERE table_schema = $1
             ORDER BY ordinal_position
@@ -177,7 +182,6 @@ impl SqlSchemaDescriber {
                 .get("full_data_type")
                 .and_then(|x| x.to_string())
                 .expect("get full_data_type aka udt_name");
-            let character_maximum_length = col.get("character_maximum_length").and_then(|x| x.as_i64());
             let is_identity_str = col
                 .get("is_identity")
                 .and_then(|x| x.to_string())
@@ -207,13 +211,25 @@ impl SqlSchemaDescriber {
                 ColumnArity::Nullable
             };
 
-            let tpe = get_column_type(
-                data_type.as_ref(),
-                &full_data_type,
+            let character_maximum_length = col
+                .get("character_maximum_length")
+                .and_then(|x| x.as_i64().map(|x| x as u32));
+            let numeric_precision = col.get("numeric_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+            let numeric_precision_radix = col
+                .get("numeric_precision_radix")
+                .and_then(|x| x.as_i64().map(|x| x as u32));
+            let numeric_scale = col.get("numeric_scale").and_then(|x| x.as_i64().map(|x| x as u32));
+            let time_precision = col.get("datetime_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+
+            let precision = Precision {
                 character_maximum_length,
-                arity,
-                enums,
-            );
+                numeric_precision,
+                numeric_precision_radix,
+                numeric_scale,
+                time_precision,
+            };
+
+            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums, precision);
 
             let default = match col.get("column_default") {
                 None => None,
@@ -229,6 +245,10 @@ impl SqlSchemaDescriber {
                                 },
                             },
                             ColumnTypeFamily::Float => match parse_float(&default_string) {
+                                Some(float_value) => DefaultValue::VALUE(float_value),
+                                None => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::Decimal => match parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::VALUE(float_value),
                                 None => DefaultValue::DBGENERATED(default_string),
                             },
@@ -276,6 +296,7 @@ impl SqlSchemaDescriber {
                                     DefaultValue::DBGENERATED(default_string)
                                 }
                             }
+                            ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                         })
                     }
@@ -637,62 +658,77 @@ struct IndexRow {
 fn get_column_type<'a>(
     data_type: &str,
     full_data_type: &'a str,
-    character_maximum_length: Option<i64>,
     arity: ColumnArity,
     enums: &[Enum],
+    precision: Precision,
 ) -> ColumnType {
     use ColumnTypeFamily::*;
     let trim = |name: &'a str| name.trim_start_matches('_');
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
 
-    let family: ColumnTypeFamily = match full_data_type {
-        x if data_type == "USER-DEFINED" && enum_exists(x) => Enum(x.to_owned()),
-        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => Enum(trim(x).to_owned()),
-        "int2" | "_int2" => Int,
-        "int4" | "_int4" => Int,
-        "int8" | "_int8" => Int,
-        "oid" | "_oid" => Int,
-        "float4" | "_float4" => Float,
-        "float8" | "_float8" => Float,
-        "bool" | "_bool" => Boolean,
-        "text" | "_text" => String,
-        "citext" | "_citext" => String,
-        "varchar" | "_varchar" => String,
-        "date" | "_date" => DateTime,
-        "bytea" | "_bytea" => Binary,
-        "json" | "_json" => Json,
-        "jsonb" | "_jsonb" => Json,
-        "uuid" | "_uuid" => Uuid,
+    let (family, native_type) = match full_data_type {
+        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), None),
+        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => (Enum(trim(x).to_owned()), None),
+        "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
+        "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
+        "int8" | "_int8" => (Int, Some(PostgresType::BigInt)),
+        "oid" | "_oid" => (Int, None),
+        "float4" | "_float4" => (Float, Some(PostgresType::Real)),
+        "float8" | "_float8" => (Float, Some(PostgresType::DoublePrecision)),
+        "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
+        "text" | "_text" => (String, Some(PostgresType::Text)),
+        "citext" | "_citext" => (String, None),
+        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_max_length()))),
+        "date" | "_date" => (DateTime, Some(PostgresType::Date)),
+        "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
+        "json" | "_json" => (Json, Some(PostgresType::JSON)),
+        "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
+        "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => String,
-        "varbit" | "_varbit" => String,
-        "box" | "_box" => Geometric,
-        "circle" | "_circle" => Geometric,
-        "line" | "_line" => Geometric,
-        "lseg" | "_lseg" => Geometric,
-        "path" | "_path" => Geometric,
-        "polygon" | "_polygon" => Geometric,
-        "bpchar" | "_bpchar" => String,
-        "interval" | "_interval" => String,
-        "numeric" | "_numeric" => Float,
-        "money" | "_money" => Float,
-        "pg_lsn" | "_pg_lsn" => LogSequenceNumber,
-        "time" | "_time" => DateTime,
-        "timetz" | "_timetz" => DateTime,
-        "timestamp" | "_timestamp" => DateTime,
-        "timestamptz" | "_timestamptz" => DateTime,
-        "tsquery" | "_tsquery" => TextSearch,
-        "tsvector" | "_tsvector" => TextSearch,
-        "txid_snapshot" | "_txid_snapshot" => TransactionId,
-        "inet" | "_inet" => String,
-        data_type => Unsupported(data_type.into()),
+        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
+        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),
+        "numeric" | "_numeric" => (
+            Decimal,
+            Some(PostgresType::Numeric(
+                precision.numeric_precision(),
+                precision.numeric_scale(),
+            )),
+        ),
+        "money" | "_money" => (Float, None),
+        "pg_lsn" | "_pg_lsn" => (LogSequenceNumber, None),
+        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision()))),
+        "timetz" | "_timetz" => (
+            DateTime,
+            Some(PostgresType::TimeWithTimeZone(precision.time_precision())),
+        ),
+        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision()))),
+        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision()))),
+        "timestamptz" | "_timestamptz" => (
+            DateTime,
+            Some(PostgresType::TimestampWithTimeZone(precision.time_precision())),
+        ),
+        "tsquery" | "_tsquery" => (TextSearch, None),
+        "tsvector" | "_tsvector" => (TextSearch, None),
+        "txid_snapshot" | "_txid_snapshot" => (TransactionId, None),
+        "inet" | "_inet" => (String, None),
+        //geometric
+        "box" | "_box" => (Unsupported(full_data_type.into()), None),
+        "circle" | "_circle" => (Unsupported(full_data_type.into()), None),
+        "line" | "_line" => (Unsupported(full_data_type.into()), None),
+        "lseg" | "_lseg" => (Unsupported(full_data_type.into()), None),
+        "path" | "_path" => (Unsupported(full_data_type.into()), None),
+        "polygon" | "_polygon" => (Unsupported(full_data_type.into()), None),
+        full_data_type => (Unsupported(full_data_type.into()), None),
     };
+
     ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
-        character_maximum_length,
+        character_maximum_length: precision.character_maximum_length,
         family,
         arity,
+        native_type: native_type.map(|x| x.to_json()),
     }
 }
 

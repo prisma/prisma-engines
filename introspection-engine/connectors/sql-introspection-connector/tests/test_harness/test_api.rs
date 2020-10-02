@@ -1,4 +1,5 @@
 use super::misc_helpers::*;
+use datamodel::configuration::preview_features::PreviewFeatures;
 use datamodel::Datamodel;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use quaint::{
@@ -61,7 +62,7 @@ impl TestApi {
     pub async fn introspect(&self) -> String {
         let introspection_result = self
             .introspection_connector
-            .introspect(&Datamodel::new())
+            .introspect(&Datamodel::new(), false)
             .await
             .unwrap();
         datamodel::render_datamodel_to_string(&introspection_result.data_model).expect("Datamodel rendering failed")
@@ -69,20 +70,33 @@ impl TestApi {
 
     pub async fn re_introspect(&self, data_model_string: &str) -> String {
         let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
-        let introspection_result = self.introspection_connector.introspect(&data_model).await.unwrap();
-        datamodel::render_datamodel_to_string(&introspection_result.data_model).expect("Datamodel rendering failed")
+        let config = datamodel::parse_configuration(data_model_string).unwrap();
+
+        let native_types = config.datasources.first().has_preview_feature("nativeTypes");
+
+        let introspection_result = self
+            .introspection_connector
+            .introspect(&data_model, native_types)
+            .await
+            .unwrap();
+        datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config)
+            .expect("Datamodel rendering failed")
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> String {
         let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
-        let introspection_result = self.introspection_connector.introspect(&data_model).await.unwrap();
+        let introspection_result = self
+            .introspection_connector
+            .introspect(&data_model, false)
+            .await
+            .unwrap();
         serde_json::to_string(&introspection_result.warnings).unwrap()
     }
 
     pub async fn introspect_version(&self) -> Version {
         let introspection_result = self
             .introspection_connector
-            .introspect(&Datamodel::new())
+            .introspect(&Datamodel::new(), false)
             .await
             .unwrap();
         introspection_result.version
@@ -91,7 +105,7 @@ impl TestApi {
     pub async fn introspection_warnings(&self) -> String {
         let introspection_result = self
             .introspection_connector
-            .introspect(&Datamodel::new())
+            .introspect(&Datamodel::new(), false)
             .await
             .unwrap();
         serde_json::to_string(&introspection_result.warnings).unwrap()

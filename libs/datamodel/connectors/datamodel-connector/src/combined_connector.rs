@@ -1,7 +1,6 @@
 use super::Connector;
 use crate::error::ConnectorError;
 use crate::{ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
-use native_types::NativeType;
 
 pub struct CombinedConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -41,7 +40,7 @@ impl Connector for CombinedConnector {
         unimplemented!("A combined connector must not be used for native types")
     }
 
-    fn introspect_native_type(&self, _native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
         unimplemented!("A combined connector must not be used for native types")
     }
 }

@@ -163,6 +163,10 @@ impl SqlSchemaDescriber {
                                     Some(float_value) => DefaultValue::VALUE(float_value),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 },
+                                ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                                    Some(float_value) => DefaultValue::VALUE(float_value),
+                                    None => DefaultValue::DBGENERATED(default_string),
+                                },
                                 ColumnTypeFamily::Boolean => match parse_int(&default_string) {
                                     Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
                                     Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
@@ -180,6 +184,7 @@ impl SqlSchemaDescriber {
                                     }
                                     _ => DefaultValue::DBGENERATED(default_string),
                                 },
+                                ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
@@ -426,14 +431,14 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         // It's tolerant though, and you can assign any data type you like to columns
         "int" => ColumnTypeFamily::Int,
         "integer" => ColumnTypeFamily::Int,
-        "real" => ColumnTypeFamily::Float,
-        "float" => ColumnTypeFamily::Float,
+        "real" => ColumnTypeFamily::Decimal,
+        "float" => ColumnTypeFamily::Decimal,
         "serial" => ColumnTypeFamily::Int,
         "boolean" => ColumnTypeFamily::Boolean,
         "text" => ColumnTypeFamily::String,
         s if s.contains("char") => ColumnTypeFamily::String,
-        s if s.contains("numeric") => ColumnTypeFamily::Float,
-        s if s.contains("decimal") => ColumnTypeFamily::Float,
+        s if s.contains("numeric") => ColumnTypeFamily::Decimal,
+        s if s.contains("decimal") => ColumnTypeFamily::Decimal,
         "date" => ColumnTypeFamily::DateTime,
         "datetime" => ColumnTypeFamily::DateTime,
         "timestamp" => ColumnTypeFamily::DateTime,
@@ -457,6 +462,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         character_maximum_length: None,
         family,
         arity,
+        native_type: None,
     }
 }
 

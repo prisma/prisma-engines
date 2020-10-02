@@ -51,7 +51,7 @@ const POSTGRES_TYPES: &'static [(&'static str, &'static str)] = &[
 ];
 
 const POSTGRES_VAR_CHAR: &'static [(&'static str, &'static str)] = &[("character varying", "varchar")];
-const POSTGRES_VAR_CHAR_LENGTHS: &'static [i64] = &[25, 36, 191];
+const POSTGRES_VAR_CHAR_LENGTHS: &'static [u32] = &[25, 36, 191];
 
 const MYSQL_TYPES: &'static [(&'static str, &'static str)] = &[
     ("tinyint", "tinyint(1)"),

@@ -1,5 +1,7 @@
 use super::*;
+use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint};
+use serde_json::from_str;
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use tracing::debug;
@@ -188,6 +190,9 @@ async fn get_all_columns(
                 data_type data_type,
                 column_type full_data_type,
                 character_maximum_length character_maximum_length,
+                numeric_precision numeric_precision,
+                numeric_scale numeric_scale,
+                datetime_precision datetime_precision,
                 column_default column_default,
                 is_nullable is_nullable,
                 extra extra,
@@ -219,7 +224,7 @@ async fn get_all_columns(
             .get("full_data_type")
             .and_then(|x| x.to_string())
             .expect("get full_data_type aka column_type");
-        let character_maximum_length = col.get("character_maximum_length").and_then(|x| x.as_i64());
+
         let is_nullable = col
             .get("is_nullable")
             .and_then(|x| x.to_string())
@@ -237,14 +242,24 @@ async fn get_all_columns(
             ColumnArity::Nullable
         };
 
-        let (tpe, enum_option) = get_column_type_and_enum(
-            &table_name,
-            &name,
-            &data_type,
-            &full_data_type,
+        let character_maximum_length = col
+            .get("character_maximum_length")
+            .and_then(|x| x.as_i64().map(|x| x as u32));
+        let numeric_precision = col.get("numeric_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+
+        let numeric_scale = col.get("numeric_scale").and_then(|x| x.as_i64().map(|x| x as u32));
+        let time_precision = col.get("datetime_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+
+        let precision = Precision {
             character_maximum_length,
-            arity,
-        );
+            numeric_precision,
+            numeric_precision_radix: None,
+            numeric_scale,
+            time_precision,
+        };
+
+        let (tpe, enum_option) =
+            get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, precision, arity);
         let extra = col
             .get("extra")
             .and_then(|x| x.to_string())
@@ -276,6 +291,10 @@ async fn get_all_columns(
                             Some(float_value) => DefaultValue::VALUE(float_value),
                             None => DefaultValue::DBGENERATED(default_string),
                         },
+                        ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                            Some(float_value) => DefaultValue::VALUE(float_value),
+                            None => DefaultValue::DBGENERATED(default_string),
+                        },
                         ColumnTypeFamily::Boolean => match parse_int(&default_string) {
                             Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
                             Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
@@ -299,6 +318,7 @@ async fn get_all_columns(
                         ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
                             &default_string.replace("_utf8mb4", "").replace("\\\'", ""),
                         ))),
+                        ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                     })
                 }
@@ -556,59 +576,106 @@ fn get_column_type_and_enum(
     column_name: &str,
     data_type: &str,
     full_data_type: &str,
-    character_maximum_length: Option<i64>,
+    precision: Precision,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
-    let family = match (data_type, full_data_type) {
-        ("int", _) => ColumnTypeFamily::Int,
-        ("smallint", _) => ColumnTypeFamily::Int,
-        ("tinyint", "tinyint(1)") => ColumnTypeFamily::Boolean,
-        ("tinyint", _) => ColumnTypeFamily::Int,
-        ("mediumint", _) => ColumnTypeFamily::Int,
-        ("bigint", _) => ColumnTypeFamily::Int,
-        ("decimal", _) => ColumnTypeFamily::Float,
-        ("numeric", _) => ColumnTypeFamily::Float,
-        ("float", _) => ColumnTypeFamily::Float,
-        ("double", _) => ColumnTypeFamily::Float,
-        ("bit", _) => ColumnTypeFamily::Int,
-        ("date", _) => ColumnTypeFamily::DateTime,
-        ("time", _) => ColumnTypeFamily::DateTime,
-        ("datetime", _) => ColumnTypeFamily::DateTime,
-        ("timestamp", _) => ColumnTypeFamily::DateTime,
-        ("year", _) => ColumnTypeFamily::Int,
-        ("char", _) => ColumnTypeFamily::String,
-        ("varchar", _) => ColumnTypeFamily::String,
-        ("text", _) => ColumnTypeFamily::String,
-        ("tinytext", _) => ColumnTypeFamily::String,
-        ("mediumtext", _) => ColumnTypeFamily::String,
-        ("longtext", _) => ColumnTypeFamily::String,
-        ("enum", _) => ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)),
-        // XXX: Is this correct?
-        ("set", _) => ColumnTypeFamily::String,
-        ("binary", _) => ColumnTypeFamily::Binary,
-        ("varbinary", _) => ColumnTypeFamily::Binary,
-        ("blob", _) => ColumnTypeFamily::Binary,
-        ("tinyblob", _) => ColumnTypeFamily::Binary,
-        ("mediumblob", _) => ColumnTypeFamily::Binary,
-        ("longblob", _) => ColumnTypeFamily::Binary,
-        ("geometry", _) => ColumnTypeFamily::Geometric,
-        ("point", _) => ColumnTypeFamily::Geometric,
-        ("linestring", _) => ColumnTypeFamily::Geometric,
-        ("polygon", _) => ColumnTypeFamily::Geometric,
-        ("multipoint", _) => ColumnTypeFamily::Geometric,
-        ("multilinestring", _) => ColumnTypeFamily::Geometric,
-        ("multipolygon", _) => ColumnTypeFamily::Geometric,
-        ("geometrycollection", _) => ColumnTypeFamily::Geometric,
-        ("json", _) => ColumnTypeFamily::Json,
-        (_, full_data_type) => ColumnTypeFamily::Unsupported(full_data_type.into()),
+    // println!("DT: {}", data_type);
+    // println!("FDT: {}", full_data_type);
+    // println!("Precision: {:?}", precision);
+
+    let (family, native_type) = match data_type {
+        "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
+        "smallint" => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
+        "tinyint" if extract_precision(full_data_type) == Some(1) => {
+            (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt))
+        }
+        "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
+        "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
+        "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
+        "decimal" => (
+            ColumnTypeFamily::Decimal,
+            Some(MySqlType::Decimal(
+                precision.numeric_precision(),
+                precision.numeric_scale(),
+            )),
+        ),
+        "numeric" => (
+            ColumnTypeFamily::Decimal,
+            Some(MySqlType::Numeric(
+                precision.numeric_precision(),
+                precision.numeric_scale(),
+            )),
+        ),
+        "float" => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
+        "double" => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
+
+        "char" => (
+            ColumnTypeFamily::String,
+            Some(MySqlType::Char(precision.character_max_length())),
+        ),
+        "varchar" => (
+            ColumnTypeFamily::String,
+            Some(MySqlType::VarChar(precision.character_max_length())),
+        ),
+        "text" => (ColumnTypeFamily::String, Some(MySqlType::Text)),
+        "tinytext" => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
+        "mediumtext" => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
+        "longtext" => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
+        "enum" => (ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)), None),
+        "json" => (ColumnTypeFamily::Json, Some(MySqlType::JSON)),
+        "set" => (ColumnTypeFamily::String, None),
+        //temporal
+        "date" => (ColumnTypeFamily::DateTime, Some(MySqlType::Date)),
+        "time" => (
+            //Fixme this can either be a time or a duration -.-
+            ColumnTypeFamily::DateTime,
+            Some(MySqlType::Time(precision.time_precision())),
+        ),
+        "datetime" => (
+            ColumnTypeFamily::DateTime,
+            Some(MySqlType::DateTime(precision.time_precision())),
+        ),
+        "timestamp" => (
+            ColumnTypeFamily::DateTime,
+            Some(MySqlType::Timestamp(precision.time_precision())),
+        ),
+        "year" => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
+        //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
+        "bit" => (
+            ColumnTypeFamily::Binary,
+            Some(MySqlType::Bit(precision.numeric_precision())),
+        ),
+        "binary" => (
+            ColumnTypeFamily::Binary,
+            Some(MySqlType::Binary(precision.character_max_length())),
+        ),
+        "varbinary" => (
+            ColumnTypeFamily::Binary,
+            Some(MySqlType::VarBinary(precision.character_max_length())),
+        ),
+        "blob" => (ColumnTypeFamily::Binary, Some(MySqlType::Blob)),
+        "tinyblob" => (ColumnTypeFamily::Binary, Some(MySqlType::TinyBlob)),
+        "mediumblob" => (ColumnTypeFamily::Binary, Some(MySqlType::MediumBlob)),
+        "longblob" => (ColumnTypeFamily::Binary, Some(MySqlType::LongBlob)),
+        //spatial
+        "geometry" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "point" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "linestring" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "polygon" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "multipoint" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "multilinestring" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "multipolygon" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        "geometrycollection" => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
+        _ => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
     };
 
     let tpe = ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
-        character_maximum_length,
+        character_maximum_length: precision.character_maximum_length,
         family: family.clone(),
         arity,
+        native_type: native_type.map(|x| x.to_json()),
     };
 
     match &family {
@@ -621,6 +688,12 @@ fn get_column_type_and_enum(
         ),
         _ => (tpe, None),
     }
+}
+
+fn extract_precision(input: &str) -> Option<u32> {
+    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
+    RE.captures(input)
+        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
 }
 
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
