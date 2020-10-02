@@ -35,6 +35,71 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn introspecting_a_one_to_one_relation_on_a_singular_primary_key_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column(
+                    "id",
+                    types::foreign("User", "id").nullable(false).unique(true).primary(true),
+                );
+            });
+        })
+        .await;
+
+    let dm = r#"
+             model Post {
+               id   Int  @id
+               User User @relation(fields: [id], references: [id])
+             }
+                 
+             model User {
+               id   Int   @id @default(autoincrement())
+               Post Post?
+             }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_one_to_one_relation_on_a_compound_primary_key_should_work(api: &TestApi) {
+    //Todo
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column(
+                    "id",
+                    types::foreign("User", "id").nullable(false).unique(true).primary(true),
+                );
+            });
+        })
+        .await;
+
+    let dm = r#"
+             model Post {
+               id   Int  @id
+               User User @relation(fields: [id], references: [id])
+             }
+                 
+             model User {
+               id   Int   @id @default(autoincrement())
+               Post Post?
+             }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
     barrel
