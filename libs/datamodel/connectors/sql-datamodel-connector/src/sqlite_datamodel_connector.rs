@@ -1,6 +1,5 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
-use native_types::NativeType;
 
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -36,7 +35,7 @@ impl Connector for SqliteDatamodelConnector {
         ));
     }
 
-    fn introspect_native_type(&self, _native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
         return Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
                 connector_name: "sqlite".to_string(),

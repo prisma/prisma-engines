@@ -54,6 +54,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
                 FieldArity::Optional => ColumnArity::Nullable,
                 FieldArity::List => ColumnArity::List,
             },
+            native_type: None,
         }
     }
 }

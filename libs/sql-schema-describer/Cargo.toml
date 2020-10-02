@@ -8,6 +8,7 @@ version = "0.1.0"
 async-trait = "0.1.17"
 once_cell = "1.3"
 prisma-value = {path = "../prisma-value"}
+native-types = {path = "../native-types"}
 regex = "1.2"
 rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
 serde = {version = "1.0", features = ["derive"]}

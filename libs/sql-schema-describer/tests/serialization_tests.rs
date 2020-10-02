@@ -2,6 +2,7 @@
 #![allow(unused)]
 
 use barrel::{types, Migration};
+use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::connector::{Queryable, Sqlite as SqliteDatabaseClient};
@@ -30,6 +31,7 @@ fn database_schema_is_serializable() {
                             data_type: "integer".to_string(),
                             full_data_type: "int".to_string(),
                             character_maximum_length: None,
+                            native_type: Some(PostgresType::Integer.to_json()),
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
@@ -46,6 +48,7 @@ fn database_schema_is_serializable() {
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Nullable,
+                            native_type: Some(PostgresType::VarChar(255).to_json()),
                         },
                         default: Some(DefaultValue::VALUE(PrismaValue::String("default value".to_string()))),
                         auto_increment: false,
@@ -59,6 +62,7 @@ fn database_schema_is_serializable() {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
+                            native_type: Some(PostgresType::Integer.to_json()),
                         },
                         default: None,
                         auto_increment: false,
@@ -94,6 +98,7 @@ fn database_schema_is_serializable() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     default: None,
                     auto_increment: true,
@@ -143,6 +148,7 @@ fn database_schema_without_primary_key_is_serializable() {
 
                     family: ColumnTypeFamily::Int,
                     arity: ColumnArity::Nullable,
+                    native_type: Some(PostgresType::Integer.to_json()),
                 },
                 default: None,
                 auto_increment: false,
@@ -194,6 +200,7 @@ fn database_schema_is_serializable_for_every_column_type_family() {
 
             family: family.to_owned(),
             arity: ColumnArity::Nullable,
+            native_type: None,
         },
         default: None,
         auto_increment: false,
@@ -237,6 +244,7 @@ fn database_schema_is_serializable_for_every_column_arity() {
 
                 family: ColumnTypeFamily::Int,
                 arity: arity.to_owned(),
+                native_type: Some(PostgresType::Integer.to_json()),
             },
             default: None,
             auto_increment: false,
@@ -281,6 +289,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     auto_increment: false,
                     default: None,
@@ -294,6 +303,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     auto_increment: false,
                     default: None,
@@ -307,6 +317,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     auto_increment: false,
                     default: None,
@@ -320,6 +331,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     auto_increment: false,
                     default: None,
@@ -333,6 +345,7 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
 
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(PostgresType::Integer.to_json()),
                     },
                     auto_increment: false,
                     default: None,

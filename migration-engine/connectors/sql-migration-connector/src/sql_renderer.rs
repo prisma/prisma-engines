@@ -87,7 +87,7 @@ pub(crate) trait SqlRenderer {
 
     /// Render a `DropTable` step.
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
+        vec![format!("DROP TABLE {}", self.quote(&table_name))]
     }
 
     /// Render a `RedefineTables` step.

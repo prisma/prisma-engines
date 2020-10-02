@@ -1,7 +1,7 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
-use native_types::{MySqlType, NativeType};
+use native_types::MySqlType;
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -80,7 +80,7 @@ impl MySqlDatamodelConnector {
         let medium_text = NativeTypeConstructor::without_args(MEDIUM_TEXT_TYPE_NAME, ScalarType::String);
         let long_text = NativeTypeConstructor::without_args(LONG_TEXT_TYPE_NAME, ScalarType::String);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, ScalarType::DateTime);
-        let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, ScalarType::DateTime);
+        let time = NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, ScalarType::DateTime);
         let datetime = NativeTypeConstructor::with_optional_args(DATETIME_TYPE_NAME, 1, ScalarType::DateTime);
         let timestamp = NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, ScalarType::DateTime);
         let year = NativeTypeConstructor::without_args(YEAR_TYPE_NAME, ScalarType::Int);
@@ -153,7 +153,7 @@ impl Connector for MySqlDatamodelConnector {
             UNSIGNED_BIG_INT_TYPE_NAME => MySqlType::UnsignedBigInt,
             DECIMAL_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    MySqlType::Decimal(*first_arg as u8, *second_arg as u8)
+                    MySqlType::Decimal(*first_arg, *second_arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         DECIMAL_TYPE_NAME,
@@ -164,7 +164,7 @@ impl Connector for MySqlDatamodelConnector {
             }
             NUMERIC_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    MySqlType::Numeric(*first_arg as u8, *second_arg as u8)
+                    MySqlType::Numeric(*first_arg, *second_arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         NUMERIC_TYPE_NAME,
@@ -231,25 +231,15 @@ impl Connector for MySqlDatamodelConnector {
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
-            TIME_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::Time(Option::from(*arg))
-                } else {
-                    MySqlType::Time(None)
-                }
-            }
-            DATETIME_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::DateTime(Option::from(*arg))
-                } else {
-                    MySqlType::DateTime(None)
-                }
-            }
-            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().map(|i| *i)),
+            TIME_TYPE_NAME => MySqlType::Time(args.first().cloned()),
+            DATETIME_TYPE_NAME => MySqlType::DateTime(args.first().cloned()),
+            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().cloned()),
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
-
-            _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
+            x => unreachable!(format!(
+                "This code is unreachable as the core must guarantee to just call with known names. {}",
+                x
+            )),
         };
 
         Ok(NativeTypeInstance::new(
@@ -259,8 +249,8 @@ impl Connector for MySqlDatamodelConnector {
         ))
     }
 
-    fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: MySqlType = serde_json::from_value(native_type.to_json()).unwrap();
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+        let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
             MySqlType::Int => (INT_TYPE_NAME, vec![]),
             MySqlType::UnsignedInt => (UNSIGNED_INT_TYPE_NAME, vec![]),
@@ -272,8 +262,8 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::UnsignedMediumInt => (UNSIGNED_MEDIUM_INT_TYPE_NAME, vec![]),
             MySqlType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
             MySqlType::UnsignedBigInt => (UNSIGNED_BIG_INT_TYPE_NAME, vec![]),
-            MySqlType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x as u32, y as u32]),
-            MySqlType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x as u32, y as u32]),
+            MySqlType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x, y]),
+            MySqlType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x, y]),
             MySqlType::Float => (FLOAT_TYPE_NAME, vec![]),
             MySqlType::Double => (DOUBLE_TYPE_NAME, vec![]),
             MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x]),
@@ -290,21 +280,19 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::MediumText => (MEDIUM_TEXT_TYPE_NAME, vec![]),
             MySqlType::LongText => (LONG_TEXT_TYPE_NAME, vec![]),
             MySqlType::Date => (DATE_TYPE_NAME, vec![]),
-            MySqlType::Time(x) => match x {
-                Some(arg) => (TIME_TYPE_NAME, vec![arg]),
-                None => (TIME_TYPE_NAME, vec![]),
-            },
-            MySqlType::DateTime(x) => match x {
-                Some(arg) => (DATETIME_TYPE_NAME, vec![arg]),
-                None => (DATETIME_TYPE_NAME, vec![]),
-            },
-            MySqlType::Timestamp(x) => match x {
-                Some(arg) => (TIMESTAMP_TYPE_NAME, vec![arg]),
-                None => (TIMESTAMP_TYPE_NAME, vec![]),
-            },
+            MySqlType::Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
+            MySqlType::DateTime(x) => (DATETIME_TYPE_NAME, arg_vec_from_opt(x)),
+            MySqlType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
         };
+
+        fn arg_vec_from_opt(input: Option<u32>) -> Vec<u32> {
+            match input {
+                Some(arg) => vec![arg],
+                None => vec![],
+            }
+        }
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))

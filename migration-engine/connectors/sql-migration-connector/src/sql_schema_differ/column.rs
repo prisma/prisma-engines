@@ -1,7 +1,7 @@
 use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
 use enumflags2::BitFlags;
 use prisma_value::PrismaValue;
-use sql_schema_describer::{walkers::ColumnWalker, DefaultValue};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
@@ -49,7 +49,13 @@ impl<'a> ColumnDiffer<'a> {
     }
 
     fn column_type_changed(&self) -> bool {
-        self.flavour.column_type_changed(self)
+        match (self.previous.column_type_family(), self.next.column_type_family()) {
+            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal) => false,
+            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float) => false,
+            (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal) => false,
+            (ColumnTypeFamily::Float, ColumnTypeFamily::Float) => false,
+            (_, _) => self.flavour.column_type_changed(self),
+        }
     }
 
     /// There are workarounds to cope with current migration and introspection limitations.

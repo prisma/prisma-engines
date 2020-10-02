@@ -1,16 +1,11 @@
 mod mssql;
 mod test_api;
 
-#[cfg(not(target_os = "macos"))]
 use crate::mssql::*;
-#[cfg(not(target_os = "macos"))]
 use barrel::{types, Migration};
-#[cfg(not(target_os = "macos"))]
 use pretty_assertions::assert_eq;
-#[cfg(not(target_os = "macos"))]
 use sql_schema_describer::*;
 
-#[cfg(not(target_os = "macos"))]
 #[tokio::test]
 async fn all_mssql_column_types_must_work() {
     let db_name = "all_mssql_column_types_must_work";
@@ -62,6 +57,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -75,6 +71,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -88,6 +85,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -101,6 +99,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
             default: None,
             auto_increment: false,
@@ -113,6 +112,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -126,6 +126,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -139,6 +140,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -152,6 +154,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -165,6 +168,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -178,6 +182,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -191,6 +196,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -204,6 +210,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -217,6 +224,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
             default: None,
             auto_increment: false,
@@ -229,6 +237,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -242,6 +251,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -255,6 +265,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -268,6 +279,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -281,6 +293,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -294,6 +307,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -304,9 +318,10 @@ async fn all_mssql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "varchar".to_string(),
                 full_data_type: "varchar".to_string(),
-                character_maximum_length: Some(-1),
+                character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -320,6 +335,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: Some(2147483647),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -333,6 +349,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -343,9 +360,10 @@ async fn all_mssql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "nvarchar".to_string(),
                 full_data_type: "nvarchar".to_string(),
-                character_maximum_length: Some(-1),
+                character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -359,6 +377,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: Some(1073741823),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -372,6 +391,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: Some(20),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -385,6 +405,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: Some(20),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -395,10 +416,10 @@ async fn all_mssql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "varbinary".to_string(),
                 full_data_type: "varbinary".to_string(),
-                character_maximum_length: Some(-1),
-
+                character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -412,6 +433,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: Some(2147483647),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -436,7 +458,6 @@ async fn all_mssql_column_types_must_work() {
     );
 }
 
-#[cfg(not(target_os = "macos"))]
 #[tokio::test]
 async fn mssql_foreign_key_on_delete_must_be_handled() {
     let db_name = "mssql_foreign_key_on_delete_must_be_handled";
@@ -469,6 +490,7 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
+                        native_type: None,
                     },
 
                     default: None,
@@ -482,6 +504,7 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: None,
                     },
                     default: None,
                     auto_increment: false,
@@ -494,6 +517,7 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: None,
                     },
                     default: None,
                     auto_increment: false,
@@ -527,7 +551,6 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
     );
 }
 
-#[cfg(not(target_os = "macos"))]
 #[tokio::test]
 async fn mssql_multi_field_indexes_must_be_inferred() {
     let db_name = "mssql_multi_field_indexes_must_be_inferred";
@@ -555,7 +578,6 @@ async fn mssql_multi_field_indexes_must_be_inferred() {
     );
 }
 
-#[cfg(not(target_os = "macos"))]
 #[tokio::test]
 async fn mssql_join_table_unique_indexes_must_be_inferred() {
     let db_name = "mssql_join_table_unique_indexes_must_be_inferred";

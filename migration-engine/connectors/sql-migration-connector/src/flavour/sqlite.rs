@@ -1,6 +1,6 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
-use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::path::Path;
@@ -9,12 +9,6 @@ use std::path::Path;
 pub(crate) struct SqliteFlavour {
     pub(super) file_path: String,
     pub(super) attached_name: String,
-}
-
-impl SqliteFlavour {
-    pub(crate) fn attached_name(&self) -> &str {
-        &self.attached_name
-    }
 }
 
 #[async_trait::async_trait]
@@ -56,9 +50,8 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = format!(
-            r#"
-            CREATE TABLE IF NOT EXISTS "{}"."_prisma_migrations" (
+        let sql = r#"
+            CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
                 "id"                    TEXT PRIMARY KEY NOT NULL,
                 "checksum"              TEXT NOT NULL,
                 "finished_at"           DATETIME,
@@ -69,11 +62,9 @@ impl SqlFlavour for SqliteFlavour {
                 "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
                 "script"                TEXT NOT NULL
             );
-            "#,
-            self.attached_name()
-        );
+            "#;
 
-        connection.raw_cmd(&sql).await
+        connection.raw_cmd(sql).await
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
@@ -85,24 +76,7 @@ impl SqlFlavour for SqliteFlavour {
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let file_path = connection.connection_info().file_path().unwrap();
 
-        std::fs::remove_file(file_path).map_err(|err| {
-            ConnectorError::from_kind(ErrorKind::Generic(anyhow::anyhow!(
-                "Failed to delete SQLite database at `{}`. {}",
-                file_path,
-                err
-            )))
-        })?;
-
-        connection
-            .execute_raw("DETACH ?", &[connection.connection_info().schema_name().into()])
-            .await?;
-
-        connection
-            .execute_raw(
-                "ATTACH DATABASE ? AS ?",
-                &[file_path.into(), connection.connection_info().schema_name().into()],
-            )
-            .await?;
+        std::fs::File::create(file_path).expect("failed to truncate sqlite file");
 
         Ok(())
     }

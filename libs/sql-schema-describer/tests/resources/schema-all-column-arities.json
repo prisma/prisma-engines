@@ -9,7 +9,8 @@
             "dataType": "integer",
             "fullDataType": "int",
             "family": "int",
-          "arity": "required"
+            "arity": "required",
+            "nativeType": "Integer"
           },
           "default": null,
           "autoIncrement": false
@@ -20,7 +21,8 @@
             "dataType": "integer",
             "fullDataType": "int",
             "family": "int",
-          "arity": "nullable"
+            "arity": "nullable",
+            "nativeType": "Integer"
           },
           "default": null,
           "autoIncrement": false
@@ -31,7 +33,8 @@
             "dataType": "integer",
             "fullDataType": "int",
             "family": "int",
-          "arity": "list"
+            "arity": "list",
+            "nativeType": "Integer"
           },
           "default": null,
           "autoIncrement": false

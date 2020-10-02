@@ -3,6 +3,7 @@ mod test_api;
 
 use crate::mysql::*;
 use barrel::{types, Migration};
+use native_types::{MySqlType, NativeType};
 use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
 use sql_schema_describer::*;
@@ -71,6 +72,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Int.to_json()),
             },
 
             default: None,
@@ -84,6 +86,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Int.to_json()),
             },
 
             default: None,
@@ -97,6 +100,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::SmallInt.to_json()),
             },
 
             default: None,
@@ -110,6 +114,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::TinyInt.to_json()),
             },
             default: None,
             auto_increment: false,
@@ -122,6 +127,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::TinyInt.to_json()),
             },
 
             default: None,
@@ -135,6 +141,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::MediumInt.to_json()),
             },
 
             default: None,
@@ -148,6 +155,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::BigInt.to_json()),
             },
 
             default: None,
@@ -159,8 +167,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "decimal".to_string(),
                 full_data_type: "decimal(10,0)".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Float,
+                family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Decimal(10, 0).to_json()),
             },
 
             default: None,
@@ -172,8 +181,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "decimal".to_string(),
                 full_data_type: "decimal(10,0)".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Float,
+                family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Decimal(10, 0).to_json()),
             },
 
             default: None,
@@ -187,6 +197,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Float.to_json()),
             },
 
             default: None,
@@ -200,6 +211,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Double.to_json()),
             },
 
             default: None,
@@ -213,6 +225,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Date.to_json()),
             },
 
             default: None,
@@ -226,6 +239,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Time(Some(0)).to_json()),
             },
 
             default: None,
@@ -239,6 +253,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::DateTime(Some(0)).to_json()),
             },
 
             default: None,
@@ -252,6 +267,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Timestamp(Some(0)).to_json()),
             },
 
             default: Some(DefaultValue::NOW),
@@ -265,6 +281,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Year.to_json()),
             },
 
             default: None,
@@ -278,6 +295,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Char(1).to_json()),
             },
 
             default: None,
@@ -291,6 +309,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::VarChar(255).to_json()),
             },
 
             default: None,
@@ -304,6 +323,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(65535),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Text.to_json()),
             },
 
             default: None,
@@ -317,6 +337,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::TinyText.to_json()),
             },
 
             default: None,
@@ -330,6 +351,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(16777215),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::MediumText.to_json()),
             },
 
             default: None,
@@ -343,6 +365,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::LongText.to_json()),
             },
 
             default: None,
@@ -356,6 +379,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(1),
                 family: ColumnTypeFamily::Enum("User_enum_col".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -369,6 +393,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(3),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -382,6 +407,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(1),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Binary(1).to_json()),
             },
 
             default: None,
@@ -395,6 +421,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(255),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::VarBinary(255).to_json()),
             },
 
             default: None,
@@ -408,6 +435,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(65535),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::Blob.to_json()),
             },
 
             default: None,
@@ -422,6 +450,7 @@ async fn all_mysql_column_types_must_work() {
 
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::TinyBlob.to_json()),
             },
 
             default: None,
@@ -435,6 +464,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(16777215),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::MediumBlob.to_json()),
             },
 
             default: None,
@@ -448,6 +478,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::LongBlob.to_json()),
             },
 
             default: None,
@@ -459,8 +490,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "geometry".to_string(),
                 full_data_type: "geometry".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Geometric,
+                family: ColumnTypeFamily::Unsupported("geometry".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -472,8 +504,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "point".to_string(),
                 full_data_type: "point".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Geometric,
+                family: ColumnTypeFamily::Unsupported("point".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -485,8 +518,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "linestring".to_string(),
                 full_data_type: "linestring".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Geometric,
+                family: ColumnTypeFamily::Unsupported("linestring".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -498,8 +532,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "polygon".to_string(),
                 full_data_type: "polygon".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Geometric,
+                family: ColumnTypeFamily::Unsupported("polygon".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -511,8 +546,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "multipoint".to_string(),
                 full_data_type: "multipoint".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Geometric,
+                family: ColumnTypeFamily::Unsupported("multipoint".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -524,8 +560,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "multilinestring".to_string(),
                 full_data_type: "multilinestring".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Geometric,
+                family: ColumnTypeFamily::Unsupported("multilinestring".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -537,8 +574,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "multipolygon".to_string(),
                 full_data_type: "multipolygon".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Geometric,
+                family: ColumnTypeFamily::Unsupported("multipolygon".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -550,8 +588,9 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "geometrycollection".to_string(),
                 full_data_type: "geometrycollection".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Geometric,
+                family: ColumnTypeFamily::Unsupported("geometrycollection".into()),
                 arity: ColumnArity::Required,
+                native_type: None,
             },
 
             default: None,
@@ -565,6 +604,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
+                native_type: Some(MySqlType::JSON.to_json()),
             },
 
             default: None,
@@ -625,6 +665,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
+                        native_type: Some(MySqlType::Int.to_json()),
                     },
 
                     default: None,
@@ -638,6 +679,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(MySqlType::Int.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -650,6 +692,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(MySqlType::Int.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -662,6 +705,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(MySqlType::Int.to_json()),
                     },
                     default: None,
                     auto_increment: false,
@@ -674,6 +718,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                         character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
+                        native_type: Some(MySqlType::Int.to_json()),
                     },
                     default: None,
                     auto_increment: false,

@@ -5,4 +5,4 @@ mod generator;
 pub use configuration::*;
 pub use datasource::*;
 pub use generator::*;
-pub(crate) mod preview_features;
+pub mod preview_features;
