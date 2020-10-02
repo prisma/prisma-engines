@@ -471,7 +471,7 @@ impl InputType {
     }
 
     pub fn xml() -> InputType {
-        InputType::Scalar(ScalarType::XML)
+        InputType::Scalar(ScalarType::Xml)
     }
 
     pub fn bytes() -> InputType {
@@ -533,7 +533,7 @@ impl OutputType {
     }
 
     pub fn xml() -> OutputType {
-        OutputType::Scalar(ScalarType::XML)
+        OutputType::Scalar(ScalarType::Xml)
     }
 
     pub fn bytes() -> OutputType {
@@ -578,7 +578,7 @@ pub enum ScalarType {
     Json,
     JsonList,
     UUID,
-    XML,
+    Xml,
     Bytes,
 }
 

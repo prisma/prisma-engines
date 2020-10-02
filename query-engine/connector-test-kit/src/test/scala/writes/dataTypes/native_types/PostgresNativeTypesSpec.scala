@@ -177,7 +177,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"bool":true,"byteA":"dGVzdA==","json":"{}","jsonb":"{\"a\":\"b\"}"}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"bool":true,"byteA":"dGVzdA==","xml":"<wurst>salat</wurst>","json":"{}","jsonb":"{\"a\":\"b\"}"}}}""")
   }
 
   "Postgres native date types" should "work" in {
