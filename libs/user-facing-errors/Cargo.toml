@@ -17,6 +17,7 @@ tracing = "0.1"
 git = "https://github.com/prisma/quaint"
 features = ["mysql", "postgresql", "sqlite"]
 optional = true
+branch = "xml_support"
 
 [features]
 default = []

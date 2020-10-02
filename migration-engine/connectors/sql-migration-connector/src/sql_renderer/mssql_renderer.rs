@@ -128,7 +128,8 @@ impl SqlRenderer for MssqlFlavour {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_))
+            | (DefaultValue::VALUE(PrismaValue::Xml(val)), ColumnTypeFamily::Xml) => {
                 format!("'{}'", escape_string_literal(&val)).into()
             }
             (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {

@@ -179,7 +179,7 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Boolean => Self::Boolean,
             ScalarType::DateTime => Self::DateTime,
             ScalarType::Json => Self::Json,
-            ScalarType::XML => Self::Xml,
+            ScalarType::Xml => Self::Xml,
             ScalarType::Decimal => Self::Float,
             ScalarType::Duration => todo!("No idea what this is supposed to be"),
             ScalarType::Bytes => Self::Bytes,

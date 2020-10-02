@@ -18,6 +18,7 @@ tracing = "0.1"
 [dependencies.quaint]
 features = ["single-postgresql", "single-mysql", "single-sqlite", "serde-support", "tracing-log"]
 git = "https://github.com/prisma/quaint"
+branch = "xml_support"
 
 [dev-dependencies]
 anyhow = "1.0.28"

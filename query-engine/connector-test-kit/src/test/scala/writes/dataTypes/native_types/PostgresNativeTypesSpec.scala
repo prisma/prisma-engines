@@ -146,6 +146,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  id    String  @id @default(cuid())
         |  bool  Boolean @test.Boolean
         |  byteA Bytes   @test.ByteA
+        |  xml   Xml     @test.Xml
         |  json  Json    @test.Json
         |  jsonb Json    @test.JsonB
         |}"""
@@ -160,12 +161,14 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |    data: {
          |      bool: true
          |      byteA: "dGVzdA=="
+         |      xml: "<wurst>salat</wurst>"
          |      json: "{}"
          |      jsonb: "{\\"a\\": \\"b\\"}"
          |    }
          |  ) {
          |    bool
          |    byteA
+         |    xml
          |    json
          |    jsonb
          |  }

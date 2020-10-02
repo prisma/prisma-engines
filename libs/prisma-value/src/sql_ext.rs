@@ -61,6 +61,8 @@ impl<'a> From<Value<'a>> for PrismaValue {
                     PrismaValue::String(s)
                 })
                 .unwrap_or(PrismaValue::Null),
+
+            Value::Xml(s) => s.map(|s| PrismaValue::Xml(s.into_owned())).unwrap_or(PrismaValue::Null),
         }
     }
 }

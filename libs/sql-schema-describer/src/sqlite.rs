@@ -189,6 +189,7 @@ impl SqlSchemaDescriber {
                                 ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(default_string)),
                                 ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Xml => unreachable!("No XML on SQLite."),
                             })
                         }
                     }

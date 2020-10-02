@@ -44,7 +44,7 @@ pub enum MssqlType {
     Binary(DataLength),
     VarBinary(DataLength),
     Image,
-    XML,
+    Xml,
 }
 
 impl super::NativeType for MssqlType {

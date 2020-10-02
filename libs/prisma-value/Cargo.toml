@@ -23,3 +23,4 @@ uuid = {version = "0.8", features = ["serde", "v4"]}
 features = ["uuid-0_8", "array", "single-postgresql"]
 git = "https://github.com/prisma/quaint"
 optional = true
+branch = "xml_support"

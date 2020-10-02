@@ -21,7 +21,7 @@ impl ScalarFieldExt for ScalarField {
             (PrismaValue::List(l), _) => Value::Array(Some(l.into_iter().map(|x| self.value(x)).collect())),
             (PrismaValue::Json(s), _) => Value::Json(serde_json::from_str(&s).unwrap()),
             (PrismaValue::Bytes(b), _) => Value::Bytes(Some(b.into())),
-            (PrismaValue::Xml(_), _) => todo!(),
+            (PrismaValue::Xml(s), _) => Value::Xml(Some(s.into())),
             (PrismaValue::Null, ident) => match ident {
                 TypeIdentifier::String => Value::Text(None),
                 TypeIdentifier::Float => Value::Real(None),

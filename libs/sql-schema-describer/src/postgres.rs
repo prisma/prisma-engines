@@ -256,6 +256,10 @@ impl SqlSchemaDescriber {
                                 .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
                                 .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
                                 .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
+                            // XML defaults come in the '<...>...</...>'::xml form.
+                            ColumnTypeFamily::Xml => unsuffix_default_literal(&default_string, "xml", "xml")
+                                .map(|default| DefaultValue::VALUE(PrismaValue::Xml(unquote_string(&default))))
+                                .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
