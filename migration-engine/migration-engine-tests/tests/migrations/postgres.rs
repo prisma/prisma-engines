@@ -126,7 +126,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("bit", "String", "Bit(1)", "bit"),
         ("varbit", "String", "VarBit(1)", "varbit"),
         ("uuid", "String", "Uuid", "uuid"),
-        ("xml", "XML", "Xml", "xml"),
+        ("xml", "Xml", "Xml", "xml"),
         ("json", "Json", "Json", "json"),
         ("jsonb", "Json", "JsonB", "jsonb"),
     ];

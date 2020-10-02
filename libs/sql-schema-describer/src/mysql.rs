@@ -300,7 +300,7 @@ async fn get_all_columns(
                             &default_string.replace("_utf8mb4", "").replace("\\\'", ""),
                         ))),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Xml => unreachable!("No XML in MySQL."),
+                        ColumnTypeFamily::Xml => unreachable!("No XML for MySQL."),
                     })
                 }
             },
