@@ -4,11 +4,11 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class XmlSpec extends FlatSpec with Matchers with ApiSpecBase {
-  "Using a XML field" should "work" ignore {
+  "Using a XML field" should "work" taggedAs (IgnoreMySql, IgnoreSQLite) in {
     val project = ProjectDsl.fromString {
       """|model Model {
          | id    Int  @id
-         | field XML? @default("<wurst>salat<wurst/>)
+         | field Xml? @default("<sense>none</sense>")
          |}"""
     }
 
@@ -20,7 +20,6 @@ class XmlSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  createOneModel(
          |    data: {
          |      id: 1
-         |      field: "<sense>none</sense>"
          |    }
          |  ) {
          |    field
@@ -30,7 +29,7 @@ class XmlSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"field":""<sense>none</sense>"}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"field":"<sense>none</sense>"}}}""")
 
     res = server.query(
       s"""

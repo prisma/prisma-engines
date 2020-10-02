@@ -60,14 +60,14 @@ object ConnectorConfig {
       case "mssql2017" =>
         ConnectorConfig(
           "sqlserver",
-          s"sqlserver://$mssql_2017_Host:$mssql_2017_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED",
+          s"sqlserver://$mssql_2017_Host:$mssql_2017_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED;encrypt=DANGER_PLAINTEXT",
           false,
           "mssql2017"
         )
       case "mssql2019" =>
         ConnectorConfig(
           "sqlserver",
-          s"sqlserver://$mssql_2019_Host:$mssql_2019_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED",
+          s"sqlserver://$mssql_2019_Host:$mssql_2019_Port;database=master;schema=$$DB;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED;encrypt=DANGER_PLAINTEXT",
           false,
           "mssql2019"
         )

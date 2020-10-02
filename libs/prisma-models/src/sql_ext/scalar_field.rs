@@ -32,7 +32,7 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::UUID => Value::Uuid(None),
                 TypeIdentifier::Int => Value::Integer(None),
                 TypeIdentifier::Bytes => Value::Bytes(None),
-                TypeIdentifier::Xml => todo!(),
+                TypeIdentifier::Xml => Value::Xml(None),
             },
         }
     }
@@ -51,8 +51,8 @@ pub fn convert_lossy<'a>(pv: PrismaValue) -> Value<'a> {
         PrismaValue::Uuid(u) => u.to_string().into(),
         PrismaValue::List(l) => Value::Array(Some(l.into_iter().map(|x| convert_lossy(x)).collect())),
         PrismaValue::Json(s) => Value::Json(serde_json::from_str(&s).unwrap()),
-        PrismaValue::Null => Value::Integer(None), // Can't tell which type the null is supposed to be.
         PrismaValue::Bytes(b) => Value::Bytes(Some(b.into())),
-        PrismaValue::Xml(_) => todo!(),
+        PrismaValue::Xml(s) => Value::Xml(Some(s.into())),
+        PrismaValue::Null => Value::Integer(None), // Can't tell which type the null is supposed to be.
     }
 }
