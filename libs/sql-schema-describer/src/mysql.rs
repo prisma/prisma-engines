@@ -596,18 +596,13 @@ fn get_column_type_and_enum(
     // println!("Default: {:?}", default);
 
     let is_tinyint1 = || extract_precision(full_data_type) == Some(1);
-    let invalid_bool_default = || match default {
-        None => false,
-        Some(param_value) => match param_value.to_string() {
-            None => false,
-            Some(x) if x == "NULL" => false,
-            Some(default_string) => match parse_int(&default_string) {
-                Some(PrismaValue::Int(1)) => false,
-                Some(PrismaValue::Int(0)) => false,
-                None => false,
-                _ => true,
-            },
-        },
+    let invalid_bool_default = || {
+        default
+            .and_then(|default| default.to_string())
+            .filter(|default_string| default_string != "NULL")
+            .and_then(|default_string| parse_int(&default_string))
+            .filter(|default_int| *default_int != PrismaValue::Int(0) && *default_int != PrismaValue::Int(1))
+            .is_some()
     };
 
     let (family, native_type) = match data_type {
