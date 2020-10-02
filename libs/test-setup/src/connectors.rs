@@ -9,6 +9,8 @@ use once_cell::sync::Lazy;
 
 fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
     vec![
+        ("mssql_2017", Tags::Mssql2017.into()),
+        ("mssql_2019", Tags::Mssql2019.into()),
         ("mysql_8", Tags::Mysql | Tags::Mysql8),
         ("mysql", Tags::Mysql.into()),
         ("mysql_5_6", Tags::Mysql | Tags::Mysql56),
@@ -81,18 +83,7 @@ pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
 });
 
 pub static CONNECTORS_MSSQL: Lazy<Connectors> = Lazy::new(|| {
-    // So, macOS doesn't like SQL Server's certificates, and we disable
-    // tests on Apple.
-    let names = if cfg!(not(target_os = "macos")) {
-        let mut names = connector_names();
-        names.push(("mssql_2017", Tags::Mssql2017.into()));
-        names.push(("mssql_2019", Tags::Mssql2019.into()));
-        names
-    } else {
-        connector_names()
-    };
-
-    let connectors: Vec<Connector> = names
+    let connectors: Vec<Connector> = connector_names()
         .iter()
         .map(|(name, tags)| Connector {
             name: (*name).to_owned(),
