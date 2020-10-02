@@ -26,7 +26,7 @@ async fn metadata_for_sqlite_should_work(api: &TestApi) {
     setup(&barrel, api.schema_name()).await;
     let result = dbg!(api.get_metadata().await);
     assert_eq!(result.table_count, 3);
-    assert_eq!(result.size_in_bytes, 0); // page_size * page_count and count is 0
+    assert_eq!(result.size_in_bytes, 16384); // page_size * page_count
 }
 
 async fn setup(barrel: &BarrelMigrationExecutor, db_name: &str) {

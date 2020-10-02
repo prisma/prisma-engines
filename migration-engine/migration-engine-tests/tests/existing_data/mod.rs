@@ -16,7 +16,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
     let conn = api.database();
-    let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
+    let insert = Insert::single_into(api.render_table_name("Test")).value("id", "test");
 
     conn.query(insert.into()).await.unwrap();
 
@@ -45,7 +45,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
 
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "puppiesCount"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "puppiesCount"])
         .values(("a", 7))
         .values(("b", 8));
 
@@ -81,7 +81,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
 
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), &["id"])
         .values(("a",))
         .values(("b",));
 
@@ -113,7 +113,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     api.infer_apply(&dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "age"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), vec!["id", "age"])
         .values(("a", 12))
         .values(("b", 22));
 
@@ -291,7 +291,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
     api.infer_apply(&dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22));
 
@@ -358,7 +358,7 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
     api.infer_apply(&dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
         .values(("c", Value::Integer(None)));
@@ -408,7 +408,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
 
     api.infer_apply(&dm).send().await?.assert_green()?;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
+    let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22))
         .values(("c", Value::Integer(None)));

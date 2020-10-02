@@ -27,13 +27,6 @@ impl Connection {
             .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
     }
 
-    pub(crate) async fn execute_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> ConnectorResult<u64> {
-        self.0
-            .execute_raw(sql, params)
-            .await
-            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
-    }
-
     pub(crate) fn quaint(&self) -> &Quaint {
         &self.0
     }
@@ -57,5 +50,14 @@ impl Connection {
             .raw_cmd(sql)
             .await
             .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
+    }
+
+    /// Render a table name with the required prefixing for use with quaint query building.
+    pub(crate) fn table_name<'a>(&'a self, name: &'a str) -> quaint::ast::Table<'a> {
+        if self.connection_info().sql_family().is_sqlite() {
+            name.into()
+        } else {
+            (self.connection_info().schema_name(), name).into()
+        }
     }
 }

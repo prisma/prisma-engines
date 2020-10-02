@@ -88,8 +88,8 @@ impl SqlSchemaDescriber {
         names
     }
 
-    async fn get_table_names(&self, schema: &str) -> Vec<String> {
-        let sql = format!(r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#, schema);
+    async fn get_table_names(&self, _schema: &str) -> Vec<String> {
+        let sql = r#"SELECT name FROM sqlite_master WHERE type='table'"#;
         debug!("describing table names with query: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("get table names");
         let names = result_set
@@ -127,8 +127,8 @@ impl SqlSchemaDescriber {
         }
     }
 
-    async fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
-        let sql = format!(r#"PRAGMA "{}".table_info ("{}")"#, schema, table);
+    async fn get_columns(&self, _schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
+        let sql = format!(r#"PRAGMA table_info ("{}")"#, table);
         debug!("describing table columns, query: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.unwrap();
         let mut pk_cols: HashMap<i64, String> = HashMap::new();
@@ -259,7 +259,7 @@ impl SqlSchemaDescriber {
         (cols, primary_key)
     }
 
-    async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
+    async fn get_foreign_keys(&self, _schema: &str, table: &str) -> Vec<ForeignKey> {
         struct IntermediateForeignKey {
             pub columns: HashMap<i64, String>,
             pub referenced_table: String,
@@ -268,7 +268,7 @@ impl SqlSchemaDescriber {
             pub on_update_action: ForeignKeyAction,
         }
 
-        let sql = format!(r#"PRAGMA "{}".foreign_key_list("{}");"#, schema, table);
+        let sql = format!(r#"PRAGMA foreign_key_list("{}");"#, table);
         debug!("describing table foreign keys, SQL: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for foreign keys");
 
@@ -379,8 +379,8 @@ impl SqlSchemaDescriber {
         fks
     }
 
-    async fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
-        let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
+    async fn get_indices(&self, _schema: &str, table: &str) -> Vec<Index> {
+        let sql = format!(r#"PRAGMA index_list("{}");"#, table);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
 
@@ -404,7 +404,7 @@ impl SqlSchemaDescriber {
                 columns: vec![],
             };
 
-            let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
+            let sql = format!(r#"PRAGMA index_info("{}");"#, name);
             let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
             debug!("Got index description results: {:?}", result_set);
             for row in result_set.into_iter() {
