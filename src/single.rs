@@ -101,7 +101,8 @@ impl Quaint {
     /// Microsoft SQL Server:
     ///
     /// - `encrypt` if set to `true` encrypts all traffic over TLS. If `false`, only
-    ///   the login details are encrypted.
+    ///   the login details are encrypted. A special value `DANGER_PLAINTEXT` will
+    ///   disable TLS completely, including sending login credentials as plaintext.
     /// - `user` sets the login name.
     /// - `password` sets the login password.
     /// - `database` sets the database to connect to.

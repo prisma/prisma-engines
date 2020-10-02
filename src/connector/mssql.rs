@@ -28,9 +28,44 @@ pub struct MssqlUrl {
     query_params: MssqlQueryParams,
 }
 
+/// TLS mode when connecting to SQL Server.
+#[derive(Debug, Clone, Copy)]
+pub enum EncryptMode {
+    /// All traffic is encrypted.
+    On,
+    /// Only the login credentials are encrypted.
+    Off,
+    /// Nothing is encrypted.
+    DangerPlainText,
+}
+
+impl fmt::Display for EncryptMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::On => write!(f, "true"),
+            Self::Off => write!(f, "false"),
+            Self::DangerPlainText => write!(f, "DANGER_PLAINTEXT"),
+        }
+    }
+}
+
+impl FromStr for EncryptMode {
+    type Err = Error;
+
+    fn from_str(s: &str) -> crate::Result<Self> {
+        let mode = match s.parse::<bool>() {
+            Ok(true) => Self::On,
+            _ if s == "DANGER_PLAINTEXT" => Self::DangerPlainText,
+            _ => Self::Off,
+        };
+
+        Ok(mode)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub(crate) struct MssqlQueryParams {
-    encrypt: bool,
+    encrypt: EncryptMode,
     port: Option<u16>,
     host: Option<String>,
     user: Option<String>,
@@ -135,7 +170,7 @@ impl MssqlUrl {
 }
 
 impl MssqlQueryParams {
-    fn encrypt(&self) -> bool {
+    fn encrypt(&self) -> EncryptMode {
         self.encrypt
     }
 
@@ -381,8 +416,8 @@ impl MssqlUrl {
 
                 let encrypt = params
                     .remove("encrypt")
-                    .and_then(|param| param.parse().ok())
-                    .unwrap_or(false);
+                    .and_then(|param| EncryptMode::from_str(&param).ok())
+                    .unwrap_or(EncryptMode::Off);
 
                 let trust_server_certificate = params
                     .remove("trustservercertificate")
