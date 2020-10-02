@@ -73,12 +73,18 @@ async fn introspecting_a_one_to_one_relation_on_a_compound_primary_key_should_wo
     let _setup_schema = barrel
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id_1", types::integer());
+                t.add_column("id_2", types::integer());
+                t.inject_custom("Primary Key(id_1, id_2)");
             });
             migration.create_table("Post", |t| {
-                t.add_column(
-                    "id",
-                    types::foreign("User", "id").nullable(false).unique(true).primary(true),
+                t.add_column("id_1", types::integer());
+                t.add_column("id_2", types::integer());
+                t.inject_custom("Primary Key(id_1, id_2)");
+                t.inject_custom(
+                    "constraint \"fk_test\" \
+                foreign key (\"id_1\", \"id_2\") \
+                REFERENCES \"User\" (\"id_1\", \"id_2\")",
                 );
             });
         })
@@ -86,14 +92,20 @@ async fn introspecting_a_one_to_one_relation_on_a_compound_primary_key_should_wo
 
     let dm = r#"
              model Post {
-               id   Int  @id
-               User User @relation(fields: [id], references: [id])
+               id_1 Int
+               id_2 Int
+               User User @relation(fields: [id_1, id_2], references: [id_1, id_2])
+                   
+               @@id([id_1, id_2])
              }
-                 
+                     
              model User {
-               id   Int   @id @default(autoincrement())
+               id_1 Int
+               id_2 Int
                Post Post?
-             }
+                           
+               @@id([id_1, id_2])
+             }                        
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
