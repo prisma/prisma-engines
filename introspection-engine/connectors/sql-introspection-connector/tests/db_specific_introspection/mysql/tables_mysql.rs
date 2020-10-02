@@ -34,6 +34,42 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
+#[test_each_connector(tags("mysql"))]
+async fn introspecting_mysql_booleans_must_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", |t| {
+                    t.add_column("id", types::primary());
+                    t.inject_custom("bool1 tinyint(1)");
+                    t.inject_custom("bool2 tinyint(1) Default Null");
+                    t.inject_custom("bool3 tinyint(1) Default 1");
+                    t.inject_custom("bool4 tinyint(1) Default 0");
+                    t.inject_custom("tinyint1 tinyint(1) Default 10");
+                    t.inject_custom("tinyint2 tinyint");
+                    t.inject_custom("tinyint3 tinyint(2)");
+                });
+            },
+            api.db_name(),
+        )
+        .await;
+    let dm = r#"    
+            model Blog {
+              id       Int      @id @default(autoincrement())
+              bool1    Boolean?
+              bool2    Boolean?
+              bool3    Boolean? @default(true)
+              bool4    Boolean? @default(false)
+              tinyint1 Int?     @default(10)
+              tinyint2 Int?
+              tinyint3 Int?
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
 #[test_each_connector(tags("mysql_8"))]
 async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) {
     let barrel = api.barrel();
