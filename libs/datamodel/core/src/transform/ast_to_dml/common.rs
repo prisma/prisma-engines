@@ -24,3 +24,21 @@ pub fn field_validation_error(
             .span,
     )
 }
+
+pub fn validate_preview_features(
+    preview_features: Vec<String>,
+    span: ast::Span,
+    supported_preview_features: Vec<&str>,
+) -> Result<(), DatamodelError> {
+    if let Some(unknown_preview_feature) = preview_features
+        .iter()
+        .find(|pf| !supported_preview_features.contains(&pf.as_str()))
+    {
+        return Err(DatamodelError::new_preview_feature_not_known_error(
+            unknown_preview_feature,
+            supported_preview_features,
+            span,
+        ));
+    }
+    Ok(())
+}

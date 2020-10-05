@@ -4,8 +4,11 @@ use super::{
     builtin_datasource_providers::{MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider},
     datasource_provider::DatasourceProvider,
 };
+use crate::ast::Span;
+use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
 use crate::error::{DatamodelError, ErrorCollection};
+use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
 
@@ -14,14 +17,12 @@ const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 /// Is responsible for loading and validating Datasources defined in an AST.
 pub struct DatasourceLoader {
     source_definitions: Vec<Box<dyn DatasourceProvider>>,
-    preview_features: Vec<&'static str>
 }
 
 impl DatasourceLoader {
     pub fn new() -> Self {
         Self {
             source_definitions: get_builtin_datasource_providers(),
-            preview_features: get_built_in_preview_features(),
         }
     }
 
@@ -135,19 +136,18 @@ impl DatasourceLoader {
         }
 
         let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
-        let preview_features = match preview_features_arg.ok() {
-            Some(x) => {
-                let args = x.as_array().to_str_vec()?;
-                if let Some(unknown_preview_feature) = args.iter().find(|pf| !self.preview_features.contains(&pf.as_str())) {
-                    return Err(DatamodelError::new_datasource_preview_feature_not_known_error(
-                        unknown_preview_feature,
-                        x.span()
-                    ))
-                }
-                args
-            },
-            None => Vec::new(),
+        let (preview_features, span) = match preview_features_arg.ok() {
+            Some(x) => (x.as_array().to_str_vec()?, x.span()),
+            None => (Vec::new(), Span::empty()),
         };
+
+        if preview_features.len() > 0 {
+            if let Err(err) =
+                validate_preview_features(preview_features.clone(), span, DATASOURCE_PREVIEW_FEATURES.to_vec())
+            {
+                return Err(err);
+            }
+        }
 
         let documentation = ast_source.documentation.clone().map(|comment| comment.text);
         let url = StringFromEnvVar {
@@ -213,11 +213,5 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(PostgresDatasourceProvider::new()),
         Box::new(SqliteDatasourceProvider::new()),
         Box::new(MsSqlDatasourceProvider::new()),
-    ]
-}
-
-fn get_built_in_preview_features() -> Vec<&'static str> {
-    vec![
-        "nativeTypes"
     ]
 }
