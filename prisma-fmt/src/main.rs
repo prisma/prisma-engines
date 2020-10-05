@@ -33,7 +33,7 @@ pub struct FormatOpts {
 #[derive(Debug, StructOpt, Clone)]
 pub struct PreviewFeaturesOpts {
     /// If set, only returns datasource instead of generator preview features
-    #[structopt(long), default_value = false]
+    #[structopt(long, default_value = false)]
     datasource_only: bool
 }
 
