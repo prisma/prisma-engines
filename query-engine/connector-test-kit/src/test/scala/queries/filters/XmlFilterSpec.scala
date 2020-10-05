@@ -6,8 +6,8 @@ import util._
 class XmlFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     s"""model Model {
-       |   id    Int  @id
-       |   bytes Xml?
+       |   id  Int  @id
+       |   xml Xml?
        |}"""
   }
 
@@ -22,15 +22,15 @@ class XmlFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     create(3, None)
 
     server
-      .query("""query { findManyModel(where: { bytes: { equals: "<horse>neigh</horse>" }}) { id }}""", project, legacy = false)
+      .query("""query { findManyModel(where: { xml: { equals: "<horse>neigh</horse>" }}) { id }}""", project, legacy = false)
       .toString should be("""{"data":{"findManyModel":[{"id":1}]}}""")
 
     server
-      .query("""query { findManyModel(where: { bytes: { not: "<horse>neigh</horse>" }}) { id }}""", project, legacy = false)
+      .query("""query { findManyModel(where: { xml: { not: "<horse>neigh</horse>" }}) { id }}""", project, legacy = false)
       .toString should be("""{"data":{"findManyModel":[{"id":2}]}}""")
 
     server
-      .query("""query { findManyModel(where: { bytes: { not: null }}) { id }}""", project, legacy = false)
+      .query("""query { findManyModel(where: { xml: { not: null }}) { id }}""", project, legacy = false)
       .toString should be("""{"data":{"findManyModel":[{"id":1},{"id":2}]}}""")
   }
 
@@ -40,11 +40,11 @@ class XmlFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     create(3, None)
 
     server
-      .query("""query { findManyModel(where: { bytes: "<horse>neigh</horse>" }) { id }}""", project, legacy = false)
+      .query("""query { findManyModel(where: { xml: "<horse>neigh</horse>" }) { id }}""", project, legacy = false)
       .toString should be("""{"data":{"findManyModel":[{"id":1}]}}""")
 
     server
-      .query("""query { findManyModel(where: { bytes: null }) { id }}""", project, legacy = false)
+      .query("""query { findManyModel(where: { xml: null }) { id }}""", project, legacy = false)
       .toString should be("""{"data":{"findManyModel":[{"id":3}]}}""")
   }
 
@@ -54,6 +54,6 @@ class XmlFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       case None    => "null"
     }
 
-    server.query(s"""mutation { createOneModel(data: { id: $id, bytes: $x }) { id }}""", project, legacy = false)
+    server.query(s"""mutation { createOneModel(data: { id: $id, xml: $x }) { id }}""", project, legacy = false)
   }
 }
