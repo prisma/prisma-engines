@@ -257,7 +257,7 @@ impl SqlRenderer for PostgresFlavour {
                 format!("E'{}'", escape_string_literal(&val)).into()
             }
             (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
-                format!("'{}'", common::format_hex(b)).into()
+                format!("'{}'", format_hex(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),

@@ -1,4 +1,4 @@
-use super::{self, SqlRenderer, *};
+use super::{common::*, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
     flavour::SqliteFlavour,
@@ -104,7 +104,7 @@ impl SqlRenderer for SqliteFlavour {
                 format!("'{}'", escape_quotes(&val)).into()
             }
             (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
-                format!("'{}'", common::format_hex(b)).into()
+                format!("'{}'", format_hex(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
@@ -296,7 +296,7 @@ fn render_column_type(t: &ColumnType) -> &'static str {
 fn escape_quotes(s: &str) -> Cow<'_, str> {
     static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
 
-    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'")
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }
 
 /// Copy the existing data into the new table.
