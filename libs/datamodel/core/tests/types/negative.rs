@@ -159,29 +159,6 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 }
 
 #[test]
-fn should_fail_on_serial_native_type_and_default_autoincrement() {
-    let dml = r#"
-        datasource pg {
-          provider = "postgres"
-          url = "postgresql://"
-          previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id      Int @id
-            serial  Int @default(autoincrement()) @pg.Serial
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_directive_validation_error(
-        "The native type serial translates to an Integer column with an auto-incrementing counter as default. The field attribute @default(autoincrement()) translates to the serial type underneath. Please remove one of the two attributes.",
-        "default", ast::Span::new(218, 242),
-    ));
-}
-
-#[test]
 fn should_fail_on_native_type_with_unknown_type() {
     let dml = r#"
         datasource pg {
