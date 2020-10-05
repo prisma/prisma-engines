@@ -22,7 +22,7 @@ impl<'a> ValidationPipeline<'a> {
     /// Validates an AST semantically and promotes it to a datamodel/schema.
     ///
     /// This method will attempt to
-    /// * Resolve all directives
+    /// * Resolve all attributes
     /// * Recursively evaluate all functions
     /// * Perform string interpolation
     /// * Resolve and check default values

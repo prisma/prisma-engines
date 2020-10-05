@@ -54,8 +54,8 @@ pub enum ErrorKind {
         expected_type: String,
     },
 
-    #[error("Attribute @{} is defined twice.", directive_name)]
-    DuplicateDirectiveError { directive_name: String },
+    #[error("Attribute @{} is defined twice.", attribute_name)]
+    DuplicateAttributeError { attribute_name: String },
 
     #[error("Native type {} is not supported for {} connector.", native_type, connector_name)]
     NativeTypeNameUnknown {

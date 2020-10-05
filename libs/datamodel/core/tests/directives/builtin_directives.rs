@@ -25,7 +25,7 @@ fn unique_directive() {
 }
 
 #[test]
-fn duplicate_directives_should_error() {
+fn duplicate_attributes_should_error() {
     let dml = r#"
         model Test {
             id String @id
@@ -37,10 +37,10 @@ fn duplicate_directives_should_error() {
 
     error.assert_is_at(
         0,
-        DatamodelError::new_duplicate_directive_error("unique", ast::Span::new(75, 81)),
+        DatamodelError::new_duplicate_attribute_error("unique", ast::Span::new(75, 81)),
     );
     error.assert_is_at(
         1,
-        DatamodelError::new_duplicate_directive_error("unique", ast::Span::new(83, 89)),
+        DatamodelError::new_duplicate_attribute_error("unique", ast::Span::new(83, 89)),
     );
 }

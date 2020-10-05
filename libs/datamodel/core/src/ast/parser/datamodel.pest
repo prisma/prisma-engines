@@ -61,7 +61,7 @@ enum_declaration = { comment_block? ~ ENUM_KEYWORD ~ non_empty_identifier ~ BLOC
 enum_value_declaration = { doc_comment_and_new_line* ~ (non_empty_identifier ~ ( "@" ~ directive )+ | non_empty_identifier) ~ doc_comment? ~ comment? ~ NEWLINE }
 
 // ######################################
-// Directives
+// Attributes
 // ######################################
 block_level_directive = { "@@" ~ directive ~ doc_comment? ~ comment? ~ NEWLINE }
 // A directive may have no arguments at all.

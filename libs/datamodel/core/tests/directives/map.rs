@@ -47,7 +47,7 @@ fn map_must_error_for_relation_fields() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_directive_validation_error(
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The directive `@map` can not be used on relation fields.",
         "map",
         Span::new(128, 146),

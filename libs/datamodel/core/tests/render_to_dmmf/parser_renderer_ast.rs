@@ -132,7 +132,7 @@ model Blog {
 }
 
 #[test]
-fn test_parser_renderer_order_of_field_directives_via_ast() {
+fn test_parser_renderer_order_of_field_attributes_via_ast() {
     let input = r#"model Post {
   id        Int      @default(autoincrement()) @id
   published Boolean  @map("_published") @default(false)
@@ -170,7 +170,7 @@ model Test {
 }
 
 #[test]
-fn test_parser_renderer_order_of_block_directives_via_ast() {
+fn test_parser_renderer_order_of_block_attributes_via_ast() {
     let input = r#"model Person {
   firstName   String
   lastName    String

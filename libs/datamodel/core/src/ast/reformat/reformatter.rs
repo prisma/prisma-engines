@@ -4,24 +4,24 @@ use pest::Parser;
 // We have to use RefCell as rust cannot
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
-use crate::ast::helper::get_sort_index_of_directive;
+use crate::ast::helper::get_sort_index_of_attribute;
 use crate::common::WritableString;
 use pest::iterators::Pair;
 
 pub struct Reformatter<'a> {
     input: &'a str,
     missing_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
-    missing_field_directives: Result<Vec<MissingFieldDirective>, crate::error::ErrorCollection>,
+    missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::error::ErrorCollection>,
 }
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
-        let missing_field_directives = Self::find_all_missing_directives(&input);
+        let missing_field_attributes = Self::find_all_missing_attributes(&input);
         Reformatter {
             input,
             missing_fields,
-            missing_field_directives,
+            missing_field_attributes,
         }
     }
 
@@ -50,28 +50,28 @@ impl<'a> Reformatter<'a> {
         Ok(result)
     }
 
-    fn find_all_missing_directives(
+    fn find_all_missing_attributes(
         schema_string: &str,
-    ) -> Result<Vec<MissingFieldDirective>, crate::error::ErrorCollection> {
+    ) -> Result<Vec<MissingFieldAttribute>, crate::error::ErrorCollection> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
-        let mut missing_field_directives = Vec::new();
+        let mut missing_field_attributes = Vec::new();
         for model in datamodel.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
                 let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
                 let new_ast_field = lowerer.lower_field(&field, &datamodel)?;
                 if original_ast_field.is_some() {
-                    for directive in new_ast_field.directives {
+                    for directive in new_ast_field.attributes {
                         if let Some(original_field) = original_ast_field {
                             if original_field
-                                .directives
+                                .attributes
                                 .iter()
                                 .find(|d| d.name.name == directive.name.name)
                                 .is_none()
                             {
-                                missing_field_directives.push(MissingFieldDirective {
+                                missing_field_attributes.push(MissingFieldAttribute {
                                     model: model.name.clone(),
                                     field: field.name().to_string(),
                                     directive,
@@ -82,7 +82,7 @@ impl<'a> Reformatter<'a> {
                 }
             }
         }
-        Ok(missing_field_directives)
+        Ok(missing_field_attributes)
     }
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
@@ -231,9 +231,9 @@ impl<'a> Reformatter<'a> {
             Box::new(|table, renderer, token, model_name| {
                 match token.as_rule() {
                     Rule::block_level_directive => {
-                        // model level Directives reset the table. -> .render() does that
+                        // model level attributes reset the table. -> .render() does that
                         table.render(renderer);
-                        Self::reformat_directive(renderer, &token, "@@");
+                        Self::reformat_attribute(renderer, &token, "@@");
                     }
                     Rule::field_declaration => self.reformat_field(table, &token, model_name),
                     _ => Self::reformat_generic_token(table, &token),
@@ -277,8 +277,8 @@ impl<'a> Reformatter<'a> {
         let mut block_name = "";
         let mut block_has_opened = false;
 
-        // sort directives
-        let directives = Self::extract_and_sort_directives(token, false);
+        // sort attributes
+        let attributes = Self::extract_and_sort_attributes(token, false);
 
         // used to add a new line between fields and block attributes if there isn't one already
         let mut last_line_was_empty = false;
@@ -292,13 +292,13 @@ impl<'a> Reformatter<'a> {
                 Rule::BLOCK_CLOSE => {
                     // New line between fields and attributes
                     // only if there isn't already a new line in between
-                    if directives.len() != 0 && !last_line_was_empty {
+                    if attributes.len() != 0 && !last_line_was_empty {
                         table.render(renderer);
                         table = TableFormat::new();
                         renderer.end_line();
                     }
 
-                    for d in &directives {
+                    for d in &attributes {
                         the_fn(&mut table, renderer, &d, block_name);
                         // New line after each block attribute
                         table.render(renderer);
@@ -369,7 +369,7 @@ impl<'a> Reformatter<'a> {
                 match token.as_rule() {
                     Rule::block_level_directive => {
                         table.render(target);
-                        Self::reformat_directive(target, token, "@@");
+                        Self::reformat_attribute(target, token, "@@");
                         table.end_line();
                     }
                     Rule::enum_value_declaration => Self::reformat_enum_entry(table, token),
@@ -383,57 +383,57 @@ impl<'a> Reformatter<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::non_empty_identifier => target.write(current.as_str()),
-                Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
+                Rule::directive => Self::reformat_attribute(&mut target.column_locked_writer_for(2), &current, "@"),
                 Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
                 _ => Self::reformat_generic_token(target, &current),
             }
         }
     }
 
-    fn extract_and_sort_directives<'i>(token: &'i Token, is_field_directive: bool) -> Vec<Pair<'i, Rule>> {
-        // get indices of directives and store in separate Vector
-        let mut directives = Vec::new();
+    fn extract_and_sort_attributes<'i>(token: &'i Token, is_field_attribute: bool) -> Vec<Pair<'i, Rule>> {
+        // get indices of attributes and store in separate Vector
+        let mut attributes = Vec::new();
         for pair in token.clone().into_inner() {
-            if is_field_directive {
+            if is_field_attribute {
                 match pair.as_rule() {
-                    Rule::directive => directives.push(pair),
+                    Rule::directive => attributes.push(pair),
                     _ => {}
                 }
             } else {
                 match pair.as_rule() {
-                    Rule::block_level_directive => directives.push(pair),
+                    Rule::block_level_directive => attributes.push(pair),
                     _ => {}
                 }
             }
         }
 
-        // sort directives
-        directives.sort_by(|a, b| {
-            let sort_index_a = get_sort_index_of_directive(is_field_directive, a.as_str());
-            let sort_index_b = get_sort_index_of_directive(is_field_directive, b.as_str());
+        // sort attributes
+        attributes.sort_by(|a, b| {
+            let sort_index_a = get_sort_index_of_attribute(is_field_attribute, a.as_str());
+            let sort_index_b = get_sort_index_of_attribute(is_field_attribute, b.as_str());
             sort_index_a.cmp(&sort_index_b)
         });
-        return directives;
+        return attributes;
     }
 
     fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
         let field_name = &Self::get_identifier(token);
 
-        // extract and sort directives
-        let directives = Self::extract_and_sort_directives(token, true);
+        // extract and sort attributes
+        let attributes = Self::extract_and_sort_attributes(token, true);
 
-        // iterate through tokens and reorder directives
+        // iterate through tokens and reorder attributes
         let mut count = 0;
-        let inner_pairs_with_sorted_directives = token.clone().into_inner().map(|p| match p.as_rule() {
+        let inner_pairs_with_sorted_attributes = token.clone().into_inner().map(|p| match p.as_rule() {
             Rule::directive => {
                 count = count + 1;
-                directives[count - 1].clone()
+                attributes[count - 1].clone()
             }
             _ => p,
         });
 
         // write to target
-        for current in inner_pairs_with_sorted_directives {
+        for current in inner_pairs_with_sorted_attributes {
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     target.write(current.as_str());
@@ -441,7 +441,7 @@ impl<'a> Reformatter<'a> {
                 Rule::field_type => {
                     target.write(&Self::reformat_field_type(&current));
                 }
-                Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
+                Rule::directive => Self::reformat_attribute(&mut target.column_locked_writer_for(2), &current, "@"),
                 // This is a comment at the end of a field.
                 Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
                 // This is a comment before the field declaration. Hence it must be interlevaed.
@@ -450,11 +450,11 @@ impl<'a> Reformatter<'a> {
                 _ => Self::reformat_generic_token(target, &current),
             }
         }
-        if let Ok(missing_field_directives) = self.missing_field_directives.as_ref() {
-            for missing_field_directive in missing_field_directives.iter() {
+        if let Ok(missing_field_attributes) = self.missing_field_attributes.as_ref() {
+            for missing_field_directive in missing_field_attributes.iter() {
                 if &missing_field_directive.field == field_name && missing_field_directive.model.as_str() == model_name
                 {
-                    Renderer::render_field_directive(
+                    Renderer::render_field_attribute(
                         &mut target.column_locked_writer_for(2),
                         &missing_field_directive.directive,
                     )
@@ -481,7 +481,7 @@ impl<'a> Reformatter<'a> {
                     target.write(&Self::get_identifier(&current));
                 }
                 Rule::directive => {
-                    Self::reformat_directive(&mut target.column_locked_writer_for(4), &current, "@");
+                    Self::reformat_attribute(&mut target.column_locked_writer_for(4), &current, "@");
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     comment(&mut target.interleave_writer(), current.as_str())
@@ -520,7 +520,7 @@ impl<'a> Reformatter<'a> {
         panic!("No identifier found.")
     }
 
-    fn reformat_directive(target: &mut dyn LineWriteable, token: &Token, owl: &str) {
+    fn reformat_attribute(target: &mut dyn LineWriteable, token: &Token, owl: &str) {
         let token = Self::unpack_token_to_find_matching_rule(token.clone(), Rule::directive);
         for current in token.clone().into_inner() {
             match current.as_rule() {
@@ -714,8 +714,8 @@ pub struct MissingField {
 }
 
 #[derive(Debug)]
-pub struct MissingFieldDirective {
+pub struct MissingFieldAttribute {
     pub model: String,
     pub field: String,
-    pub directive: crate::ast::Directive,
+    pub directive: crate::ast::Attribute,
 }

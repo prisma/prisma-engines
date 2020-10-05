@@ -8,35 +8,35 @@ mod unique_and_index;
 mod updated_at;
 
 use crate::dml;
-use directive_list_validator::DirectiveListValidator;
-use directive_validator::DirectiveValidator;
+use directive_list_validator::AttributeListValidator;
+use directive_validator::AttributeValidator;
 
-/// This is the facade for all directive validations. It is used within the `ValidationPipeline`.
-pub struct AllDirectives {
-    pub field: DirectiveListValidator<dml::Field>,
-    pub model: DirectiveListValidator<dml::Model>,
-    pub enm: DirectiveListValidator<dml::Enum>,
-    pub enm_value: DirectiveListValidator<dml::EnumValue>,
+/// This is the facade for all attribute validations. It is used within the `ValidationPipeline`.
+pub struct AllAttributes {
+    pub field: AttributeListValidator<dml::Field>,
+    pub model: AttributeListValidator<dml::Model>,
+    pub enm: AttributeListValidator<dml::Enum>,
+    pub enm_value: AttributeListValidator<dml::EnumValue>,
 }
 
-impl AllDirectives {
-    pub fn new() -> AllDirectives {
-        AllDirectives {
-            field: new_builtin_field_directives(),
-            model: new_builtin_model_directives(),
-            enm: new_builtin_enum_directives(),
-            enm_value: new_builtin_enum_value_directives(),
+impl AllAttributes {
+    pub fn new() -> AllAttributes {
+        AllAttributes {
+            field: new_builtin_field_attributes(),
+            model: new_builtin_model_attributes(),
+            enm: new_builtin_enum_attributes(),
+            enm_value: new_builtin_enum_value_attributes(),
         }
     }
 }
 
-fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
-    let mut validator = DirectiveListValidator::<dml::Field>::new();
+fn new_builtin_field_attributes() -> AttributeListValidator<dml::Field> {
+    let mut validator = AttributeListValidator::<dml::Field>::new();
 
     // this order of field attributes is used in the formatter as well
-    validator.add(Box::new(id::IdDirectiveValidator {}));
-    validator.add(Box::new(unique_and_index::FieldLevelUniqueDirectiveValidator {}));
-    validator.add(Box::new(default::DefaultDirectiveValidator {}));
+    validator.add(Box::new(id::IdAttributeValidator {}));
+    validator.add(Box::new(unique_and_index::FieldLevelUniqueAttributeValidator {}));
+    validator.add(Box::new(default::DefaultAttributeValidator {}));
     validator.add(Box::new(updated_at::UpdatedAtDirectiveValidator {}));
     validator.add(Box::new(map::MapDirectiveValidatorForField {}));
     validator.add(Box::new(relation::RelationDirectiveValidator {}));
@@ -44,11 +44,11 @@ fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
     validator
 }
 
-fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
-    let mut validator = DirectiveListValidator::<dml::Model>::new();
+fn new_builtin_model_attributes() -> AttributeListValidator<dml::Model> {
+    let mut validator = AttributeListValidator::<dml::Model>::new();
 
     // this order of block attributes is used in the formatter as well
-    validator.add(Box::new(id::ModelLevelIdDirectiveValidator {}));
+    validator.add(Box::new(id::ModelLevelIdAttributeValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelIndexDirectiveValidator {}));
     validator.add(Box::new(map::MapDirectiveValidator {}));
@@ -56,16 +56,16 @@ fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
     validator
 }
 
-fn new_builtin_enum_directives() -> DirectiveListValidator<dml::Enum> {
-    let mut validator = DirectiveListValidator::<dml::Enum>::new();
+fn new_builtin_enum_attributes() -> AttributeListValidator<dml::Enum> {
+    let mut validator = AttributeListValidator::<dml::Enum>::new();
 
     validator.add(Box::new(map::MapDirectiveValidator {}));
 
     validator
 }
 
-fn new_builtin_enum_value_directives() -> DirectiveListValidator<dml::EnumValue> {
-    let mut validator = DirectiveListValidator::<dml::EnumValue>::new();
+fn new_builtin_enum_value_attributes() -> AttributeListValidator<dml::EnumValue> {
+    let mut validator = AttributeListValidator::<dml::EnumValue>::new();
 
     validator.add(Box::new(map::MapDirectiveValidator {}));
 

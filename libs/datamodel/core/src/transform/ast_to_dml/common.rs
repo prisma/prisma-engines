@@ -4,8 +4,8 @@ use crate::{ast, dml, error::DatamodelError};
 pub (crate) const STATE_ERROR: &str = "Failed lookup of model or field during internal processing. This means that the internal representation was mutated incorrectly.";
 pub (crate) const ERROR_GEN_STATE_ERROR: &str = "Failed lookup of model or field during generating an error message. This often means that a generated field or model was the cause of an error.";
 
-impl ast::WithDirectives for Vec<ast::Directive> {
-    fn directives(&self) -> &Vec<ast::Directive> {
+impl ast::WithAttributes for Vec<ast::Attribute> {
+    fn attributes(&self) -> &Vec<ast::Attribute> {
         self
     }
 }

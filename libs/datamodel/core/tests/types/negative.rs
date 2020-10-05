@@ -14,12 +14,12 @@ fn shound_fail_on_directive_duplication() {
     let error = parse_error(dml);
 
     error.assert_is_at(
-        0,
-        DatamodelError::new_duplicate_directive_error("id", ast::Span::new(23, 25)),
+      0,
+      DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(23, 25)),
     );
     error.assert_is_at(
-        1,
-        DatamodelError::new_duplicate_directive_error("id", ast::Span::new(77, 79)),
+      1,
+      DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(77, 79)),
     );
 }
 
@@ -37,12 +37,12 @@ fn shound_fail_on_directive_duplication_recursive() {
     let error = parse_error(dml);
 
     error.assert_is_at(
-        0,
-        DatamodelError::new_duplicate_directive_error("default", ast::Span::new(40, 47)),
+      0,
+      DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(40, 47)),
     );
     error.assert_is_at(
-        1,
-        DatamodelError::new_duplicate_directive_error("default", ast::Span::new(128, 135)),
+      1,
+      DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(128, 135)),
     );
 }
 

@@ -1,4 +1,4 @@
-use super::{super::helpers::*, DirectiveValidator};
+use super::{super::helpers::*, AttributeValidator};
 use crate::ast;
 use crate::dml;
 use crate::error::{DatamodelError, ErrorCollection};
@@ -7,40 +7,40 @@ use crate::error::{DatamodelError, ErrorCollection};
 // That's important since rendering depends on that order.
 use std::collections::{BTreeMap, HashMap};
 
-/// Struct which holds a list of directive validators and automatically
-/// picks the right one for each directive in the given object.
-pub struct DirectiveListValidator<T> {
-    known_directives: BTreeMap<String, Box<dyn DirectiveValidator<T>>>,
+/// Struct which holds a list of attribute validators and automatically
+/// picks the right one for each attribute in the given object.
+pub struct AttributeListValidator<T> {
+    known_attributes: BTreeMap<String, Box<dyn AttributeValidator<T>>>,
 }
 
-impl<T: 'static> DirectiveListValidator<T> {
+impl<T: 'static> AttributeListValidator<T> {
     pub fn new() -> Self {
-        DirectiveListValidator {
-            known_directives: BTreeMap::new(),
+        AttributeListValidator {
+            known_attributes: BTreeMap::new(),
         }
     }
 
-    /// Adds a directive validator.
-    pub fn add(&mut self, validator: Box<dyn DirectiveValidator<T>>) {
-        let name = validator.directive_name();
+    /// Adds an attribute validator.
+    pub fn add(&mut self, validator: Box<dyn AttributeValidator<T>>) {
+        let name = validator.attribute_name();
 
-        if self.known_directives.contains_key(name) {
-            panic!("Duplicate directive definition: {:?}", name);
+        if self.known_attributes.contains_key(name) {
+            panic!("Duplicate attribute definition: {:?}", name);
         }
 
-        self.known_directives.insert(String::from(name), validator);
+        self.known_attributes.insert(String::from(name), validator);
     }
 
-    /// For each directive in the given object, picks the correct
-    /// directive definition and uses it to validate and apply the directive.
-    pub fn validate_and_apply(&self, ast: &dyn ast::WithDirectives, t: &mut T) -> Result<(), ErrorCollection> {
+    /// For each attribute in the given object, picks the correct
+    /// attribute definition and uses it to validate and apply the attribute.
+    pub fn validate_and_apply(&self, ast: &dyn ast::WithAttributes, t: &mut T) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
 
-        let mut directive_counts = HashMap::new();
-        for directive in ast.directives() {
-            match directive_counts.get_mut(&directive.name.name) {
+        let mut attribute_counts = HashMap::new();
+        for attribute in ast.attributes() {
+            match attribute_counts.get_mut(&attribute.name.name) {
                 None => {
-                    directive_counts.insert(&directive.name.name, 1);
+                    attribute_counts.insert(&attribute.name.name, 1);
                     ()
                 }
                 Some(count) => *count += 1,
@@ -49,16 +49,16 @@ impl<T: 'static> DirectiveListValidator<T> {
 
         errors.ok()?;
 
-        for directive in ast.directives() {
-            match self.known_directives.get(&directive.name.name) {
+        for attribute in ast.attributes() {
+            match self.known_attributes.get(&attribute.name.name) {
                 Some(validator) => {
-                    let mut arguments = Arguments::new(&directive.arguments, directive.span);
+                    let mut arguments = Arguments::new(&attribute.arguments, attribute.span);
 
-                    let directive_count = directive_counts.get(&directive.name.name).unwrap();
+                    let directive_count = attribute_counts.get(&attribute.name.name).unwrap();
                     if *directive_count > 1 && !validator.is_duplicate_definition_allowed() {
-                        errors.push(DatamodelError::new_duplicate_directive_error(
-                            &directive.name.name,
-                            directive.name.span,
+                        errors.push(DatamodelError::new_duplicate_attribute_error(
+                            &attribute.name.name,
+                            attribute.name.span,
                         ));
                     }
 
@@ -66,7 +66,7 @@ impl<T: 'static> DirectiveListValidator<T> {
                         errors.append(&mut errs);
                     }
 
-                    if let Err(mut errs) = arguments.check_for_multiple_unnamed_arguments(&directive.name.name) {
+                    if let Err(mut errs) = arguments.check_for_multiple_unnamed_arguments(&attribute.name.name) {
                         errors.append(&mut errs);
                     }
 
@@ -74,9 +74,9 @@ impl<T: 'static> DirectiveListValidator<T> {
 
                     match directive_validation_result {
                         Err(DatamodelError::ArgumentNotFound { argument_name, span }) => {
-                            errors.push(DatamodelError::new_directive_argument_not_found_error(
+                            errors.push(DatamodelError::new_attribute_argument_not_found_error(
                                 &argument_name,
-                                &directive.name.name,
+                                &attribute.name.name,
                                 span,
                             ))
                         }
@@ -92,10 +92,10 @@ impl<T: 'static> DirectiveListValidator<T> {
                     }
                 }
                 None => {
-                    if !directive.name.name.is_empty() && !directive.name.name.contains(".") {
+                    if !attribute.name.name.is_empty() && !attribute.name.name.contains(".") {
                         errors.push(DatamodelError::new_directive_not_known_error(
-                            &directive.name.name,
-                            directive.name.span,
+                            &attribute.name.name,
+                            attribute.name.span,
                         ))
                     }
                 }
@@ -107,13 +107,13 @@ impl<T: 'static> DirectiveListValidator<T> {
         Ok(())
     }
 
-    pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, ErrorCollection> {
+    pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, ErrorCollection> {
         let mut errors = ErrorCollection::new();
-        let mut result: Vec<ast::Directive> = Vec::new();
+        let mut result: Vec<ast::Attribute> = Vec::new();
 
-        for directive in self.known_directives.values() {
-            match directive.serialize(t, datamodel) {
-                Ok(mut directives) => result.append(&mut directives),
+        for attribute in self.known_attributes.values() {
+            match attribute.serialize(t, datamodel) {
+                Ok(mut attributes) => result.append(&mut attributes),
                 Err(err) => errors.push(err),
             };
         }

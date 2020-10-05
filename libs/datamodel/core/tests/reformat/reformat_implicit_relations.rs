@@ -69,7 +69,7 @@ model Post {
 }
 
 #[test]
-fn back_relation_fields_missing_directives_should_not_add_directives_multiple_times() {
+fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_times() {
     let input = r#"model User {
   id Int @id
   post Post

@@ -1,4 +1,4 @@
-use super::{Comment, Directive, Identifier, Span};
+use super::{Comment, Attribute, Identifier, Span};
 use crate::ast::{Argument, SourceConfig};
 use crate::error::ErrorCollection;
 
@@ -14,13 +14,13 @@ pub trait WithIdentifier {
     fn identifier(&self) -> &Identifier;
 }
 
-pub trait WithDirectives {
-    fn directives(&self) -> &Vec<Directive>;
+pub trait WithAttributes {
+    fn attributes(&self) -> &Vec<Attribute>;
 
-    fn validate_directives(&self) -> ErrorCollection {
+    fn validate_attributes(&self) -> ErrorCollection {
         let mut errors = ErrorCollection::new();
-        for directive in self.directives() {
-            errors.push_opt(directive.name.validate("Directive").err());
+        for attribute in self.attributes() {
+            errors.push_opt(attribute.name.validate("Attribute").err());
         }
         errors
     }
@@ -43,7 +43,7 @@ where
 
 pub enum ArgumentContainer<'a> {
     SourceConfig(&'a mut SourceConfig),
-    Directive(&'a mut Directive),
+    Directive(&'a mut Attribute),
 }
 impl ArgumentContainer<'_> {
     pub fn name(&self) -> &str {
