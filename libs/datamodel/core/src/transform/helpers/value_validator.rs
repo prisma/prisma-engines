@@ -59,6 +59,7 @@ impl ValueValidator {
             ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
             ScalarType::String => self.as_str().map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(PrismaValue::String),
+            ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
             _ => todo!(),
         }
     }
@@ -171,6 +172,8 @@ impl ValueValidator {
     }
 
     pub fn as_default_value_for_scalar_type(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {
+        println!("value {:?}", self.value);
+        println!("type: {:?}", scalar_type);
         match &self.value {
             ast::Expression::Function(name, _, _) => {
                 let generator = self.get_value_generator(&name)?;
@@ -181,6 +184,7 @@ impl ValueValidator {
             }
             _ => {
                 let x = ValueValidator::new(&self.value).as_type(scalar_type)?;
+                println!("x: {:?}", x);
                 Ok(DefaultValue::Single(x))
             }
         }
