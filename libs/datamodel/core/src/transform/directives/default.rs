@@ -1,6 +1,6 @@
 use super::{super::helpers::*, DirectiveValidator};
 use crate::error::DatamodelError;
-use crate::{ast, dml, DefaultValue, ValueGenerator};
+use crate::{ast, dml, ValueGenerator};
 use prisma_value::PrismaValue;
 
 /// Prismas builtin `@default` directive.
@@ -27,29 +27,13 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
                     .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
 
                 sf.default_value = Some(dv);
-            } else if let dml::FieldType::NativeType(scalar_type, native_type) = sf.field_type.clone() {
+            } else if let dml::FieldType::NativeType(scalar_type, _) = sf.field_type {
                 let dv = args
                     .default_arg("value")?
                     .as_default_value_for_scalar_type(scalar_type)
                     .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
 
                 sf.default_value = Some(dv);
-
-                if native_type.name == "Serial" {
-                    // assuming this must be a Postgres native type
-                    if let Some(arg) = sf.default_value.clone() {
-                        match arg {
-                            DefaultValue::Expression(o) => {
-                                if o.name == "autoincrement" {
-                                    return Err(self.wrap_in_directive_validation_error(&DatamodelError::new_connector_error(
-                                        "The native type serial translates to an Integer column with an auto-incrementing counter as default. The field attribute @default(autoincrement()) translates to the serial type underneath. Please remove one of the two attributes.",
-                                    args.span())));
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                }
             } else if let dml::FieldType::Enum(_) = sf.field_type {
                 let default_arg = args.default_arg("value")?;
 
