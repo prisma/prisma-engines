@@ -104,7 +104,7 @@ impl SqlRenderer for SqliteFlavour {
                 format!("'{}'", escape_quotes(&val)).into()
             }
             (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
-                format!("'{}'", hex::encode(b)).into()
+                format!("'{}'", common::format_hex(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),

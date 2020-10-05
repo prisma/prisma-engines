@@ -134,7 +134,7 @@ impl SqlRenderer for MssqlFlavour {
                 format!("'{}'", escape_string_literal(&val)).into()
             }
             (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
-                format!("0x{}", hex::encode(b)).into()
+                format!("0x{}", common::format_hex(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
