@@ -67,7 +67,6 @@ impl GeneratorLoader {
             Some(x) => (x.as_array().to_str_vec()?, x.span()),
             None => (Vec::new(), Span::empty()),
         };
-        println!("generator prev {:?}", preview_features);
 
         if preview_features.len() > 0 {
             if let Err(err) =
