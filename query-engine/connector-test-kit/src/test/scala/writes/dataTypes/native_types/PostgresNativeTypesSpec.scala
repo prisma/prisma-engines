@@ -15,12 +15,12 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  int      Int    @test.Integer
         |  sInt     Int    @test.SmallInt
         |  bInt     Int    @test.BigInt
-        |  serial   Int    @test.Serial
-        |  sSerial  Int    @test.SmallSerial
-        |  bSerial  Int    @test.BigSerial
-        |  inc_int  Int    @test.Integer
-        |  inc_sInt Int    @test.SmallInt
-        |  inc_bInt Int    @test.BigInt
+        |  serial   Int    @test.Serial      @default(autoincrement())
+        |  sSerial  Int    @test.SmallSerial @default(autoincrement())
+        |  bSerial  Int    @test.BigSerial   @default(autoincrement())
+        |  inc_int  Int    @test.Integer     @default(autoincrement())
+        |  inc_sInt Int    @test.SmallInt    @default(autoincrement())
+        |  inc_bInt Int    @test.BigInt      @default(autoincrement())
         |}"""
     }
 
