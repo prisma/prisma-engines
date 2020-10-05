@@ -27,7 +27,7 @@ pub enum PostgresType {
     Bit(u32),
     VarBit(u32),
     UUID,
-    XML,
+    Xml,
     JSON,
     JSONB,
 }

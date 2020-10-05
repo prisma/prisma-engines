@@ -19,6 +19,7 @@ uuid = "0.8"
 [dependencies.quaint]
 features = ["full", "tracing-log"]
 git = "https://github.com/prisma/quaint"
+branch = "xml_support"
 
 [dependencies.connector-interface]
 package = "query-connector"

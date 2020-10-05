@@ -83,6 +83,8 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::Float => "decimal(32,16)",
             ColumnTypeFamily::Int => "int",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
+            ColumnTypeFamily::Binary => "varbinary(max)",
+            ColumnTypeFamily::Xml => "xml",
             x => unimplemented!("{:?} not handled yet", x),
         };
 
@@ -127,8 +129,12 @@ impl SqlRenderer for MssqlFlavour {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_))
+            | (DefaultValue::VALUE(PrismaValue::Xml(val)), ColumnTypeFamily::Xml) => {
                 format!("'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("0x{}", hex::encode(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),

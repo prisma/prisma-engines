@@ -21,8 +21,9 @@ case class Project(
 
     s"""
            |datasource test {
-           |  provider = "${config.provider}"
+           |  provider = "${config.provider.stripSuffix("56")}"
            |  url = "${dataSourceUrl}"
+           |  previewFeatures = ["nativeTypes"]
            |}
     """.stripMargin
   }
@@ -47,8 +48,9 @@ case class Project(
     val config =
       s"""
          |datasource test {
-         |  provider = "${ConnectorConfig.instance.provider}"
+         |  provider = "${ConnectorConfig.instance.provider.stripSuffix("56")}"
          |  url = "${url}"
+         |  previewFeatures = ["nativeTypes"]
          |}
          |
          |$dataModel

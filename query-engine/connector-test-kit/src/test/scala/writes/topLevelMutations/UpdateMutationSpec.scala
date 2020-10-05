@@ -61,7 +61,7 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     updateResult.pathAsJsValue("data.updateOneTestModel") should be(
       Json.parse(
-        s"""{"optString":"test${TroubleCharacters.value}","optInt":1337,"optFloat":1.234,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01.000Z"}"""))
+        s"""{"optString":"test${TroubleCharacters.value}","optInt":1337,"optFloat":1.234,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01+00:00"}"""))
 
     val readResult = server.query(
       s"""
@@ -134,7 +134,7 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     updateResult.pathAsJsValue("data.updateOneTestModel") should be(
       Json.parse(
-        s"""{"optString":"test${TroubleCharacters.value}","optInt":1337,"optFloat":1.234,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01.000Z"}"""))
+        s"""{"optString":"test${TroubleCharacters.value}","optInt":1337,"optFloat":1.234,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01+00:00"}"""))
 
     val readResult = server.query(
       s"""
@@ -383,9 +383,8 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
         legacy = false,
       )
 
-    // We currently have a datetime precision of 3, so Prisma will add .000
-    res.pathAsString("data.updateOneTestModel.createdAt") should be("2000-01-01T00:00:00.000Z")
-    res.pathAsString("data.updateOneTestModel.updatedAt") should be("2001-01-01T00:00:00.000Z")
+    res.pathAsString("data.updateOneTestModel.createdAt") should be("2000-01-01T00:00:00+00:00")
+    res.pathAsString("data.updateOneTestModel.updatedAt") should be("2001-01-01T00:00:00+00:00")
   }
 
   "An updateOne mutation" should "correctly apply all number operations for Int" in {

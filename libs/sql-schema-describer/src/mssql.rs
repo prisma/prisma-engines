@@ -285,9 +285,10 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
+                            ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                         })
                     }
                 },

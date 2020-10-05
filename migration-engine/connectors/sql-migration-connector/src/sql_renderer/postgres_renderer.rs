@@ -252,8 +252,12 @@ impl SqlRenderer for PostgresFlavour {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_))
+            | (DefaultValue::VALUE(PrismaValue::Xml(val)), ColumnTypeFamily::Xml) => {
                 format!("E'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("'{}'", hex::encode(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
@@ -371,6 +375,8 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::String => format!("text {}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
         ColumnTypeFamily::Json => format!("jsonb {}", array),
+        ColumnTypeFamily::Binary => format!("bytea {}", array),
+        ColumnTypeFamily::Xml => format!("xml {}", array),
         x => unimplemented!("{:?} not handled yet", x),
     }
 }

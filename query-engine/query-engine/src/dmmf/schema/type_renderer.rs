@@ -54,6 +54,8 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
                 ScalarType::Json => "Json",
                 ScalarType::UUID => "UUID",
                 ScalarType::JsonList => "Json",
+                ScalarType::Xml => "Xml",
+                ScalarType::Bytes => "Bytes",
                 ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 
@@ -128,6 +130,8 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
                 ScalarType::Json => "Json",
                 ScalarType::UUID => "UUID",
                 ScalarType::JsonList => "Json",
+                ScalarType::Xml => "Xml",
+                ScalarType::Bytes => "Bytes",
                 ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 

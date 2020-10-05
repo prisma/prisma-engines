@@ -329,6 +329,7 @@ async fn get_all_columns(
                         ))),
                         ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Xml => unreachable!("No XML for MySQL."),
                     })
                 }
             },

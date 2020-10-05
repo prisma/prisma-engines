@@ -1,14 +1,14 @@
-package writes.dataTypes.json
+package writes.dataTypes.xml
 
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
-class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
-  "Using a json field" should "work" taggedAs (IgnoreMySql56, IgnoreSQLite, IgnoreMsSql) in {
+class XmlSpec extends FlatSpec with Matchers with ApiSpecBase {
+  "Using a XML field" should "work" taggedAs (IgnoreMySql, IgnoreSQLite) in {
     val project = ProjectDsl.fromString {
       """|model Model {
-         | id    String @id
-         | field Json?  @default("{}")
+         | id    Int  @id
+         | field Xml? @default("<sense>none</sense>")
          |}"""
     }
 
@@ -19,7 +19,7 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
          |mutation {
          |  createOneModel(
          |    data: {
-         |      id: "A"
+         |      id: 1
          |    }
          |  ) {
          |    field
@@ -29,15 +29,15 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"field":"{}"}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"field":"<sense>none</sense>"}}}""")
 
     res = server.query(
       s"""
          |mutation {
          |  updateOneModel(
-         |    where: { id: "A" }
+         |    where: { id: 1 }
          |    data: {
-         |      field: "{\\"a\\":\\"b\\"}"
+         |      field: "<sense>some</sense>"
          |    }
          |  ) {
          |    field
@@ -47,13 +47,13 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString should be("""{"data":{"updateOneModel":{"field":"{\"a\":\"b\"}"}}}""")
+    res.toString should be("""{"data":{"updateOneModel":{"field":"<sense>some</sense>"}}}""")
 
     res = server.query(
       s"""
          |mutation {
          |  updateOneModel(
-         |    where: { id: "A" }
+         |    where: { id: 1 }
          |    data: {
          |      field: null
          |    }

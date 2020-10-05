@@ -103,6 +103,9 @@ impl SqlRenderer for SqliteFlavour {
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
                 format!("'{}'", escape_quotes(&val)).into()
             }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("'{}'", hex::encode(b)).into()
+            }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
@@ -285,6 +288,7 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Float => "REAL",
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::String => "TEXT",
+        ColumnTypeFamily::Binary => "BLOB",
         x => unimplemented!("{:?} not handled yet", x),
     }
 }

@@ -310,6 +310,8 @@ pub enum ColumnTypeFamily {
     Binary,
     /// JSON types.
     Json,
+    /// Xml types.
+    Xml,
     /// UUID types.
     Uuid,
     /// Geometric types.
@@ -355,6 +357,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::Duration => "duration".to_string(),
             Self::Binary => "binary".to_string(),
             Self::Json => "json".to_string(),
+            Self::Xml => "xml".to_string(),
             Self::Uuid => "uuid".to_string(),
             Self::Geometric => "geometric".to_string(),
             Self::LogSequenceNumber => "logSequenceNumber".to_string(),

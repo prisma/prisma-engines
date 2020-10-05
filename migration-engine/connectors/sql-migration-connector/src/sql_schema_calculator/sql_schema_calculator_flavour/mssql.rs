@@ -41,7 +41,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
             Binary(len) => format!("binary({len})", len = len),
             VarBinary(len) => format!("varbinary({len})", len = len),
             Image => "image".to_string(),
-            XML => "xml".to_string(),
+            Xml => "xml".to_string(),
         };
 
         ColumnType {

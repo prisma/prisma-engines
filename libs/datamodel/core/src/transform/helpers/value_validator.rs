@@ -2,7 +2,7 @@ use super::env_function::EnvFunction;
 use crate::error::DatamodelError;
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use datamodel_connector::scalars::ScalarType;
 use prisma_value::PrismaValue;
 use rust_decimal::Decimal;
@@ -59,6 +59,13 @@ impl ValueValidator {
             ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
             ScalarType::String => self.as_str().map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(PrismaValue::String),
+            ScalarType::Xml => self.as_str().map(PrismaValue::Xml),
+            ScalarType::Bytes => self.as_str().and_then(|s| {
+                prisma_value::decode_bytes(&s).map(PrismaValue::Bytes).map_err(|_| {
+                    DatamodelError::new_validation_error(&format!("Invalid base64 string '{}'.", s), self.span())
+                })
+            }),
+
             _ => todo!(),
         }
     }
@@ -132,12 +139,14 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma DateTime.
-    pub fn as_date_time(&self) -> Result<DateTime<Utc>, DatamodelError> {
+    pub fn as_date_time(&self) -> Result<DateTime<FixedOffset>, DatamodelError> {
         match &self.value {
             ast::Expression::StringValue(value, _) => {
-                self.wrap_error_from_result(value.parse::<DateTime<Utc>>(), "datetime")
+                self.wrap_error_from_result(DateTime::parse_from_rfc3339(value), "datetime")
             }
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<DateTime<Utc>>(), "datetime"),
+            ast::Expression::Any(value, _) => {
+                self.wrap_error_from_result(DateTime::parse_from_rfc3339(value), "datetime")
+            }
             _ => Err(self.construct_type_mismatch_error("dateTime")),
         }
     }

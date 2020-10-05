@@ -180,10 +180,10 @@ impl TryInto<Option<bool>> for ParsedInputValue {
     }
 }
 
-impl TryInto<Option<DateTime<Utc>>> for ParsedInputValue {
+impl TryInto<Option<DateTime<FixedOffset>>> for ParsedInputValue {
     type Error = QueryParserError;
 
-    fn try_into(self) -> QueryParserResult<Option<DateTime<Utc>>> {
+    fn try_into(self) -> QueryParserResult<Option<DateTime<FixedOffset>>> {
         let prisma_value: PrismaValue = self.try_into()?;
 
         match prisma_value {

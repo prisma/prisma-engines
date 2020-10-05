@@ -354,6 +354,7 @@ pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Binary => FieldType::Unsupported(fdt), //not explicit before
+        ColumnTypeFamily::Xml => FieldType::Unsupported(fdt),    //not explicit before
         ColumnTypeFamily::Geometric => FieldType::Unsupported(fdt), // not explicit before
         ColumnTypeFamily::LogSequenceNumber => FieldType::Unsupported(fdt), // not explicit before
         ColumnTypeFamily::TextSearch => FieldType::Unsupported(fdt), // not explicit before
@@ -382,6 +383,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
         ColumnTypeFamily::LogSequenceNumber => FieldType::Unsupported(fdt),
         ColumnTypeFamily::TextSearch => FieldType::Unsupported(fdt),
         ColumnTypeFamily::TransactionId => FieldType::Unsupported(fdt),
+        ColumnTypeFamily::Xml => FieldType::Unsupported(fdt),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }

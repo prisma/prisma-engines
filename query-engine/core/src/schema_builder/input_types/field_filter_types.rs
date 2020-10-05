@@ -109,7 +109,9 @@ fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested
             .chain(alphanumeric_filters(sf))
             .collect(),
 
-        TypeIdentifier::Boolean | TypeIdentifier::Json => equality_filters(sf).collect(),
+        TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
+            equality_filters(sf).collect()
+        }
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
     };
 
@@ -213,5 +215,7 @@ fn scalar_filter_name(sf: &ScalarFieldRef, nested: bool) -> String {
         TypeIdentifier::DateTime => format!("{}DateTime{}{}Filter", nested, nullable, list),
         TypeIdentifier::Json => format!("{}Json{}{}Filter", nested, nullable, list),
         TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}Filter", nested, e, nullable, list),
+        TypeIdentifier::Xml => format!("{}Xml{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Bytes => format!("{}Bytes{}{}Filter", nested, nullable, list),
     }
 }
