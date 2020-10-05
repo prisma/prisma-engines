@@ -28,6 +28,9 @@ pub trait Rpc {
 
     #[rpc(name = "introspect")]
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput>;
+
+    #[rpc(name = "debugPanic")]
+    fn debug_panic(&self) -> RpcFutureResult<()>;
 }
 
 pub struct RpcImpl;
@@ -51,6 +54,10 @@ impl Rpc for RpcImpl {
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
         Box::new(Self::introspect_internal(input.schema, input.force).boxed().compat())
+    }
+
+    fn debug_panic(&self) -> RpcFutureResult<()> {
+        Box::new(Self::debug_panic().boxed().compat())
     }
 }
 
@@ -143,6 +150,10 @@ impl RpcImpl {
     pub async fn get_database_metadata_internal(schema: String) -> RpcResult<DatabaseMetadata> {
         let (_, _, connector) = RpcImpl::load_connector(&schema).await?;
         RpcImpl::catch(connector.get_metadata()).await
+    }
+
+    pub async fn debug_panic() -> RpcResult<()> {
+        panic!("This is the debugPanic artificial panic")
     }
 }
 
