@@ -30,6 +30,11 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     assert_eq!(first_migration.applied_steps_count, 0);
     assert_eq!(first_migration.script, script);
 
+    let duration_since_started_at = chrono::Utc::now().signed_duration_since(first_migration.started_at);
+
+    assert!(duration_since_started_at >= Duration::seconds(0));
+    assert!(duration_since_started_at < Duration::seconds(1));
+
     Ok(())
 }
 
