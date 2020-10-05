@@ -1,4 +1,4 @@
-use super::{common::*, SqlRenderer};
+use super::{self, SqlRenderer, *};
 use crate::{
     database_info::DatabaseInfo,
     flavour::SqliteFlavour,
@@ -296,7 +296,7 @@ fn render_column_type(t: &ColumnType) -> &'static str {
 fn escape_quotes(s: &str) -> Cow<'_, str> {
     static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
 
-    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'")
 }
 
 /// Copy the existing data into the new table.
