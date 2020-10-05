@@ -218,6 +218,51 @@ async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
     assert_eq!(&result, dm);
 }
 
+#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+async fn introspecting_a_table_without_uniques_should_comment_it_out_mssql(api: &TestApi) {
+    let schema = api.schema_name().to_string();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", move |t| {
+                t.add_column("id", types::integer());
+                t.inject_custom("user_id INTEGER NOT NULL");
+                t.inject_custom(&format!("FOREIGN KEY ([user_id]) REFERENCES [{}].[User]([id])", schema));
+            });
+        })
+        .await;
+
+    let dm = "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n\nmodel User {\n  id      Int    @id @default(autoincrement())\n  // Post Post[]\n}\n";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}
+
+#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+async fn introspecting_an_unsupported_type_should_comment_it_out_mssql(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("xml xml");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"xml\",\"tpe\":\"xml\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Test {\n  id     Int  @id @default(autoincrement())\n  // This type is currently not supported.\n  // xml xml?\n}\n");
+}
+
 // #[test_each_connector(tags("postgres"))]
 // async fn introspecting_a_relation_based_on_an_unsupported_field_name_should_drop_it(api: &TestApi) {
 //     let barrel = api.barrel();

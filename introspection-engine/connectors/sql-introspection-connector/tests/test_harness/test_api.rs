@@ -3,7 +3,7 @@ use datamodel::configuration::preview_features::PreviewFeatures;
 use datamodel::Datamodel;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use quaint::{
-    prelude::{ConnectionInfo, SqlFamily},
+    prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
 use sql_introspection_connector::SqlIntrospectionConnector;
@@ -139,7 +139,7 @@ impl TestApi {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                SqlFamily::Mssql => barrel::SqlVariant::Mssql,
             },
         }
     }
@@ -259,6 +259,78 @@ pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
         connection_info: database.connection_info().to_owned(),
         database,
         sql_family: SqlFamily::Sqlite,
+        introspection_connector,
+    }
+}
+
+pub async fn mssql_2017_test_api(schema: &'static str) -> TestApi {
+    mssql_test_api(mssql_2017_url("master"), schema).await
+}
+
+pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
+    mssql_test_api(mssql_2019_url("master"), schema).await
+}
+
+pub async fn mssql_test_api(connection_string: String, schema: &'static str) -> TestApi {
+    let connection_string = format!("{};schema={}", connection_string, schema);
+    let database = Quaint::new(&connection_string).await.unwrap();
+    let connection_info = database.connection_info().to_owned();
+
+    // Mickie misses DROP SCHEMA .. CASCADE, so what we need to do here is to
+    // delete first the foreign keys, then all the tables from the test schema
+    // to allow a clean slate for the next test.
+
+    let drop_fks = format!(
+        r#"
+        DECLARE @stmt NVARCHAR(max)
+        DECLARE @n CHAR(1)
+
+        SET @n = CHAR(10)
+
+        SELECT @stmt = ISNULL(@stmt + @n, '') +
+            'ALTER TABLE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(parent_object_id) + '] DROP CONSTRAINT [' + name + ']'
+        FROM sys.foreign_keys
+        WHERE SCHEMA_NAME(schema_id) = '{0}'
+
+        EXEC SP_EXECUTESQL @stmt
+        "#,
+        schema
+    );
+
+    let drop_tables = format!(
+        r#"
+        DECLARE @stmt NVARCHAR(max)
+        DECLARE @n CHAR(1)
+
+        SET @n = CHAR(10)
+
+        SELECT @stmt = ISNULL(@stmt + @n, '') +
+            'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
+        FROM sys.tables
+        WHERE SCHEMA_NAME(schema_id) = '{0}'
+
+        EXEC SP_EXECUTESQL @stmt
+        "#,
+        schema
+    );
+
+    database.raw_cmd(&drop_fks).await.unwrap();
+    database.raw_cmd(&drop_tables).await.unwrap();
+
+    database
+        .raw_cmd(&format!("DROP SCHEMA IF EXISTS {}", schema))
+        .await
+        .unwrap();
+
+    database.raw_cmd(&format!("CREATE SCHEMA {}", schema)).await.unwrap();
+
+    let introspection_connector = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
+
+    TestApi {
+        db_name: schema,
+        connection_info,
+        database,
+        sql_family: SqlFamily::Mssql,
         introspection_connector,
     }
 }

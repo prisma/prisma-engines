@@ -27,7 +27,7 @@ pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBack
         SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(wrapper)),
         SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(wrapper)),
         SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(wrapper)),
-        SqlFamily::Mssql => todo!("Greetings from Redmond"),
+        SqlFamily::Mssql => Box::new(sql_schema_describer::mssql::SqlSchemaDescriber::new(wrapper)),
     };
 
     Ok((describer, connection_info))

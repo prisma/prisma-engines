@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use pretty_assertions::assert_eq;
 
-#[test_each_connector()]
+#[test_each_connector]
 async fn introspecting_a_table_with_reserved_name_should_rename(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -18,7 +18,7 @@ async fn introspecting_a_table_with_reserved_name_should_rename(api: &TestApi) {
     assert_eq!(&result, dm);
 }
 
-#[test_each_connector()]
+#[test_each_connector]
 async fn reserved_names_case_sensitivity(api: &TestApi) {
     api.barrel()
         .execute(|migration| {

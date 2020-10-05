@@ -165,10 +165,11 @@ fn read_datamodel_from_stdin() -> std::io::Result<String> {
 }
 
 fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
-    let provider = match url.split(':').next() {
+    let provider = match url.split("://").next() {
         Some("file") | Some("sqlite") => "sqlite",
         Some(s) if s.starts_with("postgres") => "postgresql",
         Some("mysql") => "mysql",
+        Some("sqlserver") | Some("jdbc:sqlserver") => "sqlserver",
         _ => anyhow::bail!("Could not extract a provider from the URL"),
     };
 
