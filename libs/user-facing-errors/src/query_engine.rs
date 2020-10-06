@@ -32,7 +32,7 @@ impl From<Vec<String>> for DatabaseConstraint {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2000",
-    message = "The provided value for the column is too long for the column's type. Column: ${column_name}"
+    message = "The provided value for the column is too long for the column's type. Column: {column_name}"
 )]
 pub struct InputValueTooLong {
     pub column_name: String,
@@ -41,7 +41,7 @@ pub struct InputValueTooLong {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2001",
-    message = "The record searched for in the where condition (`${model_name}.${argument_name} = ${argument_value}`) does not exist"
+    message = "The record searched for in the where condition (`{model_name}.{argument_name} = {argument_value}`) does not exist"
 )]
 pub struct RecordNotFound {
     /// Model name from Prisma schema
@@ -56,7 +56,7 @@ pub struct RecordNotFound {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2002", message = "Unique constraint failed on the ${constraint}")]
+#[user_facing(code = "P2002", message = "Unique constraint failed on the {constraint}")]
 pub struct UniqueKeyViolation {
     /// Field name from one model from Prisma schema
     #[serde(rename = "target")]
@@ -66,7 +66,7 @@ pub struct UniqueKeyViolation {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2003",
-    message = "Foreign key constraint failed on the field: `${field_name}`"
+    message = "Foreign key constraint failed on the field: `{field_name}`"
 )]
 pub struct ForeignKeyViolation {
     /// Field name from one model from Prisma schema
@@ -74,7 +74,7 @@ pub struct ForeignKeyViolation {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2004", message = "A constraint failed on the database: `${database_error}`")]
+#[user_facing(code = "P2004", message = "A constraint failed on the database: `{database_error}`")]
 pub struct ConstraintViolation {
     /// Database error returned by the underlying data source
     pub database_error: String,
@@ -83,7 +83,7 @@ pub struct ConstraintViolation {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2005",
-    message = "The value `${field_value}` stored in the database for the field `${field_name}` is invalid for the field's type"
+    message = "The value `{field_value}` stored in the database for the field `{field_name}` is invalid for the field's type"
 )]
 pub struct StoredValueIsInvalid {
     /// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated if too long to display in the error message
@@ -96,7 +96,7 @@ pub struct StoredValueIsInvalid {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2006",
-    message = "The provided value `${field_value}` for `${model_name}` field `${field_name}` is not valid"
+    message = "The provided value `{field_value}` for `{model_name}` field `{field_name}` is not valid"
 )]
 pub struct TypeMismatch {
     /// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated if too long to display in the error message
@@ -110,7 +110,7 @@ pub struct TypeMismatch {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2007", message = "Data validation error `${database_error}`")]
+#[user_facing(code = "P2007", message = "Data validation error `{database_error}`")]
 pub struct TypeMismatchInvalidCustomType {
     /// Database error returned by the underlying data source
     pub database_error: String,
@@ -119,7 +119,7 @@ pub struct TypeMismatchInvalidCustomType {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2008",
-    message = "Failed to parse the query `${query_parsing_error}` at `${query_position}`"
+    message = "Failed to parse the query `{query_parsing_error}` at `{query_position}`"
 )]
 pub struct QueryParsingFailed {
     /// Error(s) encountered when trying to parse a query in the query engine
@@ -132,7 +132,7 @@ pub struct QueryParsingFailed {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2009",
-    message = "Failed to validate the query: `${query_validation_error}` at `${query_position}`"
+    message = "Failed to validate the query: `{query_validation_error}` at `{query_position}`"
 )]
 pub struct QueryValidationFailed {
     /// Error(s) encountered when trying to validate a query in the query engine
@@ -143,20 +143,20 @@ pub struct QueryValidationFailed {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2010", message = "Raw query failed. Code: `${code}`. Message: `${message}`")]
+#[user_facing(code = "P2010", message = "Raw query failed. Code: `{code}`. Message: `{message}`")]
 pub struct RawQueryFailed {
     pub code: String,
     pub message: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2011", message = "Null constraint violation on the ${constraint}")]
+#[user_facing(code = "P2011", message = "Null constraint violation on the {constraint}")]
 pub struct NullConstraintViolation {
     pub constraint: DatabaseConstraint,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2012", message = "Missing a required value at `${path}`")]
+#[user_facing(code = "P2012", message = "Missing a required value at `{path}`")]
 pub struct MissingRequiredValue {
     pub path: String,
 }
@@ -164,7 +164,7 @@ pub struct MissingRequiredValue {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2013",
-    message = "Missing the required argument `${argument_name}` for field `${field_name}` on `${object_name}`."
+    message = "Missing the required argument `{argument_name}` for field `{field_name}` on `{object_name}`."
 )]
 pub struct MissingRequiredArgument {
     pub argument_name: String,
@@ -175,7 +175,7 @@ pub struct MissingRequiredArgument {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2014",
-    message = "The change you are trying to make would violate the required relation '${relation_name}' between the `${model_a_name}` and `${model_b_name}` models."
+    message = "The change you are trying to make would violate the required relation '{relation_name}' between the `{model_a_name}` and `{model_b_name}` models."
 )]
 pub struct RelationViolation {
     pub relation_name: String,
@@ -184,13 +184,13 @@ pub struct RelationViolation {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2015", message = "A related record could not be found. ${details}")]
+#[user_facing(code = "P2015", message = "A related record could not be found. {details}")]
 pub struct RelatedRecordNotFound {
     pub details: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2016", message = "Query interpretation error. ${details}")]
+#[user_facing(code = "P2016", message = "Query interpretation error. {details}")]
 pub struct InterpretationError {
     pub details: String,
 }
@@ -198,7 +198,7 @@ pub struct InterpretationError {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2017",
-    message = "The records for relation `${relation_name}` between the `${parent_name}` and `${child_name}` models are not connected."
+    message = "The records for relation `{relation_name}` between the `{parent_name}` and `{child_name}` models are not connected."
 )]
 pub struct RecordsNotConnected {
     pub relation_name: String,
@@ -207,22 +207,19 @@ pub struct RecordsNotConnected {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P2018",
-    message = "The required connected records were not found. ${details}"
-)]
+#[user_facing(code = "P2018", message = "The required connected records were not found. {details}")]
 pub struct ConnectedRecordsNotFound {
     pub details: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2019", message = "Input error. ${details}")]
+#[user_facing(code = "P2019", message = "Input error. {details}")]
 pub struct InputError {
     pub details: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2020", message = "Value out of range for the type. ${details}")]
+#[user_facing(code = "P2020", message = "Value out of range for the type. {details}")]
 pub struct ValueOutOfRange {
     pub details: String,
 }
@@ -230,7 +227,7 @@ pub struct ValueOutOfRange {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2021",
-    message = "The table `${table}` does not exist in the current database."
+    message = "The table `{table}` does not exist in the current database."
 )]
 pub struct TableDoesNotExist {
     pub table: String,
@@ -239,7 +236,7 @@ pub struct TableDoesNotExist {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2022",
-    message = "The column `${column}` does not exist in the current database."
+    message = "The column `{column}` does not exist in the current database."
 )]
 pub struct ColumnDoesNotExist {
     pub column: String,
