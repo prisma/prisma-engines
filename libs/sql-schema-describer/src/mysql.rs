@@ -608,8 +608,14 @@ fn get_column_type_and_enum(
     let (family, native_type) = match data_type {
         "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
         "smallint" => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
-        "tinyint" if is_tinyint1() && !invalid_bool_default() => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
-        "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
+        "tinyint" if is_tinyint1() && !invalid_bool_default() => (
+            ColumnTypeFamily::Boolean,
+            Some(MySqlType::TinyInt(precision.numeric_precision())),
+        ),
+        "tinyint" => (
+            ColumnTypeFamily::Int,
+            Some(MySqlType::TinyInt(precision.numeric_precision())),
+        ),
         "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
         "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
         "decimal" => (

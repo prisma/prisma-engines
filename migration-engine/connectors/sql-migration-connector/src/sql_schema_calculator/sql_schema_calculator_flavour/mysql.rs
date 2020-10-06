@@ -51,7 +51,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         let data_type: String = match mysql_type {
             MySqlType::Int => "INTEGER".into(),
             MySqlType::SmallInt => "SMALLINT".into(),
-            MySqlType::TinyInt => "TINYINT".into(),
+            MySqlType::TinyInt(size) => format!("TINYINT({size})", size = size),
             MySqlType::MediumInt => "MEDIUMINT".into(),
             MySqlType::BigInt => "BIGINT".into(),
             MySqlType::Decimal(precision, scale) => format!("DECIMAL({}, {})", precision, scale),
