@@ -2,6 +2,8 @@ use crate::common::*;
 use datamodel::{dml::ScalarType, DefaultValue, ValueGenerator};
 use native_types::{MySqlType, PostgresType};
 use prisma_value::PrismaValue;
+use rust_decimal::prelude::FromPrimitive;
+use rust_decimal::Decimal;
 
 #[test]
 fn should_apply_a_custom_type() {
@@ -44,7 +46,7 @@ fn should_recursively_apply_a_custom_type() {
 }
 
 #[test]
-fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
+fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attribute() {
     let dml = r#"
         datasource db {
             provider        = "postgres"
@@ -71,6 +73,38 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 
     let postgres_type: PostgresType = sft.deserialize_native_type();
     assert_eq!(postgres_type, PostgresType::SmallInt);
+}
+
+#[test]
+fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
+    let dml = r#"
+        datasource db {
+            provider        = "mysql"
+            url             = "mysql://"
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model User {
+            id    Int      @id
+            test  Decimal  @default(1.00) @db.Decimal(8, 2)
+        }
+    "#;
+
+    let datamodel = parse(dml);
+
+    let user_model = datamodel.assert_has_model("User");
+
+    user_model
+        .assert_has_scalar_field("test")
+        .assert_default_value(DefaultValue::Single(PrismaValue::Float(
+            Decimal::from_f64(1.00.into()).unwrap(),
+        )));
+
+    let sft = user_model.assert_has_scalar_field("test").assert_native_type();
+
+    let mysql_type: MySqlType = sft.deserialize_native_type();
+
+    assert_eq!(mysql_type, MySqlType::Decimal(8, 2));
 }
 
 #[test]

@@ -35,6 +35,83 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn introspecting_a_one_to_one_relation_on_a_singular_primary_key_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column(
+                    "id",
+                    types::foreign("User", "id").nullable(false).unique(true).primary(true),
+                );
+            });
+        })
+        .await;
+
+    let dm = r#"
+             model Post {
+               id   Int  @id
+               User User @relation(fields: [id], references: [id])
+             }
+                 
+             model User {
+               id   Int   @id @default(autoincrement())
+               Post Post?
+             }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_one_to_one_relation_on_a_compound_primary_key_should_work(api: &TestApi) {
+    //Todo
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id_1", types::integer());
+                t.add_column("id_2", types::integer());
+                t.inject_custom("Primary Key(id_1, id_2)");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id_1", types::integer());
+                t.add_column("id_2", types::integer());
+                t.inject_custom("Primary Key(id_1, id_2)");
+                t.inject_custom(
+                    "constraint \"fk_test\" \
+                foreign key (\"id_1\", \"id_2\") \
+                REFERENCES \"User\" (\"id_1\", \"id_2\")",
+                );
+            });
+        })
+        .await;
+
+    let dm = r#"
+             model Post {
+               id_1 Int
+               id_2 Int
+               User User @relation(fields: [id_1, id_2], references: [id_1, id_2])
+                   
+               @@id([id_1, id_2])
+             }
+                     
+             model User {
+               id_1 Int
+               id_2 Int
+               Post Post?
+                           
+               @@id([id_1, id_2])
+             }                        
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
     barrel
@@ -499,37 +576,6 @@ async fn introspecting_default_values_on_relations_should_work(api: &TestApi) {
                 id      Int   @id @default(autoincrement())
                 user_id Int?  @default(0)
                 User    User? @relation(fields: [user_id], references: [id])
-            }
-
-            model User {
-                id   Int    @id @default(autoincrement())
-                Post Post[]
-            }
-        "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-            });
-            migration.create_table("Post", |t| {
-                t.add_column("test", types::text());
-                t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") Primary Key");
-            });
-        })
-        .await;
-
-    let dm = r#"
-            model Post {
-                test    String
-                user_id Int    @id
-                User    User   @relation(fields: [user_id], references: [id])
             }
 
             model User {

@@ -3,8 +3,8 @@ mod table;
 
 use crate::ast;
 
-use crate::ast::helper::get_sort_index_of_directive;
-use crate::ast::Directive;
+use crate::ast::helper::get_sort_index_of_attribute;
+use crate::ast::Attribute;
 pub use string_builder::StringBuilder;
 pub use table::TableFormat;
 
@@ -153,12 +153,12 @@ impl<'a> Renderer<'a> {
         target.write(&field.field_type.name);
 
         // Attributes
-        if !field.directives.is_empty() {
+        if !field.attributes.is_empty() {
             let mut attributes_builder = StringBuilder::new();
 
-            let directives = Self::sort_directives(field.directives.clone(), true);
-            for directive in directives {
-                Self::render_field_directive(&mut attributes_builder, &directive);
+            let attributes = Self::sort_attributes(field.attributes.clone(), true);
+            for attribute in attributes {
+                Self::render_field_attribute(&mut attributes_builder, &attribute);
             }
 
             target.write(&attributes_builder.to_string());
@@ -190,12 +190,12 @@ impl<'a> Renderer<'a> {
 
         field_formatter.render(self);
 
-        if !model.directives.is_empty() {
+        if !model.attributes.is_empty() {
             self.end_line();
-            // sort directives
-            let directives = Self::sort_directives(model.directives.clone(), false);
-            for directive in directives {
-                self.render_block_directive(&directive, comment_out.clone());
+            // sort attributes
+            let attributes = Self::sort_attributes(model.attributes.clone(), false);
+            for attribute in attributes {
+                self.render_block_attribute(&attribute, comment_out.clone());
             }
         }
 
@@ -204,14 +204,14 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    fn sort_directives(mut directives: Vec<Directive>, is_field_directive: bool) -> Vec<Directive> {
-        // sort directives
-        directives.sort_by(|a, b| {
-            let sort_index_a = get_sort_index_of_directive(is_field_directive, a.name.name.as_str());
-            let sort_index_b = get_sort_index_of_directive(is_field_directive, b.name.name.as_str());
+    fn sort_attributes(mut attributes: Vec<Attribute>, is_field_attribute: bool) -> Vec<Attribute> {
+        // sort attributes
+        attributes.sort_by(|a, b| {
+            let sort_index_a = get_sort_index_of_attribute(is_field_attribute, a.name.name.as_str());
+            let sort_index_b = get_sort_index_of_attribute(is_field_attribute, b.name.name.as_str());
             sort_index_a.cmp(&sort_index_b)
         });
-        return directives;
+        return attributes;
     }
 
     fn render_enum(&mut self, enm: &ast::Enum) {
@@ -232,12 +232,12 @@ impl<'a> Renderer<'a> {
                 "".to_string()
             };
             self.write(format!("{}{}", commented_out, &value.name.name).as_str());
-            if !value.directives.is_empty() {
+            if !value.attributes.is_empty() {
                 let mut attributes_builder = StringBuilder::new();
 
-                for directive in &value.directives {
+                for attribute in &value.attributes {
                     attributes_builder.write(&" ");
-                    Self::render_field_directive(&mut attributes_builder, &directive);
+                    Self::render_field_attribute(&mut attributes_builder, &attribute);
                 }
 
                 self.write(&attributes_builder.to_string());
@@ -250,12 +250,12 @@ impl<'a> Renderer<'a> {
             self.end_line();
         }
 
-        if !enm.directives.is_empty() {
+        if !enm.attributes.is_empty() {
             self.end_line();
-            let directives = Self::sort_directives(enm.directives.clone(), false);
-            for directive in directives {
+            let attributes = Self::sort_attributes(enm.attributes.clone(), false);
+            for attribute in attributes {
                 self.write(" ");
-                self.render_block_directive(&directive, "".to_string());
+                self.render_block_attribute(&attribute, "".to_string());
             }
         }
 
@@ -286,13 +286,13 @@ impl<'a> Renderer<'a> {
         }
 
         // Attributes
-        if !field.directives.is_empty() {
+        if !field.attributes.is_empty() {
             let mut attributes_builder = StringBuilder::new();
 
-            let directives = Self::sort_directives(field.directives.clone(), true);
-            for directive in directives {
+            let attributes = Self::sort_attributes(field.attributes.clone(), true);
+            for attribute in attributes {
                 attributes_builder.write(&" ");
-                Self::render_field_directive(&mut attributes_builder, &directive);
+                Self::render_field_attribute(&mut attributes_builder, &attribute);
             }
 
             target.write(&attributes_builder.to_string());
@@ -309,24 +309,24 @@ impl<'a> Renderer<'a> {
         };
     }
 
-    pub fn render_field_directive(target: &mut dyn LineWriteable, directive: &ast::Directive) {
+    pub fn render_field_attribute(target: &mut dyn LineWriteable, attribute: &ast::Attribute) {
         target.write("@");
-        target.write(&directive.name.name);
+        target.write(&attribute.name.name);
 
-        if !directive.arguments.is_empty() {
+        if !attribute.arguments.is_empty() {
             target.write("(");
-            Self::render_arguments(target, &directive.arguments);
+            Self::render_arguments(target, &attribute.arguments);
             target.write(")");
         }
     }
 
-    fn render_block_directive(&mut self, directive: &ast::Directive, commented_out: String) {
+    fn render_block_attribute(&mut self, attribute: &ast::Attribute, commented_out: String) {
         self.write(format!("{}@@", commented_out).as_ref());
-        self.write(&directive.name.name);
+        self.write(&attribute.name.name);
 
-        if !directive.arguments.is_empty() {
+        if !attribute.arguments.is_empty() {
             self.write("(");
-            Self::render_arguments(self, &directive.arguments);
+            Self::render_arguments(self, &attribute.arguments);
             self.write(")");
         }
 

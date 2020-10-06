@@ -251,7 +251,7 @@ fn must_error_when_unknown_fields_are_used() {
 }
 
 #[test]
-fn index_directives_must_serialize_to_valid_dml() {
+fn index_attributes_must_serialize_to_valid_dml() {
     let dml = r#"
         model User {
             id        Int    @id

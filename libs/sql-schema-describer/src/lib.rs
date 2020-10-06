@@ -162,6 +162,13 @@ impl Table {
                 && index.columns.contains(&column_name.to_owned())
         })
     }
+
+    pub fn is_column_primary_key(&self, column_name: &str) -> bool {
+        match &self.primary_key {
+            None => false,
+            Some(key) => key.is_single_primary_key(column_name),
+        }
+    }
 }
 /// The type of an index.
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]

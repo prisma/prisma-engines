@@ -1,13 +1,13 @@
-use super::{super::helpers::*, DirectiveValidator};
+use super::{super::helpers::*, AttributeValidator};
 use crate::common::RelationNames;
 use crate::error::DatamodelError;
 use crate::{ast, dml, Field};
 
-/// Prismas builtin `@relation` directive.
-pub struct RelationDirectiveValidator {}
+/// Prismas builtin `@relation` attribute.
+pub struct RelationAttributeValidator {}
 
-impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
-    fn directive_name(&self) -> &'static str {
+impl AttributeValidator<dml::Field> for RelationAttributeValidator {
+    fn attribute_name(&self) -> &'static str {
         &"relation"
     }
     fn validate_and_apply(&self, args: &mut Arguments, field: &mut dml::Field) -> Result<(), DatamodelError> {
@@ -17,7 +17,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
                 if name.is_empty() {
                     return self
-                        .new_directive_validation_error("A relation cannot have an empty name.", name_arg.span());
+                        .new_attribute_validation_error("A relation cannot have an empty name.", name_arg.span());
                 }
 
                 rf.relation_info.name = name;
@@ -38,11 +38,11 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             Ok(())
         } else {
-            self.new_directive_validation_error("Invalid field type, not a relation.", args.span())
+            self.new_attribute_validation_error("Invalid field type, not a relation.", args.span())
         }
     }
 
-    fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
+    fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, DatamodelError> {
         if let dml::Field::RelationField(rf) = field {
             let mut args = Vec::new();
 
@@ -107,7 +107,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             }
 
             if !args.is_empty() {
-                return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
+                return Ok(vec![ast::Attribute::new(self.attribute_name(), args)]);
             }
         }
         Ok(vec![])

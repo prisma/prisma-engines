@@ -397,7 +397,7 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
               
         model User {
             id   Int    @id @default(autoincrement())
-            Post Post[]
+            Post Post?
         }
 "#;
     let result = dbg!(api.introspect().await);

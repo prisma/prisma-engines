@@ -22,6 +22,19 @@ fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
     ]
 }
 
+fn connector_names_mssql() -> Vec<(&'static str, BitFlags<Tags>)> {
+    let mut names = vec![
+        ("mssql_2017", Tags::Mssql2017.into()),
+        ("mssql_2019", Tags::Mssql2019.into()),
+    ];
+
+    for name in connector_names().into_iter() {
+        names.push(name);
+    }
+
+    names
+}
+
 fn postgres_capabilities() -> BitFlags<Capabilities> {
     Capabilities::ScalarLists | Capabilities::Enums | Capabilities::Json
 }
@@ -81,18 +94,7 @@ pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
 });
 
 pub static CONNECTORS_MSSQL: Lazy<Connectors> = Lazy::new(|| {
-    // So, macOS doesn't like SQL Server's certificates, and we disable
-    // tests on Apple.
-    let names = if cfg!(not(target_os = "macos")) {
-        let mut names = connector_names();
-        names.push(("mssql_2017", Tags::Mssql2017.into()));
-        names.push(("mssql_2019", Tags::Mssql2019.into()));
-        names
-    } else {
-        connector_names()
-    };
-
-    let connectors: Vec<Connector> = names
+    let connectors: Vec<Connector> = connector_names_mssql()
         .iter()
         .map(|(name, tags)| Connector {
             name: (*name).to_owned(),

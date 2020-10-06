@@ -102,7 +102,7 @@ async fn introspecting_an_enum_with_an_invalid_value_should_work(api: &TestApi) 
         .await;
 
     let warnings = dbg!(api.introspection_warnings().await);
-    assert_eq!(&warnings, "[{\"code\":4,\"message\":\"These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` directive.\",\"affected\":[{\"enm\":\"status\",\"value\":\"1\"}]}]");
+    assert_eq!(&warnings, "[{\"code\":4,\"message\":\"These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.\",\"affected\":[{\"enm\":\"status\",\"value\":\"1\"}]}]");
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, "model News {\n  id     Int    @id @default(autoincrement())\n  status status @default(UNDEFINED)\n}\n\nenum status {\n  // 1 @map(\"1\")\n  UNDEFINED\n}\n");
@@ -124,7 +124,7 @@ async fn introspecting_an_enum_with_an_invalid_value_as_default_should_work(api:
         .await;
 
     let warnings = dbg!(api.introspection_warnings().await);
-    assert_eq!(&warnings, "[{\"code\":4,\"message\":\"These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` directive.\",\"affected\":[{\"enm\":\"status\",\"value\":\"1\"}]}]");
+    assert_eq!(&warnings, "[{\"code\":4,\"message\":\"These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.\",\"affected\":[{\"enm\":\"status\",\"value\":\"1\"}]}]");
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, "model News {\n  id     Int    @id @default(autoincrement())\n  status status @default(dbgenerated())\n}\n\nenum status {\n  // 1 @map(\"1\")\n  UNDEFINED\n}\n");
@@ -237,7 +237,7 @@ async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
 //     let warnings = dbg!(api.introspection_warnings().await);
 //     assert_eq!(
 //         &warnings,
-//         "[{\"code\":2,\"message\":\"These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` directive.\",\"affected\":[{\"model\":\"User\",\"field\":\"1\"}]}]"
+//         "[{\"code\":2,\"message\":\"These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.\",\"affected\":[{\"model\":\"User\",\"field\":\"1\"}]}]"
 //     );
 //
 //     let result = dbg!(api.introspect().await);

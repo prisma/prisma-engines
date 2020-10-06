@@ -19,11 +19,7 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn quote_with_schema<'a, 'b>(&'a self, _name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        unreachable!("quote_with_schema on sqlite");
-    }
-
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_alter_enum on sqlite")
     }
 
@@ -32,7 +28,7 @@ impl SqlRenderer for SqliteFlavour {
         _alter_index: &AlterIndex,
         _database_info: &DatabaseInfo,
         _current_schema: &SqlSchema,
-    ) -> anyhow::Result<Vec<String>> {
+    ) -> Vec<String> {
         unreachable!("render_alter_index on sqlite")
     }
 
@@ -154,7 +150,7 @@ impl SqlRenderer for SqliteFlavour {
         Vec::new()
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
         use std::fmt::Write;
 
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
@@ -181,7 +177,8 @@ impl SqlRenderer for SqliteFlavour {
                     constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
                     references = self.render_references(&table.table.name, fk),
                     comma = if fks.peek().is_some() { ",\n" } else { "" },
-                )?;
+                )
+                .expect("Error formatting to string buffer.");
             }
 
             format!(",\n\n{fks}", fks = rendered_fks)
@@ -189,13 +186,13 @@ impl SqlRenderer for SqliteFlavour {
             String::new()
         };
 
-        Ok(format!(
+        format!(
             "CREATE TABLE {table_name} (\n{columns}{foreign_keys}{primary_key}\n)",
             table_name = self.quote(table.name()),
             columns = columns,
             foreign_keys = foreign_keys,
             primary_key = primary_key,
-        ))
+        )
     }
 
     fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
@@ -244,7 +241,7 @@ impl SqlRenderer for SqliteFlavour {
             };
 
             // TODO start transaction now. Unclear if we really want to do that.
-            result.push(self.render_create_table(&temporary_table).expect("render_create_table"));
+            result.push(self.render_create_table(&temporary_table));
 
             copy_current_table_into_new_table(&mut result, &differ, temporary_table.name(), self).unwrap();
 

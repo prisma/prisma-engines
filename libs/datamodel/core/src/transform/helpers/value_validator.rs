@@ -59,6 +59,7 @@ impl ValueValidator {
             ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
             ScalarType::String => self.as_str().map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(PrismaValue::String),
+            ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
             _ => todo!(),
         }
     }

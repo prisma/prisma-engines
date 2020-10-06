@@ -1,15 +1,15 @@
 use super::*;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Directive {
+pub struct Attribute {
     pub name: Identifier,
     pub arguments: Vec<Argument>,
     pub span: Span,
 }
 
-impl Directive {
-    pub fn new(name: &str, arguments: Vec<Argument>) -> Directive {
-        Directive {
+impl Attribute {
+    pub fn new(name: &str, arguments: Vec<Argument>) -> Attribute {
+        Attribute {
             name: Identifier::new(name),
             arguments,
             span: Span::empty(),
@@ -17,13 +17,13 @@ impl Directive {
     }
 }
 
-impl WithIdentifier for Directive {
+impl WithIdentifier for Attribute {
     fn identifier(&self) -> &Identifier {
         &self.name
     }
 }
 
-impl WithSpan for Directive {
+impl WithSpan for Attribute {
     fn span(&self) -> &Span {
         &self.span
     }

@@ -38,7 +38,7 @@ impl<'a> Arguments<'a> {
         errors.ok()
     }
 
-    pub fn check_for_multiple_unnamed_arguments(&self, directive_name: &str) -> Result<(), ErrorCollection> {
+    pub fn check_for_multiple_unnamed_arguments(&self, attribute_name: &str) -> Result<(), ErrorCollection> {
         let mut unnamed_values: Vec<String> = Vec::new();
         for arg in self.arguments {
             if arg.is_unnamed() {
@@ -47,9 +47,9 @@ impl<'a> Arguments<'a> {
         }
 
         if unnamed_values.len() > 1 {
-            Err(DatamodelError::new_directive_validation_error(
+            Err(DatamodelError::new_attribute_validation_error(
                 &format!("You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[{}]`?", unnamed_values.join(", ")),
-                directive_name,
+                attribute_name,
                 self.span.clone()).into()
             )
         } else {

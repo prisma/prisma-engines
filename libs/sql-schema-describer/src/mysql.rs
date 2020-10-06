@@ -1,6 +1,6 @@
 use super::*;
 use native_types::{MySqlType, NativeType};
-use quaint::{prelude::Queryable, single::Quaint};
+use quaint::{prelude::Queryable, single::Quaint, Value};
 use serde_json::from_str;
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -258,8 +258,17 @@ async fn get_all_columns(
             time_precision,
         };
 
-        let (tpe, enum_option) =
-            get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, precision, arity);
+        let default_value = col.get("column_default");
+
+        let (tpe, enum_option) = get_column_type_and_enum(
+            &table_name,
+            &name,
+            &data_type,
+            &full_data_type,
+            precision,
+            arity,
+            default_value,
+        );
         let extra = col
             .get("extra")
             .and_then(|x| x.to_string())
@@ -276,7 +285,7 @@ async fn get_all_columns(
             entry.1.push(enm);
         }
 
-        let default = match col.get("column_default") {
+        let default = match default_value {
             None => None,
             Some(param_value) => match param_value.to_string() {
                 None => None,
@@ -578,17 +587,28 @@ fn get_column_type_and_enum(
     full_data_type: &str,
     precision: Precision,
     arity: ColumnArity,
+    default: Option<&Value>,
 ) -> (ColumnType, Option<Enum>) {
+    // println!("Name: {}", column_name);
     // println!("DT: {}", data_type);
     // println!("FDT: {}", full_data_type);
     // println!("Precision: {:?}", precision);
+    // println!("Default: {:?}", default);
+
+    let is_tinyint1 = || extract_precision(full_data_type) == Some(1);
+    let invalid_bool_default = || {
+        default
+            .and_then(|default| default.to_string())
+            .filter(|default_string| default_string != "NULL")
+            .and_then(|default_string| parse_int(&default_string))
+            .filter(|default_int| *default_int != PrismaValue::Int(0) && *default_int != PrismaValue::Int(1))
+            .is_some()
+    };
 
     let (family, native_type) = match data_type {
         "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
         "smallint" => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
-        "tinyint" if extract_precision(full_data_type) == Some(1) => {
-            (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt))
-        }
+        "tinyint" if is_tinyint1() && !invalid_bool_default() => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
         "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
         "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
         "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),

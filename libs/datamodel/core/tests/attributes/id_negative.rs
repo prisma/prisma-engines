@@ -11,7 +11,7 @@ fn id_should_error_if_the_field_is_not_required() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_directive_validation_error(
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Fields that are marked as id must be required.",
         "id",
         Span::new(36, 38),
@@ -28,7 +28,7 @@ fn id_should_error_if_unique_and_id_are_specified() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_directive_validation_error(
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Fields that are marked as id should not have an additional @unique.",
         "unique",
         Span::new(39, 45),
@@ -47,7 +47,7 @@ fn id_should_error_multiple_ids_are_provided() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "At most one field must be marked as the id field with the `@id` directive.",
+        "At most one field must be marked as the id field with the `@id` attribute.",
         "Model",
         Span::new(5, 105),
     ));

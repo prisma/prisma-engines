@@ -1,6 +1,6 @@
 use super::*;
 
-/// An argument, either for directives, or for keys in source blocks.
+/// An argument, either for attributes, or for keys in source blocks.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Argument {
     /// Name of the argument.

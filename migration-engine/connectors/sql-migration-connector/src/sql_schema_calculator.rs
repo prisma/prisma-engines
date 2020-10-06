@@ -117,7 +117,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
                     .fields
                     .iter()
-                    .map(|field_name| model.find_scalar_field(field_name).expect("Unknown field in index directive."))
+                    .map(|field_name| model.find_scalar_field(field_name).expect("Unknown field in index attribute."))
                     .collect();
 
                 let index_type = match index_definition.tpe {

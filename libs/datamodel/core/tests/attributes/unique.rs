@@ -38,7 +38,7 @@ fn multiple_unnamed_arguments_must_error() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_directive_validation_error("You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[firstName, lastName]`?", "unique", Span::new(108,134)));
+    errors.assert_is(DatamodelError::new_attribute_validation_error("You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[firstName, lastName]`?", "unique", Span::new(108, 134)));
 }
 
 #[test]
@@ -99,7 +99,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_ONE_underlying_
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_directive_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to put it on `identificationId`?", "unique",Span::new(183, 189)));
+    errors.assert_is(DatamodelError::new_attribute_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to put it on `identificationId`?", "unique", Span::new(183, 189)));
 }
 
 #[test]
@@ -121,7 +121,7 @@ fn single_field_unique_on_relation_fields_must_error_nicely_with_MANY_underlying
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_directive_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to provide `@@unique([identificationId1, identificationId2])`?", "unique",Span::new(235, 241)));
+    errors.assert_is(DatamodelError::new_attribute_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique. Did you mean to provide `@@unique([identificationId1, identificationId2])`?", "unique", Span::new(235, 241)));
 }
 
 #[test]
@@ -260,7 +260,7 @@ fn must_error_when_using_the_same_field_multiple_times() {
 }
 
 #[test]
-fn unique_directives_must_serialize_to_valid_dml() {
+fn unique_attributes_must_serialize_to_valid_dml() {
     let dml = r#"
         model User {
             id        Int    @id

@@ -15,16 +15,18 @@ use sql_schema_describer::{
 };
 use std::{borrow::Cow, fmt::Write};
 
-impl SqlRenderer for MssqlFlavour {
-    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
-        Quoted::mssql_ident(name)
-    }
-
+impl MssqlFlavour {
     fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
         QuotedWithSchema {
             schema_name: self.schema_name(),
             name: self.quote(name),
         }
+    }
+}
+
+impl SqlRenderer for MssqlFlavour {
+    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
+        Quoted::mssql_ident(name)
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
@@ -70,7 +72,7 @@ impl SqlRenderer for MssqlFlavour {
         )]
     }
 
-    fn render_alter_enum(&self, _: &AlterEnum, _: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
+    fn render_alter_enum(&self, _: &AlterEnum, _: &SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
@@ -147,7 +149,7 @@ impl SqlRenderer for MssqlFlavour {
         alter_index: &AlterIndex,
         _database_info: &DatabaseInfo,
         _current_schema: &SqlSchema,
-    ) -> anyhow::Result<Vec<String>> {
+    ) -> Vec<String> {
         let AlterIndex {
             table,
             index_name,
@@ -156,11 +158,11 @@ impl SqlRenderer for MssqlFlavour {
 
         let index_with_table = Quoted::Single(format!("{}.{}.{}", self.schema_name(), table, index_name));
 
-        Ok(vec![format!(
+        vec![format!(
             "EXEC SP_RENAME N{index_with_table}, N{index_new_name}, N'INDEX'",
             index_with_table = Quoted::Single(index_with_table),
             index_new_name = Quoted::Single(index_new_name),
-        )])
+        )]
     }
 
     fn render_create_enum(&self, _: &CreateEnum) -> Vec<String> {
@@ -209,7 +211,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_columns = table.table.primary_key_columns();
@@ -246,13 +248,13 @@ impl SqlRenderer for MssqlFlavour {
             String::new()
         };
 
-        Ok(format!(
+        format!(
             "CREATE TABLE {} ({columns}{primary_key}{constraints})",
             table_name = self.quote_with_schema(table.name()),
             columns = columns,
             primary_key = primary_key,
             constraints = constraints,
-        ))
+        )
     }
 
     fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {

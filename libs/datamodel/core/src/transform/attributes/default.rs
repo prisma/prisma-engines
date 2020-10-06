@@ -1,55 +1,39 @@
-use super::{super::helpers::*, DirectiveValidator};
+use super::{super::helpers::*, AttributeValidator};
 use crate::error::DatamodelError;
-use crate::{ast, dml, DefaultValue, ValueGenerator};
+use crate::{ast, dml, ValueGenerator};
 use prisma_value::PrismaValue;
 
-/// Prismas builtin `@default` directive.
-pub struct DefaultDirectiveValidator {}
+/// Prismas builtin `@default` attribute.
+pub struct DefaultAttributeValidator {}
 
-impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
-    fn directive_name(&self) -> &'static str {
+impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
+    fn attribute_name(&self) -> &'static str {
         &"default"
     }
 
     fn validate_and_apply(&self, args: &mut Arguments, field: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(_) = field {
-            return self.new_directive_validation_error("Cannot set a default value on a relation field.", args.span());
+            return self.new_attribute_validation_error("Cannot set a default value on a relation field.", args.span());
         } else if let dml::Field::ScalarField(sf) = field {
             // If we allow list default values, we need to adjust the types below properly for that case.
             if sf.arity == dml::FieldArity::List {
-                return self.new_directive_validation_error("Cannot set a default value on list field.", args.span());
+                return self.new_attribute_validation_error("Cannot set a default value on list field.", args.span());
             }
 
             if let dml::FieldType::Base(scalar_type, _) = sf.field_type {
                 let dv = args
                     .default_arg("value")?
                     .as_default_value_for_scalar_type(scalar_type)
-                    .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
+                    .map_err(|e| self.wrap_in_attribute_validation_error(&e))?;
 
                 sf.default_value = Some(dv);
-            } else if let dml::FieldType::NativeType(scalar_type, native_type) = sf.field_type.clone() {
+            } else if let dml::FieldType::NativeType(scalar_type, _) = sf.field_type {
                 let dv = args
                     .default_arg("value")?
                     .as_default_value_for_scalar_type(scalar_type)
-                    .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
+                    .map_err(|e| self.wrap_in_attribute_validation_error(&e))?;
 
                 sf.default_value = Some(dv);
-
-                if native_type.name == "Serial" {
-                    // assuming this must be a Postgres native type
-                    if let Some(arg) = sf.default_value.clone() {
-                        match arg {
-                            DefaultValue::Expression(o) => {
-                                if o.name == "autoincrement" {
-                                    return Err(self.wrap_in_directive_validation_error(&DatamodelError::new_connector_error(
-                                        "The native type serial translates to an Integer column with an auto-incrementing counter as default. The field attribute @default(autoincrement()) translates to the serial type underneath. Please remove one of the two attributes.",
-                                    args.span())));
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                }
             } else if let dml::FieldType::Enum(_) = sf.field_type {
                 let default_arg = args.default_arg("value")?;
 
@@ -60,7 +44,7 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
                         if generator == ValueGenerator::new_dbgenerated() {
                             sf.default_value = Some(dml::DefaultValue::Expression(generator));
                         } else {
-                            return Err(self.wrap_in_directive_validation_error(&err));
+                            return Err(self.wrap_in_attribute_validation_error(&err));
                         }
                     }
                 }
@@ -73,10 +57,10 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
         &self,
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Directive>, DatamodelError> {
+    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
         if let Some(default_value) = field.default_value() {
-            return Ok(vec![ast::Directive::new(
-                self.directive_name(),
+            return Ok(vec![ast::Attribute::new(
+                self.attribute_name(),
                 vec![ast::Argument::new("", lower_default_value(default_value.clone()))],
             )]);
         }

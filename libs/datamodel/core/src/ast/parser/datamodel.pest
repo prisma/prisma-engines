@@ -20,9 +20,9 @@ schema = { SOI ~ NEWLINE* ~ (model_declaration | enum_declaration | source_block
 // ######################################
 // Model
 // ######################################
-model_declaration = { comment_block? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( block_level_directive ) | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
+model_declaration = { comment_block? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( block_level_attribute ) | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
 
-field_declaration = { doc_comment_and_new_line* ~ non_empty_identifier ~ LEGACY_COLON? ~ (field_type ~ ( "@" ~ directive )+ | field_type)? ~ doc_comment? ~ comment? ~ NEWLINE }
+field_declaration = { doc_comment_and_new_line* ~ non_empty_identifier ~ LEGACY_COLON? ~ (field_type ~ ( "@" ~ attribute )+ | field_type)? ~ doc_comment? ~ comment? ~ NEWLINE }
 
 
 // ######################################
@@ -42,7 +42,7 @@ legacy_list_type = { "[" ~ non_empty_identifier ~ "]" }
 // ######################################
 // Type Alias
 // ######################################
-type_alias = { comment_block? ~ TYPE_KEYWORD ~ non_empty_identifier ~ "=" ~ (base_type ~ ( "@" ~ directive )+ | base_type)  }
+type_alias = { comment_block? ~ TYPE_KEYWORD ~ non_empty_identifier ~ "=" ~ (base_type ~ ( "@" ~ attribute )+ | base_type)  }
 
 // ######################################
 // Other kind of blocks
@@ -57,19 +57,19 @@ arbitrary_block = { comment_block? ~ non_empty_identifier ~ BLOCK_OPEN ~ ((!BLOC
 // ######################################
 // Enum
 // ######################################
-enum_declaration = { comment_block? ~ ENUM_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (enum_value_declaration | block_level_directive | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
-enum_value_declaration = { doc_comment_and_new_line* ~ (non_empty_identifier ~ ( "@" ~ directive )+ | non_empty_identifier) ~ doc_comment? ~ comment? ~ NEWLINE }
+enum_declaration = { comment_block? ~ ENUM_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (enum_value_declaration | block_level_attribute | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
+enum_value_declaration = { doc_comment_and_new_line* ~ (non_empty_identifier ~ ( "@" ~ attribute )+ | non_empty_identifier) ~ doc_comment? ~ comment? ~ NEWLINE }
 
 // ######################################
-// Directives
+// Attributes
 // ######################################
-block_level_directive = { "@@" ~ directive ~ doc_comment? ~ comment? ~ NEWLINE }
-// A directive may have no arguments at all.
-directive = { (directive_name ~ directive_arguments | directive_name) }
+block_level_attribute = { "@@" ~ attribute ~ doc_comment? ~ comment? ~ NEWLINE }
+// An attribute may have no arguments at all.
+attribute = { (attribute_name ~ attribute_arguments | attribute_name) }
 // This is a poor-mans version of name spacing. Not used right now. Unclear if we need it going forward.
-directive_name = @{ (maybe_empty_identifier ~ ".")? ~ maybe_empty_identifier }
+attribute_name = @{ (maybe_empty_identifier ~ ".")? ~ maybe_empty_identifier }
 // If arguments are supplied there might be one unnamed argument. Additionally there are multiple named arguments.
-directive_arguments = { "(" ~ (((argument | argument_value) ~ ("," ~ (argument | argument_value))*)?) ~ ")" }
+attribute_arguments = { "(" ~ (((argument | argument_value) ~ ("," ~ (argument | argument_value))*)?) ~ ")" }
 
 argument = { (argument_name ~ ":" ~ argument_value) }
 argument_name = { (!":" ~ non_empty_identifier)+ }

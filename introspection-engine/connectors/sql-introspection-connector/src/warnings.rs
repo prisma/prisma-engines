@@ -73,7 +73,7 @@ pub fn warning_models_without_identifier(affected: &Vec<Model>) -> Warning {
 pub fn warning_fields_with_empty_names(affected: &Vec<ModelAndField>) -> Warning {
     Warning {
         code: 2,
-        message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` directive."
+        message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
             .into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
@@ -90,7 +90,7 @@ pub fn warning_unsupported_types(affected: &Vec<ModelAndFieldAndType>) -> Warnin
 pub fn warning_enum_values_with_empty_names(affected: &Vec<EnumAndValue>) -> Warning {
     Warning {
         code: 4,
-        message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` directive."
+        message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
             .into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
