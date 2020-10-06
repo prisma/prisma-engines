@@ -4,8 +4,8 @@
 //! * `reformat`: Exposes a Formatter for Prisma files. This is used e.g. by the VS Code Extension.
 //! * `renderer`: Turns an AST into a Prisma Schema String.
 mod argument;
+mod attribute;
 mod comment;
-mod directive;
 mod r#enum;
 mod expression;
 mod field;
@@ -23,8 +23,8 @@ pub mod reformat;
 pub mod renderer;
 
 pub use argument::Argument;
+pub use attribute::Attribute;
 pub use comment::Comment;
-pub use directive::Directive;
 pub use expression::Expression;
 pub use field::{Field, FieldArity};
 pub use generator_config::GeneratorConfig;
@@ -34,14 +34,14 @@ pub use r#enum::{Enum, EnumValue};
 pub use source_config::SourceConfig;
 pub use span::Span;
 pub use top::Top;
-pub use traits::{ArgumentContainer, WithDirectives, WithDocumentation, WithIdentifier, WithName, WithSpan};
+pub use traits::{ArgumentContainer, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
 
 /// AST representation of a prisma schema.
 ///
 /// This module is used internally to represent an AST. The AST's nodes can be used
-/// during validation of a schema, especially when implementing custom directives.
+/// during validation of a schema, especially when implementing custom attributes.
 ///
-/// The AST is not validated, also fields and directives are not resolved. Every node is
+/// The AST is not validated, also fields and attributes are not resolved. Every node is
 /// annotated with it's location in the text representation.
 /// Basically, the AST is an object oriented representation of the datamodel's text.
 /// A prisma schema.

@@ -1,7 +1,7 @@
 use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
+    parse_attribute::parse_attribute,
     parse_comments::parse_comment_block,
-    parse_directive::parse_directive,
     Rule,
 };
 use crate::ast::*;
@@ -9,7 +9,7 @@ use crate::error::DatamodelError;
 
 pub fn parse_type_alias(token: &Token) -> Field {
     let mut name: Option<Identifier> = None;
-    let mut directives: Vec<Directive> = vec![];
+    let mut attributes: Vec<Attribute> = vec![];
     let mut base_type: Option<(String, Span)> = None;
     let mut comment: Option<Comment> = None;
 
@@ -18,7 +18,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
             Rule::TYPE_KEYWORD => {}
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::base_type => base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span()))),
-            Rule::directive => directives.push(parse_directive(&current)),
+            Rule::attribute => attributes.push(parse_attribute(&current)),
             Rule::comment_block => comment = Some(parse_comment_block(&current)),
             _ => parsing_catch_all(&current, "custom type"),
         }
@@ -32,7 +32,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
             },
             name,
             arity: FieldArity::Required,
-            directives,
+            attributes,
             documentation: comment,
             span: Span::from_pest(token.as_span()),
             is_commented_out: false,

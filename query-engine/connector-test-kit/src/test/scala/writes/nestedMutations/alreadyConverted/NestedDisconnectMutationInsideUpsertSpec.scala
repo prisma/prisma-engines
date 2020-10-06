@@ -386,7 +386,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                         model Todo{
                             id       String    @id @default(cuid())
                             text     String?
-                            comments Comment[] $relationInlineDirective
+                            comments Comment[] $relationInlineAttribute
                         }"""
 
     val project = SchemaDsl.fromStringV11() { schema }
@@ -450,7 +450,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                         model Todo{
                             id       String    @id @default(cuid())
                             text     String?
-                            comments Comment[] $relationInlineDirective
+                            comments Comment[] $relationInlineAttribute
                         }"""
 
     val project = SchemaDsl.fromStringV11() { schema }
@@ -512,7 +512,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                         model Todo{
                             id       String    @id @default(cuid())
                             text     String?
-                            comments Comment[] $relationInlineDirective
+                            comments Comment[] $relationInlineAttribute
                         }"""
 
     val project = SchemaDsl.fromStringV11() { schema }
@@ -630,7 +630,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                         model Todo{
                             id       String    @id @default(cuid())
                             title    String?   @unique
-                            comments Comment[] $relationInlineDirective
+                            comments Comment[] $relationInlineAttribute
                         }"""
 
     val project = SchemaDsl.fromStringV11() { schema }
@@ -848,14 +848,14 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String   @id @default(cuid())
                                              |  nameMiddle String   @unique
                                              |  tops       Top[]
-                                             |  bottoms    Bottom[] $relationInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
@@ -933,13 +933,13 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
                                              |  nameMiddle String @unique
-                                             |  bottoms    Bottom[] $relationInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
@@ -1015,7 +1015,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
@@ -1107,7 +1107,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                                              |model Bottom {
                                              |  id         String  @id @default(cuid())
                                              |  nameBottom String  @unique
-                                             |  below      Below[] $relationInlineDirective
+                                             |  below      Below[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Below {

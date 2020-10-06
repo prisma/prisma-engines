@@ -75,7 +75,7 @@ model Post {
 }
 
 #[test]
-fn format_should_enforce_order_of_field_directives() {
+fn format_should_enforce_order_of_field_attributes() {
     let input = r#"model Post {
   id        Int      @default(autoincrement()) @id
   published Boolean  @map("_published") @default(false)
@@ -113,7 +113,7 @@ model Test {
 }
 
 #[test]
-fn format_should_enforce_order_of_block_directives() {
+fn format_should_enforce_order_of_block_attributes() {
     let input = r#"model Person {
   firstName   String
   lastName    String
@@ -164,7 +164,7 @@ model Blog {
 
 #[test]
 #[ignore]
-fn format_should_put_block_directives_to_end_of_block_with_comments() {
+fn format_should_put_block_attributes_to_end_of_block_with_comments() {
     let input = r#"model Blog {
   @@id([id1, id2]) /// id comment
   id1 Int
@@ -185,7 +185,7 @@ fn format_should_put_block_directives_to_end_of_block_with_comments() {
 }
 
 #[test]
-fn format_should_put_block_directives_to_end_of_block_without_comments() {
+fn format_should_put_block_attributes_to_end_of_block_without_comments() {
     let input = r#"model Blog {
   @@map("blog")
   id1 Int
@@ -777,7 +777,7 @@ model Comment {
 }
 
 #[test]
-fn model_level_directives_reset_the_table_layout() {
+fn model_level_attributes_reset_the_table_layout() {
     let input = r#"model Post {
   id Int @id
   aVeryLongName  String

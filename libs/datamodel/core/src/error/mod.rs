@@ -19,8 +19,8 @@ pub enum DatamodelError {
     #[error("Function \"{}\" takes {} arguments, but received {}.", function_name, required_count, given_count)]
     ArgumentCountMissmatch { function_name: String, required_count: usize, given_count: usize, span: Span },
 
-    #[error("Argument \"{}\" is missing in attribute \"@{}\".", argument_name, directive_name)]
-    DirectiveArgumentNotFound { argument_name: String, directive_name: String, span: Span },
+    #[error("Argument \"{}\" is missing in attribute \"@{}\".", argument_name, attribute_name)]
+    AttributeArgumentNotFound { argument_name: String, attribute_name: String, span: Span },
 
     #[error("Argument \"{}\" is missing in data source block \"{}\".", argument_name, source_name)]
     SourceArgumentNotFound { argument_name: String, source_name: String, span: Span },
@@ -28,11 +28,11 @@ pub enum DatamodelError {
     #[error("Argument \"{}\" is missing in generator block \"{}\".", argument_name, generator_name)]
     GeneratorArgumentNotFound { argument_name: String, generator_name: String, span: Span },
 
-    #[error("Error parsing attribute \"@{}\": {}", directive_name, message)]
-    DirectiveValidationError { message: String, directive_name: String, span: Span },
+    #[error("Error parsing attribute \"@{}\": {}", attribute_name, message)]
+    AttributeValidationError { message: String, attribute_name: String, span: Span },
 
-    #[error("Attribute \"@{}\" is defined twice.", directive_name)]
-    DuplicateDirectiveError { directive_name: String, span: Span },
+    #[error("Attribute \"@{}\" is defined twice.", attribute_name)]
+    DuplicateAttributeError { attribute_name: String, span: Span },
 
     #[error("\"{}\" is a reserved scalar type name and can not be used.", type_name)]
     ReservedScalarTypeError { type_name: String, span: Span },
@@ -65,14 +65,17 @@ pub enum DatamodelError {
     #[error("Value \"{}\" is already defined on enum \"{}\".", value_name, enum_name)]
     DuplicateEnumValueError { enum_name: String, value_name: String, span: Span },
 
-    #[error("Attribute not known: \"@{}\".", directive_name)]
-    DirectiveNotKnownError { directive_name: String, span: Span },
+    #[error("Attribute not known: \"@{}\".", attribute_name)]
+    AttributeNotKnownError { attribute_name: String, span: Span },
 
     #[error("Function not known: \"{}\".", function_name)]
     FunctionNotKnownError { function_name: String, span: Span },
 
     #[error("Datasource provider not known: \"{}\".", source_name)]
     DatasourceProviderNotKnownError { source_name: String, span: Span },
+
+    #[error("The preview feature \"{}\" is not known. Expected one of: {}", preview_feature, expected_preview_features)]
+    PreviewFeatureNotKnownError { preview_feature: String, expected_preview_features: String,  span: Span },
 
     #[error("\"{}\" is not a valid value for {}.", raw_value, literal_type)]
     LiteralParseError { literal_type: String, raw_value: String, span: Span },
@@ -143,10 +146,10 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_directive_argument_not_found_error(argument_name: &str, directive_name: &str, span: Span) -> DatamodelError {
-        DatamodelError::DirectiveArgumentNotFound {
+    pub fn new_attribute_argument_not_found_error(argument_name: &str, attribute_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::AttributeArgumentNotFound {
             argument_name: String::from(argument_name),
-            directive_name: String::from(directive_name),
+            attribute_name: String::from(attribute_name),
             span,
         }
     }
@@ -167,17 +170,17 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_directive_validation_error(message: &str, directive_name: &str, span: Span) -> DatamodelError {
-        DatamodelError::DirectiveValidationError {
+    pub fn new_attribute_validation_error(message: &str, attribute_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::AttributeValidationError {
             message: String::from(message),
-            directive_name: String::from(directive_name),
+            attribute_name: String::from(attribute_name),
             span,
         }
     }
 
-    pub fn new_duplicate_directive_error(directive_name: &str, span: Span) -> DatamodelError {
-        DatamodelError::DuplicateDirectiveError {
-            directive_name: String::from(directive_name),
+    pub fn new_duplicate_attribute_error(attribute_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DuplicateAttributeError {
+            attribute_name: String::from(attribute_name),
             span,
         }
     }
@@ -328,8 +331,8 @@ impl DatamodelError {
     pub fn new_scalar_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
         DatamodelError::ScalarTypeNotFoundError { type_name: String::from(type_name), span }
     }
-    pub fn new_directive_not_known_error(directive_name: &str, span: Span) -> DatamodelError {
-        DatamodelError::DirectiveNotKnownError { directive_name: String::from(directive_name), span }
+    pub fn new_attribute_not_known_error(attribute_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::AttributeNotKnownError { attribute_name: String::from(attribute_name), span }
     }
     pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {
         DatamodelError::FunctionNotKnownError { function_name: String::from(function_name), span }
@@ -337,6 +340,10 @@ impl DatamodelError {
 
     pub fn new_datasource_provider_not_known_error(source_name: &str, span: Span) -> DatamodelError {
         DatamodelError::DatasourceProviderNotKnownError { source_name: String::from(source_name), span }
+    }
+
+    pub fn new_preview_feature_not_known_error(preview_feature: &str, expected_preview_features: Vec<&str>, span: Span) -> DatamodelError {
+        DatamodelError::PreviewFeatureNotKnownError { preview_feature: String::from(preview_feature), expected_preview_features:  expected_preview_features.join(", "), span}
     }
 
     pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
@@ -360,12 +367,12 @@ impl DatamodelError {
     pub fn span(&self) -> Span {
         match self {
             DatamodelError::ArgumentNotFound { span, .. } => *span,
-            DatamodelError::DirectiveArgumentNotFound { span, .. } => *span,
+            DatamodelError::AttributeArgumentNotFound { span, .. } => *span,
             DatamodelError::ArgumentCountMissmatch { span, .. } => *span,
             DatamodelError::SourceArgumentNotFound { span, .. } => *span,
             DatamodelError::GeneratorArgumentNotFound { span, .. } => *span,
-            DatamodelError::DirectiveValidationError { span, .. } => *span,
-            DatamodelError::DirectiveNotKnownError { span, .. } => *span,
+            DatamodelError::AttributeValidationError { span, .. } => *span,
+            DatamodelError::AttributeNotKnownError { span, .. } => *span,
             DatamodelError::ReservedScalarTypeError { span, .. } => *span,
             DatamodelError::FunctionNotKnownError { span, .. } => *span,
             DatamodelError::DatasourceProviderNotKnownError { span, .. } => *span,
@@ -380,7 +387,7 @@ impl DatamodelError {
             DatamodelError::ValidationError { span, .. } => *span,
             DatamodelError::LegacyParserError { span, .. } => *span,
             DatamodelError::ModelValidationError { span, .. } => *span,
-            DatamodelError::DuplicateDirectiveError { span, .. } => *span,
+            DatamodelError::DuplicateAttributeError { span, .. } => *span,
             DatamodelError::DuplicateConfigKeyError { span, .. } => *span,
             DatamodelError::DuplicateTopError { span, .. } => *span,
             DatamodelError::DuplicateFieldError { span, .. } => *span,
@@ -394,6 +401,7 @@ impl DatamodelError {
             DatamodelError::SourceValidationError {span, ..} => *span,
             DatamodelError::EnumValidationError {span, ..} => *span,
             DatamodelError::ConnectorError { span, .. } => *span,
+            DatamodelError::PreviewFeatureNotKnownError {span, ..} => *span,
         }
     }
     pub fn description(&self) -> String {

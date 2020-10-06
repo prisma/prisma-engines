@@ -15,7 +15,7 @@ use crate::{
 pub struct Standardiser {}
 
 impl Standardiser {
-    /// Creates a new instance, with all builtin directives registered.
+    /// Creates a new instance, with all builtin attributes registered.
     pub fn new() -> Self {
         Standardiser {}
     }

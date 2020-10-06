@@ -1,4 +1,4 @@
-use super::super::directives::AllDirectives;
+use super::super::attributes::AllAttributes;
 use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
 use crate::{
@@ -15,18 +15,18 @@ use itertools::Itertools;
 /// AST is converted to the real datamodel, and
 /// additional semantics are attached.
 pub struct LiftAstToDml<'a> {
-    directives: AllDirectives,
+    attributes: AllAttributes,
     source: Option<&'a configuration::Datasource>,
 }
 
 impl<'a> LiftAstToDml<'a> {
-    /// Creates a new instance, with all builtin directives and
-    /// the directives defined by the given sources registered.
+    /// Creates a new instance, with all builtin attributes and
+    /// the attributes defined by the given sources registered.
     ///
-    /// The directives defined by the given sources will be namespaced.
+    /// The attributes defined by the given sources will be namespaced.
     pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml {
         LiftAstToDml {
-            directives: AllDirectives::new(),
+            attributes: AllAttributes::new(),
             source,
         }
     }
@@ -73,7 +73,7 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
-        if let Err(mut err) = self.directives.model.validate_and_apply(ast_model, &mut model) {
+        if let Err(mut err) = self.attributes.model.validate_and_apply(ast_model, &mut model) {
             errors.append(&mut err);
         }
 
@@ -121,7 +121,7 @@ impl<'a> LiftAstToDml<'a> {
 
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
-        if let Err(mut err) = self.directives.enm.validate_and_apply(ast_enum, &mut en) {
+        if let Err(mut err) = self.attributes.enm.validate_and_apply(ast_enum, &mut en) {
             errors.append(&mut err);
         }
 
@@ -137,7 +137,7 @@ impl<'a> LiftAstToDml<'a> {
         let mut enum_value = dml::EnumValue::new(&ast_enum_value.name.name);
         enum_value.documentation = ast_enum_value.documentation.clone().map(|comment| comment.text);
 
-        self.directives
+        self.attributes
             .enm_value
             .validate_and_apply(ast_enum_value, &mut enum_value)?;
 
@@ -166,9 +166,9 @@ impl<'a> LiftAstToDml<'a> {
         };
 
         // We merge attributes so we can fail on duplicates.
-        let attributes = [&extra_attributes[..], &ast_field.directives[..]].concat();
+        let attributes = [&extra_attributes[..], &ast_field.attributes[..]].concat();
 
-        if let Err(mut err) = self.directives.field.validate_and_apply(&attributes, &mut field) {
+        if let Err(mut err) = self.attributes.field.validate_and_apply(&attributes, &mut field) {
             errors.append(&mut err);
         }
 
@@ -189,14 +189,14 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lift a field's type.
-    /// Auto resolves custom types and gathers directives, but without a stack overflow please.
+    /// Auto resolves custom types and gathers attributes, but without a stack overflow please.
     fn lift_field_type(
         &self,
         ast_field: &ast::Field,
         type_alias: Option<String>,
         ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
-    ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
+    ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
         let (supports_native_types, datasource_name) = match self.source {
@@ -214,13 +214,13 @@ impl<'a> LiftAstToDml<'a> {
                 let prefix = format!("{}{}", datasource_name, ".");
 
                 let type_specifications = ast_field
-                    .directives
+                    .attributes
                     .iter()
                     .filter(|dir| dir.name.name.starts_with(&prefix))
                     .collect_vec();
 
                 let type_specifications_with_invalid_datasource_name = ast_field
-                    .directives
+                    .attributes
                     .iter()
                     .filter(|dir| dir.name.name.contains(".") && !dir.name.name.starts_with(&prefix))
                     .collect_vec();
@@ -244,7 +244,7 @@ impl<'a> LiftAstToDml<'a> {
                 let type_specification = type_specifications.first();
 
                 if type_specifications.len() > 1 {
-                    return Err(DatamodelError::new_duplicate_directive_error(
+                    return Err(DatamodelError::new_duplicate_attribute_error(
                         &prefix,
                         type_specification.unwrap().span,
                     ));
@@ -323,7 +323,7 @@ impl<'a> LiftAstToDml<'a> {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
             } else {
-                if let Some(native_type_attribute) = ast_field.directives.iter().find(|d| d.name.name.contains(".")) {
+                if let Some(native_type_attribute) = ast_field.attributes.iter().find(|d| d.name.name.contains(".")) {
                     return Err(DatamodelError::new_connector_error(
                         &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
                         native_type_attribute.span,
@@ -346,7 +346,7 @@ impl<'a> LiftAstToDml<'a> {
         ast_field: &ast::Field,
         ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
-    ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
+    ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
         if checked_types.iter().any(|x| x == type_name) {
@@ -373,7 +373,7 @@ impl<'a> LiftAstToDml<'a> {
                 ));
             }
 
-            attrs.append(&mut custom_type.directives.clone());
+            attrs.append(&mut custom_type.attributes.clone());
             Ok((field_type, attrs))
         } else {
             Err(DatamodelError::new_type_not_found_error(
