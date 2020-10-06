@@ -33,7 +33,7 @@ pub struct FormatOpts {
 #[derive(Debug, StructOpt, Clone)]
 pub struct PreviewFeaturesOpts {
     /// If set, only returns datasource instead of generator preview features
-    #[structopt(long, default_value = false)]
+    #[structopt(long)]
     datasource_only: bool,
 }
 
@@ -63,6 +63,6 @@ fn main() {
         FmtOpts::Lint(opts) => lint::run(opts),
         FmtOpts::Format(opts) => format::run(opts),
         FmtOpts::NativeTypes => native::run(),
-        FmtOpts::PreviewFeatures(opts) => preview::run(),
+        FmtOpts::PreviewFeatures(opts) => preview::run(opts),
     }
 }
