@@ -26,8 +26,7 @@ tracing-error = "0.1.2"
 tempfile = "3.1.0"
 test-setup = { path = "../../libs/test-setup" }
 url = "2.1.1"
-# quaint = { git = "https://github.com/prisma/quaint" }
-quaint = {git = "https://github.com/prisma/quaint", branch = "xml_support"}
+quaint = { git = "https://github.com/prisma/quaint" }
 
 [features]
 default = ["sql"]
