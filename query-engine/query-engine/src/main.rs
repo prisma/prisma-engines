@@ -59,7 +59,7 @@ async fn main() -> Result<(), AnyError> {
 
 fn init_logger(log_format: LogFormat) {
     // Enable `tide` logs to be captured.
-    let filter = EnvFilter::from_default_env().add_attribute("tide=info".parse().unwrap());
+    let filter = EnvFilter::from_default_env().add_directive("tide=info".parse().unwrap());
 
     match log_format {
         LogFormat::Text => {
