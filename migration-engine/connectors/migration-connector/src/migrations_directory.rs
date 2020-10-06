@@ -1,5 +1,4 @@
 #![deny(missing_docs)]
-#![allow(dead_code)]
 
 //! Migrations directory management.
 //!
@@ -11,11 +10,12 @@
 
 use sha2::{Digest, Sha256, Sha512};
 use std::{
+    error::Error,
+    fmt::Display,
     fs::{create_dir, read_dir, DirEntry},
     io::{self, Write as _},
     path::{Path, PathBuf},
 };
-use thiserror::Error;
 use tracing_error::SpanTrace;
 
 use crate::FormatChecksum;
@@ -52,13 +52,26 @@ pub fn create_migration_directory(
 }
 
 /// An IO error that occurred while reading the migrations directory.
-#[derive(Debug, Error)]
-#[error("An error occurred when reading the migrations directory.")]
-pub struct ListMigrationsError(
-    #[source]
-    #[from]
-    io::Error,
-);
+#[derive(Debug)]
+pub struct ListMigrationsError(io::Error);
+
+impl Display for ListMigrationsError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "An error occurred when reading the migrations directory.")
+    }
+}
+
+impl Error for ListMigrationsError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        Some(&self.0)
+    }
+}
+
+impl From<io::Error> for ListMigrationsError {
+    fn from(err: io::Error) -> Self {
+        ListMigrationsError(err)
+    }
+}
 
 /// List the migrations present in the migration directory, lexicographically sorted by name.
 pub fn list_migrations(migrations_directory_path: &Path) -> Result<Vec<MigrationDirectory>, ListMigrationsError> {
@@ -84,13 +97,24 @@ pub struct MigrationDirectory {
     path: PathBuf,
 }
 
-#[derive(Debug, Error)]
-#[error("Failed to read migration script")]
-pub struct ReadMigrationScriptError(#[source] pub(crate) io::Error, pub(crate) SpanTrace);
+#[derive(Debug)]
+pub struct ReadMigrationScriptError(pub(crate) io::Error, pub(crate) SpanTrace);
+
+impl Display for ReadMigrationScriptError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Failed to read migration script")
+    }
+}
 
 impl From<io::Error> for ReadMigrationScriptError {
     fn from(err: io::Error) -> Self {
         ReadMigrationScriptError(err, SpanTrace::capture())
+    }
+}
+
+impl Error for ReadMigrationScriptError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        Some(&self.0)
     }
 }
 
