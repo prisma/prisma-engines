@@ -114,7 +114,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::TinyInt.to_json()),
+                native_type: Some(MySqlType::TinyInt(4).to_json()),
             },
             default: None,
             auto_increment: false,
@@ -127,7 +127,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::TinyInt.to_json()),
+                native_type: Some(MySqlType::TinyInt(1).to_json()),
             },
 
             default: None,
