@@ -235,6 +235,7 @@ impl SqlSchemaDescriber {
                 None => None,
                 Some(param_value) => match param_value.to_string() {
                     None => None,
+                    Some(x) if x.starts_with("NULL") => None,
                     Some(default_string) => {
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string) {
@@ -616,14 +617,17 @@ impl SqlSchemaDescriber {
 
     async fn get_enums(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Enum>> {
         debug!("Getting enums");
+
         let sql = "SELECT t.typname as name, e.enumlabel as value
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1
-            ORDER BY name, value";
+            ORDER BY e.enumsortorder";
+
         let rows = self.conn.query_raw(&sql, &[schema.into()]).await.unwrap();
         let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
+
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);
             let name = row.get("name").and_then(|x| x.to_string()).unwrap();

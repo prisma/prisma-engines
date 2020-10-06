@@ -7,9 +7,49 @@ use std::{
     convert::TryInto,
 };
 
-static DEFAULT_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
-static DEFAULT_NON_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('(.*)'\)").unwrap());
+/// Matches a default value in the schema, that is not a string.
+///
+/// Examples:
+///
+/// ```ignore
+/// ((1))
+/// ```
+///
+/// ```ignore
+/// ((1.123))
+/// ```
+///
+/// ```ignore
+/// ((true))
+/// ```
+static DEFAULT_NON_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
+
+/// Matches a default value in the schema, that is a string.
+///
+/// Example:
+///
+/// ```ignore
+/// ('this is a test')
+/// ```
+static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('(.*)'\)").unwrap());
+
+/// Matches a database-generated value in the schema.
+///
+/// Example:
+///
+/// ```ignore
+/// (current_timestamp)
+/// ```
 static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
+
+/// Matches a partial index condition, that filters out null values from the index.
+///
+/// Example:
+///
+/// ```ignore
+/// [id] IS NOT NULL
+/// ```
+static NULL_PARTIAL_INDEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[(.*)\] IS NOT NULL").unwrap());
 
 pub struct SqlSchemaDescriber {
     conn: Quaint,
@@ -248,10 +288,10 @@ impl SqlSchemaDescriber {
                     None => None,
                     Some(x) if x == "(NULL)" => None,
                     Some(default_string) => {
-                        let default_string = DEFAULT_INT
+                        let default_string = DEFAULT_NON_STRING
                             .captures_iter(&default_string)
                             .next()
-                            .or_else(|| DEFAULT_NON_INT.captures_iter(&default_string).next())
+                            .or_else(|| DEFAULT_STRING.captures_iter(&default_string).next())
                             .or_else(|| DEFAULT_DB_GEN.captures_iter(&default_string).next())
                             .map(|cap| cap[1].to_string())
                             .expect("Couldn't parse default value");
@@ -317,7 +357,8 @@ impl SqlSchemaDescriber {
                 ind.is_primary_key AS is_primary_key,
                 col.name AS column_name,
                 ic.index_column_id AS seq_in_index,
-                t.name AS table_name
+                t.name AS table_name,
+                ind.filter_definition AS filter_definition
             FROM
                 sys.indexes ind
             INNER JOIN sys.index_columns ic
@@ -328,6 +369,7 @@ impl SqlSchemaDescriber {
                 sys.tables t ON ind.object_id = t.object_id
             WHERE SCHEMA_NAME(t.schema_id) = @P1
                 AND t.is_ms_shipped = 0
+
             ORDER BY index_name, seq_in_index
         "#;
 
@@ -339,6 +381,28 @@ impl SqlSchemaDescriber {
 
         for row in rows {
             debug!("Got index row: {:#?}", row);
+
+            // Skip the index if it contains a partial index condition other
+            // than `[col] IS NOT NULL`.
+            //
+            // SQL Server allows only one null item per unique column by
+            // default, so we'll be having a partial index condition to filter
+            // nulls out from the index.
+            if let Some(filter_definition) = row
+                .get("filter_definition")
+                .and_then(|v| v.as_str())
+                .and_then(|v| DEFAULT_DB_GEN.captures_iter(v).next())
+                .and_then(|v| v.get(0))
+                .map(|v| v.as_str().to_string())
+            {
+                let is_user_defined_partial_index = filter_definition
+                    .split(" AND ")
+                    .any(|filter| NULL_PARTIAL_INDEX.captures_iter(filter).next().is_none());
+
+                if is_user_defined_partial_index {
+                    continue;
+                }
+            };
 
             let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
             let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
