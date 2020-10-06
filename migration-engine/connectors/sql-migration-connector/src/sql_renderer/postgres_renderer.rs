@@ -325,7 +325,7 @@ impl SqlRenderer for PostgresFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_columns = table.table.primary_key_columns();
@@ -336,12 +336,12 @@ impl SqlRenderer for PostgresFlavour {
             String::new()
         };
 
-        Ok(format!(
+        format!(
             "CREATE TABLE {table_name} (\n{columns}{primary_key}\n)",
             table_name = self.quote_with_schema(table.name()),
             columns = columns,
             primary_key = pk,
-        ))
+        )
     }
 
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String> {

@@ -211,7 +211,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_columns = table.table.primary_key_columns();
@@ -248,13 +248,13 @@ impl SqlRenderer for MssqlFlavour {
             String::new()
         };
 
-        Ok(format!(
+        format!(
             "CREATE TABLE {} ({columns}{primary_key}{constraints})",
             table_name = self.quote_with_schema(table.name()),
             columns = columns,
             primary_key = primary_key,
             constraints = constraints,
-        ))
+        )
     }
 
     fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {

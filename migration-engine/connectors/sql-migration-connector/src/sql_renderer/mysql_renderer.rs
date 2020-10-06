@@ -258,7 +258,7 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_columns = table.table.primary_key_columns();
@@ -297,13 +297,13 @@ impl SqlRenderer for MysqlFlavour {
             String::new()
         };
 
-        Ok(format!(
+        format!(
             "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
             table_name = self.quote(table.name()),
             columns = columns,
             indexes = indexes,
             primary_key = primary_key,
-        ))
+        )
     }
 
     fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {

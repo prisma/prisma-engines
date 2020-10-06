@@ -181,7 +181,7 @@ fn render_raw_sql(
                 .table_walker(&table.name)
                 .expect("CreateTable referring to an unknown table.");
 
-            Ok(vec![renderer.render_create_table(&table)?])
+            Ok(vec![renderer.render_create_table(&table)])
         }
         SqlMigrationStep::DropTable(DropTable { name }) => Ok(renderer.render_drop_table(name)),
         SqlMigrationStep::RenameTable { name, new_name } => Ok(vec![renderer.render_rename_table(name, new_name)]),

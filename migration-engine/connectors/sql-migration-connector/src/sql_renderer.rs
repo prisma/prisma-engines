@@ -52,7 +52,7 @@ pub(crate) trait SqlRenderer {
     fn render_create_index(&self, create_index: &CreateIndex) -> String;
 
     /// Render a `CreateTable` step.
-    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String>;
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String;
 
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
