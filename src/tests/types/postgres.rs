@@ -276,6 +276,17 @@ test_type!(jsonb_array(
     ])
 ));
 
+#[cfg(feature = "xml")]
+test_type!(xml(postgres, "xml", Value::Xml(None), Value::xml("<test>1</test>",)));
+
+#[cfg(all(feature = "xml", feature = "array"))]
+test_type!(xml_array(
+    postgres,
+    "xml[]",
+    Value::Array(None),
+    Value::array(vec!["<test>1</test>", "<test>2</test>",])
+));
+
 #[cfg(feature = "uuid-0_8")]
 test_type!(uuid(
     postgres,

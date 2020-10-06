@@ -50,6 +50,11 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
                     }
                     None => None,
                 },
+                #[cfg(feature = "xml")]
+                Value::Xml(s) => match s {
+                    Some(ref s) => Some(my::Value::Bytes((s).as_bytes().to_vec())),
+                    None => None,
+                },
                 #[cfg(feature = "array")]
                 Value::Array(_) => {
                     let msg = "Arrays are not supported in MySQL.";

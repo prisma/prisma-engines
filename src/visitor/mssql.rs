@@ -1,4 +1,5 @@
 use super::Visitor;
+use crate::prelude::Aliasable;
 use crate::prelude::Query;
 use crate::{
     ast::{Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Values},
@@ -85,9 +86,40 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 self.visit_multiple_tuple_comparison(left, Values::from(iter::once(right)), false)?;
             }
             (left_kind, right_kind) => {
-                self.visit_expression(Expression::from(left_kind))?;
+                let (l_alias, r_alias) = (left.alias, right.alias);
+
+                #[cfg(feature = "xml")]
+                let (left_xml, right_xml) = (left_kind.is_xml_value(), right_kind.is_xml_value());
+
+                let mut left = Expression::from(left_kind);
+
+                if let Some(alias) = l_alias {
+                    left = left.alias(alias);
+                }
+
+                let mut right = Expression::from(right_kind);
+
+                if let Some(alias) = r_alias {
+                    right = right.alias(alias);
+                }
+
+                match self {
+                    #[cfg(feature = "xml")]
+                    _ if right_xml => {
+                        self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(left))?
+                    }
+                    _ => self.visit_expression(left)?,
+                };
+
                 self.write(" = ")?;
-                self.visit_expression(Expression::from(right_kind))?;
+
+                match self {
+                    #[cfg(feature = "xml")]
+                    _ if left_xml => {
+                        self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(right))?
+                    }
+                    _ => self.visit_expression(right)?,
+                };
             }
         }
 
@@ -101,9 +133,40 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 self.visit_multiple_tuple_comparison(left, Values::from(iter::once(right)), true)?;
             }
             (left_kind, right_kind) => {
-                self.visit_expression(Expression::from(left_kind))?;
+                let (l_alias, r_alias) = (left.alias, right.alias);
+
+                #[cfg(feature = "xml")]
+                let (left_xml, right_xml) = (left_kind.is_xml_value(), right_kind.is_xml_value());
+
+                let mut left = Expression::from(left_kind);
+
+                if let Some(alias) = l_alias {
+                    left = left.alias(alias);
+                }
+
+                let mut right = Expression::from(right_kind);
+
+                if let Some(alias) = r_alias {
+                    right = right.alias(alias);
+                }
+
+                match self {
+                    #[cfg(feature = "xml")]
+                    _ if right_xml => {
+                        self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(left))?
+                    }
+                    _ => self.visit_expression(left)?,
+                };
+
                 self.write(" <> ")?;
-                self.visit_expression(Expression::from(right_kind))?;
+
+                match self {
+                    #[cfg(feature = "xml")]
+                    _ if left_xml => {
+                        self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(right))?
+                    }
+                    _ => self.visit_expression(right)?,
+                };
             }
         }
 
@@ -151,6 +214,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 let s = format!("CONVERT(time, N'{}')", time);
                 self.write(s)
             }),
+            #[cfg(feature = "xml")]
+            // Style 3 is keep all whitespace + internal DTD processing:
+            // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
+            Value::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{}', 3)", cow))),
         };
 
         match res {
@@ -624,6 +691,69 @@ mod tests {
 
         assert_eq!(expected.0, sql);
         assert_eq!(default_params(expected.1), params);
+    }
+
+    #[cfg(feature = "xml")]
+    #[test]
+    fn equality_with_a_xml_value() {
+        let expected = expected_values(
+            r#"SELECT [users].* FROM [users] WHERE CAST([xmlField] AS NVARCHAR(MAX)) = @P1"#,
+            vec![Value::xml("<cat>meow</cat>")],
+        );
+
+        let query = Select::from_table("users").so_that(Column::from("xmlField").equals(Value::xml("<cat>meow</cat>")));
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[cfg(feature = "xml")]
+    #[test]
+    fn equality_with_a_lhs_xml_value() {
+        let expected = expected_values(
+            r#"SELECT [users].* FROM [users] WHERE @P1 = CAST([xmlField] AS NVARCHAR(MAX))"#,
+            vec![Value::xml("<cat>meow</cat>")],
+        );
+
+        let value_expr: Expression = Value::xml("<cat>meow</cat>").into();
+        let query = Select::from_table("users").so_that(value_expr.equals(Column::from("xmlField")));
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[cfg(feature = "xml")]
+    #[test]
+    fn difference_with_a_xml_value() {
+        let expected = expected_values(
+            r#"SELECT [users].* FROM [users] WHERE CAST([xmlField] AS NVARCHAR(MAX)) <> @P1"#,
+            vec![Value::xml("<cat>meow</cat>")],
+        );
+
+        let query =
+            Select::from_table("users").so_that(Column::from("xmlField").not_equals(Value::xml("<cat>meow</cat>")));
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[cfg(feature = "xml")]
+    #[test]
+    fn difference_with_a_lhs_xml_value() {
+        let expected = expected_values(
+            r#"SELECT [users].* FROM [users] WHERE @P1 <> CAST([xmlField] AS NVARCHAR(MAX))"#,
+            vec![Value::xml("<cat>meow</cat>")],
+        );
+
+        let value_expr: Expression = Value::xml("<cat>meow</cat>").into();
+        let query = Select::from_table("users").so_that(value_expr.not_equals(Column::from("xmlField")));
+        let (sql, params) = Mssql::build(query).unwrap();
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
     }
 
     #[test]

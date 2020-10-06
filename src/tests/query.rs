@@ -1095,6 +1095,44 @@ async fn json_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
+#[test_each_connector(tags("mssql", "postgres"))]
+async fn xml_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api
+        .create_table(&format!("{}, xmlfield {}", api.autogen_id("id"), "xml"))
+        .await?;
+
+    let one = Insert::single_into(&table).value("xmlfield", Value::xml("<pig>oink</pig>"));
+    let two = Insert::single_into(&table).value("xmlfield", Value::xml("<horse>neigh</horse>"));
+
+    api.conn().insert(one.into()).await?;
+    api.conn().insert(two.into()).await?;
+
+    // Equals
+    {
+        let select =
+            Select::from_table(&table).so_that(Column::from("xmlfield").equals(Value::xml("<horse>neigh</horse>")));
+
+        let result = api.conn().select(select).await?;
+        assert_eq!(result.len(), 1);
+
+        let row = result.into_single()?;
+        assert_eq!(Some(2), row["id"].as_i64());
+    }
+
+    // Not equals
+    {
+        let select =
+            Select::from_table(&table).so_that(Column::from("xmlfield").not_equals(Value::xml("<horse>neigh</horse>")));
+        let result = api.conn().query(select.into()).await?;
+        assert_eq!(result.len(), 1);
+
+        let row = result.into_single()?;
+        assert_eq!(Some(1), row["id"].as_i64());
+    }
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn upper_fun(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::default().value(upper("foo").alias("val"));

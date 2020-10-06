@@ -49,6 +49,11 @@ impl<'a> Expression<'a> {
         }
     }
 
+    #[cfg(feature = "xml")]
+    pub(crate) fn is_xml_value(&self) -> bool {
+        self.kind.is_xml_value()
+    }
+
     pub(crate) fn is_asterisk(&self) -> bool {
         matches!(self.kind, ExpressionKind::Asterisk(_))
     }
@@ -175,6 +180,17 @@ pub enum ExpressionKind<'a> {
     Compare(Compare<'a>),
     /// A single value, column, row or a nested select
     Value(Box<Expression<'a>>),
+}
+
+impl<'a> ExpressionKind<'a> {
+    #[cfg(feature = "xml")]
+    pub(crate) fn is_xml_value(&self) -> bool {
+        match self {
+            Self::Parameterized(Value::Xml(_)) => true,
+            Self::Value(expr) => expr.is_xml_value(),
+            _ => false,
+        }
+    }
 }
 
 /// A quick alias to create an asterisk to a table.

@@ -25,6 +25,18 @@ pub fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a (dyn types::ToSql + S
     params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
 }
 
+struct XmlString(pub String);
+
+impl<'a> FromSql<'a> for XmlString {
+    fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<XmlString, Box<dyn std::error::Error + Sync + Send>> {
+        Ok(XmlString(String::from_utf8(raw.to_owned()).unwrap().into()))
+    }
+
+    fn accepts(ty: &PostgresType) -> bool {
+        ty == &PostgresType::XML
+    }
+}
+
 struct EnumString {
     value: String,
 }
@@ -404,6 +416,22 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
+                #[cfg(feature = "xml")]
+                PostgresType::XML => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: XmlString = val;
+                        Value::xml(val.0)
+                    }
+                    None => Value::Xml(None),
+                },
+                #[cfg(all(feature = "array", feature = "xml"))]
+                PostgresType::XML_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<XmlString> = val;
+                        Value::array(val.into_iter().map(|v| v.0))
+                    }
+                    None => Value::Array(None),
+                },
                 ref x => match x.kind() {
                     Kind::Enum(_) => match row.try_get(i)? {
                         Some(val) => {
@@ -569,6 +597,8 @@ impl<'a> ToSql for Value<'a> {
             (Value::Array(vec), _) => vec.as_ref().map(|vec| vec.to_sql(ty, out)),
             #[cfg(feature = "json-1")]
             (Value::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
+            #[cfg(feature = "xml")]
+            (Value::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             #[cfg(feature = "uuid-0_8")]
             (Value::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),
             #[cfg(feature = "chrono-0_4")]

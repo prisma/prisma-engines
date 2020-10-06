@@ -65,6 +65,9 @@ pub enum Value<'a> {
     #[cfg(feature = "json-1")]
     /// A JSON value.
     Json(Option<serde_json::Value>),
+    #[cfg(feature = "xml")]
+    /// A XML value.
+    Xml(Option<Cow<'a, str>>),
     #[cfg(feature = "uuid-0_8")]
     /// An UUID value.
     Uuid(Option<Uuid>),
@@ -123,6 +126,8 @@ impl<'a> fmt::Display for Value<'a> {
             }),
             #[cfg(feature = "json-1")]
             Value::Json(val) => val.as_ref().map(|v| write!(f, "{}", v)),
+            #[cfg(feature = "xml")]
+            Value::Xml(val) => val.as_ref().map(|v| write!(f, "{}", v)),
             #[cfg(feature = "uuid-0_8")]
             Value::Uuid(val) => val.map(|v| write!(f, "{}", v)),
             #[cfg(feature = "chrono-0_4")]
@@ -159,6 +164,8 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             }),
             #[cfg(feature = "json-1")]
             Value::Json(v) => v,
+            #[cfg(feature = "xml")]
+            Value::Xml(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             #[cfg(feature = "array")]
             Value::Array(v) => {
                 v.map(|v| serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()))
@@ -274,6 +281,15 @@ impl<'a> Value<'a> {
         Value::Json(Some(value))
     }
 
+    /// Creates a new XML value.
+    #[cfg(feature = "xml")]
+    pub fn xml<T>(value: T) -> Self
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Value::Xml(Some(value.into()))
+    }
+
     /// `true` if the `Value` is null.
     pub fn is_null(&self) -> bool {
         match self {
@@ -296,6 +312,8 @@ impl<'a> Value<'a> {
             Value::Time(t) => t.is_none(),
             #[cfg(feature = "json-1")]
             Value::Json(json) => json.is_none(),
+            #[cfg(feature = "xml")]
+            Value::Xml(s) => s.is_none(),
         }
     }
 

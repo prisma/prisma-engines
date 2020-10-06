@@ -90,6 +90,8 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
             #[cfg(feature = "chrono-0_4")]
             Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
+            #[cfg(feature = "xml")]
+            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{}'", cow))),
         };
 
         match res {

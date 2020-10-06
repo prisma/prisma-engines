@@ -222,6 +222,8 @@ impl<'a> ToSql for Value<'a> {
 
                 ToSqlOutput::from(stringified)
             }),
+            #[cfg(feature = "xml")]
+            Value::Xml(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             #[cfg(feature = "uuid-0_8")]
             Value::Uuid(value) => value.map(|value| ToSqlOutput::from(value.to_hyphenated().to_string())),
             #[cfg(feature = "chrono-0_4")]
