@@ -1,6 +1,6 @@
 mod default;
-mod directive_list_validator;
-mod directive_validator;
+mod attribute_list_validator;
+mod attribute_validator;
 mod id;
 mod map;
 mod relation;
@@ -8,8 +8,8 @@ mod unique_and_index;
 mod updated_at;
 
 use crate::dml;
-use directive_list_validator::AttributeListValidator;
-use directive_validator::AttributeValidator;
+use attribute_list_validator::AttributeListValidator;
+use attribute_validator::AttributeValidator;
 
 /// This is the facade for all attribute validations. It is used within the `ValidationPipeline`.
 pub struct AllAttributes {
@@ -37,9 +37,9 @@ fn new_builtin_field_attributes() -> AttributeListValidator<dml::Field> {
     validator.add(Box::new(id::IdAttributeValidator {}));
     validator.add(Box::new(unique_and_index::FieldLevelUniqueAttributeValidator {}));
     validator.add(Box::new(default::DefaultAttributeValidator {}));
-    validator.add(Box::new(updated_at::UpdatedAtDirectiveValidator {}));
-    validator.add(Box::new(map::MapDirectiveValidatorForField {}));
-    validator.add(Box::new(relation::RelationDirectiveValidator {}));
+    validator.add(Box::new(updated_at::UpdatedAtAttributeValidator {}));
+    validator.add(Box::new(map::MapAttributeValidatorForField {}));
+    validator.add(Box::new(relation::RelationAttributeValidator {}));
 
     validator
 }
@@ -49,9 +49,9 @@ fn new_builtin_model_attributes() -> AttributeListValidator<dml::Model> {
 
     // this order of block attributes is used in the formatter as well
     validator.add(Box::new(id::ModelLevelIdAttributeValidator {}));
-    validator.add(Box::new(unique_and_index::ModelLevelUniqueDirectiveValidator {}));
-    validator.add(Box::new(unique_and_index::ModelLevelIndexDirectiveValidator {}));
-    validator.add(Box::new(map::MapDirectiveValidator {}));
+    validator.add(Box::new(unique_and_index::ModelLevelUniqueAttributeValidator {}));
+    validator.add(Box::new(unique_and_index::ModelLevelIndexAttributeValidator {}));
+    validator.add(Box::new(map::MapAttributeValidator {}));
 
     validator
 }
@@ -59,7 +59,7 @@ fn new_builtin_model_attributes() -> AttributeListValidator<dml::Model> {
 fn new_builtin_enum_attributes() -> AttributeListValidator<dml::Enum> {
     let mut validator = AttributeListValidator::<dml::Enum>::new();
 
-    validator.add(Box::new(map::MapDirectiveValidator {}));
+    validator.add(Box::new(map::MapAttributeValidator {}));
 
     validator
 }
@@ -67,7 +67,7 @@ fn new_builtin_enum_attributes() -> AttributeListValidator<dml::Enum> {
 fn new_builtin_enum_value_attributes() -> AttributeListValidator<dml::EnumValue> {
     let mut validator = AttributeListValidator::<dml::EnumValue>::new();
 
-    validator.add(Box::new(map::MapDirectiveValidator {}));
+    validator.add(Box::new(map::MapAttributeValidator {}));
 
     validator
 }

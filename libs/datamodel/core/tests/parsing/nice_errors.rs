@@ -333,7 +333,7 @@ fn invalid_field_line_must_error_nicely() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "This line is not a valid field or directive definition.",
+        "This line is not a valid field or attribute definition.",
         Span::new(43, 57),
     ));
 }

@@ -1,4 +1,4 @@
-use super::super::directives::AllAttributes;
+use super::super::attributes::AllAttributes;
 use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
 use crate::{

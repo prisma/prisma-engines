@@ -459,7 +459,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       s"""model Child {
         | id      String   @id @default(cuid())
         | c       String   @unique
-        | parents Parent[] $relationInlineDirective
+        | parents Parent[] $relationInlineAttribute
         |}
         |
         |model Parent {
@@ -543,7 +543,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       s"""
         |model Post {
         |  id      String  @id @default(cuid())
-        |  authors AUser[] $relationInlineDirective
+        |  authors AUser[] $relationInlineAttribute
         |  title   String  @unique
         |}
         |

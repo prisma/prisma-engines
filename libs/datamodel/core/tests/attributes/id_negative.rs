@@ -47,7 +47,7 @@ fn id_should_error_multiple_ids_are_provided() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "At most one field must be marked as the id field with the `@id` directive.",
+        "At most one field must be marked as the id field with the `@id` attribute.",
         "Model",
         Span::new(5, 105),
     ));

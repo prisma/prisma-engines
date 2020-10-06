@@ -11,9 +11,9 @@ pub fn parse_attribute(token: &Token) -> Attribute {
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::directive => return parse_attribute(&current),
-            Rule::directive_name => name = Some(current.to_id()),
-            Rule::directive_arguments => parse_attribute_args(&current, &mut arguments),
+            Rule::attribute => return parse_attribute(&current),
+            Rule::attribute_name => name = Some(current.to_id()),
+            Rule::attribute_arguments => parse_attribute_args(&current, &mut arguments),
             _ => parsing_catch_all(&current, "attribute"),
         }
     }

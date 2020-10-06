@@ -1,4 +1,4 @@
-use super::{directives::AttributeDiffer, enum_values::EnumValueDiffer};
+use super::{attributes::AttributeDiffer, enum_values::EnumValueDiffer};
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST enums](/datamodel/ast/struct.Datamodel.html).
@@ -40,30 +40,30 @@ impl<'a> EnumDiffer<'a> {
 
     /// Enum attributes (`@@`) created in `next`.
     pub(crate) fn created_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.next_attributes().filter(move |next_directive| {
+        self.next_attributes().filter(move |next_attribute| {
             self.previous_attributes()
-                .find(|previous_directive| enum_attributes_match(previous_directive, next_directive))
+                .find(|previous_attribute| enum_attributes_match(previous_attribute, next_attribute))
                 .is_none()
         })
     }
 
     /// Enum attributes (`@@`) deleted in `next`.
     pub(crate) fn deleted_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.previous_attributes().filter(move |previous_directive| {
+        self.previous_attributes().filter(move |previous_attribute| {
             self.next_attributes()
-                .find(|next_directive| enum_attributes_match(previous_directive, next_directive))
+                .find(|next_attribute| enum_attributes_match(previous_attribute, next_attribute))
                 .is_none()
         })
     }
 
     /// Iterator over the enum attributes (`@@`) present in both `previous` and `next`.
     pub(crate) fn attribute_pairs(&'a self) -> impl Iterator<Item = AttributeDiffer<'a>> {
-        self.previous_attributes().filter_map(move |previous_directive| {
+        self.previous_attributes().filter_map(move |previous_attribute| {
             self.next_attributes()
-                .find(|next_directive| enum_attributes_match(previous_directive, next_directive))
-                .map(|next_directive| AttributeDiffer {
-                    previous: previous_directive,
-                    next: next_directive,
+                .find(|next_attribute| enum_attributes_match(previous_attribute, next_attribute))
+                .map(|next_attribute| AttributeDiffer {
+                    previous: previous_attribute,
+                    next: next_attribute,
                 })
         })
     }

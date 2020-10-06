@@ -187,12 +187,12 @@ fn DeleteEnum_must_work() {
 }
 
 #[test]
-fn CreateDirective_must_work() {
+fn CreateAttribute_must_work() {
     let json = r#"
         {
-            "tag": "CreateDirective",
+            "tag": "CreateAttribute",
             "location": {
-                "directive": "map",
+                "attribute": "map",
                 "path": {
                     "tag": "Model",
                     "model": "Blog"           
@@ -215,17 +215,17 @@ fn CreateDirective_must_work() {
 }
 
 #[test]
-fn minimal_DeleteDirective_must_work() {
+fn minimal_DeleteAttribute_must_work() {
     let json = r#"
         {
-            "tag": "DeleteDirective",
+            "tag": "DeleteAttribute",
             "location": {
                 "path": {
                     "tag": "Field",
                     "model": "Blog",
                     "field": "title"
                 },
-                "directive": "map"
+                "attribute": "map"
             }
         }
     "#;
@@ -244,10 +244,10 @@ fn minimal_DeleteDirective_must_work() {
 }
 
 #[test]
-fn full_DeleteDirective_must_work() {
+fn full_DeleteAttribute_must_work() {
     let json = r#"
         {
-            "tag": "DeleteDirective",
+            "tag": "DeleteAttribute",
             "location": {
                 "path": {
                     "tag": "Model",
@@ -259,7 +259,7 @@ fn full_DeleteDirective_must_work() {
                         }
                     ]
                 },
-                "directive": "unique"
+                "attribute": "unique"
             }
         }
     "#;
@@ -286,12 +286,12 @@ fn UpdateArgument_must_work() {
         {
             "tag": "UpdateArgument",
             "location": {
-                "tag": "Directive",
+                "tag": "Attribute",
                 "path": {
                     "tag": "Model",
                     "model": "CatMood"
                 },
-                "directive": "map"
+                "attribute": "map"
             },            
             "argument": "name",
             "newValue": "cat_mood"
@@ -319,8 +319,8 @@ fn CreateArgument_must_work() {
         {
             "tag": "CreateArgument",
             "location": {
-                "tag": "Directive",         
-                "directive": "map",
+                "tag": "Attribute",
+                "attribute": "map",
                 "path": {
                     "enum": "CatMood",
                     "tag": "Enum"
@@ -353,12 +353,12 @@ fn DeleteArgument_must_work() {
         {
             "tag": "DeleteArgument",
             "location": {
-                "tag": "Directive",
+                "tag": "Attribute",
                 "path": {
                     "tag":"Enum",
                     "enum": "CatMood"                    
                 },
-                "directive":"map"
+                "attribute":"map"
             },
             "argument": "name"
         }

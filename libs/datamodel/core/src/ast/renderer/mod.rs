@@ -235,9 +235,9 @@ impl<'a> Renderer<'a> {
             if !value.attributes.is_empty() {
                 let mut attributes_builder = StringBuilder::new();
 
-                for directive in &value.attributes {
+                for attribute in &value.attributes {
                     attributes_builder.write(&" ");
-                    Self::render_field_attribute(&mut attributes_builder, &directive);
+                    Self::render_field_attribute(&mut attributes_builder, &attribute);
                 }
 
                 self.write(&attributes_builder.to_string());

@@ -54,8 +54,8 @@ impl<T: 'static> AttributeListValidator<T> {
                 Some(validator) => {
                     let mut arguments = Arguments::new(&attribute.arguments, attribute.span);
 
-                    let directive_count = attribute_counts.get(&attribute.name.name).unwrap();
-                    if *directive_count > 1 && !validator.is_duplicate_definition_allowed() {
+                    let attribute_count = attribute_counts.get(&attribute.name.name).unwrap();
+                    if *attribute_count > 1 && !validator.is_duplicate_definition_allowed() {
                         errors.push(DatamodelError::new_duplicate_attribute_error(
                             &attribute.name.name,
                             attribute.name.span,
@@ -70,9 +70,9 @@ impl<T: 'static> AttributeListValidator<T> {
                         errors.append(&mut errs);
                     }
 
-                    let directive_validation_result = validator.validate_and_apply(&mut arguments, t);
+                    let attribute_validation_result = validator.validate_and_apply(&mut arguments, t);
 
-                    match directive_validation_result {
+                    match attribute_validation_result {
                         Err(DatamodelError::ArgumentNotFound { argument_name, span }) => {
                             errors.push(DatamodelError::new_attribute_argument_not_found_error(
                                 &argument_name,
@@ -93,7 +93,7 @@ impl<T: 'static> AttributeListValidator<T> {
                 }
                 None => {
                     if !attribute.name.name.is_empty() && !attribute.name.name.contains(".") {
-                        errors.push(DatamodelError::new_directive_not_known_error(
+                        errors.push(DatamodelError::new_attribute_not_known_error(
                             &attribute.name.name,
                             attribute.name.span,
                         ))

@@ -2,7 +2,7 @@ use crate::common::*;
 use datamodel::{ast, error::DatamodelError, ScalarType};
 
 #[test]
-fn unique_directive() {
+fn unique_attribute() {
     let dml = r#"
         model Test {
             id Int @id

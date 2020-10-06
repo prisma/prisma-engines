@@ -2,7 +2,7 @@ use crate::common::*;
 use datamodel::{ast::Span, error::DatamodelError};
 
 #[test]
-fn fail_on_duplicate_directive() {
+fn fail_on_duplicate_attribute() {
     let dml = r#"
     model User {
         id Int @id
@@ -16,7 +16,7 @@ fn fail_on_duplicate_directive() {
 }
 
 #[test]
-fn fail_on_duplicate_unnamed_directive() {
+fn fail_on_duplicate_unnamed_attribute() {
     let dml = r#"
     model User {
         id Int @id

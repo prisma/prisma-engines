@@ -1,5 +1,5 @@
 use super::{
-    directives::{attributes_are_identical, attributes_match, AttributeDiffer},
+    attributes::{attributes_are_identical, attributes_match, AttributeDiffer},
     FieldDiffer,
 };
 use datamodel::ast;
@@ -127,13 +127,13 @@ fn fields_match(previous: &ast::Field, next: &ast::Field) -> bool {
 const REPEATED_MODEL_ATTRIBUTES: &[&str] = &["unique", "index"];
 
 /// See ModelDiffer docs.
-pub(super) fn attribute_is_regular(directive: &&ast::Attribute) -> bool {
-    !attribute_is_repeated(directive)
+pub(super) fn attribute_is_regular(attribute: &&ast::Attribute) -> bool {
+    !attribute_is_repeated(attribute)
 }
 
 /// See ModelDiffer docs.
-pub(super) fn attribute_is_repeated(directive: &&ast::Attribute) -> bool {
-    REPEATED_MODEL_ATTRIBUTES.contains(&directive.name.name.as_str())
+pub(super) fn attribute_is_repeated(attribute: &&ast::Attribute) -> bool {
+    REPEATED_MODEL_ATTRIBUTES.contains(&attribute.name.name.as_str())
 }
 
 #[cfg(test)]
@@ -150,7 +150,7 @@ mod tests {
             coat CoatCharacteristic[]
             isGoodDog Boolean
 
-            @@customDirective(hasFur: true)
+            @@customAttribute(hasFur: true)
             @@unique([name, coat])
         }
 
@@ -169,7 +169,7 @@ mod tests {
             isGoodDog Boolean // always true
 
             @@map("goodDogs")
-            @@customDirective(hasFur: "Most of the time")
+            @@customAttribute(hasFur: "Most of the time")
         }
         "#;
         let next = parse_schema(next).unwrap();
@@ -210,7 +210,7 @@ mod tests {
     }
 
     #[test]
-    fn datamodel_differ_model_differ_directive_methods_work() {
+    fn datamodel_differ_model_differ_attribute_methods_work() {
         dog_datamodels_test(|model_diff| {
             let created_attributes: Vec<&ast::Attribute> = model_diff.created_regular_attributes().collect();
 
@@ -243,12 +243,12 @@ mod tests {
                     .render_to_string()
             );
 
-            let directive_pairs: Vec<_> = model_diff.regular_attribute_pairs().collect();
+            let attribute_pairs: Vec<_> = model_diff.regular_attribute_pairs().collect();
 
-            assert_eq!(directive_pairs.len(), 1);
-            let first_directive = directive_pairs.get(0).unwrap();
-            assert_eq!(first_directive.previous.name.name, "customDirective");
-            assert_eq!(first_directive.previous.name.name, first_directive.next.name.name)
+            assert_eq!(attribute_pairs.len(), 1);
+            let first_attribute = attribute_pairs.get(0).unwrap();
+            assert_eq!(first_attribute.previous.name.name, "customAttribute");
+            assert_eq!(first_attribute.previous.name.name, first_attribute.next.name.name)
         });
     }
 
@@ -291,15 +291,15 @@ mod tests {
 
         let created_regular_attribute_names: Vec<&String> = model_differ
             .created_regular_attributes()
-            .map(|directive| &directive.name.name)
+            .map(|attribute| &attribute.name.name)
             .collect();
         let deleted_regular_attribute_names: Vec<&String> = model_differ
             .deleted_regular_attributes()
-            .map(|directive| &directive.name.name)
+            .map(|attribute| &attribute.name.name)
             .collect();
         let updated_regular_attribute_names: Vec<&String> = model_differ
             .regular_attribute_pairs()
-            .map(|directive| &attribute.previous.name.name)
+            .map(|attribute| &attribute.previous.name.name)
             .collect();
 
         assert_eq!(updated_regular_attribute_names, &["map"]);

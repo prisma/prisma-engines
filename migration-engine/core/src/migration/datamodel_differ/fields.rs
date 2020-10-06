@@ -1,4 +1,4 @@
-use super::directives::{attributes_match, AttributeDiffer};
+use super::attributes::{attributes_match, AttributeDiffer};
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [Field ASTs](/datamodel/ast/struct.Field.html).

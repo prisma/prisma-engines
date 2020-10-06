@@ -222,7 +222,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo {
         | id       String    @id @default(cuid())
-        | comments Comment[] $relationInlineDirective
+        | comments Comment[] $relationInlineAttribute
         |}
         |
         |model Comment {
@@ -286,7 +286,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo {
         | id       String @id @default(cuid())
-        | comments Comment[] $relationInlineDirective
+        | comments Comment[] $relationInlineAttribute
         |}
         |
         |model Comment {
@@ -349,7 +349,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       s"""model List {
         | id         String @id @default(cuid())
         | listUnique String @unique
-        | todoes     Todo[] $relationInlineDirective
+        | todoes     Todo[] $relationInlineAttribute
         |}
         |
         |model Todo {
@@ -406,7 +406,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       s"""model Todo {
         | id       String    @id @default(cuid())
         | title    String?
-        | comments Comment[] $relationInlineDirective
+        | comments Comment[] $relationInlineAttribute
         |}
         |
         |model Comment {
@@ -525,7 +525,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       s"""model Todo {
         | id    String @id @default(cuid())
         | title String
-        | notes Note[] $relationInlineDirective
+        | notes Note[] $relationInlineAttribute
         |}
         |
         |model Note {
@@ -593,7 +593,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       s"""model Todo {
         | id    String @id @default(cuid())
         | title String
-        | notes Note[] $relationInlineDirective
+        | notes Note[] $relationInlineAttribute
         |}
         |
         |model Note {
@@ -657,7 +657,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       s"""model Note {
         | id    String  @id @default(cuid())
         | text  String? @unique
-        | todos Todo[]  $relationInlineDirective
+        | todos Todo[]  $relationInlineAttribute
         |}
         |
         |model Todo {
@@ -722,14 +722,14 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String   @id @default(cuid())
                                              |  nameMiddle String   @unique
                                              |  tops       Top[]
-                                             |  bottoms    Bottom[] $relationInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
@@ -810,13 +810,13 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String   @id @default(cuid())
                                              |  nameMiddle String   @unique
-                                             |  bottoms    Bottom[] $relationInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
@@ -896,7 +896,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
@@ -990,7 +990,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |model Bottom {
                                              |  id         String  @id @default(cuid())
                                              |  nameBottom String  @unique
-                                             |  below      Below[] $relationInlineDirective
+                                             |  below      Below[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Below {
@@ -1081,7 +1081,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
                                              |  nameBottom String @unique
-                                             |  below      Below[] $relationInlineDirective
+                                             |  below      Below[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Below {

@@ -1,9 +1,9 @@
 use super::{
-  helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
-  parse_comments::*,
-  parse_directive::parse_attribute,
-  parse_field::parse_field,
-  Rule,
+    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
+    parse_comments::*,
+    parse_attribute::parse_attribute,
+    parse_field::parse_field,
+    Rule,
 };
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
@@ -22,7 +22,7 @@ pub fn parse_model(token: &Token) -> Result<Model, ErrorCollection> {
                 Span::from_pest(current.as_span()),
             )),
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::block_level_directive => attributes.push(parse_attribute(&current)),
+            Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
                 Err(err) => errors.push(err),

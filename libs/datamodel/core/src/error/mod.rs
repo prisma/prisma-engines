@@ -328,7 +328,7 @@ impl DatamodelError {
     pub fn new_scalar_type_not_found_error(type_name: &str, span: Span) -> DatamodelError {
         DatamodelError::ScalarTypeNotFoundError { type_name: String::from(type_name), span }
     }
-    pub fn new_directive_not_known_error(attribute_name: &str, span: Span) -> DatamodelError {
+    pub fn new_attribute_not_known_error(attribute_name: &str, span: Span) -> DatamodelError {
         DatamodelError::AttributeNotKnownError { attribute_name: String::from(attribute_name), span }
     }
     pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {

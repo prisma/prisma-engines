@@ -3,7 +3,7 @@ use crate::error::DatamodelError;
 use crate::{ast, dml, IndexDefinition, IndexType};
 use std::collections::HashMap;
 
-/// Prismas builtin `@unique` directive.
+/// Prismas builtin `@unique` attribute.
 pub struct FieldLevelUniqueAttributeValidator {}
 
 impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
@@ -64,11 +64,11 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
     }
 }
 
-/// Prismas builtin `@@unique` directive.
-pub struct ModelLevelUniqueDirectiveValidator {}
+/// Prismas builtin `@@unique` attribute.
+pub struct ModelLevelUniqueAttributeValidator {}
 
-impl IndexDirectiveBase<dml::Model> for ModelLevelUniqueDirectiveValidator {}
-impl AttributeValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
+impl IndexAttributeBase<dml::Model> for ModelLevelUniqueAttributeValidator {}
+impl AttributeValidator<dml::Model> for ModelLevelUniqueAttributeValidator {
     fn attribute_name(&self) -> &str {
         "unique"
     }
@@ -93,11 +93,11 @@ impl AttributeValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
     }
 }
 
-/// Prismas builtin `@@index` directive.
-pub struct ModelLevelIndexDirectiveValidator {}
+/// Prismas builtin `@@index` attribute.
+pub struct ModelLevelIndexAttributeValidator {}
 
-impl IndexDirectiveBase<dml::Model> for ModelLevelIndexDirectiveValidator {}
-impl AttributeValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
+impl IndexAttributeBase<dml::Model> for ModelLevelIndexAttributeValidator {}
+impl AttributeValidator<dml::Model> for ModelLevelIndexAttributeValidator {
     fn attribute_name(&self) -> &str {
         "index"
     }
@@ -123,7 +123,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
 }
 
 /// common logic for `@@unique` and `@@index`
-trait IndexDirectiveBase<T>: AttributeValidator<T> {
+trait IndexAttributeBase<T>: AttributeValidator<T> {
     fn validate_index(
         &self,
         args: &mut Arguments,

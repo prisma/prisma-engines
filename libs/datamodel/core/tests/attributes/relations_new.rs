@@ -415,7 +415,7 @@ fn must_error_when_references_argument_is_missing_for_one_to_many() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The relation field `user` on Model `Post` must specify the `references` argument in the @relation directive.",
+        "The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.",
         "relation",
         Span::new(172, 214),
     ));
@@ -445,7 +445,7 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
     let errors = parse_error(dml);
     errors.assert_is(
         DatamodelError::new_attribute_validation_error(
-            "The relation field `posts` on Model `User` must not specify the `fields` or `references` argument in the @relation directive. You must only specify it on the opposite field `user` on model `Post`.",
+            "The relation field `posts` on Model `User` must not specify the `fields` or `references` argument in the @relation attribute. You must only specify it on the opposite field `user` on model `Post`.",
             "relation", Span::new(208, 268)
         ),
     );
@@ -472,13 +472,13 @@ fn must_error_when_both_arguments_are_missing_for_one_to_many() {
     errors.assert_is_at(
         0,
         DatamodelError::new_attribute_validation_error(
-            "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation directive.",
+            "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation attribute.",
             "relation",
             Span::new(172, 183),
         ),
     );
     errors.assert_is_at(1, DatamodelError::new_attribute_validation_error(
-        "The relation field `user` on Model `Post` must specify the `references` argument in the @relation directive.",
+        "The relation field `user` on Model `Post` must specify the `references` argument in the @relation attribute.",
         "relation",
         Span::new(172, 183),
     ));
@@ -532,14 +532,14 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
     errors.assert_is_at(
         0,
         DatamodelError::new_attribute_validation_error(
-            "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation directive. You have to provide it on one of the two fields.", 
+            "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
             "relation", Span::new(77, 91)
         ),
     );
     errors.assert_is_at(
         1,
         DatamodelError::new_attribute_validation_error(
-            "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation directive. You have to provide it on one of the two fields.", 
+            "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.",
             "relation", Span::new(170, 212)
         ),
     );
@@ -566,14 +566,14 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
     errors.assert_is_at(
         0,
         DatamodelError::new_attribute_validation_error(
-            "The relation field `post` on Model `User` provides the `references` argument in the @relation directive. And the related field `user` on Model `Post` provides the `fields` argument. You must provide both arguments on the same side.",
+            "The relation field `post` on Model `User` provides the `references` argument in the @relation attribute. And the related field `user` on Model `Post` provides the `fields` argument. You must provide both arguments on the same side.",
             "relation", Span::new(99, 142)
         ),
     );
     errors.assert_is_at(
         1,
         DatamodelError::new_attribute_validation_error(
-            "The relation field `user` on Model `Post` provides the `fields` argument in the @relation directive. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.",
+            "The relation field `user` on Model `Post` provides the `fields` argument in the @relation attribute. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.",
             "relation", Span::new(220, 263)
         ),
     );
@@ -600,14 +600,14 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
     errors.assert_is_at(
             0,
             DatamodelError::new_attribute_validation_error(
-                "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `references` argument in the @relation directive. You have to provide it only on one of the two fields.",
+                "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.",
                 "relation", Span::new(99, 160)
             ),
         );
     errors.assert_is_at(
             1,
             DatamodelError::new_attribute_validation_error(
-                "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `fields` argument in the @relation directive. You have to provide it only on one of the two fields.",
+                "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.",
                 "relation", Span::new(99, 160)
             ),
         );
@@ -615,7 +615,7 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
     errors.assert_is_at(
         2,
         DatamodelError::new_attribute_validation_error(
-            "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation directive. You have to provide it only on one of the two fields.",
+            "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.",
             "relation", Span::new(238, 299)
         ),
     );
@@ -623,7 +623,7 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
     errors.assert_is_at(
         3,
         DatamodelError::new_attribute_validation_error(
-            "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation directive. You have to provide it only on one of the two fields.",
+            "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.",
             "relation", Span::new(238,299)
         ),
     );

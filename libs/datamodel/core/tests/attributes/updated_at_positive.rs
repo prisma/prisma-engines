@@ -2,7 +2,7 @@ use crate::common::*;
 use datamodel::ScalarType;
 
 #[test]
-fn should_apply_updated_at_directive() {
+fn should_apply_updated_at_attribute() {
     let dml = r#"
     model User {
         id Int @id

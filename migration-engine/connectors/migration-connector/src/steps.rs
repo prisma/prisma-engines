@@ -204,10 +204,10 @@ impl AttributeLocation {
                     return false;
                 }
 
-                attribute.arguments.iter().all(|directive_argument| {
+                attribute.arguments.iter().all(|attribute_argument| {
                     arguments
                         .iter()
-                        .any(|self_argument| self_argument.matches_ast_argument(directive_argument))
+                        .any(|self_argument| self_argument.matches_ast_argument(attribute_argument))
                 })
             }
             _ => true,
@@ -399,8 +399,8 @@ mod tests {
     use serde_json::json;
 
     #[test]
-    fn directive_location_serialization_gives_expected_json_shape() {
-        let create_directive = CreateAttribute {
+    fn attribute_location_serialization_gives_expected_json_shape() {
+        let create_attribute = CreateAttribute {
             location: AttributeLocation {
                 path: AttributePath::Field {
                     model: "Cat".to_owned(),
@@ -410,7 +410,7 @@ mod tests {
             },
         };
 
-        let serialized_step = serde_json::to_value(&create_directive).unwrap();
+        let serialized_step = serde_json::to_value(&create_attribute).unwrap();
 
         let expected_json = json!({
             "location": {
@@ -419,7 +419,7 @@ mod tests {
                     "model": "Cat",
                     "field": "owner",
                 },
-                "directive": "status"
+                "attribute": "status"
             }
         });
 
@@ -428,6 +428,6 @@ mod tests {
         assert_eq!(serialized_step, expected_json);
 
         let deserialized_step: CreateAttribute = serde_json::from_value(expected_json).unwrap();
-        assert_eq!(create_directive, deserialized_step);
+        assert_eq!(create_attribute, deserialized_step);
     }
 }

@@ -3,12 +3,12 @@ use crate::ast::{Attribute, Span};
 use crate::error::DatamodelError;
 use crate::{ast, dml, Datamodel, WithDatabaseName};
 
-/// Prismas builtin `@map` directive.
-pub struct MapDirectiveValidator {}
+/// Prismas builtin `@map` attribute.
+pub struct MapAttributeValidator {}
 
 const ATTRIBUTE_NAME: &str = "map";
 
-impl AttributeValidator<dml::Model> for MapDirectiveValidator {
+impl AttributeValidator<dml::Model> for MapAttributeValidator {
     fn attribute_name(&self) -> &str {
         ATTRIBUTE_NAME
     }
@@ -22,8 +22,8 @@ impl AttributeValidator<dml::Model> for MapDirectiveValidator {
     }
 }
 
-pub struct MapDirectiveValidatorForField {}
-impl AttributeValidator<dml::Field> for MapDirectiveValidatorForField {
+pub struct MapAttributeValidatorForField {}
+impl AttributeValidator<dml::Field> for MapAttributeValidatorForField {
     fn attribute_name(&self) -> &str {
         ATTRIBUTE_NAME
     }
@@ -32,7 +32,7 @@ impl AttributeValidator<dml::Field> for MapDirectiveValidatorForField {
         if obj.is_relation() {
             return self.new_attribute_validation_error(
                 &format!(
-                    "The directive `@{}` can not be used on relation fields.",
+                    "The attribute `@{}` can not be used on relation fields.",
                     ATTRIBUTE_NAME
                 ),
                 args.span(),
@@ -46,7 +46,7 @@ impl AttributeValidator<dml::Field> for MapDirectiveValidatorForField {
     }
 }
 
-impl AttributeValidator<dml::Enum> for MapDirectiveValidator {
+impl AttributeValidator<dml::Enum> for MapAttributeValidator {
     fn attribute_name(&self) -> &str {
         ATTRIBUTE_NAME
     }
@@ -60,7 +60,7 @@ impl AttributeValidator<dml::Enum> for MapDirectiveValidator {
     }
 }
 
-impl AttributeValidator<dml::EnumValue> for MapDirectiveValidator {
+impl AttributeValidator<dml::EnumValue> for MapAttributeValidator {
     fn attribute_name(&self) -> &str {
         ATTRIBUTE_NAME
     }

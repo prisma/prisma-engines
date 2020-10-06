@@ -1,7 +1,7 @@
 use super::{
   helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
   parse_comments::*,
-  parse_directive::parse_attribute,
+  parse_attribute::parse_attribute,
   parse_types::parse_field_type,
   Rule,
 };
@@ -24,7 +24,7 @@ pub fn parse_field(model_name: &str, token: &Token) -> Result<Field, DatamodelEr
                     Span::from_pest(current.as_span()),
                 ))
             }
-            Rule::directive => attributes.push(parse_attribute(&current)),
+            Rule::attribute => attributes.push(parse_attribute(&current)),
             Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
             Rule::doc_comment => comments.push(parse_doc_comment(&current)),
             _ => parsing_catch_all(&current, "field"),

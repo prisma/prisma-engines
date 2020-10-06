@@ -7,7 +7,7 @@ pub(crate) struct EnumValueDiffer<'a> {
 }
 
 impl<'a> EnumValueDiffer<'a> {
-    pub(crate) fn directive_pairs<'b>(&'b self) -> impl Iterator<Item = AttributeDiffer<'a>> + 'b {
+    pub(crate) fn attribute_pairs<'b>(&'b self) -> impl Iterator<Item = AttributeDiffer<'a>> + 'b {
         self.previous_attributes().filter_map(move |previous| {
             self.next_attributes()
                 .find(|next| enum_value_attributes_match(previous, next))

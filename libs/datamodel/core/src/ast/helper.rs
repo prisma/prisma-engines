@@ -1,5 +1,5 @@
 pub fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
-    // this must match the order defined for rendering in libs/datamodel/core/src/transform/directives/mod.rs
+    // this must match the order defined for rendering in libs/datamodel/core/src/transform/attributes/mod.rs
     let correct_order = if is_field_attribute {
         vec!["id", "unique", "default", "updatedAt", "map", "relation"]
     } else {

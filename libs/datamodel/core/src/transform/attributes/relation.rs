@@ -4,9 +4,9 @@ use crate::error::DatamodelError;
 use crate::{ast, dml, Field};
 
 /// Prismas builtin `@relation` attribute.
-pub struct RelationDirectiveValidator {}
+pub struct RelationAttributeValidator {}
 
-impl AttributeValidator<dml::Field> for RelationDirectiveValidator {
+impl AttributeValidator<dml::Field> for RelationAttributeValidator {
     fn attribute_name(&self) -> &'static str {
         &"relation"
     }

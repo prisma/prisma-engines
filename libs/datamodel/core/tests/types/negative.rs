@@ -2,7 +2,7 @@ use crate::common::*;
 use datamodel::{ast, error::DatamodelError};
 
 #[test]
-fn shound_fail_on_directive_duplication() {
+fn shound_fail_on_attribute_duplication() {
     let dml = r#"
     type ID = String @id @default(cuid())
 
@@ -24,7 +24,7 @@ fn shound_fail_on_directive_duplication() {
 }
 
 #[test]
-fn shound_fail_on_directive_duplication_recursive() {
+fn shound_fail_on_attribute_duplication_recursive() {
     let dml = r#"
     type MyStringWithDefault = String @default(cuid())
     type ID = MyStringWithDefault @id

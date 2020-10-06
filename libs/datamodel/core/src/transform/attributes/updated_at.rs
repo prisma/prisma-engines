@@ -2,10 +2,10 @@ use super::{super::helpers::*, AttributeValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml};
 
-/// Prismas builtin `@updatedAt` directive.
-pub struct UpdatedAtDirectiveValidator {}
+/// Prismas builtin `@updatedAt` attribute.
+pub struct UpdatedAtAttributeValidator {}
 
-impl AttributeValidator<dml::Field> for UpdatedAtDirectiveValidator {
+impl AttributeValidator<dml::Field> for UpdatedAtAttributeValidator {
     fn attribute_name(&self) -> &'static str {
         &"updatedAt"
     }

@@ -5,7 +5,7 @@
 //! * `renderer`: Turns an AST into a Prisma Schema String.
 mod argument;
 mod comment;
-mod directive;
+mod attribute;
 mod r#enum;
 mod expression;
 mod field;
@@ -24,7 +24,7 @@ pub mod renderer;
 
 pub use argument::Argument;
 pub use comment::Comment;
-pub use directive::Attribute;
+pub use attribute::Attribute;
 pub use expression::Expression;
 pub use field::{Field, FieldArity};
 pub use generator_config::GeneratorConfig;

@@ -1,4 +1,4 @@
-use super::super::directives::AllAttributes;
+use super::super::attributes::AllAttributes;
 use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
 use crate::error::ErrorCollection;

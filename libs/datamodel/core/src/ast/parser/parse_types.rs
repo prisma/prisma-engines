@@ -1,8 +1,8 @@
 use super::{
-  helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
-  parse_comments::parse_comment_block,
-  parse_directive::parse_attribute,
-  Rule,
+    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
+    parse_comments::parse_comment_block,
+    parse_attribute::parse_attribute,
+    Rule,
 };
 use crate::ast::*;
 use crate::error::DatamodelError;
@@ -18,7 +18,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
             Rule::TYPE_KEYWORD => {}
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::base_type => base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span()))),
-            Rule::directive => attributes.push(parse_attribute(&current)),
+            Rule::attribute => attributes.push(parse_attribute(&current)),
             Rule::comment_block => comment = Some(parse_comment_block(&current)),
             _ => parsing_catch_all(&current, "custom type"),
         }
