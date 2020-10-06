@@ -3329,7 +3329,6 @@ dependencies = [
  "serde_json",
  "test-macros",
  "test-setup",
- "thiserror",
  "tokio",
  "tracing",
 ]

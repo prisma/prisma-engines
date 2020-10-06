@@ -3,14 +3,17 @@
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
+use fmt::Display;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
-use std::{fmt, str::FromStr};
-use thiserror::Error;
+use std::{
+    error::Error,
+    fmt::{self, Debug},
+    str::FromStr,
+};
 use tracing::debug;
 
 pub mod mssql;
@@ -20,12 +23,19 @@ pub mod sqlite;
 pub mod walkers;
 
 /// description errors.
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum SqlSchemaDescriberError {
     /// An unknown error occurred.
-    #[error("unknown")]
     UnknownError,
 }
+
+impl Display for SqlSchemaDescriberError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "unknown")
+    }
+}
+
+impl Error for SqlSchemaDescriberError {}
 
 /// The result type.
 pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescriberError>;
