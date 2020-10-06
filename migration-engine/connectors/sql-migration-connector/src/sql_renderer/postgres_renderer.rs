@@ -4,8 +4,8 @@ use crate::{
     flavour::PostgresFlavour,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, TableChange,
+        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
+        DropEnum, DropForeignKey, DropIndex, TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
 };
@@ -14,18 +14,47 @@ use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::walkers::*;
 use sql_schema_describer::*;
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt::Write as _};
+
+impl PostgresFlavour {
+    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+        QuotedWithSchema {
+            schema_name: self.schema_name(),
+            name: self.quote(name),
+        }
+    }
+}
 
 impl SqlRenderer for PostgresFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
     }
 
-    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        QuotedWithSchema {
-            schema_name: self.schema_name(),
-            name: self.quote(name),
+    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
+        let AddForeignKey { foreign_key, table } = add_foreign_key;
+        let mut add_constraint = String::with_capacity(120);
+
+        write!(
+            add_constraint,
+            "ALTER TABLE {table} ADD ",
+            table = self.quote_with_schema(table)
+        )
+        .unwrap();
+
+        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
+            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
         }
+
+        write!(
+            add_constraint,
+            "FOREIGN KEY ({})",
+            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
+        )
+        .unwrap();
+
+        add_constraint.push_str(&self.render_references(&table, &foreign_key));
+
+        add_constraint
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
@@ -378,7 +407,7 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
 fn escape_string_literal(s: &str) -> Cow<'_, str> {
     static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'|\\"#).unwrap());
 
-    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0")
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\")
 }
 
 fn render_alter_column(

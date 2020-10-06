@@ -19,10 +19,6 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn quote_with_schema<'a, 'b>(&'a self, _name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        unreachable!("quote_with_schema on sqlite");
-    }
-
     fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
         unreachable!("render_alter_enum on sqlite")
     }

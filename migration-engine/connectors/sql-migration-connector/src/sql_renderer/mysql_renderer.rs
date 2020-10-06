@@ -29,10 +29,6 @@ impl SqlRenderer for MysqlFlavour {
         Quoted::Backticks(name)
     }
 
-    fn quote_with_schema<'a, 'b>(&'a self, _name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        unreachable!("quote_with_schema on MySQL")
-    }
-
     fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
         use std::fmt::Write;
 

@@ -15,16 +15,18 @@ use sql_schema_describer::{
 };
 use std::{borrow::Cow, fmt::Write};
 
-impl SqlRenderer for MssqlFlavour {
-    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
-        Quoted::mssql_ident(name)
-    }
-
+impl MssqlFlavour {
     fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
         QuotedWithSchema {
             schema_name: self.schema_name(),
             name: self.quote(name),
         }
+    }
+}
+
+impl SqlRenderer for MssqlFlavour {
+    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
+        Quoted::mssql_ident(name)
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
