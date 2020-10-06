@@ -3,7 +3,7 @@ use datamodel::configuration::preview_features::PreviewFeatures;
 use datamodel::Datamodel;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
+    prelude::{ConnectionInfo, SqlFamily},
     single::Quaint,
 };
 use sql_introspection_connector::SqlIntrospectionConnector;
@@ -272,57 +272,13 @@ pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
 }
 
 pub async fn mssql_test_api(connection_string: String, schema: &'static str) -> TestApi {
+    use test_setup::connectors::mssql;
+
     let connection_string = format!("{};schema={}", connection_string, schema);
     let database = Quaint::new(&connection_string).await.unwrap();
     let connection_info = database.connection_info().to_owned();
 
-    // Mickie misses DROP SCHEMA .. CASCADE, so what we need to do here is to
-    // delete first the foreign keys, then all the tables from the test schema
-    // to allow a clean slate for the next test.
-
-    let drop_fks = format!(
-        r#"
-        DECLARE @stmt NVARCHAR(max)
-        DECLARE @n CHAR(1)
-
-        SET @n = CHAR(10)
-
-        SELECT @stmt = ISNULL(@stmt + @n, '') +
-            'ALTER TABLE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(parent_object_id) + '] DROP CONSTRAINT [' + name + ']'
-        FROM sys.foreign_keys
-        WHERE SCHEMA_NAME(schema_id) = '{0}'
-
-        EXEC SP_EXECUTESQL @stmt
-        "#,
-        schema
-    );
-
-    let drop_tables = format!(
-        r#"
-        DECLARE @stmt NVARCHAR(max)
-        DECLARE @n CHAR(1)
-
-        SET @n = CHAR(10)
-
-        SELECT @stmt = ISNULL(@stmt + @n, '') +
-            'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
-        FROM sys.tables
-        WHERE SCHEMA_NAME(schema_id) = '{0}'
-
-        EXEC SP_EXECUTESQL @stmt
-        "#,
-        schema
-    );
-
-    database.raw_cmd(&drop_fks).await.unwrap();
-    database.raw_cmd(&drop_tables).await.unwrap();
-
-    database
-        .raw_cmd(&format!("DROP SCHEMA IF EXISTS {}", schema))
-        .await
-        .unwrap();
-
-    database.raw_cmd(&format!("CREATE SCHEMA {}", schema)).await.unwrap();
+    mssql::reset_schema(&database, schema).await.unwrap();
 
     let introspection_connector = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
 
