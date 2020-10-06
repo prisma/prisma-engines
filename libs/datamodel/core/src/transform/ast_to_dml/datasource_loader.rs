@@ -4,8 +4,11 @@ use super::{
     builtin_datasource_providers::{MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider},
     datasource_provider::DatasourceProvider,
 };
+use crate::ast::Span;
+use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
 use crate::error::{DatamodelError, ErrorCollection};
+use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
 
@@ -133,10 +136,18 @@ impl DatasourceLoader {
         }
 
         let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
-        let preview_features = match preview_features_arg.ok() {
-            Some(x) => x.as_array().to_str_vec()?,
-            None => Vec::new(),
+        let (preview_features, span) = match preview_features_arg.ok() {
+            Some(x) => (x.as_array().to_str_vec()?, x.span()),
+            None => (Vec::new(), Span::empty()),
         };
+
+        if preview_features.len() > 0 {
+            if let Err(err) =
+                validate_preview_features(preview_features.clone(), span, DATASOURCE_PREVIEW_FEATURES.to_vec())
+            {
+                return Err(err);
+            }
+        }
 
         let documentation = ast_source.documentation.clone().map(|comment| comment.text);
         let url = StringFromEnvVar {
