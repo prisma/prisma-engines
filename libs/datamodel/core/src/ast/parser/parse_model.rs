@@ -1,7 +1,7 @@
 use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
-    parse_comments::*,
     parse_attribute::parse_attribute,
+    parse_comments::*,
     parse_field::parse_field,
     Rule,
 };

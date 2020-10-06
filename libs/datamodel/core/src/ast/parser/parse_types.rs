@@ -1,7 +1,7 @@
 use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
-    parse_comments::parse_comment_block,
     parse_attribute::parse_attribute,
+    parse_comments::parse_comment_block,
     Rule,
 };
 use crate::ast::*;
@@ -32,7 +32,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
             },
             name,
             arity: FieldArity::Required,
-          attributes,
+            attributes,
             documentation: comment,
             span: Span::from_pest(token.as_span()),
             is_commented_out: false,

@@ -4,8 +4,8 @@
 //! * `reformat`: Exposes a Formatter for Prisma files. This is used e.g. by the VS Code Extension.
 //! * `renderer`: Turns an AST into a Prisma Schema String.
 mod argument;
-mod comment;
 mod attribute;
+mod comment;
 mod r#enum;
 mod expression;
 mod field;
@@ -23,8 +23,8 @@ pub mod reformat;
 pub mod renderer;
 
 pub use argument::Argument;
-pub use comment::Comment;
 pub use attribute::Attribute;
+pub use comment::Comment;
 pub use expression::Expression;
 pub use field::{Field, FieldArity};
 pub use generator_config::GeneratorConfig;

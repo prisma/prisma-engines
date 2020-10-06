@@ -54,7 +54,7 @@ pub struct EnumValue {
     pub documentation: Option<Comment>,
     pub span: Span,
     pub commented_out: bool,
-}F
+}
 
 impl WithIdentifier for EnumValue {
     fn identifier(&self) -> &Identifier {

@@ -1,9 +1,9 @@
 use super::{
-  helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
-  parse_comments::*,
-  parse_attribute::parse_attribute,
-  parse_types::parse_field_type,
-  Rule,
+    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
+    parse_attribute::parse_attribute,
+    parse_comments::*,
+    parse_types::parse_field_type,
+    Rule,
 };
 use crate::ast::*;
 use crate::error::DatamodelError;
@@ -39,7 +39,7 @@ pub fn parse_field(model_name: &str, token: &Token) -> Result<Field, DatamodelEr
             },
             name,
             arity,
-          attributes,
+            attributes,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
             is_commented_out: false,

@@ -1,4 +1,4 @@
-use super::{Comment, Attribute, Identifier, Span};
+use super::{Attribute, Comment, Identifier, Span};
 use crate::ast::{Argument, SourceConfig};
 use crate::error::ErrorCollection;
 

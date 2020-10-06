@@ -1,7 +1,7 @@
 use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token},
-    parse_comments::*,
     parse_attribute::parse_attribute,
+    parse_comments::*,
     Rule,
 };
 use crate::ast::parser::helpers::TokenExtensions;

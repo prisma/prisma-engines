@@ -82,7 +82,7 @@ fn nice_error_missing_attribute_name() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "The name of an attribute must not be empty.",
+        "The name of a Attribute must not be empty.",
         Span::new(38, 38),
     ));
 }

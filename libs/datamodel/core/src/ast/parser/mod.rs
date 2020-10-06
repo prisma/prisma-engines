@@ -1,6 +1,6 @@
 mod helpers;
-mod parse_comments;
 mod parse_attribute;
+mod parse_comments;
 mod parse_enum;
 mod parse_expression;
 mod parse_field;
