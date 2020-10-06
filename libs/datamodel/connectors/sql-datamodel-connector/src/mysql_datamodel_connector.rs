@@ -56,7 +56,7 @@ impl MySqlDatamodelConnector {
         let unsigned_int = NativeTypeConstructor::without_args(UNSIGNED_INT_TYPE_NAME, ScalarType::Int);
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, ScalarType::Int);
         let unsigned_small_int = NativeTypeConstructor::without_args(UNSIGNED_SMALL_INT_TYPE_NAME, ScalarType::Int);
-        let tiny_int = NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, ScalarType::Int);
+        let tiny_int = NativeTypeConstructor::with_args(TINY_INT_TYPE_NAME, 1, ScalarType::Int);
         let unsigned_tiny_int = NativeTypeConstructor::without_args(UNSIGNED_TINY_INT_TYPE_NAME, ScalarType::Int);
         let medium_int = NativeTypeConstructor::without_args(MEDIUM_INT_TYPE_NAME, ScalarType::Int);
         let unsigned_medium_int = NativeTypeConstructor::without_args(UNSIGNED_MEDIUM_INT_TYPE_NAME, ScalarType::Int);
@@ -145,7 +145,17 @@ impl Connector for MySqlDatamodelConnector {
             UNSIGNED_INT_TYPE_NAME => MySqlType::UnsignedInt,
             SMALL_INT_TYPE_NAME => MySqlType::SmallInt,
             UNSIGNED_SMALL_INT_TYPE_NAME => MySqlType::UnsignedSmallInt,
-            TINY_INT_TYPE_NAME => MySqlType::TinyInt,
+            TINY_INT_TYPE_NAME => {
+                if let Some(arg) = args.first() {
+                    MySqlType::TinyInt(*arg)
+                } else {
+                    return Err(ConnectorError::new_argument_count_mismatch_error(
+                        TINY_INT_TYPE_NAME,
+                        1,
+                        0,
+                    ));
+                }
+            }
             UNSIGNED_TINY_INT_TYPE_NAME => MySqlType::UnsignedTinyInt,
             MEDIUM_INT_TYPE_NAME => MySqlType::MediumInt,
             UNSIGNED_MEDIUM_INT_TYPE_NAME => MySqlType::UnsignedMediumInt,
@@ -256,7 +266,7 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::UnsignedInt => (UNSIGNED_INT_TYPE_NAME, vec![]),
             MySqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             MySqlType::UnsignedSmallInt => (UNSIGNED_SMALL_INT_TYPE_NAME, vec![]),
-            MySqlType::TinyInt => (TINY_INT_TYPE_NAME, vec![]),
+            MySqlType::TinyInt(x) => (TINY_INT_TYPE_NAME, vec![x]),
             MySqlType::UnsignedTinyInt => (UNSIGNED_TINY_INT_TYPE_NAME, vec![]),
             MySqlType::MediumInt => (MEDIUM_INT_TYPE_NAME, vec![]),
             MySqlType::UnsignedMediumInt => (UNSIGNED_MEDIUM_INT_TYPE_NAME, vec![]),

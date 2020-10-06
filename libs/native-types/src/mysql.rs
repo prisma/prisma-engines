@@ -7,7 +7,7 @@ pub enum MySqlType {
     UnsignedInt,
     SmallInt,
     UnsignedSmallInt,
-    TinyInt,
+    TinyInt(u32),
     UnsignedTinyInt,
     MediumInt,
     UnsignedMediumInt,

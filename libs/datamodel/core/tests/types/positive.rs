@@ -108,6 +108,34 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 }
 
 #[test]
+fn native_type_tiny_int_should_work_with_mysql() {
+    let dml = r#"
+        datasource db {
+            provider        = "mysql"
+            url             = "mysql://"
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model User {
+            id    Int      @id
+            test  Int  @db.TinyInt(1)
+        }
+    "#;
+
+    let datamodel = parse(dml);
+
+    let user_model = datamodel.assert_has_model("User");
+
+    user_model.assert_has_scalar_field("test");
+
+    let sft = user_model.assert_has_scalar_field("test").assert_native_type();
+
+    let mysql_type: MySqlType = sft.deserialize_native_type();
+
+    assert_eq!(mysql_type, MySqlType::TinyInt(1));
+}
+
+#[test]
 fn should_be_able_to_handle_multiple_types() {
     let dml = r#"
     type ID = String @id @default(cuid())
