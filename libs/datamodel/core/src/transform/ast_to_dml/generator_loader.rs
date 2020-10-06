@@ -1,4 +1,7 @@
 use super::super::helpers::*;
+use crate::ast::Span;
+use crate::common::preview_features::GENERATOR_PREVIEW_FEATURES;
+use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, configuration::Generator, error::*};
 use std::collections::HashMap;
 
@@ -60,10 +63,18 @@ impl GeneratorLoader {
 
         // for compatibility reasons we still accept the old experimental key
         let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY).or(args.arg(EXPERIMENTAL_FEATURES_KEY));
-        let preview_features = match preview_features_arg.ok() {
-            Some(x) => x.as_array().to_str_vec()?,
-            None => Vec::new(),
+        let (preview_features, span) = match preview_features_arg.ok() {
+            Some(x) => (x.as_array().to_str_vec()?, x.span()),
+            None => (Vec::new(), Span::empty()),
         };
+
+        if preview_features.len() > 0 {
+            if let Err(err) =
+                validate_preview_features(preview_features.clone(), span, GENERATOR_PREVIEW_FEATURES.to_vec())
+            {
+                return Err(err);
+            }
+        }
 
         for prop in &ast_generator.properties {
             let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name.name);

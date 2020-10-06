@@ -1,4 +1,5 @@
 mod capabilities;
+pub mod mssql;
 mod tags;
 
 pub use capabilities::*;

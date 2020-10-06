@@ -139,7 +139,7 @@ impl TestApi {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
+                SqlFamily::Mssql => barrel::SqlVariant::Mssql,
             },
         }
     }
@@ -259,6 +259,34 @@ pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
         connection_info: database.connection_info().to_owned(),
         database,
         sql_family: SqlFamily::Sqlite,
+        introspection_connector,
+    }
+}
+
+pub async fn mssql_2017_test_api(schema: &'static str) -> TestApi {
+    mssql_test_api(mssql_2017_url("master"), schema).await
+}
+
+pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
+    mssql_test_api(mssql_2019_url("master"), schema).await
+}
+
+pub async fn mssql_test_api(connection_string: String, schema: &'static str) -> TestApi {
+    use test_setup::connectors::mssql;
+
+    let connection_string = format!("{};schema={}", connection_string, schema);
+    let database = Quaint::new(&connection_string).await.unwrap();
+    let connection_info = database.connection_info().to_owned();
+
+    mssql::reset_schema(&database, schema).await.unwrap();
+
+    let introspection_connector = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
+
+    TestApi {
+        db_name: schema,
+        connection_info,
+        database,
+        sql_family: SqlFamily::Mssql,
         introspection_connector,
     }
 }

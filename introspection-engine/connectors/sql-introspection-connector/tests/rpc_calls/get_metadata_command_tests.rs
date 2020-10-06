@@ -29,6 +29,15 @@ async fn metadata_for_sqlite_should_work(api: &TestApi) {
     assert_eq!(result.size_in_bytes, 16384); // page_size * page_count
 }
 
+#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+async fn metadata_for_mssql_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel, api.schema_name()).await;
+    let result = dbg!(api.get_metadata().await);
+    assert_eq!(result.table_count, 3);
+    assert_eq!(result.size_in_bytes, 0); // not using anything without writing something first
+}
+
 async fn setup(barrel: &BarrelMigrationExecutor, db_name: &str) {
     let _setup_schema = barrel
         .execute_with_schema(

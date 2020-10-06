@@ -42,6 +42,22 @@ async fn database_version_for_postgres_should_work(api: &TestApi) {
     assert_eq!(true, result.contains("PostgreSQL"));
 }
 
+#[test_each_connector(tags("mssql_2017"))]
+async fn database_version_for_mssql_2017_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel).await;
+    let result = dbg!(api.get_database_version().await);
+    assert_eq!(true, result.contains("Microsoft SQL Server 2017"));
+}
+
+#[test_each_connector(tags("mssql_2019"))]
+async fn database_version_for_mssql_2019_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel).await;
+    let result = dbg!(api.get_database_version().await);
+    assert_eq!(true, result.contains("Microsoft SQL Server 2019"));
+}
+
 // #[test_each_connector(tags("mssql_2019"))]
 // async fn database_version_for_mssql_2019_should_work(api: &TestApi) {
 //     let barrel = api.barrel();

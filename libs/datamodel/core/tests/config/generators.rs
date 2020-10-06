@@ -1,4 +1,5 @@
 use crate::common::ErrorAsserts;
+use datamodel::common::preview_features::GENERATOR_PREVIEW_FEATURES;
 use datamodel::error::DatamodelError;
 
 #[test]
@@ -42,12 +43,12 @@ fn preview_features_setting_must_work() {
     let schema = r#"
         generator js {
             provider = "javascript"
-            previewFeatures = "foo"
+            previewFeatures = "connectOrCreate"
         }
         
         generator go {
             provider = "go"
-            previewFeatures = ["foo", "bar"]
+            previewFeatures = ["connectOrCreate", "transactionApi"]
         } 
     "#;
 
@@ -57,7 +58,7 @@ fn preview_features_setting_must_work() {
     "provider": "javascript",
     "output":null,
     "binaryTargets": [],
-    "previewFeatures": ["foo"],
+    "previewFeatures": ["connectOrCreate"],
     "config": {}
   },
   {
@@ -65,7 +66,7 @@ fn preview_features_setting_must_work() {
     "provider": "go",
     "output":null,
     "binaryTargets": [],
-    "previewFeatures": ["foo", "bar"],
+    "previewFeatures": ["connectOrCreate", "transactionApi"],
     "config": {}
   }
 ]"#;
@@ -135,6 +136,28 @@ generator js1 {
             generator_name: String::from("js1"),
             span: datamodel::ast::Span::new(1, 73),
         });
+    } else {
+        panic!("Expected error.")
+    }
+}
+
+#[test]
+fn nice_error_for_unknown_generator_preview_feature() {
+    let schema = r#"
+    generator client {
+      provider = "prisma-client-js"
+      previewFeatures = ["foo"]
+    }
+    "#;
+
+    let res = datamodel::parse_configuration(schema);
+
+    if let Err(error) = res {
+        error.assert_is(DatamodelError::new_preview_feature_not_known_error(
+            "foo",
+            Vec::from(GENERATOR_PREVIEW_FEATURES),
+            datamodel::ast::Span::new(84, 91),
+        ));
     } else {
         panic!("Expected error.")
     }
