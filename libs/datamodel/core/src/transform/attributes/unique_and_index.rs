@@ -1,13 +1,13 @@
-use super::{super::helpers::*, DirectiveValidator};
+use super::{super::helpers::*, AttributeValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml, IndexDefinition, IndexType};
 use std::collections::HashMap;
 
-/// Prismas builtin `@unique` directive.
-pub struct FieldLevelUniqueDirectiveValidator {}
+/// Prismas builtin `@unique` attribute.
+pub struct FieldLevelUniqueAttributeValidator {}
 
-impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
-    fn directive_name(&self) -> &'static str {
+impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
+    fn attribute_name(&self) -> &'static str {
         &"unique"
     }
 
@@ -28,18 +28,18 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
                 String::new()
             };
 
-            return self.new_directive_validation_error(
+            return self.new_attribute_validation_error(
                 &format!(
-                    "The field `{field_name}` is a relation field and cannot be marked with `{directive_name}`. Only scalar fields can be made unique.{suggestion}",
+                    "The field `{field_name}` is a relation field and cannot be marked with `{attribute_name}`. Only scalar fields can be made unique.{suggestion}",
                     field_name = rf.name,
-                    directive_name  = self.directive_name(),
+                    attribute_name  = self.attribute_name(),
                     suggestion = suggestion
                 ),
                 args.span(),
             );
         } else if let dml::Field::ScalarField(sf) = obj {
             if sf.is_id {
-                return self.new_directive_validation_error(
+                return self.new_attribute_validation_error(
                     "Fields that are marked as id should not have an additional @unique.",
                     args.span(),
                 );
@@ -54,22 +54,22 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
         &self,
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Directive>, DatamodelError> {
+    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
         if let dml::Field::ScalarField(sf) = field {
             if sf.is_unique {
-                return Ok(vec![ast::Directive::new(self.directive_name(), vec![])]);
+                return Ok(vec![ast::Attribute::new(self.attribute_name(), vec![])]);
             }
         }
         Ok(vec![])
     }
 }
 
-/// Prismas builtin `@@unique` directive.
-pub struct ModelLevelUniqueDirectiveValidator {}
+/// Prismas builtin `@@unique` attribute.
+pub struct ModelLevelUniqueAttributeValidator {}
 
-impl IndexDirectiveBase<dml::Model> for ModelLevelUniqueDirectiveValidator {}
-impl DirectiveValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
-    fn directive_name(&self) -> &str {
+impl IndexAttributeBase<dml::Model> for ModelLevelUniqueAttributeValidator {}
+impl AttributeValidator<dml::Model> for ModelLevelUniqueAttributeValidator {
+    fn attribute_name(&self) -> &str {
         "unique"
     }
 
@@ -88,17 +88,17 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
         &self,
         model: &dml::Model,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Directive>, DatamodelError> {
+    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
         self.serialize_index_definitions(&model, IndexType::Unique)
     }
 }
 
-/// Prismas builtin `@@index` directive.
-pub struct ModelLevelIndexDirectiveValidator {}
+/// Prismas builtin `@@index` attribute.
+pub struct ModelLevelIndexAttributeValidator {}
 
-impl IndexDirectiveBase<dml::Model> for ModelLevelIndexDirectiveValidator {}
-impl DirectiveValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
-    fn directive_name(&self) -> &str {
+impl IndexAttributeBase<dml::Model> for ModelLevelIndexAttributeValidator {}
+impl AttributeValidator<dml::Model> for ModelLevelIndexAttributeValidator {
+    fn attribute_name(&self) -> &str {
         "index"
     }
 
@@ -117,13 +117,13 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
         &self,
         model: &dml::Model,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Directive>, DatamodelError> {
+    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
         self.serialize_index_definitions(&model, IndexType::Normal)
     }
 }
 
 /// common logic for `@@unique` and `@@index`
-trait IndexDirectiveBase<T>: DirectiveValidator<T> {
+trait IndexAttributeBase<T>: AttributeValidator<T> {
     fn validate_index(
         &self,
         args: &mut Arguments,
@@ -212,8 +212,8 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
 
             let suggestion = if had_successful_replacement {
                 format!(
-                    " Did you mean `@@{directive_name}([{fields}])`?",
-                    directive_name = directive_name(index_type),
+                    " Did you mean `@@{attribute_name}([{fields}])`?",
+                    attribute_name = attribute_name(index_type),
                     fields = suggested_fields.join(", ")
                 )
             } else {
@@ -239,8 +239,8 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         &self,
         model: &dml::Model,
         index_type: IndexType,
-    ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        let directives: Vec<ast::Directive> = model
+    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+        let attributes: Vec<ast::Attribute> = model
             .indices
             .iter()
             .filter(|index| index.tpe == index_type)
@@ -259,15 +259,15 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
                     args.push(ast::Argument::new_string("name", &name));
                 }
 
-                ast::Directive::new(self.directive_name(), args)
+                ast::Attribute::new(self.attribute_name(), args)
             })
             .collect();
 
-        Ok(directives)
+        Ok(attributes)
     }
 }
 
-fn directive_name(index_type: dml::IndexType) -> &'static str {
+fn attribute_name(index_type: dml::IndexType) -> &'static str {
     if index_type == dml::IndexType::Unique {
         "unique"
     } else {

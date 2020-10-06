@@ -42,7 +42,7 @@ model Post2 {
 }
 
 #[test]
-fn back_relation_fields_and_directive_must_be_added_even_when_directive_is_missing() {
+fn back_relation_fields_and_attribute_must_be_added_even_when_attribute_is_missing() {
     let input = r#"model User {
   id Int @id
   post Post
@@ -69,7 +69,7 @@ model Post {
 }
 
 #[test]
-fn back_relation_fields_missing_directives_should_not_add_directives_multiple_times() {
+fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_times() {
     let input = r#"model User {
   id Int @id
   post Post
@@ -109,7 +109,7 @@ model Cat {
 
 #[test]
 #[ignore]
-fn back_relations_must_be_added_when_directive_is_present_with_no_arguments() {
+fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
     let input = r#"model User {
   id Int @id
   post Post @relation
@@ -137,7 +137,7 @@ model Post {
 
 #[test]
 #[ignore]
-fn back_relations_must_be_added_when_directive_is_present_with_only_one_argument() {
+fn back_relations_must_be_added_when_attribute_is_present_with_only_one_argument() {
     let input = r#"model User {
   id Int @id
   post Post @relation(fields: [postId])
@@ -165,7 +165,7 @@ model Post {
 
 #[test]
 #[ignore]
-fn back_relations_must_be_added_when_directive_is_present_with_both_arguments() {
+fn back_relations_must_be_added_when_attribute_is_present_with_both_arguments() {
     let input = r#"model User {
   id Int @id
   post Post @relation(fields: [postId], references: [id])
@@ -192,7 +192,7 @@ model Post {
 }
 
 #[test]
-fn scalar_field_and_directive_must_be_added_even_when_directive_is_missing_and_both_relation_fields_present() {
+fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_both_relation_fields_present() {
     let input = r#"model User {
   id Int @id
   post Post
@@ -220,7 +220,7 @@ model Post {
 }
 
 #[test]
-fn scalar_field_and_directive_must_be_added_even_when_directive_is_missing_and_only_one_relation_field_present() {
+fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_only_one_relation_field_present() {
     let input = r#"model User {
   id Int @id
 }
@@ -259,7 +259,7 @@ model Cat {
 }
 
 #[test]
-fn back_relations_must_be_added_even_when_directive_is_missing_for_one_to_one() {
+fn back_relations_must_be_added_even_when_attribute_is_missing_for_one_to_one() {
     let input = r#"model User {
   id     Int   @id
   Post   Post?
@@ -285,7 +285,7 @@ model Post {
 }
 
 #[test]
-fn back_relations_and_directive_must_be_added_even_when_directive_is_missing_for_one_to_many() {
+fn back_relations_and_attribute_must_be_added_even_when_attribute_is_missing_for_one_to_many() {
     let input = r#"model User {
   id     Int   @id
   Post   Post
@@ -311,7 +311,7 @@ model Post {
 }
 
 #[test]
-fn relation_directive_must_not_be_added_for_many_to_many() {
+fn relation_attribute_must_not_be_added_for_many_to_many() {
     let input = r#"model User {
   id   Int    @id
   Post Post[]
@@ -368,7 +368,7 @@ model Post {
 
 #[test]
 #[ignore]
-fn must_add_relation_directive_to_an_existing_field() {
+fn must_add_relation_attribute_to_an_existing_field() {
     let input = r#"
     model Blog {
       id    Int     @id

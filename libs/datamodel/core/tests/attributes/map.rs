@@ -3,7 +3,7 @@ use datamodel::ast::Span;
 use datamodel::error::DatamodelError;
 
 #[test]
-fn map_directive() {
+fn map_attribute() {
     let dml = r#"
     model User {
         id Int @id
@@ -47,8 +47,8 @@ fn map_must_error_for_relation_fields() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_directive_validation_error(
-        "The directive `@map` can not be used on relation fields.",
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "The attribute `@map` can not be used on relation fields.",
         "map",
         Span::new(128, 146),
     ));

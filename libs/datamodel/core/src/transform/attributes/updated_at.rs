@@ -1,12 +1,12 @@
-use super::{super::helpers::*, DirectiveValidator};
+use super::{super::helpers::*, AttributeValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml};
 
-/// Prismas builtin `@updatedAt` directive.
-pub struct UpdatedAtDirectiveValidator {}
+/// Prismas builtin `@updatedAt` attribute.
+pub struct UpdatedAtAttributeValidator {}
 
-impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
-    fn directive_name(&self) -> &'static str {
+impl AttributeValidator<dml::Field> for UpdatedAtAttributeValidator {
+    fn attribute_name(&self) -> &'static str {
         &"updatedAt"
     }
 
@@ -14,7 +14,7 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
         if let dml::Field::ScalarField(sf) = obj {
             if sf.field_type.scalar_type() == Some(dml::ScalarType::DateTime) {
                 if sf.arity == dml::FieldArity::List {
-                    return self.new_directive_validation_error(
+                    return self.new_attribute_validation_error(
                         "Fields that are marked with @updatedAt can not be lists.",
                         args.span(),
                     );
@@ -25,7 +25,7 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
                 return Ok(());
             }
         }
-        self.new_directive_validation_error(
+        self.new_attribute_validation_error(
             "Fields that are marked with @updatedAt must be of type DateTime.",
             args.span(),
         )
@@ -35,9 +35,9 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
         &self,
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Directive>, DatamodelError> {
+    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
         if field.is_updated_at() {
-            Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())])
+            Ok(vec![ast::Attribute::new(self.attribute_name(), Vec::new())])
         } else {
             Ok(vec![])
         }

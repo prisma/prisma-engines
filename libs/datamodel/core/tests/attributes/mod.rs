@@ -1,4 +1,4 @@
-pub mod builtin_directives;
+pub mod builtin_attributes;
 pub mod default_negative;
 pub mod default_positive;
 pub mod id_negative;

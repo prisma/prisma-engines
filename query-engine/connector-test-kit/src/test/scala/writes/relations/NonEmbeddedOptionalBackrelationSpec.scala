@@ -59,7 +59,7 @@ class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with Ap
         |model Owner {
         |  id        String @id @default(cuid())
         |  ownerName String @unique
-        |  cats      Cat[]  $relationInlineDirective
+        |  cats      Cat[]  $relationInlineAttribute
         |}
         |
         |model Cat {
@@ -111,7 +111,7 @@ class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with Ap
         |model Owner {
         |  id        String @id @default(cuid())
         |  ownerName String @unique
-        |  cats      Cat[]  $relationInlineDirective
+        |  cats      Cat[]  $relationInlineAttribute
         |}
         |
         |model Cat {

@@ -3,12 +3,12 @@ use datamodel::dml;
 use datamodel::{ast::Span, error::DatamodelError};
 
 // Ported from
-// https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/RelationDirectiveSpec.scala
+// https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/RelationAttributeSpec.scala
 
 // TODO: Split up to existing relation files.
 
 #[test]
-fn succeed_without_directive_if_unambigous() {
+fn succeed_without_attribute_if_unambigous() {
     let dml = r#"
     model Todo {
       id Int @id

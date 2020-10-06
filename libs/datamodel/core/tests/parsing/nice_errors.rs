@@ -72,7 +72,7 @@ fn nice_error_missing_type() {
 }
 
 #[test]
-fn nice_error_missing_directive_name() {
+fn nice_error_missing_attribute_name() {
     let dml = r#"
     model User {
         id Int @id @
@@ -82,7 +82,7 @@ fn nice_error_missing_directive_name() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "The name of a Directive must not be empty.",
+        "The name of a Attribute must not be empty.",
         Span::new(38, 38),
     ));
 }
@@ -333,7 +333,7 @@ fn invalid_field_line_must_error_nicely() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "This line is not a valid field or directive definition.",
+        "This line is not a valid field or attribute definition.",
         Span::new(43, 57),
     ));
 }

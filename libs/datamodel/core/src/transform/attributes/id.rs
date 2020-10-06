@@ -1,12 +1,12 @@
-use super::{super::helpers::*, DirectiveValidator};
+use super::{super::helpers::*, AttributeValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml};
 
-/// Prismas builtin `@primary` directive.
-pub struct IdDirectiveValidator {}
+/// Prismas builtin `@primary` attribute.
+pub struct IdAttributeValidator {}
 
-impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
-    fn directive_name(&self) -> &'static str {
+impl AttributeValidator<dml::Field> for IdAttributeValidator {
+    fn attribute_name(&self) -> &'static str {
         &"id"
     }
 
@@ -16,14 +16,14 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
                 sf.is_id = true;
                 Ok(())
             } else {
-                self.new_directive_validation_error("Fields that are marked as id must be required.", args.span())
+                self.new_attribute_validation_error("Fields that are marked as id must be required.", args.span())
             }
         } else {
-            self.new_directive_validation_error(
+            self.new_attribute_validation_error(
                 &format!(
                     "The field `{}` is a relation field and cannot be marked with `@{}`. Only scalar fields can be declared as id.",
                     &obj.name(),
-                    self.directive_name()
+                    self.attribute_name()
                 ),
                 args.span(),
             )
@@ -34,20 +34,20 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         &self,
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Directive>, DatamodelError> {
+    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
         if let dml::Field::ScalarField(sf) = field {
             if sf.is_id {
-                return Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())]);
+                return Ok(vec![ast::Attribute::new(self.attribute_name(), Vec::new())]);
             }
         }
         Ok(vec![])
     }
 }
 
-pub struct ModelLevelIdDirectiveValidator {}
+pub struct ModelLevelIdAttributeValidator {}
 
-impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
-    fn directive_name(&self) -> &str {
+impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
+    fn attribute_name(&self) -> &str {
         "id"
     }
 
@@ -130,7 +130,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
         &self,
         model: &dml::Model,
         _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Directive>, DatamodelError> {
+    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
         if !model.id_fields.is_empty() {
             let mut args = Vec::new();
 
@@ -143,7 +143,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
                     .collect(),
             ));
 
-            return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
+            return Ok(vec![ast::Attribute::new(self.attribute_name(), args)]);
         }
 
         Ok(vec![])

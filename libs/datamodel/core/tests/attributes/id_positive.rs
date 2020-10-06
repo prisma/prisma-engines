@@ -158,7 +158,7 @@ fn relation_field_as_id_must_error() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_directive_validation_error(
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The field `identification` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
         "id",
         Span::new(84, 86),

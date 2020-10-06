@@ -1,4 +1,4 @@
-use crate::ast::WithDirectives;
+use crate::ast::WithAttributes;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
@@ -16,12 +16,12 @@ pub struct Validator<'a> {
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
-const RELATION_DIRECTIVE_NAME: &str = "relation";
-const RELATION_DIRECTIVE_NAME_WITH_AT: &str = "@relation";
+const RELATION_ATTRIBUTE_NAME: &str = "relation";
+const RELATION_ATTRIBUTE_NAME_WITH_AT: &str = "@relation";
 const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
 
 impl<'a> Validator<'a> {
-    /// Creates a new instance, with all builtin directives registered.
+    /// Creates a new instance, with all builtin attributes registered.
     pub fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
         Self { source }
     }
@@ -168,21 +168,21 @@ impl<'a> Validator<'a> {
 
         for model in ast_schema.models() {
             errors.push_opt(model.name.validate("Model").err());
-            errors.append(&mut model.validate_directives());
+            errors.append(&mut model.validate_attributes());
 
             for field in model.fields.iter() {
                 errors.push_opt(field.name.validate("Field").err());
-                errors.append(&mut field.validate_directives());
+                errors.append(&mut field.validate_attributes());
             }
         }
 
         for enum_decl in ast_schema.enums() {
             errors.push_opt(enum_decl.name.validate("Enum").err());
-            errors.append(&mut enum_decl.validate_directives());
+            errors.append(&mut enum_decl.validate_attributes());
 
             for enum_value in enum_decl.values.iter() {
                 errors.push_opt(enum_value.name.validate("Enum Value").err());
-                errors.append(&mut enum_value.validate_directives());
+                errors.append(&mut enum_value.validate_attributes());
             }
         }
 
@@ -208,9 +208,9 @@ impl<'a> Validator<'a> {
                     if let Some(index_name) = &index.name {
                         if index_names.contains(index_name) && !multiple_indexes_with_same_name_are_supported {
                             let ast_index = ast_model
-                                .directives
+                                .attributes
                                 .iter()
-                                .find(|directive| directive.name.name == "index")
+                                .find(|attribute| attribute.name.name == "index")
                                 .unwrap();
                             errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
                                 index_name,
@@ -293,7 +293,7 @@ impl<'a> Validator<'a> {
                 if let FieldType::Enum(enum_name) = &field.field_type {
                     if let Some(dml_enum) = data_model.find_enum(&enum_name) {
                         if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
-                            errors.push(DatamodelError::new_directive_validation_error(
+                            errors.push(DatamodelError::new_attribute_validation_error(
                                 &format!(
                                 "{}",
                                 "The defined default value is not a valid value of the enum specified for the field."
@@ -321,7 +321,7 @@ impl<'a> Validator<'a> {
             if !data_source.combined_connector.supports_multiple_auto_increment()
                 && model.auto_increment_fields().count() > 1
             {
-                errors.push(DatamodelError::new_directive_validation_error(
+                errors.push(DatamodelError::new_attribute_validation_error(
                     &format!(
                         "{}",
                         "The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table."
@@ -339,7 +339,7 @@ impl<'a> Validator<'a> {
                     && field.is_auto_increment()
                     && !data_source.combined_connector.supports_non_id_auto_increment()
                 {
-                    errors.push(DatamodelError::new_directive_validation_error(
+                    errors.push(DatamodelError::new_attribute_validation_error(
                     &format!(
                         "{}",
                         "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this."
@@ -353,7 +353,7 @@ impl<'a> Validator<'a> {
                     && !model.field_is_indexed(&field.name)
                     && !data_source.combined_connector.supports_non_indexed_auto_increment()
                 {
-                    errors.push(DatamodelError::new_directive_validation_error(
+                    errors.push(DatamodelError::new_attribute_validation_error(
                     &format!(
                         "{}",
                         "The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this."
@@ -378,7 +378,7 @@ impl<'a> Validator<'a> {
         model: &dml::Model,
     ) -> Result<(), DatamodelError> {
         let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
-            "At most one field must be marked as the id field with the `@id` directive.",
+            "At most one field must be marked as the id field with the `@id` attribute.",
             &model.name,
             ast_model.span,
         ));
@@ -615,7 +615,7 @@ impl<'a> Validator<'a> {
                         let referenced_field = related_model.find_field(&referenced_field)?;
 
                         if !base_field.field_type().is_compatible_with(&referenced_field.field_type()) {
-                            Some(DatamodelError::new_directive_validation_error(
+                            Some(DatamodelError::new_attribute_validation_error(
                                 &format!(
                                     "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
                                     &base_field.name(),
@@ -623,7 +623,7 @@ impl<'a> Validator<'a> {
                                     &referenced_field.name(),
                                     &related_model.name
                                 ),
-                                RELATION_DIRECTIVE_NAME,
+                                RELATION_ATTRIBUTE_NAME,
                                 ast_field.span,
                             ))
                         } else {
@@ -710,9 +710,9 @@ impl<'a> Validator<'a> {
                 && !rel_info.to_fields.is_empty()
                 && rel_info.fields.len() != rel_info.to_fields.len()
             {
-                errors.push(DatamodelError::new_directive_validation_error(
+                errors.push(DatamodelError::new_attribute_validation_error(
                     "You must specify the same number of fields in `fields` and `references`.",
-                    RELATION_DIRECTIVE_NAME,
+                    RELATION_ATTRIBUTE_NAME,
                     ast_field.span,
                 ));
             }
@@ -754,24 +754,24 @@ impl<'a> Validator<'a> {
             // ONE TO MANY
             if field.is_singular() && related_field.is_list() {
                 if rel_info.fields.is_empty() {
-                    errors.push(DatamodelError::new_directive_validation_error(
-                            &format!(
-                                "The relation field `{}` on Model `{}` must specify the `fields` argument in the {} directive. {}",
-                                &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, PRISMA_FORMAT_HINT
+                    errors.push(DatamodelError::new_attribute_validation_error(
+                        &format!(
+                            "The relation field `{}` on Model `{}` must specify the `fields` argument in the {} attribute. {}",
+                            &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, PRISMA_FORMAT_HINT
                             ),
-                            RELATION_DIRECTIVE_NAME,
-                            field_span,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
                         ));
                 }
 
                 if rel_info.to_fields.is_empty() {
-                    errors.push(DatamodelError::new_directive_validation_error(
-                            &format!(
-                                "The relation field `{}` on Model `{}` must specify the `references` argument in the {} directive.",
-                                &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT
+                    errors.push(DatamodelError::new_attribute_validation_error(
+                        &format!(
+                            "The relation field `{}` on Model `{}` must specify the `references` argument in the {} attribute.",
+                            &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
                             ),
-                            RELATION_DIRECTIVE_NAME,
-                            field_span,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
                         ));
                 }
             }
@@ -780,13 +780,13 @@ impl<'a> Validator<'a> {
                 && !related_field.is_list()
                 && (!rel_info.fields.is_empty() || !rel_info.to_fields.is_empty())
             {
-                errors.push(DatamodelError::new_directive_validation_error(
-                            &format!(
-                                "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} directive. You must only specify it on the opposite field `{}` on model `{}`.",
-                                &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name
+                errors.push(DatamodelError::new_attribute_validation_error(
+                    &format!(
+                        "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.",
+                        &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name
                             ),
-                            RELATION_DIRECTIVE_NAME,
-                            field_span,
+                    RELATION_ATTRIBUTE_NAME,
+                    field_span,
                         ));
             }
 
@@ -807,69 +807,69 @@ impl<'a> Validator<'a> {
             // ONE TO ONE
             if field.is_singular() && related_field.is_singular() {
                 if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
-                    errors.push(DatamodelError::new_directive_validation_error(
-                            &format!(
-                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} directive. You have to provide it on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
+                    errors.push(DatamodelError::new_attribute_validation_error(
+                        &format!(
+                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.",
+                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
                             ),
-                            RELATION_DIRECTIVE_NAME,
-                            field_span,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
                         ));
                 }
 
                 if rel_info.to_fields.is_empty() && related_field_rel_info.to_fields.is_empty() {
-                    errors.push(DatamodelError::new_directive_validation_error(
-                            &format!(
-                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} directive. You have to provide it on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
+                    errors.push(DatamodelError::new_attribute_validation_error(
+                        &format!(
+                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.",
+                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
                             ),
-                            RELATION_DIRECTIVE_NAME,
-                            field_span,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
                         ));
                 }
 
                 if !rel_info.to_fields.is_empty() && !related_field_rel_info.to_fields.is_empty() {
-                    errors.push(DatamodelError::new_directive_validation_error(
-                            &format!(
-                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} directive. You have to provide it only on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
+                    errors.push(DatamodelError::new_attribute_validation_error(
+                        &format!(
+                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} attribute. You have to provide it only on one of the two fields.",
+                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
                             ),
-                            RELATION_DIRECTIVE_NAME,
-                            field_span,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
                         ));
                 }
 
                 if !rel_info.fields.is_empty() && !related_field_rel_info.fields.is_empty() {
-                    errors.push(DatamodelError::new_directive_validation_error(
-                            &format!(
-                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} directive. You have to provide it only on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
+                    errors.push(DatamodelError::new_attribute_validation_error(
+                        &format!(
+                            "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} attribute. You have to provide it only on one of the two fields.",
+                            &field.name, &model.name, &related_field.name, &related_model.name, RELATION_ATTRIBUTE_NAME_WITH_AT
                             ),
-                            RELATION_DIRECTIVE_NAME,
-                            field_span,
+                        RELATION_ATTRIBUTE_NAME,
+                        field_span,
                         ));
                 }
 
                 if !errors.has_errors() {
                     if !rel_info.fields.is_empty() && !related_field_rel_info.to_fields.is_empty() {
-                        errors.push(DatamodelError::new_directive_validation_error(
-                                &format!(
-                                "The relation field `{}` on Model `{}` provides the `fields` argument in the {} directive. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.",
-                                &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name,
+                        errors.push(DatamodelError::new_attribute_validation_error(
+                            &format!(
+                                "The relation field `{}` on Model `{}` provides the `fields` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.",
+                                &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name,
                             ),
-                            RELATION_DIRECTIVE_NAME,
+                            RELATION_ATTRIBUTE_NAME,
                             field_span,
                             ));
                     }
 
                     if !rel_info.to_fields.is_empty() && !related_field_rel_info.fields.is_empty() {
-                        errors.push(DatamodelError::new_directive_validation_error(
-                                &format!(
-                                    "The relation field `{}` on Model `{}` provides the `references` argument in the {} directive. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.",
-                                    &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name,
+                        errors.push(DatamodelError::new_attribute_validation_error(
+                            &format!(
+                                "The relation field `{}` on Model `{}` provides the `references` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.",
+                                &field.name, &model.name, RELATION_ATTRIBUTE_NAME_WITH_AT, &related_field.name, &related_model.name,
                                 ),
-                                RELATION_DIRECTIVE_NAME,
-                                field_span,
+                            RELATION_ATTRIBUTE_NAME,
+                            field_span,
                             ));
                     }
                 }

@@ -595,7 +595,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo{
             id       String    @id @default(cuid())
-            comments Comment[] $relationInlineDirective
+            comments Comment[] $relationInlineAttribute
         }
 
         model Comment{
@@ -655,7 +655,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo {
               id       String    @id @default(cuid())
-              comments Comment[] $relationInlineDirective
+              comments Comment[] $relationInlineAttribute
           }
 
           model Comment {
@@ -713,7 +713,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo{
               id       String    @id @default(cuid())
-              comments Comment[] $relationInlineDirective
+              comments Comment[] $relationInlineAttribute
           }
 
           model Comment{
@@ -821,7 +821,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       s"""model Todo{
               id       String    @id @default(cuid())
               title    String    @unique
-              comments Comment[] $relationInlineDirective
+              comments Comment[] $relationInlineAttribute
           }
 
           model Comment{
@@ -1026,14 +1026,14 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String @id @default(cuid())
                                              |  nameTop String @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
                                              |  nameMiddle String @unique
                                              |  tops       Top[]
-                                             |  bottoms    Bottom[] $relationInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
@@ -1123,13 +1123,13 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String   @id @default(cuid())
                                              |  nameMiddle String   @unique
-                                             |  bottoms    Bottom[] $relationInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
@@ -1218,7 +1218,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
@@ -1317,7 +1317,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |model Bottom {
                                              |  id         String  @id @default(cuid())
                                              |  nameBottom String  @unique
-                                             |  below      Below[] $relationInlineDirective
+                                             |  below      Below[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Below {

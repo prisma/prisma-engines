@@ -1,4 +1,4 @@
-use super::super::directives::AllDirectives;
+use super::super::attributes::AllAttributes;
 use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
 use crate::error::ErrorCollection;
@@ -6,15 +6,15 @@ use crate::FieldType::NativeType;
 use crate::{ast, dml, Datasource};
 
 pub struct LowerDmlToAst<'a> {
-    directives: AllDirectives,
+    attributes: AllAttributes,
     datasource: Option<&'a Datasource>,
 }
 
 impl<'a> LowerDmlToAst<'a> {
-    /// Creates a new instance, with all builtin directives registered.
+    /// Creates a new instance, with all builtin attributes registered.
     pub fn new(datasource: Option<&'a Datasource>) -> Self {
         Self {
-            directives: AllDirectives::new(),
+            attributes: AllAttributes::new(),
             datasource,
         }
     }
@@ -60,7 +60,7 @@ impl<'a> LowerDmlToAst<'a> {
         Ok(ast::Model {
             name: ast::Identifier::new(&model.name),
             fields,
-            directives: self.directives.model.serialize(model, datamodel)?,
+            attributes: self.attributes.model.serialize(model, datamodel)?,
             documentation: model.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
             commented_out: model.is_commented_out,
@@ -74,24 +74,24 @@ impl<'a> LowerDmlToAst<'a> {
                 .values()
                 .map(|v| ast::EnumValue {
                     name: ast::Identifier::new(&v.name),
-                    directives: self.directives.enm_value.serialize(v, datamodel).unwrap(),
+                    attributes: self.attributes.enm_value.serialize(v, datamodel).unwrap(),
                     documentation: v.documentation.clone().map(|text| ast::Comment { text }),
                     span: ast::Span::empty(),
                     commented_out: v.commented_out,
                 })
                 .collect(),
-            directives: self.directives.enm.serialize(enm, datamodel)?,
+            attributes: self.attributes.enm.serialize(enm, datamodel)?,
             documentation: enm.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
         })
     }
 
     pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
-        let mut directives = self.directives.field.serialize(field, datamodel)?;
+        let mut attributes = self.attributes.field.serialize(field, datamodel)?;
         if let (dml::Field::ScalarField(sf), Some(datasource)) = (field, self.datasource) {
             if let NativeType(_prisma_tpe, native_tpe) = sf.clone().field_type {
                 if datasource.has_preview_feature("nativeTypes") {
-                    let new_directive_name = format!("{}.{}", datasource.name, native_tpe.name);
+                    let new_attribute_name = format!("{}.{}", datasource.name, native_tpe.name);
                     // lower native type arguments
                     let mut arguments = vec![];
                     for arg in native_tpe.args {
@@ -100,7 +100,7 @@ impl<'a> LowerDmlToAst<'a> {
                             Span::empty(),
                         )));
                     }
-                    directives.push(ast::Directive::new(new_directive_name.as_str(), arguments));
+                    attributes.push(ast::Attribute::new(new_attribute_name.as_str(), arguments));
                 }
             }
         }
@@ -108,7 +108,7 @@ impl<'a> LowerDmlToAst<'a> {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),
             arity: self.lower_field_arity(field.arity()),
-            directives,
+            attributes,
             field_type: self.lower_type(&field.field_type()),
             documentation: field
                 .documentation()

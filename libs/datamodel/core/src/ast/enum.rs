@@ -7,8 +7,8 @@ pub struct Enum {
     pub name: Identifier,
     /// The values of the enum.
     pub values: Vec<EnumValue>,
-    /// The directives of this enum.
-    pub directives: Vec<Directive>,
+    /// The attributes of this enum.
+    pub attributes: Vec<Attribute>,
     /// The comments for this enum.
     pub documentation: Option<Comment>,
     /// The location of this enum in the text representation.
@@ -27,9 +27,9 @@ impl WithSpan for Enum {
     }
 }
 
-impl WithDirectives for Enum {
-    fn directives(&self) -> &Vec<Directive> {
-        &self.directives
+impl WithAttributes for Enum {
+    fn attributes(&self) -> &Vec<Attribute> {
+        &self.attributes
     }
 }
 
@@ -49,7 +49,7 @@ pub struct EnumValue {
     /// The name of the enum value as it will be exposed by the api.
     pub name: Identifier,
     /// The enum value as it will be stored in the database.
-    pub directives: Vec<Directive>,
+    pub attributes: Vec<Attribute>,
     /// The location of this enum value in the text representation.
     pub documentation: Option<Comment>,
     pub span: Span,
@@ -62,9 +62,9 @@ impl WithIdentifier for EnumValue {
     }
 }
 
-impl WithDirectives for EnumValue {
-    fn directives(&self) -> &Vec<Directive> {
-        &self.directives
+impl WithAttributes for EnumValue {
+    fn attributes(&self) -> &Vec<Attribute> {
+        &self.attributes
     }
 }
 

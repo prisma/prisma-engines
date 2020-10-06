@@ -2,12 +2,12 @@ use datamodel::ast;
 use migration_connector::steps::MigrationExpression;
 
 #[derive(Debug)]
-pub(crate) struct DirectiveDiffer<'a> {
-    pub(crate) previous: &'a ast::Directive,
-    pub(crate) next: &'a ast::Directive,
+pub(crate) struct AttributeDiffer<'a> {
+    pub(crate) previous: &'a ast::Attribute,
+    pub(crate) next: &'a ast::Attribute,
 }
 
-impl<'a> DirectiveDiffer<'a> {
+impl<'a> AttributeDiffer<'a> {
     pub(crate) fn deleted_arguments(&self) -> impl Iterator<Item = &ast::Argument> {
         self.previous_arguments().filter(move |previous_argument| {
             self.next_arguments()
@@ -41,7 +41,7 @@ impl<'a> DirectiveDiffer<'a> {
     }
 }
 
-pub(crate) fn directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
+pub(crate) fn attributes_match(previous: &ast::Attribute, next: &ast::Attribute) -> bool {
     previous.name.name == next.name.name
 }
 
@@ -49,7 +49,7 @@ pub fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
     previous.name.name == next.name.name
 }
 
-pub(crate) fn directives_are_identical(previous: &ast::Directive, next: &ast::Directive) -> bool {
+pub(crate) fn attributes_are_identical(previous: &ast::Attribute, next: &ast::Attribute) -> bool {
     if previous.name.name != next.name.name {
         return false;
     }
@@ -77,12 +77,12 @@ mod tests {
     use super::*;
     use datamodel::ast::parser::parse_schema;
 
-    fn dog_model_custom_directive_test(test_fn: impl FnOnce(DirectiveDiffer<'_>)) {
+    fn dog_model_custom_attribute_test(test_fn: impl FnOnce(AttributeDiffer<'_>)) {
         let previous = r#"
         model Dog {
             id Int @id
 
-            @@customDirective(hasFur: true, animalType: "Mammal")
+            @@customAttribute(hasFur: true, animalType: "Mammal")
         }
         "#;
         let previous = parse_schema(previous).unwrap();
@@ -90,7 +90,7 @@ mod tests {
         model Dog {
             id Int @id
 
-            @@customDirective(animalType: "Mammals", legs: 4)
+            @@customAttribute(animalType: "Mammals", legs: 4)
         }
         "#;
         let next = parse_schema(next).unwrap();
@@ -101,22 +101,22 @@ mod tests {
         };
 
         let dog_diff: ModelDiffer<'_> = differ.model_pairs().next().unwrap();
-        let custom_directive = dog_diff.regular_directive_pairs().next().unwrap();
+        let custom_attribute = dog_diff.regular_attribute_pairs().next().unwrap();
 
-        assert_eq!(custom_directive.previous.name.name, "customDirective");
+        assert_eq!(custom_attribute.previous.name.name, "customAttribute");
 
-        test_fn(custom_directive)
+        test_fn(custom_attribute)
     }
 
     #[test]
-    fn datamodel_differ_directive_differ_works() {
-        dog_model_custom_directive_test(|directive_diff| {
-            let deleted_arguments = directive_diff.deleted_arguments().collect::<Vec<_>>();
+    fn datamodel_differ_attribute_differ_works() {
+        dog_model_custom_attribute_test(|attribute_diff| {
+            let deleted_arguments = attribute_diff.deleted_arguments().collect::<Vec<_>>();
 
             assert_eq!(deleted_arguments.len(), 1);
             assert_eq!(deleted_arguments.get(0).unwrap().name.name, "hasFur");
 
-            let created_arguments = directive_diff.created_arguments().collect::<Vec<_>>();
+            let created_arguments = attribute_diff.created_arguments().collect::<Vec<_>>();
 
             assert_eq!(created_arguments.len(), 1);
             assert_eq!(created_arguments.get(0).unwrap().name.name, "legs");

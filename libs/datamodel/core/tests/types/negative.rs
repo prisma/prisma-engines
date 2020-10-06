@@ -2,7 +2,7 @@ use crate::common::*;
 use datamodel::{ast, error::DatamodelError};
 
 #[test]
-fn shound_fail_on_directive_duplication() {
+fn shound_fail_on_attribute_duplication() {
     let dml = r#"
     type ID = String @id @default(cuid())
 
@@ -15,16 +15,16 @@ fn shound_fail_on_directive_duplication() {
 
     error.assert_is_at(
         0,
-        DatamodelError::new_duplicate_directive_error("id", ast::Span::new(23, 25)),
+        DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(23, 25)),
     );
     error.assert_is_at(
         1,
-        DatamodelError::new_duplicate_directive_error("id", ast::Span::new(77, 79)),
+        DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(77, 79)),
     );
 }
 
 #[test]
-fn shound_fail_on_directive_duplication_recursive() {
+fn shound_fail_on_attribute_duplication_recursive() {
     let dml = r#"
     type MyStringWithDefault = String @default(cuid())
     type ID = MyStringWithDefault @id
@@ -38,11 +38,11 @@ fn shound_fail_on_directive_duplication_recursive() {
 
     error.assert_is_at(
         0,
-        DatamodelError::new_duplicate_directive_error("default", ast::Span::new(40, 47)),
+        DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(40, 47)),
     );
     error.assert_is_at(
         1,
-        DatamodelError::new_duplicate_directive_error("default", ast::Span::new(128, 135)),
+        DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(128, 135)),
     );
 }
 
