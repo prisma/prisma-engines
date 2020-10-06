@@ -72,7 +72,7 @@ impl SqlRenderer for MssqlFlavour {
         )]
     }
 
-    fn render_alter_enum(&self, _: &AlterEnum, _: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
+    fn render_alter_enum(&self, _: &AlterEnum, _: &SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
@@ -149,7 +149,7 @@ impl SqlRenderer for MssqlFlavour {
         alter_index: &AlterIndex,
         _database_info: &DatabaseInfo,
         _current_schema: &SqlSchema,
-    ) -> anyhow::Result<Vec<String>> {
+    ) -> Vec<String> {
         let AlterIndex {
             table,
             index_name,
@@ -158,11 +158,11 @@ impl SqlRenderer for MssqlFlavour {
 
         let index_with_table = Quoted::Single(format!("{}.{}.{}", self.schema_name(), table, index_name));
 
-        Ok(vec![format!(
+        vec![format!(
             "EXEC SP_RENAME N{index_with_table}, N{index_new_name}, N'INDEX'",
             index_with_table = Quoted::Single(index_with_table),
             index_new_name = Quoted::Single(index_new_name),
-        )])
+        )]
     }
 
     fn render_create_enum(&self, _: &CreateEnum) -> Vec<String> {

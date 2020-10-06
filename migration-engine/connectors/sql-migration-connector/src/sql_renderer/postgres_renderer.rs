@@ -57,7 +57,7 @@ impl SqlRenderer for PostgresFlavour {
         add_constraint
     }
 
-    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         if alter_enum.dropped_variants.is_empty() {
             let stmts: Vec<String> = alter_enum
                 .created_variants
@@ -71,13 +71,14 @@ impl SqlRenderer for PostgresFlavour {
                 })
                 .collect();
 
-            return Ok(stmts);
+            return stmts;
         }
 
         let new_enum = differ
             .next
             .get_enum(&alter_enum.name)
-            .ok_or_else(|| anyhow::anyhow!("Enum `{}` not found in target schema.", alter_enum.name))?;
+            .ok_or_else(|| anyhow::anyhow!("Enum `{}` not found in target schema.", alter_enum.name))
+            .unwrap();
 
         let mut stmts = Vec::with_capacity(10);
 
@@ -156,7 +157,7 @@ impl SqlRenderer for PostgresFlavour {
 
         stmts.push("Commit".to_string());
 
-        Ok(stmts)
+        stmts
     }
 
     fn render_alter_index(
@@ -164,12 +165,12 @@ impl SqlRenderer for PostgresFlavour {
         alter_index: &AlterIndex,
         _database_info: &DatabaseInfo,
         _current_schema: &SqlSchema,
-    ) -> anyhow::Result<Vec<String>> {
-        Ok(vec![format!(
+    ) -> Vec<String> {
+        vec![format!(
             "ALTER INDEX {} RENAME TO {}",
             self.quote_with_schema(&alter_index.index_name),
             self.quote(&alter_index.index_new_name)
-        )])
+        )]
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
@@ -407,7 +408,7 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
 fn escape_string_literal(s: &str) -> Cow<'_, str> {
     static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'|\\"#).unwrap());
 
-    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\")
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0")
 }
 
 fn render_alter_column(

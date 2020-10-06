@@ -53,7 +53,7 @@ impl SqlRenderer for MysqlFlavour {
         add_constraint
     }
 
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_alter_enum on MySQL")
     }
 
@@ -62,7 +62,7 @@ impl SqlRenderer for MysqlFlavour {
         alter_index: &AlterIndex,
         database_info: &DatabaseInfo,
         current_schema: &SqlSchema,
-    ) -> anyhow::Result<Vec<String>> {
+    ) -> Vec<String> {
         let AlterIndex {
             table,
             index_name,
@@ -77,7 +77,8 @@ impl SqlRenderer for MysqlFlavour {
                         "Invariant violation: could not find table `{}` in current schema.",
                         table
                     )
-                })?
+                })
+                .unwrap()
                 .indices
                 .iter()
                 .find(|idx| idx.name.as_str() == index_name)
@@ -87,12 +88,13 @@ impl SqlRenderer for MysqlFlavour {
                         index_name,
                         table
                     )
-                })?;
+                })
+                .unwrap();
             let mut new_index = old_index.clone();
             new_index.name = index_new_name.to_owned();
 
             // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
-            Ok(vec![
+            vec![
                 self.render_create_index(&CreateIndex {
                     table: table.clone(),
                     index: new_index,
@@ -100,14 +102,14 @@ impl SqlRenderer for MysqlFlavour {
                     contains_nullable_columns: false,
                 }),
                 mysql_drop_index(self, table, index_name),
-            ])
+            ]
         } else {
-            Ok(vec![format!(
+            vec![format!(
                 "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
                 table_name = self.quote(&table),
                 index_name = self.quote(index_name),
                 index_new_name = self.quote(index_new_name)
-            )])
+            )]
         }
     }
 

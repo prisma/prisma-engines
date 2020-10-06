@@ -19,7 +19,7 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_alter_enum on sqlite")
     }
 
@@ -28,7 +28,7 @@ impl SqlRenderer for SqliteFlavour {
         _alter_index: &AlterIndex,
         _database_info: &DatabaseInfo,
         _current_schema: &SqlSchema,
-    ) -> anyhow::Result<Vec<String>> {
+    ) -> Vec<String> {
         unreachable!("render_alter_index on sqlite")
     }
 

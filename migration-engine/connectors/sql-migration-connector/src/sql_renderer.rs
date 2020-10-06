@@ -27,7 +27,7 @@ pub(crate) trait SqlRenderer {
 
     fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String;
 
-    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>>;
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> Vec<String>;
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String;
 
@@ -41,7 +41,7 @@ pub(crate) trait SqlRenderer {
         alter_index: &AlterIndex,
         database_info: &DatabaseInfo,
         current_schema: &SqlSchema,
-    ) -> anyhow::Result<Vec<String>>;
+    ) -> Vec<String>;
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String>;
 
