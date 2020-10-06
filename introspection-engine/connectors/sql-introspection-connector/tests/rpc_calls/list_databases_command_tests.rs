@@ -17,6 +17,14 @@ async fn databases_for_postgres_should_work(api: &TestApi) {
     assert!(result.contains(&api.schema_name().to_string()));
 }
 
+#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+async fn databases_for_mssql_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel, api.schema_name());
+    let result = dbg!(api.list_databases().await);
+    assert!(result.contains(dbg!(&api.schema_name().to_string())));
+}
+
 #[test_each_connector(tags("sqlite"))]
 async fn databases_for_sqlite_should_work(api: &TestApi) {
     let barrel = api.barrel();

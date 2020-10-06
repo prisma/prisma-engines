@@ -34,6 +34,14 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) {
     assert_eq!(result, "{\"tables\":[{\"name\":\"Blog\",\"columns\":[{\"name\":\"id\",\"tpe\":{\"dataType\":\"INTEGER\",\"fullDataType\":\"INTEGER\",\"characterMaximumLength\":null,\"family\":\"int\",\"arity\":\"required\",\"nativeType\":null},\"default\":null,\"autoIncrement\":true},{\"name\":\"string\",\"tpe\":{\"dataType\":\"TEXT\",\"fullDataType\":\"TEXT\",\"characterMaximumLength\":null,\"family\":\"string\",\"arity\":\"required\",\"nativeType\":null},\"default\":null,\"autoIncrement\":false}],\"indices\":[],\"primaryKey\":{\"columns\":[\"id\"],\"sequence\":null,\"constraintName\":null},\"foreignKeys\":[]}],\"enums\":[],\"sequences\":[]}".to_string());
 }
 
+#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+async fn database_description_for_mssql_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel).await;
+    let result = dbg!(api.get_database_description().await);
+    assert_eq!(result, "{\"tables\":[{\"name\":\"Blog\",\"columns\":[{\"name\":\"id\",\"tpe\":{\"dataType\":\"int\",\"fullDataType\":\"int\",\"characterMaximumLength\":null,\"family\":\"int\",\"arity\":\"required\",\"nativeType\":null},\"default\":null,\"autoIncrement\":true},{\"name\":\"string\",\"tpe\":{\"dataType\":\"text\",\"fullDataType\":\"text\",\"characterMaximumLength\":2147483647,\"family\":\"string\",\"arity\":\"required\",\"nativeType\":null},\"default\":null,\"autoIncrement\":false}],\"indices\":[],\"primaryKey\":{\"columns\":[\"id\"],\"sequence\":null,\"constraintName\":null},\"foreignKeys\":[]}],\"enums\":[],\"sequences\":[]}".to_string());
+}
+
 async fn setup(barrel: &BarrelMigrationExecutor) {
     barrel
         .execute(|migration| {
