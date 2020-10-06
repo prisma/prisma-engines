@@ -39,8 +39,6 @@ where
     }
 }
 
-// This is here only to get rid of the generic type parameters due to neon not
-// liking them in the exported class.
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
     async fn version(&self, input: &serde_json::Value) -> CoreResult<String>;
@@ -57,6 +55,7 @@ pub trait GenericApi: Send + Sync + 'static {
         &self,
         input: &DiagnoseMigrationHistoryInput,
     ) -> CoreResult<DiagnoseMigrationHistoryOutput>;
+    async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput>;
     async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> CoreResult<MigrationStepsResultOutput>;
     async fn initialize(&self, input: &InitializeInput) -> CoreResult<InitializeOutput>;
     async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>>;
@@ -140,6 +139,12 @@ where
     ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
         self.handle_command::<DiagnoseMigrationHistoryCommand>(input)
             .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
+            .await
+    }
+
+    async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput> {
+        self.handle_command::<EvaluateDataLoss>(input)
+            .instrument(tracing::info_span!("EvaluateDataLoss"))
             .await
     }
 
