@@ -1930,7 +1930,6 @@ dependencies = [
 name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "futures 0.3.5",
  "json-rpc-stdio",
  "migration-connector",
@@ -1940,7 +1939,6 @@ dependencies = [
  "structopt",
  "tempfile",
  "test-setup",
- "thiserror",
  "tokio",
  "tracing",
  "tracing-error",
