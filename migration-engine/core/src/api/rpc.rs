@@ -1,10 +1,7 @@
-use super::GenericApi;
-use crate::{commands::*, CoreResult};
+use crate::{commands::*, CoreResult, GenericApi};
 use futures::{FutureExt, TryFutureExt};
-use jsonrpc_core::types::error::Error as JsonRpcError;
-use jsonrpc_core::{IoHandler, Params};
+use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::{io, sync::Arc};
-use thiserror::Error;
 
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
@@ -203,11 +200,9 @@ fn render(result: impl serde::Serialize) -> Result<serde_json::Value, RunCommand
     Ok(serde_json::to_value(result).expect("Rendering of RPC response failed"))
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug)]
 enum RunCommandError {
-    #[error("{0}")]
     JsonRpcError(JsonRpcError),
-    #[error("{0}")]
     CrateError(crate::Error),
 }
 

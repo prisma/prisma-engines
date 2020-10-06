@@ -22,7 +22,6 @@ tracing = "0.1.10"
 tracing-futures = "0.2.0"
 tracing-error = "0.1.2"
 url = "2"
-sha2 = "0.9.1"
 
 [features]
 default = ["sql"]

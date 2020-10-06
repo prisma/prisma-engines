@@ -23,8 +23,9 @@ prisma-value = { path = "../../libs/prisma-value" }
 
 anyhow = "1.0"
 barrel = { git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], optional = true, branch = "mssql-support" }
+chrono = "0.4.15"
 futures = "0.3.1"
-git2 = { version = "0.11.0", default-features = false }
+indoc = "1.0.2"
 pretty_assertions = "0.6"
 quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["serde-support", "tracing-log"] }
 serde = "1"
@@ -34,5 +35,3 @@ tokio = { version = "0.2.13", features = ["macros"] }
 tracing = "0.1.12"
 tracing-futures = "0.2.1"
 url = "2.1.1"
-chrono = "0.4.15"
-indoc = "1.0.2"
