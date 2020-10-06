@@ -12,7 +12,6 @@ mod infer_migration_steps;
 mod initialization;
 mod migration_persistence;
 mod migrations;
-mod multi_user;
 mod plan_migration;
 mod reset;
 mod schema_push;
