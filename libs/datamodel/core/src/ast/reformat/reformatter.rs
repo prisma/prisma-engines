@@ -407,10 +407,8 @@ impl<'a> Reformatter<'a> {
                 if let Rule::attribute = pair.as_rule() {
                     attributes.push(pair)
                 }
-            } else {
-                if let Rule::block_level_attribute = pair.as_rule() {
-                    attributes.push(pair)
-                }
+            } else if let Rule::block_level_attribute = pair.as_rule() {
+                attributes.push(pair)
             }
         }
 

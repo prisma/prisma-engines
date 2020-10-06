@@ -22,7 +22,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
     api.infer_apply(dm1).send().await?.assert_green()?;
     api.assert_schema()
         .await?
-        .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "CUDDLY", "HUNGRY"]))?;
+        .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]))?;
 
     let dm2 = r#"
         model Cat {

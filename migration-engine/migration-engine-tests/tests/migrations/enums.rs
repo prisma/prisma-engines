@@ -84,8 +84,8 @@ async fn variants_can_be_added_to_an_existing_enum(api: &TestApi) -> TestResult 
         }
 
         enum CatMood {
-            HAPPY
             HUNGRY
+            HAPPY
         }
     "#;
 
@@ -93,7 +93,7 @@ async fn variants_can_be_added_to_an_existing_enum(api: &TestApi) -> TestResult 
 
     api.assert_schema()
         .await?
-        .assert_enum(enum_name, |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+        .assert_enum(enum_name, |enm| enm.assert_values(&["HUNGRY", "HAPPY"]))?;
 
     Ok(())
 }

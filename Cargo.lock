@@ -342,7 +342,7 @@ dependencies = [
 [[package]]
 name = "barrel"
 version = "0.6.6-alpha.0"
-source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#b6298a4208083bfb63796cdc24ce1e4bcf7f62a8"
+source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#7822943706feaf3b8f6059ccc172324b620bab6e"
 
 [[package]]
 name = "base-x"
@@ -995,6 +995,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e1cd41440ae7e4734bbd42302f63eaba892afc93a3912dad84006247f0dedb0e"
 
 [[package]]
+name = "eyre"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f4c5cb4dc433c59f09df4b4450f649cbfed61e8a3505abe32e4154066439157e"
+dependencies = [
+ "indenter",
+ "once_cell",
+]
+
+[[package]]
 name = "failure"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1462,6 +1472,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "indenter"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0bd112d44d9d870a6819eb505d04dd92b5e4d94bb8c304924a0872ae7016fb5"
+
+[[package]]
 name = "indexmap"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1556,6 +1572,29 @@ dependencies = [
  "tracing-futures",
  "tracing-subscriber",
  "user-facing-errors",
+]
+
+[[package]]
+name = "introspection-engine-tests"
+version = "0.1.0"
+dependencies = [
+ "barrel",
+ "datamodel",
+ "datamodel-connector",
+ "eyre",
+ "indoc 1.0.2",
+ "introspection-connector",
+ "pretty_assertions",
+ "quaint",
+ "serde",
+ "serde_json",
+ "sql-datamodel-connector",
+ "sql-introspection-connector",
+ "sql-schema-describer",
+ "test-macros",
+ "test-setup",
+ "tracing",
+ "tracing-futures",
 ]
 
 [[package]]
@@ -2657,7 +2696,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#d023a0522602140064822dfe98f6996a9c737064"
+source = "git+https://github.com/prisma/quaint#fa99f5353bb6c225872f6b35546dd6b54bca6b8f"
 dependencies = [
  "async-trait",
  "base64 0.11.0",

@@ -612,9 +612,9 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         }
 
         enum Mood {
-            ABSOLUTELY_FABULOUS
             HAPPY
             HUNGRY
+            ABSOLUTELY_FABULOUS
         }
     "#;
 
@@ -667,7 +667,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
                 })?;
         } else {
             api.assert_schema().await?.assert_enum("Mood", |enm| {
-                enm.assert_values(&["ABSOLUTELY_FABULOUS", "HAPPY", "HUNGRY"])
+                enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
             })?;
         };
     }
