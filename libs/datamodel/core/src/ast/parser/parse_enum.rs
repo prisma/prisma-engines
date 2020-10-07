@@ -6,10 +6,10 @@ use super::{
 };
 use crate::ast::parser::helpers::TokenExtensions;
 use crate::ast::*;
-use crate::messages::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, ErrorCollection};
 
-pub fn parse_enum(token: &Token) -> Result<Enum, MessageCollection> {
-    let mut errors = MessageCollection::new();
+pub fn parse_enum(token: &Token) -> Result<Enum, ErrorCollection> {
+    let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut values: Vec<EnumValue> = vec![];
@@ -21,10 +21,10 @@ pub fn parse_enum(token: &Token) -> Result<Enum, MessageCollection> {
             Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::enum_value_declaration => match parse_enum_value(&name.as_ref().unwrap().name, &current) {
                 Ok(enum_value) => values.push(enum_value),
-                Err(err) => errors.push_error(err),
+                Err(err) => errors.push(err),
             },
             Rule::comment_block => comment = Some(parse_comment_block(&current)),
-            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push(DatamodelError::new_validation_error(
                 "This line is not a enum value definition.",
                 Span::from_pest(current.as_span()),
             )),

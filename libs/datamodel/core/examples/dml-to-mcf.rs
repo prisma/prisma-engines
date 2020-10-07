@@ -23,7 +23,7 @@ fn main() {
 
     match &res {
         Err(errors) => {
-            for error in errors.to_error_iter() {
+            for error in errors.to_iter() {
                 println!("");
                 error
                     .pretty_print(&mut std::io::stderr().lock(), file_name, &file)

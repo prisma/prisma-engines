@@ -10,13 +10,11 @@ const TRANSACTION_API: &'static str = "transactionApi";
 const AGGREGATE_API: &'static str = "aggregateApi"; // todo move this to deprecated preview features list for VSCode
 const MIDDLEWARES: &'static str = "middlewares";
 const DISTINCT: &'static str = "distinct";
+const INSENSITIVE_FILTERS: &'static str = "insensitiveFilters";
 
 pub const DATASOURCE_PREVIEW_FEATURES: [&'static str; 1] = [NATIVE_TYPES];
-pub const GENERATOR_PREVIEW_FEATURES: [&'static str; 6] = [
-    ATOMIC_NUMBER_OPERATIONS,
-    CONNECT_OR_CREATE,
-    TRANSACTION_API,
-    AGGREGATE_API,
-    MIDDLEWARES,
-    DISTINCT,
-];
+pub const GENERATOR_PREVIEW_FEATURES: [&'static str; 3] =
+    [ATOMIC_NUMBER_OPERATIONS, CONNECT_OR_CREATE, TRANSACTION_API];
+
+pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: [&'static str; 4] =
+    [AGGREGATE_API, MIDDLEWARES, DISTINCT, INSENSITIVE_FILTERS];

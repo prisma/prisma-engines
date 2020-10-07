@@ -52,10 +52,11 @@ pub enum FmtOpts {
 }
 
 #[derive(serde::Serialize)]
-pub struct MiniError {
+pub struct MiniMessage {
     pub start: usize,
     pub end: usize,
     pub text: String,
+    pub error: bool,
 }
 
 fn main() {

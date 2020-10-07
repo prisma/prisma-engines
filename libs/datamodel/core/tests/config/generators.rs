@@ -1,6 +1,6 @@
 use crate::common::ErrorAsserts;
 use datamodel::common::preview_features::GENERATOR_PREVIEW_FEATURES;
-use datamodel::messages::DatamodelError;
+use datamodel::messages::{DatamodelError, DatamodelWarning};
 
 #[test]
 fn serialize_generators_to_cmf() {
@@ -161,6 +161,18 @@ fn nice_error_for_unknown_generator_preview_feature() {
     } else {
         panic!("Expected error.")
     }
+}
+
+#[test]
+fn nice_warning_for_deprecated_generator_preview_feature() {
+    let schema = r#"
+    generator client {
+      provider = "prisma-client-js"
+      previewFeatures = ["middlewares"]
+    }
+    "#;
+
+    // todo should warn!
 }
 
 fn assert_mcf(schema: &str, expected_mcf: &str) {

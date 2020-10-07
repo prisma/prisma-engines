@@ -1,14 +1,14 @@
 use crate::{
     ast::{self, WithIdentifier, WithName},
     dml,
-    messages::{DatamodelError, MessageCollection},
+    messages::{DatamodelError, ErrorCollection},
 };
 
 pub struct Precheck {}
 
 impl Precheck {
-    pub fn precheck(datamodel: &ast::SchemaAst) -> Result<(), MessageCollection> {
-        let mut messages = MessageCollection::new();
+    pub fn precheck(datamodel: &ast::SchemaAst) -> Result<(), ErrorCollection> {
+        let mut messages = ErrorCollection::new();
 
         let mut top_level_types_checker = DuplicateChecker::new();
         let mut sources_checker = DuplicateChecker::new();
@@ -58,16 +58,16 @@ impl Precheck {
         messages.ok()
     }
 
-    fn assert_is_not_a_reserved_scalar_type(identifier: &ast::Identifier, messages: &mut MessageCollection) {
+    fn assert_is_not_a_reserved_scalar_type(identifier: &ast::Identifier, messages: &mut ErrorCollection) {
         if dml::ScalarType::from_str(&identifier.name).is_ok() {
-            messages.push_error(DatamodelError::new_reserved_scalar_type_error(
+            messages.push(DatamodelError::new_reserved_scalar_type_error(
                 &identifier.name,
                 identifier.span,
             ));
         }
     }
 
-    fn precheck_enum(enum_type: &ast::Enum, messages: &mut MessageCollection) {
+    fn precheck_enum(enum_type: &ast::Enum, messages: &mut ErrorCollection) {
         let mut checker = DuplicateChecker::new();
         for value in &enum_type.values {
             checker.check_if_duplicate_exists(value, |_| {
@@ -77,7 +77,7 @@ impl Precheck {
         messages.append(&mut checker.messages());
     }
 
-    fn precheck_model(model: &ast::Model, messages: &mut MessageCollection) {
+    fn precheck_model(model: &ast::Model, messages: &mut ErrorCollection) {
         let mut checker = DuplicateChecker::new();
         for field in &model.fields {
             checker.check_if_duplicate_exists(field, |_| {
@@ -87,7 +87,7 @@ impl Precheck {
         messages.append(&mut checker.messages());
     }
 
-    fn precheck_generator_config(config: &ast::GeneratorConfig, messages: &mut MessageCollection) {
+    fn precheck_generator_config(config: &ast::GeneratorConfig, messages: &mut ErrorCollection) {
         let mut checker = DuplicateChecker::new();
         for arg in &config.properties {
             checker.check_if_duplicate_exists(arg, |_| {
@@ -101,7 +101,7 @@ impl Precheck {
         messages.append(&mut checker.messages());
     }
 
-    fn precheck_source_config(config: &ast::SourceConfig, messages: &mut MessageCollection) {
+    fn precheck_source_config(config: &ast::SourceConfig, messages: &mut ErrorCollection) {
         let mut checker = DuplicateChecker::new();
         for arg in &config.properties {
             checker.check_if_duplicate_exists(arg, |_| {
@@ -118,14 +118,14 @@ impl Precheck {
 
 struct DuplicateChecker<'a, T: WithName> {
     seen: Vec<&'a T>,
-    messages: MessageCollection,
+    messages: ErrorCollection,
 }
 
 impl<'a, T: WithName> DuplicateChecker<'a, T> {
     fn new() -> DuplicateChecker<'a, T> {
         DuplicateChecker {
             seen: Vec::new(),
-            messages: MessageCollection::new(),
+            messages: ErrorCollection::new(),
         }
     }
 
@@ -137,12 +137,12 @@ impl<'a, T: WithName> DuplicateChecker<'a, T> {
         F: Fn(&T) -> DatamodelError,
     {
         match self.seen.iter().find(|x| x.name() == named.name()) {
-            Some(existing) => self.messages.push_error(error_fn(existing)),
+            Some(existing) => self.messages.push(error_fn(existing)),
             None => self.seen.push(named),
         }
     }
 
-    fn messages(self) -> MessageCollection {
+    fn messages(self) -> ErrorCollection {
         self.messages
     }
 }

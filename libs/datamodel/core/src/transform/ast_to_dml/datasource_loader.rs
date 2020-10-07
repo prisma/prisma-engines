@@ -7,8 +7,8 @@ use super::{
 use crate::ast::Span;
 use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
-use crate::messages::{DatamodelError, MessageCollection};
-use crate::transform::ast_to_dml::common::validate_preview_features;
+use crate::messages::{DatamodelError, ErrorCollection};
+use crate::transform::ast_to_dml::common::validate_preview_feature;
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
 
@@ -34,24 +34,24 @@ impl DatasourceLoader {
         ast_schema: &ast::SchemaAst,
         ignore_datasource_urls: bool,
         datasource_url_overrides: Vec<(String, String)>,
-    ) -> Result<Vec<Datasource>, MessageCollection> {
+    ) -> Result<Vec<Datasource>, ErrorCollection> {
         let mut sources = vec![];
-        let mut errors = MessageCollection::new();
+        let mut errors = ErrorCollection::new();
 
         for src in &ast_schema.sources() {
             match self.lift_datasource(&src, ignore_datasource_urls, &datasource_url_overrides) {
                 Ok(loaded_src) => sources.push(loaded_src),
                 // Lift error to source.
-                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push_error(
+                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
                     DatamodelError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
                 ),
-                Err(err) => errors.push_error(err),
+                Err(err) => errors.push(err),
             }
         }
 
         if sources.len() > 1 {
             for src in &ast_schema.sources() {
-                errors.push_error(DatamodelError::new_source_validation_error(
+                errors.push(DatamodelError::new_source_validation_error(
                     &format!("You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet."),
                     &src.name.name,
                     src.span.clone(),
@@ -142,10 +142,12 @@ impl DatasourceLoader {
         };
 
         if preview_features.len() > 0 {
-            if let Err(err) =
-                validate_preview_features(preview_features.clone(), span, DATASOURCE_PREVIEW_FEATURES.to_vec())
-            {
-                return Err(err);
+            for pf in preview_features.clone() {
+                if let Err(err) =
+                    validate_preview_feature(pf.as_str(), span, DATASOURCE_PREVIEW_FEATURES.to_vec(), vec![])
+                {
+                    return Err(err);
+                }
             }
         }
 

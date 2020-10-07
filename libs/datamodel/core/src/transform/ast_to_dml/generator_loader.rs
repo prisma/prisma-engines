@@ -1,7 +1,7 @@
 use super::super::helpers::*;
 use crate::ast::Span;
-use crate::common::preview_features::GENERATOR_PREVIEW_FEATURES;
-use crate::transform::ast_to_dml::common::validate_preview_features;
+use crate::common::preview_features::{DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES};
+use crate::transform::ast_to_dml::common::validate_preview_feature;
 use crate::{ast, configuration::Generator, messages::*};
 use std::collections::HashMap;
 
@@ -22,18 +22,18 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[
 pub struct GeneratorLoader {}
 
 impl GeneratorLoader {
-    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<Vec<Generator>, MessageCollection> {
+    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<Vec<Generator>, ErrorCollection> {
         let mut generators: Vec<Generator> = vec![];
-        let mut errors = MessageCollection::new();
+        let mut errors = ErrorCollection::new();
 
         for gen in &ast_schema.generators() {
             match Self::lift_generator(&gen) {
                 Ok(loaded_gen) => generators.push(loaded_gen),
                 // Lift error.
-                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push_error(
+                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
                     DatamodelError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
                 ),
-                Err(err) => errors.push_error(err),
+                Err(err) => errors.push(err),
             }
         }
 
@@ -69,10 +69,15 @@ impl GeneratorLoader {
         };
 
         if preview_features.len() > 0 {
-            if let Err(err) =
-                validate_preview_features(preview_features.clone(), span, GENERATOR_PREVIEW_FEATURES.to_vec())
-            {
-                return Err(err);
+            for pf in preview_features.clone() {
+                if let Err(err) = validate_preview_feature(
+                    pf.as_str(),
+                    span,
+                    GENERATOR_PREVIEW_FEATURES.to_vec(),
+                    DEPRECATED_GENERATOR_PREVIEW_FEATURES.to_vec(),
+                ) {
+                    return Err(err);
+                }
             }
         }
 

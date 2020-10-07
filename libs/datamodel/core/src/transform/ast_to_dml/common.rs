@@ -1,3 +1,4 @@
+use crate::messages::{DatamodelWarning, ErrorCollection};
 use crate::{ast, dml, messages::DatamodelError};
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -25,20 +26,19 @@ pub fn field_validation_error(
     )
 }
 
-pub fn validate_preview_features(
-    preview_features: Vec<String>,
+pub fn validate_preview_feature(
+    preview_feature: &str,
     span: ast::Span,
     supported_preview_features: Vec<&str>,
+    deprecated_preview_features: Vec<&str>,
 ) -> Result<(), DatamodelError> {
-    if let Some(unknown_preview_feature) = preview_features
-        .iter()
-        .find(|pf| !supported_preview_features.contains(&pf.as_str()))
-    {
-        return Err(DatamodelError::new_preview_feature_not_known_error(
-            unknown_preview_feature,
+    if supported_preview_features.contains(&preview_feature) || deprecated_preview_features.contains(&preview_feature) {
+        Ok(())
+    } else {
+        Err(DatamodelError::new_preview_feature_not_known_error(
+            preview_feature,
             supported_preview_features,
             span,
-        ));
+        ))
     }
-    Ok(())
 }

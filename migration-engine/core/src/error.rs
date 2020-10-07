@@ -3,7 +3,7 @@
 //! Errors for the migration core.
 
 use crate::commands::CommandError;
-use datamodel::messages::MessageCollection;
+use datamodel::messages::ErrorCollection;
 use migration_connector::ConnectorError;
 use thiserror::Error;
 
@@ -31,15 +31,15 @@ pub enum Error {
 
     /// Error from the datamodel parser.
     #[error("Error in datamodel: {}", .0)]
-    DatamodelError(MessageCollection),
+    DatamodelError(ErrorCollection),
 
     /// IO error.
     #[error("Error performing IO: {:?}", .0)]
     IOError(#[source] anyhow::Error),
 }
 
-impl From<MessageCollection> for Error {
-    fn from(v: MessageCollection) -> Self {
+impl From<ErrorCollection> for Error {
+    fn from(v: ErrorCollection) -> Self {
         Error::DatamodelError(v)
     }
 }
