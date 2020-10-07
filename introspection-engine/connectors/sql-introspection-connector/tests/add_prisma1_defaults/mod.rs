@@ -80,7 +80,7 @@ async fn add_uuid_default_for_mysql(api: &TestApi) {
             model Book {
                 id  String @default(uuid()) @id
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
