@@ -15,6 +15,7 @@ enum RpcCommand {
     CreateMigration,
     DebugPanic,
     DiagnoseMigrationHistory,
+    EvaluateDataLoss,
     InferMigrationSteps,
     Initialize,
     ListMigrations,
@@ -36,6 +37,7 @@ impl RpcCommand {
             RpcCommand::CreateMigration => "createMigration",
             RpcCommand::DebugPanic => "debugPanic",
             RpcCommand::DiagnoseMigrationHistory => "diagnoseMigrationHistory",
+            RpcCommand::EvaluateDataLoss => "evaluateDataLoss",
             RpcCommand::InferMigrationSteps => "inferMigrationSteps",
             RpcCommand::ListMigrations => "listMigrations",
             RpcCommand::MigrationProgress => "migrationProgress",
@@ -57,6 +59,7 @@ const AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::ApplyMigrations,
     RpcCommand::CreateMigration,
     RpcCommand::DiagnoseMigrationHistory,
+    RpcCommand::EvaluateDataLoss,
     RpcCommand::DebugPanic,
     RpcCommand::InferMigrationSteps,
     RpcCommand::Initialize,
@@ -160,9 +163,9 @@ impl RpcApi {
                 let input: InitializeInput = params.clone().parse()?;
                 render(executor.initialize(&input).await?)
             }
-            RpcCommand::PlanMigration => {
-                let input: PlanMigrationInput = params.clone().parse()?;
-                render(executor.plan_migration(&input).await?)
+            RpcCommand::PlanMigration | RpcCommand::EvaluateDataLoss => {
+                let input: EvaluateDataLossInput = params.clone().parse()?;
+                render(executor.evaluate_data_loss(&input).await?)
             }
             RpcCommand::ListMigrations => render(executor.list_migrations(&serde_json::Value::Null).await?),
             RpcCommand::MigrationProgress => {

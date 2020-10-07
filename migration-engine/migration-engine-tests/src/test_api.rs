@@ -3,9 +3,9 @@ mod apply_migrations;
 mod calculate_database_steps;
 mod create_migration;
 mod diagnose_migration_history;
+mod evaluate_data_loss;
 mod infer;
 mod infer_apply;
-mod plan_migration;
 mod reset;
 mod schema_push;
 mod unapply_migration;
@@ -15,9 +15,9 @@ pub use apply_migrations::ApplyMigrations;
 pub use calculate_database_steps::CalculateDatabaseSteps;
 pub use create_migration::CreateMigration;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
+pub use evaluate_data_loss::EvaluateDataLoss;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
-pub use plan_migration::PlanMigration;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
@@ -207,12 +207,12 @@ impl TestApi {
         }
     }
 
-    pub fn plan_migration<'a>(
+    pub fn evaluate_data_loss<'a>(
         &'a self,
         migrations_directory: &'a TempDir,
         prisma_schema: impl Into<String>,
-    ) -> PlanMigration<'a> {
-        PlanMigration::new(&self.api, migrations_directory, prisma_schema.into())
+    ) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
     }
 
     pub fn reset<'a>(&'a self) -> Reset<'a> {

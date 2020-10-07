@@ -1,36 +1,37 @@
+use crate::AssertionResult;
+use migration_core::{
+    commands::{EvaluateDataLossInput, EvaluateDataLossOutput},
+    GenericApi,
+};
 use std::borrow::Cow;
-
-use migration_core::{commands::PlanMigrationInput, commands::PlanMigrationOutput, GenericApi};
 use tempfile::TempDir;
 
-use crate::AssertionResult;
-
-#[must_use = "This struct does nothing on its own. See PlanMigration::send()"]
-pub struct PlanMigration<'a> {
+#[must_use = "This struct does nothing on its own. See EvaluateDataLoss::send()"]
+pub struct EvaluateDataLoss<'a> {
     api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
     prisma_schema: String,
 }
 
-impl<'a> PlanMigration<'a> {
+impl<'a> EvaluateDataLoss<'a> {
     pub fn new(api: &'a dyn GenericApi, migrations_directory: &'a TempDir, prisma_schema: String) -> Self {
-        PlanMigration {
+        EvaluateDataLoss {
             api,
             migrations_directory,
             prisma_schema,
         }
     }
 
-    pub async fn send(self) -> anyhow::Result<PlanMigrationAssertion<'a>> {
+    pub async fn send(self) -> anyhow::Result<EvaluateDataLossAssertion<'a>> {
         let output = self
             .api
-            .plan_migration(&PlanMigrationInput {
+            .evaluate_data_loss(&EvaluateDataLossInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
                 prisma_schema: self.prisma_schema,
             })
             .await?;
 
-        Ok(PlanMigrationAssertion {
+        Ok(EvaluateDataLossAssertion {
             output: output,
             _api: self.api,
             _migrations_directory: self.migrations_directory,
@@ -38,23 +39,23 @@ impl<'a> PlanMigration<'a> {
     }
 }
 
-pub struct PlanMigrationAssertion<'a> {
-    output: PlanMigrationOutput,
+pub struct EvaluateDataLossAssertion<'a> {
+    output: EvaluateDataLossOutput,
     _api: &'a dyn GenericApi,
     _migrations_directory: &'a TempDir,
 }
 
-impl std::fmt::Debug for PlanMigrationAssertion<'_> {
+impl std::fmt::Debug for EvaluateDataLossAssertion<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "PlanMigrationAssertion {{ .. }}")
+        f.debug_struct("EvaluateDataLossAssertion").finish()
     }
 }
 
-impl<'a> PlanMigrationAssertion<'a> {
+impl<'a> EvaluateDataLossAssertion<'a> {
     pub fn assert_steps_count(self, count: usize) -> AssertionResult<Self> {
         anyhow::ensure!(
             self.output.migration_steps.len() == count,
-            "Assertion failed. Expected planMigration to return {} steps, found {}.\n{:?}",
+            "Assertion failed. Expected evaluateDataLoss to return {} steps, found {}.\n{:?}",
             count,
             self.output.migration_steps.len(),
             self.output.migration_steps,
@@ -147,7 +148,7 @@ impl<'a> PlanMigrationAssertion<'a> {
         Ok(self)
     }
 
-    pub fn into_output(self) -> PlanMigrationOutput {
+    pub fn into_output(self) -> EvaluateDataLossOutput {
         self.output
     }
 }

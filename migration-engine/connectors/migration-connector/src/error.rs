@@ -10,6 +10,7 @@ pub struct ConnectorError {
     /// An optional error already rendered for users in case the migration core does not handle it.
     pub user_facing_error: Option<KnownError>,
     /// The error information for internal use.
+    #[source]
     pub kind: ErrorKind,
     /// See the tracing-error docs.
     pub context: SpanTrace,
@@ -108,6 +109,7 @@ pub enum ErrorKind {
     )]
     MigrationFailedToApply {
         migration_name: String,
+        #[source]
         error: anyhow::Error,
     },
 
