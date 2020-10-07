@@ -80,8 +80,8 @@ pub mod ast;
 pub mod common;
 pub mod configuration;
 pub mod dml;
-pub mod error;
 pub mod json;
+pub mod messages;
 pub mod transform;
 pub mod walkers;
 
@@ -96,11 +96,13 @@ use transform::{
 };
 
 /// Parses and validates a datamodel string, using core attributes only.
-pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::MessageCollection> {
+pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, messages::MessageCollection> {
     parse_datamodel_internal(datamodel_string, false)
 }
 
-pub fn parse_datamodel_and_ignore_datasource_urls(datamodel_string: &str) -> Result<Datamodel, error::MessageCollection> {
+pub fn parse_datamodel_and_ignore_datasource_urls(
+    datamodel_string: &str,
+) -> Result<Datamodel, messages::MessageCollection> {
     parse_datamodel_internal(datamodel_string, true)
 }
 
@@ -127,7 +129,7 @@ pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) 
 fn parse_datamodel_internal(
     datamodel_string: &str,
     ignore_datasource_urls: bool,
-) -> Result<Datamodel, error::MessageCollection> {
+) -> Result<Datamodel, messages::MessageCollection> {
     let ast = ast::parser::parse_schema(datamodel_string)?;
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
     let validator = ValidationPipeline::new(&sources);
@@ -137,8 +139,8 @@ fn parse_datamodel_internal(
 
 /// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
 /// [Datamodel](/struct.Datamodel.html).
-pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::MessageCollection> {
-    let mut errors = error::MessageCollection::new();
+pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, messages::MessageCollection> {
+    let mut errors = messages::MessageCollection::new();
     // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
     let sources = load_sources(ast, true, vec![])?;
     let validator = ValidationPipeline::new(&sources);
@@ -152,12 +154,12 @@ pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::M
     }
 }
 
-pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, error::MessageCollection> {
+pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, messages::MessageCollection> {
     ast::parser::parse_schema(datamodel_string)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
-pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, error::MessageCollection> {
+pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, messages::MessageCollection> {
     let ast = ast::parser::parse_schema(datamodel_string)?;
     let datasources = load_sources(&ast, false, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
@@ -172,7 +174,7 @@ pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, erro
 pub fn parse_configuration_with_url_overrides(
     schema: &str,
     datasource_url_overrides: Vec<(String, String)>,
-) -> Result<Configuration, error::MessageCollection> {
+) -> Result<Configuration, messages::MessageCollection> {
     let ast = ast::parser::parse_schema(schema)?;
     let datasources = load_sources(&ast, false, datasource_url_overrides)?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
@@ -185,7 +187,7 @@ pub fn parse_configuration_with_url_overrides(
 
 pub fn parse_configuration_and_ignore_datasource_urls(
     datamodel_string: &str,
-) -> Result<Configuration, error::MessageCollection> {
+) -> Result<Configuration, messages::MessageCollection> {
     let ast = ast::parser::parse_schema(datamodel_string)?;
     let datasources = load_sources(&ast, true, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
@@ -200,7 +202,7 @@ fn load_sources(
     schema_ast: &SchemaAst,
     ignore_datasource_urls: bool,
     datasource_url_overrides: Vec<(String, String)>,
-) -> Result<Vec<Datasource>, error::MessageCollection> {
+) -> Result<Vec<Datasource>, messages::MessageCollection> {
     let source_loader = DatasourceLoader::new();
     source_loader.load_datasources_from_ast(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
 }
@@ -210,14 +212,14 @@ fn load_sources(
 //
 
 /// Renders to a return string.
-pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> Result<String, error::MessageCollection> {
+pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> Result<String, messages::MessageCollection> {
     let mut writable_string = common::WritableString::new();
     render_datamodel_to(&mut writable_string, datamodel)?;
     Ok(writable_string.into())
 }
 
 /// Renders an AST to a string.
-pub fn render_schema_ast_to_string(schema: &SchemaAst) -> Result<String, error::MessageCollection> {
+pub fn render_schema_ast_to_string(schema: &SchemaAst) -> Result<String, messages::MessageCollection> {
     let mut writable_string = common::WritableString::new();
     render_schema_ast_to(&mut writable_string, &schema, 2);
     Ok(writable_string.into())
@@ -227,7 +229,7 @@ pub fn render_schema_ast_to_string(schema: &SchemaAst) -> Result<String, error::
 pub fn render_datamodel_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
-) -> Result<(), error::MessageCollection> {
+) -> Result<(), messages::MessageCollection> {
     let lowered = LowerDmlToAst::new(None).lower(datamodel)?;
     render_schema_ast_to(stream, &lowered, 2);
     Ok(())
@@ -237,7 +239,7 @@ pub fn render_datamodel_to(
 pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
-) -> Result<String, error::MessageCollection> {
+) -> Result<String, messages::MessageCollection> {
     let mut writable_string = common::WritableString::new();
     render_datamodel_and_config_to(&mut writable_string, datamodel, config)?;
     Ok(writable_string.into())
@@ -248,7 +250,7 @@ fn render_datamodel_and_config_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
-) -> Result<(), error::MessageCollection> {
+) -> Result<(), messages::MessageCollection> {
     let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel)?;
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);

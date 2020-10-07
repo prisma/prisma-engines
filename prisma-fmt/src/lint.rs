@@ -1,5 +1,5 @@
 use crate::{LintOpts, MiniError};
-use datamodel::error::DatamodelError;
+use datamodel::messages::DatamodelError;
 use serde_json;
 use std::io::{self, Read};
 

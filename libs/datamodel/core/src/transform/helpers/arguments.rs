@@ -1,6 +1,6 @@
 use super::ValueValidator;
 use crate::ast;
-use crate::error::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, MessageCollection};
 use std::collections::HashSet;
 
 /// Represents a list of arguments.

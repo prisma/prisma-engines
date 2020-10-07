@@ -7,6 +7,4 @@ pub enum DatamodelWarning {
 
 }
 
-impl DatamodelWarning {
-
-}
+impl DatamodelWarning {}

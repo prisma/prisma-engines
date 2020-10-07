@@ -1,11 +1,11 @@
 use super::common::*;
-use crate::error::DatamodelError;
+use crate::messages::DatamodelError;
 use crate::{
-  ast,
-  common::{NameNormalizer, RelationNames},
-  dml,
-  error::MessageCollection,
-  Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
+    ast,
+    common::{NameNormalizer, RelationNames},
+    dml,
+    messages::MessageCollection,
+    Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
 
 /// Helper for standardsing a datamodel.
@@ -20,7 +20,11 @@ impl Standardiser {
         Standardiser {}
     }
 
-    pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), MessageCollection> {
+    pub fn standardise(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        schema: &mut dml::Datamodel,
+    ) -> Result<(), MessageCollection> {
         self.name_unnamed_relations(schema);
 
         self.add_missing_back_relations(ast_schema, schema)?;

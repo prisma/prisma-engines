@@ -1,6 +1,6 @@
 use super::{Attribute, Comment, Identifier, Span};
 use crate::ast::{Argument, SourceConfig};
-use crate::error::MessageCollection;
+use crate::messages::MessageCollection;
 
 pub trait WithSpan {
     fn span(&self) -> &Span;

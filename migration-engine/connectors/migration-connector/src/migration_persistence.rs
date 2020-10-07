@@ -1,6 +1,6 @@
 use crate::{error::ConnectorError, steps::*, ConnectorResult};
 use chrono::{DateTime, Utc};
-use datamodel::{ast::SchemaAst, error::MessageCollection, Datamodel};
+use datamodel::{ast::SchemaAst, messages::MessageCollection, Datamodel};
 use serde::Serialize;
 use std::str::FromStr;
 

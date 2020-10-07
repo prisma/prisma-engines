@@ -7,7 +7,7 @@ use super::{
 use crate::ast::Span;
 use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
-use crate::error::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, MessageCollection};
 use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};

@@ -1,6 +1,6 @@
 use crate::common::ErrorAsserts;
 use datamodel::common::preview_features::GENERATOR_PREVIEW_FEATURES;
-use datamodel::error::DatamodelError;
+use datamodel::messages::DatamodelError;
 
 #[test]
 fn serialize_generators_to_cmf() {

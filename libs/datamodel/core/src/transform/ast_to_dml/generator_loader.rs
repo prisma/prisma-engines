@@ -2,7 +2,7 @@ use super::super::helpers::*;
 use crate::ast::Span;
 use crate::common::preview_features::GENERATOR_PREVIEW_FEATURES;
 use crate::transform::ast_to_dml::common::validate_preview_features;
-use crate::{ast, configuration::Generator, error::*};
+use crate::{ast, configuration::Generator, messages::*};
 use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";

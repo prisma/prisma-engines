@@ -6,7 +6,7 @@ use super::{
 };
 use crate::ast::parser::helpers::TokenExtensions;
 use crate::ast::*;
-use crate::error::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, MessageCollection};
 
 pub fn parse_enum(token: &Token) -> Result<Enum, MessageCollection> {
     let mut errors = MessageCollection::new();

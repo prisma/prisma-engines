@@ -5,7 +5,7 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::error::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, MessageCollection};
 
 pub fn parse_source(token: &Token) -> Result<SourceConfig, MessageCollection> {
     let mut errors = MessageCollection::new();

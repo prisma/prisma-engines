@@ -1,5 +1,5 @@
 use crate::command_error::CommandError;
-use datamodel::error::MessageCollection;
+use datamodel::messages::MessageCollection;
 use introspection_connector::{ConnectorError, ErrorKind};
 use thiserror::Error;
 
@@ -33,8 +33,8 @@ impl From<CommandError> for Error {
     }
 }
 
-impl From<datamodel::error::MessageCollection> for Error {
-    fn from(e: datamodel::error::MessageCollection) -> Self {
+impl From<datamodel::messages::MessageCollection> for Error {
+    fn from(e: datamodel::messages::MessageCollection) -> Self {
         Error::DatamodelError(e)
     }
 }

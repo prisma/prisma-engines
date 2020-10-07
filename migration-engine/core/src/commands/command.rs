@@ -32,15 +32,15 @@ pub enum CommandError {
 
     /// When a datamodel from a generated AST is wrong. This is basically an internal error.
     #[error("The migration produced an invalid schema.\n{}", render_datamodel_error(.0, None))]
-    ProducedBadDatamodel(datamodel::error::MessageCollection),
+    ProducedBadDatamodel(datamodel::messages::MessageCollection),
 
     /// When a saved datamodel from a migration in the migrations table is no longer valid.
     #[error("The migration contains an invalid schema.\n{}", render_datamodel_error(.0, Some(.1)))]
-    InvalidPersistedDatamodel(datamodel::error::MessageCollection, String),
+    InvalidPersistedDatamodel(datamodel::messages::MessageCollection, String),
 
     /// Failed to render a prisma schema to a string.
     #[error("Failed to render the schema to a string ({0:?})")]
-    DatamodelRenderingError(datamodel::error::MessageCollection),
+    DatamodelRenderingError(datamodel::messages::MessageCollection),
 
     /// Errors from the connector.
     #[error("Connector error. (error: {0})")]
@@ -59,7 +59,7 @@ pub enum CommandError {
     Input(#[source] anyhow::Error),
 }
 
-fn render_datamodel_error(err: &datamodel::error::MessageCollection, schema: Option<&String>) -> String {
+fn render_datamodel_error(err: &datamodel::messages::MessageCollection, schema: Option<&String>) -> String {
     match schema {
         Some(schema) => err.to_pretty_string("virtual_schema.prisma", schema),
         None => format!("Datamodel error in schema that could not be rendered. {}", err),

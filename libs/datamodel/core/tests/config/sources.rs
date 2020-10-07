@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, error::DatamodelError, StringFromEnvVar};
+use datamodel::{ast::Span, messages::DatamodelError, StringFromEnvVar};
 use pretty_assertions::assert_eq;
 use serial_test::serial;
 

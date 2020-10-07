@@ -6,7 +6,7 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::error::DatamodelError;
+use crate::messages::DatamodelError;
 
 pub fn parse_field(model_name: &str, token: &Token) -> Result<Field, DatamodelError> {
     let mut name: Option<Identifier> = None;

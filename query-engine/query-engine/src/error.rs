@@ -1,5 +1,5 @@
 use connector::error::ConnectorError;
-use datamodel::error::MessageCollection;
+use datamodel::messages::MessageCollection;
 use feature_flags::FeatureFlagError;
 use graphql_parser::query::ParseError as GqlParseError;
 use query_core::CoreError;

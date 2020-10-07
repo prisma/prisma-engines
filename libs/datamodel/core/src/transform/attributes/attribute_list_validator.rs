@@ -1,7 +1,7 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::ast;
 use crate::dml;
-use crate::error::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, MessageCollection};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.

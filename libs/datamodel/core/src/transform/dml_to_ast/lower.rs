@@ -1,7 +1,7 @@
 use super::super::attributes::AllAttributes;
 use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
-use crate::error::MessageCollection;
+use crate::messages::MessageCollection;
 use crate::FieldType::NativeType;
 use crate::{ast, dml, Datasource};
 

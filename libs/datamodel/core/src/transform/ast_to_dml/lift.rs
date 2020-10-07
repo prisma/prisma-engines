@@ -2,9 +2,9 @@ use super::super::attributes::AllAttributes;
 use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
 use crate::{
-  ast, configuration, dml,
-  error::{DatamodelError, MessageCollection},
-  Field, FieldType, ScalarType,
+    ast, configuration, dml,
+    messages::{DatamodelError, MessageCollection},
+    Field, FieldType, ScalarType,
 };
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use itertools::Itertools;

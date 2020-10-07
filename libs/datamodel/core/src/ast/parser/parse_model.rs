@@ -6,7 +6,7 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::error::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, MessageCollection};
 
 pub fn parse_model(token: &Token) -> Result<Model, MessageCollection> {
     let mut errors = MessageCollection::new();

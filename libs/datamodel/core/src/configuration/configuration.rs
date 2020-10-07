@@ -1,5 +1,5 @@
 use super::{Datasource, Generator};
-use crate::error::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, MessageCollection};
 
 pub struct Configuration {
     pub generators: Vec<Generator>,

@@ -3,7 +3,7 @@
 //! Errors for the migration core.
 
 use crate::commands::CommandError;
-use datamodel::error::MessageCollection;
+use datamodel::messages::MessageCollection;
 use migration_connector::ConnectorError;
 use thiserror::Error;
 

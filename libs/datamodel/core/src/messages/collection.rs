@@ -1,6 +1,5 @@
-use super::DatamodelError;
-use crate::error::error::DatamodelError;
-use crate::error::warning::DatamodelWarning;
+use crate::messages::error::DatamodelError;
+use crate::messages::warning::DatamodelWarning;
 
 /// Represents a list of validation or parser errors and warnings.
 ///
@@ -9,19 +8,24 @@ use crate::error::warning::DatamodelWarning;
 #[derive(Debug, Clone)]
 pub struct MessageCollection {
     pub errors: Vec<DatamodelError>,
-    pub warnings: Vec<DatamodelWarning>
+    pub warnings: Vec<DatamodelWarning>,
 }
 
 impl MessageCollection {
     pub fn new() -> MessageCollection {
-        MessageCollection { errors: Vec::new(), warnings: Vec::new() }
+        MessageCollection {
+            errors: Vec::new(),
+            warnings: Vec::new(),
+        }
     }
 
     pub fn push_error(&mut self, err: DatamodelError) {
         self.errors.push(err)
     }
 
-    pub fn push_warning(&mut self, warning: DatamodelWarning) { self.warnings.push(warning) }
+    pub fn push_warning(&mut self, warning: DatamodelWarning) {
+        self.warnings.push(warning)
+    }
 
     pub fn push_error_opt(&mut self, err: Option<DatamodelError>) {
         match err {
@@ -36,7 +40,9 @@ impl MessageCollection {
         self.errors.len() > 0
     }
 
-    pub fn has_warnings(&self) -> bool {self.warnings.len() > 0}
+    pub fn has_warnings(&self) -> bool {
+        self.warnings.len() > 0
+    }
 
     /// Creates an iterator over all errors in this collection.
     pub fn to_error_iter(&self) -> std::slice::Iter<DatamodelError> {

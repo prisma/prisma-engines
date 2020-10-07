@@ -1,7 +1,7 @@
 use crate::{
-  ast::{self, WithIdentifier, WithName},
-  dml,
-  error::{DatamodelError, MessageCollection},
+    ast::{self, WithIdentifier, WithName},
+    dml,
+    messages::{DatamodelError, MessageCollection},
 };
 
 pub struct Precheck {}
@@ -51,9 +51,9 @@ impl Precheck {
             }
         }
 
-        messages.append(&mut top_level_types_checker.errors());
-        messages.append(&mut sources_checker.errors());
-        messages.append(&mut generators_checker.errors());
+        messages.append(&mut top_level_types_checker.messages());
+        messages.append(&mut sources_checker.messages());
+        messages.append(&mut generators_checker.messages());
 
         messages.ok()
     }
@@ -74,7 +74,7 @@ impl Precheck {
                 DatamodelError::new_duplicate_enum_value_error(&enum_type.name.name, &value.name.name, value.span)
             });
         }
-        messages.append(&mut checker.errors());
+        messages.append(&mut checker.messages());
     }
 
     fn precheck_model(model: &ast::Model, messages: &mut MessageCollection) {
@@ -84,7 +84,7 @@ impl Precheck {
                 DatamodelError::new_duplicate_field_error(&model.name.name, &field.name.name, field.identifier().span)
             });
         }
-        messages.append(&mut checker.errors());
+        messages.append(&mut checker.messages());
     }
 
     fn precheck_generator_config(config: &ast::GeneratorConfig, messages: &mut MessageCollection) {
@@ -98,7 +98,7 @@ impl Precheck {
                 )
             });
         }
-        messages.append(&mut checker.errors());
+        messages.append(&mut checker.messages());
     }
 
     fn precheck_source_config(config: &ast::SourceConfig, messages: &mut MessageCollection) {
@@ -112,7 +112,7 @@ impl Precheck {
                 )
             });
         }
-        messages.append(&mut checker.errors());
+        messages.append(&mut checker.messages());
     }
 }
 

@@ -9,7 +9,7 @@ use super::{
     PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
-use crate::error::{DatamodelError, MessageCollection};
+use crate::messages::{DatamodelError, MessageCollection};
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
 pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, MessageCollection> {

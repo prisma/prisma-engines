@@ -1,7 +1,7 @@
 extern crate datamodel;
 
 use self::datamodel::{IndexDefinition, StringFromEnvVar};
-use datamodel::{dml, dml::ScalarType, error::*};
+use datamodel::{dml, dml::ScalarType, messages::*};
 use datamodel_connector::NativeTypeInstance;
 use pretty_assertions::assert_eq;
 

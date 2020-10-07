@@ -1,5 +1,5 @@
 use super::*;
-use crate::{ast, configuration, dml, error::MessageCollection};
+use crate::{ast, configuration, dml, messages::MessageCollection};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps

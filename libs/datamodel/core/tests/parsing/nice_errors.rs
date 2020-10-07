@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::common::preview_features::DATASOURCE_PREVIEW_FEATURES;
-use datamodel::error::DatamodelError;
+use datamodel::messages::DatamodelError;
 
 #[test]
 fn nice_error_for_missing_model_keyword() {
