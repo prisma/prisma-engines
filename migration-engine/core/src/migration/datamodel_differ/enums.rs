@@ -77,11 +77,11 @@ impl<'a> EnumDiffer<'a> {
     }
 
     fn previous_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.previous.directives.iter()
+        self.previous.attributes.iter()
     }
 
     fn next_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.next.directives.iter()
+        self.next.attributes.iter()
     }
 }
 

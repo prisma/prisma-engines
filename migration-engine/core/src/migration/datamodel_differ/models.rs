@@ -103,19 +103,19 @@ impl<'a> ModelDiffer<'a> {
     }
 
     fn previous_regular_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.previous.directives.iter().filter(directive_is_regular)
+        self.previous.attributes.iter().filter(directive_is_regular)
     }
 
     fn next_regular_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.next.directives.iter().filter(directive_is_regular)
+        self.next.attributes.iter().filter(directive_is_regular)
     }
 
     fn previous_repeated_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.previous.directives.iter().filter(directive_is_repeated)
+        self.previous.attributes.iter().filter(directive_is_repeated)
     }
 
     fn next_repeated_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.next.directives.iter().filter(directive_is_repeated)
+        self.next.attributes.iter().filter(directive_is_repeated)
     }
 }
 
