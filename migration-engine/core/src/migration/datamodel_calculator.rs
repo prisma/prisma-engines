@@ -127,7 +127,7 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
         .iter()
         .map(|value_name| ast::EnumValue {
             name: Identifier::new(value_name),
-            directives: vec![],
+            attributes: vec![],
             documentation: None,
             span: new_span(),
             commented_out: false,
@@ -139,7 +139,7 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
         name: new_ident(name.clone()),
         span: new_span(),
         values,
-        directives: vec![],
+        attributes: vec![],
     };
 
     datamodel.tops.push(ast::Top::Enum(new_enum));
@@ -174,7 +174,7 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
         documentation: None,
         field_type: new_ident(tpe.clone()),
         span: new_span(),
-        directives: Vec::new(),
+        attributes: Vec::new(),
         is_commented_out: false,
     };
     model.fields.push(field);
@@ -196,7 +196,7 @@ fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel)
         name: new_ident(step.model.clone()),
         span: new_span(),
         fields: vec![],
-        directives: vec![],
+        attributes: vec![],
         commented_out: false,
     };
 
@@ -351,7 +351,7 @@ fn add_enum_values(r#enum: &mut ast::Enum, added_values: &[String]) {
         .values
         .extend(added_values.iter().map(|added_name| ast::EnumValue {
             name: Identifier::new(added_name),
-            directives: vec![],
+            attributes: vec![],
             documentation: None,
             span: new_span(),
             commented_out: false,
@@ -485,7 +485,7 @@ fn apply_create_type_alias(
         name: new_ident(step.type_alias.clone()),
         span: new_span(),
         arity: step.arity.into(),
-        directives: vec![],
+        attributes: vec![],
         field_type: new_ident(step.r#type.clone()),
         is_commented_out: false,
     };
