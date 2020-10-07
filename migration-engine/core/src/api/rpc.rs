@@ -1,7 +1,7 @@
 use crate::{commands::*, CoreResult, GenericApi};
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
-use std::{io, sync::Arc};
+use std::sync::Arc;
 
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
@@ -89,24 +89,6 @@ impl RpcApi {
 
     pub fn io_handler(&self) -> &IoHandler {
         &self.io_handler
-    }
-
-    /// Handle one request over stdio.
-    pub fn handle(&self) -> CoreResult<String> {
-        let mut json_is_complete = false;
-        let mut input = String::new();
-
-        while !json_is_complete {
-            io::stdin().read_line(&mut input)?;
-            json_is_complete = serde_json::from_str::<serde_json::Value>(&input).is_ok();
-        }
-
-        let result = self
-            .io_handler
-            .handle_request_sync(&input)
-            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "Reading from stdin failed."))?;
-
-        Ok(result)
     }
 
     fn add_command_handler(&mut self, cmd: RpcCommand) {

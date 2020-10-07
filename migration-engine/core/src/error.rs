@@ -21,9 +21,6 @@ pub enum Error {
 
     /// Error from the datamodel parser.
     DatamodelError(ErrorCollection),
-
-    /// IO error.
-    IOError(anyhow::Error),
 }
 
 impl Display for Error {
@@ -32,7 +29,6 @@ impl Display for Error {
             Error::ConnectorError(err) => write!(f, "Error in connector: {}", err),
             Error::CommandError(err) => write!(f, "Failure during a migration command: {}", err),
             Error::DatamodelError(err) => write!(f, "Error in datamodel: {}", err),
-            Error::IOError(err) => write!(f, "Error performing IO: {}", err),
         }
     }
 }
@@ -40,7 +36,6 @@ impl Display for Error {
 impl StdError for Error {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
-            Error::IOError(err) => Some(err.as_ref()),
             Error::ConnectorError(err) => Some(err),
             Error::CommandError(err) => Some(err),
             Error::DatamodelError(_) => None,
@@ -63,11 +58,5 @@ impl From<CommandError> for Error {
 impl From<ErrorCollection> for Error {
     fn from(v: ErrorCollection) -> Self {
         Error::DatamodelError(v)
-    }
-}
-
-impl From<std::io::Error> for Error {
-    fn from(e: std::io::Error) -> Self {
-        Error::IOError(e.into())
     }
 }
