@@ -552,7 +552,7 @@ fn find_argument_container<'schema>(
             .find_source_mut(&source_location.source)
             .map(|sc| ArgumentContainer::SourceConfig(sc)),
         steps::ArgumentLocation::Directive(directive_location) => {
-            find_directive_mut(datamodel, directive_location).map(|d| ArgumentContainer::Directive(d))
+            find_directive_mut(datamodel, directive_location).map(|d| ArgumentContainer::Attribute(d))
         }
     }
 }
