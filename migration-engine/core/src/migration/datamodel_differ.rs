@@ -56,7 +56,7 @@ fn push_created_type_aliases<'a>(steps: &mut Steps, type_aliases: impl Iterator<
             type_alias: created_type_alias.name.name.clone(),
         };
 
-        push_created_directives(steps, &location, created_type_alias.directives.iter())
+        push_created_directives(steps, &location, created_type_alias.attributes.iter())
     }
 }
 
@@ -113,7 +113,7 @@ fn push_created_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast
             r#enum: r#enum.name.name.clone(),
         };
 
-        push_created_directives(steps, &directive_path, r#enum.directives.iter());
+        push_created_directives(steps, &directive_path, r#enum.attributes.iter());
 
         for value in &r#enum.values {
             let path = steps::DirectivePath::EnumValue {
@@ -121,7 +121,7 @@ fn push_created_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast
                 value: value.name.name.clone(),
             };
 
-            push_created_directives(steps, &path, value.directives.iter());
+            push_created_directives(steps, &path, value.attributes.iter());
         }
     }
 }
@@ -152,7 +152,7 @@ fn push_updated_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = EnumDif
                 value: created_value.name.name.clone(),
             };
 
-            push_created_directives(steps, &path, created_value.directives.iter());
+            push_created_directives(steps, &path, created_value.attributes.iter());
         }
 
         for value_differ in updated_enum.value_pairs() {
@@ -285,12 +285,12 @@ fn push_created_models<'a>(steps: &mut Steps, models: impl Iterator<Item = &'a a
         push_created_directives(
             steps,
             &directive_path,
-            created_model.directives.iter().filter(models::directive_is_regular),
+            created_model.attributes.iter().filter(models::directive_is_regular),
         );
         push_created_directives_with_arguments(
             steps,
             &directive_path,
-            created_model.directives.iter().filter(models::directive_is_repeated),
+            created_model.attributes.iter().filter(models::directive_is_repeated),
         );
     }
 }
@@ -348,7 +348,7 @@ fn push_created_fields<'a>(steps: &mut Steps, model_name: &'a str, fields: impl 
             field: field.name.name.clone(),
         };
 
-        push_created_directives(steps, &directive_path, field.directives.iter());
+        push_created_directives(steps, &directive_path, field.attributes.iter());
     }
 }
 
