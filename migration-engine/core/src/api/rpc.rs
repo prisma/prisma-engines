@@ -1,4 +1,4 @@
-use crate::{commands::*, CoreResult, GenericApi};
+use crate::{commands::*, CoreError, CoreResult, GenericApi};
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
@@ -112,7 +112,7 @@ impl RpcApi {
         match result {
             Ok(result) => Ok(result),
             Err(RunCommandError::JsonRpcError(err)) => Err(err),
-            Err(RunCommandError::CrateError(err)) => Err(executor.render_jsonrpc_error(err)),
+            Err(RunCommandError::CoreError(err)) => Err(executor.render_jsonrpc_error(err)),
         }
     }
 
@@ -192,7 +192,7 @@ fn render(result: impl serde::Serialize) -> Result<serde_json::Value, RunCommand
 #[derive(Debug)]
 enum RunCommandError {
     JsonRpcError(JsonRpcError),
-    CrateError(crate::Error),
+    CoreError(CoreError),
 }
 
 impl From<JsonRpcError> for RunCommandError {
@@ -201,8 +201,8 @@ impl From<JsonRpcError> for RunCommandError {
     }
 }
 
-impl From<crate::Error> for RunCommandError {
-    fn from(e: crate::Error) -> Self {
-        RunCommandError::CrateError(e)
+impl From<CoreError> for RunCommandError {
+    fn from(e: CoreError) -> Self {
+        RunCommandError::CoreError(e)
     }
 }

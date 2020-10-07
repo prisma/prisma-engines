@@ -5,7 +5,7 @@ mod commands;
 mod error_tests;
 mod logger;
 
-use migration_core::{api::RpcApi, error::Error as CoreError};
+use migration_core::{api::RpcApi, CoreError};
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
@@ -72,9 +72,9 @@ async fn start_engine(datamodel_location: &str) -> ! {
         Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
         Err(err) => {
             let (error, exit_code) = match &err {
-                CoreError::DatamodelError(errors) => {
+                CoreError::ReceivedBadDatamodel(message) => {
                     let error = user_facing_errors::UnknownError {
-                        message: errors.to_pretty_string("schema.prisma", &datamodel),
+                        message: message.clone(),
                         backtrace: Some(format!("{:?}", user_facing_errors::new_backtrace())),
                     };
 

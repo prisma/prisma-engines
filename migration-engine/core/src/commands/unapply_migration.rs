@@ -1,9 +1,8 @@
-use crate::commands::command::*;
-use crate::migration_engine::MigrationEngine;
+use crate::{commands::command::*, CoreResult};
+use crate::{migration_engine::MigrationEngine, CoreError};
 use datamodel::{ast::SchemaAst, Datamodel};
 use migration_connector::*;
 use serde::{Deserialize, Serialize};
-use tracing::debug;
 
 pub struct UnapplyMigrationCommand<'a> {
     input: &'a UnapplyMigrationInput,
@@ -14,13 +13,13 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
     type Input = UnapplyMigrationInput;
     type Output = UnapplyMigrationOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
     {
         let cmd = UnapplyMigrationCommand { input };
-        debug!("{:?}", cmd.input);
+        tracing::debug!("{:?}", cmd.input);
         let connector = engine.connector();
 
         let result = match connector.migration_persistence().last_two_migrations().await? {
@@ -35,19 +34,19 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
                     .as_ref()
                     .map(|migration| migration.parse_schema_ast())
                     .unwrap_or_else(|| Ok(SchemaAst::empty()))
-                    .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
                 let schema_before_last_migration = second_to_last
                     .as_ref()
                     .map(|migration| migration.parse_datamodel())
                     .unwrap_or_else(|| Ok(Datamodel::new()))
-                    .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
 
                 let last_schema_ast = migration_to_rollback
                     .parse_schema_ast()
-                    .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
                 let last_schema = migration_to_rollback
                     .parse_datamodel()
-                    .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
 
                 // Generate backwards datamodel steps.
                 let datamodel_migration =

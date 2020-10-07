@@ -1,4 +1,4 @@
-use crate::{commands::CommandError, error::Error as CoreError};
+use crate::CoreError;
 use jsonrpc_core::types::Error as JsonRpcError;
 use migration_connector::ConnectorError;
 use user_facing_errors::{Error, KnownError};
@@ -9,11 +9,7 @@ pub fn render_error(crate_error: CoreError) -> Error {
             user_facing_error: Some(user_facing_error),
             ..
         }) => user_facing_error.into(),
-        CoreError::CommandError(CommandError::ConnectorError(ConnectorError {
-            user_facing_error: Some(user_facing_error),
-            ..
-        })) => user_facing_error.into(),
-        CoreError::CommandError(CommandError::ReceivedBadDatamodel(full_error)) => {
+        CoreError::ReceivedBadDatamodel(full_error) => {
             KnownError::new(user_facing_errors::common::SchemaParserError { full_error }).into()
         }
         _ => Error::from_dyn_error(&crate_error),

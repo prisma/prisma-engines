@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use super::MigrationCommand;
-use crate::migration_engine::MigrationEngine;
+use crate::{migration_engine::MigrationEngine, CoreResult};
 use migration_connector::{ErrorKind, MigrationDirectory, MigrationRecord};
 use serde::{Deserialize, Serialize};
 
@@ -53,7 +53,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
 
     type Output = DiagnoseMigrationHistoryOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> super::CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector<DatabaseMigration = D>,
         D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,

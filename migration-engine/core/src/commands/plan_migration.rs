@@ -1,5 +1,5 @@
-use super::{CommandResult, MigrationCommand};
-use crate::migration_engine::MigrationEngine;
+use super::MigrationCommand;
+use crate::{migration_engine::MigrationEngine, CoreResult};
 use serde::{Deserialize, Serialize};
 
 /// The input to the `planMigration` command.
@@ -26,7 +26,7 @@ impl<'a> MigrationCommand for PlanMigrationCommand {
 
     type Output = PlanMigrationOutput;
 
-    async fn execute<C, D>(_input: &Self::Input, _engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(_input: &Self::Input, _engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector<DatabaseMigration = D>,
         D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,

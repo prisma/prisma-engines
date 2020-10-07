@@ -1,6 +1,6 @@
 use super::MigrationStepsResultOutput;
-use crate::commands::command::*;
-use crate::migration_engine::MigrationEngine;
+use crate::{commands::command::*, CoreError};
+use crate::{migration_engine::MigrationEngine, CoreResult};
 use datamodel::{ast::SchemaAst, Datamodel};
 use migration_connector::*;
 use serde::Deserialize;
@@ -14,7 +14,7 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
     type Input = ApplyMigrationInput;
     type Output = MigrationStepsResultOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
@@ -38,7 +38,7 @@ impl<'a> ApplyMigrationCommand<'a> {
     async fn handle_transition_out_of_watch_mode<C, D>(
         &self,
         engine: &MigrationEngine<C, D>,
-    ) -> CommandResult<MigrationStepsResultOutput>
+    ) -> CoreResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
@@ -51,14 +51,14 @@ impl<'a> ApplyMigrationCommand<'a> {
         let current_datamodel = last_migration
             .map(|migration| migration.parse_datamodel())
             .unwrap_or_else(|| Ok(Datamodel::new()))
-            .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+            .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
 
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
             .await?
             .map(|m| m.parse_schema_ast())
             .unwrap_or_else(|| Ok(SchemaAst::empty()))
-            .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+            .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
@@ -70,7 +70,7 @@ impl<'a> ApplyMigrationCommand<'a> {
     async fn handle_normal_migration<C, D>(
         &self,
         engine: &MigrationEngine<C, D>,
-    ) -> CommandResult<MigrationStepsResultOutput>
+    ) -> CoreResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
@@ -82,7 +82,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             .migration_is_already_applied(&self.input.migration_id)
             .await?
         {
-            return Err(CommandError::Input(anyhow::anyhow!(
+            return Err(CoreError::Input(anyhow::anyhow!(
                 "Invariant violation: the migration with id `{migration_id}` has already been applied.",
                 migration_id = self.input.migration_id
             )));
@@ -93,11 +93,11 @@ impl<'a> ApplyMigrationCommand<'a> {
             .as_ref()
             .map(|migration| migration.parse_schema_ast())
             .unwrap_or_else(|| Ok(SchemaAst::empty()))
-            .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+            .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
         let current_datamodel = last_migration
             .map(|migration| migration.parse_datamodel())
             .unwrap_or_else(|| Ok(Datamodel::new()))
-            .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+            .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
@@ -112,14 +112,14 @@ impl<'a> ApplyMigrationCommand<'a> {
         engine: &MigrationEngine<C, D>,
         current_datamodel: Datamodel,
         next_schema_ast: SchemaAst,
-    ) -> CommandResult<MigrationStepsResultOutput>
+    ) -> CoreResult<MigrationStepsResultOutput>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
         let next_datamodel =
-            datamodel::lift_ast_to_datamodel(&next_schema_ast).map_err(CommandError::ProducedBadDatamodel)?;
+            datamodel::lift_ast_to_datamodel(&next_schema_ast).map_err(CoreError::ProducedBadDatamodel)?;
         let migration_persistence = connector.migration_persistence();
 
         let database_migration = connector
@@ -139,7 +139,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             name: self.input.migration_id.clone(),
             datamodel_steps: self.input.steps.clone(),
             datamodel_string: datamodel::render_schema_ast_to_string(&next_schema_ast)
-                .map_err(CommandError::ProducedBadDatamodel)?,
+                .map_err(CoreError::ProducedBadDatamodel)?,
             database_migration: database_migration_json,
         });
 

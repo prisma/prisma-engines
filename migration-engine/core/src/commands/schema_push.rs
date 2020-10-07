@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::parse_datamodel;
+use crate::{parse_datamodel, CoreResult};
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +15,7 @@ impl MigrationCommand for SchemaPushCommand {
     async fn execute<C, D>(
         input: &Self::Input,
         engine: &crate::migration_engine::MigrationEngine<C, D>,
-    ) -> super::CommandResult<Self::Output>
+    ) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,

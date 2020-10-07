@@ -1,5 +1,5 @@
-use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
+use crate::{commands::command::*, CoreResult};
 use datamodel::ast::SchemaAst;
 use migration_connector::*;
 use serde::{Deserialize, Serialize};
@@ -12,7 +12,7 @@ impl MigrationCommand for CalculateDatamodelCommand {
     type Input = CalculateDatamodelInput;
     type Output = CalculateDatamodelOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
