@@ -130,14 +130,49 @@ pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream, with_mssq
 
     let mut test_function = parse_macro_input!(input as ItemFn);
     super::strip_test_attribute(&mut test_function);
+    let test_name = &test_function.sig.ident;
 
-    let tests = match args {
-        Ok(args) => test_each_connector_async_wrapper_functions(&args, &test_function, with_mssql),
+    let args = match args {
+        Ok(args) => args,
         Err(err) => return err.write_errors().into(),
     };
 
+    let tests = test_each_connector_async_wrapper_functions(&args, &test_function, with_mssql);
+
+    let optional_logging_import = args.log.as_ref().map(|_| {
+        quote!(
+            use tracing_futures::WithSubscriber;
+        )
+    });
+
+    let optional_logging = args.log.as_ref().map(|log_config| {
+        quote! { .with_subscriber(test_setup::logging::test_tracing_subscriber(#log_config)) }
+    });
+
+    let optional_unwrap = if super::function_returns_result(&test_function) {
+        Some(quote!(.expect("The test function returned an Err.")))
+    } else {
+        None
+    };
+
+    let test_fn_name = &test_function.sig.ident;
+
     let output = quote! {
-        #(#tests)*
+        mod #test_name {
+            #(#tests)*
+
+            fn run(api: std::pin::Pin<Box<dyn std::future::Future<Output = super::TestApi> + 'static + Send>>) {
+                #optional_logging_import
+
+                let fut = async move {
+                    let api = api.await;
+                    super::#test_fn_name(&api).await#optional_unwrap
+                }#optional_logging;
+
+                test_setup::runtime::run_with_tokio(fut);
+            }
+
+        }
 
         #test_function
     };
@@ -150,42 +185,18 @@ fn test_each_connector_async_wrapper_functions(
     test_function: &ItemFn,
     with_mssql: bool,
 ) -> Vec<proc_macro2::TokenStream> {
-    let test_fn_name = &test_function.sig.ident;
-    let test_fn_name_str = test_fn_name.to_string();
+    let test_fn_name_str = test_function.sig.ident.to_string();
 
     let mut tests = Vec::with_capacity(CONNECTORS.len());
 
-    let optional_logging_import = args.log.as_ref().map(|_| {
-        quote!(
-            use tracing_futures::WithSubscriber;
-        )
-    });
-    let optional_logging = args.log.as_ref().map(|log_config| {
-        quote! { .with_subscriber(test_setup::logging::test_tracing_subscriber(#log_config)) }
-    });
-
-    let optional_unwrap = if super::function_returns_result(&test_function) {
-        Some(quote!(.expect("The test function returned an Err.")))
-    } else {
-        None
-    };
-
     for connector in args.connectors_to_test(with_mssql) {
-        let connector_test_fn_name =
-            Ident::new(&format!("{}_on_{}", test_fn_name, connector.name()), Span::call_site());
+        let connector_test_fn_name = Ident::new(connector.name(), Span::call_site());
         let connector_api_factory = Ident::new(connector.test_api(), Span::call_site());
 
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
-                #optional_logging_import
-
-                let fut = async {
-                    let api = #connector_api_factory(#test_fn_name_str).await;
-                    #test_fn_name(&api).await#optional_unwrap
-                }#optional_logging;
-
-                test_setup::runtime::run_with_tokio(fut)
+                run(Box::pin(super::#connector_api_factory(#test_fn_name_str)))
             }
         };
 
