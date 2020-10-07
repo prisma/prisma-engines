@@ -11,7 +11,7 @@ pub use one::*;
 pub use related::*;
 
 use super::*;
-use crate::{query_document::ParsedField, ReadQuery};
+use crate::{FieldPair, ReadQuery};
 use prisma_models::{Field, ModelProjection, ModelRef, RecordProjection, RelationFieldRef};
 use std::sync::Arc;
 
@@ -35,13 +35,13 @@ impl Builder<ReadQuery> for ReadQueryBuilder {
     }
 }
 
-pub fn collect_selection_order(from: &[ParsedField]) -> Vec<String> {
+pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
     from.iter()
-        .map(|selected_field| {
-            selected_field
+        .map(|pair| {
+            pair.parsed_field
                 .alias
                 .clone()
-                .unwrap_or_else(|| selected_field.name.clone())
+                .unwrap_or_else(|| pair.parsed_field.name.clone())
         })
         .collect()
 }
@@ -49,13 +49,13 @@ pub fn collect_selection_order(from: &[ParsedField]) -> Vec<String> {
 /// Creates SelectedFields from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
 /// Unwraps are safe due to query validation.
-pub fn collect_selected_fields(from: &[ParsedField], model: &ModelRef) -> ModelProjection {
+pub fn collect_selected_fields(from: &[FieldPair], model: &ModelRef) -> ModelProjection {
     let selected_fields = from
         .iter()
-        .filter_map(|selected_field| {
+        .filter_map(|pair| {
             model
                 .fields()
-                .find_from_scalar(&selected_field.name)
+                .find_from_scalar(&pair.parsed_field.name)
                 .ok()
                 .map(|sf| sf.into())
         })
@@ -67,10 +67,10 @@ pub fn collect_selected_fields(from: &[ParsedField], model: &ModelRef) -> ModelP
     model_id.merge(selected_projection)
 }
 
-pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
+pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
     from.into_iter()
-        .filter_map(|selected_field| {
-            let model_field = model.fields().find_from_all(&selected_field.name).unwrap();
+        .filter_map(|pair| {
+            let model_field = model.fields().find_from_all(&pair.parsed_field.name).unwrap();
             match model_field {
                 Field::Scalar(_) => None,
                 Field::Relation(ref rf) => {
@@ -78,7 +78,7 @@ pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> Query
                     let parent = Arc::clone(&rf);
 
                     Some(ReadQueryBuilder::ReadRelatedRecordsBuilder(
-                        ReadRelatedRecordsBuilder::new(model, parent, selected_field),
+                        ReadRelatedRecordsBuilder::new(model, parent, pair.parsed_field),
                     ))
                 }
             }

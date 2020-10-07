@@ -13,7 +13,6 @@ pub struct QueryDocumentParser;
 
 // Todo:
 // - Use error collections instead of letting first error win.
-// - UUID ids are not encoded in any useful way in the schema.
 impl QueryDocumentParser {
     /// Parses and validates a set of selections against a schema (output) object.
     /// On an output object, optional types designate whether or not an output field can be nulled.
@@ -44,7 +43,7 @@ impl QueryDocumentParser {
                     error_kind: QueryParserErrorKind::FieldNotFoundError,
                 }),
             })
-            .collect::<QueryParserResult<Vec<ParsedField>>>()
+            .collect::<QueryParserResult<Vec<_>>>()
             .map(|fields| ParsedObject { fields })
     }
 
@@ -53,7 +52,7 @@ impl QueryDocumentParser {
         parent_path: QueryPath,
         selection: &Selection,
         schema_field: &OutputFieldRef,
-    ) -> QueryParserResult<ParsedField> {
+    ) -> QueryParserResult<FieldPair> {
         let path = parent_path.add(schema_field.name.clone());
 
         // Parse and validate all provided arguments for the field
@@ -69,12 +68,17 @@ impl QueryDocumentParser {
                 None => None,
             };
 
-            Ok(ParsedField {
+            let schema_field = Arc::clone(schema_field);
+            let parsed_field = ParsedField {
                 name: selection.name().to_string(),
                 alias: selection.alias().clone(),
                 arguments,
                 nested_fields,
-                schema_field: Arc::clone(schema_field),
+            };
+
+            Ok(FieldPair {
+                parsed_field,
+                schema_field,
             })
         })
     }

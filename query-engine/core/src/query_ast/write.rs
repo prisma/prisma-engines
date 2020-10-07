@@ -1,6 +1,5 @@
 //! Write query AST
 use super::FilteredQuery;
-use crate::RawQueryType;
 use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::sync::Arc;
@@ -14,11 +13,8 @@ pub enum WriteQuery {
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
-    Raw {
-        query: String,
-        parameters: Vec<PrismaValue>,
-        raw_type: RawQueryType,
-    },
+    ExecuteRaw(RawQuery),
+    QueryRaw(RawQuery),
 }
 
 impl WriteQuery {
@@ -62,7 +58,8 @@ impl WriteQuery {
             Self::DeleteManyRecords(_) => false,
             Self::ConnectRecords(_) => false,
             Self::DisconnectRecords(_) => false,
-            Self::Raw { .. } => unimplemented!(),
+            Self::ExecuteRaw(_) => false,
+            Self::QueryRaw(_) => false,
         }
     }
 
@@ -75,7 +72,8 @@ impl WriteQuery {
             Self::DeleteManyRecords(q) => Arc::clone(&q.model),
             Self::ConnectRecords(q) => q.relation_field.model(),
             Self::DisconnectRecords(q) => q.relation_field.model(),
-            Self::Raw { .. } => unimplemented!(),
+            Self::ExecuteRaw(_) => unimplemented!(),
+            Self::QueryRaw(_) => unimplemented!(),
         }
     }
 }
@@ -116,11 +114,8 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
-            Self::Raw {
-                query,
-                parameters,
-                raw_type,
-            } => write!(f, "Raw ({:?}): {} ({:?})", raw_type, query, parameters),
+            Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {} ({:?})", r.query, r.parameters),
+            Self::QueryRaw(r) => write!(f, "QueryRaw: {} ({:?})", r.query, r.parameters),
         }
     }
 }
@@ -169,6 +164,12 @@ pub struct DisconnectRecords {
     pub parent_id: Option<RecordProjection>,
     pub child_ids: Vec<RecordProjection>,
     pub relation_field: RelationFieldRef,
+}
+
+#[derive(Debug, Clone)]
+pub struct RawQuery {
+    pub query: String,
+    pub parameters: Vec<PrismaValue>,
 }
 
 impl FilteredQuery for UpdateRecord {

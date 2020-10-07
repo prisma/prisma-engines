@@ -8,24 +8,6 @@ pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
 }
 
-pub enum QueryType {
-    Graph(QueryGraph),
-    Raw {
-        query: String,
-        parameters: Vec<PrismaValue>,
-        raw_type: RawQueryType,
-    },
-}
-
-impl QueryType {
-    pub fn needs_transaction(&self) -> bool {
-        match self {
-            Self::Graph(qg) => qg.needs_transaction(),
-            Self::Raw { .. } => false,
-        }
-    }
-}
-
 #[derive(Default)]
 struct RawArgs {
     query: String,

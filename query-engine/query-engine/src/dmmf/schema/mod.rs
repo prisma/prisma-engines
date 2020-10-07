@@ -97,8 +97,8 @@ impl RenderContext {
         self.schema.output_types.push(output_type);
     }
 
-    pub fn add_mapping(&mut self, name: String, operation: Option<&SchemaQueryBuilder>) {
-        if let Some(SchemaQueryBuilder::ModelQueryBuilder(m)) = operation {
+    pub fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
+        if let Some(info) = operation {
             let model_name = m.model.name.clone();
             let tag_str = format!("{}", m.tag);
             let mapping = self.mappings.iter().find(|mapping| mapping.model_name == model_name);

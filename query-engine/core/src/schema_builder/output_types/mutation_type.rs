@@ -1,5 +1,4 @@
 use super::*;
-use crate::{write, QueryGraph};
 use input_types::input_fields;
 use prisma_models::{dml, PrismaValue};
 
@@ -123,16 +122,10 @@ fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
         field_name,
         args,
         OutputType::object(output_objects::map_model_object_type(ctx, &model)),
-        Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-            model.clone(),
-            QueryTag::CreateOne,
-            Box::new(|model, parsed_field| {
-                let mut graph = QueryGraph::new();
-
-                write::create_record(&mut graph, model, parsed_field)?;
-                Ok(graph)
-            }),
-        ))),
+        Some(QueryInfo {
+            model: Some(Arc::clone(&model)),
+            tag: QueryTag::CreateOne,
+        }),
     )
 }
 
@@ -145,16 +138,10 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
             field_name,
             args,
             OutputType::object(output_objects::map_model_object_type(ctx, &model)),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                model.clone(),
-                QueryTag::DeleteOne,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-
-                    write::delete_record(&mut graph, model, parsed_field)?;
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::DeleteOne,
+            }),
         )
         .optional()
     })
@@ -172,16 +159,10 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
         field_name,
         arguments,
         OutputType::object(output_objects::batch_payload_object_type(ctx)),
-        Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-            model.clone(),
-            QueryTag::DeleteMany,
-            Box::new(|model, parsed_field| {
-                let mut graph = QueryGraph::new();
-
-                write::delete_many_records(&mut graph, model, parsed_field)?;
-                Ok(graph)
-            }),
-        ))),
+        Some(QueryInfo {
+            model: Some(Arc::clone(&model)),
+            tag: QueryTag::DeleteMany,
+        }),
     )
 }
 
@@ -194,16 +175,10 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
             field_name,
             args,
             OutputType::object(output_objects::map_model_object_type(ctx, &model)),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                model.clone(),
-                QueryTag::UpdateOne,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-
-                    write::update_record(&mut graph, model, parsed_field)?;
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::UpdateOne,
+            }),
         )
         .optional()
     })
@@ -221,16 +196,10 @@ fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
         field_name,
         arguments,
         OutputType::object(output_objects::batch_payload_object_type(ctx)),
-        Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-            model.clone(),
-            QueryTag::UpdateMany,
-            Box::new(|model, parsed_field| {
-                let mut graph = QueryGraph::new();
-
-                write::update_many_records(&mut graph, model, parsed_field)?;
-                Ok(graph)
-            }),
-        ))),
+        Some(QueryInfo {
+            model: Some(Arc::clone(&model)),
+            tag: QueryTag::UpdateMany,
+        }),
     )
 }
 
@@ -243,16 +212,10 @@ fn upsert_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
             field_name,
             args,
             OutputType::object(output_objects::map_model_object_type(ctx, &model)),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                model.clone(),
-                QueryTag::UpsertOne,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-
-                    write::upsert_record(&mut graph, model, parsed_field)?;
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::UpsertOne,
+            }),
         )
     })
 }
