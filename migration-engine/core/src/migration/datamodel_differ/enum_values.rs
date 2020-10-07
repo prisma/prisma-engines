@@ -32,11 +32,11 @@ impl<'a> EnumValueDiffer<'a> {
     }
 
     fn previous_directives<'b>(&'b self) -> impl Iterator<Item = &'a ast::Attribute> + 'b {
-        self.previous.directives.iter()
+        self.previous.attributes.iter()
     }
 
     fn next_directives<'b>(&'b self) -> impl Iterator<Item = &'a ast::Attribute> + 'b {
-        self.next.directives.iter()
+        self.next.attributes.iter()
     }
 }
 
