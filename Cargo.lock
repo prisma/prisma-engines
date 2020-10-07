@@ -1879,7 +1879,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-migration-connector",
- "thiserror",
  "tracing",
  "tracing-error",
  "tracing-futures",

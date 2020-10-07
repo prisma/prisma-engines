@@ -1,7 +1,7 @@
 use crate::{migration::datamodel_calculator::CalculatorError, migration_engine::MigrationEngine};
 use migration_connector::*;
 use serde::{de::DeserializeOwned, Serialize};
-use thiserror::Error;
+use std::{error::Error as StdError, fmt::Display};
 
 /// The implementation of an RPC command exposed by the migration engine.
 #[async_trait::async_trait]
@@ -22,45 +22,78 @@ pub trait MigrationCommand {
 pub type CommandResult<T> = Result<T, CommandError>;
 
 /// The top-level error type for migration engine commands.
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum CommandError {
     /// When there was a bad datamodel as part of the input.
-    #[error("{0}")]
     ReceivedBadDatamodel(String),
 
     /// When a datamodel from a generated AST is wrong. This is basically an internal error.
-    #[error("The migration produced an invalid schema.\n{}", render_datamodel_error(.0, None))]
     ProducedBadDatamodel(datamodel::error::ErrorCollection),
 
     /// When a saved datamodel from a migration in the migrations table is no longer valid.
-    #[error("The migration contains an invalid schema.\n{}", render_datamodel_error(.0, Some(.1)))]
     InvalidPersistedDatamodel(datamodel::error::ErrorCollection, String),
 
     /// Failed to render a prisma schema to a string.
-    #[error("Failed to render the schema to a string ({0:?})")]
     DatamodelRenderingError(datamodel::error::ErrorCollection),
 
     /// Errors from the connector.
-    #[error("Connector error. (error: {0})")]
-    ConnectorError(
-        #[source]
-        #[from]
-        ConnectorError,
-    ),
+    ConnectorError(ConnectorError),
 
     /// Generic unspecified errors.
-    #[error("Generic error. (error: {0})")]
-    Generic(#[source] anyhow::Error),
+    Generic(anyhow::Error),
 
     /// Error in command input.
-    #[error("Error in command input. (error: {0})")]
-    Input(#[source] anyhow::Error),
+    Input(anyhow::Error),
+}
+
+impl Display for CommandError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CommandError::ReceivedBadDatamodel(err) => write!(f, "{}", err),
+            CommandError::ProducedBadDatamodel(err) => write!(
+                f,
+                "The migration produced an invalid schema.\n{}",
+                render_datamodel_error(err, None)
+            ),
+            CommandError::InvalidPersistedDatamodel(err, schema) => write!(
+                f,
+                "The migration contains an invalid schema.\n{}",
+                render_datamodel_error(err, Some(schema))
+            ),
+            CommandError::DatamodelRenderingError(err) => {
+                write!(f, "Failed to render the schema to a string ({:?})", err)
+            }
+            CommandError::ConnectorError(err) => write!(f, "Connector error: {}", err),
+            CommandError::Generic(src) => write!(f, "Generic error: {}", src),
+            CommandError::Input(src) => write!(f, "Error in command input: {}", src),
+        }
+    }
+}
+
+impl StdError for CommandError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match self {
+            CommandError::ReceivedBadDatamodel(_) => None,
+            CommandError::ProducedBadDatamodel(_) => None,
+            CommandError::InvalidPersistedDatamodel(_, _) => None,
+            CommandError::DatamodelRenderingError(_) => None,
+            CommandError::ConnectorError(err) => Some(err),
+            CommandError::Generic(err) => Some(err.as_ref()),
+            CommandError::Input(err) => Some(err.as_ref()),
+        }
+    }
 }
 
 fn render_datamodel_error(err: &datamodel::error::ErrorCollection, schema: Option<&String>) -> String {
     match schema {
         Some(schema) => err.to_pretty_string("virtual_schema.prisma", schema),
         None => format!("Datamodel error in schema that could not be rendered. {}", err),
+    }
+}
+
+impl From<ConnectorError> for CommandError {
+    fn from(err: ConnectorError) -> Self {
+        CommandError::ConnectorError(err)
     }
 }
 
