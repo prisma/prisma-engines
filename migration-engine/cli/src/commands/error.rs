@@ -1,23 +1,32 @@
 use migration_connector::*;
-use thiserror::Error;
+use migration_core::{commands::CommandError, error::Error as CoreError};
+use std::fmt::Display;
 use tracing_error::SpanTrace;
 
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum CliError {
-    #[error("Known error: {:?}", error)]
     Known {
         error: user_facing_errors::KnownError,
         exit_code: i32,
     },
-    #[error("{}\n{}", error, context)]
     Unknown {
         error: migration_connector::ErrorKind,
         context: SpanTrace,
         exit_code: i32,
     },
+}
 
-    #[error("Unknown error occurred: {0}")]
-    Other(anyhow::Error),
+impl Display for CliError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CliError::Known { error, exit_code: _ } => write!(f, "Known error: {:?}", error),
+            CliError::Unknown {
+                error,
+                context,
+                exit_code: _,
+            } => write!(f, "{}\n{}", error, context),
+        }
+    }
 }
 
 impl CliError {
@@ -25,7 +34,6 @@ impl CliError {
         match self {
             CliError::Known { exit_code, .. } => *exit_code,
             CliError::Unknown { exit_code, .. } => *exit_code,
-            _ => 255,
         }
     }
 
@@ -67,7 +75,7 @@ pub fn render_error(cli_error: CliError) -> user_facing_errors::Error {
     }
 }
 
-impl From<migration_connector::ConnectorError> for CliError {
+impl From<ConnectorError> for CliError {
     fn from(e: ConnectorError) -> Self {
         let ConnectorError {
             user_facing_error,
@@ -88,11 +96,15 @@ impl From<migration_connector::ConnectorError> for CliError {
     }
 }
 
-impl From<migration_core::error::Error> for CliError {
+impl From<CoreError> for CliError {
     fn from(e: migration_core::error::Error) -> Self {
         match e {
-            migration_core::error::Error::ConnectorError(e) => e.into(),
-            e => Self::Other(e.into()),
+            CoreError::ConnectorError(e) | CoreError::CommandError(CommandError::ConnectorError(e)) => e.into(),
+            e => CliError::Unknown {
+                error: ErrorKind::Generic(e.into()),
+                context: SpanTrace::capture(),
+                exit_code: 255,
+            },
         }
     }
 }

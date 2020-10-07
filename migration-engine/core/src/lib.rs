@@ -1,10 +1,14 @@
-#![deny(rust_2018_idioms)]
-#![deny(unsafe_code)]
+#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
+//! The top-level library crate for the migration engine.
+
+#[allow(missing_docs)]
 pub mod api;
 pub mod commands;
 pub mod error;
+#[allow(missing_docs)]
 pub mod migration;
+#[allow(missing_docs)]
 pub mod migration_engine;
 
 pub use api::GenericApi;
