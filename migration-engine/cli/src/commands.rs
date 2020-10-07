@@ -79,10 +79,8 @@ async fn create_database(database_str: &str) -> Result<String, CliError> {
     Ok(format!("Database '{}' was successfully created.", db_name))
 }
 
-async fn qe_setup(database_str: &str) -> Result<(), CliError> {
-    let datamodel = datasource_from_database_str(database_str)?;
-
-    migration_core::qe_setup(&datamodel).await?;
+async fn qe_setup(prisma_schema: &str) -> Result<(), CliError> {
+    migration_core::qe_setup(&prisma_schema).await?;
 
     Ok(())
 }
