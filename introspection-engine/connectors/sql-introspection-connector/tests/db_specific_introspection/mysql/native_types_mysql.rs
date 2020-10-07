@@ -68,7 +68,7 @@ async fn introspecting_native_type_columns_feature_on(api: &TestApi) -> TestResu
   id                             Int      @id @mysql.Int
   int                            Int      @mysql.Int
   smallint                       Int      @mysql.SmallInt
-  tinyint                        Int      @mysql.TinyInt(1)
+  tinyint                        Int      @mysql.TinyInt(3)
   mediumint                      Int      @mysql.MediumInt
   bigint                         Int      @mysql.BigInt
   decimal                        Decimal  @mysql.Decimal(5, 3)
