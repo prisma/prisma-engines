@@ -85,7 +85,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn unique_attribute_on_required_one_to_one_relation_creates_one_index(api: &TestApi) -> TestResult {
+async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: &TestApi) -> TestResult {
     // We want to test that only one index is created, because of the implicit unique index on
     // required 1:1 relations.
 
