@@ -1,4 +1,4 @@
-use super::attributes::arguments_match;
+use super::directives::arguments_match;
 use datamodel::ast;
 
 #[derive(Debug)]
