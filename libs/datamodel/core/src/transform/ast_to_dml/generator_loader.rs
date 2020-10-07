@@ -22,18 +22,18 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[
 pub struct GeneratorLoader {}
 
 impl GeneratorLoader {
-    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<Vec<Generator>, ErrorCollection> {
+    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<Vec<Generator>, MessageCollection> {
         let mut generators: Vec<Generator> = vec![];
-        let mut errors = ErrorCollection::new();
+        let mut errors = MessageCollection::new();
 
         for gen in &ast_schema.generators() {
             match Self::lift_generator(&gen) {
                 Ok(loaded_gen) => generators.push(loaded_gen),
                 // Lift error.
-                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
+                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push_error(
                     DatamodelError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
                 ),
-                Err(err) => errors.push(err),
+                Err(err) => errors.push_error(err),
             }
         }
 

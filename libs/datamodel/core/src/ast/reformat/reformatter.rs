@@ -10,8 +10,8 @@ use pest::iterators::Pair;
 
 pub struct Reformatter<'a> {
     input: &'a str,
-    missing_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
-    missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::error::ErrorCollection>,
+    missing_fields: Result<Vec<MissingField>, crate::error::MessageCollection>,
+    missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::error::MessageCollection>,
 }
 
 impl<'a> Reformatter<'a> {
@@ -26,7 +26,7 @@ impl<'a> Reformatter<'a> {
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
-    fn find_all_missing_fields(schema_string: &str) -> Result<Vec<MissingField>, crate::error::ErrorCollection> {
+    fn find_all_missing_fields(schema_string: &str) -> Result<Vec<MissingField>, crate::error::MessageCollection> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
@@ -52,7 +52,7 @@ impl<'a> Reformatter<'a> {
 
     fn find_all_missing_attributes(
         schema_string: &str,
-    ) -> Result<Vec<MissingFieldAttribute>, crate::error::ErrorCollection> {
+    ) -> Result<Vec<MissingFieldAttribute>, crate::error::MessageCollection> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);

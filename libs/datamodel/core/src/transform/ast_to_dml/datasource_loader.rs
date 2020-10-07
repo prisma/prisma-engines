@@ -7,7 +7,7 @@ use super::{
 use crate::ast::Span;
 use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
-use crate::error::{DatamodelError, ErrorCollection};
+use crate::error::{DatamodelError, MessageCollection};
 use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
@@ -34,24 +34,24 @@ impl DatasourceLoader {
         ast_schema: &ast::SchemaAst,
         ignore_datasource_urls: bool,
         datasource_url_overrides: Vec<(String, String)>,
-    ) -> Result<Vec<Datasource>, ErrorCollection> {
+    ) -> Result<Vec<Datasource>, MessageCollection> {
         let mut sources = vec![];
-        let mut errors = ErrorCollection::new();
+        let mut errors = MessageCollection::new();
 
         for src in &ast_schema.sources() {
             match self.lift_datasource(&src, ignore_datasource_urls, &datasource_url_overrides) {
                 Ok(loaded_src) => sources.push(loaded_src),
                 // Lift error to source.
-                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
+                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push_error(
                     DatamodelError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
                 ),
-                Err(err) => errors.push(err),
+                Err(err) => errors.push_error(err),
             }
         }
 
         if sources.len() > 1 {
             for src in &ast_schema.sources() {
-                errors.push(DatamodelError::new_source_validation_error(
+                errors.push_error(DatamodelError::new_source_validation_error(
                     &format!("You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet."),
                     &src.name.name,
                     src.span.clone(),

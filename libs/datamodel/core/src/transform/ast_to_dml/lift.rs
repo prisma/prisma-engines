@@ -2,9 +2,9 @@ use super::super::attributes::AllAttributes;
 use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
 use crate::{
-    ast, configuration, dml,
-    error::{DatamodelError, ErrorCollection},
-    Field, FieldType, ScalarType,
+  ast, configuration, dml,
+  error::{DatamodelError, MessageCollection},
+  Field, FieldType, ScalarType,
 };
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
@@ -31,19 +31,19 @@ impl<'a> LiftAstToDml<'a> {
         }
     }
 
-    pub fn lift(&self, ast_schema: &ast::SchemaAst) -> Result<dml::Datamodel, ErrorCollection> {
+    pub fn lift(&self, ast_schema: &ast::SchemaAst) -> Result<dml::Datamodel, MessageCollection> {
         let mut schema = dml::Datamodel::new();
-        let mut errors = ErrorCollection::new();
+        let mut messages = MessageCollection::new();
 
         for ast_obj in &ast_schema.tops {
             match ast_obj {
                 ast::Top::Enum(en) => match self.lift_enum(&en) {
                     Ok(en) => schema.add_enum(en),
-                    Err(mut err) => errors.append(&mut err),
+                    Err(mut err) => messages.append(&mut err),
                 },
                 ast::Top::Model(ty) => match self.lift_model(&ty, ast_schema) {
                     Ok(md) => schema.add_model(md),
-                    Err(mut err) => errors.append(&mut err),
+                    Err(mut err) => messages.append(&mut err),
                 },
                 ast::Top::Source(_) => { /* Source blocks are explicitly ignored by the validator */ }
                 ast::Top::Generator(_) => { /* Generator blocks are explicitly ignored by the validator */ }
@@ -52,55 +52,55 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
+        if messages.has_errors() {
+            Err(messages)
         } else {
             Ok(schema)
         }
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
-    fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::SchemaAst) -> Result<dml::Model, ErrorCollection> {
+    fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::SchemaAst) -> Result<dml::Model, MessageCollection> {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
-        let mut errors = ErrorCollection::new();
+        let mut messages = MessageCollection::new();
 
         for ast_field in &ast_model.fields {
             match self.lift_field(ast_field, ast_schema) {
                 Ok(field) => model.add_field(field),
-                Err(mut err) => errors.append(&mut err),
+                Err(mut err) => messages.append(&mut err),
             }
         }
 
         if let Err(mut err) = self.attributes.model.validate_and_apply(ast_model, &mut model) {
-            errors.append(&mut err);
+            messages.append(&mut err);
         }
 
-        if errors.has_errors() {
-            return Err(errors);
+        if messages.has_errors() {
+            return Err(messages);
         }
 
         Ok(model)
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, ast_enum: &ast::Enum) -> Result<dml::Enum, ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    fn lift_enum(&self, ast_enum: &ast::Enum) -> Result<dml::Enum, MessageCollection> {
+        let mut messages = MessageCollection::new();
 
         let supports_enums = match self.source {
             Some(source) => source.combined_connector.supports_enums(),
             None => true,
         };
         if !supports_enums {
-            errors.push(DatamodelError::new_validation_error(
+            messages.push_error(DatamodelError::new_validation_error(
                 &format!(
                     "You defined the enum `{}`. But the current connector does not support enums.",
                     &ast_enum.name.name
                 ),
                 ast_enum.span,
             ));
-            return Err(errors);
+            return Err(messages);
         }
 
         let mut en = dml::Enum::new(&ast_enum.name.name, vec![]);
@@ -108,12 +108,12 @@ impl<'a> LiftAstToDml<'a> {
         for ast_enum_value in &ast_enum.values {
             match self.lift_enum_value(ast_enum_value) {
                 Ok(value) => en.add_value(value),
-                Err(mut err) => errors.append(&mut err),
+                Err(mut err) => messages.append(&mut err),
             }
         }
 
         if en.values.len() == 0 {
-            errors.push(DatamodelError::new_validation_error(
+            messages.push_error(DatamodelError::new_validation_error(
                 "An enum must have at least one value.",
                 ast_enum.span,
             ))
@@ -122,18 +122,18 @@ impl<'a> LiftAstToDml<'a> {
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
         if let Err(mut err) = self.attributes.enm.validate_and_apply(ast_enum, &mut en) {
-            errors.append(&mut err);
+            messages.append(&mut err);
         }
 
-        if errors.has_errors() {
-            Err(errors)
+        if messages.has_errors() {
+            Err(messages)
         } else {
             Ok(en)
         }
     }
 
     /// Internal: Validates an enum value AST node.
-    fn lift_enum_value(&self, ast_enum_value: &ast::EnumValue) -> Result<dml::EnumValue, ErrorCollection> {
+    fn lift_enum_value(&self, ast_enum_value: &ast::EnumValue) -> Result<dml::EnumValue, MessageCollection> {
         let mut enum_value = dml::EnumValue::new(&ast_enum_value.name.name);
         enum_value.documentation = ast_enum_value.documentation.clone().map(|comment| comment.text);
 
@@ -145,8 +145,8 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lift a field AST node to a DML field.
-    fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, MessageCollection> {
+        let mut messages = MessageCollection::new();
         // If we cannot parse the field type, we exit right away.
         let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, ast_schema, &mut Vec::new())?;
 
@@ -169,11 +169,11 @@ impl<'a> LiftAstToDml<'a> {
         let attributes = [&extra_attributes[..], &ast_field.attributes[..]].concat();
 
         if let Err(mut err) = self.attributes.field.validate_and_apply(&attributes, &mut field) {
-            errors.append(&mut err);
+            messages.append(&mut err);
         }
 
-        if errors.has_errors() {
-            Err(errors)
+        if messages.has_errors() {
+            Err(messages)
         } else {
             Ok(field)
         }
