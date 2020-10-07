@@ -6,6 +6,7 @@ use error::CliError;
 use futures::FutureExt;
 use migration_core::migration_api;
 use structopt::StructOpt;
+use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 #[derive(Debug, StructOpt)]
 pub(crate) struct Cli {
@@ -92,10 +93,10 @@ fn datasource_from_database_str(database_str: &str) -> Result<String, CliError> 
         Some("file") => "sqlite",
         Some(other) => other,
         None => {
-            return Err(CliError::Other(anyhow::anyhow!(
-                "Invalid database string format: {}",
-                database_str
-            )))
+            return Err(CliError::Known {
+                error: KnownError::new(InvalidDatabaseString { details: String::new() }),
+                exit_code: 255,
+            })
         }
     };
 
