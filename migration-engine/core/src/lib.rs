@@ -99,6 +99,9 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
 
 /// Database setup for connector-test-kit.
 pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
+    // make sure the database exists; ignore errors if it exists already
+    let _ = create_database(prisma_schema).await;
+
     let config = datamodel::parse_configuration(prisma_schema)?;
 
     let source = config
