@@ -60,7 +60,7 @@ impl ManyRecords {
                     parent_id: None,
                 })
                 .collect(),
-            field_names: selected_fields.names().map(|n| n.to_string()).collect(),
+            field_names: selected_fields.db_names().collect(),
         }
     }
 
