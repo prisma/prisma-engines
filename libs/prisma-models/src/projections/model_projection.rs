@@ -148,7 +148,7 @@ impl ModelProjection {
     }
 
     /// Checks if this model projection contains all the given database names.
-    pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = String>) -> bool {
+    pub fn contains_all_db_names(&self, names: impl Iterator<Item = String>) -> bool {
         let selected_db_names: Vec<_> = self.db_names().collect();
         let names_to_select: Vec<_> = names.collect();
 

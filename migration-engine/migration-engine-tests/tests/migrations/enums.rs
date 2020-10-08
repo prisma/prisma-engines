@@ -22,6 +22,7 @@ async fn an_enum_can_be_turned_into_a_model(api: &TestApi) -> TestResult {
         "CatMood"
     };
 
+    #[allow(clippy::redundant_closure)]
     api.assert_schema().await?.assert_enum(enum_name, |enm| Ok(enm))?;
 
     let dm2 = r#"
@@ -40,6 +41,7 @@ async fn an_enum_can_be_turned_into_a_model(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2).send().await?.assert_green()?;
 
+    #[warn(clippy::redundant_closure)]
     api.assert_schema()
         .await?
         .assert_table("Cat", |table| {
