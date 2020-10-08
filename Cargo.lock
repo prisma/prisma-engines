@@ -1914,7 +1914,6 @@ dependencies = [
  "barrel",
  "chrono",
  "datamodel",
- "futures 0.3.5",
  "indoc 1.0.2",
  "migration-connector",
  "migration-core",
