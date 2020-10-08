@@ -6,6 +6,7 @@ use error::CliError;
 use futures::FutureExt;
 use migration_core::migration_api;
 use structopt::StructOpt;
+use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 #[derive(Debug, StructOpt)]
 pub(crate) struct Cli {
@@ -78,10 +79,8 @@ async fn create_database(database_str: &str) -> Result<String, CliError> {
     Ok(format!("Database '{}' was successfully created.", db_name))
 }
 
-async fn qe_setup(database_str: &str) -> Result<(), CliError> {
-    let datamodel = datasource_from_database_str(database_str)?;
-
-    migration_core::qe_setup(&datamodel).await?;
+async fn qe_setup(prisma_schema: &str) -> Result<(), CliError> {
+    migration_core::qe_setup(&prisma_schema).await?;
 
     Ok(())
 }
@@ -92,10 +91,10 @@ fn datasource_from_database_str(database_str: &str) -> Result<String, CliError> 
         Some("file") => "sqlite",
         Some(other) => other,
         None => {
-            return Err(CliError::Other(anyhow::anyhow!(
-                "Invalid database string format: {}",
-                database_str
-            )))
+            return Err(CliError::Known {
+                error: KnownError::new(InvalidDatabaseString { details: String::new() }),
+                exit_code: 255,
+            })
         }
     };
 

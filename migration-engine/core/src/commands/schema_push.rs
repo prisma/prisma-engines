@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 pub struct SchemaPushCommand;
 
 #[async_trait::async_trait]
-impl<'a> MigrationCommand for SchemaPushCommand {
+impl MigrationCommand for SchemaPushCommand {
     type Input = SchemaPushInput;
     type Output = SchemaPushOutput;
 

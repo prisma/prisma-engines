@@ -15,7 +15,7 @@ async-trait = "0.1.17"
 chrono = { version = "0.4", features = ["serde"] }
 futures = { version = "0.3", features = ["compat"] }
 jsonrpc-core = "14.0"
-serde = { version = "1.0" }
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "1.0.9"
 tracing = "0.1.10"

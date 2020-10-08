@@ -1,9 +1,9 @@
 use crate::*;
-use migration_core::commands::PlanMigrationOutput;
+use migration_core::commands::EvaluateDataLossOutput;
 use pretty_assertions::assert_eq;
 
 #[test_each_connector]
-async fn plan_migration_with_an_up_to_date_database_returns_no_step(api: &TestApi) -> TestResult {
+async fn evaluate_data_loss_with_an_up_to_date_database_returns_no_step(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
             id Int @id
@@ -16,8 +16,8 @@ async fn plan_migration_with_an_up_to_date_database_returns_no_step(api: &TestAp
     api.create_migration("initial", dm, &directory).send().await?;
     api.apply_migrations(&directory).send().await?;
 
-    let output = api.plan_migration(&directory, dm).send().await?.into_output();
-    let expected_output = PlanMigrationOutput {
+    let output = api.evaluate_data_loss(&directory, dm).send().await?.into_output();
+    let expected_output = EvaluateDataLossOutput {
         migration_steps: vec![],
         warnings: vec![],
         unexecutable_steps: vec![],
@@ -29,7 +29,7 @@ async fn plan_migration_with_an_up_to_date_database_returns_no_step(api: &TestAp
 }
 
 #[test_each_connector]
-async fn plan_migration_with_up_to_date_db_and_pending_changes_returns_steps(api: &TestApi) -> TestResult {
+async fn evaluate_data_loss_with_up_to_date_db_and_pending_changes_returns_steps(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
             id Int @id
@@ -54,7 +54,7 @@ async fn plan_migration_with_up_to_date_db_and_pending_changes_returns_steps(api
         }
     "#;
 
-    api.plan_migration(&directory, dm2)
+    api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
         .assert_warnings(&[])?
@@ -65,7 +65,7 @@ async fn plan_migration_with_up_to_date_db_and_pending_changes_returns_steps(api
 }
 
 #[test_each_connector]
-async fn plan_migration_with_not_up_to_date_db_and_pending_changes_returns_the_right_steps(
+async fn evaluate_data_loss_with_not_up_to_date_db_and_pending_changes_returns_the_right_steps(
     api: &TestApi,
 ) -> TestResult {
     let dm1 = r#"
@@ -91,7 +91,7 @@ async fn plan_migration_with_not_up_to_date_db_and_pending_changes_returns_the_r
         }
     "#;
 
-    api.plan_migration(&directory, dm2)
+    api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
         .assert_warnings(&[])?
@@ -102,7 +102,7 @@ async fn plan_migration_with_not_up_to_date_db_and_pending_changes_returns_the_r
 }
 
 #[test_each_connector(capabilities("enums"), log = "debug,sql_schema_describer=info")]
-async fn plan_migration_with_past_unapplied_migrations_with_destructive_changes_does_not_warn_for_these(
+async fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_changes_does_not_warn_for_these(
     api: &TestApi,
 ) -> TestResult {
     let dm1 = r#"
@@ -135,7 +135,7 @@ async fn plan_migration_with_past_unapplied_migrations_with_destructive_changes_
         }
     "#;
 
-    api.plan_migration(&directory, dm2)
+    api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
         .assert_warnings(&[
@@ -166,7 +166,7 @@ async fn plan_migration_with_past_unapplied_migrations_with_destructive_changes_
         }
     "#;
 
-    api.plan_migration(&directory, dm2)
+    api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
         .assert_warnings(&[])?
@@ -177,7 +177,9 @@ async fn plan_migration_with_past_unapplied_migrations_with_destructive_changes_
 }
 
 #[test_each_connector(log = "debug,sql_schema_describer=info")]
-async fn plan_migration_returns_warnings_for_the_local_database_for_the_next_migration(api: &TestApi) -> TestResult {
+async fn evaluate_data_loss_returns_warnings_for_the_local_database_for_the_next_migration(
+    api: &TestApi,
+) -> TestResult {
     let dm1 = r#"
         model Cat {
             id Int @id
@@ -214,7 +216,7 @@ async fn plan_migration_returns_warnings_for_the_local_database_for_the_next_mig
         }
     "#;
 
-    api.plan_migration(&directory, dm2)
+    api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
         .assert_warnings(&["You are about to drop the `Cat` table, which is not empty (1 rows).".into()])?
@@ -227,7 +229,7 @@ async fn plan_migration_returns_warnings_for_the_local_database_for_the_next_mig
 }
 
 #[test_each_connector(capabilities("enums"), log = "debug,sql_schema_describer=info")]
-async fn plan_migration_maps_warnings_to_the_right_steps(api: &TestApi) -> TestResult {
+async fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
             id Int @id
@@ -277,7 +279,7 @@ async fn plan_migration_maps_warnings_to_the_right_steps(api: &TestApi) -> TestR
         }
     "#;
 
-    api.plan_migration(&directory, dm2)
+    api.evaluate_data_loss(&directory, dm2)
         .send()
         .await?
         .assert_warnings_with_indices(&[("You are about to drop the column `name` on the `Cat` table, which still contains 1 non-null values.".into(), 1)])?

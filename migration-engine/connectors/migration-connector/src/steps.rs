@@ -10,8 +10,8 @@ pub enum MigrationStep {
     CreateModel(CreateModel),
     UpdateModel(UpdateModel),
     DeleteModel(DeleteModel),
-    CreateAttribute(CreateAttribute),
-    DeleteAttribute(DeleteAttribute),
+    CreateDirective(CreateDirective),
+    DeleteDirective(DeleteDirective),
     CreateArgument(CreateArgument),
     UpdateArgument(UpdateArgument),
     DeleteArgument(DeleteArgument),
@@ -134,14 +134,14 @@ pub struct DeleteEnum {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct CreateAttribute {
-    pub location: AttributeLocation,
+pub struct CreateDirective {
+    pub location: DirectiveLocation,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct DeleteAttribute {
-    pub location: AttributeLocation,
+pub struct DeleteDirective {
+    pub location: DirectiveLocation,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -179,35 +179,35 @@ impl Into<ast::Argument> for &Argument {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "tag", deny_unknown_fields)]
 pub enum ArgumentLocation {
-    Attribute(AttributeLocation),
+    Directive(DirectiveLocation),
     Source(SourceLocation),
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct AttributeLocation {
-    pub path: AttributePath,
-    pub attribute: String,
+pub struct DirectiveLocation {
+    pub path: DirectivePath,
+    pub directive: String,
 }
 
-impl AttributeLocation {
-    pub fn matches_ast_attribute(&self, attribute: &ast::Attribute) -> bool {
-        if self.attribute != attribute.name.name {
+impl DirectiveLocation {
+    pub fn matches_ast_directive(&self, directive: &ast::Attribute) -> bool {
+        if self.directive != directive.name.name {
             return false;
         }
         match &self.path {
-            AttributePath::Model {
+            DirectivePath::Model {
                 model: _,
                 arguments: Some(arguments),
             } => {
-                if attribute.arguments.len() != arguments.len() {
+                if directive.arguments.len() != arguments.len() {
                     return false;
                 }
 
-                attribute.arguments.iter().all(|attribute_argument| {
+                directive.arguments.iter().all(|directive_argument| {
                     arguments
                         .iter()
-                        .any(|self_argument| self_argument.matches_ast_argument(attribute_argument))
+                        .any(|self_argument| self_argument.matches_ast_argument(directive_argument))
                 })
             }
             _ => true,
@@ -215,7 +215,7 @@ impl AttributeLocation {
     }
 
     pub fn into_argument_location(self) -> ArgumentLocation {
-        ArgumentLocation::Attribute(self)
+        ArgumentLocation::Directive(self)
     }
 }
 
@@ -233,7 +233,7 @@ impl SourceLocation {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "tag", deny_unknown_fields)]
-pub enum AttributePath {
+pub enum DirectivePath {
     Field {
         model: String,
         field: String,
@@ -256,7 +256,7 @@ pub enum AttributePath {
     },
 }
 
-impl AttributePath {
+impl DirectivePath {
     pub fn set_arguments(self, arguments: Vec<Argument>) -> Self {
         match self {
             Self::Model { model, arguments: _ } => Self::Model {
@@ -399,18 +399,18 @@ mod tests {
     use serde_json::json;
 
     #[test]
-    fn attribute_location_serialization_gives_expected_json_shape() {
-        let create_attribute = CreateAttribute {
-            location: AttributeLocation {
-                path: AttributePath::Field {
+    fn directive_location_serialization_gives_expected_json_shape() {
+        let create_directive = CreateDirective {
+            location: DirectiveLocation {
+                path: DirectivePath::Field {
                     model: "Cat".to_owned(),
                     field: "owner".to_owned(),
                 },
-                attribute: "status".to_owned(),
+                directive: "status".to_owned(),
             },
         };
 
-        let serialized_step = serde_json::to_value(&create_attribute).unwrap();
+        let serialized_step = serde_json::to_value(&create_directive).unwrap();
 
         let expected_json = json!({
             "location": {
@@ -419,7 +419,7 @@ mod tests {
                     "model": "Cat",
                     "field": "owner",
                 },
-                "attribute": "status"
+                "directive": "status"
             }
         });
 
@@ -427,7 +427,7 @@ mod tests {
 
         assert_eq!(serialized_step, expected_json);
 
-        let deserialized_step: CreateAttribute = serde_json::from_value(expected_json).unwrap();
-        assert_eq!(create_attribute, deserialized_step);
+        let deserialized_step: CreateDirective = serde_json::from_value(expected_json).unwrap();
+        assert_eq!(create_directive, deserialized_step);
     }
 }

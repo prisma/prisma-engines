@@ -1,5 +1,5 @@
 use super::{
-    attributes::{attributes_are_identical, attributes_match, AttributeDiffer},
+    directives::{directives_are_identical, directives_match, DirectiveDiffer},
     FieldDiffer,
 };
 use datamodel::ast;
@@ -13,9 +13,9 @@ pub(crate) struct ModelDiffer<'a> {
 
 /// Diff two models in a schema AST.
 ///
-/// Attributes diffing on a model has to make a distinction between _repeated_ attributes and regular attributes.
-/// Repeated attributes are attributes that can appear multiple times in the same model definition, like `@@unique`.
-/// Most attributes can appear only once, so we call them regular attributes.
+/// Directives diffing on a model has to make a distinction between _repeated_ directives and regular directives.
+/// Repeated directives are directives that can appear multiple times in the same model definition, like `@@unique`.
+/// Most directives can appear only once, so we call them regular directives.
 impl<'a> ModelDiffer<'a> {
     /// Iterator over the fields present in `next` but not `previous`.
     pub(crate) fn created_fields(&self) -> impl Iterator<Item = &ast::Field> {
@@ -47,49 +47,49 @@ impl<'a> ModelDiffer<'a> {
         })
     }
 
-    /// Regular model attributes (`@@`) created in `next`.
-    pub(crate) fn created_regular_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.next_regular_attributes().filter(move |next_attribute| {
-            self.previous_regular_attributes()
-                .find(|previous_attribute| attributes_match(previous_attribute, next_attribute))
+    /// Regular model directives (`@@`) created in `next`.
+    pub(crate) fn created_regular_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.next_regular_directives().filter(move |next_directive| {
+            self.previous_regular_directives()
+                .find(|previous_directive| directives_match(previous_directive, next_directive))
                 .is_none()
         })
     }
 
-    /// Regular model attributes (`@@`) deleted in `next`.
-    pub(crate) fn deleted_regular_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.previous_regular_attributes().filter(move |previous_attribute| {
-            self.next_regular_attributes()
-                .find(|next_attribute| attributes_match(previous_attribute, next_attribute))
+    /// Regular model directives (`@@`) deleted in `next`.
+    pub(crate) fn deleted_regular_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.previous_regular_directives().filter(move |previous_directive| {
+            self.next_regular_directives()
+                .find(|next_directive| directives_match(previous_directive, next_directive))
                 .is_none()
         })
     }
 
-    /// Iterator over the regular model attributes (`@@`) present in both `previous` and `next`.
-    pub(crate) fn regular_attribute_pairs(&self) -> impl Iterator<Item = AttributeDiffer<'_>> {
-        self.previous_regular_attributes()
-            .filter_map(move |previous_attribute| {
-                self.next_regular_attributes()
-                    .find(|next_attribute| attributes_match(previous_attribute, next_attribute))
-                    .map(|next_attribute| AttributeDiffer {
-                        previous: previous_attribute,
-                        next: next_attribute,
+    /// Iterator over the regular model directives (`@@`) present in both `previous` and `next`.
+    pub(crate) fn regular_directive_pairs(&self) -> impl Iterator<Item = DirectiveDiffer<'_>> {
+        self.previous_regular_directives()
+            .filter_map(move |previous_directive| {
+                self.next_regular_directives()
+                    .find(|next_directive| directives_match(previous_directive, next_directive))
+                    .map(|next_directive| DirectiveDiffer {
+                        previous: previous_directive,
+                        next: next_directive,
                     })
             })
     }
 
-    pub(crate) fn created_repeated_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.next_repeated_attributes().filter(move |next_attribute| {
-            self.previous_repeated_attributes()
-                .find(|previous_attribute| attributes_are_identical(previous_attribute, next_attribute))
+    pub(crate) fn created_repeated_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.next_repeated_directives().filter(move |next_directive| {
+            self.previous_repeated_directives()
+                .find(|previous_directive| directives_are_identical(previous_directive, next_directive))
                 .is_none()
         })
     }
 
-    pub(crate) fn deleted_repeated_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.previous_repeated_attributes().filter(move |previous_attribute| {
-            self.next_repeated_attributes()
-                .find(|next_attribute| attributes_are_identical(previous_attribute, next_attribute))
+    pub(crate) fn deleted_repeated_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.previous_repeated_directives().filter(move |previous_directive| {
+            self.next_repeated_directives()
+                .find(|next_directive| directives_are_identical(previous_directive, next_directive))
                 .is_none()
         })
     }
@@ -102,20 +102,20 @@ impl<'a> ModelDiffer<'a> {
         self.next.fields.iter()
     }
 
-    fn previous_regular_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.previous.attributes.iter().filter(attribute_is_regular)
+    fn previous_regular_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.previous.attributes.iter().filter(directive_is_regular)
     }
 
-    fn next_regular_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.next.attributes.iter().filter(attribute_is_regular)
+    fn next_regular_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.next.attributes.iter().filter(directive_is_regular)
     }
 
-    fn previous_repeated_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.previous.attributes.iter().filter(attribute_is_repeated)
+    fn previous_repeated_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.previous.attributes.iter().filter(directive_is_repeated)
     }
 
-    fn next_repeated_attributes(&self) -> impl Iterator<Item = &ast::Attribute> {
-        self.next.attributes.iter().filter(attribute_is_repeated)
+    fn next_repeated_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.next.attributes.iter().filter(directive_is_repeated)
     }
 }
 
@@ -123,17 +123,17 @@ fn fields_match(previous: &ast::Field, next: &ast::Field) -> bool {
     previous.name.name == next.name.name
 }
 
-/// Model attributes that can appear multiple times on the same model. Unlike others, they cannot be matched based only on the attribute name.
-const REPEATED_MODEL_ATTRIBUTES: &[&str] = &["unique", "index"];
+/// Model directives that can appear multiple times on the same model. Unlike others, they cannot be matched based only on the directive name.
+const REPEATED_MODEL_DIRECTIVES: &[&str] = &["unique", "index"];
 
 /// See ModelDiffer docs.
-pub(super) fn attribute_is_regular(attribute: &&ast::Attribute) -> bool {
-    !attribute_is_repeated(attribute)
+pub(super) fn directive_is_regular(directive: &&ast::Attribute) -> bool {
+    !directive_is_repeated(directive)
 }
 
 /// See ModelDiffer docs.
-pub(super) fn attribute_is_repeated(attribute: &&ast::Attribute) -> bool {
-    REPEATED_MODEL_ATTRIBUTES.contains(&attribute.name.name.as_str())
+pub(super) fn directive_is_repeated(directive: &&ast::Attribute) -> bool {
+    REPEATED_MODEL_DIRECTIVES.contains(&directive.name.name.as_str())
 }
 
 #[cfg(test)]
@@ -150,7 +150,7 @@ mod tests {
             coat CoatCharacteristic[]
             isGoodDog Boolean
 
-            @@customAttribute(hasFur: true)
+            @@customDirective(hasFur: true)
             @@unique([name, coat])
         }
 
@@ -169,7 +169,7 @@ mod tests {
             isGoodDog Boolean // always true
 
             @@map("goodDogs")
-            @@customAttribute(hasFur: "Most of the time")
+            @@customDirective(hasFur: "Most of the time")
         }
         "#;
         let next = parse_schema(next).unwrap();
@@ -210,31 +210,31 @@ mod tests {
     }
 
     #[test]
-    fn datamodel_differ_model_differ_attribute_methods_work() {
+    fn datamodel_differ_model_differ_directive_methods_work() {
         dog_datamodels_test(|model_diff| {
-            let created_attributes: Vec<&ast::Attribute> = model_diff.created_regular_attributes().collect();
+            let created_directives: Vec<&ast::Attribute> = model_diff.created_regular_directives().collect();
 
-            assert_eq!(created_attributes.len(), 1);
-            let created_attribute = created_attributes[0];
-            assert_eq!(created_attribute.name.name, "map");
-            assert_eq!(created_attribute.arguments.len(), 1);
+            assert_eq!(created_directives.len(), 1);
+            let created_directive = created_directives[0];
+            assert_eq!(created_directive.name.name, "map");
+            assert_eq!(created_directive.arguments.len(), 1);
 
-            let deleted_attributes: Vec<&ast::Attribute> = model_diff.deleted_repeated_attributes().collect();
+            let deleted_directives: Vec<&ast::Attribute> = model_diff.deleted_repeated_directives().collect();
 
-            assert_eq!(deleted_attributes.len(), 1);
-            let deleted_attribute = deleted_attributes[0];
-            assert_eq!(deleted_attribute.name.name, "unique");
-            assert_eq!(deleted_attribute.arguments.len(), 1);
+            assert_eq!(deleted_directives.len(), 1);
+            let deleted_directive = deleted_directives[0];
+            assert_eq!(deleted_directive.name.name, "unique");
+            assert_eq!(deleted_directive.arguments.len(), 1);
 
             assert_ne!(
-                created_attribute
+                created_directive
                     .arguments
                     .get(0)
                     .as_ref()
                     .unwrap()
                     .value
                     .render_to_string(),
-                deleted_attribute
+                deleted_directive
                     .arguments
                     .get(0)
                     .as_ref()
@@ -243,17 +243,17 @@ mod tests {
                     .render_to_string()
             );
 
-            let attribute_pairs: Vec<_> = model_diff.regular_attribute_pairs().collect();
+            let directive_pairs: Vec<_> = model_diff.regular_directive_pairs().collect();
 
-            assert_eq!(attribute_pairs.len(), 1);
-            let first_attribute = attribute_pairs.get(0).unwrap();
-            assert_eq!(first_attribute.previous.name.name, "customAttribute");
-            assert_eq!(first_attribute.previous.name.name, first_attribute.next.name.name)
+            assert_eq!(directive_pairs.len(), 1);
+            let first_directive = directive_pairs.get(0).unwrap();
+            assert_eq!(first_directive.previous.name.name, "customDirective");
+            assert_eq!(first_directive.previous.name.name, first_directive.next.name.name)
         });
     }
 
     #[test]
-    fn datamodel_differ_model_differ_works_with_multiple_unique_attributes() {
+    fn datamodel_differ_model_differ_works_with_multiple_unique_directives() {
         let previous = r#"
             model Test {
                 id Int @id
@@ -289,33 +289,33 @@ mod tests {
         };
         let model_differ = top_differ.model_pairs().next().unwrap();
 
-        let created_regular_attribute_names: Vec<&String> = model_differ
-            .created_regular_attributes()
-            .map(|attribute| &attribute.name.name)
+        let created_regular_directive_names: Vec<&String> = model_differ
+            .created_regular_directives()
+            .map(|directive| &directive.name.name)
             .collect();
-        let deleted_regular_attribute_names: Vec<&String> = model_differ
-            .deleted_regular_attributes()
-            .map(|attribute| &attribute.name.name)
+        let deleted_regular_directive_names: Vec<&String> = model_differ
+            .deleted_regular_directives()
+            .map(|directive| &directive.name.name)
             .collect();
-        let updated_regular_attribute_names: Vec<&String> = model_differ
-            .regular_attribute_pairs()
-            .map(|attribute| &attribute.previous.name.name)
-            .collect();
-
-        assert_eq!(updated_regular_attribute_names, &["map"]);
-        assert!(created_regular_attribute_names.is_empty());
-        assert!(deleted_regular_attribute_names.is_empty());
-
-        let created_repeated_attribute_names: Vec<_> = model_differ
-            .created_repeated_attributes()
-            .map(|attribute| &attribute.name.name)
-            .collect();
-        let deleted_repeated_attribute_names: Vec<_> = model_differ
-            .deleted_repeated_attributes()
-            .map(|attribute| &attribute.name.name)
+        let updated_regular_directive_names: Vec<&String> = model_differ
+            .regular_directive_pairs()
+            .map(|directive| &directive.previous.name.name)
             .collect();
 
-        assert_eq!(created_repeated_attribute_names, &["unique", "unique"]);
-        assert_eq!(deleted_repeated_attribute_names, &["unique", "unique"]);
+        assert_eq!(updated_regular_directive_names, &["map"]);
+        assert!(created_regular_directive_names.is_empty());
+        assert!(deleted_regular_directive_names.is_empty());
+
+        let created_repeated_directive_names: Vec<_> = model_differ
+            .created_repeated_directives()
+            .map(|directive| &directive.name.name)
+            .collect();
+        let deleted_repeated_directive_names: Vec<_> = model_differ
+            .deleted_repeated_directives()
+            .map(|directive| &directive.name.name)
+            .collect();
+
+        assert_eq!(created_repeated_directive_names, &["unique", "unique"]);
+        assert_eq!(deleted_repeated_directive_names, &["unique", "unique"]);
     }
 }

@@ -10,7 +10,7 @@ async fn single_watch_migrations_must_work(api: &TestApi) {
     let steps = vec![
         create_model_step("Test"),
         create_field_step("Test", "id", "Int"),
-        create_id_attribute_step("Test", "id"),
+        create_id_directive_step("Test", "id"),
     ];
 
     let db_schema_1 = api.apply_migration(steps.clone(), "watch-0001").await.sql_schema;
@@ -40,7 +40,7 @@ async fn multiple_watch_migrations_must_work(api: &TestApi) {
     let steps1 = vec![
         create_model_step("Test"),
         create_field_step("Test", "id", "Int"),
-        create_id_attribute_step("Test", "id"),
+        create_id_directive_step("Test", "id"),
     ];
 
     api.apply_migration(steps1.clone(), "watch-0001").await;
@@ -85,7 +85,7 @@ async fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &T
     let steps1 = vec![
         create_model_step("Test"),
         create_field_step("Test", "id", "Int"),
-        create_id_attribute_step("Test", "id"),
+        create_id_directive_step("Test", "id"),
     ];
 
     let db_schema1 = api.apply_migration(steps1.clone(), "watch-0001").await.sql_schema;
@@ -116,7 +116,7 @@ async fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: 
     let steps1 = vec![
         create_model_step("Test"),
         create_field_step("Test", "id", "Int"),
-        create_id_attribute_step("Test", "id"),
+        create_id_directive_step("Test", "id"),
     ];
 
     api.apply_migration(steps1.clone(), "watch-0001").await;
@@ -151,7 +151,7 @@ async fn applying_an_already_applied_migration_must_return_an_error(api: &TestAp
     let steps = vec![
         create_model_step("Test"),
         create_field_step("Test", "id", "Int"),
-        create_id_attribute_step("Test", "id"),
+        create_id_directive_step("Test", "id"),
     ];
 
     let migration_id = "duplicate-migration";

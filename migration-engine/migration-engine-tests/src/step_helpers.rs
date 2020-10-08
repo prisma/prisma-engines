@@ -16,14 +16,14 @@ pub fn delete_field_step(model: &str, field: &str) -> MigrationStep {
     })
 }
 
-pub fn create_id_attribute_step(model: &str, field: &str) -> MigrationStep {
-    MigrationStep::CreateAttribute(CreateAttribute {
-        location: AttributeLocation {
-            path: AttributePath::Field {
+pub fn create_id_directive_step(model: &str, field: &str) -> MigrationStep {
+    MigrationStep::CreateDirective(CreateDirective {
+        location: DirectiveLocation {
+            path: DirectivePath::Field {
                 model: model.to_owned(),
                 field: field.to_owned(),
             },
-            attribute: "id".to_owned(),
+            directive: "id".to_owned(),
         },
     })
 }
