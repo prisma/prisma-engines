@@ -12,16 +12,17 @@ pub mod migration;
 pub mod migration_engine;
 
 pub use api::GenericApi;
-pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput};
+pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationCommand, MigrationStepsResultOutput};
 pub use error::CoreResult;
 
-use commands::{CommandError, CommandResult};
+use commands::{CommandError, CommandResult, SchemaPushCommand, SchemaPushInput};
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,
 };
 use error::Error;
 use migration_connector::ConnectorError;
+use migration_engine::MigrationEngine;
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 
@@ -105,7 +106,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         .first()
         .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
 
-    match &source.active_provider {
+    let connector = match &source.active_provider {
         provider
             if [
                 MYSQL_SOURCE_NAME,
@@ -115,10 +116,21 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
             ]
             .contains(&provider.as_str()) =>
         {
+            // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
+            SqlMigrationConnector::new(&source.url().value).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
-    }
+    };
+    let engine = MigrationEngine::new(connector).await?;
+
+    // 2. create the database schema for given Prisma schema
+    let schema_push_input = SchemaPushInput {
+        schema: prisma_schema.to_string(),
+        assume_empty: true,
+        force: true,
+    };
+    SchemaPushCommand::execute(&schema_push_input, &engine).await?;
 
     Ok(())
 }
