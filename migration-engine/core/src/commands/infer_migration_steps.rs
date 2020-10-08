@@ -6,7 +6,6 @@ use datamodel::ast::{parser::parse_schema, SchemaAst};
 use migration_connector::*;
 use serde::Deserialize;
 use tracing::debug;
-use tracing_error::SpanTrace;
 
 pub struct InferMigrationStepsCommand<'a> {
     input: &'a InferMigrationStepsInput,
@@ -145,14 +144,10 @@ impl InferMigrationStepsCommand<'_> {
                     .migration_is_already_applied(&migration.migration_id)
                     .await?
                 {
-                    return Err(CoreError::ConnectorError(ConnectorError {
-                        user_facing_error: None,
-                        kind: ErrorKind::Generic(anyhow::anyhow!(
-                            "Input is invalid. Migration {} is already applied.",
-                            migration.migration_id
-                        )),
-                        context: SpanTrace::capture(),
-                    }));
+                    return Err(CoreError::Generic(anyhow::anyhow!(
+                        "Input is invalid. Migration {} is already applied.",
+                        migration.migration_id
+                    )));
                 }
             }
         }
