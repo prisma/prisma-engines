@@ -92,7 +92,10 @@ fn create_execute_raw_field() -> OutputField {
             .optional(),
         ],
         OutputType::json(),
-        None,
+        Some(QueryInfo {
+            tag: QueryTag::ExecuteRaw,
+            model: None,
+        }),
     )
 }
 
@@ -109,7 +112,10 @@ fn create_query_raw_field() -> OutputField {
             .optional(),
         ],
         OutputType::json(),
-        None,
+        Some(QueryInfo {
+            tag: QueryTag::QueryRaw,
+            model: None,
+        }),
     )
 }
 
