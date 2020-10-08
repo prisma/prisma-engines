@@ -99,15 +99,15 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
 
 /// Database setup for connector-test-kit.
 pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
-    // make sure the database exists; ignore errors if it exists already
-    let _ = create_database(prisma_schema).await;
-
     let config = datamodel::parse_configuration(prisma_schema)?;
 
     let source = config
         .datasources
         .first()
         .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
+
+    // 1. creates schema & database
+    SqlMigrationConnector::qe_setup(&source.url().value).await?;
 
     let connector = match &source.active_provider {
         provider
@@ -125,13 +125,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
     };
     let engine = MigrationEngine::new(connector).await?;
 
-    // reset
-    ResetCommand::execute(&(), &engine).await?;
-
-    // creates schema & database
-    SqlMigrationConnector::qe_setup(&source.url().value).await?;
-
-    // create the database schema for given Prisma schema
+    // 2. create the database schema for given Prisma schema
     let schema_push_input = SchemaPushInput {
         schema: prisma_schema.to_string(),
         assume_empty: true,
