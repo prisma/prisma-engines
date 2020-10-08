@@ -19,9 +19,8 @@ impl ErrorCollection {
     }
 
     pub fn push_opt(&mut self, err: Option<DatamodelError>) {
-        match err {
-            Some(err) => self.push(err),
-            None => {}
+        if let Some(err) = err {
+            self.push(err);
         }
     }
 

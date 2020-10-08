@@ -70,7 +70,7 @@ impl DatasourceLoader {
         &self,
         ast_source: &ast::SourceConfig,
         ignore_datasource_urls: bool,
-        datasource_url_overrides: &Vec<(String, String)>,
+        datasource_url_overrides: &[(String, String)],
     ) -> Result<Datasource, DatamodelError> {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
