@@ -1,4 +1,6 @@
+use migration_engine_tests::sql::*;
 use prisma_value::PrismaValue;
+use quaint::{prelude::Insert, prelude::Queryable, Value};
 use sql_schema_describer::DefaultValue;
 
 #[test_each_connector(tags("sqlite"))]

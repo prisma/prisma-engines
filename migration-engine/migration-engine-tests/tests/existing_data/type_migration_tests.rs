@@ -1,5 +1,7 @@
 use crate::*;
 use pretty_assertions::assert_eq;
+use quaint::Value;
+use std::borrow::Cow;
 
 #[test_each_connector]
 async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &TestApi) -> TestResult {
@@ -44,8 +46,8 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
     Ok(())
 }
 
-#[test_each_connector(ignore("mysql"))]
-async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api: &TestApi) -> TestResult {
+#[test_each_connector]
+async fn migrating_a_required_column_from_int_to_string_should_cast(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id
@@ -61,12 +63,10 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
         .result_raw()
         .await?;
 
-    let test = api.dump_table("Test").await?;
-    let first_row = test.get(0).unwrap();
-    assert_eq!(
-        format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
-        r#"Some(Text(Some("abcd"))) Some(Integer(Some(47)))"#
-    );
+    api.dump_table("Test").await?.assert_single_row(|row| {
+        row.assert_text_value("id", "abcd")?
+            .assert_int_value("serialNumber", 47)
+    })?;
 
     let original_schema = api.assert_schema().await?.into_schema();
 
@@ -77,14 +77,15 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
         }
     "#;
 
-    let expected_warning = "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column could be lost.";
+    let expected_warnings: &[Cow<'_, str>] = &["You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column could be lost.".into()];
 
     // Apply once without forcing
     {
         api.infer_apply(dm2)
             .send()
             .await?
-            .assert_warnings(&[expected_warning.into()])?;
+            .assert_warnings(expected_warnings)?
+            .assert_executable()?;
         api.assert_schema().await?.assert_equals(&original_schema)?;
     }
 
@@ -94,18 +95,16 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
             .force(Some(true))
             .send()
             .await?
-            .assert_warnings(&[expected_warning.into()])?;
+            .assert_warnings(expected_warnings)?;
 
         api.assert_schema().await?.assert_table("Test", |table| {
             table.assert_column("serialNumber", |col| col.assert_type_is_string())
         })?;
 
-        let test = api.dump_table("Test").await?;
-        let first_row = test.get(0).unwrap();
-        assert_eq!(
-            format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
-            r#"Some(Text(Some("abcd"))) Some(Text(Some("47")))"#
-        );
+        api.dump_table("Test").await?.assert_single_row(|row| {
+            row.assert_text_value("id", "abcd")?
+                .assert_text_value("serialNumber", "47")
+        })?;
     }
 
     Ok(())
@@ -163,17 +162,16 @@ async fn changing_an_array_column_to_scalar_must_warn(api: &TestApi) -> TestResu
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
     })?;
 
-    let rows = api.select("Film").column("id").column("mainProtagonist").send().await?;
-
-    let rows: Vec<Vec<Value>> = rows
-        .into_iter()
-        .map(|row| row.into_iter().collect::<Vec<_>>())
-        .collect();
-
-    assert_eq!(
-        rows,
-        &[&["film1".into(), "{\"giant shark\",\"jason statham\"}".into()]] // the array got cast ot a string by postgres
-    );
+    api.select("Film")
+        .column("id")
+        .column("mainProtagonist")
+        .send()
+        .await?
+        .assert_single_row(|row| {
+            row.assert_text_value("id", "film1")?
+                // the array got cast to a string by postgres
+                .assert_text_value("mainProtagonist", "{\"giant shark\",\"jason statham\"}")
+        })?;
 
     Ok(())
 }
@@ -228,14 +226,15 @@ async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> 
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
     })?;
 
-    let rows = api.select("Film").column("id").column("mainProtagonist").send().await?;
-
-    let rows: Vec<Vec<Value>> = rows
-        .into_iter()
-        .map(|row| row.into_iter().collect::<Vec<_>>())
-        .collect();
-
-    assert_eq!(rows, &[&["film1".into(), Value::text("left shark")]]);
+    api.select("Film")
+        .column("id")
+        .column("mainProtagonist")
+        .send()
+        .await?
+        .assert_single_row(|row| {
+            row.assert_text_value("id", "film1")?
+                .assert_text_value("mainProtagonist", "left shark")
+        })?;
 
     Ok(())
 }
