@@ -363,7 +363,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
         let is_declared_as_unique_through_multi_field_unique = model
             .indices
             .iter()
-            .find(|id| id.fields == vec![self.name.clone()])
+            .find(|ixd| ixd.is_unique() && ixd.fields == vec![self.name.clone()])
             .is_some();
 
         self.is_unique || is_declared_as_unique_through_multi_field_unique
