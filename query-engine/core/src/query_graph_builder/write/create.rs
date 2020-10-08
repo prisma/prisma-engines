@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
+    ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use connector::IdFilter;
 use prisma_models::ModelRef;
@@ -11,6 +11,8 @@ use write_args_parser::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
+    graph.flag_transactional();
+
     let data_map = match field.arguments.lookup("data") {
         Some(data) => data.value.try_into()?,
         None => ParsedInputMap::new(),
@@ -19,7 +21,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let create_node = create::create_record_node(graph, Arc::clone(&model), data_map)?;
 
     // Follow-up read query on the write
-    let read_query = ReadOneRecordBuilder::new(field, model.clone()).build()?;
+    let read_query = read::find_one(field, model.clone())?;
     let read_node = graph.create_node(Query::Read(read_query));
 
     graph.add_result_node(&read_node);

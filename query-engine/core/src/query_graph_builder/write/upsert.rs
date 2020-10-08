@@ -2,13 +2,15 @@ use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
+    ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use connector::IdFilter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
 pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
+    graph.flag_transactional();
+
     let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
 
     let filter = extract_unique_filter(where_arg, &model)?;
@@ -23,7 +25,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let create_node = create::create_record_node(graph, Arc::clone(&model), create_argument.value.try_into()?)?;
     let update_node = update::update_record_node(graph, filter, Arc::clone(&model), update_argument.value.try_into()?)?;
 
-    let read_query = ReadOneRecordBuilder::new(field, Arc::clone(&model)).build()?;
+    let read_query = read::find_one(field, Arc::clone(&model))?;
     let read_node_create = graph.create_node(Query::Read(read_query.clone()));
     let read_node_update = graph.create_node(Query::Read(read_query));
 

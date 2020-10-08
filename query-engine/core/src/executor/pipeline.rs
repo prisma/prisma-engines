@@ -17,13 +17,7 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
 
     pub async fn execute(self) -> crate::Result<ResponseData> {
         let serializer = self.serializer;
-        let mut graph = self.graph;
-
-        // Run final validations and transformations.
-        graph.finalize()?;
-        trace!("{}", graph);
-
-        let expr = Expressionista::translate(graph)?;
+        let expr = Expressionista::translate(self.graph)?;
         let result = self.interpreter.interpret(expr, Env::default(), 0).await;
 
         trace!("{}", self.interpreter.log_output());

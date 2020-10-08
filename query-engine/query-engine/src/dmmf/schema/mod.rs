@@ -99,19 +99,21 @@ impl RenderContext {
 
     pub fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
         if let Some(info) = operation {
-            let model_name = m.model.name.clone();
-            let tag_str = format!("{}", m.tag);
-            let mapping = self.mappings.iter().find(|mapping| mapping.model_name == model_name);
+            if let Some(ref model) = info.model {
+                let model_name = model.name.clone();
+                let tag_str = format!("{}", info.tag);
+                let mapping = self.mappings.iter().find(|mapping| mapping.model_name == model_name);
 
-            match mapping {
-                Some(ref existing) => existing.add_operation(tag_str, name.clone()),
-                None => {
-                    let new_mapping = DmmfMapping::new(model_name);
+                match mapping {
+                    Some(ref existing) => existing.add_operation(tag_str, name.clone()),
+                    None => {
+                        let new_mapping = DmmfMapping::new(model_name);
 
-                    new_mapping.add_operation(tag_str, name.clone());
-                    self.mappings.push(new_mapping);
-                }
-            };
+                        new_mapping.add_operation(tag_str, name.clone());
+                        self.mappings.push(new_mapping);
+                    }
+                };
+            }
         }
     }
 

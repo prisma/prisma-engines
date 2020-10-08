@@ -34,7 +34,7 @@ where
     ) -> crate::Result<ResponseData> {
         // Parse, validate, and extract query graph from query document.
         let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-        let is_transactional = force_transactions || query_graph.transactional();
+        let is_transactional = force_transactions || query_graph.needs_transaction();
 
         if is_transactional {
             let tx = conn.start_transaction().await?;
