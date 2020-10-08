@@ -3482,7 +3482,6 @@ version = "0.1.0"
 dependencies = [
  "darling",
  "enumflags2",
- "feature-flags",
  "once_cell",
  "proc-macro2 1.0.21",
  "quote 1.0.7",

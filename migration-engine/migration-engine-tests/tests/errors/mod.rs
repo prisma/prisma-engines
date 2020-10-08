@@ -308,7 +308,8 @@ async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
         .unwrap_err();
 
     let expected_error = user_facing_errors::Error::from(user_facing_errors::UnknownError {
-        message: "Failure during a migration command: Generic error. (error: The model abcd does not exist in this Datamodel. It is not possible to delete it.)".to_owned(),
+        message: "Generic error: The model abcd does not exist in this Datamodel. It is not possible to delete it."
+            .to_owned(),
         backtrace: None,
     });
 

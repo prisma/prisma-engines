@@ -169,7 +169,7 @@ async fn applying_an_already_applied_migration_must_return_an_error(api: &TestAp
             .await
             .map_err(|err| err.to_string())
             .unwrap_err(),
-        "Failure during a migration command: Error in command input. (error: Invariant violation: the migration with id `duplicate-migration` has already been applied.)",
+        "Error in command input: Invariant violation: the migration with id `duplicate-migration` has already been applied.",
     );
 
     Ok(())
