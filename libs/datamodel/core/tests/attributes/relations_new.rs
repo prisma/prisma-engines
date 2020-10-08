@@ -214,6 +214,56 @@ fn relation_must_error_when_referenced_field_does_not_exist() {
 }
 
 #[test]
+fn relation_must_error_on_mssql_when_referenced_field_is_nullable() {
+    let dml = r#"
+    datasource db {
+       provider = "sqlserver"
+       url = "sqlserver://foo"
+    }
+
+    model User {
+        id String   @id @default(uuid())
+        fooBar  String?  @unique
+        posts Post[]
+    }
+
+    model Post {
+        id  String  @id @default(uuid())
+        text String?
+        user   User? @relation(fields: [text], references: [fooBar])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must not refer to a nullable field in the related model `User`. But it is referencing the following fields that are nullable: fooBar", Span::new(295, 356)));
+}
+
+#[test]
+fn relation_must_not_error_on_postgres_when_referenced_field_is_nullable() {
+    let dml = r#"
+    datasource db {
+       provider = "postgres"
+       url = "postgresql://foo"
+    }
+
+    model User {
+        id String   @id @default(uuid())
+        fooBar  String?  @unique
+        posts Post[]
+    }
+
+    model Post {
+        id  String  @id @default(uuid())
+        text String?
+        user   User? @relation(fields: [text], references: [fooBar])
+    }
+    "#;
+
+    // should not error
+    let _ = parse(dml);
+}
+
+#[test]
 fn relation_must_error_when_referenced_field_is_not_scalar() {
     let dml = r#"
     model User {
