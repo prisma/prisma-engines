@@ -393,7 +393,7 @@ impl QueryDocumentParser {
                     }
 
                     None if field.is_required => Some(Err(QueryParserError {
-                        path: path,
+                        path,
                         error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                     })),
 

@@ -24,7 +24,7 @@ pub enum WriteQuery {
 impl WriteQuery {
     pub fn inject_projection_into_args(&mut self, projection: RecordProjection) {
         let keys = projection.fields().map(|sf| sf.db_name().to_owned()).collect();
-        let values = projection.values().map(|v| v).collect();
+        let values = projection.values().collect();
 
         self.inject_values_into_args(keys, values);
     }

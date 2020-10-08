@@ -52,7 +52,6 @@ impl ExpressionResult {
                         .projections(model_projection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
-                        .map(|val| val)
                         .collect(),
                 ),
 
