@@ -235,7 +235,6 @@ impl Fields {
                         .into_iter()
                         .find(|field| &field.name == f)
                         .unwrap_or_else(|| panic!("Expected ID field {} to be present on the model", f))
-                        
                 })
                 .collect();
 

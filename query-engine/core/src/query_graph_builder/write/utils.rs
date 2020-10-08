@@ -19,7 +19,10 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
 }
 
 pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
-    matches!(graph.node_content(node).unwrap(), Node::Query(Query::Write(WriteQuery::CreateRecord(_))))
+    matches!(
+        graph.node_content(node).unwrap(),
+        Node::Query(Query::Write(WriteQuery::CreateRecord(_)))
+    )
 }
 
 /// Produces a non-failing read query that fetches the requested projection of records for a given filterable.

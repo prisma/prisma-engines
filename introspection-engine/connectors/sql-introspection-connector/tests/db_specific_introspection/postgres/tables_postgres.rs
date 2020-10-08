@@ -556,8 +556,8 @@ async fn introspecting_a_table_with_partial_indexes_should_ignore_them(api: &Tes
         })
         .await;
 
-    let partial =
-        "CREATE UNIQUE INDEX \"idx_pages_unique_staticId_partial\" ON pages(staticId) WHERE isLatest = true;".to_string();
+    let partial = "CREATE UNIQUE INDEX \"idx_pages_unique_staticId_partial\" ON pages(staticId) WHERE isLatest = true;"
+        .to_string();
     let non_partial = "CREATE UNIQUE INDEX \"idx_pages_unique_staticId_non_partial\" ON pages(other);".to_string();
 
     api.database().execute_raw(&partial, &[]).await.unwrap();

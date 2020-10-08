@@ -261,7 +261,10 @@ fn one_to_many_inlined_child(
                 Box::new(move |mut update_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
                         Some(id) => Ok(id),
-                        None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested connect or create.".to_string())),
+                        None => Err(QueryGraphBuilderError::AssertionError(
+                            "[Query Graph] Expected a valid parent ID to be present for a nested connect or create."
+                                .to_string(),
+                        )),
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
@@ -282,7 +285,10 @@ fn one_to_many_inlined_child(
                 Box::new(move |mut update_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
                         Some(id) => Ok(id),
-                        None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested connect or create.".to_string())),
+                        None => Err(QueryGraphBuilderError::AssertionError(
+                            "[Query Graph] Expected a valid parent ID to be present for a nested connect or create."
+                                .to_string(),
+                        )),
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {

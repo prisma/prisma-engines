@@ -11,7 +11,7 @@ pub struct BarrelMigrationExecutor<'a> {
 impl BarrelMigrationExecutor<'_> {
     pub async fn execute<F>(self, migration_fn: F) -> anyhow::Result<SqlSchema>
     where
-        F: FnOnce(&mut barrel::Migration) ,
+        F: FnOnce(&mut barrel::Migration),
     {
         use barrel::Migration;
 

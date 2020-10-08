@@ -95,10 +95,7 @@ impl ManyRecords {
     pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<RecordProjection>> {
         self.records
             .iter()
-            .map(|record| {
-                record
-                    .projection(&self.field_names, model_projection)
-            })
+            .map(|record| record.projection(&self.field_names, model_projection))
             .collect()
     }
 

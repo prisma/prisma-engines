@@ -33,7 +33,9 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             Box::new(move |mut read_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::RecordNotFound("Record to update not found.".to_string())),
+                    None => Err(QueryGraphBuilderError::RecordNotFound(
+                        "Record to update not found.".to_string(),
+                    )),
                 }?;
 
                 if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {

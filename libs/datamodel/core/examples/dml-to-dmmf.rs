@@ -1,4 +1,3 @@
-
 use std::fs;
 
 extern crate clap;

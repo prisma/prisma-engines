@@ -71,11 +71,7 @@ impl QuerySchema {
         T: Into<String>,
     {
         let name = name.into();
-        self.mutation()
-            .get_fields()
-            .iter()
-            .find(|f| f.name == name)
-            .cloned()
+        self.mutation().get_fields().iter().find(|f| f.name == name).cloned()
     }
 
     pub fn find_query_field<T>(&self, name: T) -> Option<OutputFieldRef>

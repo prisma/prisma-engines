@@ -41,7 +41,6 @@ impl<T: 'static> AttributeListValidator<T> {
             match attribute_counts.get_mut(&attribute.name.name) {
                 None => {
                     attribute_counts.insert(&attribute.name.name, 1);
-                    
                 }
                 Some(count) => *count += 1,
             }

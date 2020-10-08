@@ -215,9 +215,7 @@ where
 
                         Query::Write(write) => {
                             self.log_line(level, || format!("WRITE {}", write));
-                            Ok(write::execute(&self.conn, write)
-                                .await
-                                .map(ExpressionResult::Query)?)
+                            Ok(write::execute(&self.conn, write).await.map(ExpressionResult::Query)?)
                         }
                     }
                 };

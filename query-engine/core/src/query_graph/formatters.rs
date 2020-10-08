@@ -109,22 +109,13 @@ impl Display for QueryGraphDependency {
 }
 
 fn fmt_raw_indices(i: &[NodeIndex]) -> String {
-    let refs: Vec<NodeRef> = i
-        .iter()
-        .map(|node_ix| NodeRef {
-            node_ix: *node_ix,
-        })
-        .collect();
+    let refs: Vec<NodeRef> = i.iter().map(|node_ix| NodeRef { node_ix: *node_ix }).collect();
 
     fmt_node_list(&refs)
 }
 
 fn fmt_node_list(v: &[NodeRef]) -> String {
-    let inner_string = v
-        .iter()
-        .map(|x| format!("{}", x))
-        .collect::<Vec<String>>()
-        .join(", ");
+    let inner_string = v.iter().map(|x| format!("{}", x)).collect::<Vec<String>>().join(", ");
 
     format!("[{}]", inner_string.as_str())
 }

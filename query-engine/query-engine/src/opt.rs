@@ -107,7 +107,8 @@ struct SourceOverride {
 impl PrismaOpt {
     fn datamodel_str(&self) -> PrismaResult<&str> {
         let res = self
-            .datamodel.as_deref()
+            .datamodel
+            .as_deref()
             .or(self.datamodel_path.as_deref())
             .ok_or_else(|| {
                 PrismaError::ConfigurationError(

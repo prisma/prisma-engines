@@ -103,14 +103,12 @@ pub fn create_relation_table_records(
     let columns: Vec<_> = parent_columns.into_iter().chain(child_columns).collect();
     let insert = Insert::multi_into(relation.as_table(), columns);
 
-    let insert: MultiRowInsert = child_ids
-        .iter()
-        .fold(insert, |insert, child_id| {
-            let mut values: Vec<_> = parent_id.db_values();
+    let insert: MultiRowInsert = child_ids.iter().fold(insert, |insert, child_id| {
+        let mut values: Vec<_> = parent_id.db_values();
 
-            values.extend(child_id.db_values());
-            insert.values(values)
-        });
+        values.extend(child_id.db_values());
+        insert.values(values)
+    });
 
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }

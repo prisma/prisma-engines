@@ -220,9 +220,7 @@ impl QueryGraph {
     pub fn result_nodes(&self) -> Vec<NodeRef> {
         self.result_nodes
             .iter()
-            .map(|node_ix| NodeRef {
-                node_ix: *node_ix,
-            })
+            .map(|node_ix| NodeRef { node_ix: *node_ix })
             .collect()
     }
 
@@ -240,9 +238,7 @@ impl QueryGraph {
 
     /// Checks if the given node is marked as one of the result nodes in the graph.
     pub fn is_result_node(&self, node: &NodeRef) -> bool {
-        self.result_nodes
-            .iter()
-            .any(|rn| rn.index() == node.node_ix.index())
+        self.result_nodes.iter().any(|rn| rn.index() == node.node_ix.index())
     }
 
     /// Checks if the subgraph starting at the given node contains the node designated as the overall result.

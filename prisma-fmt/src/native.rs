@@ -18,8 +18,7 @@ pub fn run() {
                 let available_native_type_constructors =
                     datasource.active_connector.available_native_type_constructors();
 
-                let json =
-                    serde_json::to_string(available_native_type_constructors).expect("Failed to render JSON");
+                let json = serde_json::to_string(available_native_type_constructors).expect("Failed to render JSON");
 
                 print!("{}", json)
             } else {

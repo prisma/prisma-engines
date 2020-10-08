@@ -113,7 +113,10 @@ impl VersionChecker {
     }
 
     pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: &Table) {
-        if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull) && !is_prisma_1_or_11_list_table(table) && fk.on_delete_action != ForeignKeyAction::Cascade {
+        if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull)
+            && !is_prisma_1_or_11_list_table(table)
+            && fk.on_delete_action != ForeignKeyAction::Cascade
+        {
             self.uses_on_delete = true
         }
     }

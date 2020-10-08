@@ -207,11 +207,8 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
             let names: Vec<PrismaValue> = data
                 .into_iter()
                 .filter_map(|row| {
-                    row.get("name").map(|val| {
-                        val.to_string()
-                            .map(PrismaValue::String)
-                            .unwrap_or(PrismaValue::Null)
-                    })
+                    row.get("name")
+                        .map(|val| val.to_string().map(PrismaValue::String).unwrap_or(PrismaValue::Null))
                 })
                 .collect();
 
@@ -249,11 +246,8 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
             let names: Vec<PrismaValue> = data
                 .into_iter()
                 .filter_map(|row| {
-                    row.get("name").map(|val| {
-                        val.to_string()
-                            .map(PrismaValue::String)
-                            .unwrap_or(PrismaValue::Null)
-                    })
+                    row.get("name")
+                        .map(|val| val.to_string().map(PrismaValue::String).unwrap_or(PrismaValue::Null))
                 })
                 .collect();
             assert_eq!(

@@ -50,6 +50,7 @@ pub enum MssqlType {
 
 impl super::NativeType for MssqlType {
     fn to_json(&self) -> Value {
-        serde_json::to_value(&self).unwrap_or_else(|_| panic!("Serializing the native type to json failed: {:?}", &self))
+        serde_json::to_value(&self)
+            .unwrap_or_else(|_| panic!("Serializing the native type to json failed: {:?}", &self))
     }
 }

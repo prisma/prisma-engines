@@ -294,7 +294,8 @@ impl<'a> Validator<'a> {
                     if let Some(dml_enum) = data_model.find_enum(&enum_name) {
                         if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
                             errors.push(DatamodelError::new_attribute_validation_error(
-                                &"The defined default value is not a valid value of the enum specified for the field.".to_string(),
+                                &"The defined default value is not a valid value of the enum specified for the field."
+                                    .to_string(),
                                 "default",
                                 ast_model.find_field(&field.name).span,
                             ))

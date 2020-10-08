@@ -117,14 +117,12 @@ impl QueryDocumentParser {
                 // If present, parse normally.
                 // If not present but required, throw a validation error.
                 match selection_arg {
-                    Some((_, value)) => Some(
-                        Self::parse_input_value(path, value, &schema_input_arg.field_types).map(|value| {
-                            ParsedArgument {
-                                name: schema_input_arg.name.clone(),
-                                value,
-                            }
-                        }),
-                    ),
+                    Some((_, value)) => Some(Self::parse_input_value(path, value, &schema_input_arg.field_types).map(
+                        |value| ParsedArgument {
+                            name: schema_input_arg.name.clone(),
+                            value,
+                        },
+                    )),
 
                     None if !schema_input_arg.is_required => None,
                     _ => Some(Err(QueryParserError {
