@@ -41,11 +41,10 @@ async fn an_enum_can_be_turned_into_a_model(api: &TestApi) -> TestResult {
 
     api.schema_push(dm2).send().await?.assert_green()?;
 
-    #[warn(clippy::redundant_closure)]
     api.assert_schema()
         .await?
         .assert_table("Cat", |table| {
-            table.assert_columns_count(2)?.assert_column("moodId", |col| Ok(col))
+            table.assert_columns_count(2)?.assert_column("moodId", Ok)
         })?
         .assert_table("CatMood", |table| table.assert_column_count(3))?
         .assert_has_no_enum("CatMood")?;
