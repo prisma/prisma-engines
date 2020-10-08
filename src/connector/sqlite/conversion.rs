@@ -118,7 +118,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                             let msg = format!("Value {} not supported", n);
                             let kind = ErrorKind::conversion(msg);
 
-                            Err(Error::builder(kind).build())?
+                            return Err(Error::builder(kind).build())
                         }
                         None => Value::Integer(None),
                     },
@@ -212,7 +212,7 @@ impl<'a> ToSql for Value<'a> {
                 let mut builder = Error::builder(kind);
                 builder.set_original_message(msg);
 
-                Err(RusqlError::ToSqlConversionFailure(Box::new(builder.build())))?
+                return Err(RusqlError::ToSqlConversionFailure(Box::new(builder.build())))
             }
             #[cfg(feature = "json-1")]
             Value::Json(value) => value.as_ref().map(|value| {

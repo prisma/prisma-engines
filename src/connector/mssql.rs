@@ -179,15 +179,15 @@ impl MssqlQueryParams {
     }
 
     fn host(&self) -> &str {
-        self.host.as_ref().map(|s| s.as_str()).unwrap_or("localhost")
+        self.host.as_deref().unwrap_or("localhost")
     }
 
     fn user(&self) -> Option<&str> {
-        self.user.as_ref().map(|s| s.as_str())
+        self.user.as_deref()
     }
 
     fn password(&self) -> Option<&str> {
-        self.password.as_ref().map(|s| s.as_str())
+        self.password.as_deref()
     }
 
     fn database(&self) -> &str {
@@ -368,7 +368,7 @@ impl MssqlUrl {
 
                 let params: crate::Result<HashMap<String, String>> = parts
                     .filter(|kv| kv != &"")
-                    .map(|kv| kv.split("="))
+                    .map(|kv| kv.split('='))
                     .map(|mut split| {
                         let key = split
                             .next()

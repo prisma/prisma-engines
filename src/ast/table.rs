@@ -99,7 +99,7 @@ impl<'a> Table<'a> {
                 IndexDefinition::Single(column) => {
                     if let Some(right_cond) = join_cond(&column)? {
                         match result {
-                            ConditionTree::NegativeCondition => result = right_cond.into(),
+                            ConditionTree::NegativeCondition => result = right_cond,
                             left_cond => result = left_cond.or(right_cond),
                         }
                     }
@@ -117,7 +117,7 @@ impl<'a> Table<'a> {
                     }
 
                     match result {
-                        ConditionTree::NegativeCondition => result = sub_result.into(),
+                        ConditionTree::NegativeCondition => result = sub_result,
                         left_cond => result = left_cond.or(sub_result),
                     }
                 }

@@ -54,7 +54,7 @@ impl From<tiberius::error::Error> for Error {
                     .split(' ')
                     .last()
                     .unwrap()
-                    .split("'")
+                    .split('\'')
                     .nth(1)
                     .unwrap();
 
@@ -70,13 +70,12 @@ impl From<tiberius::error::Error> for Error {
             tiberius::error::Error::Server(e) if e.code() == 547 => {
                 let index = e
                     .message()
-                    .split('.')
-                    .nth(0)
+                    .split('.').next()
                     .unwrap()
                     .split_whitespace()
                     .last()
                     .unwrap()
-                    .split("\"")
+                    .split('\"')
                     .nth(1)
                     .unwrap();
 
@@ -95,7 +94,7 @@ impl From<tiberius::error::Error> for Error {
                 let index = splitted.nth(1).unwrap().to_string();
 
                 let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Index(index.to_string()),
+                    constraint: DatabaseConstraint::Index(index),
                 });
 
                 builder.set_original_code(format!("{}", e.code()));
@@ -116,7 +115,7 @@ impl From<tiberius::error::Error> for Error {
                 let column_name = e.message().split('\'').nth(3).unwrap().to_string();
 
                 let mut builder = Error::builder(ErrorKind::LengthMismatch {
-                    column: Some(column_name.to_owned()),
+                    column: Some(column_name),
                 });
 
                 builder.set_original_code(format!("{}", e.code()));

@@ -12,7 +12,7 @@ impl From<my::Error> for Error {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
 
-                let index = splitted[1].split(".").last().unwrap().to_string();
+                let index = splitted[1].split('.').last().unwrap().to_string();
 
                 let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
                     constraint: DatabaseConstraint::Index(index),

@@ -122,7 +122,7 @@ impl SslParams {
                 })
                 .build()
             })?;
-            let password = self.identity_password.0.as_ref().map(|s| s.as_str()).unwrap_or("");
+            let password = self.identity_password.0.as_deref().unwrap_or("");
             let identity = Identity::from_pkcs12(&db, &password)?;
 
             auth.identity(identity);

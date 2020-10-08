@@ -52,7 +52,7 @@ impl ConnectionInfo {
 
                     return Ok(ConnectionInfo::Sqlite {
                         file_path: params.file_path,
-                        db_name: params.db_name.clone(),
+                        db_name: params.db_name,
                     });
                 }
             }

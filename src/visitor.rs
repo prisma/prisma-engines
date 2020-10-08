@@ -940,7 +940,7 @@ pub trait Visitor<'a> {
 
         self.visit_column(Column::from(cte.identifier.into_owned()))?;
 
-        if cols.len() > 0 {
+        if !cols.is_empty() {
             self.write(" ")?;
             self.visit_row(Row::from(cols))?;
         }

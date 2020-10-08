@@ -17,7 +17,7 @@ pub fn conv_params<'a>(params: &'a [Value<'a>]) -> crate::Result<Vec<&'a dyn ToS
             let mut builder = Error::builder(kind);
             builder.set_original_message(msg);
 
-            Err(builder.build())?
+            return Err(builder.build())
         } else {
             converted.push(param as &dyn ToSql)
         }

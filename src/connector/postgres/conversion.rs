@@ -29,7 +29,7 @@ struct XmlString(pub String);
 
 impl<'a> FromSql<'a> for XmlString {
     fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<XmlString, Box<dyn std::error::Error + Sync + Send>> {
-        Ok(XmlString(String::from_utf8(raw.to_owned()).unwrap().into()))
+        Ok(XmlString(String::from_utf8(raw.to_owned()).unwrap()))
     }
 
     fn accepts(ty: &PostgresType) -> bool {
@@ -44,7 +44,7 @@ struct EnumString {
 impl<'a> FromSql<'a> for EnumString {
     fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<EnumString, Box<dyn std::error::Error + Sync + Send>> {
         Ok(EnumString {
-            value: String::from_utf8(raw.to_owned()).unwrap().into(),
+            value: String::from_utf8(raw.to_owned()).unwrap(),
         })
     }
 
@@ -513,14 +513,14 @@ impl<'a> ToSql for Value<'a> {
             }),
             (Value::Array(decimals), &PostgresType::FLOAT4_ARRAY) => decimals.as_ref().map(|decimals| {
                 let f: Vec<f32> = decimals
-                    .into_iter()
+                    .iter()
                     .filter_map(|v| v.as_decimal().and_then(|decimal| decimal.to_f32()))
                     .collect();
                 f.to_sql(ty, out)
             }),
             (Value::Array(decimals), &PostgresType::FLOAT8_ARRAY) => decimals.as_ref().map(|decimals| {
                 let f: Vec<f64> = decimals
-                    .into_iter()
+                    .iter()
                     .filter_map(|v| {
                         v.as_decimal()
                             .and_then(|decimal| decimal.to_string().parse::<f64>().ok())
@@ -648,7 +648,7 @@ fn string_to_bits(s: &str) -> crate::Result<BitVec> {
                 let msg = "Unexpected character for bits input. Expected only 1 and 0.";
                 let kind = ErrorKind::conversion(msg);
 
-                Err(Error::builder(kind).build())?
+                return Err(Error::builder(kind).build())
             }
         }
     }

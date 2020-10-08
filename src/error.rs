@@ -65,12 +65,12 @@ impl Error {
 
     /// The error code sent by the database, if available.
     pub fn original_code(&self) -> Option<&str> {
-        self.original_code.as_ref().map(|s| s.as_str())
+        self.original_code.as_deref()
     }
 
     /// The original error message sent by the database, if available.
     pub fn original_message(&self) -> Option<&str> {
-        self.original_message.as_ref().map(|s| s.as_str())
+        self.original_message.as_deref()
     }
 
     /// A more specific error type for matching.
