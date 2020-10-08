@@ -15,7 +15,7 @@ pub use api::GenericApi;
 pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationCommand, MigrationStepsResultOutput};
 pub use error::CoreResult;
 
-use commands::{CommandError, CommandResult, ResetCommand, SchemaPushCommand, SchemaPushInput};
+use commands::{CommandError, CommandResult, SchemaPushCommand, SchemaPushInput};
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,
@@ -106,9 +106,6 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         .first()
         .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
 
-    // 1. creates schema & database
-    SqlMigrationConnector::qe_setup(&source.url().value).await?;
-
     let connector = match &source.active_provider {
         provider
             if [
@@ -119,6 +116,8 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
             ]
             .contains(&provider.as_str()) =>
         {
+            // 1. creates schema & database
+            SqlMigrationConnector::qe_setup(&source.url().value).await?;
             SqlMigrationConnector::new(&source.url().value).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
