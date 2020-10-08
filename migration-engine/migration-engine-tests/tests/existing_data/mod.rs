@@ -209,7 +209,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                 .filter_map(|row| {
                     row.get("name").map(|val| {
                         val.to_string()
-                            .map(|val| PrismaValue::String(val))
+                            .map(PrismaValue::String)
                             .unwrap_or(PrismaValue::Null)
                     })
                 })
@@ -251,7 +251,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                 .filter_map(|row| {
                     row.get("name").map(|val| {
                         val.to_string()
-                            .map(|val| PrismaValue::String(val))
+                            .map(PrismaValue::String)
                             .unwrap_or(PrismaValue::Null)
                     })
                 })

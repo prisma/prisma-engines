@@ -1533,7 +1533,7 @@ fn infer_CreateSource() {
             value: MigrationExpression("\"postgres\"".to_owned()),
         }),
         MigrationStep::CreateArgument(CreateArgument {
-            location: source_location.clone().into_argument_location(),
+            location: source_location.into_argument_location(),
             argument: "url".to_owned(),
             value: MigrationExpression("\"***\"".to_owned()),
         }),
