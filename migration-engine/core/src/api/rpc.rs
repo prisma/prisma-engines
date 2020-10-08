@@ -163,7 +163,7 @@ impl RpcApi {
                 let input: InitializeInput = params.clone().parse()?;
                 render(executor.initialize(&input).await?)
             }
-            RpcCommand::PlanMigration | RpcCommand::EvaluateDataLoss => {
+            RpcCommand::EvaluateDataLoss => {
                 let input: EvaluateDataLossInput = params.clone().parse()?;
                 render(executor.evaluate_data_loss(&input).await?)
             }
@@ -181,6 +181,10 @@ impl RpcApi {
             RpcCommand::UnapplyMigration => {
                 let input: UnapplyMigrationInput = params.clone().parse()?;
                 render(executor.unapply_migration(&input).await?)
+            }
+            RpcCommand::PlanMigration => {
+                let input: PlanMigrationInput = params.clone().parse()?;
+                render(executor.plan_migration(&input).await?)
             }
             RpcCommand::Reset => render(executor.reset(&()).await?),
             RpcCommand::SchemaPush => {
