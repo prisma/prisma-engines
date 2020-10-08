@@ -110,9 +110,9 @@ impl Display for QueryGraphDependency {
 
 fn fmt_raw_indices(i: &[NodeIndex]) -> String {
     let refs: Vec<NodeRef> = i
-        .into_iter()
+        .iter()
         .map(|node_ix| NodeRef {
-            node_ix: node_ix.clone(),
+            node_ix: *node_ix,
         })
         .collect();
 
@@ -121,7 +121,7 @@ fn fmt_raw_indices(i: &[NodeIndex]) -> String {
 
 fn fmt_node_list(v: &[NodeRef]) -> String {
     let inner_string = v
-        .into_iter()
+        .iter()
         .map(|x| format!("{}", x))
         .collect::<Vec<String>>()
         .join(", ");
@@ -131,7 +131,7 @@ fn fmt_node_list(v: &[NodeRef]) -> String {
 
 fn fmt_node_tuples(t: &[(NodeRef, NodeRef)]) -> String {
     let inner_string = t
-        .into_iter()
+        .iter()
         .map(|x| format!("({}, {})", x.0, x.1))
         .collect::<Vec<String>>()
         .join(", ");

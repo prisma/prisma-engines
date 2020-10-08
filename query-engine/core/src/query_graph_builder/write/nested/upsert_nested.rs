@@ -143,9 +143,7 @@ pub fn nested_upsert(
                 if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
                     let child_id = match child_ids.pop() {
                         Some(id) => Ok(id),
-                        None => Err(QueryGraphBuilderError::AssertionError(format!(
-                            "[Query Graph] Expected a valid parent ID to be present for a nested update in a nested upsert."
-                        ))),
+                        None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested update in a nested upsert.".to_string())),
                     }?;
 
                     wq.add_filter(child_id.filter());
@@ -175,9 +173,7 @@ pub fn nested_upsert(
                     QueryGraphDependency::ParentProjection(parent_model_id, Box::new(move |mut update_node, mut parent_ids| {
                         let parent_id = match parent_ids.pop() {
                             Some(pid) => Ok(pid),
-                            None => Err(QueryGraphBuilderError::AssertionError(format!(
-                                "[Query Graph] Expected a valid parent ID to be present to retrieve the finder for a parent update in a nested upsert."
-                            ))),
+                            None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present to retrieve the finder for a parent update in a nested upsert.".to_string())),
                         }?;
 
                         if let Node::Query(Query::Write(ref mut wq)) = update_node {
@@ -195,9 +191,7 @@ pub fn nested_upsert(
                     QueryGraphDependency::ParentProjection(child_link.clone(), Box::new(move |mut update_node, mut child_links| {
                         let child_link = match child_links.pop() {
                             Some(link) => Ok(link),
-                            None => Err(QueryGraphBuilderError::AssertionError(format!(
-                                "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject for a parent update in a nested upsert."
-                            ))),
+                            None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject for a parent update in a nested upsert.".to_string())),
                         }?;
 
                         if let Node::Query(Query::Write(ref mut wq)) = update_node {
@@ -216,9 +210,7 @@ pub fn nested_upsert(
                     QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut create_node, mut parent_links| {
                         let parent_link = match parent_links.pop() {
                             Some(link) => Ok(link),
-                            None => Err(QueryGraphBuilderError::AssertionError(format!(
-                                "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject into the child create in a nested upsert."
-                            ))),
+                            None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject into the child create in a nested upsert.".to_string())),
                         }?;
 
                         if let Node::Query(Query::Write(ref mut wq)) = create_node {

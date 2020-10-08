@@ -4,7 +4,7 @@ use crate::Query;
 pub fn format_expression(expr: &Expression, indent: usize) -> String {
     match expr {
         Expression::Sequence { seq } => seq
-            .into_iter()
+            .iter()
             .map(|expr| add_indent(indent, format_expression(expr, indent + 2)))
             .collect::<Vec<String>>()
             .join("\n"),
@@ -17,7 +17,7 @@ pub fn format_expression(expr: &Expression, indent: usize) -> String {
         Expression::Func { func: _ } => add_indent(indent, "(Fn env)"),
         Expression::Let { bindings, expressions } => {
             let binding_strs = bindings
-                .into_iter()
+                .iter()
                 .map(|binding| {
                     add_indent(
                         indent + 2,
@@ -28,7 +28,7 @@ pub fn format_expression(expr: &Expression, indent: usize) -> String {
                 .join("\n");
 
             let exp_strs = expressions
-                .into_iter()
+                .iter()
                 .map(|exp| format_expression(exp, indent))
                 .collect::<Vec<String>>()
                 .join("\n");

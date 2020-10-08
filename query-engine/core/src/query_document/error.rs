@@ -68,7 +68,7 @@ impl Display for QueryParserErrorKind {
                 f,
                 "Unable to match input value to any allowed input type for the field. Parse errors: [{}]",
                 parsing_errors
-                    .into_iter()
+                    .iter()
                     .map(|err| format!("{}", err))
                     .collect::<Vec<_>>()
                     .join(", ")

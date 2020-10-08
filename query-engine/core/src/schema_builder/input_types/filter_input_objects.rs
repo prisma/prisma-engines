@@ -26,7 +26,7 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
         .optional(),
         input_field(
             "NOT",
-            vec![object_type.clone(), InputType::list(object_type.clone())],
+            vec![object_type.clone(), InputType::list(object_type)],
             None,
         )
         .optional(),
@@ -66,7 +66,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
         .optional(),
         input_field(
             "NOT",
-            vec![object_type.clone(), InputType::list(object_type.clone())],
+            vec![object_type.clone(), InputType::list(object_type)],
             None,
         )
         .optional(),

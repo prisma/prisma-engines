@@ -183,7 +183,7 @@ pub(crate) fn map_numeric_field_aggregation_object(
     return_cached_output!(ctx, &name);
 
     let fields: Vec<OutputField> = fields
-        .into_iter()
+        .iter()
         .map(|sf| {
             field(
                 sf.name.clone(),

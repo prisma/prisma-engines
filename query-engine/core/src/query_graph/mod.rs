@@ -211,7 +211,7 @@ impl QueryGraph {
     /// Returns None if no such node is found.
     pub fn find_result_node(&self, starting_node: &NodeRef) -> Option<NodeRef> {
         if self.is_result_node(starting_node) {
-            Some(starting_node.clone())
+            Some(*starting_node)
         } else {
             todo!()
         }
@@ -221,14 +221,14 @@ impl QueryGraph {
         self.result_nodes
             .iter()
             .map(|node_ix| NodeRef {
-                node_ix: node_ix.clone(),
+                node_ix: *node_ix,
             })
             .collect()
     }
 
     /// Adds a result node to the graph.
     pub fn add_result_node(&mut self, node: &NodeRef) {
-        self.result_nodes.push(node.node_ix.clone());
+        self.result_nodes.push(node.node_ix);
     }
 
     pub fn mark_visited(&mut self, node: &NodeRef) {
@@ -242,8 +242,7 @@ impl QueryGraph {
     pub fn is_result_node(&self, node: &NodeRef) -> bool {
         self.result_nodes
             .iter()
-            .find(|rn| rn.index() == node.node_ix.index())
-            .is_some()
+            .any(|rn| rn.index() == node.node_ix.index())
     }
 
     /// Checks if the subgraph starting at the given node contains the node designated as the overall result.
@@ -267,7 +266,7 @@ impl QueryGraph {
         graph
             .node_indices()
             .filter_map(|ix| {
-                if let Some(_) = graph.edges_directed(ix, Direction::Incoming).next() {
+                if graph.edges_directed(ix, Direction::Incoming).next().is_some() {
                     None
                 } else {
                     Some(ix)
@@ -435,7 +434,7 @@ impl QueryGraph {
 
     /// Marks a node pair for swapping.
     pub fn mark_nodes(&mut self, parent_node: &NodeRef, child_node: &NodeRef) {
-        self.marked_node_pairs.push((parent_node.clone(), child_node.clone()));
+        self.marked_node_pairs.push((*parent_node, *child_node));
     }
 
     /// Swaps all marked parent-child pairs.
@@ -505,7 +504,7 @@ impl QueryGraph {
     /// ```
     /// [DTODO] put if flow exception illustration here.
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
-        if self.marked_node_pairs.len() > 0 {
+        if !self.marked_node_pairs.is_empty() {
             trace!("[Graph][Swap] Before shape: {}", self);
         }
 

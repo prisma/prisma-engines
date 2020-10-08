@@ -64,9 +64,7 @@ pub fn connect_records_node(
                 let len = parent_ids.len();
 
                 if len == 0 {
-                    return Err(QueryGraphBuilderError::AssertionError(format!(
-                        "Required exactly one parent ID to be present for connect query, found 0."
-                    )));
+                    return Err(QueryGraphBuilderError::AssertionError("Required exactly one parent ID to be present for connect query, found 0.".to_string()));
                 }
 
                 if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = connect_node {

@@ -52,7 +52,7 @@ impl ExpressionResult {
                         .projections(model_projection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
-                        .map(|val| val.into())
+                        .map(|val| val)
                         .collect(),
                 ),
 
@@ -211,14 +211,14 @@ where
                             self.log_line(level, || format!("READ {}", read));
                             Ok(read::execute(&self.conn, read, None)
                                 .await
-                                .map(|res| ExpressionResult::Query(res))?)
+                                .map(ExpressionResult::Query)?)
                         }
 
                         Query::Write(write) => {
                             self.log_line(level, || format!("WRITE {}", write));
                             Ok(write::execute(&self.conn, write)
                                 .await
-                                .map(|res| ExpressionResult::Query(res))?)
+                                .map(ExpressionResult::Query)?)
                         }
                     }
                 };

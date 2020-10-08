@@ -32,7 +32,7 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         match graph
             .node_content(node)
-            .expect(&format!("Node content {} was empty", node.id()))
+            .unwrap_or_else(|| panic!("Node content {} was empty", node.id()))
         {
             Node::Query(_) => Self::build_query_expression(graph, node, parent_edges),
             Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edges),
@@ -66,7 +66,7 @@ impl Expressionista {
         if child_expressions.is_empty() {
             Ok(expr)
         } else {
-            let node_binding_name = node_id.clone();
+            let node_binding_name = node_id;
 
             // Add a final statement to the evaluation if the current node has child nodes and is supposed to be the
             // final result, to make sure it propagates upwards.
@@ -104,7 +104,7 @@ impl Expressionista {
             .collect();
 
         // Start removing the highest indices first to not invalidate subsequent removals.
-        result_positions.sort();
+        result_positions.sort_unstable();
         result_positions.reverse();
 
         let result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions
@@ -123,7 +123,7 @@ impl Expressionista {
             .collect::<InterpretationResult<Vec<Expression>>>()?;
 
         // Fold result scopes into one expression.
-        if result_subgraphs.len() > 0 {
+        if !result_subgraphs.is_empty() {
             let result_exp = Self::fold_result_scopes(graph, result_subgraphs)?;
             expressions.push(result_exp);
         }
@@ -188,7 +188,7 @@ impl Expressionista {
         if exprs.is_empty() {
             Ok(expr)
         } else {
-            let node_binding_name = node_id.clone();
+            let node_binding_name = node_id;
 
             Ok(Expression::Let {
                 bindings: vec![Binding {
@@ -259,7 +259,7 @@ impl Expressionista {
                     else_: else_expr,
                 };
 
-                let expr = if child_expressions.len() > 0 {
+                let expr = if !child_expressions.is_empty() {
                     Expression::Let {
                         bindings: vec![Binding {
                             name: node_id,

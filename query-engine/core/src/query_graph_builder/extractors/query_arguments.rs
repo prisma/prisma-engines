@@ -156,10 +156,10 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
             Ok(field) => extract_cursor_field(field, map_value)?,
             Err(_) => match utils::resolve_compound_field(&field_name, &model) {
                 Some(fields) => extract_compound_cursor_field(fields, map_value)?,
-                None => Err(QueryGraphBuilderError::AssertionError(format!(
+                None => return Err(QueryGraphBuilderError::AssertionError(format!(
                     "Unable to resolve field {} to a field or a set of fields on model {}",
                     field_name, model.name
-                )))?,
+                ))),
             },
         };
 

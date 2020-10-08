@@ -59,9 +59,7 @@ pub fn disconnect_records_node(
         QueryGraphDependency::ParentProjection(parent_model_id, Box::new(|mut disconnect_node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError(format!(
-                    "[Query Graph] Expected a valid parent ID to be present for a nested disconnect on a many-to-many relation."
-                ))),
+                None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested disconnect on a many-to-many relation.".to_string())),
             }?;
 
             if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {

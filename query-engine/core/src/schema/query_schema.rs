@@ -73,7 +73,7 @@ impl QuerySchema {
         let name = name.into();
         self.mutation()
             .get_fields()
-            .into_iter()
+            .iter()
             .find(|f| f.name == name)
             .cloned()
     }
@@ -83,7 +83,7 @@ impl QuerySchema {
         T: Into<String>,
     {
         let name = name.into();
-        self.query().get_fields().into_iter().find(|f| f.name == name).cloned()
+        self.query().get_fields().iter().find(|f| f.name == name).cloned()
     }
 
     pub fn mutation(&self) -> ObjectTypeStrongRef {
@@ -145,7 +145,7 @@ impl ObjectType {
     }
 
     pub fn find_field(&self, name: &str) -> Option<OutputFieldRef> {
-        self.get_fields().into_iter().find(|f| &f.name == name).cloned()
+        self.get_fields().iter().find(|f| &f.name == name).cloned()
     }
 
     /// True if fields are empty, false otherwise.
@@ -317,7 +317,7 @@ impl InputObjectType {
 
     pub fn set_fields(&self, fields: Vec<InputField>) {
         self.fields
-            .set(fields.into_iter().map(|f| Arc::new(f)).collect())
+            .set(fields.into_iter().map(Arc::new).collect())
             .expect("InputObjectType::set_fields");
     }
 
@@ -331,7 +331,7 @@ impl InputObjectType {
         T: Into<String>,
     {
         let name = name.into();
-        self.get_fields().into_iter().find(|f| f.name == name).cloned()
+        self.get_fields().iter().find(|f| f.name == name).cloned()
     }
 
     /// Allow exactly one field of the possible ones to be in the input.
@@ -536,17 +536,11 @@ impl OutputType {
     }
 
     pub fn is_list(&self) -> bool {
-        match self {
-            OutputType::List(_) => true,
-            _ => false,
-        }
+        matches!(self, OutputType::List(_))
     }
 
     pub fn is_object(&self) -> bool {
-        match self {
-            OutputType::Object(_) => true,
-            _ => false,
-        }
+        matches!(self, OutputType::Object(_))
     }
 }
 

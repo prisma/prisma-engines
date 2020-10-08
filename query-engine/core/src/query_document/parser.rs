@@ -118,7 +118,7 @@ impl QueryDocumentParser {
                 // If not present but required, throw a validation error.
                 match selection_arg {
                     Some((_, value)) => Some(
-                        Self::parse_input_value(path.clone(), value, &schema_input_arg.field_types).map(|value| {
+                        Self::parse_input_value(path, value, &schema_input_arg.field_types).map(|value| {
                             ParsedArgument {
                                 name: schema_input_arg.name.clone(),
                                 value,
@@ -274,7 +274,7 @@ impl QueryDocumentParser {
 
         let mut prisma_values = Vec::with_capacity(values.len());
 
-        for v in values.into_iter() {
+        for v in values.iter() {
             let pv = PrismaValue::try_from(v.clone()).map_err(|_| QueryParserError {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::AssertionError("Nested JSON arguments are not supported".into()),
@@ -393,7 +393,7 @@ impl QueryDocumentParser {
                     }
 
                     None if field.is_required => Some(Err(QueryParserError {
-                        path: path.clone(),
+                        path: path,
                         error_kind: QueryParserErrorKind::RequiredValueNotSetError,
                     })),
 
@@ -436,10 +436,10 @@ impl QueryDocumentParser {
 
                 if too_many || too_few {
                     Err(QueryParserError {
-                        path: path,
+                        path,
                         error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(
-                            schema_object.constraints.min_num_fields.clone(),
-                            schema_object.constraints.max_num_fields.clone(),
+                            schema_object.constraints.min_num_fields,
+                            schema_object.constraints.max_num_fields,
                             map.len(),
                         )),
                     })

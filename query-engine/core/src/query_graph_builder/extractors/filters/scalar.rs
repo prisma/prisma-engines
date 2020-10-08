@@ -74,10 +74,10 @@ pub fn parse(
         "lte" => field.less_than_or_equals(as_prisma_value(input)?),
         "gte" => field.greater_than_or_equals(as_prisma_value(input)?),
 
-        _ => Err(QueryGraphBuilderError::InputError(format!(
+        _ => return Err(QueryGraphBuilderError::InputError(format!(
             "{} is not a valid scalar filter operation",
             filter_key
-        )))?,
+        ))),
     };
 
     Ok(filter)

@@ -19,10 +19,7 @@ pub fn coerce_vec(val: ParsedInputValue) -> Vec<ParsedInputValue> {
 }
 
 pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
-    match graph.node_content(node).unwrap() {
-        Node::Query(Query::Write(WriteQuery::CreateRecord(_))) => true,
-        _ => false,
-    }
+    matches!(graph.node_content(node).unwrap(), Node::Query(Query::Write(WriteQuery::CreateRecord(_))))
 }
 
 /// Produces a non-failing read query that fetches the requested projection of records for a given filterable.
@@ -219,7 +216,7 @@ pub fn insert_existing_1to1_related_model_checks(
             Box::new(move |if_node, child_ids| {
                 // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
                 // to the parent, as that would violate the other childs relation side.
-                if child_ids.len() > 0 && child_side_required {
+                if !child_ids.is_empty() && child_side_required {
                     return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
                 }
 
@@ -239,11 +236,11 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &update_existing_child,
-        QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut update_existing_child, mut child_ids| {
+        QueryGraphDependency::ParentProjection(child_model_identifier, Box::new(move |mut update_existing_child, mut child_ids| {
             // This has to succeed or the if-then node wouldn't trigger.
             let child_id = match child_ids.pop() {
                 Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
+                None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent.".to_string())),
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
@@ -310,7 +307,7 @@ pub fn insert_deletion_checks(
     let relation_fields = internal_model.fields_requiring_model(model);
     let mut check_nodes = vec![];
 
-    if relation_fields.len() > 0 {
+    if !relation_fields.is_empty() {
         let noop_node = graph.create_node(Node::Empty);
 
         // We know that the relation can't be a list and must be required on the related model for `model` (see fields_requiring_model).

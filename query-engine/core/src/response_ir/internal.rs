@@ -136,10 +136,7 @@ fn serialize_record_selection(
                         .map(|(parent, items)| {
                             if !opt {
                                 // Check that all items are non-null
-                                if items.iter().any(|item| match item {
-                                    Item::Value(PrismaValue::Null) => true,
-                                    _ => false,
-                                }) {
+                                if items.iter().any(|item| matches!(item, Item::Value(PrismaValue::Null))) {
                                     return Err(CoreError::SerializationError(format!(
                                         "Required field '{}' returned a null record",
                                         name
@@ -328,7 +325,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
                 let items = unwrap_prisma_value(value)
                     .into_iter()
                     .map(|v| convert_prisma_value(v, subtype))
-                    .map(|pv| pv.map(|x| Item::Value(x)))
+                    .map(|pv| pv.map(Item::Value))
                     .collect::<Result<Vec<Item>, CoreError>>()?;
                 Ok(Item::list(items))
             }
