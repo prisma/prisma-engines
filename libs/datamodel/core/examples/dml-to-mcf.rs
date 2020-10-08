@@ -1,4 +1,4 @@
-use datamodel;
+
 use std::fs;
 
 use clap::{App, Arg};
@@ -17,14 +17,14 @@ fn main() {
         .get_matches();
 
     let file_name = matches.value_of("INPUT").unwrap();
-    let file = fs::read_to_string(&file_name).expect(&format!("Unable to open file {}", file_name));
+    let file = fs::read_to_string(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name));
 
     let res = datamodel::parse_configuration(&file);
 
     match &res {
         Err(errors) => {
             for error in errors.to_iter() {
-                println!("");
+                println!();
                 error
                     .pretty_print(&mut std::io::stderr().lock(), file_name, &file)
                     .expect("Failed to write errors to stderr");

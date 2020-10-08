@@ -294,10 +294,7 @@ impl<'a> Validator<'a> {
                     if let Some(dml_enum) = data_model.find_enum(&enum_name) {
                         if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
                             errors.push(DatamodelError::new_attribute_validation_error(
-                                &format!(
-                                "{}",
-                                "The defined default value is not a valid value of the enum specified for the field."
-                            ),
+                                &"The defined default value is not a valid value of the enum specified for the field.".to_string(),
                                 "default",
                                 ast_model.find_field(&field.name).span,
                             ))
@@ -322,10 +319,7 @@ impl<'a> Validator<'a> {
                 && model.auto_increment_fields().count() > 1
             {
                 errors.push(DatamodelError::new_attribute_validation_error(
-                    &format!(
-                        "{}",
-                        "The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table."
-                    ),
+                    &"The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.".to_string(),
                     "default",
                     ast_model.span,
                 ))
@@ -340,10 +334,7 @@ impl<'a> Validator<'a> {
                     && !data_source.combined_connector.supports_non_id_auto_increment()
                 {
                     errors.push(DatamodelError::new_attribute_validation_error(
-                    &format!(
-                        "{}",
-                        "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this."
-                    ),
+                    &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
                     "default",
                     ast_field.span,
                 ))
@@ -354,10 +345,7 @@ impl<'a> Validator<'a> {
                     && !data_source.combined_connector.supports_non_indexed_auto_increment()
                 {
                     errors.push(DatamodelError::new_attribute_validation_error(
-                    &format!(
-                        "{}",
-                        "The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this."
-                    ),
+                    &"The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.".to_string(),
                     "default",
                     ast_field.span,
                 ))

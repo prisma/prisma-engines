@@ -104,14 +104,13 @@ pub fn create_relation_table_records(
     let insert = Insert::multi_into(relation.as_table(), columns);
 
     let insert: MultiRowInsert = child_ids
-        .into_iter()
+        .iter()
         .fold(insert, |insert, child_id| {
             let mut values: Vec<_> = parent_id.db_values();
 
             values.extend(child_id.db_values());
             insert.values(values)
-        })
-        .into();
+        });
 
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }

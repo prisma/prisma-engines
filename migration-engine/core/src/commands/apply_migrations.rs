@@ -144,7 +144,7 @@ fn diagnose_migration_history(
         let error_lines = edited_migrations.map(|db_migration| {
             let diagnostic = match db_migration.finished_at {
                 Some(finished_at) => format!("and finished at {finished_at}.", finished_at = finished_at),
-                None => format!("but failed."),
+                None => "but failed.".to_string(),
             };
 
             format!(
@@ -183,7 +183,7 @@ impl HistoryProblems {
 
         for failed_migration in &self.failed_migrations {
             error.push_str(&failed_migration);
-            error.push_str("\n");
+            error.push('\n');
         }
 
         if let Some(edited_migrations) = &self.edited_migrations {

@@ -5,7 +5,7 @@ mod preview;
 
 use std::path::PathBuf;
 
-use serde;
+
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt, Clone)]

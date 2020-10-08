@@ -44,7 +44,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         fn render(input: Option<u32>) -> String {
             match input {
                 None => "".to_string(),
-                Some(arg) => format!("({})", arg).to_string(),
+                Some(arg) => format!("({})", arg),
             }
         }
 

@@ -131,7 +131,7 @@ mod test {
         match func_arguments.get(0) {
             Some(Expression::Array(strings, _)) => {
                 let strings = strings
-                    .into_iter()
+                    .iter()
                     .map(|arg| match arg {
                         Expression::StringValue(s, _) => s.as_str(),
                         _ => unreachable!(),

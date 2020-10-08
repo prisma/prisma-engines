@@ -200,7 +200,7 @@ impl<'a> Renderer<'a> {
         }
 
         self.indent_down();
-        self.write(format!("{}{}", comment_out.clone(), "}").as_ref());
+        self.write(format!("{}{}", comment_out, "}").as_ref());
         self.end_line();
     }
 
@@ -211,7 +211,7 @@ impl<'a> Renderer<'a> {
             let sort_index_b = get_sort_index_of_attribute(is_field_attribute, b.name.name.as_str());
             sort_index_a.cmp(&sort_index_b)
         });
-        return attributes;
+        attributes
     }
 
     fn render_enum(&mut self, enm: &ast::Enum) {

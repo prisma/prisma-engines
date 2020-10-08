@@ -117,7 +117,7 @@ impl ModelProjection {
     /// Creates a record projection of the model projection containing only null values.
     pub fn empty_record_projection(&self) -> RecordProjection {
         self.scalar_fields()
-            .map(|f| (f.clone(), PrismaValue::Null))
+            .map(|f| (f, PrismaValue::Null))
             .collect::<Vec<_>>()
             .into()
     }
@@ -144,7 +144,7 @@ impl ModelProjection {
         T: Into<Field>,
     {
         let field: Field = field.into();
-        self.fields().find(|f| f.name() == field.name()).is_some()
+        self.fields().any(|f| f.name() == field.name())
     }
 
     /// Checks if this model projection contains all the given database names.

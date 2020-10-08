@@ -38,14 +38,14 @@ pub struct BarrelMigrationExecutor {
 impl BarrelMigrationExecutor {
     pub async fn execute<F>(&self, migration_fn: F)
     where
-        F: FnOnce(&mut Migration) -> (),
+        F: FnOnce(&mut Migration) ,
     {
         self.execute_with_schema(migration_fn, &self.schema_name).await
     }
 
     pub async fn execute_with_schema<F>(&self, migration_fn: F, schema_name: &str)
     where
-        F: FnOnce(&mut Migration) -> (),
+        F: FnOnce(&mut Migration) ,
     {
         let mut migration = Migration::new().schema(schema_name);
         migration_fn(&mut migration);
@@ -55,7 +55,7 @@ impl BarrelMigrationExecutor {
 }
 
 async fn run_full_sql(database: &Quaint, full_sql: &str) {
-    for sql in full_sql.split(";") {
+    for sql in full_sql.split(';') {
         if sql != "" {
             database.query_raw(&sql, &[]).await.unwrap();
         }

@@ -14,18 +14,16 @@ pub fn run() {
         Ok(configuration) => {
             if configuration.datasources.len() != 1 {
                 print!("[]")
+            } else if let Some(datasource) = configuration.datasources.first() {
+                let available_native_type_constructors =
+                    datasource.active_connector.available_native_type_constructors();
+
+                let json =
+                    serde_json::to_string(available_native_type_constructors).expect("Failed to render JSON");
+
+                print!("{}", json)
             } else {
-                if let Some(datasource) = configuration.datasources.first() {
-                    let available_native_type_constructors =
-                        datasource.active_connector.available_native_type_constructors();
-
-                    let json =
-                        serde_json::to_string(available_native_type_constructors).expect("Failed to render JSON");
-
-                    print!("{}", json)
-                } else {
-                    print!("[]")
-                }
+                print!("[]")
             }
         }
         _ => print!("[]"),

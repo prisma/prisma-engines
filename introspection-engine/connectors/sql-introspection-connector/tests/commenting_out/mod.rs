@@ -88,7 +88,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out_mysql(api: 
 
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_an_enum_with_an_invalid_value_should_work(api: &TestApi) {
-    let sql = format!("CREATE Type status as ENUM ( '1', 'UNDEFINED')");
+    let sql = "CREATE Type status as ENUM ( \'1\', \'UNDEFINED\')".to_string();
 
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
@@ -110,7 +110,7 @@ async fn introspecting_an_enum_with_an_invalid_value_should_work(api: &TestApi) 
 
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_an_enum_with_an_invalid_value_as_default_should_work(api: &TestApi) {
-    let sql = format!("CREATE Type status as ENUM ( '1', 'UNDEFINED')");
+    let sql = "CREATE Type status as ENUM ( \'1\', \'UNDEFINED\')".to_string();
 
     api.database().execute_raw(&sql, &[]).await.unwrap();
 

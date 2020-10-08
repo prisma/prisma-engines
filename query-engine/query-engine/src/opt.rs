@@ -107,10 +107,8 @@ struct SourceOverride {
 impl PrismaOpt {
     fn datamodel_str(&self) -> PrismaResult<&str> {
         let res = self
-            .datamodel
-            .as_ref()
-            .map(|dm| dm.as_str())
-            .or(self.datamodel_path.as_ref().map(|dm| dm.as_str()))
+            .datamodel.as_deref()
+            .or(self.datamodel_path.as_deref())
             .ok_or_else(|| {
                 PrismaError::ConfigurationError(
                     "Datamodel should be provided either as path or base64-encoded string.".into(),
@@ -156,7 +154,7 @@ impl PrismaOpt {
 
     /// Extract the log format from on the RUST_LOG_FORMAT env var.
     pub(crate) fn log_format(&self) -> crate::LogFormat {
-        match self.log_format.as_ref().map(|s| s.as_str()) {
+        match self.log_format.as_deref() {
             Some("devel") => crate::LogFormat::Text,
             _ => crate::LogFormat::Json,
         }
@@ -183,11 +181,11 @@ fn parse_base64_string(s: &str) -> PrismaResult<String> {
 }
 
 fn load_datamodel_file(path: &OsStr) -> String {
-    let mut f = File::open(path).expect(&format!("Could not open datamodel file {:?}", path));
+    let mut f = File::open(path).unwrap_or_else(|_| panic!("Could not open datamodel file {:?}", path));
     let mut datamodel = String::new();
 
     f.read_to_string(&mut datamodel)
-        .expect(&format!("Could not read datamodel file: {:?}", path));
+        .unwrap_or_else(|_| panic!("Could not read datamodel file: {:?}", path));
 
     datamodel
 }

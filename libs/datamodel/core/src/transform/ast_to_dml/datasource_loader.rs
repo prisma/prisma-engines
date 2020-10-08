@@ -52,9 +52,9 @@ impl DatasourceLoader {
         if sources.len() > 1 {
             for src in &ast_schema.sources() {
                 errors.push(DatamodelError::new_source_validation_error(
-                    &format!("You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet."),
+                    &"You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.".to_string(),
                     &src.name.name,
-                    src.span.clone(),
+                    src.span,
                 ));
             }
         }
@@ -78,7 +78,7 @@ impl DatasourceLoader {
         let provider_arg = args.arg("provider")?;
         if provider_arg.is_from_env() {
             return Err(DatamodelError::new_functional_evaluation_error(
-                &format!("A datasource must not use the env() function in the provider argument."),
+                &"A datasource must not use the env() function in the provider argument.".to_string(),
                 ast_source.span,
             ));
         }
@@ -141,7 +141,7 @@ impl DatasourceLoader {
             None => (Vec::new(), Span::empty()),
         };
 
-        if preview_features.len() > 0 {
+        if !preview_features.is_empty() {
             if let Err(err) =
                 validate_preview_features(preview_features.clone(), span, DATASOURCE_PREVIEW_FEATURES.to_vec())
             {
@@ -192,7 +192,7 @@ impl DatasourceLoader {
                 provider: providers,
                 active_provider: first_successful_provider.canonical_name().to_string(),
                 url,
-                documentation: documentation.clone(),
+                documentation,
                 combined_connector,
                 active_connector: first_successful_provider.connector(),
                 preview_features,

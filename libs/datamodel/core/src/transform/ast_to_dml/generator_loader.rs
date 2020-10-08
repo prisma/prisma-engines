@@ -68,7 +68,7 @@ impl GeneratorLoader {
             None => (Vec::new(), Span::empty()),
         };
 
-        if preview_features.len() > 0 {
+        if !preview_features.is_empty() {
             if let Err(err) =
                 validate_preview_features(preview_features.clone(), span, GENERATOR_PREVIEW_FEATURES.to_vec())
             {

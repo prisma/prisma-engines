@@ -90,7 +90,7 @@ mod tests {
         "#;
 
         let err = datamodel::parse_datamodel(bad_dml)
-            .map_err(|err| CommandError::ProducedBadDatamodel(err))
+            .map_err(CommandError::ProducedBadDatamodel)
             .unwrap_err();
 
         assert_eq!(

@@ -44,12 +44,12 @@ impl FromSource for Sqlite {
                 .ok_or_else(|| invalid_file_path_error(&file_path, &connection_info))?
                 .to_owned();
 
-            let mut splitted = source.url().value.split("?");
+            let mut splitted = source.url().value.split('?');
             let url = splitted.next().unwrap();
             let params = splitted.next();
 
             let mut params: Vec<&str> = match params {
-                Some(params) => params.split("&").collect(),
+                Some(params) => params.split('&').collect(),
                 None => Vec::with_capacity(1),
             };
 

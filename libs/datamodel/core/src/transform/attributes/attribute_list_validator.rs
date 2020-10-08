@@ -41,7 +41,7 @@ impl<T: 'static> AttributeListValidator<T> {
             match attribute_counts.get_mut(&attribute.name.name) {
                 None => {
                     attribute_counts.insert(&attribute.name.name, 1);
-                    ()
+                    
                 }
                 Some(count) => *count += 1,
             }
@@ -92,7 +92,7 @@ impl<T: 'static> AttributeListValidator<T> {
                     }
                 }
                 None => {
-                    if !attribute.name.name.is_empty() && !attribute.name.name.contains(".") {
+                    if !attribute.name.name.is_empty() && !attribute.name.name.contains('.') {
                         errors.push(DatamodelError::new_attribute_not_known_error(
                             &attribute.name.name,
                             attribute.name.span,

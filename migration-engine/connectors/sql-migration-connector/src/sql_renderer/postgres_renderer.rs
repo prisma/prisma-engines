@@ -103,10 +103,7 @@ impl SqlRenderer for PostgresFlavour {
 
         // alter type of the current columns to new, with a cast
         {
-            let affected_columns = walk_columns(differ.next).filter(|column| match &column.column_type().family {
-                ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str() => true,
-                _ => false,
-            });
+            let affected_columns = walk_columns(differ.next).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str()));
 
             for column in affected_columns {
                 let sql = format!(
@@ -331,7 +328,7 @@ impl SqlRenderer for PostgresFlavour {
 
         let primary_columns = table.table.primary_key_columns();
         let pk_column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-        let pk = if pk_column_names.len() > 0 {
+        let pk = if !pk_column_names.is_empty() {
             format!(",\nPRIMARY KEY ({})", pk_column_names)
         } else {
             String::new()

@@ -45,7 +45,7 @@ pub fn parse_field(model_name: &str, token: &Token) -> Result<Field, DatamodelEr
             is_commented_out: false,
         }),
         _ => Err(DatamodelError::new_model_validation_error(
-            &format!("This field declaration is invalid. It is either missing a name or a type."),
+            &"This field declaration is invalid. It is either missing a name or a type.".to_string(),
             model_name,
             Span::from_pest(token.as_span()),
         )),

@@ -43,7 +43,7 @@ impl<'a> CreateMigration<'a> {
             .await?;
 
         Ok(CreateMigrationAssertion {
-            output: output,
+            output,
             _api: self.api,
             migrations_directory: self.migrations_directory,
         })

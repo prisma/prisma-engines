@@ -73,7 +73,7 @@ impl TestApi {
 
 pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_url(db_name.as_ref());
+    let url = mysql_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     TestApi {
@@ -87,7 +87,7 @@ pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
 
 pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_8_url(db_name.as_ref());
+    let url = mysql_8_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     TestApi {
@@ -101,7 +101,7 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
 
 pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_5_6_url(db_name.as_ref());
+    let url = mysql_5_6_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     TestApi {
@@ -115,7 +115,7 @@ pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
 
 pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mariadb_url(db_name.as_ref());
+    let url = mariadb_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     TestApi {
@@ -217,14 +217,14 @@ pub struct BarrelMigrationExecutor {
 impl BarrelMigrationExecutor {
     pub async fn execute<F>(&self, migration_fn: F)
     where
-        F: FnOnce(&mut Migration) -> (),
+        F: FnOnce(&mut Migration) ,
     {
         self.execute_with_schema(migration_fn, &self.schema_name).await
     }
 
     pub async fn execute_with_schema<F>(&self, migration_fn: F, schema_name: &str)
     where
-        F: FnOnce(&mut Migration) -> (),
+        F: FnOnce(&mut Migration) ,
     {
         let mut migration = Migration::new().schema(schema_name);
         migration_fn(&mut migration);
@@ -235,7 +235,7 @@ impl BarrelMigrationExecutor {
 }
 
 async fn run_full_sql(database: &Quaint, full_sql: &str) {
-    for sql in full_sql.split(";") {
+    for sql in full_sql.split(';') {
         if sql != "" {
             database.query_raw(&sql, &[]).await.unwrap();
         }

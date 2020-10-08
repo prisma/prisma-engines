@@ -73,7 +73,7 @@ impl ManyRecords {
             .collect();
 
         self.records.sort_by(|a, b| {
-            let mut orderings = order_bys.into_iter().map(|o| {
+            let mut orderings = order_bys.iter().map(|o| {
                 let index = field_indices[o.field.db_name()];
                 match o.sort_order {
                     SortOrder::Ascending => a.values[index].cmp(&b.values[index]),
@@ -98,7 +98,6 @@ impl ManyRecords {
             .map(|record| {
                 record
                     .projection(&self.field_names, model_projection)
-                    .map(|i| i.clone())
             })
             .collect()
     }

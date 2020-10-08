@@ -1,4 +1,4 @@
-use datamodel;
+
 use std::fs;
 
 extern crate clap;
@@ -18,7 +18,7 @@ fn main() {
         .get_matches();
 
     let file_name = matches.value_of("INPUT").unwrap();
-    let file = fs::read_to_string(&file_name).expect(&format!("Unable to open file {}", file_name));
+    let file = fs::read_to_string(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name));
 
     let validated = datamodel::parse_datamodel_or_pretty_error(&file, &file_name);
 

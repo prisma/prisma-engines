@@ -26,7 +26,7 @@ impl Identifier {
                 &format!("The name of a {} must not start with a number.", schema_item),
                 self.span,
             ))
-        } else if self.name.contains("-") {
+        } else if self.name.contains('-') {
             Err(DatamodelError::new_validation_error(
                 &format!("The character `-` is not allowed in {} names.", schema_item),
                 self.span,

@@ -28,7 +28,7 @@ impl ErrorCollection {
     /// Returns true, if there is at least one error
     /// in this collection.
     pub fn has_errors(&self) -> bool {
-        self.errors.len() > 0
+        !self.errors.is_empty()
     }
 
     /// Creates an iterator over all errors in this collection.

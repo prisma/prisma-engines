@@ -34,10 +34,7 @@ pub struct IndexDefinition {
 
 impl IndexDefinition {
     pub fn is_unique(&self) -> bool {
-        match self.tpe {
-            IndexType::Unique => true,
-            _ => false,
-        }
+        matches!(self.tpe, IndexType::Unique)
     }
 }
 
@@ -267,10 +264,7 @@ impl Model {
             .iter()
             .any(|index| index.fields.first().unwrap() == field_name);
 
-        let is_first_in_primary_key = match self.id_fields.first() {
-            Some(f) if f == field_name => true,
-            _ => false,
-        };
+        let is_first_in_primary_key = matches!(self.id_fields.first(), Some(f) if f == field_name);
 
         is_first_in_index || is_first_in_primary_key
     }

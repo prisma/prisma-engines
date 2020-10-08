@@ -112,7 +112,7 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
-        if en.values.len() == 0 {
+        if en.values.is_empty() {
             errors.push(DatamodelError::new_validation_error(
                 "An enum must have at least one value.",
                 ast_enum.span,
@@ -222,13 +222,13 @@ impl<'a> LiftAstToDml<'a> {
                 let type_specifications_with_invalid_datasource_name = ast_field
                     .attributes
                     .iter()
-                    .filter(|dir| dir.name.name.contains(".") && !dir.name.name.starts_with(&prefix))
+                    .filter(|dir| dir.name.name.contains('.') && !dir.name.name.starts_with(&prefix))
                     .collect_vec();
 
-                if type_specifications_with_invalid_datasource_name.len() > 0 {
+                if !type_specifications_with_invalid_datasource_name.is_empty() {
                     let incorrect_type_specification =
                         type_specifications_with_invalid_datasource_name.first().unwrap();
-                    let mut type_specification_name_split = incorrect_type_specification.name.name.split(".");
+                    let mut type_specification_name_split = incorrect_type_specification.name.name.split('.');
                     let given_prefix = type_specification_name_split.next().unwrap();
                     return Err(DatamodelError::new_connector_error(
                         &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
@@ -310,7 +310,7 @@ impl<'a> LiftAstToDml<'a> {
                     let parse_native_type_result = connector.parse_native_type(x, args);
                     match parse_native_type_result {
                         Err(connector_error) => {
-                            return Err(DatamodelError::new_connector_error(
+                            Err(DatamodelError::new_connector_error(
                                 &connector_error.to_string(),
                                 type_specification.unwrap().span,
                             ))
@@ -322,15 +322,13 @@ impl<'a> LiftAstToDml<'a> {
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
+            } else if let Some(native_type_attribute) = ast_field.attributes.iter().find(|d| d.name.name.contains('.')) {
+                Err(DatamodelError::new_connector_error(
+                    &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
+                    native_type_attribute.span,
+                ))
             } else {
-                if let Some(native_type_attribute) = ast_field.attributes.iter().find(|d| d.name.name.contains(".")) {
-                    return Err(DatamodelError::new_connector_error(
-                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
-                        native_type_attribute.span,
-                    ));
-                } else {
-                    Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
-                }
+                Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))

@@ -169,7 +169,7 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
 }
 
 fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    feature_flags::initialize(&vec![String::from("all")]).unwrap();
+    feature_flags::initialize(&[String::from("all")]).unwrap();
 
     let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string).unwrap();
     let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();

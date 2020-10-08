@@ -257,7 +257,7 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer,
         token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) -> () + 'a>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str)  + 'a>,
     ) {
         self.reformat_block_element_internal(block_type, renderer, token, the_fn, {
             // a no op
@@ -270,8 +270,8 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer,
         token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) -> () + 'a>,
-        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &str) -> () + 'a>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str)  + 'a>,
+        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &str)  + 'a>,
     ) {
         let mut table = TableFormat::new();
         let mut block_name = "";
@@ -292,7 +292,7 @@ impl<'a> Reformatter<'a> {
                 Rule::BLOCK_CLOSE => {
                     // New line between fields and attributes
                     // only if there isn't already a new line in between
-                    if attributes.len() != 0 && !last_line_was_empty {
+                    if !attributes.is_empty() && !last_line_was_empty {
                         table.render(renderer);
                         table = TableFormat::new();
                         renderer.end_line();
@@ -413,7 +413,7 @@ impl<'a> Reformatter<'a> {
             let sort_index_b = get_sort_index_of_attribute(is_field_attribute, b.as_str());
             sort_index_a.cmp(&sort_index_b)
         });
-        return attributes;
+        attributes
     }
 
     fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
@@ -426,7 +426,7 @@ impl<'a> Reformatter<'a> {
         let mut count = 0;
         let inner_pairs_with_sorted_attributes = token.clone().into_inner().map(|p| match p.as_rule() {
             Rule::attribute => {
-                count = count + 1;
+                count += 1;
                 attributes[count - 1].clone()
             }
             _ => p,

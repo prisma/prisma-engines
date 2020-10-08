@@ -11,7 +11,7 @@ pub struct BarrelMigrationExecutor<'a> {
 impl BarrelMigrationExecutor<'_> {
     pub async fn execute<F>(self, migration_fn: F) -> anyhow::Result<SqlSchema>
     where
-        F: FnOnce(&mut barrel::Migration) -> (),
+        F: FnOnce(&mut barrel::Migration) ,
     {
         use barrel::Migration;
 
@@ -40,7 +40,7 @@ impl BarrelMigrationExecutor<'_> {
 }
 
 async fn run_full_sql(database: &Quaint, full_sql: &str) -> anyhow::Result<()> {
-    for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
+    for sql in full_sql.split(';').filter(|sql| !sql.is_empty()) {
         database.query_raw(&sql, &[]).await?;
     }
 

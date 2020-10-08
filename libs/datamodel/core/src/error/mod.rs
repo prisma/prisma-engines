@@ -420,9 +420,9 @@ fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, e
     let span = error_obj.span();
     let error = error_obj.description();
 
-    let start_line_number = text[..span.start].matches("\n").count();
-    let end_line_number = text[..span.end].matches("\n").count();
-    let file_lines = text.split("\n").collect::<Vec<&str>>();
+    let start_line_number = text[..span.start].matches('\n').count();
+    let end_line_number = text[..span.end].matches('\n').count();
+    let file_lines = text.split('\n').collect::<Vec<&str>>();
 
     let chars_in_line_before: usize = file_lines[..start_line_number].iter().map(|l| l.len()).sum();
     // Don't forget to count the all the line breaks.

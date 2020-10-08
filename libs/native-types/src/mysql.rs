@@ -40,6 +40,6 @@ pub enum MySqlType {
 
 impl super::NativeType for MySqlType {
     fn to_json(&self) -> Value {
-        serde_json::to_value(&self).expect(&format!("Serializing the native type to json failed: {:?}", &self))
+        serde_json::to_value(&self).unwrap_or_else(|_| panic!("Serializing the native type to json failed: {:?}", &self))
     }
 }
