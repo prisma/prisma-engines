@@ -35,16 +35,16 @@ class NonUniqueIndexUsageSpec extends FlatSpec with Matchers with ApiSpecBase wi
       legacy = false
     )
 
-    // Id must show up, field must not.
+    // Field must not show up in the *WhereUniqueInput.
     server.queryThatMustFail(
       s"""query {
-         |findManyTestModel(where: { field: "nope" }) {
+         |findOneTestModel(where: { field: "nope" }) {
          |    id
          |  }
          |}
       """,
       project,
-      errorCode = 999,
+      errorCode = 2009,
       legacy = false
     )
   }
