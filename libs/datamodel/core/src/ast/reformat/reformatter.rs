@@ -257,7 +257,7 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer,
         token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str)  + 'a>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) + 'a>,
     ) {
         self.reformat_block_element_internal(block_type, renderer, token, the_fn, {
             // a no op
@@ -270,8 +270,8 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer,
         token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str)  + 'a>,
-        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &str)  + 'a>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) + 'a>,
+        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &str) + 'a>,
     ) {
         let mut table = TableFormat::new();
         let mut block_name = "";
@@ -395,14 +395,12 @@ impl<'a> Reformatter<'a> {
         let mut attributes = Vec::new();
         for pair in token.clone().into_inner() {
             if is_field_attribute {
-                match pair.as_rule() {
-                    Rule::attribute => attributes.push(pair),
-                    _ => {}
+                if let Rule::attribute = pair.as_rule() {
+                    attributes.push(pair)
                 }
             } else {
-                match pair.as_rule() {
-                    Rule::block_level_attribute => attributes.push(pair),
-                    _ => {}
+                if let Rule::block_level_attribute = pair.as_rule() {
+                    attributes.push(pair)
                 }
             }
         }

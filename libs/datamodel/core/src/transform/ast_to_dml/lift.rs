@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::super::attributes::AllAttributes;
 use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
@@ -309,12 +311,10 @@ impl<'a> LiftAstToDml<'a> {
 
                     let parse_native_type_result = connector.parse_native_type(x, args);
                     match parse_native_type_result {
-                        Err(connector_error) => {
-                            Err(DatamodelError::new_connector_error(
-                                &connector_error.to_string(),
-                                type_specification.unwrap().span,
-                            ))
-                        }
+                        Err(connector_error) => Err(DatamodelError::new_connector_error(
+                            &connector_error.to_string(),
+                            type_specification.unwrap().span,
+                        )),
                         Ok(parsed_native_type) => {
                             Ok((dml::FieldType::NativeType(scalar_type, parsed_native_type), vec![]))
                         }
@@ -322,7 +322,8 @@ impl<'a> LiftAstToDml<'a> {
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
-            } else if let Some(native_type_attribute) = ast_field.attributes.iter().find(|d| d.name.name.contains('.')) {
+            } else if let Some(native_type_attribute) = ast_field.attributes.iter().find(|d| d.name.name.contains('.'))
+            {
                 Err(DatamodelError::new_connector_error(
                     &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
                     native_type_attribute.span,

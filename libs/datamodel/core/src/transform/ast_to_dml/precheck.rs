@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{
     ast::{self, WithIdentifier, WithName},
     dml,

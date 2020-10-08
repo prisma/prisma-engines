@@ -252,7 +252,7 @@ impl Model {
         result
     }
 
-    pub fn field_is_indexed(&self, field_name: &String) -> bool {
+    pub fn field_is_indexed(&self, field_name: &str) -> bool {
         let field = self.find_field(field_name).unwrap();
 
         if field.is_id() || field.is_unique() {
