@@ -33,7 +33,7 @@ fn parse_attribute_args(token: &Token, arguments: &mut Vec<Argument>) {
         match current.as_rule() {
             // This is a named arg.
             Rule::argument => arguments.push(parse_attribute_arg(&current)),
-            // This is a an unnamed arg.
+            // This is an unnamed arg.
             Rule::argument_value => arguments.push(Argument {
                 name: Identifier::new(""),
                 value: parse_arg_value(&current),
