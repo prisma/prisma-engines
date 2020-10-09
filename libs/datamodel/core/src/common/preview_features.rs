@@ -11,8 +11,8 @@ const AGGREGATE_API: &'static str = "aggregateApi"; // todo move this to depreca
 const MIDDLEWARES: &'static str = "middlewares";
 const DISTINCT: &'static str = "distinct";
 
-pub const DATASOURCE_PREVIEW_FEATURES: [&'static str; 1] = [NATIVE_TYPES];
-pub const GENERATOR_PREVIEW_FEATURES: [&'static str; 6] = [
+pub const DATASOURCE_PREVIEW_FEATURES: &[&'static str] = &[NATIVE_TYPES];
+pub const GENERATOR_PREVIEW_FEATURES: &[&'static str] = &[
     ATOMIC_NUMBER_OPERATIONS,
     CONNECT_OR_CREATE,
     TRANSACTION_API,
@@ -21,4 +21,4 @@ pub const GENERATOR_PREVIEW_FEATURES: [&'static str; 6] = [
     DISTINCT,
 ];
 
-pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: [&'static str; 3] = [AGGREGATE_API, MIDDLEWARES, DISTINCT];
+pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&'static str] = &[AGGREGATE_API, MIDDLEWARES, DISTINCT];

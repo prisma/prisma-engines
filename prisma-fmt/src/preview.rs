@@ -5,9 +5,9 @@ use datamodel::common::preview_features::{
 
 pub fn run(opts: PreviewFeaturesOpts) {
     let result = if opts.datasource_only {
-        DATASOURCE_PREVIEW_FEATURES.to_vec()
+        DATASOURCE_PREVIEW_FEATURES
     } else {
-        let preview_features = GENERATOR_PREVIEW_FEATURES.to_vec();
+        let preview_features = GENERATOR_PREVIEW_FEATURES;
         preview_features
             .iter()
             .filter(|pf| !DEPRECATED_GENERATOR_PREVIEW_FEATURES.contains(pf))
