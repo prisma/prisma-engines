@@ -19,13 +19,19 @@ pub fn query_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuilde
 
 fn raw_query(mut field: ParsedField) -> QueryGraphBuilderResult<RawQuery> {
     let query_arg = field.arguments.lookup("query").unwrap().value;
-    let parameters_arg = field.arguments.lookup("parameters").unwrap().value;
+    let parameters_arg = field.arguments.lookup("parameters");
 
     let query_value: PrismaValue = query_arg.try_into()?;
-    let parameter_value: PrismaValue = parameters_arg.try_into()?;
+    let parameters: Vec<PrismaValue> = match parameters_arg {
+        Some(parsed) => {
+            let val: PrismaValue = parsed.value.try_into()?;
+            val.into_list().unwrap()
+        }
+        None => vec![],
+    };
 
     Ok(RawQuery {
         query: query_value.into_string().unwrap(),
-        parameters: parameter_value.into_list().unwrap(),
+        parameters,
     })
 }

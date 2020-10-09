@@ -66,7 +66,7 @@ where
         field_type: Arc::new(field_type),
         query_info,
         is_required: true,
-    }
+}
 }
 
 /// Field convenience wrapper function.
