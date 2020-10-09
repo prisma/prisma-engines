@@ -7,11 +7,10 @@ pub fn run(opts: PreviewFeaturesOpts) {
     let result = if opts.datasource_only {
         DATASOURCE_PREVIEW_FEATURES
     } else {
-        let preview_features = GENERATOR_PREVIEW_FEATURES;
-        preview_features
+        GENERATOR_PREVIEW_FEATURES
             .iter()
             .filter(|pf| !DEPRECATED_GENERATOR_PREVIEW_FEATURES.contains(pf))
-            .collect()
+            .collect();
     };
 
     if result.len() == 0 {
