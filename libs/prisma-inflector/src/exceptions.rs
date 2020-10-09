@@ -1,4 +1,4 @@
-pub static UNCOUNTABLE: &'static [&'static str] = &[
+pub static UNCOUNTABLE: &[&str] = &[
     // endings
     "fish",
     "ois",
@@ -54,7 +54,7 @@ pub static UNCOUNTABLE: &'static [&'static str] = &[
     "sugar",
 ];
 
-pub static STANDARD_IRREGULAR: &'static [(&'static str, &'static str)] = &[
+pub static STANDARD_IRREGULAR: &[(&str, &str)] = &[
     ("child", "children"),        // classical
     ("ephemeris", "ephemerides"), // classical
     ("mongoose", "mongoose"),     // anglicized
@@ -65,7 +65,7 @@ pub static STANDARD_IRREGULAR: &'static [(&'static str, &'static str)] = &[
     ("quiz", "quizzes"),
 ];
 
-pub static IRREGULAR_ANGLICIZED: &'static [(&'static str, &'static str)] = &[
+pub static IRREGULAR_ANGLICIZED: &[(&str, &str)] = &[
     ("beef", "beefs"),
     ("brother", "brothers"),
     ("cow", "cows"),
@@ -75,7 +75,7 @@ pub static IRREGULAR_ANGLICIZED: &'static [(&'static str, &'static str)] = &[
     ("opus", "opuses"),
 ];
 
-pub static IRREGULAR_CLASSICAL: &'static [(&'static str, &'static str)] = &[
+pub static IRREGULAR_CLASSICAL: &[(&str, &str)] = &[
     ("beef", "beeves"),
     ("brother", "brethren"),
     ("cos", "kine"),
@@ -85,7 +85,7 @@ pub static IRREGULAR_CLASSICAL: &'static [(&'static str, &'static str)] = &[
     ("opus", "opera"),
 ];
 
-pub static IRREGULAR_SUFFIX_INFLECTIONS: &'static [(&'static str, &'static str)] = &[
+pub static IRREGULAR_SUFFIX_INFLECTIONS: &[(&str, &str)] = &[
     ("man$", "men"),
     ("([lm])ouse$", "${1}ice"),
     ("tooth$", "teeth"),
@@ -95,14 +95,14 @@ pub static IRREGULAR_SUFFIX_INFLECTIONS: &'static [(&'static str, &'static str)]
     ("([csx])is$", "${1}es"),
 ];
 
-pub static MODERN_CLASSICAL_INFLECTIONS: &'static [(&'static str, &'static str)] = &[
+pub static MODERN_CLASSICAL_INFLECTIONS: &[(&str, &str)] = &[
     ("trix$", "trices"),
     ("eau$", "eaux"),
     ("ieu$", "ieux"),
     ("(..[iay])nx$", "${1}nges"),
 ];
 
-pub static ADDITIONAL_SUFFIX_INFLECTIONS: &'static [(&'static str, &'static str)] = &[
+pub static ADDITIONAL_SUFFIX_INFLECTIONS: &[(&str, &str)] = &[
     // The suffixes -ch, -sh, and -ss all take -es in the plural (churches, classes, etc)...
     (r"([cs])h$", "${1}hes"),
     ("ss$", "sses"),

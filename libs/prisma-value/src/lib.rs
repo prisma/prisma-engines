@@ -109,10 +109,7 @@ where
 
 impl PrismaValue {
     pub fn is_null(&self) -> bool {
-        match self {
-            PrismaValue::Null => true,
-            _ => false,
-        }
+        matches!(self, PrismaValue::Null)
     }
 
     pub fn into_string(self) -> Option<String> {

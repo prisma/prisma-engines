@@ -97,7 +97,7 @@ pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef)
     let mut args = vec![
         where_argument(ctx, &model),
         order_by_argument(ctx, &model),
-        input_field("cursor", unique_input_type.clone(), None).optional(),
+        input_field("cursor", unique_input_type, None).optional(),
         input_field("take", InputType::int(), None).optional(),
         input_field("skip", InputType::int(), None).optional(),
     ];

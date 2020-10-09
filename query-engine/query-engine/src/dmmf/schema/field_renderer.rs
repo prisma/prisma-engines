@@ -9,11 +9,7 @@ pub(super) fn render_input_field(input_field: &InputFieldRef, ctx: &mut RenderCo
     let nullable = input_field
         .field_types
         .iter()
-        .find(|typ| match typ {
-            InputType::Scalar(ScalarType::Null) => true,
-            _ => false,
-        })
-        .is_some();
+        .any(|typ| matches!(typ, InputType::Scalar(ScalarType::Null)));
 
     let field = DmmfInputField {
         name: input_field.name.clone(),

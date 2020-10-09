@@ -156,7 +156,7 @@ impl InMemoryRecordProcessor {
 
         many_records.records.retain(|record| {
             if last_parent_id == record.parent_id {
-                current_count = current_count + 1;
+                current_count += 1;
             } else {
                 last_parent_id = record.parent_id.clone();
                 current_count = 1; // this is the first record we see for this parent id

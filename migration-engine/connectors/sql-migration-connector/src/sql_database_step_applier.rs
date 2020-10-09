@@ -62,13 +62,13 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
             for warning in &diagnostics.warnings {
                 script.push_str("  - ");
                 script.push_str(&warning.description);
-                script.push_str("\n");
+                script.push('\n');
             }
 
             for unexecutable in &diagnostics.unexecutable_migrations {
                 script.push_str("  - ");
                 script.push_str(&unexecutable.description);
-                script.push_str("\n");
+                script.push('\n');
             }
 
             script.push_str("\n*/\n")
@@ -85,7 +85,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
 
             script.push_str("-- ");
             script.push_str(step.description());
-            script.push_str("\n");
+            script.push('\n');
 
             for statement in statements {
                 script.push_str(&statement);

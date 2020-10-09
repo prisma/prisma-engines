@@ -587,7 +587,7 @@ fn infer_CreateDirective_on_enum() {
 
     let expected = &[
         MigrationStep::CreateDirective(CreateDirective {
-            location: directive_location.clone(),
+            location: directive_location,
         }),
         MigrationStep::CreateArgument(CreateArgument {
             location: argument_location,
@@ -1533,7 +1533,7 @@ fn infer_CreateSource() {
             value: MigrationExpression("\"postgres\"".to_owned()),
         }),
         MigrationStep::CreateArgument(CreateArgument {
-            location: source_location.clone().into_argument_location(),
+            location: source_location.into_argument_location(),
             argument: "url".to_owned(),
             value: MigrationExpression("\"***\"".to_owned()),
         }),
@@ -1599,7 +1599,7 @@ fn infer_Arguments_on_Datasources() {
             argument: "b".to_owned(),
         }),
         MigrationStep::UpdateArgument(UpdateArgument {
-            location: argument_location.clone(),
+            location: argument_location,
             argument: "a".to_owned(),
             new_value: MigrationExpression("2".to_owned()),
         }),

@@ -183,7 +183,7 @@ impl HistoryProblems {
 
         for failed_migration in &self.failed_migrations {
             error.push_str(&failed_migration);
-            error.push_str("\n");
+            error.push('\n');
         }
 
         if let Some(edited_migrations) = &self.edited_migrations {

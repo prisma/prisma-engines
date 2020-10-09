@@ -113,9 +113,9 @@ impl Filter {
         }
 
         match self {
-            Self::Scalar(sf) => sf.batched().into_iter().map(|sf| Self::Scalar(sf)).collect(),
-            Self::And(filters) => batch(filters, |filters| Filter::And(filters)),
-            Self::Or(filters) => batch(filters, |filters| Filter::Or(filters)),
+            Self::Scalar(sf) => sf.batched().into_iter().map(Self::Scalar).collect(),
+            Self::And(filters) => batch(filters, Filter::And),
+            Self::Or(filters) => batch(filters, Filter::Or),
             _ => vec![self],
         }
     }

@@ -25,10 +25,7 @@ pub enum RelationCondition {
 
 impl RelationCondition {
     pub fn invert_of_subselect(self) -> bool {
-        match self {
-            RelationCondition::EveryRelatedRecord => true,
-            _ => false,
-        }
+        matches!(self, RelationCondition::EveryRelatedRecord)
     }
 }
 

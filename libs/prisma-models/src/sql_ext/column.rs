@@ -54,7 +54,7 @@ pub trait AsColumns {
 
 impl AsColumns for &[Field] {
     fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.into_iter().flat_map(AsColumns::as_columns).collect();
+        let cols: Vec<Column<'static>> = self.iter().flat_map(AsColumns::as_columns).collect();
         ColumnIterator::from(cols)
     }
 }

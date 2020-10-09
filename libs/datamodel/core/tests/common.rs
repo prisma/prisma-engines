@@ -196,23 +196,23 @@ impl RelationFieldAsserts for dml::RelationField {
 impl DatamodelAsserts for dml::Datamodel {
     fn assert_has_model(&self, t: &str) -> &dml::Model {
         self.find_model(&t.to_owned())
-            .expect(format!("Model {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Model {} not found", t))
     }
     fn assert_has_enum(&self, t: &str) -> &dml::Enum {
         self.find_enum(&t.to_owned())
-            .expect(format!("Enum {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Enum {} not found", t))
     }
 }
 
 impl ModelAsserts for dml::Model {
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField {
         self.find_scalar_field(&t.to_owned())
-            .expect(format!("Field {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Field {} not found", t))
     }
 
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField {
         self.find_relation_field(&t.to_owned())
-            .expect(format!("Field {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Field {} not found", t))
     }
 
     fn assert_is_embedded(&self, t: bool) -> &Self {
@@ -253,7 +253,7 @@ impl EnumAsserts for dml::Enum {
     fn assert_has_value(&self, t: &str) -> &dml::EnumValue {
         self.values()
             .find(|x| *x.name == t.to_owned())
-            .expect(format!("Enum Value {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Enum Value {} not found", t))
     }
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
@@ -344,21 +344,21 @@ pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> ErrorCo
     }
 }
 
-pub const SQLITE_SOURCE: &'static str = r#"
+pub const SQLITE_SOURCE: &str = r#"
     datasource db {
         provider = "sqlite"
         url      = "file:dev.db"
     }
 "#;
 
-pub const POSTGRES_SOURCE: &'static str = r#"
+pub const POSTGRES_SOURCE: &str = r#"
     datasource db {
         provider = "postgres"
         url      = "postgresql://localhost:5432"
     }
 "#;
 
-pub const MYSQL_SOURCE: &'static str = r#"
+pub const MYSQL_SOURCE: &str = r#"
     datasource db {
         provider = "mysql"
         url      = "mysql://localhost:3306"

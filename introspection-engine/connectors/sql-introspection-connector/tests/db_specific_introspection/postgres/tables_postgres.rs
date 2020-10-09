@@ -389,8 +389,8 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
-    let sequence = format!("CREATE SEQUENCE test_seq START 1");
-    let color = format!("CREATE Type color as Enum ('black', 'white')");
+    let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
+    let color = "CREATE Type color as Enum (\'black\', \'white\')".to_string();
 
     api.database().execute_raw(&sequence, &[]).await.unwrap();
     api.database().execute_raw(&color, &[]).await.unwrap();
@@ -556,9 +556,9 @@ async fn introspecting_a_table_with_partial_indexes_should_ignore_them(api: &Tes
         })
         .await;
 
-    let partial =
-        format!(r#"CREATE UNIQUE INDEX "idx_pages_unique_staticId_partial" ON pages(staticId) WHERE isLatest = true;"#);
-    let non_partial = format!(r#"CREATE UNIQUE INDEX "idx_pages_unique_staticId_non_partial" ON pages(other);"#);
+    let partial = "CREATE UNIQUE INDEX \"idx_pages_unique_staticId_partial\" ON pages(staticId) WHERE isLatest = true;"
+        .to_string();
+    let non_partial = "CREATE UNIQUE INDEX \"idx_pages_unique_staticId_non_partial\" ON pages(other);".to_string();
 
     api.database().execute_raw(&partial, &[]).await.unwrap();
     api.database().execute_raw(&non_partial, &[]).await.unwrap();

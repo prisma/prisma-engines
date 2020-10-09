@@ -62,7 +62,7 @@ where
 {
     OutputField {
         name: name.into(),
-        arguments: arguments.into_iter().map(|f| Arc::new(f)).collect(),
+        arguments: arguments.into_iter().map(Arc::new).collect(),
         field_type: Arc::new(field_type),
         query_builder,
         is_required: true,
@@ -148,5 +148,5 @@ where
     T: AsRef<str>,
 {
     // Extremely sophisticated.
-    field_names.into_iter().map(AsRef::as_ref).join("_")
+    field_names.iter().map(AsRef::as_ref).join("_")
 }

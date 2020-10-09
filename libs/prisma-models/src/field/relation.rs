@@ -140,10 +140,12 @@ impl RelationField {
                 .map(|field_name| {
                     fields
                         .find_from_all(field_name)
-                        .expect(&format!(
-                            "Invalid data model: To field {} can't be resolved on model {}",
-                            field_name, model.name
-                        ))
+                        .unwrap_or_else(|_| {
+                            panic!(
+                                "Invalid data model: To field {} can't be resolved on model {}",
+                                field_name, model.name
+                            )
+                        })
                         .clone()
                 })
                 .collect();
@@ -173,10 +175,12 @@ impl RelationField {
                 .fields
                 .iter()
                 .map(|f| {
-                    Arc::downgrade(&fields.find_from_scalar(f).expect(&format!(
-                        "Expected '{}' to be a scalar field on model '{}', found none.",
-                        f, model.name
-                    )))
+                    Arc::downgrade(&fields.find_from_scalar(f).unwrap_or_else(|_| {
+                        panic!(
+                            "Expected '{}' to be a scalar field on model '{}', found none.",
+                            f, model.name
+                        )
+                    }))
                 })
                 .collect()
         });

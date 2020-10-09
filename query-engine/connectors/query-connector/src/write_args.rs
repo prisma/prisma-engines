@@ -156,14 +156,14 @@ impl WriteArgs {
         let updated_at_field = model.fields().updated_at();
 
         if let Some(f) = created_at_field {
-            if let None = self.args.get(f.db_name()) {
+            if self.args.get(f.db_name()).is_none() {
                 self.args.insert(f.into(), now.clone().into());
             }
         }
 
         if let Some(f) = updated_at_field {
-            if let None = self.args.get(f.db_name()) {
-                self.args.insert(f.into(), now.clone().into());
+            if self.args.get(f.db_name()).is_none() {
+                self.args.insert(f.into(), now.into());
             }
         }
     }
@@ -171,7 +171,7 @@ impl WriteArgs {
     pub fn update_datetimes(&mut self, model: ModelRef) {
         if !self.args.is_empty() {
             if let Some(field) = model.fields().updated_at() {
-                if let None = self.args.get(field.db_name()) {
+                if self.args.get(field.db_name()).is_none() {
                     self.args.insert(field.into(), PrismaValue::DateTime(Utc::now()).into());
                 }
             }
@@ -197,7 +197,7 @@ impl WriteArgs {
                     None => PrismaValue::Null,
                 };
 
-                (field.clone(), val.clone())
+                (field, val)
             })
             .collect();
 

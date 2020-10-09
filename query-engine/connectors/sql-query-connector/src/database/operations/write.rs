@@ -75,7 +75,7 @@ pub async fn update_records(
     let ids = conn.filter_selectors(model, record_filter).await?;
     let id_args = pick_args(&model.primary_identifier(), &args);
 
-    if ids.len() == 0 {
+    if ids.is_empty() {
         return Ok(vec![]);
     }
 

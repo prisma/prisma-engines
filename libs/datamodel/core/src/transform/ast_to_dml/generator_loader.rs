@@ -62,13 +62,15 @@ impl GeneratorLoader {
         };
 
         // for compatibility reasons we still accept the old experimental key
-        let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY).or(args.arg(EXPERIMENTAL_FEATURES_KEY));
+        let preview_features_arg = args
+            .arg(PREVIEW_FEATURES_KEY)
+            .or_else(|_| args.arg(EXPERIMENTAL_FEATURES_KEY));
         let (preview_features, span) = match preview_features_arg.ok() {
             Some(x) => (x.as_array().to_str_vec()?, x.span()),
             None => (Vec::new(), Span::empty()),
         };
 
-        if preview_features.len() > 0 {
+        if !preview_features.is_empty() {
             if let Err(err) =
                 validate_preview_features(preview_features.clone(), span, GENERATOR_PREVIEW_FEATURES.to_vec())
             {
