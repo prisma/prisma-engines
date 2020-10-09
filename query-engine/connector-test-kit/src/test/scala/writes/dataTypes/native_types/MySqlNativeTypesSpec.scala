@@ -50,7 +50,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
         legacy = false
       )
 
-      res.toString should be(s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":127,"mInt":8388607,"bInt":5294967295,"$fieldName":1}}}""")
+      res.toString should be(s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"mInt":8388607,"bInt":5294967295,"$fieldName":1}}}""")
     }
   }
 
