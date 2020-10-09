@@ -20,7 +20,7 @@ impl TryInto<PrismaValue> for ParsedInputValue {
                 .into_iter()
                 .map(|val| val.try_into())
                 .collect::<QueryParserResult<Vec<PrismaValue>>>()
-                .map(|vec| PrismaValue::List(vec)),
+                .map(PrismaValue::List),
 
             v => Err(QueryParserError {
                 path: QueryPath::default(),

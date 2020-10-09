@@ -116,7 +116,7 @@ fn create_query_raw_field() -> OutputField {
 
 /// Builds a create mutation field (e.g. createUser) for given model.
 fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::create_arguments(ctx, model).unwrap_or_else(|| vec![]);
+    let args = arguments::create_arguments(ctx, model).unwrap_or_else(Vec::new);
     let field_name = ctx.pluralize_internal(format!("create{}", model.name), format!("createOne{}", model.name));
 
     field(

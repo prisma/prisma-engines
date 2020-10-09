@@ -29,7 +29,7 @@ impl IndexTemplate {
                 let field = fields
                     .iter()
                     .find(|sf| sf.name == name)
-                    .expect(&format!("Unable to resolve field '{}'", name));
+                    .unwrap_or_else(|| panic!("Unable to resolve field '{}'", name));
 
                 Arc::downgrade(field)
             })

@@ -48,7 +48,7 @@ impl RecordProjection {
             }
         }
 
-        return false;
+        false
     }
 
     /// Consumes this projection and splits it into a set of `RecordProjection`s based on the passed
@@ -58,7 +58,7 @@ impl RecordProjection {
             self.into_iter().map(|(sf, val)| (sf.name.clone(), (sf, val))).collect();
 
         projections
-            .into_iter()
+            .iter()
             .map(|p| {
                 p.scalar_fields()
                     .map(|sf| {

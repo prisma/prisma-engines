@@ -73,7 +73,7 @@ impl GqlFieldRenderer {
 ///            it's only serving the playground used for ad-hoc debugging.
 fn pick_input_type(candidates: &[InputType]) -> &InputType {
     candidates
-        .into_iter()
+        .iter()
         .fold1(|prev, next| match (prev, next) {
             (InputType::Scalar(ScalarType::Null), _) => next, // Null has the least precedence.
             (InputType::Scalar(_), InputType::List(_)) => next, // Lists have precedence over scalars.

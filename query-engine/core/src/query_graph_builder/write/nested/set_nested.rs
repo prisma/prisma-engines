@@ -108,9 +108,7 @@ fn handle_many_to_many(
          QueryGraphDependency::ParentProjection(parent_model_identifier, Box::new(|mut disconnect_node, mut parent_ids| {
              let parent_id = match parent_ids.pop() {
                  Some(pid) => Ok(pid),
-                 None => Err(QueryGraphBuilderError::AssertionError(format!(
-                     "[Query Graph] Expected a valid parent ID to be present for a nested set (disconnect part) on a many-to-many relation."
-                 ))),
+                 None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested set (disconnect part) on a many-to-many relation.".to_string())),
              }?;
 
              if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
@@ -140,7 +138,7 @@ fn handle_many_to_many(
 
     if filter.size() > 0 {
         let expected_connects = filter.size();
-        let read_new_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier, filter);
+        let read_new_query = utils::read_ids_infallible(child_model, child_model_identifier, filter);
         let read_new_node = graph.create_node(read_new_query);
 
         graph.create_edge(&disconnect_node, &read_new_node, QueryGraphDependency::ExecutionOrder)?;
@@ -244,7 +242,7 @@ fn handle_one_to_many(
         &read_old_node,
         &diff_node,
         QueryGraphDependency::ParentProjection(
-            child_model_identifier.clone(),
+            child_model_identifier,
             Box::new(move |mut diff_node, child_ids| {
                 if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
                     diff.right = HashSet::from_iter(child_ids.into_iter());
@@ -280,13 +278,11 @@ fn handle_one_to_many(
         parent_node,
         &update_connect_node,
         QueryGraphDependency::ParentProjection(
-            parent_link.clone(),
+            parent_link,
             Box::new(move |mut update_connect_node, mut parent_links| {
                 let parent_link = match parent_links.pop() {
                     Some(link) => Ok(link),
-                    None => Err(QueryGraphBuilderError::AssertionError(format!(
-                        "[Query Graph] Expected a valid parent ID to be present for a nested set on a one-to-many relation."
-                    ))),
+                    None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested set on a one-to-many relation.".to_string())),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_connect_node {

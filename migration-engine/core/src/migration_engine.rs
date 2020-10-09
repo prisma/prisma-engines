@@ -1,6 +1,8 @@
-use crate::migration::datamodel_calculator::*;
-use crate::migration::datamodel_migration_steps_inferrer::*;
-use crate::{commands::CommandResult, CoreResult};
+use crate::{
+    commands::CommandResult,
+    migration::{datamodel_calculator::*, datamodel_migration_steps_inferrer::*},
+    CoreResult,
+};
 use datamodel::ast::SchemaAst;
 use migration_connector::*;
 use std::sync::Arc;

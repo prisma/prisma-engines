@@ -274,10 +274,7 @@ async fn get_all_columns(
             .and_then(|x| x.to_string())
             .expect("get extra")
             .to_lowercase();
-        let auto_increment = match extra.as_str() {
-            "auto_increment" => true,
-            _ => false,
-        };
+        let auto_increment = matches!(extra.as_str(), "auto_increment");
 
         let entry = map.entry(table_name).or_insert((Vec::new(), Vec::new()));
 

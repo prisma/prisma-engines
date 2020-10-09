@@ -195,7 +195,7 @@ fn migration_table_setup(
     t.add_column(REVISION_COLUMN, types::primary());
     t.add_column(NAME_COLUMN, text_type.clone());
     t.add_column(DATAMODEL_COLUMN, unlimited_text_type.clone());
-    t.add_column(STATUS_COLUMN, text_type.clone());
+    t.add_column(STATUS_COLUMN, text_type);
     t.add_column(APPLIED_COLUMN, types::integer());
     t.add_column(ROLLED_BACK_COLUMN, types::integer());
     t.add_column(DATAMODEL_STEPS_COLUMN, unlimited_text_type.clone());

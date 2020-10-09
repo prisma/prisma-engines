@@ -8,7 +8,7 @@ pub async fn get_mssql_describer_for_schema(sql: &str, schema: &'static str) -> 
     let api = mssql_2019_test_api(schema).await;
     debug!("Executing SQL Server migrations: {}", sql);
 
-    let statements = sql.split(";").filter(|s| !s.is_empty());
+    let statements = sql.split(';').filter(|s| !s.is_empty());
 
     for statement in statements {
         debug!("Executing migration statement: '{}'", statement);

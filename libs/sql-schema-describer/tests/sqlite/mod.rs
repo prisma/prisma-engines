@@ -21,7 +21,7 @@ pub async fn get_sqlite_describer(sql: &str, db_name: &str) -> sqlite::SqlSchema
         .await
         .unwrap();
 
-    for statement in sql.split(";").filter(|statement| !statement.is_empty()) {
+    for statement in sql.split(';').filter(|statement| !statement.is_empty()) {
         conn.query_raw(statement, &[]).await.expect("executing migration");
     }
 

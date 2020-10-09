@@ -294,10 +294,8 @@ impl<'a> Validator<'a> {
                     if let Some(dml_enum) = data_model.find_enum(&enum_name) {
                         if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
                             errors.push(DatamodelError::new_attribute_validation_error(
-                                &format!(
-                                "{}",
-                                "The defined default value is not a valid value of the enum specified for the field."
-                            ),
+                                &"The defined default value is not a valid value of the enum specified for the field."
+                                    .to_string(),
                                 "default",
                                 ast_model.find_field(&field.name).span,
                             ))
@@ -322,10 +320,7 @@ impl<'a> Validator<'a> {
                 && model.auto_increment_fields().count() > 1
             {
                 errors.push(DatamodelError::new_attribute_validation_error(
-                    &format!(
-                        "{}",
-                        "The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table."
-                    ),
+                    &"The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.".to_string(),
                     "default",
                     ast_model.span,
                 ))
@@ -340,10 +335,7 @@ impl<'a> Validator<'a> {
                     && !data_source.combined_connector.supports_non_id_auto_increment()
                 {
                     errors.push(DatamodelError::new_attribute_validation_error(
-                    &format!(
-                        "{}",
-                        "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this."
-                    ),
+                    &"The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.".to_string(),
                     "default",
                     ast_field.span,
                 ))
@@ -354,10 +346,7 @@ impl<'a> Validator<'a> {
                     && !data_source.combined_connector.supports_non_indexed_auto_increment()
                 {
                     errors.push(DatamodelError::new_attribute_validation_error(
-                    &format!(
-                        "{}",
-                        "The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this."
-                    ),
+                    &"The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.".to_string(),
                     "default",
                     ast_field.span,
                 ))
@@ -690,6 +679,25 @@ impl<'a> Validator<'a> {
                                      rel_info.to_fields.join(", ")),
                             ast_field.span)
                         );
+                }
+
+                let references_nullable_field = rel_info.to_fields.iter().any(|field_name| {
+                    let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
+                    referenced_field.is_optional()
+                });
+
+                let must_not_reference_nullable_field = match self.source {
+                    Some(source) => !source.combined_connector.supports_relations_over_nullable_field(),
+                    None => false,
+                };
+
+                if references_nullable_field && must_not_reference_nullable_field {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The argument `references` must not refer to a nullable field in the related model `{}`. But it is referencing the following fields that are nullable: {}",
+                                &related_model.name,
+                                rel_info.to_fields.join(", ")),
+                    ast_field.span)
+                    );
                 }
 
                 // TODO: This error is only valid for connectors that don't support native many to manys.

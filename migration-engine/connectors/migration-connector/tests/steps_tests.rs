@@ -187,12 +187,12 @@ fn DeleteEnum_must_work() {
 }
 
 #[test]
-fn CreateAttribute_must_work() {
+fn CreateDirective_must_work() {
     let json = r#"
         {
-            "tag": "CreateAttribute",
+            "tag": "CreateDirective",
             "location": {
-                "attribute": "map",
+                "directive": "map",
                 "path": {
                     "tag": "Model",
                     "model": "Blog"           
@@ -201,13 +201,13 @@ fn CreateAttribute_must_work() {
         }
     "#;
 
-    let expected_step = MigrationStep::CreateAttribute(CreateAttribute {
-        location: AttributeLocation {
-            path: AttributePath::Model {
+    let expected_step = MigrationStep::CreateDirective(CreateDirective {
+        location: DirectiveLocation {
+            path: DirectivePath::Model {
                 model: "Blog".to_owned(),
                 arguments: None,
             },
-            attribute: "map".to_owned(),
+            directive: "map".to_owned(),
         },
     });
 
@@ -215,28 +215,28 @@ fn CreateAttribute_must_work() {
 }
 
 #[test]
-fn minimal_DeleteAttribute_must_work() {
+fn minimal_DeleteDirective_must_work() {
     let json = r#"
         {
-            "tag": "DeleteAttribute",
+            "tag": "DeleteDirective",
             "location": {
                 "path": {
                     "tag": "Field",
                     "model": "Blog",
                     "field": "title"
                 },
-                "attribute": "map"
+                "directive": "map"
             }
         }
     "#;
 
-    let expected_step = MigrationStep::DeleteAttribute(DeleteAttribute {
-        location: AttributeLocation {
-            path: AttributePath::Field {
+    let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
+        location: DirectiveLocation {
+            path: DirectivePath::Field {
                 model: "Blog".to_owned(),
                 field: "title".to_owned(),
             },
-            attribute: "map".to_owned(),
+            directive: "map".to_owned(),
         },
     });
 
@@ -244,10 +244,10 @@ fn minimal_DeleteAttribute_must_work() {
 }
 
 #[test]
-fn full_DeleteAttribute_must_work() {
+fn full_DeleteDirective_must_work() {
     let json = r#"
         {
-            "tag": "DeleteAttribute",
+            "tag": "DeleteDirective",
             "location": {
                 "path": {
                     "tag": "Model",
@@ -259,21 +259,21 @@ fn full_DeleteAttribute_must_work() {
                         }
                     ]
                 },
-                "attribute": "unique"
+                "directive": "unique"
             }
         }
     "#;
 
-    let expected_step = MigrationStep::DeleteAttribute(DeleteAttribute {
-        location: AttributeLocation {
-            path: AttributePath::Model {
+    let expected_step = MigrationStep::DeleteDirective(DeleteDirective {
+        location: DirectiveLocation {
+            path: DirectivePath::Model {
                 model: "Blog".to_owned(),
                 arguments: Some(vec![Argument {
                     name: "".to_owned(),
                     value: MigrationExpression("[name, age]".to_owned()),
                 }]),
             },
-            attribute: "unique".to_owned(),
+            directive: "unique".to_owned(),
         },
     });
 
@@ -286,12 +286,12 @@ fn UpdateArgument_must_work() {
         {
             "tag": "UpdateArgument",
             "location": {
-                "tag": "Attribute",
+                "tag": "Directive",
                 "path": {
                     "tag": "Model",
                     "model": "CatMood"
                 },
-                "attribute": "map"
+                "directive": "map"
             },            
             "argument": "name",
             "newValue": "cat_mood"
@@ -299,12 +299,12 @@ fn UpdateArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::UpdateArgument(UpdateArgument {
-        location: ArgumentLocation::Attribute(AttributeLocation {
-            path: AttributePath::Model {
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            path: DirectivePath::Model {
                 model: "CatMood".to_owned(),
                 arguments: None,
             },
-            attribute: "map".to_owned(),
+            directive: "map".to_owned(),
         }),
         argument: "name".to_owned(),
         new_value: MigrationExpression("cat_mood".to_owned()),
@@ -319,8 +319,8 @@ fn CreateArgument_must_work() {
         {
             "tag": "CreateArgument",
             "location": {
-                "tag": "Attribute",
-                "attribute": "map",
+                "tag": "Directive",
+                "directive": "map",
                 "path": {
                     "enum": "CatMood",
                     "tag": "Enum"
@@ -332,11 +332,11 @@ fn CreateArgument_must_work() {
     "#;
 
     let expected_step = MigrationStep::CreateArgument(CreateArgument {
-        location: ArgumentLocation::Attribute(AttributeLocation {
-            path: AttributePath::Enum {
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            path: DirectivePath::Enum {
                 r#enum: "CatMood".to_owned(),
             },
-            attribute: "map".to_owned(),
+            directive: "map".to_owned(),
         }),
         argument: "name".to_owned(),
         value: MigrationExpression("cat_mood".to_owned()),
@@ -353,23 +353,23 @@ fn DeleteArgument_must_work() {
         {
             "tag": "DeleteArgument",
             "location": {
-                "tag": "Attribute",
+                "tag": "Directive",
                 "path": {
                     "tag":"Enum",
                     "enum": "CatMood"                    
                 },
-                "attribute":"map"
+                "directive":"map"
             },
             "argument": "name"
         }
     "#;
 
     let expected_step = MigrationStep::DeleteArgument(DeleteArgument {
-        location: ArgumentLocation::Attribute(AttributeLocation {
-            path: AttributePath::Enum {
+        location: ArgumentLocation::Directive(DirectiveLocation {
+            path: DirectivePath::Enum {
                 r#enum: "CatMood".to_owned(),
             },
-            attribute: "map".to_owned(),
+            directive: "map".to_owned(),
         }),
         argument: "name".to_owned(),
     });

@@ -204,17 +204,11 @@ impl MigrationStatus {
     }
 
     pub fn is_success(&self) -> bool {
-        match self {
-            MigrationStatus::MigrationSuccess => true,
-            _ => false,
-        }
+        matches!(self, MigrationStatus::MigrationSuccess)
     }
 
     pub fn is_pending(&self) -> bool {
-        match self {
-            MigrationStatus::Pending => true,
-            _ => false,
-        }
+        matches!(self, MigrationStatus::Pending)
     }
 }
 

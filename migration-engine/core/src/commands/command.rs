@@ -1,8 +1,6 @@
-use crate::migration::datamodel_calculator::CalculatorError;
-use crate::migration_engine::MigrationEngine;
+use crate::{migration::datamodel_calculator::CalculatorError, migration_engine::MigrationEngine};
 use migration_connector::*;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{de::DeserializeOwned, Serialize};
 use thiserror::Error;
 
 /// The implementation of an RPC command exposed by the migration engine.
@@ -92,7 +90,7 @@ mod tests {
         "#;
 
         let err = datamodel::parse_datamodel(bad_dml)
-            .map_err(|err| CommandError::ProducedBadDatamodel(err))
+            .map_err(CommandError::ProducedBadDatamodel)
             .unwrap_err();
 
         assert_eq!(

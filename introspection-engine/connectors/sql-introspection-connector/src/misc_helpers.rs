@@ -60,7 +60,7 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
         column.to_lowercase() == "b"
     }
 
-    table.name.starts_with("_")
+    table.name.starts_with('_')
         //UNIQUE INDEX [A,B]
         && table.indices.iter().any(|i| {
             i.columns.len() == 2

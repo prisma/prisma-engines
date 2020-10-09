@@ -110,7 +110,7 @@ impl EnumValue {
     /// The effective database name, i.e. the name in the @map annotation, and failing that the
     /// identifier name.
     pub fn final_database_name(&self) -> &str {
-        self.database_name.as_deref().unwrap_or(self.name.as_str())
+        self.database_name.as_deref().unwrap_or_else(|| self.name.as_str())
     }
 }
 

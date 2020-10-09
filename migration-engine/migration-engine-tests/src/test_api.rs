@@ -3,9 +3,9 @@ mod apply_migrations;
 mod calculate_database_steps;
 mod create_migration;
 mod diagnose_migration_history;
+mod evaluate_data_loss;
 mod infer;
 mod infer_apply;
-mod plan_migration;
 mod reset;
 mod schema_push;
 mod unapply_migration;
@@ -15,9 +15,9 @@ pub use apply_migrations::ApplyMigrations;
 pub use calculate_database_steps::CalculateDatabaseSteps;
 pub use create_migration::CreateMigration;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
+pub use evaluate_data_loss::EvaluateDataLoss;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
-pub use plan_migration::PlanMigration;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
@@ -192,34 +192,34 @@ impl TestApi {
         }
     }
 
-    pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
+    pub fn infer(&self, dm: impl Into<String>) -> Infer<'_> {
         Infer::new(&self.api, dm)
     }
 
-    pub fn apply<'a>(&'a self) -> Apply<'a> {
+    pub fn apply(&self) -> Apply<'_> {
         Apply::new(&self.api)
     }
 
-    pub fn unapply_migration<'a>(&'a self) -> UnapplyMigration<'a> {
+    pub fn unapply_migration(&self) -> UnapplyMigration<'_> {
         UnapplyMigration {
             api: &self.api,
             force: None,
         }
     }
 
-    pub fn plan_migration<'a>(
+    pub fn evaluate_data_loss<'a>(
         &'a self,
         migrations_directory: &'a TempDir,
         prisma_schema: impl Into<String>,
-    ) -> PlanMigration<'a> {
-        PlanMigration::new(&self.api, migrations_directory, prisma_schema.into())
+    ) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
     }
 
-    pub fn reset<'a>(&'a self) -> Reset<'a> {
+    pub fn reset(&self) -> Reset<'_> {
         Reset::new(&self.api)
     }
 
-    pub fn schema_push<'a>(&'a self, dm: impl Into<String>) -> SchemaPush<'a> {
+    pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new(&self.api, dm.into())
     }
 
@@ -288,7 +288,7 @@ impl TestApi {
         }
     }
 
-    pub fn calculate_database_steps<'a>(&'a self) -> CalculateDatabaseSteps<'a> {
+    pub fn calculate_database_steps(&self) -> CalculateDatabaseSteps<'_> {
         CalculateDatabaseSteps::new(&self.api)
     }
 }

@@ -172,10 +172,7 @@ impl ScalarField {
         if self.model().is_legacy() {
             self.name == CREATED_AT_FIELD
         } else {
-            match self.behaviour {
-                Some(FieldBehaviour::CreatedAt) => true,
-                _ => false,
-            }
+            matches!(self.behaviour, Some(FieldBehaviour::CreatedAt))
         }
     }
 
@@ -183,10 +180,7 @@ impl ScalarField {
         if self.model().is_legacy() {
             self.name == UPDATED_AT_FIELD
         } else {
-            match self.behaviour {
-                Some(FieldBehaviour::UpdatedAt) => true,
-                _ => false,
-            }
+            matches!(self.behaviour, Some(FieldBehaviour::UpdatedAt))
         }
     }
 
@@ -203,6 +197,6 @@ impl ScalarField {
     }
 
     pub fn is_read_only(&self) -> bool {
-        self.read_only.get_or_init(|| false).clone()
+        *self.read_only.get_or_init(|| false)
     }
 }

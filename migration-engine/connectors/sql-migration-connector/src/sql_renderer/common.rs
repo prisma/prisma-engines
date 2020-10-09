@@ -2,7 +2,7 @@ use sql_schema_describer::walkers::*;
 use sql_schema_describer::*;
 use std::fmt::{Display, Write as _};
 
-pub(super) const SQL_INDENTATION: &'static str = "    ";
+pub(super) const SQL_INDENTATION: &str = "    ";
 
 #[derive(Debug)]
 pub(crate) enum Quoted<T> {
