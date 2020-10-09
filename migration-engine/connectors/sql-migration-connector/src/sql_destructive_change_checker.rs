@@ -149,7 +149,7 @@ impl SqlDestructiveChangeChecker<'_> {
                             next,
                         };
 
-                        if let Some(_) = differ.dropped_primary_key() {
+                        if differ.dropped_primary_key().is_some() {
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange { table: name.clone() },
                                 step_index,

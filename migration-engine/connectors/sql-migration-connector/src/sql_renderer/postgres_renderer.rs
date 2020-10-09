@@ -236,13 +236,11 @@ impl SqlRenderer for PostgresFlavour {
             lines.join(",\n")
         );
 
-        let statements = before_statements
+        before_statements
             .into_iter()
             .chain(std::iter::once(alter_table))
             .chain(after_statements.into_iter())
-            .collect();
-
-        statements
+            .collect()
     }
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String {
@@ -331,7 +329,7 @@ impl SqlRenderer for PostgresFlavour {
 
         let primary_columns = table.table.primary_key_columns();
         let pk_column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-        let pk = if pk_column_names.len() > 0 {
+        let pk = if !pk_column_names.is_empty() {
             format!(",\nPRIMARY KEY ({})", pk_column_names)
         } else {
             String::new()

@@ -56,7 +56,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
 
         // Note: it would be much nicer if we could place the warnings next to
         // the SQL for the steps that triggered them.
-        if diagnostics.has_warnings() || diagnostics.unexecutable_migrations.len() > 0 {
+        if diagnostics.has_warnings() || !diagnostics.unexecutable_migrations.is_empty() {
             script.push_str("/*\n  Warnings:\n\n");
 
             for warning in &diagnostics.warnings {

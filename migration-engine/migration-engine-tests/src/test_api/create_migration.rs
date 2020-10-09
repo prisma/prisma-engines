@@ -43,7 +43,7 @@ impl<'a> CreateMigration<'a> {
             .await?;
 
         Ok(CreateMigrationAssertion {
-            output: output,
+            output,
             _api: self.api,
             migrations_directory: self.migrations_directory,
         })
@@ -91,7 +91,6 @@ impl<'a> CreateMigrationAssertion<'a> {
     {
         let migration = std::fs::read_dir(self.migrations_directory.path())
             .context("Reading migrations directory for named migration.")?
-            .into_iter()
             .find_map(|entry| {
                 let entry = entry.unwrap();
                 let name = entry.file_name();

@@ -110,8 +110,8 @@ impl SqlRenderer for MssqlFlavour {
         let (on_delete, on_update) = if is_self_relation {
             ("ON DELETE NO ACTION", "ON UPDATE NO ACTION")
         } else {
-            let on_delete = common::render_on_delete(&foreign_key.on_delete_action).into();
-            let on_update = common::render_on_update(&foreign_key.on_update_action).into();
+            let on_delete = common::render_on_delete(&foreign_key.on_delete_action);
+            let on_update = common::render_on_update(&foreign_key.on_update_action);
 
             (on_delete, on_update)
         };
