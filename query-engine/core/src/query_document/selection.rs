@@ -179,17 +179,11 @@ impl<'a> SelectionSet<'a> {
     }
 
     pub fn is_single(&self) -> bool {
-        match self {
-            Self::Single(_, _) => true,
-            _ => false,
-        }
+        matches!(self, Self::Single(_, _))
     }
 
     pub fn is_multi(&self) -> bool {
-        match self {
-            Self::Multi(_, _) => true,
-            _ => false,
-        }
+        matches!(self, Self::Multi(_, _))
     }
 
     pub fn is_empty(&self) -> bool {
@@ -332,7 +326,7 @@ fn single_to_multi_filter(obj: IndexMap<String, QueryValue>) -> IndexMap<String,
     let mut new_obj = IndexMap::new();
 
     for (key, value) in obj {
-        let equality_obj = IndexMap::from(vec![("equals".to_owned(), value)].into_iter().collect());
+        let equality_obj = vec![("equals".to_owned(), value)].into_iter().collect();
         new_obj.insert(key, QueryValue::Object(equality_obj));
     }
 

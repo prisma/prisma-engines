@@ -30,7 +30,7 @@ pub fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
 }
 
 pub fn strip_new_line(str: &str) -> &str {
-    if str.ends_with("\n") {
+    if str.ends_with('\n') {
         &str[0..str.len() - 1] // slice away line break.
     } else {
         &str

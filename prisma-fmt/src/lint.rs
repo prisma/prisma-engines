@@ -1,6 +1,6 @@
 use crate::{LintOpts, MiniError};
 use datamodel::error::DatamodelError;
-use serde_json;
+
 use std::io::{self, Read};
 
 pub fn run(opts: LintOpts) {

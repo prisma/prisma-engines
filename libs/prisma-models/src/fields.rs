@@ -51,14 +51,11 @@ impl Fields {
                 let field = self
                     .all
                     .iter()
-                    .find(|f| match f {
-                        Field::Scalar(sf) if &sf.name == field_name => true,
-                        _ => false,
-                    })
+                    .find(|f| matches!(f, Field::Scalar(sf) if &sf.name == field_name))
                     .expect("Expected inlined relation field reference to be an existing scalar field.");
 
                 if let Field::Scalar(sf) = field {
-                    if let Err(_) = sf.read_only.set(true) {
+                    if sf.read_only.set(true).is_err() {
                         // Ignore error
                     };
                 }
@@ -229,7 +226,7 @@ impl Fields {
 
     /// Attempts to resolve a compound ID field on the model (supplied with @@id on scalar fields).
     fn find_multipart_id(&self) -> Option<Vec<ScalarFieldRef>> {
-        if self.id_field_names.len() > 0 {
+        if !self.id_field_names.is_empty() {
             let fields = self
                 .id_field_names
                 .iter()
@@ -237,8 +234,7 @@ impl Fields {
                     self.scalar()
                         .into_iter()
                         .find(|field| &field.name == f)
-                        .expect(&format!("Expected ID field {} to be present on the model", f))
-                        .clone()
+                        .unwrap_or_else(|| panic!("Expected ID field {} to be present on the model", f))
                 })
                 .collect();
 

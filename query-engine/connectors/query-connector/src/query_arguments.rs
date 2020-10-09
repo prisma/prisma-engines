@@ -108,8 +108,8 @@ impl QueryArguments {
                     .map(|filter| QueryArguments {
                         model: model.clone(),
                         cursor: cursor.clone(),
-                        take: take.clone(),
-                        skip: skip.clone(),
+                        take,
+                        skip,
                         filter: Some(filter),
                         order_by: order_by.clone(),
                         distinct: distinct.clone(),

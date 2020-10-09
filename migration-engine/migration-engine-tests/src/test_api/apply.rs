@@ -14,7 +14,7 @@ pub struct Apply<'a> {
 }
 
 impl Apply<'_> {
-    pub fn new<'a>(api: &'a dyn GenericApi) -> Apply<'a> {
+    pub fn new(api: &dyn GenericApi) -> Apply<'_> {
         Apply {
             api,
             migration_id: None,

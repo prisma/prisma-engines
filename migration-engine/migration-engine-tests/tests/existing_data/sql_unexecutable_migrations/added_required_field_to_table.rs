@@ -32,7 +32,7 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
         .send()
         .await?
         .assert_no_warning()?
-        .assert_unexecutable(&[format!("Added the required column `age` to the `Test` table without a default value. There are 1 rows in this table, it is not possible to execute this migration.")])?;
+        .assert_unexecutable(&["Added the required column `age` to the `Test` table without a default value. There are 1 rows in this table, it is not possible to execute this migration.".to_string()])?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
     assert_eq!(rows, &[&[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#]]);

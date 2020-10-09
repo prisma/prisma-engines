@@ -97,7 +97,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
     user_model
         .assert_has_scalar_field("test")
         .assert_default_value(DefaultValue::Single(PrismaValue::Float(
-            Decimal::from_f64(1.00.into()).unwrap(),
+            Decimal::from_f64(1.00).unwrap(),
         )));
 
     let sft = user_model.assert_has_scalar_field("test").assert_native_type();
@@ -211,6 +211,7 @@ fn should_handle_type_specifications_on_mysql() {
             id       Int      @id
             smallInt Int      @mys.SmallInt
             foobar   DateTime @mys.Datetime(6)
+            fooInt   Boolean @mys.TinyInt
         }
     "#;
 
@@ -227,4 +228,9 @@ fn should_handle_type_specifications_on_mysql() {
 
     let mysql_type: MySqlType = sft.deserialize_native_type();
     assert_eq!(mysql_type, MySqlType::DateTime(Some(6)));
+
+    let sft = user_model.assert_has_scalar_field("fooInt").assert_native_type();
+
+    let mysql_type: MySqlType = sft.deserialize_native_type();
+    assert_eq!(mysql_type, MySqlType::TinyInt);
 }

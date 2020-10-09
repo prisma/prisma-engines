@@ -192,10 +192,7 @@ pub enum IndexType {
 
 impl IndexType {
     pub fn is_unique(&self) -> bool {
-        match self {
-            IndexType::Unique => true,
-            _ => false,
-        }
+        matches!(self, IndexType::Unique)
     }
 }
 
@@ -579,6 +576,6 @@ mod tests {
 
         assert_eq!(unquote_string(&quoted_str), "abc $$ def");
 
-        assert_eq!(unquote_string("heh ".into()), "heh ");
+        assert_eq!(unquote_string("heh "), "heh ");
     }
 }

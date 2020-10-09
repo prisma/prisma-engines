@@ -19,16 +19,15 @@ impl ErrorCollection {
     }
 
     pub fn push_opt(&mut self, err: Option<DatamodelError>) {
-        match err {
-            Some(err) => self.push(err),
-            None => {}
+        if let Some(err) = err {
+            self.push(err);
         }
     }
 
     /// Returns true, if there is at least one error
     /// in this collection.
     pub fn has_errors(&self) -> bool {
-        self.errors.len() > 0
+        !self.errors.is_empty()
     }
 
     /// Creates an iterator over all errors in this collection.

@@ -3,7 +3,7 @@ use datamodel::error::ErrorCollection;
 use feature_flags::FeatureFlagError;
 use graphql_parser::query::ParseError as GqlParseError;
 use query_core::CoreError;
-use serde_json;
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]

@@ -1,6 +1,7 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml, IndexDefinition, IndexType};
+use std::cmp::Ordering;
 use std::collections::HashMap;
 
 /// Prismas builtin `@unique` attribute.
@@ -13,19 +14,17 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
 
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(rf) = obj {
-            let suggestion = if rf.relation_info.fields.len() == 1 {
-                format!(
+            let suggestion = match rf.relation_info.fields.len().cmp(&1) {
+                Ordering::Equal => format!(
                     " Did you mean to put it on `{}`?",
                     rf.relation_info.fields.first().unwrap()
-                )
-            } else if rf.relation_info.fields.len() > 1 {
-                format!(
+                ),
+                Ordering::Greater => format!(
                     " Did you mean to provide `@@unique([{}])`?",
                     rf.relation_info.fields.join(", ")
-                )
-            } else {
+                ),
                 // no suggestion possible
-                String::new()
+                Ordering::Less => String::new(),
             };
 
             return self.new_attribute_validation_error(

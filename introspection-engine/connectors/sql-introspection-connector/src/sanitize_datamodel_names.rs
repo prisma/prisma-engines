@@ -8,8 +8,8 @@ use quaint::prelude::SqlFamily;
 use regex::Regex;
 use std::collections::HashMap;
 
-static EMPTY_ENUM_PLACEHOLDER: &'static str = "EMPTY_ENUM_VALUE";
-static EMPTY_STRING: &'static str = "";
+static EMPTY_ENUM_PLACEHOLDER: &str = "EMPTY_ENUM_VALUE";
+static EMPTY_STRING: &str = "";
 
 static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
@@ -105,7 +105,7 @@ fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<Str
 fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (String, Option<String>)>) {
     for enm in datamodel.enums_mut() {
         if let Some((sanitized_name, db_name)) = enum_renames.get(&enm.name) {
-            if let None = enm.database_name() {
+            if enm.database_name().is_none() {
                 enm.set_database_name(db_name.clone());
             }
 
@@ -126,7 +126,7 @@ fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (Str
 }
 
 fn sanitize_strings(strings: &[String]) -> Vec<String> {
-    strings.into_iter().map(|f| sanitize_string(f)).collect()
+    strings.iter().map(|f| sanitize_string(f)).collect()
 }
 
 // Todo: This is now widely used, we can make this smarter at some point.
@@ -144,8 +144,8 @@ where
 
     if sanitized != name {
         // Only set the db name if there's none already set (or else this would invalidate the model).
-        if let None = db_name {
-            renameable.set_database_name(Some(name.to_owned()));
+        if db_name.is_none() {
+            renameable.set_database_name(Some(name));
         }
 
         renameable.set_name(&sanitized);
@@ -176,11 +176,11 @@ fn rename_reserved(model: &mut Model) {
 
         match model.documentation {
             Some(ref docs) => model.documentation = Some(format!("{}\n{}", docs, comment)),
-            None => model.documentation = Some(comment.to_owned()),
+            None => model.documentation = Some(comment),
         }
 
         // Only set @@map if there's no @@map already set.
-        if let None = model.database_name {
+        if model.database_name.is_none() {
             model.database_name = Some(model.name.clone());
         }
 

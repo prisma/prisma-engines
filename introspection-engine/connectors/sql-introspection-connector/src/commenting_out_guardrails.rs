@@ -21,7 +21,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         let model_name = model.name.clone();
 
         for field in model.scalar_fields_mut() {
-            if field.name == "".to_string() {
+            if field.name == *"" {
                 field.documentation = Some(
                     "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*"
                         .to_string(),
@@ -39,7 +39,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         let enum_name = enm.name.clone();
         for enum_value in enm.values_mut() {
             if let Some(name) = &enum_value.database_name {
-                if enum_value.name == "".to_string() {
+                if enum_value.name == *"" {
                     enum_value.name = name.clone();
                     enum_value.commented_out = true;
                     enum_values_with_empty_names.push(EnumAndValue::new(&enum_name, &enum_value.name))

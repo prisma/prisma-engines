@@ -43,7 +43,7 @@ pub struct CategoryRule {
 
 impl Pluralize for CategoryRule {
     fn pluralize(&self, s: &str) -> Option<String> {
-        let normalized = s.to_lowercase().to_owned();
+        let normalized = s.to_lowercase();
 
         for suffix in self.words {
             if normalized.ends_with(suffix) {

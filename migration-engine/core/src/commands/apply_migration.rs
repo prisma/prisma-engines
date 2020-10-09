@@ -149,7 +149,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             .await?;
 
         match (
-            diagnostics.unexecutable_migrations.len() > 0,
+            !diagnostics.unexecutable_migrations.is_empty(),
             diagnostics.has_warnings(),
             self.input.force.unwrap_or(false),
         ) {

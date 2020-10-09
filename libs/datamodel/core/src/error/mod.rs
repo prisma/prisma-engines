@@ -316,8 +316,8 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_parser_error(expected: &Vec<&'static str>, span: Span) -> DatamodelError {
-        DatamodelError::ParserError { expected: expected.clone(), expected_str: expected.join(", "), span }
+    pub fn new_parser_error(expected: &[&'static str], span: Span) -> DatamodelError {
+        DatamodelError::ParserError { expected: expected.to_owned(), expected_str: expected.join(", "), span }
     }
     pub fn new_functional_evaluation_error(message: &str, span: Span) -> DatamodelError {
         DatamodelError::FunctionalEvaluationError { message: String::from(message), span }
@@ -420,9 +420,9 @@ fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, e
     let span = error_obj.span();
     let error = error_obj.description();
 
-    let start_line_number = text[..span.start].matches("\n").count();
-    let end_line_number = text[..span.end].matches("\n").count();
-    let file_lines = text.split("\n").collect::<Vec<&str>>();
+    let start_line_number = text[..span.start].matches('\n').count();
+    let end_line_number = text[..span.end].matches('\n').count();
+    let file_lines = text.split('\n').collect::<Vec<&str>>();
 
     let chars_in_line_before: usize = file_lines[..start_line_number].iter().map(|l| l.len()).sum();
     // Don't forget to count the all the line breaks.
@@ -458,7 +458,7 @@ fn pretty_print_error(f: &mut dyn std::io::Write, file_name: &str, text: &str, e
     writeln!(f, "{}", format_line_number(0))
 }
 
-fn format_line_number_with_line(line_number: usize, lines: &Vec<&str>) -> colored::ColoredString {
+fn format_line_number_with_line(line_number: usize, lines: &[&str]) -> colored::ColoredString {
     if line_number > 0 && line_number <= lines.len() {
         colored::ColoredString::from(format!("{}{}", format_line_number(line_number), lines[line_number - 1]).as_str())
     } else {

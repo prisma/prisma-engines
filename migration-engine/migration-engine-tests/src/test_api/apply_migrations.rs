@@ -26,7 +26,7 @@ impl<'a> ApplyMigrations<'a> {
             .await?;
 
         Ok(ApplyMigrationsAssertion {
-            output: output,
+            output,
             _api: self.api,
             _migrations_directory: self.migrations_directory,
         })

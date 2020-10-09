@@ -225,18 +225,23 @@ impl<'a> Diagnostics<'a> {
 #[derive(Debug, PartialEq, Serialize)]
 #[serde(tag = "diagnostic", rename_all = "camelCase")]
 pub enum HistoryDiagnostic {
-    /// There are migrations in the migrations directory that have not been applied to the database yet.
+    /// There are migrations in the migrations directory that have not been
+    /// applied to the database yet.
+    #[serde(rename_all = "camelCase")]
     DatabaseIsBehind {
         /// The names of the migrations.
         unapplied_migration_names: Vec<String>,
     },
-    /// Migrations have been applied to the database that are not in the migrations directory.
+    /// Migrations have been applied to the database that are not in the
+    /// migrations directory.
+    #[serde(rename_all = "camelCase")]
     MigrationsDirectoryIsBehind {
         /// The names of the migrations.
         unpersisted_migration_names: Vec<String>,
     },
     /// The migrations table history and the migrations directory history are
     /// not the same. This currently ignores the ordering of migrations.
+    #[serde(rename_all = "camelCase")]
     HistoriesDiverge {
         /// The last migration that is present both in the migrations directory
         /// and the migrations table.
@@ -260,6 +265,7 @@ pub enum DriftDiagnostic {
     /// expected at its stage in the migration history.
     DriftDetected,
     /// When a migration fails to apply cleanly to a temporary database.
+    #[serde(rename_all = "camelCase")]
     MigrationFailedToApply {
         /// The name of the migration that failed.
         migration_name: String,

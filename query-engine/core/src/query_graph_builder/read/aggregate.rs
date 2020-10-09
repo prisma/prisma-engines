@@ -71,7 +71,7 @@ fn resolve_fields(model: &ModelRef, field: FieldPair) -> Vec<ScalarFieldRef> {
 
 fn collect_selection_tree(fields: &[FieldPair]) -> Vec<(String, Option<Vec<String>>)> {
     fields
-        .into_iter()
+        .iter()
         .map(|field| {
             let field = &field.parsed_field;
             (

@@ -57,7 +57,7 @@ impl MySqlDatamodelConnector {
         let unsigned_int = NativeTypeConstructor::without_args(UNSIGNED_INT_TYPE_NAME, ScalarType::Int);
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, ScalarType::Int);
         let unsigned_small_int = NativeTypeConstructor::without_args(UNSIGNED_SMALL_INT_TYPE_NAME, ScalarType::Int);
-        let tiny_int = NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, ScalarType::Int);
+        let tiny_int = NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, ScalarType::Boolean);
         let unsigned_tiny_int = NativeTypeConstructor::without_args(UNSIGNED_TINY_INT_TYPE_NAME, ScalarType::Int);
         let medium_int = NativeTypeConstructor::without_args(MEDIUM_INT_TYPE_NAME, ScalarType::Int);
         let unsigned_medium_int = NativeTypeConstructor::without_args(UNSIGNED_MEDIUM_INT_TYPE_NAME, ScalarType::Int);

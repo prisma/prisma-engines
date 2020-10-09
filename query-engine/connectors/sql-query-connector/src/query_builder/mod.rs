@@ -21,7 +21,7 @@ where
     records
         .chunks(PARAMETER_LIMIT)
         .map(|chunk| {
-            let tree = conditions(columns, chunk.into_iter().map(|r| *r));
+            let tree = conditions(columns, chunk.iter().copied());
             f(tree).into()
         })
         .collect()
