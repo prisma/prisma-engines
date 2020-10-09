@@ -11,6 +11,7 @@ pub fn run(opts: PreviewFeaturesOpts) {
         preview_features
             .iter()
             .filter(|pf| !DEPRECATED_GENERATOR_PREVIEW_FEATURES.contains(pf))
+            .collect()
     };
 
     if result.len() == 0 {
