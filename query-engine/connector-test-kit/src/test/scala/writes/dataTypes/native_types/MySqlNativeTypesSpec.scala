@@ -11,7 +11,6 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
     // MySQL only allows one autoinc column, so loop through all to test them.
     for ((fieldName, annotation) <- Seq(("inc_int", "@test.Int"),
                                         ("inc_sInt", "@test.SmallInt"),
-                                        ("inc_tInt", "@test.TinyInt"),
                                         ("inc_mInt", "@test.MediumInt"),
                                         ("inc_bInt", "@test.BigInt"))) {
 
@@ -21,7 +20,6 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
         |  $fieldName Int @id @default(autoincrement()) $annotation
         |  int      Int   @test.Int
         |  sInt     Int   @test.SmallInt
-        |  tInt     Int   @test.TinyInt
         |  mInt     Int   @test.MediumInt
         |  bInt     Int   @test.BigInt
         |}"""
@@ -37,14 +35,12 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
            |    data: {
            |      int: 2147483647
            |      sInt: 32767
-           |      tInt: 127
            |      mInt: 8388607
            |      bInt: 5294967295
            |    }
            |  ) {
            |    int
            |    sInt
-           |    tInt
            |    mInt
            |    bInt
            |    $fieldName
@@ -232,6 +228,32 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
       """{"data":{"createOneModel":{"bit":"dA==","bin":"dGVzdA==","vBin":"dGVzdA==","blob":"dGVzdA==","tBlob":"dGVzdA==","mBlob":"dGVzdA==","lBlob":"dGVzdA=="}}}""")
   }
 
-  // XML
-  // JSON?
+  "Other MySQL native types" should "work" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model Model {
+        |  id   String  @id @default(cuid())
+        |  tInt Boolean @test.TinyInt
+        |}"""
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      s"""
+         |mutation {
+         |  createOneModel(
+         |    data: {
+         |      tInt: true
+         |    }
+         |  ) {
+         |    tInt
+         |  }
+         |}""".stripMargin,
+      project,
+      legacy = false
+    )
+
+    res.toString should be("""{"data":{"createOneModel":{"tInt":true}}}""")
+  }
 }
