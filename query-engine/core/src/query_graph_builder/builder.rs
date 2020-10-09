@@ -50,24 +50,6 @@ impl QueryGraphBuilder {
         }
     }
 
-    // /// Maps a read operation to one or more queries.
-    // fn map_read_operation(&self, read_selection: Selection) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
-    //     let query_object = self.query_schema.query();
-    //     Self::process(read_selection, &query_object)
-    // }
-
-    // /// Maps a write operation to one or more queries.
-    // fn map_write_operation(&self, write_selection: Selection) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
-    //     let mutation_object = self.query_schema.mutation();
-    //     let (mut graph, ir_ser) = Self::process(write_selection, &mutation_object)?;
-
-    //     // if let QueryGraph::Graph(ref mut graph) = graph {
-    //     //     graph.flag_transactional();
-    //     // };
-
-    //     Ok((graph, ir_ser))
-    // }
-
     fn build_internal(
         &self,
         selection: Selection,
@@ -90,34 +72,6 @@ impl QueryGraphBuilder {
                 field_pair.parsed_field.name
             )))
         }
-
-        // let parsed_field = parsed_object.fields.pop().unwrap();
-        // let result_info = Self::derive_serializer(&selections.pop().unwrap(), &parsed_field);
-
-        // let schema_field = parsed_field.schema_field.clone();
-        // let builder = schema_field.query_builder();
-
-        // schema_field.query_info
-
-        // let query_type = match (builder, parsed_field.raw_query_type()) {
-        //     (Some(builder), None) => Ok(QueryGraph::Graph(builder.build(parsed_field)?)),
-        //     (_, Some(raw_type)) => {
-        //         let raw_args = RawArgs::from(parsed_field.arguments);
-
-        //         Ok(QueryGraph::Raw {
-        //             query: raw_args.query,
-        //             parameters: raw_args.parameters,
-        //             raw_type,
-        //         })
-        //     }
-        //     (None, None) => Err(QueryGraphBuilderError::SchemaError(format!(
-        //         "Expected attached query builder on {} object, root level field '{}'.",
-        //         object.name(),
-        //         parsed_field.name
-        //     ))),
-        // }?;
-
-        // Ok((query_type, result_info))
     }
 
     fn dispatch_build(&self, field_pair: FieldPair) -> QueryGraphBuilderResult<QueryGraph> {
