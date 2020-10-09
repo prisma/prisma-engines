@@ -192,15 +192,15 @@ impl TestApi {
         }
     }
 
-    pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
+    pub fn infer(&self, dm: impl Into<String>) -> Infer<'_> {
         Infer::new(&self.api, dm)
     }
 
-    pub fn apply<'a>(&'a self) -> Apply<'a> {
+    pub fn apply(&self) -> Apply<'_> {
         Apply::new(&self.api)
     }
 
-    pub fn unapply_migration<'a>(&'a self) -> UnapplyMigration<'a> {
+    pub fn unapply_migration(&self) -> UnapplyMigration<'_> {
         UnapplyMigration {
             api: &self.api,
             force: None,
@@ -215,11 +215,11 @@ impl TestApi {
         EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
     }
 
-    pub fn reset<'a>(&'a self) -> Reset<'a> {
+    pub fn reset(&self) -> Reset<'_> {
         Reset::new(&self.api)
     }
 
-    pub fn schema_push<'a>(&'a self, dm: impl Into<String>) -> SchemaPush<'a> {
+    pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new(&self.api, dm.into())
     }
 
@@ -288,7 +288,7 @@ impl TestApi {
         }
     }
 
-    pub fn calculate_database_steps<'a>(&'a self) -> CalculateDatabaseSteps<'a> {
+    pub fn calculate_database_steps(&self) -> CalculateDatabaseSteps<'_> {
         CalculateDatabaseSteps::new(&self.api)
     }
 }

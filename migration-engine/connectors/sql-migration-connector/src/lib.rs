@@ -94,7 +94,7 @@ impl MigrationConnector for SqlMigrationConnector {
         self.database_info
             .database_version
             .clone()
-            .unwrap_or("Database version information not available.".into())
+            .unwrap_or_else(|| "Database version information not available.".into())
     }
 
     async fn create_database(database_str: &str) -> ConnectorResult<String> {
