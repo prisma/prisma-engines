@@ -1,15 +1,16 @@
 // datasource preview features
-const NATIVE_TYPES: &'static str = "nativeTypes";
+const NATIVE_TYPES: &str = "nativeTypes";
 
 // generator preview features
-const ATOMIC_NUMBER_OPERATIONS: &'static str = "atomicNumberOperations";
-const CONNECT_OR_CREATE: &'static str = "connectOrCreate";
-const TRANSACTION_API: &'static str = "transactionApi";
+const ATOMIC_NUMBER_OPERATIONS: &str = "atomicNumberOperations";
+const CONNECT_OR_CREATE: &str = "connectOrCreate";
+const TRANSACTION_API: &str = "transactionApi";
 
 // deprecated preview features
-const AGGREGATE_API: &'static str = "aggregateApi"; // todo move this to deprecated preview features list for VSCode
-const MIDDLEWARES: &'static str = "middlewares";
-const DISTINCT: &'static str = "distinct";
+const AGGREGATE_API: &str = "aggregateApi"; // todo move this to deprecated preview features list for VSCode
+const MIDDLEWARES: &str = "middlewares";
+const DISTINCT: &str = "distinct";
+
 
 pub const DATASOURCE_PREVIEW_FEATURES: &[&'static str] = &[NATIVE_TYPES];
 pub const GENERATOR_PREVIEW_FEATURES: &[&'static str] = &[

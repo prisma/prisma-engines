@@ -65,9 +65,9 @@ pub fn nested_update(
                 Box::new(move |mut update_node, mut child_ids| {
                     let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
-                        None => Err(QueryGraphBuilderError::AssertionError(format!(
-                            "Expected a valid parent ID to be present for nested update to-one case."
-                        ))),
+                        None => Err(QueryGraphBuilderError::AssertionError(
+                            "Expected a valid parent ID to be present for nested update to-one case.".to_string(),
+                        )),
                     }?;
 
                     if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {

@@ -98,7 +98,7 @@ impl ToSqlRow for ResultRow {
                         .into_iter()
                         .map(|p_value| row_value_to_prisma_value(p_value, &type_identifier))
                         .collect::<crate::Result<Vec<_>>>()
-                        .map(|vec| PrismaValue::List(vec)),
+                        .map(PrismaValue::List),
                     _ => {
                         let error = io::Error::new(
                             io::ErrorKind::InvalidData,

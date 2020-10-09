@@ -70,7 +70,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
 
 pub(super) fn render_input_types(input_types: &[InputType], ctx: &mut RenderContext) -> Vec<DmmfTypeReference> {
     input_types
-        .into_iter()
+        .iter()
         .map(|input_type| render_input_type(input_type, ctx))
         .collect()
 }

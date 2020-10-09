@@ -14,7 +14,7 @@ pub fn run(opts: PreviewFeaturesOpts) {
             .collect()
     };
 
-    if result.len() == 0 {
+    if result.is_empty() {
         print!("[]")
     } else {
         let json = serde_json::to_string(&result).expect("Failed to render JSON");

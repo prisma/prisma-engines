@@ -103,10 +103,7 @@ impl SqlRenderer for PostgresFlavour {
 
         // alter type of the current columns to new, with a cast
         {
-            let affected_columns = walk_columns(differ.next).filter(|column| match &column.column_type().family {
-                ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str() => true,
-                _ => false,
-            });
+            let affected_columns = walk_columns(differ.next).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str()));
 
             for column in affected_columns {
                 let sql = format!(

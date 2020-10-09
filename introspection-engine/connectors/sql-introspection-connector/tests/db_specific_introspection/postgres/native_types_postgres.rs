@@ -1,7 +1,7 @@
 use crate::*;
 use test_harness::*;
 
-const TYPES: &'static [(&str, &str)] = &[
+const TYPES: &[(&str, &str)] = &[
     //fieldname, db datatype
     ("smallint", "SmallInt"),
     ("int", "Integer"),

@@ -50,7 +50,7 @@ impl<'a> Arguments<'a> {
             Err(DatamodelError::new_attribute_validation_error(
                 &format!("You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[{}]`?", unnamed_values.join(", ")),
                 attribute_name,
-                self.span.clone()).into()
+                self.span).into()
             )
         } else {
             Ok(())

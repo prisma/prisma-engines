@@ -178,7 +178,7 @@ impl AliasedCondition for RelationFilter {
             None => ids.collect(),
         };
 
-        let condition = self.condition.clone();
+        let condition = self.condition;
         let sub_select = self.aliased_sel(alias.map(|a| a.inc(AliasMode::Table)));
 
         let comparison = match condition {
@@ -195,8 +195,8 @@ impl AliasedCondition for RelationFilter {
 impl AliasedSelect for RelationFilter {
     /// The subselect part of the `RelationFilter` `ConditionTree`.
     fn aliased_sel<'a>(self, alias: Option<Alias>) -> Select<'static> {
-        let alias = alias.unwrap_or(Alias::default());
-        let condition = self.condition.clone();
+        let alias = alias.unwrap_or_default();
+        let condition = self.condition;
 
         let table = self.field.as_table();
         let selected_identifier: Vec<Column> = self
@@ -257,7 +257,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
             })
         } else {
             let relation = self.field.relation();
-            let table = Table::from(relation.as_table());
+            let table = relation.as_table();
             let relation_table = match alias {
                 Some(ref alias) => table.alias(alias.to_string()),
                 None => table,
@@ -436,7 +436,7 @@ fn convert_value<'a>(fields: &[ScalarFieldRef], value: PrismaValue) -> Value<'a>
 fn convert_values<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>) -> Vec<Value<'a>> {
     if fields.len() == values.len() {
         fields
-            .into_iter()
+            .iter()
             .zip(values)
             .map(|(field, value)| field.value(value))
             .collect()

@@ -42,11 +42,11 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection
                     Rule::comment_block => (),
                     Rule::EOI => {}
                     Rule::CATCH_ALL => errors.push(DatamodelError::new_validation_error(
-                        &format!("This line is invalid. It does not start with any known Prisma schema keyword."),
+                        &"This line is invalid. It does not start with any known Prisma schema keyword.".to_string(),
                         Span::from_pest(current.as_span()),
                     )),
                     Rule::arbitrary_block => errors.push(DatamodelError::new_validation_error(
-                        &format!("This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'."),
+                        &"This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.".to_string(),
                         Span::from_pest(current.as_span()),
                     )),
                     _ => parsing_catch_all(&current, "datamodel"),

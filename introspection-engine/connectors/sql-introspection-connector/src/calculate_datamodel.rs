@@ -21,17 +21,11 @@ pub fn calculate_datamodel(
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
-    let mut version_check = VersionChecker::new(family.clone(), schema);
+    let mut version_check = VersionChecker::new(*family, schema);
     let mut data_model = Datamodel::new();
 
     // 1to1 translation of the sql schema
-    introspect(
-        schema,
-        &mut version_check,
-        &mut data_model,
-        family.clone(),
-        native_types,
-    )?;
+    introspect(schema, &mut version_check, &mut data_model, *family, native_types)?;
 
     // our opinionation about valid names
     sanitize_datamodel_names(&mut data_model, family);

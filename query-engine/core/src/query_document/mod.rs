@@ -61,7 +61,7 @@ impl BatchDocument {
     fn can_compact(&self) -> bool {
         match self {
             Self::Multi(operations, _) => match operations.split_first() {
-                Some((first, rest)) if first.is_find_one() => rest.into_iter().all(|op| {
+                Some((first, rest)) if first.is_find_one() => rest.iter().all(|op| {
                     op.is_find_one()
                         && first.name() == op.name()
                         && first.nested_selections().len() == op.nested_selections().len()
@@ -207,7 +207,7 @@ impl From<Vec<Operation>> for CompactedDocument {
 
         // The trick again to detect if we have a compound key or not. (sigh)
         // Gets the argument keys for later mapping.
-        let keys = match arguments[0].iter().next() {
+        let keys = match arguments[0].get(0) {
             Some((_, QueryValue::Object(obj))) => obj.iter().map(|(k, _)| k.to_string()).collect(),
             _ => arguments[0].iter().map(|(k, _)| k.to_string()).collect(),
         };

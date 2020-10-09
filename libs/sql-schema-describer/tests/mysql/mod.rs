@@ -16,7 +16,7 @@ pub async fn get_mysql_describer_for_schema(sql: &str, schema: &str) -> mysql::S
     // Migrate the database we just created.
 
     debug!("Executing MySQL migrations: {}", sql);
-    let statements = sql.split(";").filter(|s| !s.is_empty());
+    let statements = sql.split(';').filter(|s| !s.is_empty());
     for statement in statements {
         debug!("Executing migration statement: '{}'", statement);
         conn.query_raw(&statement, &[])

@@ -98,9 +98,7 @@ pub fn nested_delete(
                  QueryGraphDependency::ParentProjection(child_model_identifier, Box::new(move |mut delete_record_node, mut child_ids| {
                      let child_id = match child_ids.pop() {
                          Some(pid) => Ok(pid),
-                         None => Err(QueryGraphBuilderError::AssertionError(format!(
-                             "[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."
-                         ))),
+                         None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation.".to_string())),
                      }?;
 
                      if let Node::Query(Query::Write(WriteQuery::DeleteRecord(ref mut dq))) = delete_record_node {

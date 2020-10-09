@@ -44,7 +44,7 @@ impl AggregateRecordsBuilder {
 
     fn collect_selection_tree(fields: &[ParsedField]) -> Vec<(String, Option<Vec<String>>)> {
         fields
-            .into_iter()
+            .iter()
             .map(|field| {
                 (
                     field.name.clone(),

@@ -109,7 +109,7 @@ impl Model {
             let fields: Vec<_> = dml_fields
                 .iter()
                 .map(|dml_field| {
-                    let field = self.fields().find_from_all(&dml_field.name).expect(&format!("Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.", &dml_field.name));
+                    let field = self.fields().find_from_all(&dml_field.name).unwrap_or_else(|_| panic!("Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.", &dml_field.name));
                     field.clone()
                 })
                 .collect();
@@ -134,7 +134,7 @@ impl Model {
 
     pub fn unique_indexes(&self) -> Vec<&Index> {
         self.indexes()
-            .into_iter()
+            .iter()
             .filter(|index| index.typ == IndexType::Unique)
             .collect()
     }

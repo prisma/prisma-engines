@@ -98,7 +98,7 @@ where
                 let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
                 let result = QueryPipeline::new(query, interpreter, info).execute().await;
 
-                if !result.is_ok() {
+                if result.is_err() {
                     tx.rollback().await?;
                 }
 

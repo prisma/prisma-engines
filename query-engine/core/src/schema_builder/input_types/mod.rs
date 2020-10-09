@@ -74,7 +74,7 @@ fn list_union_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputTyp
 }
 
 fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
-    alias.map(|n| capitalize(n)).unwrap_or_else(|| {
+    alias.map(capitalize).unwrap_or_else(|| {
         let field_names: Vec<String> = from_fields.iter().map(|field| capitalize(&field.name)).collect();
         field_names.join("")
     })

@@ -3,7 +3,7 @@ use connector_interface::QueryArguments;
 use prisma_models::*;
 use quaint::ast::*;
 
-static ORDER_TABLE_ALIAS: &'static str = "order_cmp";
+static ORDER_TABLE_ALIAS: &str = "order_cmp";
 
 /// Builds a cursor query condition based on the cursor arguments and if necessary a table that the condition depends on.
 ///

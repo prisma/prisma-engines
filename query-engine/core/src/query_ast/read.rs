@@ -37,7 +37,7 @@ impl ReadQuery {
         match self {
             ReadQuery::RecordQuery(x) => x.model.clone(),
             ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
-            ReadQuery::RelatedRecordsQuery(x) => x.parent_field.related_field().model().clone(),
+            ReadQuery::RelatedRecordsQuery(x) => x.parent_field.related_field().model(),
             ReadQuery::AggregateRecordsQuery(x) => x.model.clone(),
         }
     }

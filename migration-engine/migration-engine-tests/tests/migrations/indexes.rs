@@ -306,7 +306,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
         .table_bang("A")
         .indices
         .iter()
-        .find(|i| i.columns == &["field", "secondField"]);
+        .find(|i| i.columns == ["field", "secondField"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 

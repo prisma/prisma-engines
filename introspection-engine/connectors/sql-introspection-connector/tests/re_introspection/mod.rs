@@ -275,7 +275,7 @@ async fn re_introspecting_mapped_field_name(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_mapped_enum_name(api: &TestApi) {
-    let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
+    let sql = "CREATE Type color as ENUM ( \'black\', \'white\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -331,7 +331,7 @@ async fn re_introspecting_mapped_enum_name(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_mapped_enum_value_name(api: &TestApi) {
-    let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
+    let sql = "CREATE Type color as ENUM ( \'black\', \'white\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -383,7 +383,7 @@ async fn re_introspecting_mapped_enum_value_name(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_manually_remapped_enum_value_name(api: &TestApi) {
-    let sql = format!("CREATE Type color as ENUM ( '_black', 'white')");
+    let sql = "CREATE Type color as ENUM ( \'_black\', \'white\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -435,7 +435,7 @@ async fn re_introspecting_manually_remapped_enum_value_name(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
-    let sql = format!("CREATE Type _color as ENUM ( 'black', 'white')");
+    let sql = "CREATE Type _color as ENUM ( \'black\', \'white\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -491,7 +491,7 @@ async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_manually_re_mapped_invalid_enum_values(api: &TestApi) {
-    let sql = format!("CREATE Type invalid as ENUM ( '@', '-')");
+    let sql = "CREATE Type invalid as ENUM ( \'@\', \'-\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -745,25 +745,25 @@ async fn re_introspecting_custom_model_order(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_custom_enum_order(api: &TestApi) {
-    let sql = format!("CREATE Type a as ENUM ( 'id')");
+    let sql = "CREATE Type a as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
-    let sql = format!("CREATE Type b as ENUM ( 'id')");
+    let sql = "CREATE Type b as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
-    let sql = format!("CREATE Type j as ENUM ( 'id')");
+    let sql = "CREATE Type j as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
-    let sql = format!("CREATE Type f as ENUM ( 'id')");
+    let sql = "CREATE Type f as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
-    let sql = format!("CREATE Type z as ENUM ( 'id')");
+    let sql = "CREATE Type z as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
-    let sql = format!("CREATE Type m as ENUM ( 'id')");
+    let sql = "CREATE Type m as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
-    let sql = format!("CREATE Type l as ENUM ( 'id')");
+    let sql = "CREATE Type l as ENUM ( \'id\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
     let input_dm = r#"
@@ -944,7 +944,7 @@ async fn re_introspecting_virtual_cuid_default(api: &TestApi) {
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_comments(api: &TestApi) {
     let barrel = api.barrel();
-    let sql = format!("CREATE Type a as ENUM ( 'A')");
+    let sql = "CREATE Type a as ENUM ( \'A\')".to_string();
     api.database().execute_raw(&sql, &[]).await.unwrap();
 
     let _setup_schema = barrel

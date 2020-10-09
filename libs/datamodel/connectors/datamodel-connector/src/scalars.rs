@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
 /// Prisma's builtin scalar types.
@@ -15,8 +17,9 @@ pub enum ScalarType {
     Duration,
 }
 
-impl ScalarType {
-    pub fn from_str(s: &str) -> Result<Self, String> {
+impl FromStr for ScalarType {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "Int" => Ok(ScalarType::Int),
             "Float" => Ok(ScalarType::Float),

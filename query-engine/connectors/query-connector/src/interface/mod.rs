@@ -117,7 +117,7 @@ impl Aggregator {
         fixed_type: Option<TypeIdentifier>,
     ) -> Vec<(TypeIdentifier, FieldArity)> {
         fields
-            .into_iter()
+            .iter()
             .map(|f| {
                 (
                     fixed_type.clone().unwrap_or(f.type_identifier.clone()),
