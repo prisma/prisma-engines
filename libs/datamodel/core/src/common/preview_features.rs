@@ -11,7 +11,6 @@ const AGGREGATE_API: &str = "aggregateApi"; // todo move this to deprecated prev
 const MIDDLEWARES: &str = "middlewares";
 const DISTINCT: &str = "distinct";
 
-
 pub const DATASOURCE_PREVIEW_FEATURES: &[&'static str] = &[NATIVE_TYPES];
 pub const GENERATOR_PREVIEW_FEATURES: &[&'static str] = &[
     ATOMIC_NUMBER_OPERATIONS,
