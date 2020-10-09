@@ -19,12 +19,12 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
                     " Did you mean to put it on `{}`?",
                     rf.relation_info.fields.first().unwrap()
                 ),
-                Ordering::Less => format!(
+                Ordering::Greater => format!(
                     " Did you mean to provide `@@unique([{}])`?",
                     rf.relation_info.fields.join(", ")
                 ),
                 // no suggestion possible
-                Ordering::Greater => String::new(),
+                Ordering::Less => String::new(),
             };
 
             return self.new_attribute_validation_error(
