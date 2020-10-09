@@ -10,7 +10,7 @@ pub fn run(opts: PreviewFeaturesOpts) {
         GENERATOR_PREVIEW_FEATURES
             .iter()
             .filter(|pf| !DEPRECATED_GENERATOR_PREVIEW_FEATURES.contains(pf))
-            .collect();
+            .collect()
     };
 
     if result.len() == 0 {
