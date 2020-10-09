@@ -4,8 +4,8 @@ mod rpc;
 pub use error_rendering::render_error;
 pub use rpc::*;
 
-use crate::{commands::*, migration_engine::MigrationEngine, CoreResult};
-use migration_connector::*;
+use crate::{commands::*, migration_engine::MigrationEngine, CoreError, CoreResult};
+use migration_connector::{DatabaseMigrationMarker, MigrationConnector, MigrationPersistence};
 use tracing_futures::Instrument;
 
 pub struct MigrationApi<C, D>
@@ -67,11 +67,11 @@ pub trait GenericApi: Send + Sync + 'static {
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
     fn connector_type(&self) -> &'static str;
 
-    fn render_error(&self, error: crate::error::Error) -> user_facing_errors::Error {
+    fn render_error(&self, error: CoreError) -> user_facing_errors::Error {
         error_rendering::render_error(error)
     }
 
-    fn render_jsonrpc_error(&self, error: crate::error::Error) -> jsonrpc_core::error::Error {
+    fn render_jsonrpc_error(&self, error: CoreError) -> jsonrpc_core::error::Error {
         error_rendering::render_jsonrpc_error(error)
     }
 }

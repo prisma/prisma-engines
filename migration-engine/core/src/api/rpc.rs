@@ -1,7 +1,7 @@
-use crate::{commands::*, CoreResult, GenericApi};
+use crate::{commands::*, CoreError, CoreResult, GenericApi};
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
-use std::{io, sync::Arc};
+use std::sync::Arc;
 
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
@@ -91,24 +91,6 @@ impl RpcApi {
         &self.io_handler
     }
 
-    /// Handle one request over stdio.
-    pub fn handle(&self) -> CoreResult<String> {
-        let mut json_is_complete = false;
-        let mut input = String::new();
-
-        while !json_is_complete {
-            io::stdin().read_line(&mut input)?;
-            json_is_complete = serde_json::from_str::<serde_json::Value>(&input).is_ok();
-        }
-
-        let result = self
-            .io_handler
-            .handle_request_sync(&input)
-            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "Reading from stdin failed."))?;
-
-        Ok(result)
-    }
-
     fn add_command_handler(&mut self, cmd: RpcCommand) {
         let executor = Arc::clone(&self.executor);
 
@@ -130,7 +112,7 @@ impl RpcApi {
         match result {
             Ok(result) => Ok(result),
             Err(RunCommandError::JsonRpcError(err)) => Err(err),
-            Err(RunCommandError::CrateError(err)) => Err(executor.render_jsonrpc_error(err)),
+            Err(RunCommandError::CoreError(err)) => Err(executor.render_jsonrpc_error(err)),
         }
     }
 
@@ -210,7 +192,7 @@ fn render(result: impl serde::Serialize) -> Result<serde_json::Value, RunCommand
 #[derive(Debug)]
 enum RunCommandError {
     JsonRpcError(JsonRpcError),
-    CrateError(crate::Error),
+    CoreError(CoreError),
 }
 
 impl From<JsonRpcError> for RunCommandError {
@@ -219,8 +201,8 @@ impl From<JsonRpcError> for RunCommandError {
     }
 }
 
-impl From<crate::Error> for RunCommandError {
-    fn from(e: crate::Error) -> Self {
-        RunCommandError::CrateError(e)
+impl From<CoreError> for RunCommandError {
+    fn from(e: CoreError) -> Self {
+        RunCommandError::CoreError(e)
     }
 }

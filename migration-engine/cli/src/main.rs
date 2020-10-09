@@ -5,7 +5,7 @@ mod commands;
 mod error_tests;
 mod logger;
 
-use migration_core::{api::RpcApi, error::Error as CoreError};
+use migration_core::{api::RpcApi, CoreError};
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
@@ -13,9 +13,6 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(version = env!("GIT_HASH"))]
 struct MigrationEngineCli {
-    /// Run only a single command, then exit
-    #[structopt(short = "s", long)]
-    single_cmd: bool,
     /// Path to the datamodel
     #[structopt(short = "d", long, name = "FILE")]
     datamodel: Option<String>,
@@ -49,7 +46,7 @@ async fn main() {
     match input.cli_subcommand {
         None => {
             if let Some(datamodel_location) = input.datamodel.as_ref() {
-                start_engine(datamodel_location, input.single_cmd).await
+                start_engine(datamodel_location).await
             } else {
                 panic!("Missing --datamodel");
             }
@@ -61,7 +58,7 @@ async fn main() {
     }
 }
 
-async fn start_engine(datamodel_location: &str, single_cmd: bool) -> ! {
+async fn start_engine(datamodel_location: &str) -> ! {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
@@ -70,31 +67,24 @@ async fn start_engine(datamodel_location: &str, single_cmd: bool) -> ! {
     let mut datamodel = String::new();
     file.read_to_string(&mut datamodel).unwrap();
 
-    if single_cmd {
-        let api = RpcApi::new(&datamodel).await.unwrap();
-        let response = api.handle().unwrap();
+    match RpcApi::new(&datamodel).await {
+        // Block the thread and handle IO in async until EOF.
+        Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
+        Err(err) => {
+            let (error, exit_code) = match &err {
+                CoreError::ReceivedBadDatamodel(message) => {
+                    let error = user_facing_errors::UnknownError {
+                        message: message.clone(),
+                        backtrace: Some(format!("{:?}", user_facing_errors::new_backtrace())),
+                    };
 
-        println!("{}", response);
-    } else {
-        match RpcApi::new(&datamodel).await {
-            // Block the thread and handle IO in async until EOF.
-            Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
-            Err(err) => {
-                let (error, exit_code) = match &err {
-                    CoreError::DatamodelError(errors) => {
-                        let error = user_facing_errors::UnknownError {
-                            message: errors.to_pretty_string("schema.prisma", &datamodel),
-                            backtrace: Some(format!("{:?}", user_facing_errors::new_backtrace())),
-                        };
+                    (user_facing_errors::Error::from(error), 1)
+                }
+                _ => (migration_core::api::render_error(err), 255),
+            };
 
-                        (user_facing_errors::Error::from(error), 1)
-                    }
-                    _ => (migration_core::api::render_error(err), 255),
-                };
-
-                serde_json::to_writer(std::io::stdout().lock(), &error).expect("failed to write to stdout");
-                std::process::exit(exit_code)
-            }
+            serde_json::to_writer(std::io::stdout().lock(), &error).expect("failed to write to stdout");
+            std::process::exit(exit_code)
         }
     }
 

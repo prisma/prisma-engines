@@ -1,9 +1,8 @@
-use std::path::Path;
-
-use super::{CommandError, CommandResult, MigrationCommand};
-use crate::migration_engine::MigrationEngine;
+use super::MigrationCommand;
+use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
 use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord};
 use serde::{Deserialize, Serialize};
+use std::path::Path;
 
 /// The input to the `ApplyMigrations` command.
 #[derive(Deserialize, Debug)]
@@ -32,7 +31,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
 
     type Output = ApplyMigrationsOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> super::CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector<DatabaseMigration = D>,
         D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
@@ -105,7 +104,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
 fn diagnose_migration_history(
     migrations_from_database: &[MigrationRecord],
     migrations_from_filesystem: &[MigrationDirectory],
-) -> CommandResult<()> {
+) -> CoreResult<()> {
     tracing::debug!("Running diagnostics.");
 
     let mut history_problems = HistoryProblems::default();
@@ -171,7 +170,7 @@ struct HistoryProblems {
 }
 
 impl HistoryProblems {
-    fn to_result(&self) -> CommandResult<()> {
+    fn to_result(&self) -> CoreResult<()> {
         if self.failed_migrations.is_empty() && self.edited_migrations.is_none() {
             return Ok(());
         }
@@ -190,6 +189,6 @@ impl HistoryProblems {
             error.push_str(edited_migrations)
         }
 
-        Err(CommandError::Generic(anyhow::anyhow!("{}", error)))
+        Err(CoreError::Generic(anyhow::anyhow!("{}", error)))
     }
 }

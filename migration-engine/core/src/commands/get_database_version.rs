@@ -1,5 +1,5 @@
-use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
+use crate::{commands::command::*, CoreResult};
 use migration_connector::*;
 
 /// Returns the version of the used db if available.
@@ -10,7 +10,7 @@ impl MigrationCommand for VersionCommand {
     type Input = serde_json::Value;
     type Output = String;
 
-    async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,

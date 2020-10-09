@@ -2,6 +2,7 @@ use super::super::{assertions::AssertionResult, unique_migration_id};
 use migration_core::{
     api::GenericApi,
     commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput},
+    CoreResult,
 };
 use std::borrow::Cow;
 
@@ -44,7 +45,7 @@ impl<'a> InferApply<'a> {
         self.send_inner().await.map_err(|err| api.render_error(err))
     }
 
-    pub async fn send_inner(self) -> Result<MigrationStepsResultOutput, migration_core::error::Error> {
+    pub async fn send_inner(self) -> CoreResult<MigrationStepsResultOutput> {
         let migration_id = self.migration_id.map(Into::into).unwrap_or_else(unique_migration_id);
 
         let input = InferMigrationStepsInput {

@@ -5,12 +5,10 @@
 //! migrations.
 
 use super::MigrationStepsResultOutput;
-use crate::commands::command::*;
-use crate::migration_engine::MigrationEngine;
+use crate::{commands::command::MigrationCommand, migration_engine::MigrationEngine, CoreError, CoreResult};
 use datamodel::ast::SchemaAst;
-use migration_connector::*;
+use migration_connector::{DatabaseMigrationMarker, DestructiveChangeDiagnostics, MigrationConnector, MigrationStep};
 use serde::Deserialize;
-use tracing::debug;
 
 pub struct CalculateDatabaseStepsCommand<'a> {
     input: &'a CalculateDatabaseStepsInput,
@@ -21,13 +19,13 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
     type Input = CalculateDatabaseStepsInput;
     type Output = MigrationStepsResultOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let cmd = CalculateDatabaseStepsCommand { input };
-        debug!(command_input = ?cmd.input);
+        tracing::debug!(command_input = ?cmd.input);
 
         let connector = engine.connector();
 
@@ -38,13 +36,13 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
             .datamodel_calculator()
             .infer(&SchemaAst::empty(), &assume_to_be_applied)?;
         let assumed_datamodel =
-            datamodel::lift_ast_to_datamodel(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
+            datamodel::lift_ast_to_datamodel(&assumed_datamodel_ast).map_err(CoreError::ProducedBadDatamodel)?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&assumed_datamodel_ast, &steps_to_apply)?;
         let next_datamodel =
-            datamodel::lift_ast_to_datamodel(&next_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
+            datamodel::lift_ast_to_datamodel(&next_datamodel_ast).map_err(CoreError::ProducedBadDatamodel)?;
 
         let database_migration = connector
             .database_migration_inferrer()

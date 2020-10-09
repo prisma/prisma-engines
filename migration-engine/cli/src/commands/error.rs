@@ -1,5 +1,5 @@
-use migration_connector::*;
-use migration_core::{commands::CommandError, error::Error as CoreError};
+use migration_connector::{ConnectorError, ErrorKind};
+use migration_core::CoreError;
 use std::fmt::Display;
 use tracing_error::SpanTrace;
 
@@ -97,9 +97,9 @@ impl From<ConnectorError> for CliError {
 }
 
 impl From<CoreError> for CliError {
-    fn from(e: migration_core::error::Error) -> Self {
+    fn from(e: CoreError) -> Self {
         match e {
-            CoreError::ConnectorError(e) | CoreError::CommandError(CommandError::ConnectorError(e)) => e.into(),
+            CoreError::ConnectorError(e) => e.into(),
             e => CliError::Unknown {
                 error: ErrorKind::Generic(e.into()),
                 context: SpanTrace::capture(),

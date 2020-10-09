@@ -3,15 +3,26 @@
 use anyhow::format_err;
 use datamodel::ast::{self, ArgumentContainer, Identifier, SchemaAst};
 use migration_connector::steps::{self, CreateSource, DeleteSource, MigrationStep};
-use thiserror::Error;
+use std::{error::Error as StdError, fmt::Display};
 
 pub trait DataModelCalculator: Send + Sync + 'static {
     fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> Result<SchemaAst, CalculatorError>;
 }
 
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct CalculatorError(#[source] anyhow::Error);
+#[derive(Debug)]
+pub struct CalculatorError(anyhow::Error);
+
+impl Display for CalculatorError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl StdError for CalculatorError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        Some(self.0.as_ref())
+    }
+}
 
 impl From<anyhow::Error> for CalculatorError {
     fn from(fe: anyhow::Error) -> Self {
