@@ -6,7 +6,7 @@ mod object_renderer;
 mod schema_renderer;
 mod type_renderer;
 
-use crate::dmmf::DmmfMapping;
+use super::{DmmfModelOperations, DmmfOperationMappings};
 use enum_renderer::*;
 use field_renderer::*;
 use object_renderer::*;
@@ -22,8 +22,8 @@ pub use ast::*;
 
 pub struct DmmfQuerySchemaRenderer;
 
-impl QuerySchemaRenderer<(DmmfSchema, Vec<DmmfMapping>)> for DmmfQuerySchemaRenderer {
-    fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, Vec<DmmfMapping>) {
+impl QuerySchemaRenderer<(DmmfSchema, DmmfOperationMappings)> for DmmfQuerySchemaRenderer {
+    fn render(query_schema: QuerySchemaRef) -> (DmmfSchema, DmmfOperationMappings) {
         let mut ctx = RenderContext::new();
         ctx.mark_to_be_rendered(&query_schema);
 
@@ -43,8 +43,8 @@ pub struct RenderContext {
     /// Aggregator for query schema
     schema: DmmfSchema,
 
-    /// Aggregator for mappings
-    mappings: Vec<DmmfMapping>,
+    /// Aggregator for operation mappings
+    mappings: DmmfOperationMappings,
 
     /// Prevents double rendering of elements that are referenced multiple times.
     /// Names of input / output types / enums / models are globally unique.
@@ -59,13 +59,13 @@ impl RenderContext {
     pub fn new() -> Self {
         RenderContext {
             schema: DmmfSchema::default(),
-            mappings: vec![],
+            mappings: Default::default(),
             rendered: HashSet::new(),
             next_pass: Vec::new(),
         }
     }
 
-    pub fn finalize(self) -> (DmmfSchema, Vec<DmmfMapping>) {
+    pub fn finalize(self) -> (DmmfSchema, DmmfOperationMappings) {
         let mut schema = self.schema;
 
         schema.root_query_type = "Query".into();
@@ -102,17 +102,28 @@ impl RenderContext {
             if let Some(ref model) = info.model {
                 let model_name = model.name.clone();
                 let tag_str = format!("{}", info.tag);
-                let mapping = self.mappings.iter().find(|mapping| mapping.model_name == model_name);
+                let model_op = self
+                    .mappings
+                    .model_operations
+                    .iter()
+                    .find(|mapping| mapping.model_name == model_name);
 
-                match mapping {
+                match model_op {
                     Some(ref existing) => existing.add_operation(tag_str, name.clone()),
                     None => {
-                        let new_mapping = DmmfMapping::new(model_name);
+                        let new_mapping = DmmfModelOperations::new(model_name);
 
                         new_mapping.add_operation(tag_str, name.clone());
-                        self.mappings.push(new_mapping);
+                        self.mappings.model_operations.push(new_mapping);
                     }
                 };
+            } else {
+                match info.tag {
+                    QueryTag::ExecuteRaw | QueryTag::QueryRaw => {
+                        self.mappings.other_operations.write.push(info.tag.to_string())
+                    }
+                    _ => unreachable!("Invalid operations mapping."),
+                }
             }
         }
     }
