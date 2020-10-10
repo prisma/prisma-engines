@@ -34,7 +34,7 @@ pub fn calculate_datamodel(
     deduplicate_relation_field_names(&mut data_model);
 
     let mut warnings = vec![];
-    warnings.append(&mut enrich(previous_data_model, &mut data_model));
+    warnings.append(&mut enrich(previous_data_model, &mut data_model, family));
     tracing::debug!("Enriching datamodel is done: {:?}", data_model);
 
     // commenting out models, fields, enums, enum values

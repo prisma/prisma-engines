@@ -1146,3 +1146,53 @@ async fn re_introspecting_multiple_many_to_many_on_same_model(api: &TestApi) {
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn re_introspecting_mysql_enum_names(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  ENUM('black', 'white') Not Null");
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model User {
+               id               Int @id @default(autoincrement())
+               color            BlackNWhite
+            }
+
+            enum BlackNWhite{
+                black
+                white
+            }
+        "#;
+
+    let final_dm = r#"
+             model User {
+               id               Int @id @default(autoincrement())
+               color            BlackNWhite
+            }
+
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+
+            enum BlackNWhite{
+                black
+                white
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+    let warnings = api.re_introspect_warnings(input_dm).await;
+
+    assert_eq_json(&warnings, "[{\"code\":9,\"message\":\"These enums were enriched with `@@map` information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"BlackNWhite\"}]}]");
+}
