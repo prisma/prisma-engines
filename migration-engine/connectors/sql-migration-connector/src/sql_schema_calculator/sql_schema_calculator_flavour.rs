@@ -4,8 +4,7 @@ mod postgres;
 mod sqlite;
 
 use super::SqlSchemaCalculator;
-use datamodel::{walkers::ScalarFieldWalker, ScalarType};
-use datamodel_connector::NativeTypeInstance;
+use datamodel::{walkers::ScalarFieldWalker, NativeTypeInstance, ScalarType};
 use sql_schema_describer as sql;
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
