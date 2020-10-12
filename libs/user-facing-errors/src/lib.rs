@@ -103,6 +103,14 @@ impl Error {
         }
     }
 
+    /// Build from a KnownError
+    pub fn new_known(err: KnownError) -> Self {
+        Error {
+            inner: ErrorType::Known(err),
+            is_panic: false,
+        }
+    }
+
     pub fn from_panic_payload(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Self {
         let message = Self::extract_panic_message(panic_payload).unwrap_or_else(|| "<unknown panic>".to_owned());
 
@@ -122,6 +130,7 @@ impl Error {
             .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
     }
 
+    /// Extract the inner known error, or panic.
     pub fn unwrap_known(self) -> KnownError {
         match self.inner {
             ErrorType::Known(err) => err,

@@ -22,7 +22,9 @@ pub use database_migration_inferrer::*;
 pub use database_migration_step_applier::*;
 pub use destructive_change_checker::*;
 pub use error::*;
-pub use imperative_migrations_persistence::{ImperativeMigrationsPersistence, PersistenceNotInitializedError, MigrationRecord, Timestamp};
+pub use imperative_migrations_persistence::{
+    ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp,
+};
 pub use migration_applier::*;
 pub use migration_persistence::*;
 pub use migrations_directory::{create_migration_directory, list_migrations, ListMigrationsError, MigrationDirectory};

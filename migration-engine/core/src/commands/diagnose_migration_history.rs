@@ -2,7 +2,7 @@ use std::path::Path;
 
 use super::MigrationCommand;
 use crate::{migration_engine::MigrationEngine, CoreResult};
-use migration_connector::{ErrorKind, MigrationDirectory, MigrationRecord};
+use migration_connector::{MigrationDirectory, MigrationRecord};
 use serde::{Deserialize, Serialize};
 
 /// The input to the `DiagnoseMigrationHistory` command.
@@ -110,16 +110,8 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             })
             .cloned()
             .collect();
-        diagnostics.drift_detected = match migration_inferrer.detect_drift(&applied_migrations).await {
-            Ok(drift_detected) => drift_detected,
-            Err(err) => match &err.kind {
-                ErrorKind::MigrationFailedToApply { migration_name, error } => {
-                    diagnostics.migration_failed_to_apply = Some((migration_name.clone(), error.to_string()));
-                    false
-                }
-                _ => return Err(err.into()),
-            },
-        };
+
+        diagnostics.drift_detected = migration_inferrer.detect_drift(&applied_migrations).await?;
 
         Ok(DiagnoseMigrationHistoryOutput {
             drift: diagnostics.drift(),
