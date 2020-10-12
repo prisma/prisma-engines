@@ -29,7 +29,7 @@ pub(crate) struct SqlSchemaDiffer<'a> {
     pub(crate) flavour: &'a dyn SqlFlavour,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SqlSchemaDiff {
     pub add_foreign_keys: Vec<AddForeignKey>,
     pub drop_foreign_keys: Vec<DropForeignKey>,
