@@ -4,7 +4,6 @@ pub mod error;
 use crate::error::ConnectorError;
 pub use combined_connector::CombinedConnector;
 use dml::native_type_constructor::NativeTypeConstructor;
-use dml::NativeTypeInstance;
 
 pub trait Connector: Send + Sync {
     fn capabilities(&self) -> &Vec<ConnectorCapability>;
