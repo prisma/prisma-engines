@@ -1,7 +1,7 @@
 use crate::migrations_directory::ReadMigrationScriptError;
 use std::{error::Error as StdError, fmt::Display};
 use tracing_error::SpanTrace;
-use user_facing_errors::KnownError;
+use user_facing_errors::{KnownError, UserFacingError};
 
 #[derive(Debug)]
 pub struct ConnectorError {
@@ -70,6 +70,15 @@ impl ConnectorError {
         ConnectorError {
             user_facing_error: None,
             kind: ErrorKind::InvalidDatabaseUrl(format!("{} in `{}`)", err, url)),
+            context: SpanTrace::capture(),
+        }
+    }
+
+    pub fn user_facing_error<T: UserFacingError>(err: T) -> Self {
+        let kind = ErrorKind::Generic(anyhow::anyhow!("{}", err.message()));
+        ConnectorError {
+            user_facing_error: Some(KnownError::new(err)),
+            kind,
             context: SpanTrace::capture(),
         }
     }

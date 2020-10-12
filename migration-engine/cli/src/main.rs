@@ -80,7 +80,7 @@ async fn start_engine(datamodel_location: &str) -> ! {
 
                     (user_facing_errors::Error::from(error), 1)
                 }
-                _ => (migration_core::api::render_error(err), 255),
+                _ => (err.render_user_facing(), 255),
             };
 
             serde_json::to_writer(std::io::stdout().lock(), &error).expect("failed to write to stdout");
