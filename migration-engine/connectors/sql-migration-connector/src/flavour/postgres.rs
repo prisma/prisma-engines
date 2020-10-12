@@ -56,6 +56,24 @@ impl SqlFlavour for PostgresFlavour {
         Ok(db_name.to_owned())
     }
 
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE _prisma_migrations (
+                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+                checksum                VARCHAR(64) NOT NULL,
+                finished_at             TIMESTAMPTZ,
+                migration_name          TEXT NOT NULL,
+                logs                    TEXT NOT NULL,
+                rolled_back_at          TIMESTAMPTZ,
+                started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+                applied_steps_count     INTEGER NOT NULL DEFAULT 0,
+                script                  TEXT NOT NULL
+            );
+        "#;
+
+        connection.raw_cmd(sql).await
+    }
+
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
         sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
@@ -93,24 +111,6 @@ impl SqlFlavour for PostgresFlavour {
             .await?;
 
         Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE IF NOT EXISTS _prisma_migrations (
-                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
-                checksum                VARCHAR(64) NOT NULL,
-                finished_at             TIMESTAMPTZ,
-                migration_name          TEXT NOT NULL,
-                logs                    TEXT NOT NULL,
-                rolled_back_at          TIMESTAMPTZ,
-                started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
-                applied_steps_count     INTEGER NOT NULL DEFAULT 0,
-                script                  TEXT NOT NULL
-            );
-        "#;
-
-        connection.raw_cmd(sql).await
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
