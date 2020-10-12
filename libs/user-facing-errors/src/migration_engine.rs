@@ -53,6 +53,27 @@ pub struct DatabaseSchemaNotEmpty {
     pub database_name: String,
 }
 
+#[derive(Debug, Serialize)]
+pub struct MigrationDoesNotApplyCleanly {
+    pub migration_name: String,
+    pub inner_error: crate::Error,
+}
+
+impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
+    const ERROR_CODE: &'static str = "P3006";
+
+    fn message(&self) -> String {
+        format!("Migration `{migration_name}` failed to apply cleanly to a temporary database. \n{error_code}Error:\n{inner_error}", migration_name = self.migration_name, inner_error = self.inner_error.message(), error_code = match &self.inner_error.inner {
+            crate::ErrorType::Known(crate::KnownError {
+                message: _,
+                meta: _,
+                error_code,
+            }) => format!("Error code: {}\n", &error_code),
+            crate::ErrorType::Unknown(_) => String::new(),
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

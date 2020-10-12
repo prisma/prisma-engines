@@ -44,14 +44,18 @@ impl ConnectorError {
 
     pub fn into_migration_failed(self, migration_name: String) -> Self {
         let context = self.context.clone();
-        let user_facing_error = self.user_facing_error.clone();
+        let user_facing_error = user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly {
+            migration_name,
+            inner_error: self
+                .user_facing_error
+                .clone()
+                .map(user_facing_errors::Error::new_known)
+                .unwrap_or_else(|| user_facing_errors::Error::new_non_panic_with_current_backtrace(self.to_string())),
+        };
 
         ConnectorError {
-            user_facing_error,
-            kind: ErrorKind::MigrationFailedToApply {
-                migration_name,
-                error: self.into(),
-            },
+            user_facing_error: Some(KnownError::new(user_facing_error)),
+            kind: ErrorKind::Generic(self.into()),
             context,
         }
     }
@@ -87,48 +91,17 @@ impl ConnectorError {
 #[derive(Debug)]
 pub enum ErrorKind {
     Generic(anyhow::Error),
-
     QueryError(anyhow::Error),
-
-    DatabaseDoesNotExist {
-        db_name: String,
-    },
-
-    DatabaseAccessDenied {
-        database_name: String,
-    },
-
-    DatabaseAlreadyExists {
-        db_name: String,
-    },
-
-    DatabaseCreationFailed {
-        explanation: String,
-    },
-
-    AuthenticationFailed {
-        user: String,
-    },
-
+    DatabaseDoesNotExist { db_name: String },
+    DatabaseAccessDenied { database_name: String },
+    DatabaseAlreadyExists { db_name: String },
+    DatabaseCreationFailed { explanation: String },
+    AuthenticationFailed { user: String },
     InvalidDatabaseUrl(String),
-
-    ConnectionError {
-        host: String,
-        cause: anyhow::Error,
-    },
-
+    ConnectionError { host: String, cause: anyhow::Error },
     ConnectTimeout,
-
-    MigrationFailedToApply {
-        migration_name: String,
-        error: anyhow::Error,
-    },
-
     Timeout,
-
-    TlsError {
-        message: String,
-    },
+    TlsError { message: String },
 }
 
 impl Display for ErrorKind {
@@ -150,11 +123,6 @@ impl Display for ErrorKind {
                 write!(f, "Failed to connect to the database at `{}`.", host)
             }
             ErrorKind::ConnectTimeout => "Connection timed out".fmt(f),
-            ErrorKind::MigrationFailedToApply { migration_name, error } => write!(
-                f,
-                "Migration `{}` failed to apply cleanly to a temporary database. {}",
-                migration_name, error
-            ),
             ErrorKind::Timeout => "Operation timed out".fmt(f),
             ErrorKind::TlsError { message } => write!(f, "Error opening a TLS connection. {}", message),
         }
@@ -174,10 +142,6 @@ impl StdError for ErrorKind {
             ErrorKind::InvalidDatabaseUrl(_) => None,
             ErrorKind::ConnectionError { host: _, cause } => Some(cause.as_ref()),
             ErrorKind::ConnectTimeout => None,
-            ErrorKind::MigrationFailedToApply {
-                migration_name: _,
-                error,
-            } => Some(error.as_ref()),
             ErrorKind::Timeout => None,
             ErrorKind::TlsError { message: _ } => None,
         }
