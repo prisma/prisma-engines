@@ -5,7 +5,7 @@ pub use error_rendering::render_error;
 pub use rpc::*;
 
 use crate::{commands::*, migration_engine::MigrationEngine, CoreError, CoreResult};
-use migration_connector::{DatabaseMigrationMarker, MigrationConnector, MigrationPersistence};
+use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use tracing_futures::Instrument;
 
 pub struct MigrationApi<C, D>
@@ -64,7 +64,6 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
-    fn migration_persistence(&self) -> &dyn MigrationPersistence;
 
     fn render_error(&self, error: CoreError) -> user_facing_errors::Error {
         error_rendering::render_error(error)
@@ -202,9 +201,5 @@ where
         self.handle_command::<UnapplyMigrationCommand<'_>>(input)
             .instrument(tracing::info_span!("UnapplyMigration"))
             .await
-    }
-
-    fn migration_persistence<'a>(&'a self) -> &dyn MigrationPersistence {
-        self.engine.connector().migration_persistence()
     }
 }
