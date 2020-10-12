@@ -811,6 +811,7 @@ dependencies = [
  "colored",
  "cuid",
  "datamodel-connector",
+ "dml",
  "indoc 0.3.6",
  "itertools",
  "native-types",
@@ -827,7 +828,6 @@ dependencies = [
  "sql-datamodel-connector",
  "thiserror",
  "tracing",
- "uuid",
 ]
 
 [[package]]
@@ -869,6 +869,17 @@ name = "discard"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
+
+[[package]]
+name = "dml"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "cuid",
+ "datamodel-connector",
+ "prisma-value",
+ "uuid",
+]
 
 [[package]]
 name = "dtoa"

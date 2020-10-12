@@ -1,4 +1,7 @@
-use super::*;
+use crate::field::{Field, FieldType, RelationField, ScalarField};
+use crate::model::Model;
+use crate::r#enum::Enum;
+use crate::relation_info::RelationInfo;
 
 /// Entities in the datamodel can be flagged as `is_commented_out`. This let's the renderer
 /// know that introspection encountered unsupported names or features and these are supposed
@@ -156,8 +159,8 @@ impl Datamodel {
             .find(|f| {
                 f.relation_info.name == info.name
                     && (f.relation_info.to != info.to ||
-                    // This is to differentiate the opposite field from self in the self relation case.
-                    f.name != exclude)
+          // This is to differentiate the opposite field from self in the self relation case.
+          f.name != exclude)
             })
     }
 

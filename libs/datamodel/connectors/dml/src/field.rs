@@ -1,4 +1,6 @@
 use super::*;
+use crate::default_value::{DefaultValue, ValueGenerator};
+use crate::traits::{WithDatabaseName, WithName};
 use datamodel_connector::NativeTypeInstance;
 use std::hash::Hash;
 

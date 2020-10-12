@@ -1,4 +1,4 @@
-use super::*;
+use crate::traits::{WithDatabaseName, WithName};
 
 /// Represents an enum in the datamodel.
 #[derive(Debug, PartialEq, Clone)]
