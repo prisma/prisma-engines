@@ -2,8 +2,8 @@ extern crate datamodel;
 
 use self::datamodel::StringFromEnvVar;
 use datamodel::dml::IndexDefinition;
+use datamodel::dml::NativeTypeInstance;
 use datamodel::{dml, dml::ScalarType, error::*};
-use datamodel_connector::NativeTypeInstance;
 use pretty_assertions::assert_eq;
 
 pub trait DatasourceAsserts {

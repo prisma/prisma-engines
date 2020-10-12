@@ -1,5 +1,5 @@
-use super::*;
 use crate::field::{Field, FieldType, RelationField, ScalarField};
+use crate::scalars::ScalarType;
 use crate::traits::{WithDatabaseName, WithName};
 
 /// Represents a model in a prisma schema.

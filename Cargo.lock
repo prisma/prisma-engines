@@ -834,8 +834,7 @@ dependencies = [
 name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
- "native-types",
- "serde",
+ "dml",
  "serde_json",
  "thiserror",
 ]
@@ -876,8 +875,10 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cuid",
- "datamodel-connector",
+ "native-types",
  "prisma-value",
+ "serde",
+ "serde_json",
  "uuid",
 ]
 
@@ -3188,6 +3189,7 @@ name = "sql-datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "datamodel-connector",
+ "dml",
  "native-types",
  "serde_json",
 ]
