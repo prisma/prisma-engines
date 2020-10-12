@@ -1,4 +1,4 @@
-use crate::{commands::*, CoreError, CoreResult, GenericApi};
+use crate::{CoreError, CoreResult, GenericApi};
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
@@ -96,16 +96,14 @@ impl RpcApi {
 
         self.io_handler.add_method(cmd.name(), move |params: Params| {
             let executor = Arc::clone(&executor);
-            let fut = async move { Self::create_handler(&executor, cmd, &params).await };
-
-            fut.boxed().compat()
+            Self::create_handler(executor, cmd, params).boxed().compat()
         });
     }
 
     async fn create_handler(
-        executor: &Arc<dyn GenericApi>,
+        executor: Arc<dyn GenericApi>,
         cmd: RpcCommand,
-        params: &Params,
+        params: Params,
     ) -> Result<serde_json::Value, JsonRpcError> {
         let result: Result<serde_json::Value, RunCommandError> = Self::run_command(&executor, cmd, params).await;
 
@@ -119,68 +117,29 @@ impl RpcApi {
     async fn run_command(
         executor: &Arc<dyn GenericApi>,
         cmd: RpcCommand,
-        params: &Params,
+        params: Params,
     ) -> Result<serde_json::Value, RunCommandError> {
         tracing::debug!(?cmd, "running the command");
         match cmd {
-            RpcCommand::GetDatabaseVersion => render(executor.version(&serde_json::Value::Null).await?),
-            RpcCommand::ApplyMigrations => {
-                let input: ApplyMigrationsInput = params.clone().parse()?;
-                render(executor.apply_migrations(&input).await?)
-            }
-            RpcCommand::CreateMigration => {
-                let input: CreateMigrationInput = params.clone().parse()?;
-                render(executor.create_migration(&input).await?)
-            }
+            RpcCommand::ApplyMigrations => render(executor.apply_migrations(&params.parse()?).await?),
+            RpcCommand::CreateMigration => render(executor.create_migration(&params.parse()?).await?),
             RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),
+            RpcCommand::ApplyMigration => render(executor.apply_migration(&params.parse()?).await?),
+            RpcCommand::CalculateDatabaseSteps => render(executor.calculate_database_steps(&params.parse()?).await?),
+            RpcCommand::CalculateDatamodel => render(executor.calculate_datamodel(&params.parse()?).await?),
             RpcCommand::DiagnoseMigrationHistory => {
-                let input: DiagnoseMigrationHistoryInput = params.clone().parse()?;
-                render(executor.diagnose_migration_history(&input).await?)
+                render(executor.diagnose_migration_history(&params.parse()?).await?)
             }
-            RpcCommand::InferMigrationSteps => {
-                let input: InferMigrationStepsInput = params.clone().parse()?;
-                render(executor.infer_migration_steps(&input).await?)
-            }
-            RpcCommand::Initialize => {
-                let input: InitializeInput = params.clone().parse()?;
-                render(executor.initialize(&input).await?)
-            }
-            RpcCommand::EvaluateDataLoss => {
-                let input: EvaluateDataLossInput = params.clone().parse()?;
-                render(executor.evaluate_data_loss(&input).await?)
-            }
+            RpcCommand::EvaluateDataLoss => render(executor.evaluate_data_loss(&params.parse()?).await?),
+            RpcCommand::GetDatabaseVersion => render(executor.version(&serde_json::Value::Null).await?),
+            RpcCommand::InferMigrationSteps => render(executor.infer_migration_steps(&params.parse()?).await?),
+            RpcCommand::Initialize => render(executor.initialize(&params.parse()?).await?),
             RpcCommand::ListMigrations => render(executor.list_migrations(&serde_json::Value::Null).await?),
-            RpcCommand::MigrationProgress => {
-                let input: MigrationProgressInput = params.clone().parse()?;
-                render(executor.migration_progress(&input).await?)
-            }
-            RpcCommand::ApplyMigration => {
-                let input: ApplyMigrationInput = params.clone().parse()?;
-                let result = executor.apply_migration(&input).await?;
-                tracing::debug!("command result: {:?}", result);
-                render(result)
-            }
-            RpcCommand::UnapplyMigration => {
-                let input: UnapplyMigrationInput = params.clone().parse()?;
-                render(executor.unapply_migration(&input).await?)
-            }
-            RpcCommand::PlanMigration => {
-                let input: PlanMigrationInput = params.clone().parse()?;
-                render(executor.plan_migration(&input).await?)
-            }
+            RpcCommand::MigrationProgress => render(executor.migration_progress(&params.parse()?).await?),
+            RpcCommand::PlanMigration => render(executor.plan_migration(&params.parse()?).await?),
             RpcCommand::Reset => render(executor.reset(&()).await?),
-            RpcCommand::SchemaPush => {
-                let input: SchemaPushInput = params.clone().parse()?;
-                render(executor.schema_push(&input).await?)
-            }
-            RpcCommand::CalculateDatamodel => {
-                let input: CalculateDatamodelInput = params.clone().parse()?;
-                render(executor.calculate_datamodel(&input).await?)
-            }
-            RpcCommand::CalculateDatabaseSteps => {
-                let input: CalculateDatabaseStepsInput = params.clone().parse()?;
-                render(executor.calculate_database_steps(&input).await?)
-            }
+            RpcCommand::SchemaPush => render(executor.schema_push(&params.parse()?).await?),
+            RpcCommand::UnapplyMigration => render(executor.unapply_migration(&params.parse()?).await?),
         }
     }
 }
