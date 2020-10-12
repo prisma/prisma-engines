@@ -26,14 +26,6 @@ impl StdError for ConnectorError {
 }
 
 impl ConnectorError {
-    pub fn from_kind(kind: ErrorKind) -> Self {
-        ConnectorError {
-            user_facing_error: None,
-            kind,
-            context: SpanTrace::capture(),
-        }
-    }
-
     pub fn generic(error: anyhow::Error) -> Self {
         ConnectorError {
             user_facing_error: None,
