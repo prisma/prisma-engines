@@ -1,8 +1,10 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
+use anyhow::format_err;
+use connection_string::JdbcString;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::connector::MssqlUrl;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
-use std::collections::HashMap;
+use std::str::FromStr;
 
 #[derive(Debug)]
 pub(crate) struct MssqlFlavour(pub(crate) MssqlUrl);
@@ -12,33 +14,31 @@ impl MssqlFlavour {
         self.0.schema()
     }
 
-    fn master_url(jdbc_string: &str) -> (String, String) {
-        let mut splitted = jdbc_string.split(';');
-        let uri = splitted.next().unwrap().to_string();
+    fn master_url(input: &str) -> ConnectorResult<(String, String)> {
+        let mut conn = JdbcString::from_str(input).map_err(|e| ConnectorError::generic(anyhow::Error::new(e)))?;
+        let server_name = conn.server_name().ok_or_else(|| {
+            ConnectorError::generic(format_err!("JDBC connection string did not contain a server name"))
+        })?;
 
-        let mut params: HashMap<String, String> = splitted
-            .map(|kv| kv.split('='))
-            .map(|mut kv| {
-                let key = kv.next().unwrap().to_string();
-                let value = kv.next().unwrap().to_string();
-
-                (key, value)
-            })
-            .collect();
+        let host = match conn.instance_name() {
+            Some(instance_name) => format!(r#"{}\{}"#, server_name, instance_name),
+            None => server_name.to_string(),
+        };
+        let params = conn.properties_mut();
 
         let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
         let params: Vec<_> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
 
-        let master_uri = format!("{};{}", uri, params.join(";"));
+        let master_url = format!("{};{}", host, params.join(";"));
 
-        (db_name, master_uri)
+        Ok((db_name, master_url))
     }
 }
 
 #[async_trait::async_trait]
 impl SqlFlavour for MssqlFlavour {
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
-        let (db_name, master_uri) = Self::master_url(jdbc_string);
+        let (db_name, master_uri) = Self::master_url(jdbc_string)?;
         let conn = connect(&master_uri.to_string()).await?;
 
         let query = format!("CREATE DATABASE [{}]", db_name);
@@ -131,7 +131,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
-        let (db_name, master_uri) = Self::master_url(database_str);
+        let (db_name, master_uri) = Self::master_url(database_str)?;
         let conn = connect(&master_uri).await?;
 
         // Without these, our poor connection gets deadlocks if other schemas

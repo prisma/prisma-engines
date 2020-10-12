@@ -3278,6 +3278,7 @@ dependencies = [
  "async-trait",
  "barrel",
  "chrono",
+ "connection-string",
  "datamodel",
  "datamodel-connector",
  "enumflags2",
