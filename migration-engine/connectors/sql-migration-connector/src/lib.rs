@@ -4,7 +4,6 @@
 // This is public for test purposes.
 pub mod sql_migration;
 
-mod component;
 mod connection_wrapper;
 mod database_info;
 mod error;
@@ -22,16 +21,12 @@ use connection_wrapper::Connection;
 use error::quaint_error_to_connector_error;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
-use component::Component;
 use database_info::DatabaseInfo;
 use flavour::SqlFlavour;
 use migration_connector::*;
-use quaint::{prelude::ConnectionInfo, single::Quaint};
+use quaint::{prelude::ConnectionInfo, prelude::SqlFamily, single::Quaint};
 use sql_database_migration_inferrer::*;
-use sql_database_step_applier::*;
-use sql_destructive_change_checker::*;
 use sql_migration::SqlMigration;
-use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 
 pub struct SqlMigrationConnector {
@@ -72,6 +67,18 @@ impl SqlMigrationConnector {
         flavour.qe_setup(database_str).await
     }
 
+    fn conn(&self) -> &Connection {
+        &self.connection
+    }
+
+    fn database_info(&self) -> &DatabaseInfo {
+        &self.database_info
+    }
+
+    fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync) {
+        self.flavour.as_ref()
+    }
+
     /// For tests.
     pub fn quaint(&self) -> &Quaint {
         self.connection.quaint()
@@ -79,6 +86,14 @@ impl SqlMigrationConnector {
 
     async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         self.flavour.describe_schema(&self.connection).await
+    }
+
+    fn schema_name(&self) -> &str {
+        self.database_info.connection_info().schema_name()
+    }
+
+    fn sql_family(&self) -> SqlFamily {
+        self.database_info.sql_family()
     }
 }
 
@@ -117,20 +132,20 @@ impl MigrationConnector for SqlMigrationConnector {
         self.database_info.check_database_version_compatibility(datamodel)
     }
 
-    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
-        Box::new(SqlMigrationPersistence { connector: self })
+    fn migration_persistence(&self) -> &dyn MigrationPersistence {
+        self
     }
 
-    fn database_migration_inferrer<'a>(&'a self) -> Box<dyn DatabaseMigrationInferrer<SqlMigration> + 'a> {
-        Box::new(SqlDatabaseMigrationInferrer { connector: self })
+    fn database_migration_inferrer(&self) -> &dyn DatabaseMigrationInferrer<SqlMigration> {
+        self
     }
 
-    fn database_migration_step_applier<'a>(&'a self) -> Box<dyn DatabaseMigrationStepApplier<SqlMigration> + 'a> {
-        Box::new(SqlDatabaseStepApplier { connector: self })
+    fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier<SqlMigration> {
+        self
     }
 
-    fn destructive_change_checker<'a>(&'a self) -> Box<dyn DestructiveChangeChecker<SqlMigration> + 'a> {
-        Box::new(SqlDestructiveChangeChecker { connector: self })
+    fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker<SqlMigration> {
+        self
     }
 
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<SqlMigration> {

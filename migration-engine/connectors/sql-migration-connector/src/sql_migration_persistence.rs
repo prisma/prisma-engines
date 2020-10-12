@@ -1,23 +1,12 @@
-use crate::{connection_wrapper::Connection, Component};
+use crate::{connection_wrapper::Connection, SqlMigrationConnector};
 use barrel::types;
 use chrono::*;
 use migration_connector::*;
-use quaint::ast::*;
-use quaint::{connector::ResultSet, prelude::SqlFamily};
+use quaint::{ast::*, connector::ResultSet, prelude::SqlFamily};
 use std::convert::TryFrom;
 
-pub struct SqlMigrationPersistence<'a> {
-    pub connector: &'a crate::SqlMigrationConnector,
-}
-
-impl Component for SqlMigrationPersistence<'_> {
-    fn connector(&self) -> &crate::SqlMigrationConnector {
-        self.connector
-    }
-}
-
 #[async_trait::async_trait]
-impl MigrationPersistence for SqlMigrationPersistence<'_> {
+impl MigrationPersistence for SqlMigrationConnector {
     async fn init(&self) -> Result<(), ConnectorError> {
         let sql_str = match self.sql_family() {
             SqlFamily::Sqlite => {
@@ -205,7 +194,7 @@ fn migration_table_setup(
     t.add_column(FINISHED_AT_COLUMN, datetime_type.nullable(true));
 }
 
-impl<'a> SqlMigrationPersistence<'a> {
+impl SqlMigrationConnector {
     fn table(&self) -> Table<'_> {
         match self.sql_family() {
             SqlFamily::Sqlite => {

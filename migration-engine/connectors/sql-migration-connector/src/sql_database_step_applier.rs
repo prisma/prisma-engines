@@ -2,7 +2,7 @@ use crate::{
     database_info::DatabaseInfo,
     sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
     sql_schema_differ::SqlSchemaDiffer,
-    Component, SqlFlavour,
+    SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{
     ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics,
@@ -10,18 +10,8 @@ use migration_connector::{
 };
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 
-pub struct SqlDatabaseStepApplier<'a> {
-    pub connector: &'a crate::SqlMigrationConnector,
-}
-
-impl Component for SqlDatabaseStepApplier<'_> {
-    fn connector(&self) -> &crate::SqlMigrationConnector {
-        self.connector
-    }
-}
-
 #[async_trait::async_trait]
-impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
+impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
     #[tracing::instrument(skip(self, database_migration))]
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         self.apply_next_step(
@@ -101,7 +91,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     }
 }
 
-impl SqlDatabaseStepApplier<'_> {
+impl SqlMigrationConnector {
     async fn apply_next_step(
         &self,
         steps: &[SqlMigrationStep],

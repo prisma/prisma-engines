@@ -30,7 +30,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
         let assume_to_be_applied = cmd.assume_to_be_applied();
 
-        cmd.validate_assumed_migrations_are_not_applied(migration_persistence.as_ref())
+        cmd.validate_assumed_migrations_are_not_applied(migration_persistence)
             .await?;
 
         let last_migration = migration_persistence.last().await?;

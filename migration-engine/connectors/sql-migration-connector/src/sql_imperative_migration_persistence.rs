@@ -1,4 +1,4 @@
-use crate::{component::Component, error::quaint_error_to_connector_error, SqlMigrationConnector};
+use crate::{error::quaint_error_to_connector_error, SqlMigrationConnector};
 use migration_connector::{ConnectorResult, FormatChecksum, ImperativeMigrationsPersistence, MigrationRecord};
 use quaint::ast::*;
 use sha2::{Digest, Sha256};
@@ -86,7 +86,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         let result = self.conn().query(select).await?;
 
         let rows = quaint::serde::from_rows(result)
-            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))?;
+            .map_err(|err| quaint_error_to_connector_error(err, self.database_info().connection_info()))?;
 
         Ok(rows)
     }

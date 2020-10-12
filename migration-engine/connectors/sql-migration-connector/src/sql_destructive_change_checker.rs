@@ -1,3 +1,19 @@
+//! The SQL implementation of DestructiveChangeChecker is responsible for
+//! informing users about potentially destructive or impossible changes that
+//! their attempted migrations contain.
+//!
+//! It proceeds in three steps:
+//!
+//! - Examine the SqlMigrationSteps in the migration, to generate a
+//!   `DestructiveCheckPlan` containing destructive change checks (implementors
+//!   of the `Check` trait). At this stage, there is no interaction with the
+//!   database.
+//! - Execute that plan (`DestructiveCheckPlan::execute`), running queries
+//!   against the database to inspect its current state, depending on what
+//!   information the checks require.
+//! - Render the final user-facing messages based on the plan and the gathered
+//!   information.
+
 mod check;
 mod database_inspection_results;
 mod destructive_change_checker_flavour;
@@ -10,7 +26,7 @@ pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavo
 use crate::{
     sql_migration::{AlterEnum, CreateIndex, DropTable, SqlMigrationStep, TableChange},
     sql_schema_differ::{ColumnDiffer, TableDiffer},
-    Component, SqlMigration,
+    SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
@@ -21,28 +37,7 @@ use sql_schema_describer::{
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
-/// The SqlDestructiveChangeChecker is responsible for informing users about potentially
-/// destructive or impossible changes that their attempted migrations contain.
-///
-/// It proceeds in three steps:
-///
-/// - Examine the SqlMigrationSteps in the migration, to generate a `DestructiveCheckPlan`
-///   containing destructive change checks (implementors of the `Check` trait). At this stage, there
-///   is no interaction with the database.
-/// - Execute that plan (`DestructiveCheckPlan::execute`), running queries against the database to
-///   inspect its current state, depending on what information the checks require.
-/// - Render the final user-facing messages based on the plan and the gathered information.
-pub struct SqlDestructiveChangeChecker<'a> {
-    pub connector: &'a crate::SqlMigrationConnector,
-}
-
-impl Component for SqlDestructiveChangeChecker<'_> {
-    fn connector(&self) -> &crate::SqlMigrationConnector {
-        self.connector
-    }
-}
-
-impl SqlDestructiveChangeChecker<'_> {
+impl SqlMigrationConnector {
     fn check_table_drop(&self, table_name: &str, plan: &mut DestructiveCheckPlan, step_index: usize) {
         plan.push_warning(
             SqlMigrationWarningCheck::NonEmptyTableDrop {
@@ -216,7 +211,7 @@ impl SqlDestructiveChangeChecker<'_> {
 }
 
 #[async_trait::async_trait]
-impl DestructiveChangeChecker<SqlMigration> for SqlDestructiveChangeChecker<'_> {
+impl DestructiveChangeChecker<SqlMigration> for SqlMigrationConnector {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(
             &database_migration.steps,

@@ -66,21 +66,19 @@ pub trait MigrationConnector: Send + Sync + 'static {
     }
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
-    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
+    fn migration_persistence<'a>(&'a self) -> &dyn MigrationPersistence;
 
     /// See [ImperativeMigrationPersistence](trait.ImperativeMigrationPersistence.html).
     fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence;
 
     /// See [DatabaseMigrationInferrer](trait.DatabaseMigrationInferrer.html).
-    fn database_migration_inferrer<'a>(&'a self) -> Box<dyn DatabaseMigrationInferrer<Self::DatabaseMigration> + 'a>;
+    fn database_migration_inferrer(&self) -> &dyn DatabaseMigrationInferrer<Self::DatabaseMigration>;
 
     /// See [DatabaseMigrationStepApplier](trait.DatabaseMigrationStepApplier.html).
-    fn database_migration_step_applier<'a>(
-        &'a self,
-    ) -> Box<dyn DatabaseMigrationStepApplier<Self::DatabaseMigration> + 'a>;
+    fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier<Self::DatabaseMigration>;
 
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
-    fn destructive_change_checker<'a>(&'a self) -> Box<dyn DestructiveChangeChecker<Self::DatabaseMigration> + 'a>;
+    fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker<Self::DatabaseMigration>;
 
     // TODO: figure out if this is the best way to do this or move to a better place/interface
     // this is placed here so i can use the associated type
