@@ -1,10 +1,11 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
-use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::collections::HashMap;
 use url::Url;
+use user_facing_errors::migration_engine;
 
 #[derive(Debug)]
 pub(crate) struct PostgresFlavour(pub(crate) PostgresUrl);
@@ -239,12 +240,9 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
         }
     }
 
-    let conn = conn
-        .ok_or_else(|| {
-            ConnectorError::from_kind(ErrorKind::DatabaseCreationFailed {
-                explanation: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned()
-            })
-        })??;
+    let conn = conn.ok_or_else(|| {
+        ConnectorError::user_facing_error(migration_engine::DatabaseCreationFailed { database_error: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned() })
+    })??;
 
     Ok(conn)
 }
