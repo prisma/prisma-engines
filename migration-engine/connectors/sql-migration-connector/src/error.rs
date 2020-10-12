@@ -30,9 +30,6 @@ pub(crate) fn quaint_error_to_connector_error(error: QuaintError, connection_inf
         QuaintKind::TlsError { message } => ErrorKind::TlsError {
             message: message.clone(),
         },
-        QuaintKind::UniqueConstraintViolation { ref constraint } => ErrorKind::UniqueConstraintViolation {
-            field_name: constraint.to_string(),
-        },
         _ => ErrorKind::QueryError(error.into()),
     };
 

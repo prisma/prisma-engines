@@ -48,7 +48,7 @@ impl SqlFlavour for SqliteFlavour {
             );
             "#;
 
-        connection.raw_cmd(sql).await
+        Ok(connection.raw_cmd(sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
@@ -105,9 +105,12 @@ impl SqlFlavour for SqliteFlavour {
                 migration.migration_name()
             );
 
-            conn.raw_cmd(&script).await.map_err(|connector_error| {
-                connector_error.into_migration_failed(migration.migration_name().to_owned())
-            })?;
+            conn.raw_cmd(&script)
+                .await
+                .map_err(ConnectorError::from)
+                .map_err(|connector_error| {
+                    connector_error.into_migration_failed(migration.migration_name().to_owned())
+                })?;
         }
 
         let sql_schema = self.describe_schema(&conn).await?;

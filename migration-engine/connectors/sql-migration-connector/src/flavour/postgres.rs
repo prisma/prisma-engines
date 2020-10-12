@@ -1,7 +1,7 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
 use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
-use quaint::connector::PostgresUrl;
+use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::collections::HashMap;
 use url::Url;
@@ -31,13 +31,13 @@ impl SqlFlavour for PostgresFlavour {
 
         match conn.raw_cmd(&query).await {
             Ok(_) => (),
-            Err(err) if matches!(err.kind, ErrorKind::DatabaseAlreadyExists { .. }) => {
+            Err(err) if matches!(err.kind(), QuaintKind::DatabaseAlreadyExists { .. }) => {
                 database_already_exists_error = Some(err)
             }
-            Err(err) if matches!(err.kind, ErrorKind::UniqueConstraintViolation { .. }) => {
+            Err(err) if matches!(err.kind(), QuaintKind::UniqueConstraintViolation { .. }) => {
                 database_already_exists_error = Some(err)
             }
-            Err(err) => return Err(err),
+            Err(err) => return Err(err.into()),
         };
 
         // Now create the schema
@@ -50,7 +50,7 @@ impl SqlFlavour for PostgresFlavour {
         conn.raw_cmd(&schema_sql).await?;
 
         if let Some(err) = database_already_exists_error {
-            return Err(err);
+            return Err(err.into());
         }
 
         Ok(db_name.to_owned())
@@ -71,7 +71,7 @@ impl SqlFlavour for PostgresFlavour {
             );
         "#;
 
-        connection.raw_cmd(sql).await
+        Ok(connection.raw_cmd(sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
@@ -185,9 +185,13 @@ impl SqlFlavour for PostgresFlavour {
                     migration.migration_name()
                 );
 
-                temporary_database.raw_cmd(&script).await.map_err(|connector_error| {
-                    connector_error.into_migration_failed(migration.migration_name().to_owned())
-                })?;
+                temporary_database
+                    .raw_cmd(&script)
+                    .await
+                    .map_err(ConnectorError::from)
+                    .map_err(|connector_error| {
+                        connector_error.into_migration_failed(migration.migration_name().to_owned())
+                    })?;
             }
 
             // the connection to the temporary database is dropped at the end of

@@ -173,18 +173,22 @@ async fn count_values_in_column(column_name: &str, table: &str, conn: &Connectio
         .value(count(quaint::ast::Column::new(column_name)))
         .so_that(column_name.is_not_null());
 
-    let values_count: i64 = conn.query(query).await.and_then(|result_set| {
-        result_set
-            .first()
-            .as_ref()
-            .and_then(|row| row.at(0))
-            .and_then(|count| count.as_i64())
-            .ok_or_else(|| {
-                ConnectorError::generic(anyhow::anyhow!(
-                    "Unexpected result set shape when checking dropped columns."
-                ))
-            })
-    })?;
+    let values_count: i64 = conn
+        .query(query)
+        .await
+        .map_err(ConnectorError::from)
+        .and_then(|result_set| {
+            result_set
+                .first()
+                .as_ref()
+                .and_then(|row| row.at(0))
+                .and_then(|count| count.as_i64())
+                .ok_or_else(|| {
+                    ConnectorError::generic(anyhow::anyhow!(
+                        "Unexpected result set shape when checking dropped columns."
+                    ))
+                })
+        })?;
 
     Ok(values_count)
 }

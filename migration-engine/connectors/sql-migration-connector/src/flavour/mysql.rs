@@ -73,7 +73,7 @@ impl SqlFlavour for MysqlFlavour {
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         "#;
 
-        connection.raw_cmd(sql).await
+        Ok(connection.raw_cmd(sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
@@ -151,9 +151,13 @@ impl SqlFlavour for MysqlFlavour {
                 migration.migration_name()
             );
 
-            temp_database.raw_cmd(&script).await.map_err(|connector_error| {
-                connector_error.into_migration_failed(migration.migration_name().to_owned())
-            })?;
+            temp_database
+                .raw_cmd(&script)
+                .await
+                .map_err(ConnectorError::from)
+                .map_err(|connector_error| {
+                    connector_error.into_migration_failed(migration.migration_name().to_owned())
+                })?;
         }
 
         let sql_schema = self.describe_schema(&temp_database).await?;

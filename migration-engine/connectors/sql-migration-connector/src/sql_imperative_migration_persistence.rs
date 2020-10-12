@@ -67,8 +67,6 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     }
 
     async fn list_migrations(&self) -> ConnectorResult<Vec<MigrationRecord>> {
-        self.flavour.create_imperative_migrations_table(self.conn()).await?;
-
         let select = Select::from_table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .column("id")
             .column("checksum")
