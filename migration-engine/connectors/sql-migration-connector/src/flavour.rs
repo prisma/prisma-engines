@@ -56,7 +56,7 @@ pub(crate) trait SqlFlavour:
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Make sure that the `_prisma_migrations` table exists.
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Create a database for the given URL on the server, if applicable.
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;

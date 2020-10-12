@@ -33,24 +33,9 @@ impl SqlFlavour for SqliteFlavour {
         Ok(self.file_path.clone())
     }
 
-    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
-            .describe(connection.connection_info().schema_name())
-            .await
-            .map_err(|err| match err {
-                SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
-                }
-            })
-    }
-
-    async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
-        Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = r#"
-            CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
+            CREATE TABLE "_prisma_migrations" (
                 "id"                    TEXT PRIMARY KEY NOT NULL,
                 "checksum"              TEXT NOT NULL,
                 "finished_at"           DATETIME,
@@ -64,6 +49,21 @@ impl SqlFlavour for SqliteFlavour {
             "#;
 
         connection.raw_cmd(sql).await
+    }
+
+    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
+        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
+            .describe(connection.connection_info().schema_name())
+            .await
+            .map_err(|err| match err {
+                SqlSchemaDescriberError::UnknownError => {
+                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
+                }
+            })
+    }
+
+    async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
+        Ok(())
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {

@@ -57,7 +57,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
             })
             .collect();
 
-        let mut applied_migration_names: Vec<String> = Vec::new();
+        let mut applied_migration_names: Vec<String> = Vec::with_capacity(unapplied_migrations.len());
 
         for unapplied_migration in unapplied_migrations {
             let script = unapplied_migration

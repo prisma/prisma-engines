@@ -10,8 +10,6 @@ const IMPERATIVE_MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
         let conn = self.conn();
-        self.flavour.ensure_imperative_migrations_table(conn).await?;
-
         let id = Uuid::new_v4().to_string();
 
         let mut hasher = Sha256::new();
@@ -69,7 +67,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     }
 
     async fn list_migrations(&self) -> ConnectorResult<Vec<MigrationRecord>> {
-        self.flavour.ensure_imperative_migrations_table(self.conn()).await?;
+        self.flavour.create_imperative_migrations_table(self.conn()).await?;
 
         let select = Select::from_table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .column("id")

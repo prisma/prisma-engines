@@ -53,6 +53,24 @@ impl SqlFlavour for MssqlFlavour {
         Ok(db_name)
     }
 
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE [_prisma_migrations] (
+                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+                checksum                VARCHAR(64) NOT NULL,
+                finished_at             DATETIMEOFFSET,
+                migration_name          NVARCHAR(MAX) NOT NULL,
+                logs                    NVARCHAR(MAX) NOT NULL,
+                rolled_back_at          DATETIMEOFFSET,
+                started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                applied_steps_count     INT NOT NULL DEFAULT 0,
+                script                  NVARCHAR(MAX) NOT NULL
+            );
+        "#;
+
+        connection.raw_cmd(sql).await
+    }
+
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
         sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
@@ -138,24 +156,6 @@ impl SqlFlavour for MssqlFlavour {
         connection.raw_cmd("SELECT 1").await?;
 
         Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE IF NOT EXISTS [_prisma_migrations] (
-                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
-                checksum                VARCHAR(64) NOT NULL,
-                finished_at             DATETIMEOFFSET,
-                migration_name          NVARCHAR(MAX) NOT NULL,
-                logs                    NVARCHAR(MAX) NOT NULL,
-                rolled_back_at          DATETIMEOFFSET,
-                started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                applied_steps_count     INT NOT NULL DEFAULT 0,
-                script                  NVARCHAR(MAX) NOT NULL
-            );
-        "#;
-
-        connection.raw_cmd(sql).await
     }
 
     async fn sql_schema_from_migration_history(
