@@ -1,19 +1,28 @@
 use crate::migrations_directory::ReadMigrationScriptError;
-use std::fmt::Display;
-use thiserror::Error;
+use std::{error::Error as StdError, fmt::Display};
 use tracing_error::SpanTrace;
 use user_facing_errors::KnownError;
 
-#[derive(Debug, Error)]
-#[error("{}\n{}", kind, context)]
+#[derive(Debug)]
 pub struct ConnectorError {
     /// An optional error already rendered for users in case the migration core does not handle it.
     pub user_facing_error: Option<KnownError>,
     /// The error information for internal use.
-    #[source]
     pub kind: ErrorKind,
     /// See the tracing-error docs.
     pub context: SpanTrace,
+}
+
+impl Display for ConnectorError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}\n{}", self.kind, self.context)
+    }
+}
+
+impl StdError for ConnectorError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        Some(&self.kind)
+    }
 }
 
 impl ConnectorError {
@@ -66,61 +75,104 @@ impl ConnectorError {
     }
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum ErrorKind {
-    #[error(transparent)]
     Generic(anyhow::Error),
 
-    #[error("Error querying the database: {0}")]
-    QueryError(#[source] anyhow::Error),
+    QueryError(anyhow::Error),
 
-    #[error("Database '{}' does not exist", db_name)]
-    DatabaseDoesNotExist { db_name: String },
+    DatabaseDoesNotExist {
+        db_name: String,
+    },
 
-    #[error("Access denied to database '{}'", database_name)]
-    DatabaseAccessDenied { database_name: String },
+    DatabaseAccessDenied {
+        database_name: String,
+    },
 
-    #[error("Database '{}' already exists", db_name)]
-    DatabaseAlreadyExists { db_name: String },
+    DatabaseAlreadyExists {
+        db_name: String,
+    },
 
-    #[error("Could not create the database. {}", explanation)]
-    DatabaseCreationFailed { explanation: String },
+    DatabaseCreationFailed {
+        explanation: String,
+    },
 
-    #[error("Authentication failed for user '{}'", user)]
-    AuthenticationFailed { user: String },
+    AuthenticationFailed {
+        user: String,
+    },
 
-    #[error("{}", _0)]
     InvalidDatabaseUrl(String),
 
-    #[error("Failed to connect to the database at `{}`.", host)]
     ConnectionError {
         host: String,
-        #[source]
         cause: anyhow::Error,
     },
 
-    #[error("Connect timed out")]
     ConnectTimeout,
 
-    #[error(
-        "Migration `{}` failed to apply cleanly to a temporary database. {}",
-        migration_name,
-        error
-    )]
     MigrationFailedToApply {
         migration_name: String,
-        #[source]
         error: anyhow::Error,
     },
 
-    #[error("Operation timed out")]
     Timeout,
 
-    #[error("Error opening a TLS connection. {}", message)]
-    TlsError { message: String },
+    TlsError {
+        message: String,
+    },
+}
 
-    #[error("Unique constraint violation.")]
-    UniqueConstraintViolation { field_name: String },
+impl Display for ErrorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ErrorKind::Generic(err) => err.fmt(f),
+            ErrorKind::QueryError(err) => write!(f, "Error querying the database: {}", err),
+            ErrorKind::DatabaseDoesNotExist { db_name } => write!(f, "Database `{}` does not exist", db_name),
+            ErrorKind::DatabaseAccessDenied { database_name } => {
+                write!(f, "Access denied to database `{}`", database_name)
+            }
+            ErrorKind::DatabaseAlreadyExists { db_name } => write!(f, "Database '{}' already exists", db_name),
+            ErrorKind::DatabaseCreationFailed { explanation } => {
+                write!(f, "Could not create the database. {}", explanation)
+            }
+            ErrorKind::AuthenticationFailed { user } => write!(f, "Authentication failed for user '{}'", user),
+            ErrorKind::InvalidDatabaseUrl(err) => err.fmt(f),
+            ErrorKind::ConnectionError { host, cause: _ } => {
+                write!(f, "Failed to connect to the database at `{}`.", host)
+            }
+            ErrorKind::ConnectTimeout => "Connection timed out".fmt(f),
+            ErrorKind::MigrationFailedToApply { migration_name, error } => write!(
+                f,
+                "Migration `{}` failed to apply cleanly to a temporary database. {}",
+                migration_name, error
+            ),
+            ErrorKind::Timeout => "Operation timed out".fmt(f),
+            ErrorKind::TlsError { message } => write!(f, "Error opening a TLS connection. {}", message),
+        }
+    }
+}
+
+impl StdError for ErrorKind {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match self {
+            ErrorKind::Generic(err) => Some(err.as_ref()),
+            ErrorKind::QueryError(err) => Some(err.as_ref()),
+            ErrorKind::DatabaseDoesNotExist { db_name: _ } => None,
+            ErrorKind::DatabaseAccessDenied { database_name: _ } => None,
+            ErrorKind::DatabaseAlreadyExists { db_name: _ } => None,
+            ErrorKind::DatabaseCreationFailed { explanation: _ } => None,
+            ErrorKind::AuthenticationFailed { user: _ } => None,
+            ErrorKind::InvalidDatabaseUrl(_) => None,
+            ErrorKind::ConnectionError { host: _, cause } => Some(cause.as_ref()),
+            ErrorKind::ConnectTimeout => None,
+            ErrorKind::MigrationFailedToApply {
+                migration_name: _,
+                error,
+            } => Some(error.as_ref()),
+            ErrorKind::Timeout => None,
+            ErrorKind::TlsError { message: _ } => None,
+        }
+    }
 }
 
 impl From<ReadMigrationScriptError> for ConnectorError {

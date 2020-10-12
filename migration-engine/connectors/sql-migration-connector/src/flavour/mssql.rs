@@ -68,7 +68,7 @@ impl SqlFlavour for MssqlFlavour {
             );
         "#;
 
-        connection.raw_cmd(sql).await
+        Ok(connection.raw_cmd(sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
