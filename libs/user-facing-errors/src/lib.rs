@@ -121,6 +121,13 @@ impl Error {
             .map(|s| -> String { (*s).to_owned() })
             .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
     }
+
+    pub fn unwrap_known(self) -> KnownError {
+        match self.inner {
+            ErrorType::Known(err) => err,
+            err @ ErrorType::Unknown(_) => panic!("Expected known error, got {:?}", err),
+        }
+    }
 }
 
 pub fn new_backtrace() -> backtrace::Backtrace {

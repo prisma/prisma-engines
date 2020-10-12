@@ -1,6 +1,7 @@
 use crate::{error::quaint_error_to_connector_error, SqlMigrationConnector};
 use migration_connector::{
-    ConnectorResult, FormatChecksum, ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError,
+    ConnectorError, ConnectorResult, FormatChecksum, ImperativeMigrationsPersistence, MigrationRecord,
+    PersistenceNotInitializedError,
 };
 use quaint::{ast::*, error::ErrorKind as QuaintKind};
 use sha2::{Digest, Sha256};
@@ -37,8 +38,11 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         }
 
         if !schema.is_empty() {
-            dbg!(&schema);
-            todo!("Non-empty schema")
+            return Err(ConnectorError::user_facing_error(
+                user_facing_errors::migration_engine::DatabaseSchemaNotEmpty {
+                    database_name: self.database_info.connection_info().database_location().to_owned(),
+                },
+            ));
         }
 
         self.flavour.create_imperative_migrations_table(&self.conn()).await?;

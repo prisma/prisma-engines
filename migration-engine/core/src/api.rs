@@ -1,7 +1,6 @@
 mod error_rendering;
 mod rpc;
 
-pub use error_rendering::render_error;
 pub use rpc::*;
 
 use crate::{commands::*, migration_engine::MigrationEngine, CoreError, CoreResult};
@@ -66,10 +65,6 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
     fn migration_persistence(&self) -> &dyn MigrationPersistence;
     fn connector_type(&self) -> &'static str;
-
-    fn render_error(&self, error: CoreError) -> user_facing_errors::Error {
-        error_rendering::render_error(error)
-    }
 
     fn render_jsonrpc_error(&self, error: CoreError) -> jsonrpc_core::error::Error {
         error_rendering::render_jsonrpc_error(error)

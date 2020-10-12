@@ -12,7 +12,7 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     ///
     /// If the migration persistence is not present in the target database,
     /// check whether the database schema is empty. If it is, initialize the
-    /// migration persistence. If not, return a NonEmptyDatabase error.
+    /// migration persistence. If not, return a DatabaseSchemaNotEmpty error.
     async fn initialize(&self) -> ConnectorResult<()>;
 
     /// Record that a migration is about to be applied. Returns the unique identifier for the migration.

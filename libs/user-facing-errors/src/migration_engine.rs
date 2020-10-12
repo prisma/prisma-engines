@@ -44,7 +44,14 @@ pub struct MigrateSystemDatabase {
     pub database_name: String,
 }
 
-// Tests
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P3005",
+    message = "The database schema for `{database_name}` is not empty. Please follow the to-be-written instructions on how to set up migrate with an existing database, or use an empty database."
+)]
+pub struct DatabaseSchemaNotEmpty {
+    pub database_name: String,
+}
 
 #[cfg(test)]
 mod tests {
