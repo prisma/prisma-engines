@@ -95,7 +95,6 @@ pub enum ErrorKind {
     DatabaseDoesNotExist { db_name: String },
     DatabaseAccessDenied { database_name: String },
     DatabaseAlreadyExists { db_name: String },
-    DatabaseCreationFailed { explanation: String },
     AuthenticationFailed { user: String },
     InvalidDatabaseUrl(String),
     ConnectionError { host: String, cause: anyhow::Error },
@@ -114,9 +113,6 @@ impl Display for ErrorKind {
                 write!(f, "Access denied to database `{}`", database_name)
             }
             ErrorKind::DatabaseAlreadyExists { db_name } => write!(f, "Database '{}' already exists", db_name),
-            ErrorKind::DatabaseCreationFailed { explanation } => {
-                write!(f, "Could not create the database. {}", explanation)
-            }
             ErrorKind::AuthenticationFailed { user } => write!(f, "Authentication failed for user '{}'", user),
             ErrorKind::InvalidDatabaseUrl(err) => err.fmt(f),
             ErrorKind::ConnectionError { host, cause: _ } => {
@@ -137,7 +133,6 @@ impl StdError for ErrorKind {
             ErrorKind::DatabaseDoesNotExist { db_name: _ } => None,
             ErrorKind::DatabaseAccessDenied { database_name: _ } => None,
             ErrorKind::DatabaseAlreadyExists { db_name: _ } => None,
-            ErrorKind::DatabaseCreationFailed { explanation: _ } => None,
             ErrorKind::AuthenticationFailed { user: _ } => None,
             ErrorKind::InvalidDatabaseUrl(_) => None,
             ErrorKind::ConnectionError { host: _, cause } => Some(cause.as_ref()),
