@@ -72,7 +72,7 @@ impl GeneratorLoader {
 
         if !preview_features.is_empty() {
             if let Err(err) =
-                validate_preview_features(preview_features.clone(), span, GENERATOR_PREVIEW_FEATURES.to_vec())
+                validate_preview_features(preview_features.clone(), span, Vec::from(GENERATOR_PREVIEW_FEATURES))
             {
                 return Err(err);
             }
