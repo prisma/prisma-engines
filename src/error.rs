@@ -214,6 +214,13 @@ impl From<num::TryFromIntError> for Error {
     }
 }
 
+impl From<connection_string::Error> for Error {
+    fn from(err: connection_string::Error) -> Error {
+        let err = Cow::Owned(format!("{}", err));
+        Self::builder(ErrorKind::ConversionError(err)).build()
+    }
+}
+
 #[cfg(feature = "pooled")]
 impl From<mobc::Error<Error>> for Error {
     fn from(e: mobc::Error<Error>) -> Self {
@@ -254,6 +261,18 @@ impl From<url::ParseError> for Error {
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Error {
         Error::builder(ErrorKind::IoError(e)).build()
+    }
+}
+
+impl From<std::num::ParseIntError> for Error {
+    fn from(_e: std::num::ParseIntError) -> Error {
+        Error::builder(ErrorKind::conversion("Couldn't convert data to an integer")).build()
+    }
+}
+
+impl From<std::str::ParseBoolError> for Error {
+    fn from(_e: std::str::ParseBoolError) -> Error {
+        Error::builder(ErrorKind::conversion("Couldn't convert data to a boolean")).build()
     }
 }
 

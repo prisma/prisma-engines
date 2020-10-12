@@ -10,7 +10,6 @@ use crate::{
 use async_trait::async_trait;
 use futures::lock::Mutex;
 use std::{
-    collections::HashMap,
     convert::TryFrom,
     fmt::{self, Write},
     future::Future,
@@ -20,7 +19,6 @@ use std::{
 use tiberius::*;
 use tokio::{net::TcpStream, time::timeout};
 use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
-use url::Url;
 
 #[derive(Debug, Clone)]
 pub struct MssqlUrl {
@@ -359,91 +357,66 @@ impl MssqlUrl {
         })
     }
 
-    fn parse_query_params(jdbc_connection_string: &str) -> crate::Result<MssqlQueryParams> {
-        let mut parts = jdbc_connection_string.split(';');
+    fn parse_query_params(input: &str) -> crate::Result<MssqlQueryParams> {
+        let mut conn = connection_string::JdbcString::from_str(input)?;
 
-        match parts.next() {
-            Some(host_part) => {
-                let url = Url::parse(&host_part.replace("jdbc:sqlserver://", "sqlserver://"))?;
+        let host = conn.server_name().map(|server_name| match conn.instance_name() {
+            Some(instance_name) => format!(r#"{}\{}"#, server_name, instance_name),
+            None => server_name.to_string(),
+        });
 
-                let params: crate::Result<HashMap<String, String>> = parts
-                    .filter(|kv| kv != &"")
-                    .map(|kv| kv.split('='))
-                    .map(|mut split| {
-                        let key = split
-                            .next()
-                            .ok_or_else(|| {
-                                let kind = ErrorKind::conversion("Malformed connection string key");
-                                Error::builder(kind).build()
-                            })?
-                            .trim();
+        let port = conn.port();
+        let props = conn.properties_mut();
+        let user = props.remove("user");
+        let password = props.remove("password");
+        let database = props.remove("database").unwrap_or_else(|| String::from("master"));
+        let schema = props.remove("schema").unwrap_or_else(|| String::from("dbo"));
 
-                        let value = split.next().ok_or_else(|| {
-                            let kind = ErrorKind::conversion("Malformed connection string value");
-                            Error::builder(kind).build()
-                        })?;
+        let connection_limit = props.remove("connectionlimit").map(|param| param.parse()).transpose()?;
 
-                        Ok((key.trim().to_lowercase(), value.trim().to_string()))
-                    })
-                    .collect();
+        let transaction_isolation_level = props
+            .remove("isolationlevel")
+            .map(|level| IsolationLevel::from_str(&level))
+            .transpose()?;
 
-                let mut params = params?;
+        let connect_timeout = props
+            .remove("logintimeout")
+            .or_else(|| props.remove("connecttimeout"))
+            .or_else(|| props.remove("connectiontimeout"))
+            .map(|param| param.parse().map(Duration::from_secs))
+            .transpose()?;
 
-                let host = url.host().map(|s| s.to_string());
-                let port = url.port();
-                let user = params.remove("user");
-                let password = params.remove("password");
-                let database = params.remove("database").unwrap_or_else(|| String::from("master"));
-                let schema = params.remove("schema").unwrap_or_else(|| String::from("dbo"));
-                let connection_limit = params.remove("connectionlimit").and_then(|param| param.parse().ok());
+        let socket_timeout = props
+            .remove("sockettimeout")
+            .map(|param| param.parse().map(Duration::from_secs))
+            .transpose()?;
 
-                let transaction_isolation_level = match params.remove("isolationlevel") {
-                    Some(level) => Some(IsolationLevel::from_str(&level)?),
-                    None => None,
-                };
+        let encrypt = props
+            .remove("encrypt")
+            .map(|param| EncryptMode::from_str(&param))
+            .transpose()?
+            .unwrap_or(EncryptMode::Off);
 
-                let connect_timeout = params
-                    .remove("logintimeout")
-                    .or_else(|| params.remove("connecttimeout"))
-                    .or_else(|| params.remove("connectiontimeout"))
-                    .and_then(|param| param.parse::<u64>().ok())
-                    .map(|secs| Duration::new(secs, 0));
+        let trust_server_certificate = props
+            .remove("trustservercertificate")
+            .map(|param| param.parse())
+            .transpose()?
+            .unwrap_or(false);
 
-                let socket_timeout = params
-                    .remove("sockettimeout")
-                    .and_then(|param| param.parse::<u64>().ok())
-                    .map(|secs| Duration::new(secs, 0));
-
-                let encrypt = params
-                    .remove("encrypt")
-                    .and_then(|param| EncryptMode::from_str(&param).ok())
-                    .unwrap_or(EncryptMode::Off);
-
-                let trust_server_certificate = params
-                    .remove("trustservercertificate")
-                    .and_then(|param| param.parse().ok())
-                    .unwrap_or(false);
-
-                Ok(MssqlQueryParams {
-                    encrypt,
-                    port,
-                    host,
-                    user,
-                    password,
-                    database,
-                    schema,
-                    trust_server_certificate,
-                    connection_limit,
-                    socket_timeout,
-                    connect_timeout,
-                    transaction_isolation_level,
-                })
-            }
-            _ => {
-                let kind = ErrorKind::conversion("Malformed connection string");
-                Err(Error::builder(kind).build())
-            }
-        }
+        Ok(MssqlQueryParams {
+            encrypt,
+            port,
+            host,
+            user,
+            password,
+            database,
+            schema,
+            trust_server_certificate,
+            connection_limit,
+            socket_timeout,
+            connect_timeout,
+            transaction_isolation_level,
+        })
     }
 
     fn create_ado_net_string(params: &MssqlQueryParams) -> crate::Result<String> {
