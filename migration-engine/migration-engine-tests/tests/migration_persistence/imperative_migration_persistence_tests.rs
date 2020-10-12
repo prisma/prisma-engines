@@ -6,13 +6,15 @@ use pretty_assertions::assert_eq;
 async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 
+    persistence.initialize().await?;
+
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
     let id = persistence
         .record_migration_started("initial_migration", script)
         .await?;
 
-    let migrations = persistence.list_migrations().await?;
+    let migrations = persistence.list_migrations().await?.unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -38,9 +40,11 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
+
+    persistence.initialize().await?;
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
@@ -49,7 +53,7 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
         .await?;
     persistence.record_migration_finished(&id).await?;
 
-    let migrations = persistence.list_migrations().await?;
+    let migrations = persistence.list_migrations().await?.unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -82,6 +86,8 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
 async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 
+    persistence.initialize().await?;
+
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
     let id = persistence
@@ -90,7 +96,7 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
     persistence.record_successful_step(&id, "oï").await?;
     persistence.record_migration_finished(&id).await?;
 
-    let migrations = persistence.list_migrations().await?;
+    let migrations = persistence.list_migrations().await?.unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -123,6 +129,8 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
 async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 
+    persistence.initialize().await?;
+
     let script_1 = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
     let id_1 = persistence
@@ -141,7 +149,7 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
         .record_successful_step(&id_2, "logs for the second migration")
         .await?;
 
-    let migrations = persistence.list_migrations().await?;
+    let migrations = persistence.list_migrations().await?.unwrap();
 
     assert_eq!(migrations.len(), 2);
 
