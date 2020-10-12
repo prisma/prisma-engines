@@ -64,7 +64,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
-    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
+    fn migration_persistence(&self) -> &dyn MigrationPersistence;
     fn connector_type(&self) -> &'static str;
 
     fn render_error(&self, error: CoreError) -> user_facing_errors::Error {
@@ -205,7 +205,7 @@ where
             .await
     }
 
-    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
+    fn migration_persistence<'a>(&'a self) -> &dyn MigrationPersistence {
         self.engine.connector().migration_persistence()
     }
 

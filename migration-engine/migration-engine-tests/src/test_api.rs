@@ -83,7 +83,7 @@ impl TestApi {
         self.connector_name == "mysql_mariadb"
     }
 
-    pub fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
+    pub fn migration_persistence(&self) -> &dyn MigrationPersistence {
         self.api.migration_persistence()
     }
 
