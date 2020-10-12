@@ -62,10 +62,12 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
         let migration_persistence = connector.new_migration_persistence();
         let migration_inferrer = connector.database_migration_inferrer();
 
+        tracing::debug!("Diagnosing migration history");
+
         // Load the migrations.
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
-        let migrations_from_database = migration_persistence.list_migrations().await?;
+        let migrations_from_database = migration_persistence.list_migrations().await?.unwrap_or_default();
 
         let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
 

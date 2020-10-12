@@ -1,6 +1,6 @@
 use super::MigrationCommand;
 use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
-use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord};
+use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -40,9 +40,14 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
         let applier = connector.database_migration_step_applier();
         let migration_persistence = connector.new_migration_persistence();
 
+        migration_persistence.initialize().await?;
+
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
-        let migrations_from_database = migration_persistence.list_migrations().await?;
+        let migrations_from_database = migration_persistence
+            .list_migrations()
+            .await?
+            .map_err(PersistenceNotInitializedError::into_connector_error)?;
 
         diagnose_migration_history(&migrations_from_database, &migrations_from_filesystem)?;
 

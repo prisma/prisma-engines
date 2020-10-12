@@ -14,7 +14,7 @@ async fn diagnose_migrations_history_on_an_empty_database_without_migration_retu
     Ok(())
 }
 
-#[test_each_connector(log = "debug, sql_schema_describer=info")]
+#[test_each_connector]
 async fn diagnose_migrations_history_after_two_migrations_happy_path(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -92,7 +92,7 @@ async fn diagnose_migration_history_detects_drift(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug, sql_schema_describer=info")]
+#[test_each_connector]
 async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -146,7 +146,7 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
     Ok(())
 }
 
-#[test_each_connector(log = "debug, sql_schema_describer=info")]
+#[test_each_connector]
 async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -203,7 +203,7 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
     Ok(())
 }
 
-#[test_each_connector(log = "debug, sql_schema_describer=info")]
+#[test_each_connector]
 async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -286,7 +286,7 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
     Ok(())
 }
 
-#[test_each_connector(log = "debug, sql_schema_describer=info")]
+#[test_each_connector]
 async fn diagnose_migrations_history_can_detect_edited_migrations(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 

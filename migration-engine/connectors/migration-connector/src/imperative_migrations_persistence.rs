@@ -1,4 +1,4 @@
-use crate::ConnectorResult;
+use crate::{ConnectorError, ConnectorResult};
 use serde::Deserialize;
 
 /// A timestamp.
@@ -7,6 +7,14 @@ pub type Timestamp = chrono::DateTime<chrono::Utc>;
 /// Management of imperative migrations state in the database.
 #[async_trait::async_trait]
 pub trait ImperativeMigrationsPersistence: Send + Sync {
+    /// This method is responsible for checking whether the migrations
+    /// persistence is initialized.
+    ///
+    /// If the migration persistence is not present in the target database,
+    /// check whether the database schema is empty. If it is, initialize the
+    /// migration persistence. If not, return a NonEmptyDatabase error.
+    async fn initialize(&self) -> ConnectorResult<()>;
+
     /// Record that a migration is about to be applied. Returns the unique identifier for the migration.
     async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String>;
 
@@ -21,8 +29,22 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// populating the `finished_at` field in the migration record.
     async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()>;
 
-    /// List all applied migrations, ordered by `started_at`.
-    async fn list_migrations(&self) -> ConnectorResult<Vec<MigrationRecord>>;
+    /// List all applied migrations, ordered by `started_at`. This should fail
+    /// hard if the migration persistence is not initialized.
+    async fn list_migrations(&self) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>;
+}
+
+/// Error returned when the persistence is not initialized.
+#[derive(Debug)]
+pub struct PersistenceNotInitializedError;
+
+impl PersistenceNotInitializedError {
+    /// Explicit conversion to a ConnectorError.
+    pub fn into_connector_error(self) -> ConnectorError {
+        ConnectorError::generic(anyhow::anyhow!(
+            "Invariant violation: migration persistence is not initialized."
+        ))
+    }
 }
 
 /// An applied migration, as returned by list_migrations.
