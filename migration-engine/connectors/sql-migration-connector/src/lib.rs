@@ -84,7 +84,8 @@ impl SqlMigrationConnector {
         self.connection.quaint()
     }
 
-    async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
+    /// Made public for tests.
+    pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         self.flavour.describe_schema(&self.connection).await
     }
 

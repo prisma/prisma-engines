@@ -4,7 +4,7 @@ mod rpc;
 pub use rpc::*;
 
 use crate::{commands::*, migration_engine::MigrationEngine, CoreError, CoreResult};
-use migration_connector::{DatabaseMigrationMarker, MigrationConnector, MigrationPersistence};
+use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use tracing_futures::Instrument;
 
 pub struct MigrationApi<C, D>
@@ -63,8 +63,6 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
-    fn migration_persistence(&self) -> &dyn MigrationPersistence;
-    fn connector_type(&self) -> &'static str;
 
     fn render_jsonrpc_error(&self, error: CoreError) -> jsonrpc_core::error::Error {
         error_rendering::render_jsonrpc_error(error)
@@ -199,13 +197,5 @@ where
         self.handle_command::<UnapplyMigrationCommand<'_>>(input)
             .instrument(tracing::info_span!("UnapplyMigration"))
             .await
-    }
-
-    fn migration_persistence<'a>(&'a self) -> &dyn MigrationPersistence {
-        self.engine.connector().migration_persistence()
-    }
-
-    fn connector_type(&self) -> &'static str {
-        self.engine.connector().connector_type()
     }
 }
