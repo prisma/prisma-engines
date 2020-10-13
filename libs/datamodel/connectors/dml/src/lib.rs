@@ -12,7 +12,6 @@ pub mod scalars;
 pub mod traits;
 use serde::de::DeserializeOwned;
 
-// Compatibility exports so that users of this module don't need to import the connector as well.
 use crate::relation_info::RelationInfo;
 use native_types::NativeType;
 
