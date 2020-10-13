@@ -1,7 +1,10 @@
-#![deny(rust_2018_idioms, unsafe_code)]
+//! The SQL migration connector.
+
+#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::trivial_regex)] // these will grow
 
 // This is public for test purposes.
+#[allow(missing_docs)]
 pub mod sql_migration;
 
 mod connection_wrapper;
@@ -29,6 +32,7 @@ use sql_database_migration_inferrer::*;
 use sql_migration::SqlMigration;
 use sql_schema_describer::SqlSchema;
 
+/// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
     connection: Connection,
     database_info: DatabaseInfo,
@@ -36,6 +40,7 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
+    /// Construct and initialize the SQL migration connector.
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let connection = connect(database_str).await?;
         let database_info = DatabaseInfo::new(connection.quaint(), connection.connection_info().clone()).await?;
@@ -51,6 +56,7 @@ impl SqlMigrationConnector {
         })
     }
 
+    /// Create the database corresponding to the connection string, without initializing the connector.
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
@@ -58,6 +64,7 @@ impl SqlMigrationConnector {
         flavour.create_database(database_str).await
     }
 
+    /// Set up the database for connector-test-kit, without initializing the connector.
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
