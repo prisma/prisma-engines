@@ -122,7 +122,8 @@ where
         self.handle_command::<CreateMigrationCommand>(input)
             .instrument(tracing::info_span!(
                 "CreateMigration",
-                migration_name = input.migration_name.as_str()
+                migration_name = input.migration_name.as_str(),
+                draft = input.draft,
             ))
             .await
     }
