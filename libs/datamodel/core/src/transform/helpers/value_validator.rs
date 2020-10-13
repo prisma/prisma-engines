@@ -122,6 +122,7 @@ impl ValueValidator {
     /// Tries to convert the wrapped value to a Prisma Float.
     pub fn as_float(&self) -> Result<Decimal, DatamodelError> {
         match &self.value {
+            ast::Expression::StringValue(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
             ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
             ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),

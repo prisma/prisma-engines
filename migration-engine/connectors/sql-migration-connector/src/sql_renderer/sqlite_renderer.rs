@@ -283,6 +283,7 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Boolean => "BOOLEAN",
         ColumnTypeFamily::DateTime => "DATETIME",
         ColumnTypeFamily::Float => "REAL",
+        ColumnTypeFamily::Decimal => "REAL",
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::String => "TEXT",
         ColumnTypeFamily::Binary => "BLOB",

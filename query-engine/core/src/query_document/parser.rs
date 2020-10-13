@@ -4,7 +4,7 @@ use chrono::prelude::*;
 use indexmap::IndexMap;
 use prisma_value::PrismaValue;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
-use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, sync::Arc};
+use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
 // todo: validate is one of!
@@ -230,6 +230,8 @@ impl QueryDocumentParser {
                 Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
             }
             (QueryValue::String(s), ScalarType::Bytes) => Self::parse_bytes(parent_path, s),
+            (QueryValue::String(s), ScalarType::Decimal) => Self::parse_decimal(parent_path, s),
+            (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
             (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(Decimal::from(i))),
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
@@ -266,6 +268,15 @@ impl QueryDocumentParser {
                     "'{}' is not a valid base64 encoded string.",
                     s
                 )),
+            })
+    }
+
+    pub fn parse_decimal(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
+        Decimal::from_str(&s)
+            .map(PrismaValue::Float)
+            .map_err(|_| QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid decimal string.", s)),
             })
     }
 
