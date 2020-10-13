@@ -26,6 +26,7 @@ impl StdError for ConnectorError {
 }
 
 impl ConnectorError {
+    /// Construct a `Generic` connector error.
     pub fn generic(error: anyhow::Error) -> Self {
         ConnectorError {
             user_facing_error: None,
@@ -34,7 +35,8 @@ impl ConnectorError {
         }
     }
 
-    pub fn into_migration_failed(self, migration_name: String) -> Self {
+    /// Turn the error into a nested, user-facing MigrationDoesNotApplyCleanly error.
+    pub fn into_migration_does_not_apply_cleanly(self, migration_name: String) -> Self {
         let context = self.context.clone();
         let user_facing_error = user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly {
             migration_name,

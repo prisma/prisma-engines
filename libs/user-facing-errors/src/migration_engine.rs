@@ -63,14 +63,16 @@ impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
     const ERROR_CODE: &'static str = "P3006";
 
     fn message(&self) -> String {
-        format!("Migration `{migration_name}` failed to apply cleanly to a temporary database. \n{error_code}Error:\n{inner_error}", migration_name = self.migration_name, inner_error = self.inner_error.message(), error_code = match &self.inner_error.inner {
+        let error_code = match &self.inner_error.inner {
             crate::ErrorType::Known(crate::KnownError {
                 message: _,
                 meta: _,
                 error_code,
             }) => format!("Error code: {}\n", &error_code),
             crate::ErrorType::Unknown(_) => String::new(),
-        })
+        };
+
+        format!("Migration `{migration_name}` failed to apply cleanly to a temporary database. \n{error_code}Error:\n{inner_error}", migration_name = self.migration_name, inner_error = self.inner_error.message(), error_code = error_code)
     }
 }
 
