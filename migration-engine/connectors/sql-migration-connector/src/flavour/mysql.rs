@@ -156,7 +156,7 @@ impl SqlFlavour for MysqlFlavour {
                 .await
                 .map_err(ConnectorError::from)
                 .map_err(|connector_error| {
-                    connector_error.into_migration_failed(migration.migration_name().to_owned())
+                    connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
                 })?;
         }
 
