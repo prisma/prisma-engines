@@ -5,7 +5,7 @@ use crate::{
 };
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
-use quaint::{connector::MysqlUrl, prelude::SqlFamily};
+use quaint::connector::MysqlUrl;
 use regex::RegexSet;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use url::Url;
@@ -120,10 +120,6 @@ impl SqlFlavour for MysqlFlavour {
         connection.raw_cmd(&format!("USE `{}`", db_name)).await?;
 
         Ok(())
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Mysql
     }
 
     #[tracing::instrument(skip(self, migrations, connection))]

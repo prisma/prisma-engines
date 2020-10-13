@@ -1,7 +1,7 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
-use quaint::{connector::MssqlUrl, prelude::SqlFamily};
+use quaint::connector::MssqlUrl;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::collections::HashMap;
 
@@ -132,10 +132,6 @@ impl SqlFlavour for MssqlFlavour {
             .unwrap();
 
         Ok(())
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Mssql
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {

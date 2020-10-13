@@ -1,9 +1,9 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
-use datamodel::{walkers::ScalarFieldWalker, FieldArity, ScalarType};
+use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, FieldArity, ScalarType};
 use datamodel_connector::NativeTypeInstance;
 use native_types::MssqlType;
-use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily};
+use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, ForeignKeyAction};
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     fn column_type_for_native_type(
@@ -55,6 +55,15 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
                 FieldArity::List => ColumnArity::List,
             },
             native_type: None,
+        }
+    }
+
+    fn m2m_foreign_key_action(&self, model_a: &ModelWalker<'_>, model_b: &ModelWalker<'_>) -> ForeignKeyAction {
+        // MSSQL will crash when creating a cyclic cascade
+        if model_a.name() == model_b.name() {
+            ForeignKeyAction::NoAction
+        } else {
+            ForeignKeyAction::Cascade
         }
     }
 }

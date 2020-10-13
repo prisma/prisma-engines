@@ -328,7 +328,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.flavour.sql_family().is_mysql() && index::index_covers_fk(&tables.previous, &index) {
+                if self.database_info.sql_family().is_mysql() && index::index_covers_fk(&tables.previous, &index) {
                     continue;
                 }
 
