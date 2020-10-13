@@ -24,7 +24,7 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_migration::{AlterEnum, CreateIndex, DropTable, SqlMigrationStep, TableChange},
+    sql_migration::{AlterEnum, AlterTable, CreateIndex, DropTable, SqlMigrationStep, TableChange},
     sql_schema_differ::{ColumnDiffer, TableDiffer},
     SqlMigration, SqlMigrationConnector,
 };
@@ -84,27 +84,27 @@ impl SqlMigrationConnector {
 
         for (step_index, step) in steps.iter().enumerate() {
             match step {
-                SqlMigrationStep::AlterTable(alter_table) => {
+                SqlMigrationStep::AlterTable(AlterTable { table, changes }) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = before.table_walker(&alter_table.table.name);
-                    let after_table = after.table_walker(&alter_table.table.name);
+                    let before_table = before.table_walker(&table.name);
+                    let after_table = after.table_walker(&table.name);
 
                     if let (Some(before_table), Some(after_table)) = (before_table, after_table) {
-                        for change in &alter_table.changes {
+                        for change in changes {
                             match *change {
                                 TableChange::DropColumn(ref drop_column) => {
-                                    let column = find_column(before, &alter_table.table.name, &drop_column.name)
+                                    let column = find_column(before, &table.name, &drop_column.name)
                                         .expect("Dropping of unknown column.");
 
                                     self.check_column_drop(&column, &mut plan, step_index);
                                 }
                                 TableChange::AlterColumn(ref alter_column) => {
                                     let previous_column = before_table
-                                        .column(&alter_column.name)
+                                        .column(&alter_column.column_name)
                                         .expect("unsupported column renaming");
                                     let next_column = after_table
-                                        .column(&alter_column.name)
+                                        .column(&alter_column.column_name)
                                         .expect("unsupported column renaming");
 
                                     let differ = ColumnDiffer {
@@ -114,7 +114,8 @@ impl SqlMigrationConnector {
                                         flavour: self.flavour(),
                                     };
 
-                                    self.flavour().check_alter_column(&differ, &mut plan, step_index)
+                                    todo!("sqlite check alter column")
+                                    // self.flavour().check_alter_column(&differ, &mut plan, step_index)
                                 }
                                 TableChange::AddColumn(ref add_column) => {
                                     let column = find_column(after, after_table.name(), &add_column.column.name)
@@ -124,11 +125,31 @@ impl SqlMigrationConnector {
                                 }
                                 TableChange::DropPrimaryKey { .. } => plan.push_warning(
                                     SqlMigrationWarningCheck::PrimaryKeyChange {
-                                        table: alter_table.table.name.clone(),
+                                        table: table.name.clone(),
                                     },
                                     step_index,
                                 ),
-                                _ => (),
+                                TableChange::DropAndRecreateColumn {
+                                    ref column_name,
+                                    column_index,
+                                    changes,
+                                } => {
+                                    let previous_column =
+                                        before_table.column(&column_name).expect("unsupported column renaming");
+                                    let next_column =
+                                        after_table.column(&column_name).expect("unsupported column renaming");
+
+                                    let differ = ColumnDiffer {
+                                        database_info: self.database_info(),
+                                        previous: previous_column,
+                                        next: next_column,
+                                        flavour: self.flavour(),
+                                    };
+
+                                    self.flavour
+                                        .check_drop_and_recreate_column(&differ, changes, &mut plan, step_index)
+                                }
+                                TableChange::AddPrimaryKey { .. } => (),
                             }
                         }
                     }
@@ -160,7 +181,8 @@ impl SqlMigrationConnector {
                         }
 
                         for columns in differ.column_pairs() {
-                            self.flavour().check_alter_column(&columns, &mut plan, step_index);
+                            todo!("sqlite alter column")
+                            // self.flavour().check_alter_column(&columns, &mut plan, step_index);
                         }
                     }
                 }

@@ -136,6 +136,15 @@ impl<'a> TableWalker<'a> {
         self.columns().find(|column| column.name() == column_name)
     }
 
+    /// Get a column in the table by index.
+    pub fn column_at(&self, idx: usize) -> Option<ColumnWalker<'a>> {
+        self.table.columns.get(idx).map(|column| ColumnWalker {
+            schema: self.schema,
+            column,
+            table: self.table,
+        })
+    }
+
     /// Traverse the table's columns.
     pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
         self.table.columns.iter().map(move |column| ColumnWalker {

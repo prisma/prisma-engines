@@ -134,7 +134,7 @@ impl<'schema> TableDiffer<'schema> {
                     .iter()
                     .any(|pk_col| pk_col == columns.previous.name())
             })
-            .any(|columns| columns.all_changes().type_changed())
+            .any(|columns| columns.all_changes().0.type_changed())
     }
 
     fn previous_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {

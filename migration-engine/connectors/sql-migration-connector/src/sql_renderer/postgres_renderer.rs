@@ -197,21 +197,35 @@ impl SqlRenderer for PostgresFlavour {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
-                TableChange::AlterColumn(AlterColumn { name, column: _ }) => {
+                TableChange::AlterColumn(AlterColumn {
+                    column_name,
+                    changes: _,
+                    type_change,
+                }) => {
                     let column = differ
                         .diff_table(&table.name)
                         .expect("AlterTable on unknown table.")
-                        .diff_column(name)
+                        .diff_column(column_name)
                         .expect("AlterColumn on unknown column.");
-                    if render_alter_column(self, &column, &mut before_statements, &mut lines, &mut after_statements)
-                        .is_none()
-                    {
-                        let name = self.quote(&name);
-                        lines.push(format!("DROP COLUMN {}", name));
 
-                        let col_sql = self.render_column(column.next);
-                        lines.push(format!("ADD COLUMN {}", col_sql));
-                    }
+                    render_alter_column(self, &column, &mut before_statements, &mut lines, &mut after_statements);
+                }
+                TableChange::DropAndRecreateColumn {
+                    column_name,
+                    column_index,
+                    changes,
+                } => {
+                    let name = self.quote(column_name);
+                    lines.push(format!("DROP COLUMN {}", name));
+
+                    let column = differ
+                        .diff_table(&table.name)
+                        .expect("AlterTable on unknown table")
+                        .diff_column(column_name)
+                        .expect("AlterColumn on unknown column.");
+
+                    let col_sql = self.render_column(column.next);
+                    lines.push(format!("ADD COLUMN {}", col_sql));
                 }
             };
         }
@@ -413,12 +427,12 @@ fn render_alter_column(
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
     after_statements: &mut Vec<String>,
-) -> Option<()> {
+) {
     // Matches the sequence name from inside an autoincrement default expression.
     static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
 
-    let steps = expand_postgres_alter_column(differ)?;
+    let steps = expand_postgres_alter_column(differ);
     let table_name = Quoted::postgres_ident(differ.previous.table().name());
     let column_name = Quoted::postgres_ident(differ.previous.name());
 
@@ -486,6 +500,4 @@ fn render_alter_column(
             }
         }
     }
-
-    Some(())
 }

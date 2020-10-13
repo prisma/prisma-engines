@@ -1,14 +1,12 @@
 use crate::sql_schema_differ::{ColumnChange, ColumnChanges, ColumnDiffer};
-use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
+use sql_schema_describer::{ColumnArity, ColumnType, DefaultValue};
 
-pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer<'_>) -> MysqlAlterColumn {
-    let column_changes = columns.all_changes();
-
-    if column_changes.only_default_changed() && columns.next.default().is_none() {
+pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer<'_>, changes: &ColumnChanges) -> MysqlAlterColumn {
+    if changes.only_default_changed() && columns.next.default().is_none() {
         return MysqlAlterColumn::DropDefault;
     }
 
-    if column_changes.column_was_renamed() {
+    if changes.column_was_renamed() {
         unreachable!("MySQL column renaming.")
     }
 
@@ -24,15 +22,16 @@ pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer<'_>) -> MysqlAlte
     };
 
     MysqlAlterColumn::Modify {
-        changes: column_changes,
+        changes: changes.clone(),
         new_default,
     }
 }
 
-pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option<Vec<PostgresAlterColumn>> {
+pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Vec<PostgresAlterColumn> {
     let mut changes = Vec::new();
+    let mut set_type = false;
 
-    for change in columns.all_changes().iter() {
+    for change in columns.all_changes().0.iter() {
         match change {
             ColumnChange::Default => match (&columns.previous.default(), &columns.next.default()) {
                 (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault((**next_default).clone())),
@@ -42,30 +41,21 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
                 (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
                 (ColumnArity::Nullable, ColumnArity::Required) => changes.push(PostgresAlterColumn::SetNotNull),
                 (ColumnArity::List, ColumnArity::Nullable) => {
-                    changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()));
+                    set_type = true;
                     changes.push(PostgresAlterColumn::DropNotNull)
                 }
                 (ColumnArity::List, ColumnArity::Required) => {
-                    changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()));
+                    set_type = true;
                     changes.push(PostgresAlterColumn::SetNotNull)
                 }
                 (ColumnArity::Nullable, ColumnArity::List) | (ColumnArity::Required, ColumnArity::List) => {
-                    changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()))
+                    set_type = true;
                 }
                 (ColumnArity::Nullable, ColumnArity::Nullable)
                 | (ColumnArity::Required, ColumnArity::Required)
                 | (ColumnArity::List, ColumnArity::List) => (),
             },
-            ColumnChange::TypeChanged => match (
-                &columns.previous.column_type_family(),
-                &columns.next.column_type_family(),
-            ) {
-                // Ints can be cast to text.
-                (ColumnTypeFamily::Int, ColumnTypeFamily::String) => {
-                    changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()))
-                }
-                _ => return None,
-            },
+            ColumnChange::TypeChanged => set_type = true,
             ColumnChange::Sequence => {
                 if columns.previous.is_autoincrement() {
                     // The sequence should be dropped.
@@ -79,7 +69,12 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
         }
     }
 
-    Some(changes)
+    // This is a flag so we don't push multiple SetTypes from arity and type changes.
+    if set_type {
+        changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()));
+    }
+
+    changes
 }
 
 #[derive(Debug)]
