@@ -1,8 +1,11 @@
+//! The migration connector ConnectorError type.
+
 use crate::migrations_directory::ReadMigrationScriptError;
 use std::{error::Error as StdError, fmt::Display};
 use tracing_error::SpanTrace;
 use user_facing_errors::{KnownError, UserFacingError};
 
+/// The general error reporting type for migration connectors.
 #[derive(Debug)]
 pub struct ConnectorError {
     /// An optional error already rendered for users in case the migration core does not handle it.
@@ -54,6 +57,7 @@ impl ConnectorError {
         }
     }
 
+    /// Construct a QueryError.
     pub fn query_error(error: anyhow::Error) -> Self {
         let kind = ErrorKind::QueryError(error);
 
@@ -64,6 +68,7 @@ impl ConnectorError {
         }
     }
 
+    /// Construct an UrlParseError.
     pub fn url_parse_error(err: impl Display, url: &str) -> Self {
         ConnectorError {
             user_facing_error: None,
@@ -72,6 +77,7 @@ impl ConnectorError {
         }
     }
 
+    /// Construct a GenericError with an associated user facing error.
     pub fn user_facing_error<T: UserFacingError>(err: T) -> Self {
         let kind = ErrorKind::Generic(anyhow::anyhow!("{}", err.message()));
         ConnectorError {
@@ -83,6 +89,7 @@ impl ConnectorError {
 }
 
 #[derive(Debug)]
+#[allow(missing_docs)]
 pub enum ErrorKind {
     Generic(anyhow::Error),
     QueryError(anyhow::Error),

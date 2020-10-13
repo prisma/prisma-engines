@@ -5,7 +5,6 @@
 mod database_migration_inferrer;
 mod database_migration_step_applier;
 mod destructive_change_checker;
-#[allow(missing_docs)]
 mod error;
 mod imperative_migrations_persistence;
 #[allow(missing_docs)]
