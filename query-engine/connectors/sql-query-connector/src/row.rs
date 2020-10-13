@@ -195,7 +195,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
-        TypeIdentifier::Float => match p_value {
+        TypeIdentifier::Float | TypeIdentifier::Decimal => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Real(Some(f)) => PrismaValue::Float(f.normalize()),
             Value::Integer(Some(i)) => {
@@ -214,7 +214,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             _ => {
                 let error = io::Error::new(
                     io::ErrorKind::InvalidData,
-                    "Float value not stored as float, int or text",
+                    "Float/Decimal value not stored as float, int or text",
                 );
                 return Err(SqlError::ConversionError(error.into()));
             }

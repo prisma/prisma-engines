@@ -61,6 +61,7 @@ pub enum TypeIdentifier {
     String,
     Int,
     Float,
+    Decimal,
     Boolean,
     Enum(String),
     UUID,

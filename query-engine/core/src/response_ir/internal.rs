@@ -367,6 +367,8 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
             PrismaValue::Int(i.to_i64().expect("Unable to convert Decimal to i64."))
         }
 
+        (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
+
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
         (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),

@@ -54,6 +54,7 @@ fn non_list_scalar_update_field_mapper(
 ) -> InputField {
     let base_update_type = match &field.type_identifier {
         TypeIdentifier::Float => InputType::object(operations_object_type(ctx, "Float", field, true)),
+        TypeIdentifier::Decimal => InputType::object(operations_object_type(ctx, "Decimal", field, true)),
         TypeIdentifier::Int => InputType::object(operations_object_type(ctx, "Int", field, true)),
         TypeIdentifier::String => InputType::object(operations_object_type(ctx, "String", field, false)),
         TypeIdentifier::Boolean => InputType::object(operations_object_type(ctx, "Bool", field, false)),

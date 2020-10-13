@@ -446,6 +446,10 @@ impl InputType {
         InputType::Scalar(ScalarType::Float)
     }
 
+    pub fn decimal() -> InputType {
+        InputType::Scalar(ScalarType::Decimal)
+    }
+
     pub fn boolean() -> InputType {
         InputType::Scalar(ScalarType::Boolean)
     }
@@ -512,6 +516,10 @@ impl OutputType {
         OutputType::Scalar(ScalarType::Float)
     }
 
+    pub fn decimal() -> OutputType {
+        OutputType::Scalar(ScalarType::Decimal)
+    }
+
     pub fn boolean() -> OutputType {
         OutputType::Scalar(ScalarType::Boolean)
     }
@@ -562,6 +570,7 @@ pub enum ScalarType {
     String,
     Int,
     Float,
+    Decimal,
     Boolean,
     Enum(EnumTypeRef),
     DateTime,

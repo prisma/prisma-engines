@@ -75,6 +75,7 @@ pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField
         ModelField::Scalar(sf) => match sf.type_identifier {
             TypeIdentifier::String => OutputType::string(),
             TypeIdentifier::Float => OutputType::float(),
+            TypeIdentifier::Decimal => OutputType::decimal(),
             TypeIdentifier::Boolean => OutputType::boolean(),
             TypeIdentifier::Enum(_) => map_enum_field(sf).into(),
             TypeIdentifier::Json => OutputType::json(),
