@@ -1,5 +1,6 @@
 use super::*;
 use crate::default_value::{DefaultValue, ValueGenerator};
+use crate::native_type_instance::NativeTypeInstance;
 use crate::scalars::ScalarType;
 use crate::traits::{WithDatabaseName, WithName};
 use std::hash::Hash;

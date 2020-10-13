@@ -1,8 +1,8 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::native_type_constructor::NativeTypeConstructor;
+use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
-use dml::NativeTypeInstance;
 use native_types::MySqlType;
 
 const INT_TYPE_NAME: &str = "Int";

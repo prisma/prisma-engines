@@ -1,7 +1,7 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::native_type_constructor::NativeTypeConstructor;
-use dml::NativeTypeInstance;
+use dml::native_type_instance::NativeTypeInstance;
 
 pub struct MsSqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
