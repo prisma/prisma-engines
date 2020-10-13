@@ -25,12 +25,30 @@ impl SqlFlavour for SqliteFlavour {
         if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
             std::fs::create_dir_all(dir)
                 .context("Creating SQLite database parent directory.")
-                .map_err(|io_err| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(io_err)))?;
+                .map_err(|io_err| ConnectorError::generic(io_err))?;
         }
 
         connect(database_str).await?;
 
         Ok(self.file_path.clone())
+    }
+
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE "_prisma_migrations" (
+                "id"                    TEXT PRIMARY KEY NOT NULL,
+                "checksum"              TEXT NOT NULL,
+                "finished_at"           DATETIME,
+                "migration_name"        TEXT NOT NULL,
+                "logs"                  TEXT NOT NULL,
+                "rolled_back_at"        DATETIME,
+                "started_at"            DATETIME NOT NULL DEFAULT current_timestamp,
+                "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
+                "script"                TEXT NOT NULL
+            );
+            "#;
+
+        Ok(connection.raw_cmd(sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
@@ -46,24 +64,6 @@ impl SqlFlavour for SqliteFlavour {
 
     async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
         Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
-                "id"                    TEXT PRIMARY KEY NOT NULL,
-                "checksum"              TEXT NOT NULL,
-                "finished_at"           DATETIME,
-                "migration_name"        TEXT NOT NULL,
-                "logs"                  TEXT NOT NULL,
-                "rolled_back_at"        DATETIME,
-                "started_at"            DATETIME NOT NULL DEFAULT current_timestamp,
-                "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
-                "script"                TEXT NOT NULL
-            );
-            "#;
-
-        connection.raw_cmd(sql).await
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
@@ -105,9 +105,12 @@ impl SqlFlavour for SqliteFlavour {
                 migration.migration_name()
             );
 
-            conn.raw_cmd(&script).await.map_err(|connector_error| {
-                connector_error.into_migration_failed(migration.migration_name().to_owned())
-            })?;
+            conn.raw_cmd(&script)
+                .await
+                .map_err(ConnectorError::from)
+                .map_err(|connector_error| {
+                    connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                })?;
         }
 
         let sql_schema = self.describe_schema(&conn).await?;

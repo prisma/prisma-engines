@@ -58,6 +58,24 @@ impl SqlFlavour for MysqlFlavour {
         Ok(db_name.to_owned())
     }
 
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE _prisma_migrations (
+                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+                checksum                VARCHAR(64) NOT NULL,
+                finished_at             DATETIME(3),
+                migration_name          TEXT NOT NULL,
+                logs                    TEXT NOT NULL,
+                rolled_back_at          DATETIME(3),
+                started_at              DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+                applied_steps_count     INTEGER UNSIGNED NOT NULL DEFAULT 0,
+                script                  TEXT NOT NULL
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        "#;
+
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
         sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
@@ -73,24 +91,6 @@ impl SqlFlavour for MysqlFlavour {
         connection.raw_cmd("SELECT 1").await?;
 
         Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE IF NOT EXISTS _prisma_migrations (
-                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
-                checksum                VARCHAR(64) NOT NULL,
-                finished_at             DATETIME(3),
-                migration_name          TEXT NOT NULL,
-                logs                    TEXT NOT NULL,
-                rolled_back_at          DATETIME(3),
-                started_at              DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-                applied_steps_count     INTEGER UNSIGNED NOT NULL DEFAULT 0,
-                script                  TEXT NOT NULL
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-        "#;
-
-        connection.raw_cmd(sql).await
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
@@ -151,9 +151,13 @@ impl SqlFlavour for MysqlFlavour {
                 migration.migration_name()
             );
 
-            temp_database.raw_cmd(&script).await.map_err(|connector_error| {
-                connector_error.into_migration_failed(migration.migration_name().to_owned())
-            })?;
+            temp_database
+                .raw_cmd(&script)
+                .await
+                .map_err(ConnectorError::from)
+                .map_err(|connector_error| {
+                    connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                })?;
         }
 
         let sql_schema = self.describe_schema(&temp_database).await?;

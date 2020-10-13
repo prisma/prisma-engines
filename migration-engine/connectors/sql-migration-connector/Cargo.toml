@@ -29,5 +29,5 @@ tokio = { version = "0.2.13", default-features = false, features = ["time"] }
 tracing = "0.1.10"
 tracing-error = "0.1.2"
 tracing-futures = "0.2.0"
-uuid = { version = "*", features = ["v4"] }
 url = "2.1.1"
+uuid = { version = "*", features = ["v4"] }

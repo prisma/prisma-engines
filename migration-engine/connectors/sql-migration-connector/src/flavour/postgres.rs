@@ -1,10 +1,11 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
-use migration_connector::{ConnectorError, ConnectorResult, ErrorKind, MigrationDirectory};
-use quaint::connector::PostgresUrl;
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::collections::HashMap;
 use url::Url;
+use user_facing_errors::migration_engine;
 
 #[derive(Debug)]
 pub(crate) struct PostgresFlavour(pub(crate) PostgresUrl);
@@ -31,13 +32,13 @@ impl SqlFlavour for PostgresFlavour {
 
         match conn.raw_cmd(&query).await {
             Ok(_) => (),
-            Err(err) if matches!(err.kind, ErrorKind::DatabaseAlreadyExists { .. }) => {
+            Err(err) if matches!(err.kind(), QuaintKind::DatabaseAlreadyExists { .. }) => {
                 database_already_exists_error = Some(err)
             }
-            Err(err) if matches!(err.kind, ErrorKind::UniqueConstraintViolation { .. }) => {
+            Err(err) if matches!(err.kind(), QuaintKind::UniqueConstraintViolation { .. }) => {
                 database_already_exists_error = Some(err)
             }
-            Err(err) => return Err(err),
+            Err(err) => return Err(err.into()),
         };
 
         // Now create the schema
@@ -50,10 +51,28 @@ impl SqlFlavour for PostgresFlavour {
         conn.raw_cmd(&schema_sql).await?;
 
         if let Some(err) = database_already_exists_error {
-            return Err(err);
+            return Err(err.into());
         }
 
         Ok(db_name.to_owned())
+    }
+
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE _prisma_migrations (
+                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+                checksum                VARCHAR(64) NOT NULL,
+                finished_at             TIMESTAMPTZ,
+                migration_name          TEXT NOT NULL,
+                logs                    TEXT NOT NULL,
+                rolled_back_at          TIMESTAMPTZ,
+                started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+                applied_steps_count     INTEGER NOT NULL DEFAULT 0,
+                script                  TEXT NOT NULL
+            );
+        "#;
+
+        Ok(connection.raw_cmd(sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
@@ -93,24 +112,6 @@ impl SqlFlavour for PostgresFlavour {
             .await?;
 
         Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE IF NOT EXISTS _prisma_migrations (
-                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
-                checksum                VARCHAR(64) NOT NULL,
-                finished_at             TIMESTAMPTZ,
-                migration_name          TEXT NOT NULL,
-                logs                    TEXT NOT NULL,
-                rolled_back_at          TIMESTAMPTZ,
-                started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
-                applied_steps_count     INTEGER NOT NULL DEFAULT 0,
-                script                  TEXT NOT NULL
-            );
-        "#;
-
-        connection.raw_cmd(sql).await
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
@@ -185,9 +186,13 @@ impl SqlFlavour for PostgresFlavour {
                     migration.migration_name()
                 );
 
-                temporary_database.raw_cmd(&script).await.map_err(|connector_error| {
-                    connector_error.into_migration_failed(migration.migration_name().to_owned())
-                })?;
+                temporary_database
+                    .raw_cmd(&script)
+                    .await
+                    .map_err(ConnectorError::from)
+                    .map_err(|connector_error| {
+                        connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                    })?;
             }
 
             // the connection to the temporary database is dropped at the end of
@@ -235,12 +240,9 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
         }
     }
 
-    let conn = conn
-        .ok_or_else(|| {
-            ConnectorError::from_kind(ErrorKind::DatabaseCreationFailed {
-                explanation: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned()
-            })
-        })??;
+    let conn = conn.ok_or_else(|| {
+        ConnectorError::user_facing_error(migration_engine::DatabaseCreationFailed { database_error: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned() })
+    })??;
 
     Ok(conn)
 }

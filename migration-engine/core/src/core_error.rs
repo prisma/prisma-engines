@@ -1,5 +1,6 @@
 use migration_connector::{ConnectorError, ListMigrationsError};
 use std::{error::Error as StdError, fmt::Display};
+use user_facing_errors::KnownError;
 
 use crate::migration::datamodel_calculator::CalculatorError;
 
@@ -63,6 +64,22 @@ impl StdError for CoreError {
             CoreError::ConnectorError(err) => Some(err),
             CoreError::Generic(err) => Some(err.as_ref()),
             CoreError::Input(err) => Some(err.as_ref()),
+        }
+    }
+}
+
+impl CoreError {
+    /// Render to an `user_facing_error::Error`.
+    pub fn render_user_facing(self) -> user_facing_errors::Error {
+        match self {
+            CoreError::ConnectorError(ConnectorError {
+                user_facing_error: Some(user_facing_error),
+                ..
+            }) => user_facing_error.into(),
+            CoreError::ReceivedBadDatamodel(full_error) => {
+                KnownError::new(user_facing_errors::common::SchemaParserError { full_error }).into()
+            }
+            crate_error => user_facing_errors::Error::from_dyn_error(&crate_error),
         }
     }
 }

@@ -87,7 +87,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
     }
 
     async fn apply_script(&self, script: &str) -> ConnectorResult<()> {
-        self.conn().raw_cmd(script).await
+        Ok(self.conn().raw_cmd(script).await?)
     }
 }
 
