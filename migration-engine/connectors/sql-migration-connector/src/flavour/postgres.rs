@@ -5,7 +5,7 @@ use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::collections::HashMap;
 use url::Url;
-use user_facing_errors::migration_engine;
+use user_facing_errors::{common::DatabaseDoesNotExist, migration_engine, UserFacingError};
 
 #[derive(Debug)]
 pub(crate) struct PostgresFlavour(pub(crate) PostgresUrl);
@@ -81,7 +81,7 @@ impl SqlFlavour for PostgresFlavour {
             .await
             .map_err(|err| match err {
                 SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
+                    ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
                 }
             })
     }
@@ -225,9 +225,9 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
         url.set_path(&format!("/{}", database_name));
         match connect(url.as_str()).await {
             // If the database does not exist, try the next one.
-            Err(err) => match &err.kind {
-                migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),
-                _other_outcome => {
+            Err(err) => match &err.error_code() {
+                Some(DatabaseDoesNotExist::ERROR_CODE) => (),
+                _ => {
                     conn = Some(Err(err));
                     break;
                 }
