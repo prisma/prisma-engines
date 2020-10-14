@@ -332,6 +332,24 @@ fn fail_when_no_source_is_declared() {
     }
 }
 
+#[test]
+fn microsoft_sql_server_preview_feature_must_work() {
+    let schema = r#"
+        datasource redmond {
+            provider = "sqlserver"
+            url = "sqlserver://localhost:1645;foo=bar"
+            previewFeatures = ["microsoftSqlServer"]
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let data_source = config.datasources.first().unwrap();
+
+    assert!(data_source
+        .preview_features
+        .contains(&String::from("microsoftSqlServer")));
+}
+
 fn assert_eq_json(a: &str, b: &str) {
     let json_a: serde_json::Value = serde_json::from_str(a).expect("The String a was not valid JSON.");
     let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");
