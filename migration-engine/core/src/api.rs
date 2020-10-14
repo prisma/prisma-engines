@@ -3,7 +3,7 @@ mod rpc;
 
 pub use rpc::*;
 
-use crate::{commands::*, migration_engine::MigrationEngine, CoreError, CoreResult};
+use crate::{commands::*, migration_engine::MigrationEngine, CoreResult};
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use tracing_futures::Instrument;
 
@@ -63,10 +63,6 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
-
-    fn render_jsonrpc_error(&self, error: CoreError) -> jsonrpc_core::error::Error {
-        error_rendering::render_jsonrpc_error(error)
-    }
 }
 
 #[async_trait::async_trait]
