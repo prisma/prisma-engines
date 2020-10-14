@@ -1,7 +1,7 @@
 extern crate datamodel;
 
 use self::datamodel::{IndexDefinition, StringFromEnvVar};
-use datamodel::{dml, dml::ScalarType, error::*};
+use datamodel::{dml, dml::ScalarType, errors_and_warnings::*, ValidatedDatamodel};
 use datamodel_connector::NativeTypeInstance;
 use pretty_assertions::assert_eq;
 
@@ -65,6 +65,10 @@ pub trait ErrorAsserts {
     fn assert_is_message(&self, msg: &str) -> &Self;
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
     fn assert_length(&self, length: usize) -> &Self;
+}
+
+pub trait WarningAsserts {
+    fn assert_is(&self, warning: DatamodelWarning) -> &Self;
 }
 
 impl DatasourceAsserts for datamodel::Datasource {
@@ -271,7 +275,21 @@ impl EnumValueAsserts for dml::EnumValue {
     }
 }
 
-impl ErrorAsserts for ErrorCollection {
+impl WarningAsserts for Vec<DatamodelWarning> {
+    fn assert_is(&self, warning: DatamodelWarning) -> &Self {
+        assert_eq!(
+            self.len(),
+            1,
+            "Expected exactly one validation warning. Warnings are: {:?}",
+            &self
+        );
+        assert_eq!(self[0], warning);
+
+        self
+    }
+}
+
+impl ErrorAsserts for ErrorsAndWarnings {
     fn assert_is(&self, error: DatamodelError) -> &Self {
         assert_eq!(
             self.errors.len(),
@@ -315,11 +333,11 @@ impl ErrorAsserts for ErrorCollection {
 }
 
 #[allow(dead_code)] // Not sure why the compiler thinks this is never used.
-pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
+pub fn parse(datamodel_string: &str) -> ValidatedDatamodel {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(s) => s,
         Err(errs) => {
-            for err in errs.to_iter() {
+            for err in errs.to_error_iter() {
                 err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
                     .unwrap();
             }
@@ -330,14 +348,14 @@ pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
 }
 
 #[allow(dead_code)] // Not sure why the compiler thinks this is never used.
-pub fn parse_error(datamodel_string: &str) -> ErrorCollection {
+pub fn parse_error(datamodel_string: &str) -> ErrorsAndWarnings {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,
     }
 }
 
-pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> ErrorCollection {
+pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> ErrorsAndWarnings {
     match datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,

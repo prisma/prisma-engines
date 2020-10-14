@@ -304,6 +304,8 @@ fn render_schema_ast_to_string(schema: &datamodel::ast::SchemaAst) -> String {
     writable_string.into()
 }
 
-fn parse_to_ast(datamodel_string: &str) -> Result<datamodel::ast::SchemaAst, datamodel::error::ErrorCollection> {
+fn parse_to_ast(
+    datamodel_string: &str,
+) -> Result<datamodel::ast::SchemaAst, datamodel::errors_and_warnings::ErrorsAndWarnings> {
     datamodel::ast::parser::parse_schema(datamodel_string)
 }

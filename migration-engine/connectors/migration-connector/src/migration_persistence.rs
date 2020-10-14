@@ -1,6 +1,6 @@
 use crate::{error::ConnectorError, steps::*, ConnectorResult};
 use chrono::{DateTime, Utc};
-use datamodel::{ast::SchemaAst, error::ErrorCollection, Datamodel};
+use datamodel::{ast::SchemaAst, errors_and_warnings::ErrorsAndWarnings, Datamodel};
 use serde::Serialize;
 use std::str::FromStr;
 
@@ -163,12 +163,13 @@ impl Migration {
         datetime
     }
 
-    pub fn parse_datamodel(&self) -> Result<Datamodel, (ErrorCollection, String)> {
+    pub fn parse_datamodel(&self) -> Result<Datamodel, (ErrorsAndWarnings, String)> {
         datamodel::parse_datamodel_and_ignore_datasource_urls(&self.datamodel_string)
+            .map(|d| d.datamodel)
             .map_err(|err| (err, self.datamodel_string.clone()))
     }
 
-    pub fn parse_schema_ast(&self) -> Result<SchemaAst, (ErrorCollection, String)> {
+    pub fn parse_schema_ast(&self) -> Result<SchemaAst, (ErrorsAndWarnings, String)> {
         datamodel::parse_schema_ast(&self.datamodel_string).map_err(|err| (err, self.datamodel_string.clone()))
     }
 }

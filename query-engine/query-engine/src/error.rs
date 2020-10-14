@@ -1,5 +1,5 @@
 use connector::error::ConnectorError;
-use datamodel::error::ErrorCollection;
+use datamodel::errors_and_warnings::ErrorsAndWarnings;
 use feature_flags::FeatureFlagError;
 use graphql_parser::query::ParseError as GqlParseError;
 use query_core::CoreError;
@@ -24,7 +24,7 @@ pub enum PrismaError {
     ConnectorError(ConnectorError),
 
     #[error("{}", _0)]
-    ConversionError(ErrorCollection, String),
+    ConversionError(ErrorsAndWarnings, String),
 
     #[error("{}", _0)]
     IOError(anyhow::Error),
@@ -37,7 +37,7 @@ pub enum PrismaError {
     UnsupportedFeatureError(&'static str, String),
 
     #[error("Error in data model: {}", _0)]
-    DatamodelError(ErrorCollection),
+    DatamodelError(ErrorsAndWarnings),
 
     #[error("{}", _0)]
     QueryConversionError(String),
@@ -58,7 +58,7 @@ impl PrismaError {
             }) => err.into(),
             PrismaError::ConversionError(errors, dml_string) => {
                 let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
-                write!(full_error, "\nValidation Error Count: {}", errors.to_iter().len())?;
+                write!(full_error, "\nValidation Error Count: {}", errors.errors.len())?;
 
                 user_facing_errors::Error::from(user_facing_errors::KnownError::new(
                     user_facing_errors::common::SchemaParserError { full_error },
@@ -85,8 +85,8 @@ impl From<CoreError> for PrismaError {
     }
 }
 
-impl From<ErrorCollection> for PrismaError {
-    fn from(e: ErrorCollection) -> Self {
+impl From<ErrorsAndWarnings> for PrismaError {
+    fn from(e: ErrorsAndWarnings) -> Self {
         PrismaError::DatamodelError(e)
     }
 }

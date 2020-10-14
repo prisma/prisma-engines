@@ -22,8 +22,7 @@ git = "https://github.com/prisma/quaint"
 [dev-dependencies]
 anyhow = "1.0.28"
 barrel = {git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], branch = "mssql-support"}
-futures = "0.3"
 pretty_assertions = "0.6"
 test-macros = { path = "../test-macros" }
 test-setup = { path = "../test-setup" }
-tokio = {version = "0.2.13", features = ["rt-threaded", "macros"]}
+tokio = {version = "0.2.13", default_features = false, features = ["rt-core", "macros"]}

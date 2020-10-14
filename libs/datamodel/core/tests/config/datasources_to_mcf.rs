@@ -81,7 +81,7 @@ fn serialize_builtin_sources_to_dmmf() {
 
 fn assert_rendered_mcf(schema: &str, expected_dmmf: &str) {
     let config = datamodel::parse_configuration(schema).unwrap();
-    let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
+    let rendered = datamodel::json::mcf::render_sources_to_json(&config.configuration.datasources);
 
     print!("{}", &rendered);
 

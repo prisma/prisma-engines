@@ -272,6 +272,7 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
         .collect()
 }
 
+/// The name of the migrations table.
 pub static MIGRATION_TABLE_NAME: &str = "_Migration";
 static NAME_COLUMN: &str = "name";
 static REVISION_COLUMN: &str = "revision";

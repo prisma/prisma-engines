@@ -32,7 +32,7 @@ fn skipping_of_env_vars() {
 
     // must not fail with correct env var set
     std::env::set_var("POSTGRES_URL", "postgresql://localhost:5432");
-    parse(dml);
+    parse(dml).datamodel;
 }
 
 #[ignore]
@@ -48,7 +48,7 @@ fn interpolate_environment_variables() {
 
     std::env::set_var("TEST_USER", "prisma-user");
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
@@ -72,7 +72,7 @@ fn interpolate_nested_environment_variables() {
     std::env::set_var("TEST_USER_VAR", "TEST_USER");
     std::env::set_var("TEST_USER", "prisma-user");
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
@@ -94,7 +94,7 @@ fn ducktype_environment_variables() {
 
     std::env::set_var("USER_AGE", "18");
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model

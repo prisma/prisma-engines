@@ -11,7 +11,7 @@ fn strings_with_quotes_are_unescaped() {
         }"#
     );
 
-    let mut dml = datamodel::parse_datamodel(input).unwrap();
+    let mut dml = datamodel::parse_datamodel(input).unwrap().datamodel;
     let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
     let name = cat.scalar_fields().find(|f| f.name == "name").unwrap();
 
@@ -37,7 +37,7 @@ fn strings_with_newlines_are_unescpaed() {
         }"#
     );
 
-    let mut dml = datamodel::parse_datamodel(input).unwrap();
+    let mut dml = datamodel::parse_datamodel(input).unwrap().datamodel;
     let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
     let name = cat.scalar_fields().find(|f| f.name == "name").unwrap();
 

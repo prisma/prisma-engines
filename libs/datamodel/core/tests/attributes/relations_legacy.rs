@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::dml;
-use datamodel::{ast::Span, error::DatamodelError};
+use datamodel::{ast::Span, errors_and_warnings::DatamodelError};
 
 // Ported from
 // https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/RelationAttributeSpec.scala
@@ -22,7 +22,7 @@ fn succeed_without_attribute_if_unambigous() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let todo_model = schema.assert_has_model("Todo");
     todo_model
         .assert_has_relation_field("comments")
@@ -76,7 +76,7 @@ fn settings_must_be_deteced() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let todo_model = schema.assert_has_model("Todo");
     todo_model

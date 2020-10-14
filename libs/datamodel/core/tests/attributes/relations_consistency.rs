@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::error::DatamodelError;
+use datamodel::errors_and_warnings::DatamodelError;
 use datamodel::{render_datamodel_to_string, FieldArity, FieldType, ScalarField};
 use datamodel_connector::scalars::ScalarType;
 use pretty_assertions::assert_eq;
@@ -18,7 +18,7 @@ fn must_add_back_relation_fields_for_given_list_field() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let user_model = schema.assert_has_model("User");
     user_model
@@ -54,7 +54,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
     }
     "#;
 
-    let schema = dbg!(parse(dml));
+    let schema = dbg!(parse(dml).datamodel);
 
     let user_model = schema.assert_has_model("User");
     user_model
@@ -96,7 +96,7 @@ model Post {
 }
 "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let rendered = dbg!(render_datamodel_to_string(&schema).unwrap());
 
@@ -129,7 +129,7 @@ fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     schema
         .assert_has_model("User1")
@@ -168,7 +168,7 @@ fn must_add_to_fields_correctly_for_one_to_one_relations() {
     }
     "#;
 
-    let schema = dbg!(parse(dml));
+    let schema = dbg!(parse(dml).datamodel);
 
     schema
         .assert_has_model("User")
@@ -194,7 +194,7 @@ fn must_add_to_fields_on_both_sides_for_many_to_many_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     schema
         .assert_has_model("User")
@@ -221,7 +221,7 @@ fn must_add_to_fields_on_both_sides_for_one_to_many_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     schema
         .assert_has_model("User")
@@ -245,7 +245,7 @@ fn must_add_to_fields_on_both_sides_for_one_to_many_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     schema
         .assert_has_model("User")
@@ -272,7 +272,7 @@ model Author {
 }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let author_model = schema.assert_has_model("Author");
     author_model
@@ -332,7 +332,7 @@ fn should_add_back_relations_for_more_complex_cases() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     // PostToUser
 
@@ -438,7 +438,7 @@ fn should_add_to_fields_on_the_correct_side_tie_breaker() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_relation_field("post")
@@ -467,7 +467,7 @@ fn should_add_to_fields_on_the_correct_side_list() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_relation_field("post")
@@ -494,7 +494,7 @@ fn should_camel_case_back_relation_field_name() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("OhWhatAUser")
@@ -512,7 +512,7 @@ fn must_add_back_relation_fields_for_self_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let model = schema.assert_has_model("Human");
     model
         .assert_has_relation_field("son")
@@ -538,7 +538,7 @@ fn should_add_embed_ids_on_self_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let model = schema.assert_has_model("Human");
     model
         .assert_has_relation_field("son")
@@ -572,7 +572,7 @@ fn should_not_get_confused_with_complicated_self_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let model = schema.assert_has_model("Human");
     model
         .assert_has_relation_field("son")
@@ -624,7 +624,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let post = schema.assert_has_model("Post");
     let blog_id_fields: Vec<&ScalarField> = post.scalar_fields().filter(|f| &f.name == "blogId").collect();
     dbg!(&post.fields);
@@ -648,7 +648,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let post = schema.assert_has_model("Post");
 
     dbg!(&post.fields);

@@ -21,7 +21,7 @@ fn allow_multiple_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_relation_field("posts")
@@ -66,7 +66,7 @@ fn allow_complicated_self_relations() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_relation_field("son").assert_relation_to("User");
@@ -96,7 +96,7 @@ fn allow_unambiguous_self_relations_in_presence_of_unrelated_other_relations() {
         }
     "#;
 
-    parse(dml);
+    parse(dml).datamodel;
 }
 
 #[test]
@@ -112,7 +112,7 @@ fn must_generate_back_relation_fields_for_named_relation_fields() {
     }
     "#;
 
-    let datamodel = parse(dml);
+    let datamodel = parse(dml).datamodel;
 
     datamodel
         .assert_has_model("User")

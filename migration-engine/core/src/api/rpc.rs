@@ -3,6 +3,8 @@ use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
 
+use super::error_rendering::render_jsonrpc_error;
+
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
     executor: Arc<dyn GenericApi>,
@@ -110,7 +112,7 @@ impl RpcApi {
         match result {
             Ok(result) => Ok(result),
             Err(RunCommandError::JsonRpcError(err)) => Err(err),
-            Err(RunCommandError::CoreError(err)) => Err(executor.render_jsonrpc_error(err)),
+            Err(RunCommandError::CoreError(err)) => Err(render_jsonrpc_error(err)),
         }
     }
 

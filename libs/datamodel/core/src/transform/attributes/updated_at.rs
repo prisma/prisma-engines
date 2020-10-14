@@ -1,5 +1,5 @@
 use super::{super::helpers::*, AttributeValidator};
-use crate::error::DatamodelError;
+use crate::errors_and_warnings::DatamodelError;
 use crate::{ast, dml};
 
 /// Prismas builtin `@updatedAt` attribute.

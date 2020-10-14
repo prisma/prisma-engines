@@ -1,6 +1,6 @@
 use super::ValueValidator;
 use crate::ast;
-use crate::error::{DatamodelError, ErrorCollection};
+use crate::errors_and_warnings::{DatamodelError, ErrorsAndWarnings};
 use std::collections::HashSet;
 
 /// Represents a list of arguments.
@@ -22,13 +22,13 @@ impl<'a> Arguments<'a> {
     }
 
     /// Checks if arguments occur twice and returns an appropriate error list.
-    pub fn check_for_duplicate_named_arguments(&self) -> Result<(), ErrorCollection> {
+    pub fn check_for_duplicate_named_arguments(&self) -> Result<(), ErrorsAndWarnings> {
         let mut arg_names: HashSet<&'a str> = HashSet::new();
-        let mut errors = ErrorCollection::new();
+        let mut errors = ErrorsAndWarnings::new();
 
         for arg in self.arguments {
             if arg_names.contains::<&str>(&(&arg.name.name as &str)) {
-                errors.push(DatamodelError::new_duplicate_argument_error(&arg.name.name, arg.span));
+                errors.push_error(DatamodelError::new_duplicate_argument_error(&arg.name.name, arg.span));
             }
             if !arg.is_unnamed() {
                 arg_names.insert(&arg.name.name);
@@ -38,7 +38,7 @@ impl<'a> Arguments<'a> {
         errors.ok()
     }
 
-    pub fn check_for_multiple_unnamed_arguments(&self, attribute_name: &str) -> Result<(), ErrorCollection> {
+    pub fn check_for_multiple_unnamed_arguments(&self, attribute_name: &str) -> Result<(), ErrorsAndWarnings> {
         let mut unnamed_values: Vec<String> = Vec::new();
         for arg in self.arguments {
             if arg.is_unnamed() {
@@ -58,12 +58,12 @@ impl<'a> Arguments<'a> {
     }
 
     /// Checks if arguments were not accessed and raises the appropriate errors.
-    pub fn check_for_unused_arguments(&self) -> Result<(), ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    pub fn check_for_unused_arguments(&self) -> Result<(), ErrorsAndWarnings> {
+        let mut errors = ErrorsAndWarnings::new();
 
         for arg in self.arguments {
             if !self.used_arguments.contains::<&str>(&(&arg.name.name as &str)) {
-                errors.push(DatamodelError::new_unused_argument_error(&arg.name.name, arg.span));
+                errors.push_error(DatamodelError::new_unused_argument_error(&arg.name.name, arg.span));
             }
         }
 

@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use datamodel::{ast::Span, error::*, render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, errors_and_warnings::*, render_datamodel_to_string, IndexDefinition, IndexType};
 
 use crate::common::*;
 
@@ -16,7 +16,7 @@ fn basic_unique_index_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
@@ -138,7 +138,7 @@ fn single_field_unique_on_enum_field_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     schema
         .assert_has_model("User")
         .assert_has_scalar_field("role")
@@ -157,7 +157,7 @@ fn the_name_argument_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
@@ -179,7 +179,7 @@ fn multiple_unique_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
 
     user_model.assert_has_index(IndexDefinition {
@@ -211,7 +211,7 @@ fn multi_field_unique_indexes_on_enum_fields_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
@@ -270,7 +270,7 @@ fn unique_attributes_must_serialize_to_valid_dml() {
             @@unique([firstName,lastName], name: "customName")
         }
     "#;
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema).unwrap()).is_ok());
 }

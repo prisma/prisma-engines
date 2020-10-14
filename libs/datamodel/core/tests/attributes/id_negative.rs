@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, error::DatamodelError};
+use datamodel::{ast::Span, errors_and_warnings::DatamodelError};
 
 #[test]
 fn id_should_error_if_the_field_is_not_required() {

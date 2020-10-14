@@ -12,7 +12,7 @@ fn correctly_handle_server_side_now_function() {
 
     std::env::set_var("TEST_USER", "prisma-user");
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
@@ -32,7 +32,7 @@ fn correctly_handle_server_side_cuid_function() {
 
     std::env::set_var("TEST_USER", "prisma-user");
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
@@ -52,7 +52,7 @@ fn correctly_handle_server_side_uuid_function() {
 
     std::env::set_var("TEST_USER", "prisma-user");
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model

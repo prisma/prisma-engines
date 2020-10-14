@@ -1,5 +1,6 @@
 use migration_connector::{ConnectorError, ListMigrationsError};
 use std::{error::Error as StdError, fmt::Display};
+use user_facing_errors::KnownError;
 
 use crate::migration::datamodel_calculator::CalculatorError;
 
@@ -13,13 +14,13 @@ pub enum CoreError {
     ReceivedBadDatamodel(String),
 
     /// When a datamodel from a generated AST is wrong. This is basically an internal error.
-    ProducedBadDatamodel(datamodel::error::ErrorCollection),
+    ProducedBadDatamodel(datamodel::errors_and_warnings::ErrorsAndWarnings),
 
     /// When a saved datamodel from a migration in the migrations table is no longer valid.
-    InvalidPersistedDatamodel(datamodel::error::ErrorCollection, String),
+    InvalidPersistedDatamodel(datamodel::errors_and_warnings::ErrorsAndWarnings, String),
 
     /// Failed to render a prisma schema to a string.
-    DatamodelRenderingError(datamodel::error::ErrorCollection),
+    DatamodelRenderingError(datamodel::errors_and_warnings::ErrorsAndWarnings),
 
     /// Errors from the connector.
     ConnectorError(ConnectorError),
@@ -67,7 +68,23 @@ impl StdError for CoreError {
     }
 }
 
-fn render_datamodel_error(err: &datamodel::error::ErrorCollection, schema: Option<&String>) -> String {
+impl CoreError {
+    /// Render to an `user_facing_error::Error`.
+    pub fn render_user_facing(self) -> user_facing_errors::Error {
+        match self {
+            CoreError::ConnectorError(ConnectorError {
+                user_facing_error: Some(user_facing_error),
+                ..
+            }) => user_facing_error.into(),
+            CoreError::ReceivedBadDatamodel(full_error) => {
+                KnownError::new(user_facing_errors::common::SchemaParserError { full_error }).into()
+            }
+            crate_error => user_facing_errors::Error::from_dyn_error(&crate_error),
+        }
+    }
+}
+
+fn render_datamodel_error(err: &datamodel::errors_and_warnings::ErrorsAndWarnings, schema: Option<&String>) -> String {
     match schema {
         Some(schema) => err.to_pretty_string("virtual_schema.prisma", schema),
         None => format!("Datamodel error in schema that could not be rendered. {}", err),

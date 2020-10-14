@@ -1,5 +1,5 @@
 use migration_connector::steps::{DeleteModel, MigrationStep};
-use migration_core::api::{render_error, RpcApi};
+use migration_core::api::RpcApi;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
@@ -27,7 +27,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
     let user = url.username();
     let host = url.host().unwrap().to_string();
 
-    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `postgres` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host),
@@ -64,7 +64,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
     let user = url.username();
     let host = url.host().unwrap().to_string();
 
-    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Authentication failed against database server at `{host}`, the provided database credentials for `{user}` are not valid.\n\nPlease make sure to provide valid database credentials for the database server at `{host}`.", host = host, user = user),
@@ -101,7 +101,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
 
-    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
@@ -138,7 +138,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap();
 
-    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Can't reach database server at `{host}`:`{port}`\n\nPlease make sure your database server is running at `{host}`:`{port}`.", host = host, port = port),
@@ -173,7 +173,7 @@ async fn database_does_not_exist_must_return_a_proper_error() {
 
     let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
 
-    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
     let expected = json!({
         "is_panic": false,
         "message": format!("Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.", database_name = database_name, database_host = url.host().unwrap(), database_port = url.port().unwrap()),
@@ -215,7 +215,7 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     );
 
     let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
-    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
 
     let expected = json!({
         "is_panic": false,
@@ -245,7 +245,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 
     let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
 
-    let json_error = serde_json::to_value(&render_error(error)).unwrap();
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
 
     let err_message: String = json_error["message"].as_str().unwrap().into();
 
@@ -285,7 +285,7 @@ async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> Tes
 
         let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
 
-        let json_error = serde_json::to_value(&render_error(error)).unwrap();
+        let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
 
         let expected = json!({
             "is_panic": false,

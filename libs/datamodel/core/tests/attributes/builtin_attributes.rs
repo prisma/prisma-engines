@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast, error::DatamodelError, ScalarType};
+use datamodel::{ast, errors_and_warnings::DatamodelError, ScalarType};
 
 #[test]
 fn unique_attribute() {
@@ -10,7 +10,7 @@ fn unique_attribute() {
         }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let test_model = schema.assert_has_model("Test");
 
     test_model

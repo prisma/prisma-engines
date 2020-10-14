@@ -6,12 +6,18 @@ use pest::Parser;
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
 use crate::common::WritableString;
+use crate::errors_and_warnings::DatamodelWarning;
 use pest::iterators::Pair;
 
 pub struct Reformatter<'a> {
     input: &'a str,
-    missing_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
-    missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::error::ErrorCollection>,
+    missing_fields: Result<ValidatedMissingFields, crate::errors_and_warnings::ErrorsAndWarnings>,
+    missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::errors_and_warnings::ErrorsAndWarnings>,
+}
+
+pub struct ValidatedMissingFields {
+    pub missing_fields: Vec<MissingField>,
+    pub warnings: Vec<DatamodelWarning>,
 }
 
 impl<'a> Reformatter<'a> {
@@ -26,18 +32,23 @@ impl<'a> Reformatter<'a> {
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
-    fn find_all_missing_fields(schema_string: &str) -> Result<Vec<MissingField>, crate::error::ErrorCollection> {
+    fn find_all_missing_fields(
+        schema_string: &str,
+    ) -> Result<ValidatedMissingFields, crate::errors_and_warnings::ErrorsAndWarnings> {
+        let mut errors_and_warnings = crate::errors_and_warnings::ErrorsAndWarnings::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
+        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
-        for model in datamodel.models() {
+        errors_and_warnings.append_warning_vec(validated_datamodel.warnings);
+
+        for model in validated_datamodel.datamodel.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
 
             for field in model.fields() {
                 if ast_model.fields.iter().find(|f| f.name.name == field.name()).is_none() {
-                    let ast_field = lowerer.lower_field(&field, &datamodel)?;
+                    let ast_field = lowerer.lower_field(&field, &validated_datamodel.datamodel)?;
 
                     result.push(MissingField {
                         model: model.name.clone(),
@@ -47,21 +58,26 @@ impl<'a> Reformatter<'a> {
             }
         }
 
-        Ok(result)
+        Ok(ValidatedMissingFields {
+            missing_fields: result,
+            warnings: errors_and_warnings.warnings,
+        })
     }
 
     fn find_all_missing_attributes(
         schema_string: &str,
-    ) -> Result<Vec<MissingFieldAttribute>, crate::error::ErrorCollection> {
+    ) -> Result<Vec<MissingFieldAttribute>, crate::errors_and_warnings::ErrorsAndWarnings> {
+        let mut errors_and_warnings = crate::errors_and_warnings::ErrorsAndWarnings::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
+        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
+        errors_and_warnings.append_warning_vec(validated_datamodel.warnings);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut missing_field_attributes = Vec::new();
-        for model in datamodel.models() {
+        for model in validated_datamodel.datamodel.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
                 let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
-                let new_ast_field = lowerer.lower_field(&field, &datamodel)?;
+                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.datamodel)?;
                 if original_ast_field.is_some() {
                     for attribute in new_ast_field.attributes {
                         if let Some(original_field) = original_ast_field {
@@ -242,7 +258,7 @@ impl<'a> Reformatter<'a> {
             Box::new(|table, _, model_name| {
                 // TODO: what is the right thing to do on error?
                 if let Ok(missing_fields) = self.missing_fields.as_ref() {
-                    for missing_back_relation_field in missing_fields.iter() {
+                    for missing_back_relation_field in missing_fields.missing_fields.iter() {
                         if missing_back_relation_field.model.as_str() == model_name {
                             Renderer::render_field(table, &missing_back_relation_field.field, false);
                         }

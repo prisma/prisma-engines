@@ -1,5 +1,10 @@
 use super::{Datasource, Generator};
-use crate::error::{DatamodelError, ErrorCollection};
+use crate::errors_and_warnings::{DatamodelError, DatamodelWarning, ErrorsAndWarnings};
+
+pub struct ValidatedConfiguration {
+    pub configuration: Configuration,
+    pub warnings: Vec<DatamodelWarning>,
+}
 
 pub struct Configuration {
     pub generators: Vec<Generator>,
@@ -7,7 +12,7 @@ pub struct Configuration {
 }
 
 impl Configuration {
-    pub fn validate_that_one_datasource_is_provided(self) -> Result<Self, ErrorCollection> {
+    pub fn validate_that_one_datasource_is_provided(self) -> Result<Self, ErrorsAndWarnings> {
         if self.datasources.is_empty() {
             Err(DatamodelError::new_validation_error(
                 "You defined no datasource. You must define exactly one datasource.",

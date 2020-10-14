@@ -1,4 +1,4 @@
-use datamodel::{ast::Span, error::*, render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, errors_and_warnings::*, render_datamodel_to_string, IndexDefinition, IndexType};
 
 use crate::common::*;
 
@@ -14,7 +14,7 @@ fn basic_index_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
@@ -39,7 +39,7 @@ fn indexes_on_enum_fields_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: None,
@@ -85,7 +85,7 @@ fn the_name_argument_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model.assert_has_index(IndexDefinition {
         name: Some("MyIndexName".to_string()),
@@ -117,7 +117,7 @@ fn multiple_indexes_with_same_name_are_supported_by_mysql() {
      }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let user_model = schema.assert_has_model("User");
     let post_model = schema.assert_has_model("Post");
@@ -215,7 +215,7 @@ fn multiple_index_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
 
     user_model.assert_has_index(IndexDefinition {
@@ -261,7 +261,7 @@ fn index_attributes_must_serialize_to_valid_dml() {
             @@index([firstName,lastName], name: "customName")
         }
     "#;
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema).unwrap()).is_ok());
 }

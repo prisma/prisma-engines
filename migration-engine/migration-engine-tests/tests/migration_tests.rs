@@ -213,7 +213,7 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_each_connector(log = "debug,sql_schema_describer=info", ignore("sqlite"))]
+#[test_each_connector(ignore("sqlite"))]
 async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -256,7 +256,7 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_each_connector(log = "debug,sql_schema_describer=info", ignore("sqlite"))]
+#[test_each_connector(ignore("sqlite"))]
 async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -330,7 +330,7 @@ async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_each_connector(ignore("sqlite"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(ignore("sqlite"))]
 async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -518,7 +518,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_each_connector]
 async fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1079,11 +1079,12 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
 #[test_each_connector]
 async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
     let dm1 = r#"
-            model A {
-                id    Int    @id
-                field String @unique
-            }
-        "#;
+        model A {
+            id    Int    @id
+            field String @unique
+        }
+    "#;
+
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
@@ -1094,10 +1095,11 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
     let dm2 = r#"
-            model A {
-                id    Int    @id
-            }
-        "#;
+        model A {
+            id    Int    @id
+        }
+    "#;
+
     let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result
         .table_bang("A")
@@ -1107,7 +1109,7 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
     assert_eq!(index.is_some(), false);
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_each_connector]
 async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1149,22 +1151,24 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResu
 #[test_each_connector]
 async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
     let dm1 = r#"
-            model A {
-                id    Int    @id
-                field String @unique
-            }
-        "#;
+        model A {
+            id    Int    @id
+            field String @unique
+        }
+    "#;
+
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
     let dm2 = r#"
-            model A {
-                id    Int    @id
-                field String
-            }
-        "#;
+        model A {
+            id    Int    @id
+            field String
+        }
+    "#;
+
     let result = api.infer_and_apply(&dm2).await.sql_schema;
     let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
     assert!(index.is_none());
@@ -1174,13 +1178,13 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
 async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
     // Group is a reserved keyword
     let dm = r#"
-            model Group {
-                id          String  @id @default(cuid())
-                parent_id   String?
-                parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
-                childGroups Group[] @relation(name: "ChildGroups")
-            }
-        "#;
+        model Group {
+            id          String  @id @default(cuid())
+            parent_id   String?
+            parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
+            childGroups Group[] @relation(name: "ChildGroups")
+        }
+    "#;
 
     api.infer_apply(&dm).send().await?.assert_green()?;
 
@@ -1195,22 +1199,22 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
 async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &TestApi) {
     // test case for https://github.com/prisma/lift/issues/148
     let dm_1 = r#"
-            model User {
-                id        String  @id @default(cuid())
-            }
+        model User {
+            id        String  @id @default(cuid())
+        }
 
-            model Profile {
-                id        String  @id @default(cuid())
-                userId    String
-                user      User    @relation(fields: userId, references: id)
-                skills    Skill[]
-            }
+        model Profile {
+            id        String  @id @default(cuid())
+            userId    String
+            user      User    @relation(fields: userId, references: id)
+            skills    Skill[]
+        }
 
-            model Skill {
-                id          String  @id @default(cuid())
-                profiles    Profile[]
-            }
-        "#;
+        model Skill {
+            id          String  @id @default(cuid())
+            profiles    Profile[]
+        }
+    "#;
     let sql_schema = api.infer_and_apply(&dm_1).await.sql_schema;
 
     let index = sql_schema
@@ -1222,23 +1226,23 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
     assert_eq!(index.tpe, IndexType::Unique);
 
     let dm_2 = r#"
-            model User {
-                id        String  @id @default(cuid())
-                someField String?
-            }
+        model User {
+            id        String  @id @default(cuid())
+            someField String?
+        }
 
-            model Profile {
-                id        String  @id @default(cuid())
-                userId    String
-                user      User    @relation(fields: userId, references: id)
-                skills    Skill[]
-            }
+        model Profile {
+            id        String  @id @default(cuid())
+            userId    String
+            user      User    @relation(fields: userId, references: id)
+            skills    Skill[]
+        }
 
-            model Skill {
-                id          String  @id @default(cuid())
-                profiles    Profile[]
-            }
-        "#;
+        model Skill {
+            id          String  @id @default(cuid())
+            profiles    Profile[]
+        }
+    "#;
 
     let result = api.infer_and_apply(&dm_2).await;
     let sql_schema = result.sql_schema;
@@ -1255,17 +1259,17 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 #[test_each_connector]
 async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm_1 = r#"
-            model User {
-                id        String  @id @default(cuid())
-                address_id String @map("address_name")
-                address   Address @relation(fields: [address_id], references: [id])
-            }
+        model User {
+            id        String  @id @default(cuid())
+            address_id String @map("address_name")
+            address   Address @relation(fields: [address_id], references: [id])
+        }
 
-            model Address {
-                id        String  @id @default(cuid())
-                street    String
-            }
-        "#;
+        model Address {
+            id        String  @id @default(cuid())
+            street    String
+        }
+    "#;
 
     api.infer_apply(&dm_1).send().await?.assert_green()?;
     api.assert_schema()
@@ -1273,25 +1277,21 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
         .assert_table("User", |table| table.assert_has_column("address_name"))?;
 
     let dm_2 = r#"
-            model User {
-                id        String  @id @default(cuid())
-            }
+        model User {
+            id        String  @id @default(cuid())
+        }
 
-            model Address {
-                id        String  @id @default(cuid())
-                street    String
-            }
-        "#;
+        model Address {
+            id        String  @id @default(cuid())
+            street    String
+        }
+    "#;
 
-    let sql_schema = api.infer_and_apply(&dm_2).await.sql_schema;
+    api.infer_apply(dm_2).send().await?.assert_green()?;
 
-    let address_name_field = sql_schema
-        .table_bang("User")
-        .columns
-        .iter()
-        .find(|col| col.name == "address_name");
-
-    assert!(address_name_field.is_none());
+    api.assert_schema()
+        .await?
+        .assert_table("User", |table| table.assert_does_not_have_column("address_name"))?;
 
     Ok(())
 }
@@ -1375,7 +1375,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql-schema-describer=info")]
+#[test_each_connector]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::Insert;
 
@@ -2101,7 +2101,7 @@ async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_each_connector]
 async fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created(api: &TestApi) -> TestResult {
     let dm = r#"
         model List {
@@ -2193,7 +2193,7 @@ async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(log = "sql_schema_describer=info,debug")]
+#[test_each_connector]
 async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {

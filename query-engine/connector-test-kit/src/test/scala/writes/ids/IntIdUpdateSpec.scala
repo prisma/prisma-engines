@@ -120,7 +120,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     result.pathAsLong("data.updateTodo.id") should equal(1)
   }
 
-  "Updating the id of an item with an id field of type Int with autoincrement" should "error" in {
+  "Updating the id of an item with an id field of type Int with autoincrement" should "errors_and_warnings" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Todo {
@@ -157,7 +157,7 @@ class IntIdUpdateSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Updating a unique field of type Int with autoincrement" should "error" taggedAs (IgnoreSQLite, IgnoreMySql) in {
+  "Updating a unique field of type Int with autoincrement" should "errors_and_warnings" taggedAs (IgnoreSQLite, IgnoreMySql) in {
     val project = ProjectDsl.fromString {
       s"""
          |model Todo {

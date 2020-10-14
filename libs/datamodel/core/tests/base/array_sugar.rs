@@ -16,7 +16,7 @@ fn should_treat_single_values_as_arrays_of_length_one() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let post_model = schema.assert_has_model("Post");
     post_model

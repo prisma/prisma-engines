@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::dml;
-use datamodel::error::DatamodelError;
+use datamodel::errors_and_warnings::DatamodelError;
 
 #[test]
 fn relation_happy_path() {
@@ -20,7 +20,7 @@ fn relation_happy_path() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_relation_field("posts")
@@ -111,7 +111,7 @@ fn optional_relation_field_must_succeed_when_all_underlying_fields_are_optional(
     "#;
 
     // must not crash
-    let _ = parse(dml);
+    let _ = parse(dml).datamodel;
 }
 
 #[test]
@@ -438,7 +438,7 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
     }
     "#;
 
-    let result = parse(dml);
+    let result = parse(dml).datamodel;
     result
         .assert_has_model("Post")
         .assert_has_relation_field("user")
@@ -550,7 +550,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     }
     "#;
 
-    let result = parse(dml);
+    let result = parse(dml).datamodel;
     result
         .assert_has_model("Post")
         .assert_has_relation_field("user")

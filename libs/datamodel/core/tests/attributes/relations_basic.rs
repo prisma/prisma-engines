@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::error::DatamodelError;
+use datamodel::errors_and_warnings::DatamodelError;
 use datamodel::{dml, ScalarType};
 
 #[test]
@@ -21,7 +21,7 @@ fn resolve_relation() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_scalar_field("firstName")
@@ -55,7 +55,7 @@ fn resolve_related_field() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let post_model = schema.assert_has_model("Post");
     post_model
@@ -85,7 +85,7 @@ fn resolve_related_fields() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
 
     let post_model = schema.assert_has_model("Post");
     post_model
@@ -139,7 +139,7 @@ fn resolve_enum_field() {
     }
     "#;
 
-    let schema = parse(dml);
+    let schema = parse(dml).datamodel;
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_scalar_field("email")

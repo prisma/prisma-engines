@@ -1,5 +1,5 @@
 use crate::command_error::CommandError;
-use datamodel::error::ErrorCollection;
+use datamodel::errors_and_warnings::ErrorsAndWarnings;
 use introspection_connector::{ConnectorError, ErrorKind};
 use thiserror::Error;
 
@@ -12,7 +12,7 @@ pub enum Error {
     CommandError(CommandError),
 
     #[error("Error in datamodel: {:?}", .0)]
-    DatamodelError(ErrorCollection),
+    DatamodelError(ErrorsAndWarnings),
 
     #[error("{}", _0)]
     InvalidDatabaseUrl(String),
@@ -33,8 +33,8 @@ impl From<CommandError> for Error {
     }
 }
 
-impl From<datamodel::error::ErrorCollection> for Error {
-    fn from(e: datamodel::error::ErrorCollection) -> Self {
+impl From<datamodel::errors_and_warnings::ErrorsAndWarnings> for Error {
+    fn from(e: datamodel::errors_and_warnings::ErrorsAndWarnings) -> Self {
         Error::DatamodelError(e)
     }
 }
