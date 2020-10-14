@@ -54,21 +54,15 @@ async fn select_1(api: &TestApi) -> anyhow::Result<()> {
     let query = indoc! {r#"
         mutation {
             queryRaw(
-                query: "SELECT 1"
+                query: "SELECT 1 AS result"
             )
         }
     "#};
 
-    let column_name = match api.connection_info() {
-        ConnectionInfo::Postgres(_) => "?column?",
-        ConnectionInfo::Mssql(_) => "",
-        _ => "1",
-    };
-
     assert_eq!(
         json!({
             "data": {
-                "queryRaw": [{column_name: 1}]
+                "queryRaw": [{"result": 1}]
             }
         }),
         query_engine.request(query).await
@@ -87,7 +81,7 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
             indoc! {r#"
                 mutation {
                     queryRaw(
-                        query: "SELECT ($1)::text",
+                        query: "SELECT ($1)::text AS result",
                         parameters: "[\"foo\"]"
                     )
                 }
@@ -97,7 +91,7 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
             indoc! {r#"
                 mutation {
                     queryRaw(
-                        query: "SELECT @P1",
+                        query: "SELECT @P1 AS result",
                         parameters: "[\"foo\"]"
                     )
                 }
@@ -107,7 +101,7 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
             indoc! {r#"
                 mutation {
                     queryRaw(
-                        query: "SELECT ?",
+                        query: "SELECT ? AS result",
                         parameters: "[\"foo\"]"
                     )
                 }
@@ -115,16 +109,10 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
         }
     };
 
-    let column_name = match api.connection_info() {
-        ConnectionInfo::Postgres(_) => "text",
-        ConnectionInfo::Mssql(_) => "",
-        _ => "?",
-    };
-
     assert_eq!(
         json!({
             "data": {
-                "queryRaw": [{column_name: "foo"}]
+                "queryRaw": [{"result": "foo"}]
             }
         }),
         query_engine.request(query).await
@@ -338,6 +326,56 @@ async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Res
         ConnectionInfo::Sqlite { .. } => assert_eq!(Some("1555"), error_code),
         ConnectionInfo::Mssql { .. } => assert_eq!(Some("2627"), error_code),
     }
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn parameter_escaping(api: &TestApi) -> anyhow::Result<()> {
+    feature_flags::initialize(&[String::from("all")]).unwrap();
+    let query_engine = api.create_engine(&TODO).await?;
+
+    let query = match api.connection_info() {
+        ConnectionInfo::Postgres(_) => {
+            indoc! {r#"
+                mutation {
+                    queryRaw(
+                        query: "SELECT ($1)::text AS result",
+                        parameters: "[\"\\\"name\\\"\"]"
+                    )
+                }
+            "#}
+        }
+        ConnectionInfo::Mssql(_) => {
+            indoc! {r#"
+                mutation {
+                    queryRaw(
+                        query: "SELECT @P1 AS result",
+                        parameters: "[\"\\\"name\\\"\"]"
+                    )
+                }
+            "#}
+        }
+        _ => {
+            indoc! {r#"
+                mutation {
+                    queryRaw(
+                        query: "SELECT ? AS result",
+                        parameters: "[\"\\\"name\\\"\"]"
+                    )
+                }
+            "#}
+        }
+    };
+
+    assert_eq!(
+        json!({
+            "data": {
+                "queryRaw": [{"result": "\"name\""}]
+            }
+        }),
+        query_engine.request(query).await
+    );
 
     Ok(())
 }
