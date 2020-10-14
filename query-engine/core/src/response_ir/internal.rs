@@ -38,9 +38,10 @@ pub fn serialize_internal(
     field: &OutputFieldRef,
     is_list: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
+    dbg!(format!("Serializing: {}", &field.name));
     match result {
         QueryResult::RecordSelection(rs) => serialize_record_selection(rs, field, &field.field_type, is_list),
-        QueryResult::RecordAggregation(ra) => serialize_aggregation(ra),
+        QueryResult::RecordAggregation(ra) => serialize_aggregation(field, ra),
 
         QueryResult::Count(c) => {
             // Todo needs a real implementation or needs to move to RecordAggregation
@@ -59,11 +60,20 @@ pub fn serialize_internal(
     }
 }
 
-fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result<CheckedItemsWithParents> {
+fn serialize_aggregation(
+    output_field: &OutputFieldRef,
+    record_aggregation: RecordAggregation,
+) -> crate::Result<CheckedItemsWithParents> {
+    dbg!(&output_field.name);
+
     let ordering = record_aggregation.selection_order;
     let results = record_aggregation.results;
 
     let mut flattened = HashMap::with_capacity(ordering.len());
+    let aggregate_object_type = match output_field.field_type.borrow() {
+        OutputType::Object(obj) => obj.into_arc(),
+        _ => unreachable!("Aggregate output must be an object."),
+    };
 
     for result in results {
         match result {
@@ -72,19 +82,32 @@ fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result
             }
 
             AggregationResult::Average(field, value) => {
-                flattened.insert(format!("avg_{}", &field.name), Item::Value(value));
+                let avg_field = aggregate_object_type.find_field("avg").unwrap();
+                let avg_object_type = match avg_field.field_type.borrow() {
+                    OutputType::Object(obj) => obj.into_arc(),
+                    _ => unreachable!("Avg output must be an object."),
+                };
+
+                let field_output_type = avg_object_type.find_field(&field.name).unwrap();
+                flattened.insert(
+                    format!("avg_{}", &field.name),
+                    serialize_scalar(&field_output_type, value)?,
+                );
             }
 
             AggregationResult::Sum(field, value) => {
-                flattened.insert(format!("sum_{}", &field.name), Item::Value(value));
+                let field_type = aggregate_object_type.find_field("sum").unwrap();
+                flattened.insert(format!("sum_{}", &field.name), serialize_scalar(output_field, value)?);
             }
 
             AggregationResult::Min(field, value) => {
-                flattened.insert(format!("min_{}", &field.name), Item::Value(value));
+                let field_type = aggregate_object_type.find_field("min").unwrap();
+                flattened.insert(format!("min_{}", &field.name), serialize_scalar(output_field, value)?);
             }
 
             AggregationResult::Max(field, value) => {
-                flattened.insert(format!("max_{}", &field.name), Item::Value(value));
+                let field_type = aggregate_object_type.find_field("max").unwrap();
+                flattened.insert(format!("max_{}", &field.name), serialize_scalar(output_field, value)?);
             }
         }
     }
@@ -367,6 +390,7 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
             PrismaValue::Int(i.to_i64().expect("Unable to convert Decimal to i64."))
         }
 
+        (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
         (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
 
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),

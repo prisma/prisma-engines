@@ -42,6 +42,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
          |    avg {
          |      float
          |      int
+         |      dec
          |    }
          |  }
          |}""".stripMargin,
@@ -50,6 +51,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
 
     result.pathAsFloat("data.aggregateItem.avg.float") should be(0.0)
     result.pathAsInt("data.aggregateItem.avg.int") should be(0)
+    result.pathAsString("data.aggregateItem.avg.dec") should be("0")
   }
 
   "Averaging with some records in the database" should "return the correct averages" in {
@@ -70,7 +72,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
     )
 
     result.pathAsDouble("data.aggregateItem.avg.float") should be(5.0)
-    result.pathAsDouble("data.aggregateItem.avg.dec") should be("5.0")
+    result.pathAsString("data.aggregateItem.avg.dec") should be("5")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(7.5)
   }
 
@@ -95,7 +97,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
     )
 
     result.pathAsDouble("data.aggregateItem.avg.float") should be(5.0)
-    result.pathAsDouble("data.aggregateItem.avg.dec") should be("5.0")
+    result.pathAsString("data.aggregateItem.avg.dec") should be("5")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(7.5)
 
     result = server.query(
@@ -113,7 +115,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
     )
 
     result.pathAsDouble("data.aggregateItem.avg.float") should be(2.875)
-    result.pathAsDouble("data.aggregateItem.avg.dec") should be("2.875")
+    result.pathAsString("data.aggregateItem.avg.dec") should be("2.875")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(4.5)
 
     result = server.query(
@@ -131,7 +133,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
     )
 
     result.pathAsDouble("data.aggregateItem.avg.float") should be(2.875)
-    result.pathAsDouble("data.aggregateItem.avg.dec") should be("2.875")
+    result.pathAsString("data.aggregateItem.avg.dec") should be("2.875")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(4.5)
 
     result = server.query(
@@ -149,7 +151,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
     )
 
     result.pathAsDouble("data.aggregateItem.avg.float") should be(0.75)
-    result.pathAsDouble("data.aggregateItem.avg.dec") should be("0.75")
+    result.pathAsString("data.aggregateItem.avg.dec") should be("0.75")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(1.5)
 
     result = server.query(
@@ -167,7 +169,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
     )
 
     result.pathAsDouble("data.aggregateItem.avg.float") should be(0.75)
-    result.pathAsDouble("data.aggregateItem.avg.dec") should be("0.75")
+    result.pathAsString("data.aggregateItem.avg.dec") should be("0.75")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(1.5)
 
     result = server.query(
@@ -185,7 +187,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
     )
 
     result.pathAsDouble("data.aggregateItem.avg.float") should be(0.75)
-    result.pathAsDouble("data.aggregateItem.avg.dec") should be("0.75")
+    result.pathAsString("data.aggregateItem.avg.dec") should be("0.75")
     result.pathAsDouble("data.aggregateItem.avg.int") should be(1.5)
   }
 }
