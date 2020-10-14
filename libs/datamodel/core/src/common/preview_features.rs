@@ -1,5 +1,6 @@
 // datasource preview features
 const NATIVE_TYPES: &str = "nativeTypes";
+const SQL_SERVER: &str = "microsoftSqlServer";
 
 // generator preview features
 const ATOMIC_NUMBER_OPERATIONS: &str = "atomicNumberOperations";
@@ -11,7 +12,7 @@ const AGGREGATE_API: &str = "aggregateApi"; // todo move this to deprecated prev
 const MIDDLEWARES: &str = "middlewares";
 const DISTINCT: &str = "distinct";
 
-pub const DATASOURCE_PREVIEW_FEATURES: &[&'static str] = &[NATIVE_TYPES];
+pub const DATASOURCE_PREVIEW_FEATURES: &[&'static str] = &[NATIVE_TYPES, SQL_SERVER];
 pub const GENERATOR_PREVIEW_FEATURES: &[&'static str] = &[
     ATOMIC_NUMBER_OPERATIONS,
     CONNECT_OR_CREATE,
