@@ -1,10 +1,8 @@
 use crate::{error::quaint_error_to_connector_error, SqlMigrationConnector};
 use migration_connector::{
-    ConnectorError, ConnectorResult, FormatChecksum, ImperativeMigrationsPersistence, MigrationRecord,
-    PersistenceNotInitializedError,
+    ConnectorError, ConnectorResult, ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError,
 };
 use quaint::{ast::*, error::ErrorKind as QuaintKind};
-use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
 const IMPERATIVE_MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
@@ -50,18 +48,18 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(())
     }
 
-    async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
+    async fn record_migration_started_impl(
+        &self,
+        migration_name: &str,
+        script: &str,
+        checksum: &str,
+    ) -> ConnectorResult<String> {
         let conn = self.conn();
         let id = Uuid::new_v4().to_string();
 
-        let mut hasher = Sha256::new();
-        hasher.update(script.as_bytes());
-        let checksum: [u8; 32] = hasher.finalize().into();
-        let checksum_string = checksum.format_checksum();
-
         let insert = Insert::single_into((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .value("id", id.as_str())
-            .value("checksum", checksum_string.as_str())
+            .value("checksum", checksum)
             // We need this line because MySQL can't default a text field to an empty string
             .value("logs", "")
             .value("migration_name", migration_name)

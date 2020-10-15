@@ -17,7 +17,7 @@ pub enum CoreError {
     ProducedBadDatamodel(datamodel::error::ErrorCollection),
 
     /// When a saved datamodel from a migration in the migrations table is no longer valid.
-    InvalidPersistedDatamodel(datamodel::error::ErrorCollection, String),
+    InvalidPersistedDatamodel(String),
 
     /// Failed to render a prisma schema to a string.
     DatamodelRenderingError(datamodel::error::ErrorCollection),
@@ -41,11 +41,9 @@ impl Display for CoreError {
                 "The migration produced an invalid schema.\n{}",
                 render_datamodel_error(err, None)
             ),
-            CoreError::InvalidPersistedDatamodel(err, schema) => write!(
-                f,
-                "The migration contains an invalid schema.\n{}",
-                render_datamodel_error(err, Some(schema))
-            ),
+            CoreError::InvalidPersistedDatamodel(err) => {
+                write!(f, "The migration contains an invalid schema.\n{}", err)
+            }
             CoreError::DatamodelRenderingError(err) => write!(f, "Failed to render the schema to a string ({:?})", err),
             CoreError::ConnectorError(err) => write!(f, "Connector error: {}", err),
             CoreError::Generic(src) => write!(f, "Generic error: {}", src),
@@ -59,7 +57,7 @@ impl StdError for CoreError {
         match self {
             CoreError::ReceivedBadDatamodel(_) => None,
             CoreError::ProducedBadDatamodel(_) => None,
-            CoreError::InvalidPersistedDatamodel(_, _) => None,
+            CoreError::InvalidPersistedDatamodel(_) => None,
             CoreError::DatamodelRenderingError(_) => None,
             CoreError::ConnectorError(err) => Some(err),
             CoreError::Generic(err) => Some(err.as_ref()),

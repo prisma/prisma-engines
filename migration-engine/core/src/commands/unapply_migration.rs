@@ -34,19 +34,19 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
                     .as_ref()
                     .map(|migration| migration.parse_schema_ast())
                     .unwrap_or_else(|| Ok(SchemaAst::empty()))
-                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(CoreError::InvalidPersistedDatamodel)?;
                 let schema_before_last_migration = second_to_last
                     .as_ref()
                     .map(|migration| migration.parse_datamodel())
                     .unwrap_or_else(|| Ok(Datamodel::new()))
-                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(CoreError::InvalidPersistedDatamodel)?;
 
                 let last_schema_ast = migration_to_rollback
                     .parse_schema_ast()
-                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(CoreError::InvalidPersistedDatamodel)?;
                 let last_schema = migration_to_rollback
                     .parse_datamodel()
-                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(CoreError::InvalidPersistedDatamodel)?;
 
                 // Generate backwards datamodel steps.
                 let datamodel_migration =
