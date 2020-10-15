@@ -1,5 +1,7 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
-use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
+use datamodel_connector::{Connector, ConnectorCapability};
+use dml::native_type_constructor::NativeTypeConstructor;
+use dml::native_type_instance::NativeTypeInstance;
 
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,

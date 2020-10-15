@@ -1,10 +1,5 @@
 use super::{Datasource, Generator};
-use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
-
-pub struct ValidatedConfiguration {
-    pub configuration: Configuration,
-    pub warnings: Vec<DatamodelWarning>,
-}
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
 pub struct Configuration {
     pub generators: Vec<Generator>,

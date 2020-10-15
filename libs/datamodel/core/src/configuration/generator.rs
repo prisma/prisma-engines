@@ -1,12 +1,6 @@
 use crate::configuration::preview_features::PreviewFeatures;
-use crate::diagnostics::DatamodelWarning;
 use serde::Serialize;
 use std::collections::HashMap;
-
-pub struct ValidatedGenerator {
-    pub(crate) generator: Generator,
-    pub(crate) warnings: Vec<DatamodelWarning>,
-}
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, Serialize)]

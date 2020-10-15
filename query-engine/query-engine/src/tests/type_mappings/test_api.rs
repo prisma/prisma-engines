@@ -43,7 +43,7 @@ impl TestApi {
             .datamodel;
         let config = datamodel::parse_configuration(&introspection_result.datamodel).unwrap();
 
-        let context = PrismaContext::builder(config.configuration, dml.clone())
+        let context = PrismaContext::builder(config.subject, dml.clone())
             .enable_raw_queries(true)
             .build()
             .await

@@ -12,9 +12,9 @@ pub fn run() {
 
     match datamodel_result {
         Ok(validated_configuration) => {
-            if validated_configuration.configuration.datasources.len() != 1 {
+            if validated_configuration.subject.datasources.len() != 1 {
                 print!("[]")
-            } else if let Some(datasource) = validated_configuration.configuration.datasources.first() {
+            } else if let Some(datasource) = validated_configuration.subject.datasources.first() {
                 let available_native_type_constructors =
                     datasource.active_connector.available_native_type_constructors();
 

@@ -1,3 +1,4 @@
+use crate::common::parse_configuration;
 use crate::common::ErrorAsserts;
 use datamodel::common::preview_features::GENERATOR_PREVIEW_FEATURES;
 use datamodel::diagnostics::DatamodelError;
@@ -164,8 +165,8 @@ fn nice_error_for_unknown_generator_preview_feature() {
 }
 
 fn assert_mcf(schema: &str, expected_mcf: &str) {
-    let config = datamodel::parse_configuration(schema).unwrap();
-    let rendered = datamodel::json::mcf::generators_to_json(&config.configuration.generators);
+    let config = parse_configuration(schema);
+    let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
 
     print!("{}", &expected_mcf);
 

@@ -10,7 +10,7 @@ fn unique_attribute() {
         }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let test_model = schema.assert_has_model("Test");
 
     test_model

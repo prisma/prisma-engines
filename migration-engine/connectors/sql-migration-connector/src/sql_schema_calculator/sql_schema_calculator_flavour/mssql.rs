@@ -1,7 +1,7 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
-use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, FieldArity, ScalarType};
-use datamodel_connector::NativeTypeInstance;
+use datamodel::walkers::ModelWalker;
+use datamodel::{walkers::ScalarFieldWalker, FieldArity, NativeTypeInstance, ScalarType};
 use native_types::MssqlType;
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, ForeignKeyAction};
 

@@ -15,7 +15,7 @@ fn parse_scalar_types() {
     }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_scalar_field("firstName")
@@ -54,7 +54,7 @@ fn parse_field_arity() {
     }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_scalar_field("text")
@@ -179,14 +179,12 @@ fn json_type_must_work_for_some_connectors() {
 
     // Postgres does support it
     parse(&format!("{}\n{}", POSTGRES_SOURCE, dml))
-        .datamodel
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
 
     // MySQL does support it
     parse(&format!("{}\n{}", MYSQL_SOURCE, dml))
-        .datamodel
         .assert_has_model("User")
         .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);

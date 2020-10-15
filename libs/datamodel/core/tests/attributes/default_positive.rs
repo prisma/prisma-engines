@@ -18,7 +18,7 @@ fn should_set_default_for_all_scalar_types() {
     }
     "#;
 
-    let datamodel = parse(dml).datamodel;
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("int")
@@ -62,7 +62,7 @@ fn should_set_default_an_enum_type() {
     }
     "#;
 
-    let datamodel = parse(dml).datamodel;
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("role")
@@ -87,7 +87,7 @@ fn should_set_default_on_remapped_enum_type() {
     }
     "#;
 
-    let datamodel = parse(dml).datamodel;
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("role")
@@ -111,7 +111,7 @@ fn db_generated_function_must_work_for_enum_fields() {
     }
     "#;
 
-    let datamodel = parse(dml).datamodel;
+    let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("role")

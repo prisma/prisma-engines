@@ -175,7 +175,7 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
         .unwrap()
         .datamodel;
     let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
-    let capabilities = match config.configuration.datasources.first() {
+    let capabilities = match config.subject.datasources.first() {
         Some(ds) => ds.capabilities(),
         None => ConnectorCapabilities::empty(),
     };

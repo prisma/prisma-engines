@@ -186,7 +186,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.ok()
+        errors.to_result()
     }
 
     fn validate_names_for_indexes(
@@ -223,7 +223,7 @@ impl<'a> Validator<'a> {
             }
         }
 
-        errors.ok()
+        errors.to_result()
     }
 
     fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {

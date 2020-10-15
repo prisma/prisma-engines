@@ -81,7 +81,7 @@ enum CategoryEnum {
 }
 "#;
 
-    let dml = parse(input).datamodel;
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -128,7 +128,7 @@ model Test {
 }
 "#;
 
-    let dml = parse(input).datamodel;
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -181,7 +181,7 @@ model Blog {
 }
 "#;
 
-    let dml = parse(input).datamodel;
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -213,7 +213,7 @@ model Post {
 }
 "#;
 
-    let dml = parse(input).datamodel;
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -237,7 +237,7 @@ model User {
 }
 "#;
 
-    let dml = parse(input).datamodel;
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -260,13 +260,13 @@ model Blog {
 }
 "#;
 
-    let dml = parse(input).datamodel;
+    let dml = parse(input);
 
     println!("{:?}", dml);
 
-    let config = datamodel::parse_configuration(input).unwrap();
-    let dml = parse(input).datamodel;
-    let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config.configuration).unwrap();
+    let config = parse_configuration(input);
+    let dml = parse(input);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config).unwrap();
 
     assert_eq!(rendered, input);
 }
@@ -298,17 +298,15 @@ datasource db {
 
     // check that `experimentalFeatures` is turned into `previewFeatures`.
     {
-        let config = datamodel::parse_configuration(input_with_experimental).unwrap();
-        let rendered =
-            datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config.configuration).unwrap();
+        let config = parse_configuration(input_with_experimental);
+        let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config).unwrap();
         assert_eq!(rendered, input_with_preview);
     }
 
     // check that `previewFeatures` stays as is.
     {
-        let config = datamodel::parse_configuration(input_with_preview).unwrap();
-        let rendered =
-            datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config.configuration).unwrap();
+        let config = parse_configuration(input_with_preview);
+        let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config).unwrap();
         println!("{}", rendered);
         assert_eq!(rendered, input_with_preview);
     }

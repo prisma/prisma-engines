@@ -20,7 +20,7 @@ fn relation_happy_path() {
     }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_relation_field("posts")
@@ -111,7 +111,7 @@ fn optional_relation_field_must_succeed_when_all_underlying_fields_are_optional(
     "#;
 
     // must not crash
-    let _ = parse(dml).datamodel;
+    let _ = parse(dml);
 }
 
 #[test]
@@ -438,7 +438,7 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
     }
     "#;
 
-    let result = parse(dml).datamodel;
+    let result = parse(dml);
     result
         .assert_has_model("Post")
         .assert_has_relation_field("user")
@@ -550,7 +550,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     }
     "#;
 
-    let result = parse(dml).datamodel;
+    let result = parse(dml);
     result
         .assert_has_model("Post")
         .assert_has_relation_field("user")

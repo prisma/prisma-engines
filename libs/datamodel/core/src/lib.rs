@@ -85,11 +85,11 @@ pub mod json;
 pub mod transform;
 pub mod walkers;
 
+pub use crate::dml::*;
 pub use configuration::*;
-pub use dml::*;
 
 use crate::ast::SchemaAst;
-use crate::transform::ast_to_dml::ValidatedDatasources;
+use crate::diagnostics::{ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
 use std::io::Write;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
@@ -134,7 +134,7 @@ fn parse_datamodel_internal(
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parser::parse_schema(datamodel_string)?;
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
-    let validator = ValidationPipeline::new(&sources.datasources);
+    let validator = ValidationPipeline::new(&sources.subject);
 
     diagnostics.append_warning_vec(sources.warnings);
 
@@ -156,7 +156,7 @@ pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<ValidatedDatamodel,
     let mut diagnostics = diagnostics::Diagnostics::new();
     // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
     let sources = load_sources(ast, true, vec![])?;
-    let validator = ValidationPipeline::new(&sources.datasources);
+    let validator = ValidationPipeline::new(&sources.subject);
 
     diagnostics.append_warning_vec(sources.warnings);
 
@@ -187,9 +187,9 @@ pub fn parse_configuration(datamodel_string: &str) -> Result<ValidatedConfigurat
     warnings.append(&mut validated_sources.warnings);
 
     Ok(ValidatedConfiguration {
-        configuration: Configuration {
-            datasources: validated_sources.datasources,
-            generators: validated_generators.generators,
+        subject: Configuration {
+            datasources: validated_sources.subject,
+            generators: validated_generators.subject,
         },
         warnings,
     })
@@ -209,9 +209,9 @@ pub fn parse_configuration_with_url_overrides(
     warnings.append(&mut validated_sources.warnings);
 
     Ok(ValidatedConfiguration {
-        configuration: Configuration {
-            datasources: validated_sources.datasources,
-            generators: validated_generators.generators,
+        subject: Configuration {
+            datasources: validated_sources.subject,
+            generators: validated_generators.subject,
         },
         warnings,
     })
@@ -229,9 +229,9 @@ pub fn parse_configuration_and_ignore_datasource_urls(
     warnings.append(&mut validated_sources.warnings);
 
     Ok(ValidatedConfiguration {
-        configuration: Configuration {
-            datasources: validated_sources.datasources,
-            generators: validated_generators.generators,
+        subject: Configuration {
+            datasources: validated_sources.subject,
+            generators: validated_generators.subject,
         },
         warnings,
     })

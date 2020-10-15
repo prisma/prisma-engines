@@ -189,8 +189,8 @@ fn new_lines_in_source_must_work() {
         }
     "#;
 
-    let config = datamodel::parse_configuration(schema).unwrap();
-    let rendered = datamodel::json::mcf::render_sources_to_json(&config.configuration.datasources);
+    let config = parse_configuration(schema);
+    let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
 
     let expected = r#"[
         {
@@ -240,8 +240,8 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
 
     let url = "postgres://localhost";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
-    let data_source = config.configuration.datasources.first().unwrap();
+    let config = parse_configuration_with_url_overrides(schema, overrides);
+    let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
     data_source.assert_url(StringFromEnvVar {
@@ -263,8 +263,8 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
 
     let url = "postgres://hostbar";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
-    let data_source = config.configuration.datasources.first().unwrap();
+    let config = parse_configuration_with_url_overrides(schema, overrides);
+    let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
     data_source.assert_url(StringFromEnvVar {
@@ -285,8 +285,8 @@ fn must_succeed_with_overrides() {
 
     let url = "postgres://hostbar";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
-    let data_source = config.configuration.datasources.first().unwrap();
+    let config = parse_configuration_with_url_overrides(schema, overrides);
+    let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
     data_source.assert_url(StringFromEnvVar {
@@ -320,9 +320,9 @@ fn fail_to_load_sources_for_invalid_source() {
 #[serial]
 fn fail_when_no_source_is_declared() {
     let invalid_datamodel: &str = r#"        "#;
-    let res = datamodel::parse_configuration(invalid_datamodel).unwrap();
+    let res = parse_configuration(invalid_datamodel);
 
-    if let Err(diagnostics) = res.configuration.validate_that_one_datasource_is_provided() {
+    if let Err(diagnostics) = res.validate_that_one_datasource_is_provided() {
         diagnostics.assert_is(DatamodelError::ValidationError {
             message: "You defined no datasource. You must define exactly one datasource.".to_string(),
             span: datamodel::ast::Span::new(0, 0),
@@ -330,6 +330,24 @@ fn fail_when_no_source_is_declared() {
     } else {
         panic!("Expected error.")
     }
+}
+
+#[test]
+fn microsoft_sql_server_preview_feature_must_work() {
+    let schema = r#"
+        datasource redmond {
+            provider = "sqlserver"
+            url = "sqlserver://localhost:1645;foo=bar"
+            previewFeatures = ["microsoftSqlServer"]
+        }
+    "#;
+
+    let config = parse_configuration(schema);
+    let data_source = config.datasources.first().unwrap();
+
+    assert!(data_source
+        .preview_features
+        .contains(&String::from("microsoftSqlServer")));
 }
 
 fn assert_eq_json(a: &str, b: &str) {

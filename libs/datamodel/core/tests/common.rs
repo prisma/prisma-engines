@@ -1,8 +1,7 @@
 extern crate datamodel;
 
 use self::datamodel::{IndexDefinition, StringFromEnvVar};
-use datamodel::{diagnostics::*, dml, dml::ScalarType, ValidatedDatamodel};
-use datamodel_connector::NativeTypeInstance;
+use datamodel::{diagnostics::*, dml, dml::ScalarType, Configuration, Datamodel, NativeTypeInstance};
 use pretty_assertions::assert_eq;
 
 pub trait DatasourceAsserts {
@@ -333,7 +332,52 @@ impl ErrorAsserts for Diagnostics {
 }
 
 #[allow(dead_code)] // Not sure why the compiler thinks this is never used.
-pub fn parse(datamodel_string: &str) -> ValidatedDatamodel {
+pub fn parse(datamodel_string: &str) -> Datamodel {
+    match datamodel::parse_datamodel(datamodel_string) {
+        Ok(s) => s.subject,
+        Err(errs) => {
+            for err in errs.to_error_iter() {
+                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
+                    .unwrap();
+            }
+
+            panic!("Datamodel parsing failed. Please see error above.")
+        }
+    }
+}
+
+pub fn parse_configuration(datamodel_string: &str) -> Configuration {
+    match datamodel::parse_configuration(datamodel_string) {
+        Ok(c) => c.subject,
+        Err(errs) => {
+            for err in errs.to_error_iter() {
+                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
+                    .unwrap()
+            }
+
+            panic!("Configuration parsing failed. Please see error above.")
+        }
+    }
+}
+
+pub fn parse_configuration_with_url_overrides(
+    datamodel_string: &str,
+    datasource_url_overrides: Vec<(String, String)>,
+) -> Configuration {
+    match datamodel::parse_configuration_with_url_overrides(datamodel_string, datasource_url_overrides) {
+        Ok(c) => c.subject,
+        Err(errs) => {
+            for err in errs.to_error_iter() {
+                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
+                    .unwrap()
+            }
+
+            panic!("Configuration parsing failed. Please see error above.")
+        }
+    }
+}
+
+pub fn parse_with_diagnostics(datamodel_string: &str) -> ValidatedDatamodel {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(s) => s,
         Err(errs) => {

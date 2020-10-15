@@ -10,7 +10,7 @@ fn should_apply_updated_at_attribute() {
     }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_scalar_field("lastSeen")

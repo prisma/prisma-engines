@@ -15,8 +15,8 @@ fn should_apply_a_custom_type() {
     }
     "#;
 
-    let validated_datamodel = parse(dml);
-    let user_model = validated_datamodel.datamodel.assert_has_model("Model");
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
         .assert_is_id()
@@ -36,8 +36,8 @@ fn should_recursively_apply_a_custom_type() {
         }
     "#;
 
-    let validated_datamodel = parse(dml);
-    let user_model = validated_datamodel.datamodel.assert_has_model("Model");
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("Model");
     user_model
         .assert_has_scalar_field("id")
         .assert_is_id()
@@ -61,9 +61,9 @@ fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attr
 
     "#;
 
-    let validated_datamodel = parse(dml);
+    let datamodel = parse(dml);
 
-    let user_model = validated_datamodel.datamodel.assert_has_model("User");
+    let user_model = datamodel.assert_has_model("User");
 
     user_model
         .assert_has_scalar_field("name")
@@ -90,9 +90,9 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
         }
     "#;
 
-    let validated_datamodel = parse(dml);
+    let datamodel = parse(dml);
 
-    let user_model = validated_datamodel.datamodel.assert_has_model("User");
+    let user_model = datamodel.assert_has_model("User");
 
     user_model
         .assert_has_scalar_field("test")
@@ -121,8 +121,8 @@ fn should_be_able_to_handle_multiple_types() {
     }
     "#;
 
-    let validated_datamodel = parse(dml);
-    let user_model = validated_datamodel.datamodel.assert_has_model("User");
+    let datamodel = parse(dml);
+    let user_model = datamodel.assert_has_model("User");
     user_model
         .assert_has_scalar_field("id")
         .assert_is_id()
@@ -157,9 +157,9 @@ fn should_be_able_to_define_custom_enum_types() {
     }
     "#;
 
-    let validated_datamodel = parse(dml);
+    let datamodel = parse(dml);
 
-    let user_model = validated_datamodel.datamodel.assert_has_model("User");
+    let user_model = datamodel.assert_has_model("User");
 
     user_model
         .assert_has_scalar_field("role")
@@ -183,9 +183,9 @@ fn should_handle_type_specifications_on_postgres() {
         }
     "#;
 
-    let validated_datamodel = parse(dml);
+    let datamodel = parse(dml);
 
-    let user_model = validated_datamodel.datamodel.assert_has_model("Blog");
+    let user_model = datamodel.assert_has_model("Blog");
 
     let sft = user_model.assert_has_scalar_field("bigInt").assert_native_type();
 
@@ -215,9 +215,9 @@ fn should_handle_type_specifications_on_mysql() {
         }
     "#;
 
-    let validated_datamodel = parse(dml);
+    let datamodel = parse(dml);
 
-    let user_model = validated_datamodel.datamodel.assert_has_model("Blog");
+    let user_model = datamodel.assert_has_model("Blog");
 
     let sft = user_model.assert_has_scalar_field("smallInt").assert_native_type();
 

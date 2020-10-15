@@ -20,7 +20,7 @@ fn map_attribute() {
     }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User").assert_with_db_name("user");
     user_model
         .assert_has_scalar_field("firstName")

@@ -22,7 +22,7 @@ fn succeed_without_attribute_if_unambigous() {
     }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let todo_model = schema.assert_has_model("Todo");
     todo_model
         .assert_has_relation_field("comments")
@@ -76,7 +76,7 @@ fn settings_must_be_deteced() {
     }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
 
     let todo_model = schema.assert_has_model("Todo");
     todo_model

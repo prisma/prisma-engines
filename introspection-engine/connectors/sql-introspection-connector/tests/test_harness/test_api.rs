@@ -69,29 +69,25 @@ impl TestApi {
     }
 
     pub async fn re_introspect(&self, data_model_string: &str) -> String {
-        let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
-        let config = datamodel::parse_configuration(data_model_string).unwrap();
+        let data_model = datamodel::parse_datamodel(data_model_string).unwrap().subject;
+        let config = datamodel::parse_configuration(data_model_string).unwrap().subject;
 
-        let native_types = config
-            .configuration
-            .datasources
-            .first()
-            .has_preview_feature("nativeTypes");
+        let native_types = config.datasources.first().has_preview_feature("nativeTypes");
 
         let introspection_result = self
             .introspection_connector
-            .introspect(&data_model.datamodel, native_types)
+            .introspect(&data_model, native_types)
             .await
             .unwrap();
-        datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config.configuration)
+        datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config)
             .expect("Datamodel rendering failed")
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> String {
-        let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
+        let data_model = datamodel::parse_datamodel(data_model_string).unwrap().subject;
         let introspection_result = self
             .introspection_connector
-            .introspect(&data_model.datamodel, false)
+            .introspect(&data_model, false)
             .await
             .unwrap();
         serde_json::to_string(&introspection_result.warnings).unwrap()

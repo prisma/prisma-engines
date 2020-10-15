@@ -46,7 +46,7 @@ impl<T: 'static> AttributeListValidator<T> {
             }
         }
 
-        errors.ok()?;
+        errors.to_result()?;
 
         for attribute in ast.attributes() {
             match self.known_attributes.get(&attribute.name.name) {
@@ -101,7 +101,7 @@ impl<T: 'static> AttributeListValidator<T> {
             };
         }
 
-        errors.ok()?;
+        errors.to_result()?;
 
         Ok(())
     }
@@ -117,7 +117,7 @@ impl<T: 'static> AttributeListValidator<T> {
             };
         }
 
-        errors.ok()?;
+        errors.to_result()?;
 
         Ok(result)
     }

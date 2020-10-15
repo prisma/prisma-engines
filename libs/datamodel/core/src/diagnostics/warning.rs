@@ -1,5 +1,5 @@
 use crate::ast::Span;
-use crate::diagnostics::pretty_print;
+use crate::diagnostics::helper::pretty_print;
 use thiserror::Error;
 
 // No format for this file, on purpose.

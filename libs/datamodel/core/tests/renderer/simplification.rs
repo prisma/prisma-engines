@@ -15,7 +15,7 @@ model User {
 
     let expected = input;
 
-    let dml = parse(input).datamodel;
+    let dml = parse(input);
     println!("{:?}", dml);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
@@ -51,7 +51,7 @@ model User {
 }
 "#;
 
-    let dml = parse(input).datamodel;
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -71,7 +71,7 @@ fn test_render_relation_name_on_self_relations() {
 }
 "#;
 
-    let dml = datamodel::parse_datamodel(input).unwrap().datamodel;
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);

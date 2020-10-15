@@ -7,17 +7,12 @@ use super::{
 use crate::ast::Span;
 use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
-use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
+use crate::diagnostics::{DatamodelError, Diagnostics, ValidatedDatasource, ValidatedDatasources};
 use crate::transform::ast_to_dml::common::validate_preview_features;
-use crate::{ast, Datasource, ValidatedDatasource};
+use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
-
-pub struct ValidatedDatasources {
-    pub datasources: Vec<Datasource>,
-    pub warnings: Vec<DatamodelWarning>,
-}
 
 /// Is responsible for loading and validating Datasources defined in an AST.
 pub struct DatasourceLoader {
@@ -47,7 +42,7 @@ impl DatasourceLoader {
             match self.lift_datasource(&src, ignore_datasource_urls, &datasource_url_overrides) {
                 Ok(loaded_src) => {
                     diagnostics.append_warning_vec(loaded_src.warnings);
-                    sources.push(loaded_src.datasource)
+                    sources.push(loaded_src.subject)
                 }
                 // Lift error.
                 Err(err) => {
@@ -84,7 +79,7 @@ impl DatasourceLoader {
             Err(diagnostics)
         } else {
             Ok(ValidatedDatasources {
-                datasources: sources,
+                subject: sources,
                 warnings: diagnostics.warnings,
             })
         }
@@ -102,21 +97,19 @@ impl DatasourceLoader {
 
         let provider_arg = args.arg("provider")?;
         if provider_arg.is_from_env() {
-            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
+            return Err(diagnostics.merge_error(DatamodelError::new_functional_evaluation_error(
                 &"A datasource must not use the env() function in the provider argument.".to_string(),
                 ast_source.span,
-            ));
-            return Err(diagnostics);
+            )));
         }
         let providers = provider_arg.as_array().to_str_vec()?;
 
         if providers.is_empty() {
-            diagnostics.push_error(DatamodelError::new_source_validation_error(
+            return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
                 "The provider argument in a datasource must not be empty",
                 source_name,
                 provider_arg.span(),
-            ));
-            return Err(diagnostics);
+            )));
         }
 
         let url_args = args.arg("url")?;
@@ -129,8 +122,7 @@ impl DatasourceLoader {
             (Err(err), _)
                 if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
             {
-                diagnostics.push_error(err);
-                return Err(diagnostics);
+                return Err(diagnostics.merge_error(err));
             }
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
@@ -142,8 +134,7 @@ impl DatasourceLoader {
             }
             (Ok((env_var, url)), _) => (env_var, url.trim().to_owned()),
             (Err(err), _) => {
-                diagnostics.push_error(err);
-                return Err(diagnostics);
+                return Err(diagnostics.merge_error(err));
             }
         };
 
@@ -159,12 +150,11 @@ impl DatasourceLoader {
                 "You must provide a nonempty URL for the datasource `{}`.{}",
                 source_name, &suffix
             );
-            diagnostics.push_error(DatamodelError::new_source_validation_error(
+            return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
                 &msg,
                 source_name,
                 url_args.span(),
-            ));
-            return Err(diagnostics);
+            )));
         }
 
         let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
@@ -180,10 +170,8 @@ impl DatasourceLoader {
                 Vec::from(DATASOURCE_PREVIEW_FEATURES),
                 Vec::from(DEPRECATED_DATASOURCE_PREVIEW_FEATURES),
             );
-            println!("{:?}", result);
             diagnostics.append(&mut result);
             if diagnostics.has_errors() {
-                println!("yes");
                 return Err(diagnostics);
             }
         }
@@ -200,11 +188,12 @@ impl DatasourceLoader {
             .collect();
 
         if all_datasource_providers.is_empty() {
-            diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
-                &providers.join(","),
-                provider_arg.span(),
-            ));
-            return Err(diagnostics);
+            return Err(
+                diagnostics.merge_error(DatamodelError::new_datasource_provider_not_known_error(
+                    &providers.join(","),
+                    provider_arg.span(),
+                )),
+            );
         }
 
         let validated_providers: Vec<_> = all_datasource_providers
@@ -228,7 +217,7 @@ impl DatasourceLoader {
         if !successes.is_empty() {
             let first_successful_provider = successes.into_iter().next().unwrap()?;
             Ok(ValidatedDatasource {
-                datasource: Datasource {
+                subject: Datasource {
                     name: source_name.to_string(),
                     provider: providers,
                     active_provider: first_successful_provider.canonical_name().to_string(),
@@ -241,8 +230,7 @@ impl DatasourceLoader {
                 warnings: diagnostics.warnings,
             })
         } else {
-            diagnostics.push_error(errors.into_iter().next().unwrap().err().unwrap());
-            Err(diagnostics)
+            Err(diagnostics.merge_error(errors.into_iter().next().unwrap().err().unwrap()))
         }
     }
 

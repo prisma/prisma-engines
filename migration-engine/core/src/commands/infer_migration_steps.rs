@@ -37,7 +37,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         let current_datamodel_ast = if let Some(migration) = last_migration.as_ref() {
             migration
                 .parse_schema_ast()
-                .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?
+                .map_err(CoreError::InvalidPersistedDatamodel)?
         } else {
             SchemaAst::empty()
         };
@@ -58,7 +58,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             .infer(&assumed_datamodel_ast, &next_datamodel_ast);
 
         let database_migration = database_migration_inferrer
-            .infer(&assumed_datamodel.datamodel, &next_datamodel, &model_migration_steps)
+            .infer(&assumed_datamodel.subject, &next_datamodel, &model_migration_steps)
             .await?;
 
         let DestructiveChangeDiagnostics {
@@ -78,11 +78,11 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
                     .as_ref()
                     .map(|m| m.parse_schema_ast())
                     .unwrap_or_else(|| Ok(SchemaAst::empty()))
-                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(CoreError::InvalidPersistedDatamodel)?;
                 let last_non_watch_datamodel = last_non_watch_applied_migration
                     .map(|m| m.parse_datamodel())
                     .unwrap_or_else(|| Ok(Datamodel::new()))
-                    .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(CoreError::InvalidPersistedDatamodel)?;
                 let datamodel_steps = engine
                     .datamodel_migration_steps_inferrer()
                     .infer(&last_non_watch_datamodel_ast, &next_datamodel_ast);

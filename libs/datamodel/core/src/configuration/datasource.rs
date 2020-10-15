@@ -1,12 +1,6 @@
 use crate::configuration::preview_features::PreviewFeatures;
-use crate::diagnostics::DatamodelWarning;
 use datamodel_connector::{Connector, ConnectorCapabilities};
 use serde::Serialize;
-
-pub struct ValidatedDatasource {
-    pub datasource: Datasource,
-    pub warnings: Vec<DatamodelWarning>,
-}
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {

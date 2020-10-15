@@ -130,7 +130,7 @@ impl PrismaOpt {
 
         match datamodel {
             Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
-            _ => Ok(datamodel.unwrap().datamodel),
+            _ => Ok(datamodel.unwrap().subject),
         }
     }
 
@@ -150,7 +150,7 @@ impl PrismaOpt {
             datamodel::parse_configuration_with_url_overrides(datamodel_str, datasource_url_overrides)
         };
         config_result
-            .map(|config| config.configuration)
+            .map(|config| config.subject)
             .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }
 

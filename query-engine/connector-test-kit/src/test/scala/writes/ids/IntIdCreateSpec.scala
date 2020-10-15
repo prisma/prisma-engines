@@ -32,7 +32,7 @@ class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
     result.pathAsLong("data.createTodo.id") should equal(10)
   }
 
-  "Creating an item with an id field of type Int without default without providing the id" should "diagnostics" in {
+  "Creating an item with an id field of type Int without default without providing the id" should "error" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Todo {
@@ -127,7 +127,7 @@ class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
     result.pathAsLong("data.createTodo.id") should equal(1)
   }
 
-  "Creating an item with an id field of type Int with autoincrement and providing an id" should "diagnostics" in {
+  "Creating an item with an id field of type Int with autoincrement and providing an id" should "error" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Todo {

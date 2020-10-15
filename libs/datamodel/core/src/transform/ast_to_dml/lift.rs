@@ -1,13 +1,11 @@
 use std::str::FromStr;
 
 use super::super::attributes::AllAttributes;
+use crate::diagnostics::{DatamodelError, Diagnostics};
+use crate::dml::ScalarType;
 use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
-use crate::{
-    ast, configuration,
-    diagnostics::{DatamodelError, Diagnostics},
-    dml, Field, FieldType, ScalarType,
-};
+use crate::{ast, configuration, dml, Field, FieldType};
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 

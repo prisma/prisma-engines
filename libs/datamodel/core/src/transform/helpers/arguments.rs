@@ -35,7 +35,7 @@ impl<'a> Arguments<'a> {
             }
         }
 
-        errors.ok()
+        errors.to_result()
     }
 
     pub fn check_for_multiple_unnamed_arguments(&self, attribute_name: &str) -> Result<(), Diagnostics> {
@@ -67,7 +67,7 @@ impl<'a> Arguments<'a> {
             }
         }
 
-        errors.ok()
+        errors.to_result()
     }
 
     /// Gets the span of all arguments wrapped by this instance.

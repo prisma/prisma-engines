@@ -72,7 +72,7 @@ impl RpcImpl {
         let config = datamodel::parse_configuration(&schema)?;
 
         let url = config
-            .configuration
+            .subject
             .datasources
             .first()
             .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?
@@ -81,7 +81,7 @@ impl RpcImpl {
             .value;
 
         Ok((
-            config.configuration,
+            config.subject,
             url.clone(),
             Box::new(SqlIntrospectionConnector::new(&url).await?),
         ))
@@ -98,23 +98,17 @@ impl RpcImpl {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
         let input_data_model = if !force {
-            datamodel::parse_datamodel(&schema)
-                .map(|d| d.datamodel)
-                .map_err(|err| {
-                    Error::from(CommandError::ReceivedBadDatamodel(
-                        err.to_pretty_string("schema.prisma", &schema),
-                    ))
-                })?
+            datamodel::parse_datamodel(&schema).map(|d| d.subject).map_err(|err| {
+                Error::from(CommandError::ReceivedBadDatamodel(
+                    err.to_pretty_string("schema.prisma", &schema),
+                ))
+            })?
         } else {
             Datamodel::new()
         };
 
         let native_types = match datamodel::parse_configuration(&schema) {
-            Ok(config) => config
-                .configuration
-                .datasources
-                .first()
-                .has_preview_feature("nativeTypes"),
+            Ok(config) => config.subject.datasources.first().has_preview_feature("nativeTypes"),
             Err(_) => false,
         };
 

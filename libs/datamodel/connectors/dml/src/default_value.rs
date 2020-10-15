@@ -1,4 +1,4 @@
-use super::ScalarType;
+use crate::scalars::ScalarType;
 use chrono::Utc;
 use prisma_value::PrismaValue;
 use std::fmt;

@@ -1,5 +1,5 @@
 use super::*;
-use crate::{ast, configuration, diagnostics::Diagnostics, dml, ValidatedDatamodel};
+use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
@@ -27,7 +27,7 @@ impl<'a> ValidationPipeline<'a> {
     /// * Perform string interpolation
     /// * Resolve and check default values
     /// * Resolve and check all field types
-    pub fn validate(&self, ast_schema: &ast::SchemaAst) -> Result<dml::ValidatedDatamodel, Diagnostics> {
+    pub fn validate(&self, ast_schema: &ast::SchemaAst) -> Result<ValidatedDatamodel, Diagnostics> {
         let mut diagnostics = Diagnostics::new();
 
         // Phase 0 is parsing.
@@ -83,7 +83,7 @@ impl<'a> ValidationPipeline<'a> {
             Err(diagnostics)
         } else {
             Ok(ValidatedDatamodel {
-                datamodel: schema,
+                subject: schema,
                 warnings: diagnostics.warnings,
             })
         }

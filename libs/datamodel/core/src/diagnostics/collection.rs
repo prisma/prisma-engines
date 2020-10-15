@@ -33,6 +33,11 @@ impl Diagnostics {
         }
     }
 
+    pub fn merge_error(&mut self, err: DatamodelError) -> Diagnostics {
+        self.push_error(err);
+        self.clone()
+    }
+
     /// Returns true, if there is at least one error
     /// in this collection.
     pub fn has_errors(&self) -> bool {
@@ -59,17 +64,15 @@ impl Diagnostics {
         self.warnings.append(&mut err_and_warn.warnings)
     }
 
-    pub fn append_error_vec(&mut self, errors: Vec<DatamodelError>) {
-        let mut errors = errors;
-        self.errors.append(&mut errors);
+    pub fn append_error_vec(&mut self, mut errors: Vec<DatamodelError>) {
+        self.errors.append(&mut errors)
     }
 
-    pub fn append_warning_vec(&mut self, warnings: Vec<DatamodelWarning>) {
-        let mut warnings = warnings;
+    pub fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
         self.warnings.append(&mut warnings);
     }
 
-    pub fn ok(&self) -> Result<(), Diagnostics> {
+    pub fn to_result(&self) -> Result<(), Diagnostics> {
         if self.has_errors() {
             Err(self.clone())
         } else {

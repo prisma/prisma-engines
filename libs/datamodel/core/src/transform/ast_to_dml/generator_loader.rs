@@ -2,7 +2,7 @@ use super::super::helpers::*;
 use crate::ast::Span;
 use crate::common::preview_features::{DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES};
 use crate::transform::ast_to_dml::common::validate_preview_features;
-use crate::{ast, configuration::Generator, diagnostics::*, ValidatedGenerator};
+use crate::{ast, configuration::Generator, diagnostics::*};
 use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";
@@ -21,11 +21,6 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[
 /// Is responsible for loading and validating Generators defined in an AST.
 pub struct GeneratorLoader {}
 
-pub struct ValidatedGenerators {
-    pub generators: Vec<Generator>,
-    pub warnings: Vec<DatamodelWarning>,
-}
-
 impl GeneratorLoader {
     pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<ValidatedGenerators, Diagnostics> {
         let mut generators: Vec<Generator> = vec![];
@@ -35,7 +30,7 @@ impl GeneratorLoader {
             match Self::lift_generator(&gen) {
                 Ok(loaded_gen) => {
                     diagnostics.append_warning_vec(loaded_gen.warnings);
-                    generators.push(loaded_gen.generator)
+                    generators.push(loaded_gen.subject)
                 }
                 // Lift error.
                 Err(err) => {
@@ -62,7 +57,7 @@ impl GeneratorLoader {
             Err(diagnostics)
         } else {
             Ok(ValidatedGenerators {
-                generators,
+                subject: generators,
                 warnings: diagnostics.warnings,
             })
         }
@@ -102,12 +97,9 @@ impl GeneratorLoader {
                 Vec::from(GENERATOR_PREVIEW_FEATURES),
                 Vec::from(DEPRECATED_GENERATOR_PREVIEW_FEATURES),
             );
+            diagnostics.append(&mut result);
             if result.has_errors() {
-                diagnostics.append(&mut result);
                 return Err(diagnostics);
-            }
-            if result.has_warnings() {
-                diagnostics.append_warning_vec(result.warnings)
             }
         }
 
@@ -121,7 +113,7 @@ impl GeneratorLoader {
         }
 
         Ok(ValidatedGenerator {
-            generator: Generator {
+            subject: Generator {
                 name: ast_generator.name.name.clone(),
                 provider,
                 output,

@@ -29,6 +29,7 @@ pub use migration_persistence::*;
 pub use migrations_directory::{create_migration_directory, list_migrations, ListMigrationsError, MigrationDirectory};
 pub use steps::MigrationStep;
 
+use sha2::{Digest, Sha256};
 use std::fmt::Debug;
 
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
@@ -111,6 +112,14 @@ pub trait DatabaseMigrationMarker: Debug + Send + Sync {
 /// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
 /// variant is a [ConnectorError](/error/enum.ConnectorError.html).
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
+
+/// Compute the checksum for a migration script, and return it formatted to be human-readable.
+fn checksum(script: &str) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(script.as_bytes());
+    let checksum: [u8; 32] = hasher.finalize().into();
+    checksum.format_checksum()
+}
 
 /// Format a checksum to a hexadecimal string. This is used to checksum
 /// migration scripts with Sha256.

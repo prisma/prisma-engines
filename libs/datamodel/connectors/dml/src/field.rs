@@ -1,5 +1,8 @@
 use super::*;
-use datamodel_connector::NativeTypeInstance;
+use crate::default_value::{DefaultValue, ValueGenerator};
+use crate::native_type_instance::NativeTypeInstance;
+use crate::scalars::ScalarType;
+use crate::traits::{WithDatabaseName, WithName};
 use std::hash::Hash;
 
 /// Arity of a Field in a Model.

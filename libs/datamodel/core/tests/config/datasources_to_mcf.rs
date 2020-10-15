@@ -1,3 +1,4 @@
+use crate::common::parse_configuration;
 use pretty_assertions::assert_eq;
 
 #[test]
@@ -80,8 +81,8 @@ fn serialize_builtin_sources_to_dmmf() {
 }
 
 fn assert_rendered_mcf(schema: &str, expected_dmmf: &str) {
-    let config = datamodel::parse_configuration(schema).unwrap();
-    let rendered = datamodel::json::mcf::render_sources_to_json(&config.configuration.datasources);
+    let config = parse_configuration(schema);
+    let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
 
     print!("{}", &rendered);
 

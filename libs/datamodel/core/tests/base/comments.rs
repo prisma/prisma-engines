@@ -13,7 +13,7 @@ fn comments_must_work_in_models() {
     }
     "#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User").assert_with_documentation("comment 1");
     user_model
         .assert_has_scalar_field("firstName")
@@ -89,7 +89,7 @@ fn comments_must_work_in_enums() {
     }"#;
 
     // must not crash
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     schema
         .assert_has_enum("Role")
         .assert_with_documentation("Documentation Comment Enum")
@@ -105,7 +105,7 @@ fn accept_a_comment_at_the_end() {
     }
     // This is a comment"#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
@@ -121,7 +121,7 @@ fn accept_a_doc_comment_at_the_end() {
     }
     /// This is a doc comment"#;
 
-    let schema = parse(dml).datamodel;
+    let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
