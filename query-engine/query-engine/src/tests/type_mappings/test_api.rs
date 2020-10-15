@@ -40,7 +40,7 @@ impl TestApi {
 
         let dml = datamodel::parse_datamodel(&introspection_result.datamodel)
             .unwrap()
-            .datamodel;
+            .subject;
         let config = datamodel::parse_configuration(&introspection_result.datamodel).unwrap();
 
         let context = PrismaContext::builder(config.subject, dml.clone())
