@@ -98,7 +98,7 @@ impl GeneratorLoader {
                 Vec::from(DEPRECATED_GENERATOR_PREVIEW_FEATURES),
             );
             diagnostics.append(&mut result);
-            if result.has_errors() {
+            if diagnostics.has_errors() {
                 return Err(diagnostics);
             }
         }
