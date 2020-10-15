@@ -1,8 +1,8 @@
 use super::super::attributes::AllAttributes;
 use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
+use crate::dml::FieldType::NativeType;
 use crate::error::ErrorCollection;
-use crate::FieldType::NativeType;
 use crate::{ast, dml, Datasource};
 
 pub struct LowerDmlToAst<'a> {

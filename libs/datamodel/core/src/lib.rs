@@ -85,8 +85,8 @@ pub mod json;
 pub mod transform;
 pub mod walkers;
 
+pub use crate::dml::*;
 pub use configuration::*;
-pub use dml::*;
 
 use crate::ast::SchemaAst;
 use std::io::Write;
