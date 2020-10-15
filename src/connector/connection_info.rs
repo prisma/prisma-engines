@@ -292,7 +292,7 @@ impl fmt::Display for SqlFamily {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(feature = "sqlite")]
+    #[cfg(any(feature = "sqlite", feature = "mysql"))]
     use super::*;
 
     #[test]
@@ -302,6 +302,22 @@ mod tests {
 
         match conn_info {
             ConnectionInfo::Sqlite { file_path, db_name: _ } => assert_eq!(file_path, "dev.db"),
+            _ => panic!("wrong"),
+        }
+    }
+
+    #[test]
+    #[cfg(feature = "mysql")]
+    fn mysql_connection_info_from_str() {
+        let conn_info = ConnectionInfo::from_url("mysql://myuser:my%23pass%23word@lclhst:5432/mydb").unwrap();
+
+        match conn_info {
+            ConnectionInfo::Mysql(url) => {
+                assert_eq!(url.password().unwrap(), "my#pass#word");
+                assert_eq!(url.host(), "lclhst");
+                assert_eq!(url.username(), "myuser");
+                assert_eq!(url.dbname(), "mydb");
+            }
             _ => panic!("wrong"),
         }
     }
