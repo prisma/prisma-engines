@@ -173,7 +173,7 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
 
     let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string)
         .unwrap()
-        .datamodel;
+        .subject;
     let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
     let capabilities = match config.subject.datasources.first() {
         Some(ds) => ds.capabilities(),
