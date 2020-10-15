@@ -3229,7 +3229,6 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "sha2 0.9.1",
  "sql-schema-describer",
  "tempfile",
  "tokio",

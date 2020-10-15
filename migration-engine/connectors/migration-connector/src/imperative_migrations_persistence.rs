@@ -1,4 +1,4 @@
-use crate::{ConnectorError, ConnectorResult};
+use crate::{checksum, ConnectorError, ConnectorResult};
 use serde::Deserialize;
 
 /// A timestamp.
@@ -15,8 +15,27 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// migration persistence. If not, return a DatabaseSchemaNotEmpty error.
     async fn initialize(&self) -> ConnectorResult<()>;
 
-    /// Record that a migration is about to be applied. Returns the unique identifier for the migration.
-    async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String>;
+    /// Record that a migration is about to be applied. Returns the unique
+    /// identifier for the migration.
+    ///
+    /// This is a default method that computes the checkum. Implementors should
+    /// implement record_migration_started_impl.
+    async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
+        self.record_migration_started_impl(migration_name, script, &checksum(script))
+            .await
+    }
+
+    /// Record that a migration is about to be applied. Returns the unique
+    /// identifier for the migration.
+    ///
+    /// This is an implementation detail, consumers should use
+    /// `record_migration_started()` instead.
+    async fn record_migration_started_impl(
+        &self,
+        migration_name: &str,
+        script: &str,
+        checksum: &str,
+    ) -> ConnectorResult<String>;
 
     /// Increase the applied_steps_count counter, and append the given logs.
     async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
