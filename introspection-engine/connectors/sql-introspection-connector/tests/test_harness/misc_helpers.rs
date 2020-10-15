@@ -3,7 +3,7 @@ use pretty_assertions::assert_eq;
 use quaint::{connector::Queryable, single::Quaint};
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
-    let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
+    let parsed_expected = datamodel::parse_datamodel(&right).unwrap().subject;
     let reformatted_expected =
         datamodel::render_datamodel_to_string(&parsed_expected).expect("Datamodel rendering failed");
 
@@ -11,8 +11,8 @@ pub(crate) fn custom_assert(left: &str, right: &str) {
 }
 
 pub(crate) fn custom_assert_with_config(left: &str, right: &str) {
-    let parsed_expected_datamodel = datamodel::parse_datamodel(&right).unwrap();
-    let parsed_expected_config = datamodel::parse_configuration(&right).unwrap();
+    let parsed_expected_datamodel = datamodel::parse_datamodel(&right).unwrap().subject;
+    let parsed_expected_config = datamodel::parse_configuration(&right).unwrap().subject;
     let reformatted_expected =
         datamodel::render_datamodel_and_config_to_string(&parsed_expected_datamodel, &parsed_expected_config)
             .expect("Datamodel rendering failed");

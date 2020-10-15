@@ -44,7 +44,7 @@ pub struct TestApi {
 impl TestApi {
     pub async fn create_engine(&self, datamodel: &str) -> anyhow::Result<QueryEngine> {
         let datamodel_string = format!("{}\n\n{}", self.config, datamodel);
-        let dml = datamodel::parse_datamodel(&datamodel_string).unwrap();
+        let dml = datamodel::parse_datamodel(&datamodel_string).unwrap().subject;
         let config = datamodel::parse_configuration(&datamodel_string).unwrap();
 
         self.migration_api
@@ -55,7 +55,7 @@ impl TestApi {
             })
             .await?;
 
-        let context = PrismaContext::builder(config, dml)
+        let context = PrismaContext::builder(config.subject, dml)
             .enable_raw_queries(true)
             .build()
             .await

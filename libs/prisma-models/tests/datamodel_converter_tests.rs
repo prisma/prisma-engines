@@ -491,7 +491,7 @@ fn implicit_many_to_many_relation() {
 }
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
-    let datamodel = datamodel::parse_datamodel(datamodel).unwrap();
+    let datamodel = datamodel::parse_datamodel(datamodel).unwrap().subject;
     let template = DatamodelConverter::convert(&datamodel);
     template.build("not_important".to_string())
 }

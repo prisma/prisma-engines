@@ -165,6 +165,7 @@ impl Migration {
 
     pub fn parse_datamodel(&self) -> Result<Datamodel, String> {
         datamodel::parse_datamodel_and_ignore_datasource_urls(&self.datamodel_string)
+            .map(|d| d.subject)
             .map_err(|err| err.to_pretty_string("schema.prisma", &self.datamodel_string))
     }
 

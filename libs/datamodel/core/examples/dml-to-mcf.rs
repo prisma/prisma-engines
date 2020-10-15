@@ -22,7 +22,7 @@ fn main() {
 
     match &res {
         Err(errors) => {
-            for error in errors.to_iter() {
+            for error in errors.to_error_iter() {
                 println!();
                 error
                     .pretty_print(&mut std::io::stderr().lock(), file_name, &file)
@@ -30,7 +30,8 @@ fn main() {
             }
         }
         Ok(config) => {
-            let json = serde_json::to_string_pretty(&datamodel::json::mcf::config_to_mcf_json_value(&config)).unwrap();
+            let json =
+                serde_json::to_string_pretty(&datamodel::json::mcf::config_to_mcf_json_value(&config.subject)).unwrap();
             println!("{}", json);
         }
     }

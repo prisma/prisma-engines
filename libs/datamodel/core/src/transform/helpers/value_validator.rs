@@ -1,5 +1,5 @@
 use super::env_function::EnvFunction;
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
 use chrono::{DateTime, Utc};

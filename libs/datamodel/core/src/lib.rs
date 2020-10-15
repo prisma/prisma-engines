@@ -79,8 +79,8 @@ extern crate tracing;
 pub mod ast;
 pub mod common;
 pub mod configuration;
+pub mod diagnostics;
 pub mod dml;
-pub mod error;
 pub mod json;
 pub mod transform;
 pub mod walkers;
@@ -89,6 +89,7 @@ pub use crate::dml::*;
 pub use configuration::*;
 
 use crate::ast::SchemaAst;
+use crate::diagnostics::{ValidatedConfiguration, ValidatedDatamodel, ValidatedDatasources};
 use std::io::Write;
 use transform::{
     ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
@@ -96,23 +97,25 @@ use transform::{
 };
 
 /// Parses and validates a datamodel string, using core attributes only.
-pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
+pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
     parse_datamodel_internal(datamodel_string, false)
 }
 
-pub fn parse_datamodel_and_ignore_datasource_urls(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
+pub fn parse_datamodel_and_ignore_datasource_urls(
+    datamodel_string: &str,
+) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
     parse_datamodel_internal(datamodel_string, true)
 }
 
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
-pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<Datamodel, String> {
+pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {
     match parse_datamodel_internal(datamodel_string, false) {
         Ok(dml) => Ok(dml),
         Err(errs) => {
             let mut buffer = std::io::Cursor::new(Vec::<u8>::new());
 
-            for error in errs.to_iter() {
+            for error in errs.to_error_iter() {
                 writeln!(&mut buffer).expect("Failed to render error.");
                 error
                     .pretty_print(&mut buffer, file_name, datamodel_string)
@@ -127,44 +130,68 @@ pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) 
 fn parse_datamodel_internal(
     datamodel_string: &str,
     ignore_datasource_urls: bool,
-) -> Result<Datamodel, error::ErrorCollection> {
+) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
+    let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parser::parse_schema(datamodel_string)?;
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
-    let validator = ValidationPipeline::new(&sources);
+    let validator = ValidationPipeline::new(&sources.subject);
 
-    validator.validate(&ast)
-}
-
-/// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
-/// [Datamodel](/struct.Datamodel.html).
-pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
-    let mut errors = error::ErrorCollection::new();
-    // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
-    let sources = load_sources(ast, true, vec![])?;
-    let validator = ValidationPipeline::new(&sources);
+    diagnostics.append_warning_vec(sources.warnings);
 
     match validator.validate(&ast) {
-        Ok(src) => Ok(src),
+        Ok(mut src) => {
+            src.warnings.append(&mut diagnostics.warnings);
+            Ok(src)
+        }
         Err(mut err) => {
-            errors.append(&mut err);
-            Err(errors)
+            diagnostics.append(&mut err);
+            Err(diagnostics)
         }
     }
 }
 
-pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, error::ErrorCollection> {
+/// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
+/// [Datamodel](/struct.Datamodel.html).
+pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
+    let mut diagnostics = diagnostics::Diagnostics::new();
+    // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
+    let sources = load_sources(ast, true, vec![])?;
+    let validator = ValidationPipeline::new(&sources.subject);
+
+    diagnostics.append_warning_vec(sources.warnings);
+
+    match validator.validate(&ast) {
+        Ok(mut src) => {
+            src.warnings.append(&mut diagnostics.warnings);
+            Ok(src)
+        }
+        Err(mut err) => {
+            diagnostics.append(&mut err);
+            Err(diagnostics)
+        }
+    }
+}
+
+pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics::Diagnostics> {
     ast::parser::parse_schema(datamodel_string)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
-pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, error::ErrorCollection> {
+pub fn parse_configuration(datamodel_string: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
+    let mut warnings = Vec::new();
     let ast = ast::parser::parse_schema(datamodel_string)?;
-    let datasources = load_sources(&ast, false, vec![])?;
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let mut validated_sources = load_sources(&ast, false, vec![])?;
+    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
-    Ok(Configuration {
-        datasources,
-        generators,
+    warnings.append(&mut validated_generators.warnings);
+    warnings.append(&mut validated_sources.warnings);
+
+    Ok(ValidatedConfiguration {
+        subject: Configuration {
+            datasources: validated_sources.subject,
+            generators: validated_generators.subject,
+        },
+        warnings,
     })
 }
 
@@ -172,27 +199,41 @@ pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, erro
 pub fn parse_configuration_with_url_overrides(
     schema: &str,
     datasource_url_overrides: Vec<(String, String)>,
-) -> Result<Configuration, error::ErrorCollection> {
+) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
+    let mut warnings = Vec::new();
     let ast = ast::parser::parse_schema(schema)?;
-    let datasources = load_sources(&ast, false, datasource_url_overrides)?;
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let mut validated_sources = load_sources(&ast, false, datasource_url_overrides)?;
+    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
-    Ok(Configuration {
-        datasources,
-        generators,
+    warnings.append(&mut validated_generators.warnings);
+    warnings.append(&mut validated_sources.warnings);
+
+    Ok(ValidatedConfiguration {
+        subject: Configuration {
+            datasources: validated_sources.subject,
+            generators: validated_generators.subject,
+        },
+        warnings,
     })
 }
 
 pub fn parse_configuration_and_ignore_datasource_urls(
     datamodel_string: &str,
-) -> Result<Configuration, error::ErrorCollection> {
+) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
+    let mut warnings = Vec::new();
     let ast = ast::parser::parse_schema(datamodel_string)?;
-    let datasources = load_sources(&ast, true, vec![])?;
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let mut validated_sources = load_sources(&ast, true, vec![])?;
+    let mut validated_generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
-    Ok(Configuration {
-        datasources,
-        generators,
+    warnings.append(&mut validated_generators.warnings);
+    warnings.append(&mut validated_sources.warnings);
+
+    Ok(ValidatedConfiguration {
+        subject: Configuration {
+            datasources: validated_sources.subject,
+            generators: validated_generators.subject,
+        },
+        warnings,
     })
 }
 
@@ -200,7 +241,7 @@ fn load_sources(
     schema_ast: &SchemaAst,
     ignore_datasource_urls: bool,
     datasource_url_overrides: Vec<(String, String)>,
-) -> Result<Vec<Datasource>, error::ErrorCollection> {
+) -> Result<ValidatedDatasources, diagnostics::Diagnostics> {
     let source_loader = DatasourceLoader::new();
     source_loader.load_datasources_from_ast(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
 }
@@ -210,14 +251,14 @@ fn load_sources(
 //
 
 /// Renders to a return string.
-pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> Result<String, error::ErrorCollection> {
+pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> Result<String, diagnostics::Diagnostics> {
     let mut writable_string = common::WritableString::new();
     render_datamodel_to(&mut writable_string, datamodel)?;
     Ok(writable_string.into())
 }
 
 /// Renders an AST to a string.
-pub fn render_schema_ast_to_string(schema: &SchemaAst) -> Result<String, error::ErrorCollection> {
+pub fn render_schema_ast_to_string(schema: &SchemaAst) -> Result<String, diagnostics::Diagnostics> {
     let mut writable_string = common::WritableString::new();
     render_schema_ast_to(&mut writable_string, &schema, 2);
     Ok(writable_string.into())
@@ -227,7 +268,7 @@ pub fn render_schema_ast_to_string(schema: &SchemaAst) -> Result<String, error::
 pub fn render_datamodel_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
-) -> Result<(), error::ErrorCollection> {
+) -> Result<(), diagnostics::Diagnostics> {
     let lowered = LowerDmlToAst::new(None).lower(datamodel)?;
     render_schema_ast_to(stream, &lowered, 2);
     Ok(())
@@ -237,7 +278,7 @@ pub fn render_datamodel_to(
 pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
-) -> Result<String, error::ErrorCollection> {
+) -> Result<String, diagnostics::Diagnostics> {
     let mut writable_string = common::WritableString::new();
     render_datamodel_and_config_to(&mut writable_string, datamodel, config)?;
     Ok(writable_string.into())
@@ -248,7 +289,7 @@ fn render_datamodel_and_config_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
-) -> Result<(), error::ErrorCollection> {
+) -> Result<(), diagnostics::Diagnostics> {
     let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel)?;
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);

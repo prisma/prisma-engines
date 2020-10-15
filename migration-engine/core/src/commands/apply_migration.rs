@@ -124,7 +124,7 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         let database_migration = connector
             .database_migration_inferrer()
-            .infer(&current_datamodel, &next_datamodel, &self.input.steps)
+            .infer(&current_datamodel, &next_datamodel.subject, &self.input.steps)
             .await?;
 
         let database_steps_json_pretty = connector
@@ -179,7 +179,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         } = diagnostics;
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
+            datamodel: datamodel::render_datamodel_to_string(&next_datamodel.subject).unwrap(),
             datamodel_steps: self.input.steps.clone(),
             database_steps: database_steps_json_pretty,
             errors,

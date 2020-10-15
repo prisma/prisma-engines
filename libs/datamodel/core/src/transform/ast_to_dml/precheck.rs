@@ -2,15 +2,15 @@ use std::str::FromStr;
 
 use crate::{
     ast::{self, WithIdentifier, WithName},
+    diagnostics::{DatamodelError, Diagnostics},
     dml,
-    error::{DatamodelError, ErrorCollection},
 };
 
 pub struct Precheck {}
 
 impl Precheck {
-    pub fn precheck(datamodel: &ast::SchemaAst) -> Result<(), ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    pub fn precheck(datamodel: &ast::SchemaAst) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         let mut top_level_types_checker = DuplicateChecker::new();
         let mut sources_checker = DuplicateChecker::new();
@@ -57,19 +57,19 @@ impl Precheck {
         errors.append(&mut sources_checker.errors());
         errors.append(&mut generators_checker.errors());
 
-        errors.ok()
+        errors.to_result()
     }
 
-    fn assert_is_not_a_reserved_scalar_type(identifier: &ast::Identifier, errors: &mut ErrorCollection) {
+    fn assert_is_not_a_reserved_scalar_type(identifier: &ast::Identifier, errors: &mut Diagnostics) {
         if dml::ScalarType::from_str(&identifier.name).is_ok() {
-            errors.push(DatamodelError::new_reserved_scalar_type_error(
+            errors.push_error(DatamodelError::new_reserved_scalar_type_error(
                 &identifier.name,
                 identifier.span,
             ));
         }
     }
 
-    fn precheck_enum(enum_type: &ast::Enum, errors: &mut ErrorCollection) {
+    fn precheck_enum(enum_type: &ast::Enum, errors: &mut Diagnostics) {
         let mut checker = DuplicateChecker::new();
         for value in &enum_type.values {
             checker.check_if_duplicate_exists(value, |_| {
@@ -79,7 +79,7 @@ impl Precheck {
         errors.append(&mut checker.errors());
     }
 
-    fn precheck_model(model: &ast::Model, errors: &mut ErrorCollection) {
+    fn precheck_model(model: &ast::Model, errors: &mut Diagnostics) {
         let mut checker = DuplicateChecker::new();
         for field in &model.fields {
             checker.check_if_duplicate_exists(field, |_| {
@@ -89,7 +89,7 @@ impl Precheck {
         errors.append(&mut checker.errors());
     }
 
-    fn precheck_generator_config(config: &ast::GeneratorConfig, errors: &mut ErrorCollection) {
+    fn precheck_generator_config(config: &ast::GeneratorConfig, errors: &mut Diagnostics) {
         let mut checker = DuplicateChecker::new();
         for arg in &config.properties {
             checker.check_if_duplicate_exists(arg, |_| {
@@ -103,7 +103,7 @@ impl Precheck {
         errors.append(&mut checker.errors());
     }
 
-    fn precheck_source_config(config: &ast::SourceConfig, errors: &mut ErrorCollection) {
+    fn precheck_source_config(config: &ast::SourceConfig, errors: &mut Diagnostics) {
         let mut checker = DuplicateChecker::new();
         for arg in &config.properties {
             checker.check_if_duplicate_exists(arg, |_| {
@@ -120,14 +120,14 @@ impl Precheck {
 
 struct DuplicateChecker<'a, T: WithName> {
     seen: Vec<&'a T>,
-    errors: ErrorCollection,
+    errors: Diagnostics,
 }
 
 impl<'a, T: WithName> DuplicateChecker<'a, T> {
     fn new() -> DuplicateChecker<'a, T> {
         DuplicateChecker {
             seen: Vec::new(),
-            errors: ErrorCollection::new(),
+            errors: Diagnostics::new(),
         }
     }
 
@@ -139,12 +139,12 @@ impl<'a, T: WithName> DuplicateChecker<'a, T> {
         F: Fn(&T) -> DatamodelError,
     {
         match self.seen.iter().find(|x| x.name() == named.name()) {
-            Some(existing) => self.errors.push(error_fn(existing)),
+            Some(existing) => self.errors.push_error(error_fn(existing)),
             None => self.seen.push(named),
         }
     }
 
-    fn errors(self) -> ErrorCollection {
+    fn errors(self) -> Diagnostics {
         self.errors
     }
 }

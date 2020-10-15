@@ -1,7 +1,7 @@
 use super::super::helpers::*;
 use crate::ast;
+use crate::diagnostics::DatamodelError;
 use crate::dml;
-use crate::error::DatamodelError;
 
 /// Structs implementing this trait can be used to validate any
 /// attribute and to apply the attribute's effect on the corresponding

@@ -69,8 +69,8 @@ impl TestApi {
     }
 
     pub async fn re_introspect(&self, data_model_string: &str) -> String {
-        let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
-        let config = datamodel::parse_configuration(data_model_string).unwrap();
+        let data_model = datamodel::parse_datamodel(data_model_string).unwrap().subject;
+        let config = datamodel::parse_configuration(data_model_string).unwrap().subject;
 
         let native_types = config.datasources.first().has_preview_feature("nativeTypes");
 
@@ -84,7 +84,7 @@ impl TestApi {
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> String {
-        let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
+        let data_model = datamodel::parse_datamodel(data_model_string).unwrap().subject;
         let introspection_result = self
             .introspection_connector
             .introspect(&data_model, false)

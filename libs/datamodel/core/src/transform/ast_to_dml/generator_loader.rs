@@ -1,8 +1,8 @@
 use super::super::helpers::*;
 use crate::ast::Span;
-use crate::common::preview_features::GENERATOR_PREVIEW_FEATURES;
+use crate::common::preview_features::{DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES};
 use crate::transform::ast_to_dml::common::validate_preview_features;
-use crate::{ast, configuration::Generator, error::*};
+use crate::{ast, configuration::Generator, diagnostics::*};
 use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";
@@ -22,30 +22,50 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[
 pub struct GeneratorLoader {}
 
 impl GeneratorLoader {
-    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<Vec<Generator>, ErrorCollection> {
+    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<ValidatedGenerators, Diagnostics> {
         let mut generators: Vec<Generator> = vec![];
-        let mut errors = ErrorCollection::new();
+        let mut diagnostics = Diagnostics::new();
 
         for gen in &ast_schema.generators() {
             match Self::lift_generator(&gen) {
-                Ok(loaded_gen) => generators.push(loaded_gen),
+                Ok(loaded_gen) => {
+                    diagnostics.append_warning_vec(loaded_gen.warnings);
+                    generators.push(loaded_gen.subject)
+                }
                 // Lift error.
-                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
-                    DatamodelError::new_generator_argument_not_found_error(&argument_name, &gen.name.name, span),
-                ),
-                Err(err) => errors.push(err),
+                Err(err) => {
+                    for e in err.errors {
+                        match e {
+                            DatamodelError::ArgumentNotFound { argument_name, span } => {
+                                diagnostics.push_error(DatamodelError::new_generator_argument_not_found_error(
+                                    argument_name.as_str(),
+                                    gen.name.name.as_str(),
+                                    span,
+                                ));
+                            }
+                            _ => {
+                                diagnostics.push_error(e);
+                            }
+                        }
+                    }
+                    diagnostics.append_warning_vec(err.warnings)
+                }
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
+        if diagnostics.has_errors() {
+            Err(diagnostics)
         } else {
-            Ok(generators)
+            Ok(ValidatedGenerators {
+                subject: generators,
+                warnings: diagnostics.warnings,
+            })
         }
     }
 
-    fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<Generator, DatamodelError> {
+    fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<ValidatedGenerator, Diagnostics> {
         let mut args = Arguments::new(&ast_generator.properties, ast_generator.span);
+        let mut diagnostics = Diagnostics::new();
 
         let provider = args.arg(PROVIDER_KEY)?.as_str()?;
         let output = if let Ok(arg) = args.arg(OUTPUT_KEY) {
@@ -71,10 +91,15 @@ impl GeneratorLoader {
         };
 
         if !preview_features.is_empty() {
-            if let Err(err) =
-                validate_preview_features(preview_features.clone(), span, Vec::from(GENERATOR_PREVIEW_FEATURES))
-            {
-                return Err(err);
+            let mut result = validate_preview_features(
+                preview_features.clone(),
+                span,
+                Vec::from(GENERATOR_PREVIEW_FEATURES),
+                Vec::from(DEPRECATED_GENERATOR_PREVIEW_FEATURES),
+            );
+            diagnostics.append(&mut result);
+            if diagnostics.has_errors() {
+                return Err(diagnostics);
             }
         }
 
@@ -87,14 +112,17 @@ impl GeneratorLoader {
             properties.insert(prop.name.name.clone(), prop.value.to_string());
         }
 
-        Ok(Generator {
-            name: ast_generator.name.name.clone(),
-            provider,
-            output,
-            binary_targets,
-            preview_features,
-            config: properties,
-            documentation: ast_generator.documentation.clone().map(|comment| comment.text),
+        Ok(ValidatedGenerator {
+            subject: Generator {
+                name: ast_generator.name.name.clone(),
+                provider,
+                output,
+                binary_targets,
+                preview_features,
+                config: properties,
+                documentation: ast_generator.documentation.clone().map(|comment| comment.text),
+            },
+            warnings: diagnostics.warnings,
         })
     }
 }

@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, error::DatamodelError, StringFromEnvVar};
+use datamodel::{ast::Span, diagnostics::DatamodelError, StringFromEnvVar};
 use pretty_assertions::assert_eq;
 use serial_test::serial;
 
@@ -18,13 +18,13 @@ datasource db2 {
 }
 "#;
 
-    let errors = parse_error(&schema);
-    errors.assert_length(2);
-    errors.assert_is_at(
+    let diagnostics = parse_error(&schema);
+    diagnostics.assert_length(2);
+    diagnostics.assert_is_at(
         0,
         DatamodelError::new_source_validation_error("You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.", "db1", Span::new(1, 82)),
     );
-    errors.assert_is_at(
+    diagnostics.assert_is_at(
         1,
         DatamodelError::new_source_validation_error("You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.", "db2", Span::new(84, 155)),
     );
@@ -43,8 +43,8 @@ fn must_forbid_env_functions_in_provider_field() {
     std::env::set_var("DB_URL", "https://localhost");
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
-    let errors = config.err().expect("This must error");
-    errors.assert_is(DatamodelError::new_functional_evaluation_error(
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_functional_evaluation_error(
         "A datasource must not use the env() function in the provider argument.",
         Span::new(9, 108),
     ));
@@ -62,8 +62,8 @@ fn must_forbid_env_functions_in_provider_field_even_if_missing() {
     std::env::set_var("DB_URL", "https://localhost");
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
-    let errors = config.err().expect("This must error");
-    errors.assert_is(DatamodelError::new_functional_evaluation_error(
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_functional_evaluation_error(
         "A datasource must not use the env() function in the provider argument.",
         Span::new(9, 108),
     ));
@@ -79,8 +79,8 @@ fn must_error_for_empty_urls() {
     "#;
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
-    let errors = config.err().expect("This must error");
-    errors.assert_is(DatamodelError::new_source_validation_error(
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "You must provide a nonempty URL for the datasource `myds`.",
         "myds",
         Span::new(77, 79),
@@ -98,8 +98,8 @@ fn must_error_for_empty_provider_arrays() {
 
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
-    let errors = config.err().expect("This must error");
-    errors.assert_is(DatamodelError::new_validation_error(
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_validation_error(
         "This line is not a valid definition within a datasource.",
         Span::new(39, 53),
     ));
@@ -117,8 +117,8 @@ fn must_error_for_empty_urls_derived_from_env_vars() {
     "#;
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
-    let errors = config.err().expect("This must error");
-    errors.assert_is(DatamodelError::new_source_validation_error(
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "You must provide a nonempty URL for the datasource `myds`. The environment variable `DB_URL` resolved to an empty string.",
         "myds",
         Span::new(77, 90),
@@ -135,8 +135,8 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
     "#;
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
-    let errors = config.err().expect("This must error");
-    errors.assert_is(DatamodelError::new_source_validation_error(
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "The URL for datasource `myds` must start with the protocol `mysql://`.",
         "myds",
         Span::new(76, 91),
@@ -153,8 +153,8 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
     "#;
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
-    let errors = config.err().expect("This must error");
-    errors.assert_is(DatamodelError::new_source_validation_error(
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "The URL for datasource `myds` must start with the protocol `postgresql://`.",
         "myds",
         Span::new(81, 91),
@@ -171,8 +171,8 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
     "#;
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
-    let errors = config.err().expect("This must error");
-    errors.assert_is(DatamodelError::new_source_validation_error(
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "The URL for datasource `myds` must start with the protocol `file:`.",
         "myds",
         Span::new(77, 87),
@@ -189,7 +189,7 @@ fn new_lines_in_source_must_work() {
         }
     "#;
 
-    let config = datamodel::parse_configuration(schema).unwrap();
+    let config = parse_configuration(schema);
     let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
 
     let expected = r#"[
@@ -221,8 +221,8 @@ fn must_error_if_env_var_is_missing() {
 
     let result = datamodel::parse_configuration(schema);
     assert!(result.is_err());
-    let errors = result.err().unwrap();
-    errors.assert_is(DatamodelError::new_environment_functional_evaluation_error(
+    let diagnostics = result.err().unwrap();
+    diagnostics.assert_is(DatamodelError::new_environment_functional_evaluation_error(
         "DATABASE_URL",
         Span::new(75, 94),
     ));
@@ -240,7 +240,7 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
 
     let url = "postgres://localhost";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
+    let config = parse_configuration_with_url_overrides(schema, overrides);
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
@@ -263,7 +263,7 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
 
     let url = "postgres://hostbar";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
+    let config = parse_configuration_with_url_overrides(schema, overrides);
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
@@ -285,7 +285,7 @@ fn must_succeed_with_overrides() {
 
     let url = "postgres://hostbar";
     let overrides = vec![("ds".to_string(), url.to_string())];
-    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
+    let config = parse_configuration_with_url_overrides(schema, overrides);
     let data_source = config.datasources.first().unwrap();
 
     data_source.assert_name("ds");
@@ -306,8 +306,8 @@ fn fail_to_load_sources_for_invalid_source() {
     "#;
     let res = datamodel::parse_configuration(invalid_datamodel);
 
-    if let Err(error) = res {
-        error.assert_is(DatamodelError::DatasourceProviderNotKnownError {
+    if let Err(diagnostics) = res {
+        diagnostics.assert_is(DatamodelError::DatasourceProviderNotKnownError {
             source_name: String::from("AStrangeHalfMongoDatabase"),
             span: datamodel::ast::Span::new(49, 76),
         });
@@ -320,10 +320,10 @@ fn fail_to_load_sources_for_invalid_source() {
 #[serial]
 fn fail_when_no_source_is_declared() {
     let invalid_datamodel: &str = r#"        "#;
-    let res = datamodel::parse_configuration(invalid_datamodel).unwrap();
+    let res = parse_configuration(invalid_datamodel);
 
-    if let Err(error) = res.validate_that_one_datasource_is_provided() {
-        error.assert_is(DatamodelError::ValidationError {
+    if let Err(diagnostics) = res.validate_that_one_datasource_is_provided() {
+        diagnostics.assert_is(DatamodelError::ValidationError {
             message: "You defined no datasource. You must define exactly one datasource.".to_string(),
             span: datamodel::ast::Span::new(0, 0),
         });
@@ -342,7 +342,7 @@ fn microsoft_sql_server_preview_feature_must_work() {
         }
     "#;
 
-    let config = datamodel::parse_configuration(schema).unwrap();
+    let config = parse_configuration(schema);
     let data_source = config.datasources.first().unwrap();
 
     assert!(data_source

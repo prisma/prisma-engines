@@ -5,10 +5,10 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::error::{DatamodelError, ErrorCollection};
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_source(token: &Token) -> Result<SourceConfig, ErrorCollection> {
-    let mut errors = ErrorCollection::new();
+pub fn parse_source(token: &Token) -> Result<SourceConfig, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
     let mut comment: Option<Comment> = None;
@@ -18,7 +18,7 @@ pub fn parse_source(token: &Token) -> Result<SourceConfig, ErrorCollection> {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::key_value => properties.push(parse_key_value(&current)),
             Rule::comment_block => comment = Some(parse_comment_block(&current)),
-            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push(DatamodelError::new_validation_error(
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
                 "This line is not a valid definition within a datasource.",
                 Span::from_pest(current.as_span()),
             )),
@@ -26,7 +26,7 @@ pub fn parse_source(token: &Token) -> Result<SourceConfig, ErrorCollection> {
         }
     }
 
-    errors.ok()?;
+    errors.to_result()?;
 
     match name {
         Some(name) => Ok(SourceConfig {
@@ -42,8 +42,8 @@ pub fn parse_source(token: &Token) -> Result<SourceConfig, ErrorCollection> {
     }
 }
 
-pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, ErrorCollection> {
-    let mut errors = ErrorCollection::new();
+pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
     let mut comments: Vec<String> = Vec::new();
@@ -54,7 +54,7 @@ pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, ErrorCollection
             Rule::key_value => properties.push(parse_key_value(&current)),
             Rule::doc_comment => comments.push(parse_doc_comment(&current)),
             Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push(DatamodelError::new_validation_error(
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
                 "This line is not a valid definition within a generator.",
                 Span::from_pest(current.as_span()),
             )),
@@ -62,7 +62,7 @@ pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, ErrorCollection
         }
     }
 
-    errors.ok()?;
+    errors.to_result()?;
 
     match name {
         Some(name) => Ok(GeneratorConfig {

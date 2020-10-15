@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use datamodel::{ast::Span, error::*, render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, diagnostics::*, render_datamodel_to_string, IndexDefinition, IndexType};
 
 use crate::common::*;
 

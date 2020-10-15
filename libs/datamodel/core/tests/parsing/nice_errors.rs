@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::common::preview_features::DATASOURCE_PREVIEW_FEATURES;
-use datamodel::error::DatamodelError;
+use datamodel::diagnostics::DatamodelError;
 
 #[test]
 fn nice_error_for_missing_model_keyword() {
@@ -24,7 +24,7 @@ fn nice_error_for_unknown_datasource_preview_feature() {
     let dml = r#"
     datasource ds {
         provider = "postgres"
-        url = "DATASOURCE_URL"
+        url = "postgresql://"
         previewFeatures = ["foo"]
     }
 
@@ -38,7 +38,7 @@ fn nice_error_for_unknown_datasource_preview_feature() {
     error.assert_is(DatamodelError::new_preview_feature_not_known_error(
         "foo",
         Vec::from(DATASOURCE_PREVIEW_FEATURES),
-        Span::new(108, 115),
+        Span::new(107, 114),
     ));
 }
 

@@ -7,7 +7,7 @@ use super::{
 use crate::ast::Span;
 use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
-use crate::error::{DatamodelError, ErrorCollection};
+use crate::diagnostics::{DatamodelError, Diagnostics, ValidatedDatasource, ValidatedDatasources};
 use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
@@ -34,24 +34,40 @@ impl DatasourceLoader {
         ast_schema: &ast::SchemaAst,
         ignore_datasource_urls: bool,
         datasource_url_overrides: Vec<(String, String)>,
-    ) -> Result<Vec<Datasource>, ErrorCollection> {
+    ) -> Result<ValidatedDatasources, Diagnostics> {
         let mut sources = vec![];
-        let mut errors = ErrorCollection::new();
+        let mut diagnostics = Diagnostics::new();
 
         for src in &ast_schema.sources() {
             match self.lift_datasource(&src, ignore_datasource_urls, &datasource_url_overrides) {
-                Ok(loaded_src) => sources.push(loaded_src),
-                // Lift error to source.
-                Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
-                    DatamodelError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
-                ),
-                Err(err) => errors.push(err),
+                Ok(loaded_src) => {
+                    diagnostics.append_warning_vec(loaded_src.warnings);
+                    sources.push(loaded_src.subject)
+                }
+                // Lift error.
+                Err(err) => {
+                    for e in err.errors {
+                        match e {
+                            DatamodelError::ArgumentNotFound { argument_name, span } => {
+                                diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
+                                    argument_name.as_str(),
+                                    src.name.name.as_str(),
+                                    span,
+                                ));
+                            }
+                            _ => {
+                                diagnostics.push_error(e);
+                            }
+                        }
+                    }
+                    diagnostics.append_warning_vec(err.warnings)
+                }
             }
         }
 
         if sources.len() > 1 {
             for src in &ast_schema.sources() {
-                errors.push(DatamodelError::new_source_validation_error(
+                diagnostics.push_error(DatamodelError::new_source_validation_error(
                     &"You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.".to_string(),
                     &src.name.name,
                     src.span,
@@ -59,10 +75,13 @@ impl DatasourceLoader {
             }
         }
 
-        if errors.has_errors() {
-            Err(errors)
+        if diagnostics.has_errors() {
+            Err(diagnostics)
         } else {
-            Ok(sources)
+            Ok(ValidatedDatasources {
+                subject: sources,
+                warnings: diagnostics.warnings,
+            })
         }
     }
 
@@ -71,25 +90,26 @@ impl DatasourceLoader {
         ast_source: &ast::SourceConfig,
         ignore_datasource_urls: bool,
         datasource_url_overrides: &[(String, String)],
-    ) -> Result<Datasource, DatamodelError> {
+    ) -> Result<ValidatedDatasource, Diagnostics> {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
+        let mut diagnostics = Diagnostics::new();
 
         let provider_arg = args.arg("provider")?;
         if provider_arg.is_from_env() {
-            return Err(DatamodelError::new_functional_evaluation_error(
+            return Err(diagnostics.merge_error(DatamodelError::new_functional_evaluation_error(
                 &"A datasource must not use the env() function in the provider argument.".to_string(),
                 ast_source.span,
-            ));
+            )));
         }
         let providers = provider_arg.as_array().to_str_vec()?;
 
         if providers.is_empty() {
-            return Err(DatamodelError::new_source_validation_error(
+            return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
                 "The provider argument in a datasource must not be empty",
                 source_name,
                 provider_arg.span(),
-            ));
+            )));
         }
 
         let url_args = args.arg("url")?;
@@ -102,7 +122,7 @@ impl DatasourceLoader {
             (Err(err), _)
                 if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
             {
-                return Err(err)
+                return Err(diagnostics.merge_error(err));
             }
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
@@ -113,7 +133,9 @@ impl DatasourceLoader {
                 (None, url.to_owned())
             }
             (Ok((env_var, url)), _) => (env_var, url.trim().to_owned()),
-            (Err(err), _) => return Err(err),
+            (Err(err), _) => {
+                return Err(diagnostics.merge_error(err));
+            }
         };
 
         if url.is_empty() {
@@ -128,11 +150,11 @@ impl DatasourceLoader {
                 "You must provide a nonempty URL for the datasource `{}`.{}",
                 source_name, &suffix
             );
-            return Err(DatamodelError::new_source_validation_error(
+            return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
                 &msg,
                 source_name,
                 url_args.span(),
-            ));
+            )));
         }
 
         let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
@@ -142,10 +164,15 @@ impl DatasourceLoader {
         };
 
         if !preview_features.is_empty() {
-            if let Err(err) =
-                validate_preview_features(preview_features.clone(), span, Vec::from(DATASOURCE_PREVIEW_FEATURES))
-            {
-                return Err(err);
+            let mut result = validate_preview_features(
+                preview_features.clone(),
+                span,
+                Vec::from(DATASOURCE_PREVIEW_FEATURES),
+                Vec::from(DEPRECATED_DATASOURCE_PREVIEW_FEATURES),
+            );
+            diagnostics.append(&mut result);
+            if diagnostics.has_errors() {
+                return Err(diagnostics);
             }
         }
 
@@ -161,10 +188,12 @@ impl DatasourceLoader {
             .collect();
 
         if all_datasource_providers.is_empty() {
-            return Err(DatamodelError::new_datasource_provider_not_known_error(
-                &providers.join(","),
-                provider_arg.span(),
-            ));
+            return Err(
+                diagnostics.merge_error(DatamodelError::new_datasource_provider_not_known_error(
+                    &providers.join(","),
+                    provider_arg.span(),
+                )),
+            );
         }
 
         let validated_providers: Vec<_> = all_datasource_providers
@@ -187,18 +216,21 @@ impl DatasourceLoader {
         let (successes, errors): (Vec<_>, Vec<_>) = validated_providers.into_iter().partition(|result| result.is_ok());
         if !successes.is_empty() {
             let first_successful_provider = successes.into_iter().next().unwrap()?;
-            Ok(Datasource {
-                name: source_name.to_string(),
-                provider: providers,
-                active_provider: first_successful_provider.canonical_name().to_string(),
-                url,
-                documentation,
-                combined_connector,
-                active_connector: first_successful_provider.connector(),
-                preview_features,
+            Ok(ValidatedDatasource {
+                subject: Datasource {
+                    name: source_name.to_string(),
+                    provider: providers,
+                    active_provider: first_successful_provider.canonical_name().to_string(),
+                    url,
+                    documentation,
+                    combined_connector,
+                    active_connector: first_successful_provider.connector(),
+                    preview_features,
+                },
+                warnings: diagnostics.warnings,
             })
         } else {
-            Err(errors.into_iter().next().unwrap().err().unwrap())
+            Err(diagnostics.merge_error(errors.into_iter().next().unwrap().err().unwrap()))
         }
     }
 

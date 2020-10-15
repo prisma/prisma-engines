@@ -46,7 +46,7 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
 
         let database_migration = connector
             .database_migration_inferrer()
-            .infer(&assumed_datamodel, &next_datamodel, &steps_to_apply)
+            .infer(&assumed_datamodel.subject, &next_datamodel.subject, &steps_to_apply)
             .await?;
 
         let DestructiveChangeDiagnostics {

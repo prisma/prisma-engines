@@ -14,13 +14,13 @@ pub enum CoreError {
     ReceivedBadDatamodel(String),
 
     /// When a datamodel from a generated AST is wrong. This is basically an internal error.
-    ProducedBadDatamodel(datamodel::error::ErrorCollection),
+    ProducedBadDatamodel(datamodel::diagnostics::Diagnostics),
 
     /// When a saved datamodel from a migration in the migrations table is no longer valid.
     InvalidPersistedDatamodel(String),
 
     /// Failed to render a prisma schema to a string.
-    DatamodelRenderingError(datamodel::error::ErrorCollection),
+    DatamodelRenderingError(datamodel::diagnostics::Diagnostics),
 
     /// Errors from the connector.
     ConnectorError(ConnectorError),
@@ -79,7 +79,7 @@ impl CoreError {
     }
 }
 
-fn render_datamodel_error(err: &datamodel::error::ErrorCollection, schema: Option<&String>) -> String {
+fn render_datamodel_error(err: &datamodel::diagnostics::Diagnostics, schema: Option<&String>) -> String {
     match schema {
         Some(schema) => err.to_pretty_string("virtual_schema.prisma", schema),
         None => format!("Datamodel error in schema that could not be rendered. {}", err),

@@ -1,8 +1,8 @@
 use super::super::attributes::AllAttributes;
 use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
+use crate::diagnostics::Diagnostics;
 use crate::dml::FieldType::NativeType;
-use crate::error::ErrorCollection;
 use crate::{ast, dml, Datasource};
 
 pub struct LowerDmlToAst<'a> {
@@ -19,9 +19,9 @@ impl<'a> LowerDmlToAst<'a> {
         }
     }
 
-    pub fn lower(&self, datamodel: &dml::Datamodel) -> Result<ast::SchemaAst, ErrorCollection> {
+    pub fn lower(&self, datamodel: &dml::Datamodel) -> Result<ast::SchemaAst, Diagnostics> {
         let mut tops: Vec<ast::Top> = Vec::new();
-        let mut errors = ErrorCollection::new();
+        let mut errors = Diagnostics::new();
 
         for model in datamodel.models() {
             if !model.is_generated {
@@ -42,8 +42,8 @@ impl<'a> LowerDmlToAst<'a> {
         Ok(ast::SchemaAst { tops })
     }
 
-    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, Diagnostics> {
+        let mut errors = Diagnostics::new();
         let mut fields: Vec<ast::Field> = Vec::new();
 
         for field in model.fields() {
@@ -67,7 +67,7 @@ impl<'a> LowerDmlToAst<'a> {
         })
     }
 
-    fn lower_enum(&self, enm: &dml::Enum, datamodel: &dml::Datamodel) -> Result<ast::Enum, ErrorCollection> {
+    fn lower_enum(&self, enm: &dml::Enum, datamodel: &dml::Datamodel) -> Result<ast::Enum, Diagnostics> {
         Ok(ast::Enum {
             name: ast::Identifier::new(&enm.name),
             values: enm
@@ -86,7 +86,7 @@ impl<'a> LowerDmlToAst<'a> {
         })
     }
 
-    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
+    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, Diagnostics> {
         let mut attributes = self.attributes.field.serialize(field, datamodel)?;
         if let (dml::Field::ScalarField(sf), Some(datasource)) = (field, self.datasource) {
             if let NativeType(_prisma_tpe, native_tpe) = sf.clone().field_type {

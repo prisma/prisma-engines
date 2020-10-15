@@ -58,7 +58,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             .infer(&assumed_datamodel_ast, &next_datamodel_ast);
 
         let database_migration = database_migration_inferrer
-            .infer(&assumed_datamodel, &next_datamodel, &model_migration_steps)
+            .infer(&assumed_datamodel.subject, &next_datamodel, &model_migration_steps)
             .await?;
 
         let DestructiveChangeDiagnostics {

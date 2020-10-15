@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast, error::DatamodelError};
+use datamodel::{ast, diagnostics::DatamodelError};
 
 #[test]
 fn shound_fail_on_attribute_duplication() {
