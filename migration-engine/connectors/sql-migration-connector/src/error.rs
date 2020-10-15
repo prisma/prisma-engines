@@ -1,45 +1,11 @@
-use migration_connector::{ConnectorError, ErrorKind};
-use quaint::{
-    error::{Error as QuaintError, ErrorKind as QuaintKind},
-    prelude::ConnectionInfo,
-};
-use std::{error::Error, fmt::Display};
-use tracing_error::SpanTrace;
-use user_facing_errors::{migration_engine::MigrateSystemDatabase, quaint::render_quaint_error, KnownError};
+use migration_connector::ConnectorError;
+use quaint::{error::Error as QuaintError, prelude::ConnectionInfo};
+use user_facing_errors::{migration_engine::MigrateSystemDatabase, quaint::render_quaint_error};
 
 pub(crate) fn quaint_error_to_connector_error(error: QuaintError, connection_info: &ConnectionInfo) -> ConnectorError {
-    let user_facing_error = render_quaint_error(error.kind(), connection_info);
-
-    let kind = match error.kind() {
-        QuaintKind::DatabaseDoesNotExist { ref db_name } => ErrorKind::DatabaseDoesNotExist {
-            db_name: db_name.clone(),
-        },
-        QuaintKind::DatabaseAlreadyExists { ref db_name } => ErrorKind::DatabaseAlreadyExists {
-            db_name: db_name.clone(),
-        },
-        QuaintKind::DatabaseAccessDenied { ref db_name } => ErrorKind::DatabaseAccessDenied {
-            database_name: db_name.clone(),
-        },
-        QuaintKind::AuthenticationFailed { ref user } => ErrorKind::AuthenticationFailed { user: user.clone() },
-        QuaintKind::ConnectTimeout(..) => ErrorKind::ConnectTimeout,
-        QuaintKind::ConnectionError { .. } => ErrorKind::ConnectionError {
-            cause: error.into(),
-            host: connection_info.host().to_owned(),
-        },
-        QuaintKind::Timeout(..) => ErrorKind::Timeout,
-        QuaintKind::TlsError { message } => ErrorKind::TlsError {
-            message: message.clone(),
-        },
-        QuaintKind::UniqueConstraintViolation { ref constraint } => ErrorKind::UniqueConstraintViolation {
-            field_name: constraint.to_string(),
-        },
-        _ => ErrorKind::QueryError(error.into()),
-    };
-
-    ConnectorError {
-        user_facing_error,
-        kind,
-        context: SpanTrace::capture(),
+    match render_quaint_error(error.kind(), connection_info) {
+        Some(user_facing_error) => user_facing_error.into(),
+        None => ConnectorError::generic(anyhow::anyhow!("Error querying the database: {}", error)),
     }
 }
 
@@ -48,24 +14,10 @@ pub(crate) type CheckDatabaseInfoResult = Result<(), SystemDatabase>;
 #[derive(Debug)]
 pub(crate) struct SystemDatabase(pub(crate) String);
 
-impl Display for SystemDatabase {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "The `{}` database is a system database, it should not be altered with prisma migrate. Please connect to another database.", self.0)
-    }
-}
-
-impl Error for SystemDatabase {}
-
 impl From<SystemDatabase> for ConnectorError {
     fn from(err: SystemDatabase) -> ConnectorError {
-        let user_facing = MigrateSystemDatabase {
+        ConnectorError::user_facing_error(MigrateSystemDatabase {
             database_name: err.0.clone(),
-        };
-
-        ConnectorError {
-            user_facing_error: Some(KnownError::new(user_facing)),
-            kind: ErrorKind::Generic(err.into()),
-            context: SpanTrace::capture(),
-        }
+        })
     }
 }

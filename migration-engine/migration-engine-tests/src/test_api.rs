@@ -30,7 +30,9 @@ use super::{
     sql::barrel_migration_executor::BarrelMigrationExecutor,
     InferAndApplyOutput,
 };
-use migration_connector::{ImperativeMigrationsPersistence, MigrationPersistence, MigrationRecord, MigrationStep};
+use migration_connector::{
+    ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord, MigrationStep,
+};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyMigrationInput,
@@ -84,7 +86,7 @@ impl TestApi {
     }
 
     pub fn migration_persistence(&self) -> &dyn MigrationPersistence {
-        self.api.migration_persistence()
+        self.api.connector().migration_persistence()
     }
 
     pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
@@ -235,22 +237,8 @@ impl TestApi {
         }
     }
 
-    fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {
-        let db = self.database.clone();
-        match self.api.connector_type() {
-            "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
-            "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
-            "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
-            _ => unimplemented!(),
-        }
-    }
-
     pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
-        let mut result = self
-            .describer()
-            .describe(self.schema_name())
-            .await
-            .expect("Description failed");
+        let mut result = self.api.connector().describe_schema().await?;
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
         result.tables = result

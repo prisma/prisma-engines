@@ -1,4 +1,6 @@
-use migration_core::{commands::DiagnoseMigrationHistoryInput, commands::DiagnoseMigrationHistoryOutput, GenericApi};
+use migration_core::{
+    commands::DiagnoseMigrationHistoryInput, commands::DiagnoseMigrationHistoryOutput, CoreResult, GenericApi,
+};
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See DiagnoseMigrationHistory::send()"]
@@ -15,7 +17,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
         }
     }
 
-    pub async fn send(self) -> anyhow::Result<DiagnoseMigrationHistoryAssertions<'a>> {
+    pub async fn send(self) -> CoreResult<DiagnoseMigrationHistoryAssertions<'a>> {
         let output = self
             .api
             .diagnose_migration_history(&DiagnoseMigrationHistoryInput {

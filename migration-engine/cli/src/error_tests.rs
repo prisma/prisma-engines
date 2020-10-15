@@ -49,7 +49,7 @@ async fn bad_postgres_url_must_return_a_good_error() {
 
     let expected = json!({
         "is_panic": false,
-        "message": "Error parsing connection string: invalid port number in `postgresql://postgres:prisma@localhost:543`/mydb?schema=public`)\n",
+        "message": "Error parsing connection string: invalid port number in `postgresql://postgres:prisma@localhost:543`/mydb?schema=public`\n\n",
         "backtrace": null,
     });
 

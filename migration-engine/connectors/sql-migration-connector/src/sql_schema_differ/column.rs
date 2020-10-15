@@ -63,7 +63,7 @@ impl<'a> ColumnDiffer<'a> {
     /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
     fn defaults_match(&self) -> bool {
         // JSON defaults on MySQL should be ignored.
-        if self.flavour.sql_family().is_mysql()
+        if self.database_info.sql_family().is_mysql()
             && (self.previous.column_type_family().is_json() || self.next.column_type_family().is_json())
         {
             return true;

@@ -190,21 +190,7 @@ impl<'a> SqlSchemaCalculator<'a> {
         }
     }
 
-    fn m2m_foreign_key_action(
-        family: SqlFamily,
-        model_a: &ModelWalker<'_>,
-        model_b: &ModelWalker<'_>,
-    ) -> sql::ForeignKeyAction {
-        match family {
-            // MSSQL will crash when creating a cyclic cascade
-            SqlFamily::Mssql if model_a.name() == model_b.name() => sql::ForeignKeyAction::NoAction,
-            _ => sql::ForeignKeyAction::Cascade,
-        }
-    }
-
     fn calculate_relation_tables<'b>(&'b self) -> impl Iterator<Item = sql::Table> + 'b {
-        let family = self.flavour.sql_family();
-
         walk_relations(self.data_model)
             .filter_map(|relation| relation.as_m2m())
             .map(move |m2m| {
@@ -220,16 +206,16 @@ impl<'a> SqlSchemaCalculator<'a> {
                         columns: vec![m2m.model_a_column().into()],
                         referenced_table: model_a.db_name().into(),
                         referenced_columns: vec![model_a_id.db_name().into()],
-                        on_update_action: Self::m2m_foreign_key_action(family, &model_a, &model_b),
-                        on_delete_action: Self::m2m_foreign_key_action(family, &model_a, &model_b),
+                        on_update_action: self.flavour.m2m_foreign_key_action(&model_a, &model_b),
+                        on_delete_action: self.flavour.m2m_foreign_key_action(&model_a, &model_b),
                     },
                     sql::ForeignKey {
                         constraint_name: None,
                         columns: vec![m2m.model_b_column().into()],
                         referenced_table: model_b.db_name().into(),
                         referenced_columns: vec![model_b_id.db_name().into()],
-                        on_update_action: Self::m2m_foreign_key_action(family, &model_a, &model_b),
-                        on_delete_action: Self::m2m_foreign_key_action(family, &model_a, &model_b),
+                        on_update_action: self.flavour.m2m_foreign_key_action(&model_a, &model_b),
+                        on_delete_action: self.flavour.m2m_foreign_key_action(&model_a, &model_b),
                     },
                 ];
 

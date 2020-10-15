@@ -72,36 +72,22 @@ impl Check for UnexecutableStepCheck {
                 }
             }
             UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => {
-                let message = |details| format!("Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}", column = column, table = table, details = details);
+                let message = |details| {
+                    format!("Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}", column = column, table = table, details = details)
+                };
 
                 match database_checks.get_row_and_non_null_value_count(table, column) {
                     (Some(0), _) => None,
                     (_, Some(0)) => None,
                     (_, Some(value_count)) => Some(message(format_args!(
-                        "There are {} existing non-null values in that column, this migration step cannot be executed.", value_count
+                        "There are {} existing non-null values in that column, this migration step cannot be executed.",
+                        value_count
                     ))),
                     (_, _) => Some(message(format_args!(
                         "If there are non-null values in that column, this migration step will fail."
-                    )))
-
+                    ))),
                 }
             }
-            // TODO
-            //
-            // SqlUnexecutableMigration::AddedUnimplementableUniqueConstraint { table, constrained_columns } => write!(f, "Added a unique constraint that would not hold given existing data on `{table}`.{constrained_columns:?}", table = table, constrained_columns = constrained_columns)?,
-            // SqlUnexecutableMigration::DeletedUsedEnumValue {
-            //     r#enum,
-            //     value,
-            //     uses_count,
-            // } => {
-            //     write!(f, "You deleted the value `{value}` of the `{enum_name}` enum, but it is still used `{uses_count:?}` times in the database. (TODO: say which tables)", value = value, enum_name = r#enum, uses_count = uses_count)?
-            // }
-            // SqlUnexecutableMigration::PrimaryKeyChanged { table } => write!(
-            //     f,
-            //     "The id field(s) for table {table} changed. This is currently not supported by prisma
-            //     migrate.",
-            //     table = table
-            // )?,
         }
     }
 }

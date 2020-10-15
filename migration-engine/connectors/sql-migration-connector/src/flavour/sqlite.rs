@@ -1,7 +1,6 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::path::Path;
 
@@ -26,7 +25,7 @@ impl SqlFlavour for SqliteFlavour {
         if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
             std::fs::create_dir_all(dir)
                 .context("Creating SQLite database parent directory.")
-                .map_err(|io_err| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(io_err)))?;
+                .map_err(|io_err| ConnectorError::generic(io_err))?;
         }
 
         connect(database_str).await?;
@@ -34,24 +33,9 @@ impl SqlFlavour for SqliteFlavour {
         Ok(self.file_path.clone())
     }
 
-    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
-            .describe(connection.connection_info().schema_name())
-            .await
-            .map_err(|err| match err {
-                SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
-                }
-            })
-    }
-
-    async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
-        Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = r#"
-            CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
+            CREATE TABLE "_prisma_migrations" (
                 "id"                    TEXT PRIMARY KEY NOT NULL,
                 "checksum"              TEXT NOT NULL,
                 "finished_at"           DATETIME,
@@ -64,7 +48,22 @@ impl SqlFlavour for SqliteFlavour {
             );
             "#;
 
-        connection.raw_cmd(sql).await
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
+    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
+        sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
+            .describe(connection.connection_info().schema_name())
+            .await
+            .map_err(|err| match err {
+                SqlSchemaDescriberError::UnknownError => {
+                    ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
+                }
+            })
+    }
+
+    async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
+        Ok(())
     }
 
     async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
@@ -79,10 +78,6 @@ impl SqlFlavour for SqliteFlavour {
         std::fs::File::create(file_path).expect("failed to truncate sqlite file");
 
         Ok(())
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Sqlite
     }
 
     #[tracing::instrument(skip(self, migrations, _connection))]
@@ -110,9 +105,12 @@ impl SqlFlavour for SqliteFlavour {
                 migration.migration_name()
             );
 
-            conn.raw_cmd(&script).await.map_err(|connector_error| {
-                connector_error.into_migration_failed(migration.migration_name().to_owned())
-            })?;
+            conn.raw_cmd(&script)
+                .await
+                .map_err(ConnectorError::from)
+                .map_err(|connector_error| {
+                    connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                })?;
         }
 
         let sql_schema = self.describe_schema(&conn).await?;

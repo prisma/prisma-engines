@@ -5,7 +5,7 @@ use crate::{
 };
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
-use quaint::{connector::MysqlUrl, prelude::SqlFamily};
+use quaint::connector::MysqlUrl;
 use regex::RegexSet;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use url::Url;
@@ -58,26 +58,9 @@ impl SqlFlavour for MysqlFlavour {
         Ok(db_name.to_owned())
     }
 
-    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
-        sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
-            .describe(connection.connection_info().schema_name())
-            .await
-            .map_err(|err| match err {
-                SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
-                }
-            })
-    }
-
-    async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
-        connection.raw_cmd("SELECT 1").await?;
-
-        Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = r#"
-            CREATE TABLE IF NOT EXISTS _prisma_migrations (
+            CREATE TABLE _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
                 finished_at             DATETIME(3),
@@ -90,7 +73,24 @@ impl SqlFlavour for MysqlFlavour {
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         "#;
 
-        connection.raw_cmd(sql).await
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
+    async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
+        sql_schema_describer::mysql::SqlSchemaDescriber::new(connection.quaint().clone())
+            .describe(connection.connection_info().schema_name())
+            .await
+            .map_err(|err| match err {
+                SqlSchemaDescriberError::UnknownError => {
+                    ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
+                }
+            })
+    }
+
+    async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("SELECT 1").await?;
+
+        Ok(())
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
@@ -122,10 +122,6 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Mysql
-    }
-
     #[tracing::instrument(skip(self, migrations, connection))]
     async fn sql_schema_from_migration_history(
         &self,
@@ -155,9 +151,13 @@ impl SqlFlavour for MysqlFlavour {
                 migration.migration_name()
             );
 
-            temp_database.raw_cmd(&script).await.map_err(|connector_error| {
-                connector_error.into_migration_failed(migration.migration_name().to_owned())
-            })?;
+            temp_database
+                .raw_cmd(&script)
+                .await
+                .map_err(ConnectorError::from)
+                .map_err(|connector_error| {
+                    connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                })?;
         }
 
         let sql_schema = self.describe_schema(&temp_database).await?;
