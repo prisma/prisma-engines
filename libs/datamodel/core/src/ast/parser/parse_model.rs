@@ -6,10 +6,10 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::errors_and_warnings::{DatamodelError, ErrorsAndWarnings};
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_model(token: &Token) -> Result<Model, ErrorsAndWarnings> {
-    let mut errors = ErrorsAndWarnings::new();
+pub fn parse_model(token: &Token) -> Result<Model, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut fields: Vec<Field> = vec![];

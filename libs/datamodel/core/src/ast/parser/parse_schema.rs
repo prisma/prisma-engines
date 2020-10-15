@@ -9,11 +9,11 @@ use super::{
     PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
-use crate::errors_and_warnings::{DatamodelError, ErrorsAndWarnings};
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
-pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorsAndWarnings> {
-    let mut errors = ErrorsAndWarnings::new();
+pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
     match datamodel_result {

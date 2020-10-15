@@ -5,10 +5,10 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::errors_and_warnings::{DatamodelError, ErrorsAndWarnings};
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_source(token: &Token) -> Result<SourceConfig, ErrorsAndWarnings> {
-    let mut errors = ErrorsAndWarnings::new();
+pub fn parse_source(token: &Token) -> Result<SourceConfig, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
     let mut comment: Option<Comment> = None;
@@ -42,8 +42,8 @@ pub fn parse_source(token: &Token) -> Result<SourceConfig, ErrorsAndWarnings> {
     }
 }
 
-pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, ErrorsAndWarnings> {
-    let mut errors = ErrorsAndWarnings::new();
+pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
     let mut comments: Vec<String> = Vec::new();

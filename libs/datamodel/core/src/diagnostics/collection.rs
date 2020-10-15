@@ -1,19 +1,19 @@
 use super::DatamodelError;
-use crate::errors_and_warnings::warning::DatamodelWarning;
+use crate::diagnostics::warning::DatamodelWarning;
 
-/// Represents a list of validation or parser errors.
+/// Represents a list of validation or parser errors and warnings.
 ///
-/// This is used to accumulate multiple errors during validation.
+/// This is used to accumulate multiple errors and warnings during validation.
 /// It is used to not error out early and instead show multiple errors at once.
 #[derive(Debug, Clone)]
-pub struct ErrorsAndWarnings {
+pub struct Diagnostics {
     pub errors: Vec<DatamodelError>,
     pub warnings: Vec<DatamodelWarning>,
 }
 
-impl ErrorsAndWarnings {
-    pub fn new() -> ErrorsAndWarnings {
-        ErrorsAndWarnings {
+impl Diagnostics {
+    pub fn new() -> Diagnostics {
+        Diagnostics {
             errors: Vec::new(),
             warnings: Vec::new(),
         }
@@ -54,7 +54,7 @@ impl ErrorsAndWarnings {
     }
 
     /// Appends all errors from another collection to this collection.
-    pub fn append(&mut self, err_and_warn: &mut ErrorsAndWarnings) {
+    pub fn append(&mut self, err_and_warn: &mut Diagnostics) {
         self.errors.append(&mut err_and_warn.errors);
         self.warnings.append(&mut err_and_warn.warnings)
     }
@@ -69,7 +69,7 @@ impl ErrorsAndWarnings {
         self.warnings.append(&mut warnings);
     }
 
-    pub fn ok(&self) -> Result<(), ErrorsAndWarnings> {
+    pub fn ok(&self) -> Result<(), Diagnostics> {
         if self.has_errors() {
             Err(self.clone())
         } else {
@@ -89,24 +89,24 @@ impl ErrorsAndWarnings {
     }
 }
 
-impl std::fmt::Display for ErrorsAndWarnings {
+impl std::fmt::Display for Diagnostics {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let msg: Vec<String> = self.errors.iter().map(|e| e.to_string()).collect();
         f.write_str(&msg.join("\n"))
     }
 }
 
-impl From<DatamodelError> for ErrorsAndWarnings {
+impl From<DatamodelError> for Diagnostics {
     fn from(error: DatamodelError) -> Self {
-        let mut col = ErrorsAndWarnings::new();
+        let mut col = Diagnostics::new();
         col.push_error(error);
         col
     }
 }
 
-impl From<DatamodelWarning> for ErrorsAndWarnings {
+impl From<DatamodelWarning> for Diagnostics {
     fn from(warning: DatamodelWarning) -> Self {
-        let mut col = ErrorsAndWarnings::new();
+        let mut col = Diagnostics::new();
         col.push_warning(warning);
         col
     }

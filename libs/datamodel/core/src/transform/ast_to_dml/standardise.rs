@@ -1,11 +1,10 @@
 use super::common::*;
-use crate::errors_and_warnings::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::{
     ast,
     common::{NameNormalizer, RelationNames},
-    dml,
-    errors_and_warnings::ErrorsAndWarnings,
-    Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
+    diagnostics::Diagnostics,
+    dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
 
 /// Helper for standardsing a datamodel.
@@ -20,11 +19,7 @@ impl Standardiser {
         Standardiser {}
     }
 
-    pub fn standardise(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        schema: &mut dml::Datamodel,
-    ) -> Result<(), ErrorsAndWarnings> {
+    pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         self.name_unnamed_relations(schema);
 
         self.add_missing_back_relations(ast_schema, schema)?;
@@ -109,8 +104,8 @@ impl Standardiser {
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
-    ) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    ) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         let mut missing_back_relation_fields = Vec::new();
         for model in schema.models() {
@@ -162,8 +157,8 @@ impl Standardiser {
         model: &dml::Model,
         schema: &dml::Datamodel,
         schema_ast: &ast::SchemaAst,
-    ) -> Result<Vec<AddMissingBackRelationField>, ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    ) -> Result<Vec<AddMissingBackRelationField>, Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         let mut result = Vec::new();
         for field in model.relation_fields() {

@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::errors_and_warnings::DatamodelWarning;
+use datamodel::diagnostics::DatamodelWarning;
 
 #[test]
 fn nice_warning_for_deprecated_datasource_preview_feature() {

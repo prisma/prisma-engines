@@ -1,5 +1,5 @@
 use super::{super::helpers::*, AttributeValidator};
-use crate::errors_and_warnings::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::{ast, dml, IndexDefinition, IndexType};
 use std::cmp::Ordering;
 use std::collections::HashMap;

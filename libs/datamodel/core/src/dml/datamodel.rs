@@ -1,5 +1,5 @@
 use super::*;
-use crate::errors_and_warnings::DatamodelWarning;
+use crate::diagnostics::DatamodelWarning;
 
 /// Entities in the datamodel can be flagged as `is_commented_out`. This let's the renderer
 /// know that introspection encountered unsupported names or features and these are supposed

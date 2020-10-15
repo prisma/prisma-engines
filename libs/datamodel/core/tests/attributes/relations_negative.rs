@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, errors_and_warnings::DatamodelError};
+use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
 fn should_fail_on_ambiguous_relations_with_automatic_names_1() {

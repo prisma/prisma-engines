@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::errors_and_warnings::DatamodelError;
+use datamodel::diagnostics::DatamodelError;
 use datamodel::{render_datamodel_to_string, FieldArity, FieldType, ScalarField};
 use datamodel_connector::scalars::ScalarType;
 use pretty_assertions::assert_eq;

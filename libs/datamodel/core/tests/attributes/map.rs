@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::errors_and_warnings::DatamodelError;
+use datamodel::diagnostics::DatamodelError;
 
 #[test]
 fn map_attribute() {

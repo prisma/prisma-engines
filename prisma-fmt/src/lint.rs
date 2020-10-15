@@ -1,5 +1,5 @@
 use crate::{LintOpts, MiniError};
-use datamodel::errors_and_warnings::{DatamodelError, DatamodelWarning};
+use datamodel::diagnostics::{DatamodelError, DatamodelWarning};
 
 use std::io::{self, Read};
 

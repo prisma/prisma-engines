@@ -1,5 +1,5 @@
 use crate::configuration::preview_features::PreviewFeatures;
-use crate::errors_and_warnings::DatamodelWarning;
+use crate::diagnostics::DatamodelWarning;
 use serde::Serialize;
 use std::collections::HashMap;
 

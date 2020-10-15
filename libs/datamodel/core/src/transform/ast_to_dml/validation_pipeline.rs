@@ -1,5 +1,5 @@
 use super::*;
-use crate::{ast, configuration, dml, errors_and_warnings::ErrorsAndWarnings, ValidatedDatamodel};
+use crate::{ast, configuration, diagnostics::Diagnostics, dml, ValidatedDatamodel};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
@@ -27,64 +27,64 @@ impl<'a> ValidationPipeline<'a> {
     /// * Perform string interpolation
     /// * Resolve and check default values
     /// * Resolve and check all field types
-    pub fn validate(&self, ast_schema: &ast::SchemaAst) -> Result<dml::ValidatedDatamodel, ErrorsAndWarnings> {
-        let mut errors_and_warnings = ErrorsAndWarnings::new();
+    pub fn validate(&self, ast_schema: &ast::SchemaAst) -> Result<dml::ValidatedDatamodel, Diagnostics> {
+        let mut diagnostics = Diagnostics::new();
 
         // Phase 0 is parsing.
         // Phase 1 is source block loading.
 
         // Phase 2: Prechecks.
         if let Err(mut err) = precheck::Precheck::precheck(&ast_schema) {
-            errors_and_warnings.append(&mut err);
+            diagnostics.append(&mut err);
         }
 
         // Early return so that the validator does not have to deal with invalid schemas
-        if errors_and_warnings.has_errors() {
-            return Err(errors_and_warnings);
+        if diagnostics.has_errors() {
+            return Err(diagnostics);
         }
 
         // Phase 3: Lift AST to DML.
         let mut schema = match self.lifter.lift(ast_schema) {
             Err(mut err) => {
                 // Cannot continue on lifter error.
-                errors_and_warnings.append(&mut err);
-                return Err(errors_and_warnings);
+                diagnostics.append(&mut err);
+                return Err(diagnostics);
             }
             Ok(schema) => schema,
         };
 
         // Phase 4: Validation
         if let Err(mut err) = self.validator.validate(ast_schema, &mut schema) {
-            errors_and_warnings.append(&mut err);
+            diagnostics.append(&mut err);
         }
 
         // Early return so that the standardiser does not have to deal with invalid schemas
-        if errors_and_warnings.has_errors() {
-            return Err(errors_and_warnings);
+        if diagnostics.has_errors() {
+            return Err(diagnostics);
         }
 
         // TODO: Move consistency stuff into different module.
         // Phase 5: Consistency fixes. These don't fail.
         if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema) {
-            errors_and_warnings.append(&mut err);
+            diagnostics.append(&mut err);
         }
 
         // Early return so that the post validation does not have to deal with invalid schemas
-        if errors_and_warnings.has_errors() {
-            return Err(errors_and_warnings);
+        if diagnostics.has_errors() {
+            return Err(diagnostics);
         }
 
         // Phase 6: Post Standardisation Validation
         if let Err(mut err) = self.validator.post_standardisation_validate(ast_schema, &mut schema) {
-            errors_and_warnings.append(&mut err);
+            diagnostics.append(&mut err);
         }
 
-        if errors_and_warnings.has_errors() {
-            Err(errors_and_warnings)
+        if diagnostics.has_errors() {
+            Err(diagnostics)
         } else {
             Ok(ValidatedDatamodel {
                 datamodel: schema,
-                warnings: errors_and_warnings.warnings,
+                warnings: diagnostics.warnings,
             })
         }
     }

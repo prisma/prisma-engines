@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast, errors_and_warnings::DatamodelError, ScalarType};
+use datamodel::{ast, diagnostics::DatamodelError, ScalarType};
 
 #[test]
 fn unique_attribute() {

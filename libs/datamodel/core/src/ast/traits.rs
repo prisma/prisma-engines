@@ -1,6 +1,6 @@
 use super::{Attribute, Comment, Identifier, Span};
 use crate::ast::{Argument, SourceConfig};
-use crate::errors_and_warnings::ErrorsAndWarnings;
+use crate::diagnostics::Diagnostics;
 
 pub trait WithSpan {
     fn span(&self) -> &Span;
@@ -17,8 +17,8 @@ pub trait WithIdentifier {
 pub trait WithAttributes {
     fn attributes(&self) -> &Vec<Attribute>;
 
-    fn validate_attributes(&self) -> ErrorsAndWarnings {
-        let mut errors = ErrorsAndWarnings::new();
+    fn validate_attributes(&self) -> Diagnostics {
+        let mut errors = Diagnostics::new();
         for attribute in self.attributes() {
             errors.push_opt_error(attribute.name.validate("Attribute").err());
         }

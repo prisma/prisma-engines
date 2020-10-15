@@ -7,7 +7,7 @@ use super::{
 use crate::ast::Span;
 use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
-use crate::errors_and_warnings::{DatamodelError, DatamodelWarning, ErrorsAndWarnings};
+use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
 use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, Datasource, ValidatedDatasource};
 use datamodel_connector::{CombinedConnector, Connector};
@@ -39,14 +39,14 @@ impl DatasourceLoader {
         ast_schema: &ast::SchemaAst,
         ignore_datasource_urls: bool,
         datasource_url_overrides: Vec<(String, String)>,
-    ) -> Result<ValidatedDatasources, ErrorsAndWarnings> {
+    ) -> Result<ValidatedDatasources, Diagnostics> {
         let mut sources = vec![];
-        let mut errors_and_warnings = ErrorsAndWarnings::new();
+        let mut diagnostics = Diagnostics::new();
 
         for src in &ast_schema.sources() {
             match self.lift_datasource(&src, ignore_datasource_urls, &datasource_url_overrides) {
                 Ok(loaded_src) => {
-                    errors_and_warnings.append_warning_vec(loaded_src.warnings);
+                    diagnostics.append_warning_vec(loaded_src.warnings);
                     sources.push(loaded_src.datasource)
                 }
                 // Lift error.
@@ -54,25 +54,25 @@ impl DatasourceLoader {
                     for e in err.errors {
                         match e {
                             DatamodelError::ArgumentNotFound { argument_name, span } => {
-                                errors_and_warnings.push_error(DatamodelError::new_source_argument_not_found_error(
+                                diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
                                     argument_name.as_str(),
                                     src.name.name.as_str(),
                                     span,
                                 ));
                             }
                             _ => {
-                                errors_and_warnings.push_error(e);
+                                diagnostics.push_error(e);
                             }
                         }
                     }
-                    errors_and_warnings.append_warning_vec(err.warnings)
+                    diagnostics.append_warning_vec(err.warnings)
                 }
             }
         }
 
         if sources.len() > 1 {
             for src in &ast_schema.sources() {
-                errors_and_warnings.push_error(DatamodelError::new_source_validation_error(
+                diagnostics.push_error(DatamodelError::new_source_validation_error(
                     &"You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.".to_string(),
                     &src.name.name,
                     src.span,
@@ -80,12 +80,12 @@ impl DatasourceLoader {
             }
         }
 
-        if errors_and_warnings.has_errors() {
-            Err(errors_and_warnings)
+        if diagnostics.has_errors() {
+            Err(diagnostics)
         } else {
             Ok(ValidatedDatasources {
                 datasources: sources,
-                warnings: errors_and_warnings.warnings,
+                warnings: diagnostics.warnings,
             })
         }
     }
@@ -95,28 +95,28 @@ impl DatasourceLoader {
         ast_source: &ast::SourceConfig,
         ignore_datasource_urls: bool,
         datasource_url_overrides: &[(String, String)],
-    ) -> Result<ValidatedDatasource, ErrorsAndWarnings> {
+    ) -> Result<ValidatedDatasource, Diagnostics> {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
-        let mut errors_and_warnings = ErrorsAndWarnings::new();
+        let mut diagnostics = Diagnostics::new();
 
         let provider_arg = args.arg("provider")?;
         if provider_arg.is_from_env() {
-            errors_and_warnings.push_error(DatamodelError::new_functional_evaluation_error(
+            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
                 &"A datasource must not use the env() function in the provider argument.".to_string(),
                 ast_source.span,
             ));
-            return Err(errors_and_warnings);
+            return Err(diagnostics);
         }
         let providers = provider_arg.as_array().to_str_vec()?;
 
         if providers.is_empty() {
-            errors_and_warnings.push_error(DatamodelError::new_source_validation_error(
+            diagnostics.push_error(DatamodelError::new_source_validation_error(
                 "The provider argument in a datasource must not be empty",
                 source_name,
                 provider_arg.span(),
             ));
-            return Err(errors_and_warnings);
+            return Err(diagnostics);
         }
 
         let url_args = args.arg("url")?;
@@ -129,8 +129,8 @@ impl DatasourceLoader {
             (Err(err), _)
                 if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
             {
-                errors_and_warnings.push_error(err);
-                return Err(errors_and_warnings);
+                diagnostics.push_error(err);
+                return Err(diagnostics);
             }
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
@@ -142,8 +142,8 @@ impl DatasourceLoader {
             }
             (Ok((env_var, url)), _) => (env_var, url.trim().to_owned()),
             (Err(err), _) => {
-                errors_and_warnings.push_error(err);
-                return Err(errors_and_warnings);
+                diagnostics.push_error(err);
+                return Err(diagnostics);
             }
         };
 
@@ -159,12 +159,12 @@ impl DatasourceLoader {
                 "You must provide a nonempty URL for the datasource `{}`.{}",
                 source_name, &suffix
             );
-            errors_and_warnings.push_error(DatamodelError::new_source_validation_error(
+            diagnostics.push_error(DatamodelError::new_source_validation_error(
                 &msg,
                 source_name,
                 url_args.span(),
             ));
-            return Err(errors_and_warnings);
+            return Err(diagnostics);
         }
 
         let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
@@ -181,10 +181,10 @@ impl DatasourceLoader {
                 Vec::from(DEPRECATED_DATASOURCE_PREVIEW_FEATURES),
             );
             println!("{:?}", result);
-            errors_and_warnings.append(&mut result);
-            if errors_and_warnings.has_errors() {
+            diagnostics.append(&mut result);
+            if diagnostics.has_errors() {
                 println!("yes");
-                return Err(errors_and_warnings);
+                return Err(diagnostics);
             }
         }
 
@@ -200,11 +200,11 @@ impl DatasourceLoader {
             .collect();
 
         if all_datasource_providers.is_empty() {
-            errors_and_warnings.push_error(DatamodelError::new_datasource_provider_not_known_error(
+            diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
                 &providers.join(","),
                 provider_arg.span(),
             ));
-            return Err(errors_and_warnings);
+            return Err(diagnostics);
         }
 
         let validated_providers: Vec<_> = all_datasource_providers
@@ -238,11 +238,11 @@ impl DatasourceLoader {
                     active_connector: first_successful_provider.connector(),
                     preview_features,
                 },
-                warnings: errors_and_warnings.warnings,
+                warnings: diagnostics.warnings,
             })
         } else {
-            errors_and_warnings.push_error(errors.into_iter().next().unwrap().err().unwrap());
-            Err(errors_and_warnings)
+            diagnostics.push_error(errors.into_iter().next().unwrap().err().unwrap());
+            Err(diagnostics)
         }
     }
 

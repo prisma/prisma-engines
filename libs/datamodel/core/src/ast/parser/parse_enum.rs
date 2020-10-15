@@ -6,10 +6,10 @@ use super::{
 };
 use crate::ast::parser::helpers::TokenExtensions;
 use crate::ast::*;
-use crate::errors_and_warnings::{DatamodelError, ErrorsAndWarnings};
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_enum(token: &Token) -> Result<Enum, ErrorsAndWarnings> {
-    let mut errors = ErrorsAndWarnings::new();
+pub fn parse_enum(token: &Token) -> Result<Enum, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut values: Vec<EnumValue> = vec![];

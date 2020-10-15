@@ -1,7 +1,7 @@
 extern crate datamodel;
 
 use self::datamodel::{IndexDefinition, StringFromEnvVar};
-use datamodel::{dml, dml::ScalarType, errors_and_warnings::*, ValidatedDatamodel};
+use datamodel::{diagnostics::*, dml, dml::ScalarType, ValidatedDatamodel};
 use datamodel_connector::NativeTypeInstance;
 use pretty_assertions::assert_eq;
 
@@ -289,7 +289,7 @@ impl WarningAsserts for Vec<DatamodelWarning> {
     }
 }
 
-impl ErrorAsserts for ErrorsAndWarnings {
+impl ErrorAsserts for Diagnostics {
     fn assert_is(&self, error: DatamodelError) -> &Self {
         assert_eq!(
             self.errors.len(),
@@ -348,14 +348,14 @@ pub fn parse(datamodel_string: &str) -> ValidatedDatamodel {
 }
 
 #[allow(dead_code)] // Not sure why the compiler thinks this is never used.
-pub fn parse_error(datamodel_string: &str) -> ErrorsAndWarnings {
+pub fn parse_error(datamodel_string: &str) -> Diagnostics {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,
     }
 }
 
-pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> ErrorsAndWarnings {
+pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> Diagnostics {
     match datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,

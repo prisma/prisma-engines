@@ -2,7 +2,7 @@ use super::super::helpers::*;
 use crate::ast::Span;
 use crate::common::preview_features::{DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES};
 use crate::transform::ast_to_dml::common::validate_preview_features;
-use crate::{ast, configuration::Generator, errors_and_warnings::*, ValidatedGenerator};
+use crate::{ast, configuration::Generator, diagnostics::*, ValidatedGenerator};
 use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";
@@ -27,14 +27,14 @@ pub struct ValidatedGenerators {
 }
 
 impl GeneratorLoader {
-    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<ValidatedGenerators, ErrorsAndWarnings> {
+    pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst) -> Result<ValidatedGenerators, Diagnostics> {
         let mut generators: Vec<Generator> = vec![];
-        let mut errors_and_warnings = ErrorsAndWarnings::new();
+        let mut diagnostics = Diagnostics::new();
 
         for gen in &ast_schema.generators() {
             match Self::lift_generator(&gen) {
                 Ok(loaded_gen) => {
-                    errors_and_warnings.append_warning_vec(loaded_gen.warnings);
+                    diagnostics.append_warning_vec(loaded_gen.warnings);
                     generators.push(loaded_gen.generator)
                 }
                 // Lift error.
@@ -42,35 +42,35 @@ impl GeneratorLoader {
                     for e in err.errors {
                         match e {
                             DatamodelError::ArgumentNotFound { argument_name, span } => {
-                                errors_and_warnings.push_error(DatamodelError::new_generator_argument_not_found_error(
+                                diagnostics.push_error(DatamodelError::new_generator_argument_not_found_error(
                                     argument_name.as_str(),
                                     gen.name.name.as_str(),
                                     span,
                                 ));
                             }
                             _ => {
-                                errors_and_warnings.push_error(e);
+                                diagnostics.push_error(e);
                             }
                         }
                     }
-                    errors_and_warnings.append_warning_vec(err.warnings)
+                    diagnostics.append_warning_vec(err.warnings)
                 }
             }
         }
 
-        if errors_and_warnings.has_errors() {
-            Err(errors_and_warnings)
+        if diagnostics.has_errors() {
+            Err(diagnostics)
         } else {
             Ok(ValidatedGenerators {
                 generators,
-                warnings: errors_and_warnings.warnings,
+                warnings: diagnostics.warnings,
             })
         }
     }
 
-    fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<ValidatedGenerator, ErrorsAndWarnings> {
+    fn lift_generator(ast_generator: &ast::GeneratorConfig) -> Result<ValidatedGenerator, Diagnostics> {
         let mut args = Arguments::new(&ast_generator.properties, ast_generator.span);
-        let mut errors_and_warnings = ErrorsAndWarnings::new();
+        let mut diagnostics = Diagnostics::new();
 
         let provider = args.arg(PROVIDER_KEY)?.as_str()?;
         let output = if let Ok(arg) = args.arg(OUTPUT_KEY) {
@@ -103,11 +103,11 @@ impl GeneratorLoader {
                 Vec::from(DEPRECATED_GENERATOR_PREVIEW_FEATURES),
             );
             if result.has_errors() {
-                errors_and_warnings.append(&mut result);
-                return Err(errors_and_warnings);
+                diagnostics.append(&mut result);
+                return Err(diagnostics);
             }
             if result.has_warnings() {
-                errors_and_warnings.append_warning_vec(result.warnings)
+                diagnostics.append_warning_vec(result.warnings)
             }
         }
 
@@ -130,7 +130,7 @@ impl GeneratorLoader {
                 config: properties,
                 documentation: ast_generator.documentation.clone().map(|comment| comment.text),
             },
-            warnings: errors_and_warnings.warnings,
+            warnings: diagnostics.warnings,
         })
     }
 }

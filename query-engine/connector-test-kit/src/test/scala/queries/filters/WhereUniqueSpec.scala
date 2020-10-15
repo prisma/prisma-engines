@@ -34,7 +34,7 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
   // We cannot express that we expect exactly one field in the WhereUniqueInput in GraphQL, we therefore will error at runtime
   // and hint at the correct way to use the api
 
-  "Providing zero unique fields" should "errors_and_warnings" in {
+  "Providing zero unique fields" should "diagnostics" in {
     server.queryThatMustFail(
       s"""query{user(where: {}){unique}}""",
       project,
@@ -47,7 +47,7 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(s"""query{user(where: {email: "test@test.com"}){unique}}""", project).toString should be("""{"data":{"user":{"unique":2}}}""")
   }
 
-  "Providing more than 1 unique field" should "errors_and_warnings" in {
+  "Providing more than 1 unique field" should "diagnostics" in {
     server.queryThatMustFail(
       s"""query{user(where: {id:"wrong", email: "test@test.com"}){unique}}""",
       project,

@@ -1,5 +1,5 @@
-use crate::errors_and_warnings::{DatamodelWarning, ErrorsAndWarnings};
-use crate::{ast, dml, errors_and_warnings::DatamodelError};
+use crate::diagnostics::{DatamodelWarning, Diagnostics};
+use crate::{ast, diagnostics::DatamodelError, dml};
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 pub (crate) const STATE_ERROR: &str = "Failed lookup of model or field during internal processing. This means that the internal representation was mutated incorrectly.";
@@ -31,8 +31,8 @@ pub fn validate_preview_features(
     span: ast::Span,
     supported_preview_features: Vec<&str>,
     deprecated_preview_features: Vec<&str>,
-) -> ErrorsAndWarnings {
-    let mut result = ErrorsAndWarnings::new();
+) -> Diagnostics {
+    let mut result = Diagnostics::new();
     if let Some(unknown_preview_feature) = preview_features
         .iter()
         .find(|pf| !supported_preview_features.contains(&pf.as_str()))

@@ -1,8 +1,8 @@
 use crate::ast::WithAttributes;
 use crate::{
-    ast, configuration, dml,
-    errors_and_warnings::{DatamodelError, ErrorsAndWarnings},
-    DefaultValue, FieldType,
+    ast, configuration,
+    diagnostics::{DatamodelError, Diagnostics},
+    dml, DefaultValue, FieldType,
 };
 use prisma_value::PrismaValue;
 use std::collections::HashSet;
@@ -26,8 +26,8 @@ impl<'a> Validator<'a> {
         Self { source }
     }
 
-    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorsAndWarnings> {
-        let mut all_errors = ErrorsAndWarnings::new();
+    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+        let mut all_errors = Diagnostics::new();
 
         if let Err(ref mut errs) = self.validate_names(ast_schema) {
             all_errors.append(errs);
@@ -40,7 +40,7 @@ impl<'a> Validator<'a> {
         // Model level validations.
         for model in schema.models() {
             // Having a separate error collection allows checking whether any error has occurred for a model.
-            let mut errors_for_model = ErrorsAndWarnings::new();
+            let mut errors_for_model = Diagnostics::new();
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
@@ -114,7 +114,7 @@ impl<'a> Validator<'a> {
 
         // Enum level validations.
         for declared_enum in schema.enums() {
-            let mut errors_for_enum = ErrorsAndWarnings::new();
+            let mut errors_for_enum = Diagnostics::new();
             if let Err(err) = self.validate_enum_name(
                 ast_schema.find_enum(&declared_enum.name).expect(STATE_ERROR),
                 declared_enum,
@@ -136,13 +136,13 @@ impl<'a> Validator<'a> {
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
-    ) -> Result<(), ErrorsAndWarnings> {
-        let mut all_errors = ErrorsAndWarnings::new();
+    ) -> Result<(), Diagnostics> {
+        let mut all_errors = Diagnostics::new();
 
         // Model level validations.
         for model in schema.models() {
             // Having a separate error collection allows checking whether any error has occurred for a model.
-            let mut errors_for_model = ErrorsAndWarnings::new();
+            let mut errors_for_model = Diagnostics::new();
 
             if !errors_for_model.has_errors() {
                 let mut new_errors = self.validate_relation_arguments_bla(
@@ -163,8 +163,8 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         for model in ast_schema.models() {
             errors.push_opt_error(model.name.validate("Model").err());
@@ -193,8 +193,8 @@ impl<'a> Validator<'a> {
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &dml::Datamodel,
-    ) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    ) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
         let mut index_names = HashSet::new();
 
         let multiple_indexes_with_same_name_are_supported = self
@@ -226,8 +226,8 @@ impl<'a> Validator<'a> {
         errors.ok()
     }
 
-    fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         // TODO: this is really ugly
         let scalar_lists_are_supported = match self.source {
@@ -252,8 +252,8 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         for field in model.scalar_fields() {
             if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
@@ -285,8 +285,8 @@ impl<'a> Validator<'a> {
         data_model: &dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
-    ) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    ) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         for field in model.scalar_fields() {
             if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
@@ -312,8 +312,8 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         if let Some(data_source) = self.source {
             if !data_source.combined_connector.supports_multiple_auto_increment()
@@ -490,8 +490,8 @@ impl<'a> Validator<'a> {
         _datamodel: &dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
-    ) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    ) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         for field in model.relation_fields() {
             let ast_field = ast_model.find_field(&field.name);
@@ -576,8 +576,8 @@ impl<'a> Validator<'a> {
         datamodel: &dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
-    ) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    ) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         for field in model.relation_fields() {
             let ast_field = ast_model.find_field(&field.name);
@@ -743,8 +743,8 @@ impl<'a> Validator<'a> {
         datamodel: &dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
-    ) -> ErrorsAndWarnings {
-        let mut errors = ErrorsAndWarnings::new();
+    ) -> Diagnostics {
+        let mut errors = Diagnostics::new();
 
         for field in model.relation_fields() {
             let field_span = ast_model

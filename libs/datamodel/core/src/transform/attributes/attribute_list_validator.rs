@@ -1,7 +1,7 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::ast;
+use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::dml;
-use crate::errors_and_warnings::{DatamodelError, ErrorsAndWarnings};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.
@@ -33,8 +33,8 @@ impl<T: 'static> AttributeListValidator<T> {
 
     /// For each attribute in the given object, picks the correct
     /// attribute definition and uses it to validate and apply the attribute.
-    pub fn validate_and_apply(&self, ast: &dyn ast::WithAttributes, t: &mut T) -> Result<(), ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    pub fn validate_and_apply(&self, ast: &dyn ast::WithAttributes, t: &mut T) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         let mut attribute_counts = HashMap::new();
         for attribute in ast.attributes() {
@@ -106,8 +106,8 @@ impl<T: 'static> AttributeListValidator<T> {
         Ok(())
     }
 
-    pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, ErrorsAndWarnings> {
-        let mut errors = ErrorsAndWarnings::new();
+    pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, Diagnostics> {
+        let mut errors = Diagnostics::new();
         let mut result: Vec<ast::Attribute> = Vec::new();
 
         for attribute in self.known_attributes.values() {

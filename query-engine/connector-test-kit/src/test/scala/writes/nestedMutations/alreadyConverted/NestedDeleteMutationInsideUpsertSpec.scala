@@ -378,7 +378,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     }
   }
 
-  "a P1! to CM  relation" should "errors_and_warnings" in {
+  "a P1! to CM  relation" should "diagnostics" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel

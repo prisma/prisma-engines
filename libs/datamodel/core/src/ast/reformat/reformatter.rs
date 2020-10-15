@@ -6,13 +6,13 @@ use pest::Parser;
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
 use crate::common::WritableString;
-use crate::errors_and_warnings::DatamodelWarning;
+use crate::diagnostics::DatamodelWarning;
 use pest::iterators::Pair;
 
 pub struct Reformatter<'a> {
     input: &'a str,
-    missing_fields: Result<ValidatedMissingFields, crate::errors_and_warnings::ErrorsAndWarnings>,
-    missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::errors_and_warnings::ErrorsAndWarnings>,
+    missing_fields: Result<ValidatedMissingFields, crate::diagnostics::Diagnostics>,
+    missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics>,
 }
 
 pub struct ValidatedMissingFields {
@@ -32,16 +32,14 @@ impl<'a> Reformatter<'a> {
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
-    fn find_all_missing_fields(
-        schema_string: &str,
-    ) -> Result<ValidatedMissingFields, crate::errors_and_warnings::ErrorsAndWarnings> {
-        let mut errors_and_warnings = crate::errors_and_warnings::ErrorsAndWarnings::new();
+    fn find_all_missing_fields(schema_string: &str) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
+        let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
-        errors_and_warnings.append_warning_vec(validated_datamodel.warnings);
+        diagnostics.append_warning_vec(validated_datamodel.warnings);
 
         for model in validated_datamodel.datamodel.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
@@ -60,17 +58,17 @@ impl<'a> Reformatter<'a> {
 
         Ok(ValidatedMissingFields {
             missing_fields: result,
-            warnings: errors_and_warnings.warnings,
+            warnings: diagnostics.warnings,
         })
     }
 
     fn find_all_missing_attributes(
         schema_string: &str,
-    ) -> Result<Vec<MissingFieldAttribute>, crate::errors_and_warnings::ErrorsAndWarnings> {
-        let mut errors_and_warnings = crate::errors_and_warnings::ErrorsAndWarnings::new();
+    ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
+        let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
-        errors_and_warnings.append_warning_vec(validated_datamodel.warnings);
+        diagnostics.append_warning_vec(validated_datamodel.warnings);
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut missing_field_attributes = Vec::new();
         for model in validated_datamodel.datamodel.models() {
