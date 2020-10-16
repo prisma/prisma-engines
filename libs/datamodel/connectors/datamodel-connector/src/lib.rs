@@ -3,6 +3,7 @@ mod combined_connector;
 pub mod error;
 use crate::error::ConnectorError;
 pub use combined_connector::CombinedConnector;
+use dml::field::Field;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 

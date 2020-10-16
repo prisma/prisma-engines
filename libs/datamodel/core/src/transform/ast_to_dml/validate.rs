@@ -461,18 +461,14 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_field_connector_specific(
-        &self,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    fn validate_field_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
+        let mut diagnostics = Diagnostics::new();
 
         if let Some(source) = self.source {
             let connector = &source.active_connector;
             for field in model.fields.iter() {
                 if let Err(err) = connector.validate_field(field) {
-                    errors.push(DatamodelError::new_connector_error(
+                    diagnostics.push_error(DatamodelError::new_connector_error(
                         &err.to_string(),
                         ast_model.find_field(&field.name()).span,
                     ));
@@ -480,7 +476,11 @@ impl<'a> Validator<'a> {
             }
         }
 
-        Ok(())
+        if diagnostics.has_errors() {
+            Err(diagnostics)
+        } else {
+            Ok(())
+        }
     }
 
     /// Ensures that embedded types do not have back relations
