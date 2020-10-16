@@ -7,7 +7,11 @@ fn should_fail_on_native_type_text_with_unique_attribute() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          previewFeatures = ["nativeTypes"]
+        }
+
+        generator {
+            provider = "prisma-client-js"
+            previwFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -30,7 +34,11 @@ fn should_fail_on_native_type_long_text_with_unique_attribute() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          previewFeatures = ["nativeTypes"]
+        }
+
+        generator {
+            provider = "prisma-client-js"
+            previwFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -53,7 +61,11 @@ fn should_fail_on_native_type_medium_text_with_unique_attribute() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          previewFeatures = ["nativeTypes"]
+        }
+
+        generator {
+            provider = "prisma-client-js"
+            previwFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -76,7 +88,11 @@ fn should_fail_on_native_type_tiny_text_with_unique_attribute() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          previewFeatures = ["nativeTypes"]
+        }
+
+        generator {
+            provider = "prisma-client-js"
+            previwFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -99,7 +115,11 @@ fn should_fail_on_native_type_blob_with_unique_attribute() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          previewFeatures = ["nativeTypes"]
+        }
+
+        generator {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -122,7 +142,11 @@ fn should_fail_on_native_type_tiny_blob_with_unique_attribute() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          previewFeatures = ["nativeTypes"]
+        }
+
+        generator {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -145,7 +169,11 @@ fn should_fail_on_native_type_medium_blob_with_unique_attribute() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          previewFeatures = ["nativeTypes"]
+        }
+
+        generator {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -168,7 +196,11 @@ fn should_fail_on_native_type_long_blob_with_unique_attribute() {
         datasource db {
           provider = "mysql"
           url = "mysql://"
-          previewFeatures = ["nativeTypes"]
+        }
+
+        generator {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {

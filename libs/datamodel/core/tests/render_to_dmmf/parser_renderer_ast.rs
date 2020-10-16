@@ -118,7 +118,11 @@ fn test_parser_renderer_native_types_via_ast() {
     let input = r#"datasource pg {
   provider        = "postgresql"
   url             = "postgresql://"
-  previewFeatures = ["nativeTypes"]
+}
+
+generator {
+  provider = "prisma-client-js"
+  previwFeatures = ["nativeTypes"]
 }
 
 model Blog {
