@@ -338,16 +338,19 @@ fn microsoft_sql_server_preview_feature_must_work() {
         datasource redmond {
             provider = "sqlserver"
             url = "sqlserver://localhost:1645;foo=bar"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
             previewFeatures = ["microsoftSqlServer"]
         }
+
     "#;
 
     let config = parse_configuration(schema);
-    let data_source = config.datasources.first().unwrap();
+    let generator = config.generators.first().unwrap();
 
-    assert!(data_source
-        .preview_features
-        .contains(&String::from("microsoftSqlServer")));
+    assert!(generator.preview_features.contains(&String::from("microsoftSqlServer")));
 }
 
 fn assert_eq_json(a: &str, b: &str) {

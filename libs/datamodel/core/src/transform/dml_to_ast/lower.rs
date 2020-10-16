@@ -3,19 +3,21 @@ use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
 use crate::diagnostics::Diagnostics;
 use crate::dml::FieldType::NativeType;
-use crate::{ast, dml, Datasource};
+use crate::{ast, dml, Datasource, Generator};
 
 pub struct LowerDmlToAst<'a> {
     attributes: AllAttributes,
     datasource: Option<&'a Datasource>,
+    generators: &'a Vec<Generator>,
 }
 
 impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(datasource: Option<&'a Datasource>) -> Self {
+    pub fn new(datasource: Option<&'a Datasource>, generators: &'a Vec<Generator>) -> Self {
         Self {
             attributes: AllAttributes::new(),
             datasource,
+            generators,
         }
     }
 
@@ -90,7 +92,7 @@ impl<'a> LowerDmlToAst<'a> {
         let mut attributes = self.attributes.field.serialize(field, datamodel)?;
         if let (dml::Field::ScalarField(sf), Some(datasource)) = (field, self.datasource) {
             if let NativeType(_prisma_tpe, native_tpe) = sf.clone().field_type {
-                if datasource.has_preview_feature("nativeTypes") {
+                if self.generators.iter().any(|g| g.has_preview_feature("nativeTypes")) {
                     let new_attribute_name = format!("{}.{}", datasource.name, native_tpe.name);
                     // lower native type arguments
                     let mut arguments = vec![];

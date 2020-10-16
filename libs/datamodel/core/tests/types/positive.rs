@@ -51,8 +51,13 @@ fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attr
         datasource db {
             provider        = "postgres"
             url             = env("DATABASE_URL")
-            previewFeatures = ["nativeTypes"]
         }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
+        }
+
 
         model User {
             id   Int @id
@@ -81,7 +86,11 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
         datasource db {
             provider        = "mysql"
             url             = "mysql://"
-            previewFeatures = ["nativeTypes"]
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
         }
 
         model User {
@@ -173,6 +182,10 @@ fn should_handle_type_specifications_on_postgres() {
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
           previewFeatures = ["nativeTypes"]
         }
 
@@ -204,6 +217,10 @@ fn should_handle_type_specifications_on_mysql() {
         datasource mys {
           provider = "mysql"
           url = "mysql://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
           previewFeatures = ["nativeTypes"]
         }
 

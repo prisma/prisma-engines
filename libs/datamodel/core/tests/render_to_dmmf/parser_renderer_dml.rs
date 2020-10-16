@@ -247,10 +247,14 @@ model User {
 
 #[test]
 fn test_parser_renderer_native_types_via_dml() {
-    let input = r#"datasource pg {
-  provider        = "postgresql"
-  url             = "postgresql://"
+    let input = r#"generator client {
+  provider        = "prisma-client-js"
   previewFeatures = ["nativeTypes"]
+}
+
+datasource pg {
+  provider = "postgresql"
+  url      = "postgresql://"
 }
 
 model Blog {

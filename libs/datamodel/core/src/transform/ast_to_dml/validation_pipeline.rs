@@ -3,17 +3,20 @@ use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
-pub struct ValidationPipeline<'a> {
-    lifter: LiftAstToDml<'a>,
+pub struct ValidationPipeline<'a, 'b> {
+    lifter: LiftAstToDml<'a, 'b>,
     validator: Validator<'a>,
     standardiser: Standardiser,
 }
 
-impl<'a> ValidationPipeline<'a> {
-    pub fn new(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
+impl<'a, 'b> ValidationPipeline<'a, 'b> {
+    pub fn new(
+        sources: &'a [configuration::Datasource],
+        generators: &'b Vec<configuration::Generator>,
+    ) -> ValidationPipeline<'a, 'b> {
         let source = sources.first();
         ValidationPipeline {
-            lifter: LiftAstToDml::new(source),
+            lifter: LiftAstToDml::new(source, generators),
             validator: Validator::new(source),
             standardiser: Standardiser::new(),
         }
