@@ -15,8 +15,8 @@ fn must_add_new_line_to_end_of_schema() {
 #[test]
 fn test_reformat_model_simple() {
     let input = r#"
-        model User { 
-            id               Int                   @id 
+        model User {
+            id               Int                   @id
         }
     "#;
 
@@ -32,12 +32,12 @@ fn test_reformat_model_simple() {
 fn test_reformat_model_complex() {
     let input = r#"
         /// model doc comment
-        model User { 
+        model User {
             id Int @id // doc comment on the side
             fieldA String    @unique // comment on the side
             // comment before
             /// doc comment before
-            anotherWeirdFieldName Int 
+            anotherWeirdFieldName Int
         }
     "#;
 
@@ -269,11 +269,11 @@ fn commented_models_dont_get_removed() {
         // model One {
         //   id Int @id
         // }
-        
+
         model Two {
           id Int @id
         }
-        
+
         // model Three {
         //   id Int @id
         // }
@@ -298,7 +298,7 @@ model Two {
 #[test]
 fn a_comment_in_datasource_must_not_add_extra_newlines() {
     let input = r#"
-        datasource pg { 
+        datasource pg {
             provider = "postgresql"
             url = "postgresql://"
             // a comment
@@ -318,7 +318,7 @@ fn a_comment_in_datasource_must_not_add_extra_newlines() {
 #[test]
 fn a_comment_in_generator_must_not_add_extra_newlines() {
     let input = r#"
-        generator js { 
+        generator js {
             provider = "js"
             // a comment
         }
@@ -336,7 +336,7 @@ fn a_comment_in_generator_must_not_add_extra_newlines() {
 #[test]
 fn test_reformat_config() {
     let input = r#"
-        datasource pg { 
+        datasource pg {
             provider = "postgresql"
             url = "postgresql://"
         }
@@ -436,7 +436,7 @@ fn reformatting_enums_must_work() {
 
   // comment
   ORANGE_AND_KIND_OF_RED @map("super_color")
-  
+
   @@map("the_colors")
 }
 "#;
@@ -458,7 +458,7 @@ fn reformatting_enums_must_work() {
 #[test]
 fn reformatting_must_work_when_env_var_is_missing() {
     let input = r#"
-        datasource pg { 
+        datasource pg {
             provider = "postgresql"
             url = env("DATABASE_URL")
         }
@@ -525,8 +525,12 @@ fn reformatting_an_invalid_generator_block_must_work() {
 #[test]
 fn reformatting_a_model_with_native_type_definitions_must_work() {
     let input = r#"datasource pg {
-  provider        = "postgres"
-  url             = "postgresql://"
+  provider = "postgres"
+  url      = "postgresql://"
+}
+
+generator js {
+  provider        = "prisma-client-js"
   previewFeatures = ["nativeTypes"]
 }
 
