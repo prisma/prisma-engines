@@ -144,7 +144,11 @@ impl Connector for MySqlDatamodelConnector {
             if (native_type_name == TEXT_TYPE_NAME
                 || native_type_name == TINY_TEXT_TYPE_NAME
                 || native_type_name == MEDIUM_TEXT_TYPE_NAME
-                || native_type_name == LONG_TEXT_TYPE_NAME)
+                || native_type_name == LONG_TEXT_TYPE_NAME
+                || native_type_name == BLOB_TYPE_NAME
+                || native_type_name == LONG_BLOB_TYPE_NAME
+                || native_type_name == TINY_BLOB_TYPE_NAME
+                || native_type_name == MEDIUM_BLOB_TYPE_NAME)
                 && field.is_unique()
             {
                 return Err(ConnectorError::new_incompatible_native_type_with_unique(
