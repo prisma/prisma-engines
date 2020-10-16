@@ -7,7 +7,7 @@ import util._
 class RelationGraphQLSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "One2One relations" should "only allow one item per side" in {
+  "One2One relations" should "only allow one item per side" taggedAs (IgnoreMsSql) in {
     val dms = {
       val dm1 = """model Owner{
                      id        String  @id @default(cuid())

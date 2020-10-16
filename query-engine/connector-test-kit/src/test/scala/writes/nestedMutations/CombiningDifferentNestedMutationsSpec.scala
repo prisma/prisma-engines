@@ -30,7 +30,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         """
           |mutation {
           |  createParent(
-          |    data: { p: "p1", childrenOpt: { create: [{ c: "c1" }, { c: "c2" }] } }
+          |    data: { p: "p1", p_1: "1", p_2: "2" childrenOpt: { create: [{ c: "c1", c_1: "foo", c_2: "bar" }, { c: "c2", c_1: "q1t", c_2: "asd" }] } }
           |  ) {
           |    childrenOpt(orderBy: { c: asc }) {
           |      c
@@ -50,7 +50,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
           |    where: { p: "p1" }
           |    data: {
           |      childrenOpt: {
-          |        create: [{ c: "c3" }, { c: "c4" }]
+          |        create: [{ c: "c3", c_1: "jeesus", c_2: "maria" }, { c: "c4", c_1: "3t1", c_2: "a1" }]
           |        update: [{ where: { c: "c3" }, data: { c: { set: "cUpdated" } } }]
           |      }
           |    }
@@ -83,7 +83,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         """
           |mutation {
           |  createParent(
-          |    data: { p: "p1", childrenOpt: { create: [{ c: "c1" }, { c: "c2" }] } }
+          |    data: { p: "p1", p_1: "1", p_2: "2", childrenOpt: { create: [{ c: "c1", c_1: "foo", c_2: "bar" }, { c: "c2", c_1: "zol", c_2: "lol" }] } }
           |  ) {
           |    childrenOpt {
           |      c
@@ -102,7 +102,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
           |  updateParent(
           |    where: { p: "p1" }
           |    data: {
-          |      childrenOpt: { create: [{ c: "c3" }, { c: "c4" }], delete: [{ c: "c3" }] }
+          |      childrenOpt: { create: [{ c: "c3", c_1: "yksi", c_2: "kaksi" }, { c: "c4", c_1: "kolme", c_2: "nelja" }], delete: [{ c: "c3" }] }
           |    }
           |  ) {
           |    childrenOpt {
@@ -132,7 +132,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         """
           |mutation {
           |  createParent(
-          |    data: { p: "p1", childrenOpt: { create: [{ c: "c1" }, { c: "c2" }] } }
+          |    data: { p: "p1", p_1: "1", p_2: "2", childrenOpt: { create: [{ c: "c1", c_1: "foo", c_2: "bar" }, { c: "c2", c_1: "om", c_2: "mo" }] } }
           |  ) {
           |    childrenOpt {
           |      c
@@ -151,7 +151,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
           |  updateParent(
           |    where: { p: "p1" }
           |    data: {
-          |      childrenOpt: { create: [{ c: "c3" }, { c: "c4" }], set: [{ c: "c3" }] }
+          |      childrenOpt: { create: [{ c: "c3", c_1: "yksi", c_2: "kaksi" }, { c: "c4", c_1: "kolme", c_2: "neljae" }], set: [{ c: "c3" }] }
           |    }
           |  ) {
           |    childrenOpt {
@@ -182,7 +182,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         """
           |mutation {
           |  createParent(
-          |    data: { p: "p1", childrenOpt: { create: [{ c: "c1" }, { c: "c2" }] } }
+          |    data: { p: "p1", p_1: "1", p_2: "2", childrenOpt: { create: [{ c: "c1", c_1: "1", c_2: "2" }, { c: "c2", c_1: "3", c_2: "4" }] } }
           |  ) {
           |    childrenOpt(orderBy: { c: asc }) {
           |      c
@@ -202,16 +202,16 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
           |    where: { p: "p1" }
           |    data: {
           |      childrenOpt: {
-          |        create: [{ c: "c3" }, { c: "c4" }]
+          |        create: [{ c: "c3", c_1: "5", c_2: "6" }, { c: "c4", c_1: "7", c_2: "8" }]
           |        upsert: [
           |          {
           |            where: { c: "c3" }
-          |            create: { c: "should not matter" }
+          |            create: { c: "should not matter", c_1: "no matter", c_2: "matter not" }
           |            update: { c: { set: "cUpdated" }}
           |          }
           |          {
           |            where: { c: "c5" }
-          |            create: { c: "cNew" }
+          |            create: { c: "cNew", c_1: "matter", c_2: "most" }
           |            update: { c: { set: "should not matter" }}
           |          }
           |        ]
@@ -245,7 +245,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         """
           |mutation {
           |  createParent(
-          |    data: { p: "p1", childrenOpt: { create: [{ c: "c1" }, { c: "c2" }] } }
+          |    data: { p: "p1", p_1: "1", p_2: "2", childrenOpt: { create: [{ c: "c1", c_1: "foo", c_2: "bar" }, { c: "c2", c_1: "asd", c_2: "qawf" }] } }
           |  ) {
           |    childrenOpt {
           |      c
@@ -265,7 +265,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
           |    where: { p: "p1" }
           |    data: {
           |      childrenOpt: {
-          |        create: [{ c: "c3" }, { c: "c4" }]
+          |        create: [{ c: "c3", c_1: "yksi", c_2: "kaksi" }, { c: "c4", c_1: "kolme", c_2: "neljae" }]
           |        disconnect: [{ c: "c3" }]
           |      }
           |    }

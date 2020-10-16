@@ -99,7 +99,6 @@ impl SqlRenderer for MysqlFlavour {
                     table: table.clone(),
                     index: new_index,
                     caused_by_create_table: false,
-                    contains_nullable_columns: false,
                 }),
                 mysql_drop_index(self, table, index_name),
             ]

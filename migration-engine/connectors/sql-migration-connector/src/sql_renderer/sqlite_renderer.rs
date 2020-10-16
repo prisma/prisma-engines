@@ -259,7 +259,6 @@ impl SqlRenderer for SqliteFlavour {
                     table: differ.next.name().to_owned(),
                     index: index.clone(),
                     caused_by_create_table: false,
-                    contains_nullable_columns: false,
                 })
             }));
         }
