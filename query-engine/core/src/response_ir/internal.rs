@@ -82,32 +82,23 @@ fn serialize_aggregation(
             }
 
             AggregationResult::Average(field, value) => {
-                let avg_field = aggregate_object_type.find_field("avg").unwrap();
-                let avg_object_type = match avg_field.field_type.borrow() {
-                    OutputType::Object(obj) => obj.into_arc(),
-                    _ => unreachable!("Avg output must be an object."),
-                };
-
-                let field_output_type = avg_object_type.find_field(&field.name).unwrap();
-                flattened.insert(
-                    format!("avg_{}", &field.name),
-                    serialize_scalar(&field_output_type, value)?,
-                );
+                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "avg", &field.name);
+                flattened.insert(format!("avg_{}", &field.name), serialize_scalar(&output_field, value)?);
             }
 
             AggregationResult::Sum(field, value) => {
-                let field_type = aggregate_object_type.find_field("sum").unwrap();
-                flattened.insert(format!("sum_{}", &field.name), serialize_scalar(output_field, value)?);
+                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "sum", &field.name);
+                flattened.insert(format!("sum_{}", &field.name), serialize_scalar(&output_field, value)?);
             }
 
             AggregationResult::Min(field, value) => {
-                let field_type = aggregate_object_type.find_field("min").unwrap();
-                flattened.insert(format!("min_{}", &field.name), serialize_scalar(output_field, value)?);
+                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "min", &field.name);
+                flattened.insert(format!("min_{}", &field.name), serialize_scalar(&output_field, value)?);
             }
 
             AggregationResult::Max(field, value) => {
-                let field_type = aggregate_object_type.find_field("max").unwrap();
-                flattened.insert(format!("max_{}", &field.name), serialize_scalar(output_field, value)?);
+                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "max", &field.name);
+                flattened.insert(format!("max_{}", &field.name), serialize_scalar(&output_field, value)?);
             }
         }
     }
@@ -134,6 +125,21 @@ fn serialize_aggregation(
     envelope.insert(None, Item::Map(inner_map));
 
     Ok(envelope)
+}
+
+// Workaround until we streamline serialization.
+fn find_nested_aggregate_output_field(
+    object_type: &ObjectTypeStrongRef,
+    nested_obj_name: &str,
+    nested_field_name: &str,
+) -> OutputFieldRef {
+    let nested_field = object_type.find_field(nested_obj_name).unwrap();
+    let nested_object_type = match nested_field.field_type.borrow() {
+        OutputType::Object(obj) => obj.into_arc(),
+        _ => unreachable!(format!("{} output must be an object.", nested_obj_name)),
+    };
+
+    nested_object_type.find_field(nested_field_name).unwrap()
 }
 
 fn serialize_record_selection(

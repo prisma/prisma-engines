@@ -232,6 +232,7 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::Bytes) => Self::parse_bytes(parent_path, s),
             (QueryValue::String(s), ScalarType::Decimal) => Self::parse_decimal(parent_path, s),
             (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
+            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(Decimal::from(i))),
             (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(Decimal::from(i))),
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
