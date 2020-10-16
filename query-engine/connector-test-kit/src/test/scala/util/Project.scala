@@ -59,6 +59,10 @@ case class Project(
          |datasource test {
          |  provider = "${ConnectorConfig.instance.provider.stripSuffix("56")}"
          |  url = "${url}"
+         |}
+         |
+         |generator client {
+         |  provider = "prisma-client-js"
          |  previewFeatures = ["nativeTypes"]
          |}
          |
