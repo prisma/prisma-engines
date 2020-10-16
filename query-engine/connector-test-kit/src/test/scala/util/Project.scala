@@ -22,9 +22,18 @@ case class Project(
     s"""
            |datasource test {
            |  provider = "${config.provider.stripSuffix("56")}"
-           |  url = "${dataSourceUrl}"
-           |  previewFeatures = ["nativeTypes"]
+           |  url = "$dataSourceUrl"
            |}
+    """.stripMargin
+  }
+
+  // Completely useless, but required since previewFeatures are a complete mess.
+  val generatorBlock: String = {
+    s"""
+       |generator client {
+       |  provider = "prisma-client-js"
+       |  previewFeatures = ["nativeTypes"]
+       |}
     """.stripMargin
   }
 
