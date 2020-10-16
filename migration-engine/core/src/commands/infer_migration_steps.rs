@@ -48,7 +48,9 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             datamodel::lift_ast_to_datamodel(&assumed_datamodel_ast).map_err(CoreError::ProducedBadDatamodel)?;
 
         let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
-        let version_check_errors = connector.check_database_version_compatibility(&next_datamodel);
+        if let Some(err) = connector.check_database_version_compatibility(&next_datamodel) {
+            return Err(ConnectorError::user_facing_error(err).into());
+        };
 
         let next_datamodel_ast = parse_schema(&cmd.input.datamodel)
             .map_err(|err| CoreError::Input(anyhow::anyhow!("{}", err.to_pretty_string("", &cmd.input.datamodel))))?;
@@ -63,7 +65,6 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
         let DestructiveChangeDiagnostics {
             warnings,
-            errors: _,
             unexecutable_migrations,
         } = connector
             .destructive_change_checker()
@@ -110,9 +111,9 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: returned_datamodel_steps,
             database_steps,
-            errors: version_check_errors,
+            errors: [],
             warnings,
-            general_errors: vec![],
+            general_errors: [],
             unexecutable_migrations,
         })
     }
