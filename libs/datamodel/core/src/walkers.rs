@@ -2,12 +2,11 @@
 //! The most prominent functionality is the pain free navigation of relations.
 use crate::{
     dml::{
-        Datamodel, DefaultValue, Enum, FieldArity, FieldType, IndexDefinition, Model, ScalarField, ScalarType,
-        WithDatabaseName,
+        Datamodel, DefaultValue, Enum, FieldArity, FieldType, IndexDefinition, Model, ScalarField, WithDatabaseName,
     },
-    RelationField,
+    NativeTypeInstance, RelationField,
 };
-use datamodel_connector::NativeTypeInstance;
+use dml::scalars::ScalarType;
 use itertools::Itertools;
 
 /// Iterator over all the models in the schema.

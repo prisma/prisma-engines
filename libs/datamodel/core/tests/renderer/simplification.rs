@@ -71,7 +71,7 @@ fn test_render_relation_name_on_self_relations() {
 }
 "#;
 
-    let dml = datamodel::parse_datamodel(input).unwrap();
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);

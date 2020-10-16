@@ -2,9 +2,8 @@ use super::SqlSchemaCalculatorFlavour;
 use crate::{flavour::MysqlFlavour, sql_schema_calculator::SqlSchemaCalculator};
 use datamodel::{
     walkers::{walk_scalar_fields, ScalarFieldWalker},
-    ScalarType,
+    NativeTypeInstance, ScalarType,
 };
-use datamodel_connector::NativeTypeInstance;
 use native_types::MySqlType;
 use sql_schema_describer::{self as sql};
 

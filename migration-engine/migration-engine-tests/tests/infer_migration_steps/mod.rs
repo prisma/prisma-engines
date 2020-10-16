@@ -96,7 +96,12 @@ async fn infer_migration_steps_validates_that_already_applied_migrations_are_not
         .send()
         .await;
 
-    assert!(response.unwrap_err().to_string().starts_with("Failure during a migration command: Connector error. (error: Input is invalid. Migration mig01 is already applied."));
+    let err = response.unwrap_err().to_string();
+
+    assert!(
+        err.starts_with("Generic error: Input is invalid. Migration mig01 is already applied."),
+        err
+    );
 
     Ok(())
 }

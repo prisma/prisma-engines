@@ -1,5 +1,4 @@
 use crate::{
-    commands::CommandResult,
     migration::{datamodel_calculator::*, datamodel_migration_steps_inferrer::*},
     CoreResult,
 };
@@ -34,12 +33,12 @@ where
         Ok(engine)
     }
 
-    pub async fn init(&self) -> CommandResult<()> {
+    pub async fn init(&self) -> CoreResult<()> {
         self.connector().initialize().await?;
         Ok(())
     }
 
-    pub async fn reset(&self) -> CommandResult<()> {
+    pub async fn reset(&self) -> CoreResult<()> {
         self.connector().reset().await?;
         Ok(())
     }

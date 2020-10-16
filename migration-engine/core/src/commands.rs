@@ -33,7 +33,7 @@ pub use apply_migration::*;
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
 pub use calculate_database_steps::*;
 pub use calculate_datamodel::*;
-pub use command::{CommandError, CommandResult, MigrationCommand};
+pub use command::MigrationCommand;
 pub use create_migration::{CreateMigrationCommand, CreateMigrationInput, CreateMigrationOutput};
 pub use debug_panic::DebugPanicCommand;
 pub use diagnose_migration_history::{

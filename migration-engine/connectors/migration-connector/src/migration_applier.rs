@@ -15,8 +15,8 @@ pub struct MigrationApplierImpl<'a, T>
 where
     T: Send + Sync + 'static,
 {
-    pub migration_persistence: Box<dyn MigrationPersistence + 'a>,
-    pub step_applier: Box<dyn DatabaseMigrationStepApplier<T> + 'a>,
+    pub migration_persistence: &'a dyn MigrationPersistence,
+    pub step_applier: &'a dyn DatabaseMigrationStepApplier<T>,
 }
 
 #[async_trait::async_trait]

@@ -1,5 +1,5 @@
 use super::*;
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Identifier {

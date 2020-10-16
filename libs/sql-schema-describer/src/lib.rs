@@ -45,10 +45,13 @@ pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescribe
 pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.
     async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
+
     /// Get the databases metadata.
     async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
+
     /// Describe a database schema.
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
+
     /// Get the database version.
     async fn version(&self, schema: &str) -> SqlSchemaDescriberResult<Option<String>>;
 }
@@ -84,6 +87,18 @@ impl SqlSchema {
     /// Get an enum.
     pub fn get_enum(&self, name: &str) -> Option<&Enum> {
         self.enums.iter().find(|x| x.name == name)
+    }
+
+    /// Is this schema empty?
+    pub fn is_empty(&self) -> bool {
+        matches!(
+            self,
+            SqlSchema {
+                tables,
+                enums,
+                sequences,
+            } if tables.is_empty() && enums.is_empty() && sequences.is_empty()
+        )
     }
 
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {

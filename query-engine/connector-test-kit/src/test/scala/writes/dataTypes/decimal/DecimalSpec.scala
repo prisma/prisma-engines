@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class DecimalSpec extends FlatSpec with Matchers with ApiSpecBase {
-  "Using a Decimal field" should "work" in {
+  "Using a Decimal field" should "work" taggedAs (IgnoreSQLite, IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       """|model Model {
          | id    Int      @id
@@ -37,7 +37,7 @@ class DecimalSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  updateOneModel(
          |    where: { id: 1 }
          |    data: {
-         |      field: "0.0998877665544332211"
+         |      field: "0.09988776655443322"
          |    }
          |  ) {
          |    field
@@ -47,7 +47,7 @@ class DecimalSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString should be("""{"data":{"updateOneModel":{"field":"0.0998877665544332211"}}}""")
+    res.toString should be("""{"data":{"updateOneModel":{"field":"0.09988776655443322"}}}""")
 
     res = server.query(
       s"""

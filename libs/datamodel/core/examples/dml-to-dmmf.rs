@@ -26,7 +26,7 @@ fn main() {
             println!("{}", formatted);
         }
         Ok(dml) => {
-            let json = datamodel::json::dmmf::render_to_dmmf(&dml);
+            let json = datamodel::json::dmmf::render_to_dmmf(&dml.subject);
             println!("{}", json);
         }
     }

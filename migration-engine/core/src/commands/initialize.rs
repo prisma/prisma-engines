@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::migration_engine::MigrationEngine;
+use crate::{migration_engine::MigrationEngine, CoreResult};
 use serde::Deserialize;
 
 /// Input to the `Initialize` command.
@@ -22,7 +22,7 @@ impl<'a> MigrationCommand for InitializeCommand {
 
     type Output = InitializeOutput;
 
-    async fn execute<C, D>(_input: &Self::Input, _engine: &MigrationEngine<C, D>) -> super::CommandResult<Self::Output>
+    async fn execute<C, D>(_input: &Self::Input, _engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector<DatabaseMigration = D>,
         D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,

@@ -6,6 +6,7 @@ version = "0.1.0"
 
 [dependencies]
 datamodel-connector = {path = "../connectors/datamodel-connector"}
+dml = {path = "../connectors/dml"}
 prisma-value = {path = "../../prisma-value"}
 rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
 sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
@@ -23,7 +24,6 @@ serde = {version = "1.0.90", features = ["derive"]}
 serde_json = {version = "1.0", features = ["preserve_order"]}
 thiserror = "1.0"
 tracing = "0.1"
-uuid = {version = "0.8", features = ["serde", "v4"]}
 
 [dev-dependencies]
 clap = "2.33"

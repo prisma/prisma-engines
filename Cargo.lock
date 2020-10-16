@@ -368,7 +368,7 @@ dependencies = [
 [[package]]
 name = "barrel"
 version = "0.6.6-alpha.0"
-source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#b6298a4208083bfb63796cdc24ce1e4bcf7f62a8"
+source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#7822943706feaf3b8f6059ccc172324b620bab6e"
 
 [[package]]
 name = "base-x"
@@ -831,6 +831,7 @@ dependencies = [
  "colored",
  "cuid",
  "datamodel-connector",
+ "dml",
  "indoc 0.3.6",
  "itertools",
  "native-types",
@@ -847,15 +848,13 @@ dependencies = [
  "sql-datamodel-connector",
  "thiserror",
  "tracing",
- "uuid",
 ]
 
 [[package]]
 name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
- "native-types",
- "serde",
+ "dml",
  "serde_json",
  "thiserror",
 ]
@@ -889,6 +888,19 @@ name = "discard"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
+
+[[package]]
+name = "dml"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "cuid",
+ "native-types",
+ "prisma-value",
+ "serde",
+ "serde_json",
+ "uuid",
+]
 
 [[package]]
 name = "dtoa"
@@ -1001,6 +1013,16 @@ name = "event-listener"
 version = "2.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7531096570974c3a9dcf9e4b8e1cede1ec26cf5046219fb3b9d897503b9be59"
+
+[[package]]
+name = "eyre"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f4c5cb4dc433c59f09df4b4450f649cbfed61e8a3505abe32e4154066439157e"
+dependencies = [
+ "indenter",
+ "once_cell",
+]
 
 [[package]]
 name = "failure"
@@ -1469,6 +1491,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "indenter"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0bd112d44d9d870a6819eb505d04dd92b5e4d94bb8c304924a0872ae7016fb5"
+
+[[package]]
 name = "indexmap"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1566,6 +1594,29 @@ dependencies = [
  "tracing-futures",
  "tracing-subscriber",
  "user-facing-errors",
+]
+
+[[package]]
+name = "introspection-engine-tests"
+version = "0.1.0"
+dependencies = [
+ "barrel",
+ "datamodel",
+ "datamodel-connector",
+ "eyre",
+ "indoc 1.0.2",
+ "introspection-connector",
+ "pretty_assertions",
+ "quaint",
+ "serde",
+ "serde_json",
+ "sql-datamodel-connector",
+ "sql-introspection-connector",
+ "sql-schema-describer",
+ "test-macros",
+ "test-setup",
+ "tracing",
+ "tracing-futures",
 ]
 
 [[package]]
@@ -1881,7 +1932,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.9.1",
- "thiserror",
  "tracing",
  "tracing-error",
  "user-facing-errors",
@@ -1901,9 +1951,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-migration-connector",
- "thiserror",
  "tracing",
- "tracing-error",
  "tracing-futures",
  "url 2.1.1",
  "user-facing-errors",
@@ -1938,7 +1986,6 @@ dependencies = [
  "barrel",
  "chrono",
  "datamodel",
- "futures 0.3.5",
  "indoc 1.0.2",
  "migration-connector",
  "migration-core",
@@ -2666,7 +2713,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#95be46502571c425642c1006d8c40b8d39f5bfa8"
+source = "git+https://github.com/prisma/quaint#fa99f5353bb6c225872f6b35546dd6b54bca6b8f"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -3196,6 +3243,7 @@ name = "sql-datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "datamodel-connector",
+ "dml",
  "native-types",
  "serde_json",
 ]
@@ -3249,12 +3297,10 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "sha2 0.9.1",
  "sql-schema-describer",
  "tempfile",
  "tokio",
  "tracing",
- "tracing-error",
  "tracing-futures",
  "url 2.1.1",
  "user-facing-errors",
@@ -3293,7 +3339,6 @@ dependencies = [
  "anyhow",
  "async-trait",
  "barrel",
- "futures 0.3.5",
  "native-types",
  "once_cell",
  "pretty_assertions",
@@ -3501,7 +3546,6 @@ version = "0.1.0"
 dependencies = [
  "darling",
  "enumflags2",
- "feature-flags",
  "once_cell",
  "proc-macro2 1.0.24",
  "quote 1.0.7",

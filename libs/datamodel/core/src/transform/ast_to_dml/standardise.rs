@@ -1,11 +1,10 @@
 use super::common::*;
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::{
     ast,
     common::{NameNormalizer, RelationNames},
-    dml,
-    error::ErrorCollection,
-    Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
+    diagnostics::Diagnostics,
+    dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
 
 /// Helper for standardsing a datamodel.
@@ -20,7 +19,7 @@ impl Standardiser {
         Standardiser {}
     }
 
-    pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
+    pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
         self.name_unnamed_relations(schema);
 
         self.add_missing_back_relations(ast_schema, schema)?;
@@ -105,8 +104,8 @@ impl Standardiser {
         &self,
         ast_schema: &ast::SchemaAst,
         schema: &mut dml::Datamodel,
-    ) -> Result<(), ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    ) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         let mut missing_back_relation_fields = Vec::new();
         for model in schema.models() {
@@ -127,7 +126,7 @@ impl Standardiser {
                 let source_field = source_model
                     .find_relation_field(&missing_back_relation_field.related_field)
                     .expect(STATE_ERROR);
-                errors.push(field_validation_error(
+                errors.push_error(field_validation_error(
                                 "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
                                 &source_model,
                                 &Field::RelationField(source_field.clone()),
@@ -158,8 +157,8 @@ impl Standardiser {
         model: &dml::Model,
         schema: &dml::Datamodel,
         schema_ast: &ast::SchemaAst,
-    ) -> Result<Vec<AddMissingBackRelationField>, ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    ) -> Result<Vec<AddMissingBackRelationField>, Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         let mut result = Vec::new();
         for field in model.relation_fields() {
@@ -226,7 +225,7 @@ impl Standardiser {
                                     }
                                     _ => {
                                         // field with name exists and the type is incompatible.
-                                        errors.push(DatamodelError::new_model_validation_error(
+                                        errors.push_error(DatamodelError::new_model_validation_error(
                                             &format!(
                                                 "Automatic underlying field generation tried to add the field `{}` in model `{}` for the back relation field of `{}` in `{}`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
                                                 &f.name,

@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, error::DatamodelError};
+use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
 fn should_fail_if_field_type_is_string() {

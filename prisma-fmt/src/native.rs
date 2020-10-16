@@ -11,10 +11,10 @@ pub fn run() {
     let datamodel_result = datamodel::parse_configuration_and_ignore_datasource_urls(&datamodel_string);
 
     match datamodel_result {
-        Ok(configuration) => {
-            if configuration.datasources.len() != 1 {
+        Ok(validated_configuration) => {
+            if validated_configuration.subject.datasources.len() != 1 {
                 print!("[]")
-            } else if let Some(datasource) = configuration.datasources.first() {
+            } else if let Some(datasource) = validated_configuration.subject.datasources.first() {
                 let available_native_type_constructors =
                     datasource.active_connector.available_native_type_constructors();
 

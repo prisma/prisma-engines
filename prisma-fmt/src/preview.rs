@@ -1,11 +1,17 @@
 use crate::PreviewFeaturesOpts;
-use datamodel::common::preview_features::{DATASOURCE_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES};
+use datamodel::common::preview_features::{
+    DATASOURCE_PREVIEW_FEATURES, DEPRECATED_GENERATOR_PREVIEW_FEATURES, GENERATOR_PREVIEW_FEATURES,
+};
 
 pub fn run(opts: PreviewFeaturesOpts) {
-    let result = if opts.datasource_only {
+    let result: Vec<&str> = if opts.datasource_only {
         DATASOURCE_PREVIEW_FEATURES.to_vec()
     } else {
-        GENERATOR_PREVIEW_FEATURES.to_vec()
+        GENERATOR_PREVIEW_FEATURES
+            .iter()
+            .filter(|pf| !DEPRECATED_GENERATOR_PREVIEW_FEATURES.contains(pf))
+            .map(|&x| x)
+            .collect()
     };
 
     if result.is_empty() {

@@ -1,8 +1,8 @@
 use std::path::Path;
 
 use super::MigrationCommand;
-use crate::migration_engine::MigrationEngine;
-use migration_connector::{ErrorKind, MigrationDirectory, MigrationRecord};
+use crate::{migration_engine::MigrationEngine, CoreResult};
+use migration_connector::{MigrationDirectory, MigrationRecord};
 use serde::{Deserialize, Serialize};
 
 /// The input to the `DiagnoseMigrationHistory` command.
@@ -53,7 +53,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
 
     type Output = DiagnoseMigrationHistoryOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> super::CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector<DatabaseMigration = D>,
         D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
@@ -62,10 +62,12 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
         let migration_persistence = connector.new_migration_persistence();
         let migration_inferrer = connector.database_migration_inferrer();
 
+        tracing::debug!("Diagnosing migration history");
+
         // Load the migrations.
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
-        let migrations_from_database = migration_persistence.list_migrations().await?;
+        let migrations_from_database = migration_persistence.list_migrations().await?.unwrap_or_default();
 
         let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
 
@@ -108,16 +110,8 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             })
             .cloned()
             .collect();
-        diagnostics.drift_detected = match migration_inferrer.detect_drift(&applied_migrations).await {
-            Ok(drift_detected) => drift_detected,
-            Err(err) => match &err.kind {
-                ErrorKind::MigrationFailedToApply { migration_name, error } => {
-                    diagnostics.migration_failed_to_apply = Some((migration_name.clone(), error.to_string()));
-                    false
-                }
-                _ => return Err(err.into()),
-            },
-        };
+
+        diagnostics.drift_detected = migration_inferrer.detect_drift(&applied_migrations).await?;
 
         Ok(DiagnoseMigrationHistoryOutput {
             drift: diagnostics.drift(),

@@ -1,9 +1,9 @@
 use super::env_function::EnvFunction;
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
 use chrono::{DateTime, FixedOffset};
-use datamodel_connector::scalars::ScalarType;
+use dml::scalars::ScalarType;
 use prisma_value::PrismaValue;
 use rust_decimal::Decimal;
 use std::error;

@@ -9,7 +9,7 @@ pub struct DatamodelConverter<'a> {
 
 impl<'a> DatamodelConverter<'a> {
     pub fn convert_string(datamodel: String) -> InternalDataModelTemplate {
-        let datamodel = datamodel::parse_datamodel(&datamodel).unwrap();
+        let datamodel = datamodel::parse_datamodel(&datamodel).unwrap().subject;
         Self::convert(&datamodel)
     }
 

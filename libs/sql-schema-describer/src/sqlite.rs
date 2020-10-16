@@ -89,7 +89,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_table_names(&self, _schema: &str) -> Vec<String> {
-        let sql = r#"SELECT name FROM sqlite_master WHERE type='table'"#;
+        let sql = r#"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
         debug!("describing table names with query: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("get table names");
         let names = result_set
