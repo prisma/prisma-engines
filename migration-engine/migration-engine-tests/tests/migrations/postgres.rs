@@ -135,7 +135,11 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         datasource pg {
             provider = "postgres"
             url = "postgresql://localhost/test"
-            previewFeatures = ["nativeTypes"]
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
         }
 
         model A {

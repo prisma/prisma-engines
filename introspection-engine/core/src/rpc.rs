@@ -108,7 +108,11 @@ impl RpcImpl {
         };
 
         let native_types = match datamodel::parse_configuration(&schema) {
-            Ok(config) => config.subject.datasources.first().has_preview_feature("nativeTypes"),
+            Ok(config) => config
+                .subject
+                .generators
+                .iter()
+                .any(|g| g.has_preview_feature("nativeTypes")),
             Err(_) => false,
         };
 

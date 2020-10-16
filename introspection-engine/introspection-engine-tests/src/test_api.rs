@@ -76,7 +76,7 @@ impl TestApi {
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(data_model_string)?;
         let config = parse_configuration(data_model_string)?;
-        let native_types = config.datasources.first().has_preview_feature("nativeTypes");
+        let native_types = config.generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
 
         let introspection_result = self
             .introspection_connector

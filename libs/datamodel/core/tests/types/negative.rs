@@ -115,6 +115,10 @@ fn should_fail_on_native_type_with_invalid_datasource_name() {
         datasource db {
           provider = "postgres"
           url = "postgresql://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
           previewFeatures = ["nativeTypes"]
         }
 
@@ -128,7 +132,7 @@ fn should_fail_on_native_type_with_invalid_datasource_name() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.BigInt?",
-        ast::Span::new(222, 231),
+        ast::Span::new(300, 309),
     ));
 }
 
@@ -138,6 +142,10 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
           previewFeatures = ["nativeTypes"]
         }
 
@@ -154,7 +162,7 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
         "VarChar",
         1,
         0,
-        ast::Span::new(259, 271),
+        ast::Span::new(337, 349),
     ));
 }
 
@@ -164,6 +172,10 @@ fn should_fail_on_native_type_with_unknown_type() {
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
           previewFeatures = ["nativeTypes"]
         }
 
@@ -178,7 +190,7 @@ fn should_fail_on_native_type_with_unknown_type() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Native type Numerical is not supported for postgresql connector.",
-        ast::Span::new(222, 240),
+        ast::Span::new(300, 318),
     ));
 }
 
@@ -210,6 +222,10 @@ fn should_fail_on_native_type_with_incompatible_type() {
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
           previewFeatures = ["nativeTypes"]
         }
 
@@ -224,7 +240,7 @@ fn should_fail_on_native_type_with_incompatible_type() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Native type VarChar is not compatible with declared field type Boolean, expected field type String.",
-        ast::Span::new(260, 273),
+        ast::Span::new(338, 351),
     ));
 }
 
@@ -234,6 +250,10 @@ fn should_fail_on_native_type_with_invalid_arguments() {
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
           previewFeatures = ["nativeTypes"]
         }
 
@@ -250,6 +270,6 @@ fn should_fail_on_native_type_with_invalid_arguments() {
         "numeric",
         "literal",
         "a",
-        ast::Span::new(270, 271),
+        ast::Span::new(348, 349),
     ));
 }
