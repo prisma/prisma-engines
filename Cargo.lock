@@ -604,6 +604,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "connection-string"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d672ca0b0ad00e87bf383a2c68e76dc4408d198473fd221c44605f0e37af118"
+
+[[package]]
 name = "const-random"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2713,7 +2719,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#fa99f5353bb6c225872f6b35546dd6b54bca6b8f"
+source = "git+https://github.com/prisma/quaint#a7f07d2cd3f6a7d85ff027eb1da67e4afea81f25"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -3606,8 +3612,8 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.4.10"
-source = "git+https://github.com/prisma/tiberius?branch=pgbouncer-mode-hack#e96aab3da8210d9af1a0f1b3bf1624c8e4e43de3"
+version = "0.4.11"
+source = "git+https://github.com/prisma/tiberius?branch=pgbouncer-mode-hack#8fc1a63d2690a5aa69f7cd642b0c6d6248b7d02e"
 dependencies = [
  "async-native-tls",
  "async-stream",
@@ -3616,6 +3622,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "chrono",
+ "connection-string",
  "encoding",
  "futures 0.3.5",
  "futures-sink",
