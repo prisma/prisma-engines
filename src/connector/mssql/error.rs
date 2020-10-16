@@ -70,7 +70,8 @@ impl From<tiberius::error::Error> for Error {
             tiberius::error::Error::Server(e) if e.code() == 547 => {
                 let index = e
                     .message()
-                    .split('.').next()
+                    .split('.')
+                    .next()
                     .unwrap()
                     .split_whitespace()
                     .last()

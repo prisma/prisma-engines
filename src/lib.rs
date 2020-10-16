@@ -108,28 +108,28 @@ mod macros;
 
 #[cfg(all(
     not(feature = "tracing-log"),
-    any(feature = "sqlite", feature = "mysql", feature = "postgresql")
+    any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql")
 ))]
 #[macro_use]
 extern crate log;
 
 #[macro_use]
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql"))]
 extern crate metrics;
 
 pub mod ast;
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql"))]
 pub mod connector;
 pub mod error;
 #[cfg(all(
     feature = "pooled",
-    any(feature = "sqlite", feature = "mysql", feature = "postgresql")
+    any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql")
 ))]
 pub mod pooled;
 pub mod prelude;
 #[cfg(feature = "serde-support")]
 pub mod serde;
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql"))]
 pub mod single;
 #[cfg(test)]
 mod tests;

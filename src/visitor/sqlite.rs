@@ -64,7 +64,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
                 let mut builder = Error::builder(kind);
                 builder.set_original_message(msg);
 
-                return Err(builder.build())
+                return Err(builder.build());
             }
             #[cfg(feature = "uuid-0_8")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.to_hyphenated().to_string()))),

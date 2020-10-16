@@ -53,5 +53,5 @@ pub use union::Union;
 pub use update::*;
 pub use values::{IntoRaw, Raw, Value, Values};
 
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql"))]
 pub(crate) use values::Params;
