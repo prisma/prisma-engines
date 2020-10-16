@@ -78,10 +78,6 @@ mod tests {
             ColumnTypeFamily::Binary,
             ColumnTypeFamily::Json,
             ColumnTypeFamily::Uuid,
-            ColumnTypeFamily::Geometric,
-            ColumnTypeFamily::LogSequenceNumber,
-            ColumnTypeFamily::TextSearch,
-            ColumnTypeFamily::TransactionId,
         ];
 
         fn unsupported(family: ColumnTypeFamily) -> (FieldType, bool, Option<String>) {
