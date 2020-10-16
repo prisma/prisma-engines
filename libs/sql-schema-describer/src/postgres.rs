@@ -278,10 +278,6 @@ impl SqlSchemaDescriber {
                                 .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
                                 .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix_without_quotes = format!("::{}", enum_name);
                                 let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
@@ -700,7 +696,7 @@ fn get_column_type<'a>(
             )),
         ),
         "money" | "_money" => (Float, None),
-        "pg_lsn" | "_pg_lsn" => (LogSequenceNumber, None),
+        "pg_lsn" | "_pg_lsn" => (Unsupported(full_data_type.into()), None),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision()))),
         "timetz" | "_timetz" => (
             DateTime,
@@ -712,9 +708,9 @@ fn get_column_type<'a>(
             DateTime,
             Some(PostgresType::TimestampWithTimeZone(precision.time_precision())),
         ),
-        "tsquery" | "_tsquery" => (TextSearch, None),
-        "tsvector" | "_tsvector" => (TextSearch, None),
-        "txid_snapshot" | "_txid_snapshot" => (TransactionId, None),
+        "tsquery" | "_tsquery" => (Unsupported(full_data_type.into()), None),
+        "tsvector" | "_tsvector" => (Unsupported(full_data_type.into()), None),
+        "txid_snapshot" | "_txid_snapshot" => (Unsupported(full_data_type.into()), None),
         "inet" | "_inet" => (String, None),
         //geometric
         "box" | "_box" => (Unsupported(full_data_type.into()), None),
