@@ -90,50 +90,6 @@
           },
           "default": null,
           "autoIncrement": false
-        },
-        {
-          "name": "column9",
-          "tpe": {
-            "dataType": "raw type",
-            "fullDataType": "full raw type",
-            "family": "geometric",
-          "arity": "nullable"
-          },
-          "default": null,
-          "autoIncrement": false
-        },
-        {
-          "name": "column10",
-          "tpe": {
-            "dataType": "raw type",
-            "fullDataType": "full raw type",
-            "family": "logSequenceNumber",
-          "arity": "nullable"
-          },
-          "default": null,
-          "autoIncrement": false
-        },
-        {
-          "name": "column11",
-          "tpe": {
-            "dataType": "raw type",
-            "fullDataType": "full raw type",
-            "family": "textSearch",
-          "arity": "nullable"
-          },
-          "default": null,
-          "autoIncrement": false
-        },
-        {
-          "name": "column12",
-          "tpe": {
-            "dataType": "raw type",
-            "fullDataType": "full raw type",
-            "family": "transactionId",
-          "arity": "nullable"
-          },
-          "default": null,
-          "autoIncrement": false
         }
       ],
       "indices": [],
