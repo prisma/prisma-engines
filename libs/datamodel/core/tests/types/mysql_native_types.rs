@@ -11,7 +11,7 @@ fn should_fail_on_native_type_text_with_unique_attribute() {
 
         generator js {
             provider = "prisma-client-js"
-            previwFeatures = ["nativeTypes"]
+            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -38,7 +38,7 @@ fn should_fail_on_native_type_long_text_with_unique_attribute() {
 
         generator js {
             provider = "prisma-client-js"
-            previwFeatures = ["nativeTypes"]
+            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -65,7 +65,7 @@ fn should_fail_on_native_type_medium_text_with_unique_attribute() {
 
         generator js {
             provider = "prisma-client-js"
-            previwFeatures = ["nativeTypes"]
+            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
@@ -92,7 +92,7 @@ fn should_fail_on_native_type_tiny_text_with_unique_attribute() {
 
         generator js {
             provider = "prisma-client-js"
-            previwFeatures = ["nativeTypes"]
+            previewFeatures = ["nativeTypes"]
         }
 
         model Blog {

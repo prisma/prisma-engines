@@ -122,7 +122,7 @@ fn test_parser_renderer_native_types_via_ast() {
 
 generator js {
   provider = "prisma-client-js"
-  previwFeatures = ["nativeTypes"]
+  previewFeatures = ["nativeTypes"]
 }
 
 model Blog {

@@ -531,7 +531,7 @@ fn reformatting_a_model_with_native_type_definitions_must_work() {
 
 generator js {
   provider = "prisma-client-js"
-  previwFeatures = ["nativeTypes"]
+  previewFeatures = ["nativeTypes"]
 }
 
 model Blog {
