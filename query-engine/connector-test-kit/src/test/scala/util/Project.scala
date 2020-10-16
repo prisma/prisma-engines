@@ -37,11 +37,11 @@ case class Project(
     """.stripMargin
   }
 
-  val dataModelWithDataSourceConfig = {
-    dataSourceConfig + "\n" + dataModel
+  val fullDatamodel = {
+    dataSourceConfig + "\n" + generatorBlock + "\n" + dataModel
   }
 
-  val envVar = UTF8Base64.encode(dataModelWithDataSourceConfig)
+  val envVar = UTF8Base64.encode(fullDatamodel)
 
   val pgBouncerEnvVar = {
     val host = {
@@ -76,7 +76,7 @@ case class Project(
     val writer   = new PrintWriter(file)
 
     try {
-      dataModelWithDataSourceConfig.foreach(writer.print)
+      fullDatamodel.foreach(writer.print)
     } finally {
       writer.close()
     }
