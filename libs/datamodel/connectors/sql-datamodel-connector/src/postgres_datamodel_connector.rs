@@ -1,5 +1,6 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
+use dml::field::Field;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
@@ -121,6 +122,10 @@ impl PostgresDatamodelConnector {
 impl Connector for PostgresDatamodelConnector {
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
+    }
+
+    fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
+        Ok(())
     }
 
     fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {

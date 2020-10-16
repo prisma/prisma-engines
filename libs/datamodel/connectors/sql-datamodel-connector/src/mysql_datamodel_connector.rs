@@ -1,5 +1,6 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
+use dml::field::{Field, FieldType};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
@@ -135,6 +136,28 @@ impl MySqlDatamodelConnector {
 impl Connector for MySqlDatamodelConnector {
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
+    }
+
+    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
+        if let FieldType::NativeType(_scalar_type, native_type) = field.field_type() {
+            let native_type_name = native_type.name.as_str();
+            if (native_type_name == TEXT_TYPE_NAME
+                || native_type_name == TINY_TEXT_TYPE_NAME
+                || native_type_name == MEDIUM_TEXT_TYPE_NAME
+                || native_type_name == LONG_TEXT_TYPE_NAME
+                || native_type_name == BLOB_TYPE_NAME
+                || native_type_name == LONG_BLOB_TYPE_NAME
+                || native_type_name == TINY_BLOB_TYPE_NAME
+                || native_type_name == MEDIUM_BLOB_TYPE_NAME)
+                && field.is_unique()
+            {
+                return Err(ConnectorError::new_incompatible_native_type_with_unique(
+                    native_type_name,
+                    "MySQL",
+                ));
+            }
+        }
+        Ok(())
     }
 
     fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
