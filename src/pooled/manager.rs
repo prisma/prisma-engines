@@ -77,7 +77,7 @@ impl Manager for QuaintManager {
     type Error = Error;
 
     async fn connect(&self) -> crate::Result<Self::Connection> {
-        match self {
+        let conn = match self {
             #[cfg(feature = "sqlite")]
             QuaintManager::Sqlite { url, db_name } => {
                 use crate::connector::Sqlite;
@@ -105,7 +105,15 @@ impl Manager for QuaintManager {
                 use crate::connector::Mssql;
                 Ok(Box::new(Mssql::new(url.clone()).await?) as Self::Connection)
             }
+        };
+
+        #[cfg(feature = "tracing-log")]
+        {
+            conn.iter()
+                .for_each(|_| tracing::debug!("Acquired database connection."));
         }
+
+        conn
     }
 
     async fn check(&self, conn: Self::Connection) -> crate::Result<Self::Connection> {
