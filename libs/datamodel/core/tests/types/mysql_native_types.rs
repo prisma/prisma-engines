@@ -9,7 +9,7 @@ fn should_fail_on_native_type_text_with_unique_attribute() {
           url = "mysql://"
         }
 
-        generator {
+        generator js {
             provider = "prisma-client-js"
             previwFeatures = ["nativeTypes"]
         }
@@ -36,7 +36,7 @@ fn should_fail_on_native_type_long_text_with_unique_attribute() {
           url = "mysql://"
         }
 
-        generator {
+        generator js {
             provider = "prisma-client-js"
             previwFeatures = ["nativeTypes"]
         }
@@ -63,7 +63,7 @@ fn should_fail_on_native_type_medium_text_with_unique_attribute() {
           url = "mysql://"
         }
 
-        generator {
+        generator js {
             provider = "prisma-client-js"
             previwFeatures = ["nativeTypes"]
         }
@@ -90,7 +90,7 @@ fn should_fail_on_native_type_tiny_text_with_unique_attribute() {
           url = "mysql://"
         }
 
-        generator {
+        generator js {
             provider = "prisma-client-js"
             previwFeatures = ["nativeTypes"]
         }
@@ -117,7 +117,7 @@ fn should_fail_on_native_type_blob_with_unique_attribute() {
           url = "mysql://"
         }
 
-        generator {
+        generator js {
             provider = "prisma-client-js"
             previewFeatures = ["nativeTypes"]
         }
@@ -144,7 +144,7 @@ fn should_fail_on_native_type_tiny_blob_with_unique_attribute() {
           url = "mysql://"
         }
 
-        generator {
+        generator js {
             provider = "prisma-client-js"
             previewFeatures = ["nativeTypes"]
         }
@@ -171,7 +171,7 @@ fn should_fail_on_native_type_medium_blob_with_unique_attribute() {
           url = "mysql://"
         }
 
-        generator {
+        generator js {
             provider = "prisma-client-js"
             previewFeatures = ["nativeTypes"]
         }
@@ -198,7 +198,7 @@ fn should_fail_on_native_type_long_blob_with_unique_attribute() {
           url = "mysql://"
         }
 
-        generator {
+        generator js {
             provider = "prisma-client-js"
             previewFeatures = ["nativeTypes"]
         }

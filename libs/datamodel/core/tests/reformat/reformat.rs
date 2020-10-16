@@ -529,7 +529,7 @@ fn reformatting_a_model_with_native_type_definitions_must_work() {
   url             = "postgresql://"
 }
 
-generator {
+generator js {
   provider = "prisma-client-js"
   previwFeatures = ["nativeTypes"]
 }
