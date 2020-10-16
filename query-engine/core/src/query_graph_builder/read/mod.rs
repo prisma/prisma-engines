@@ -107,7 +107,7 @@ pub fn merge_relation_selections(
     };
 
     let nested: Vec<_> = nested_queries
-        .into_iter()
+        .iter()
         .map(|nested_query| {
             if let ReadQuery::RelatedRecordsQuery(ref rq) = nested_query {
                 rq.parent_field.linking_fields()
@@ -124,7 +124,7 @@ pub fn merge_relation_selections(
 /// Necessary for post-processing of unstable orderings with cursor operations.
 pub fn merge_cursor_fields(selected_fields: ModelProjection, cursor: &Option<RecordProjection>) -> ModelProjection {
     match cursor {
-        Some(cursor) => selected_fields.clone().merge(cursor.into()),
+        Some(cursor) => selected_fields.merge(cursor.into()),
         None => selected_fields,
     }
 }

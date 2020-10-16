@@ -1,10 +1,10 @@
 mod format;
 mod lint;
 mod native;
+mod preview;
 
 use std::path::PathBuf;
 
-use serde;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt, Clone)]
@@ -30,6 +30,13 @@ pub struct FormatOpts {
 }
 
 #[derive(Debug, StructOpt, Clone)]
+pub struct PreviewFeaturesOpts {
+    /// If set, only returns datasource instead of generator preview features
+    #[structopt(long)]
+    datasource_only: bool,
+}
+
+#[derive(Debug, StructOpt, Clone)]
 #[structopt(version = env!("GIT_HASH"))]
 /// Prisma Datamodel v2 formatter
 pub enum FmtOpts {
@@ -39,6 +46,8 @@ pub enum FmtOpts {
     Format(FormatOpts),
     /// Specifies Native Types mode
     NativeTypes,
+    /// Specifies preview features mode
+    PreviewFeatures(PreviewFeaturesOpts),
 }
 
 #[derive(serde::Serialize)]
@@ -46,6 +55,7 @@ pub struct MiniError {
     pub start: usize,
     pub end: usize,
     pub text: String,
+    pub is_warning: bool,
 }
 
 fn main() {
@@ -53,5 +63,6 @@ fn main() {
         FmtOpts::Lint(opts) => lint::run(opts),
         FmtOpts::Format(opts) => format::run(opts),
         FmtOpts::NativeTypes => native::run(),
+        FmtOpts::PreviewFeatures(opts) => preview::run(opts),
     }
 }

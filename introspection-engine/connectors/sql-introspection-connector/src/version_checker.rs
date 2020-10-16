@@ -33,7 +33,7 @@ const INT_4: &str = "int4";
 const VARCHAR: &str = "varchar";
 const CHARACTER_VARYING: &str = "character varying";
 
-const SQLITE_TYPES: &'static [(&'static str, &'static str)] = &[
+const SQLITE_TYPES: &[(&str, &str)] = &[
     ("BOOLEAN", "BOOLEAN"),
     ("DATE", "DATE"),
     ("REAL", "REAL"),
@@ -41,7 +41,7 @@ const SQLITE_TYPES: &'static [(&'static str, &'static str)] = &[
     ("TEXT", "TEXT"),
 ];
 
-const POSTGRES_TYPES: &'static [(&'static str, &'static str)] = &[
+const POSTGRES_TYPES: &[(&str, &str)] = &[
     ("boolean", "bool"),
     ("timestamp without time zone", "timestamp"),
     ("numeric", "numeric"),
@@ -50,10 +50,10 @@ const POSTGRES_TYPES: &'static [(&'static str, &'static str)] = &[
     ("character varying", "varchar"),
 ];
 
-const POSTGRES_VAR_CHAR: &'static [(&'static str, &'static str)] = &[("character varying", "varchar")];
-const POSTGRES_VAR_CHAR_LENGTHS: &'static [u32] = &[25, 36, 191];
+const POSTGRES_VAR_CHAR: &[(&str, &str)] = &[("character varying", "varchar")];
+const POSTGRES_VAR_CHAR_LENGTHS: &[u32] = &[25, 36, 191];
 
-const MYSQL_TYPES: &'static [(&'static str, &'static str)] = &[
+const MYSQL_TYPES: &[(&str, &str)] = &[
     ("tinyint", "tinyint(1)"),
     ("datetime", "datetime(3)"),
     ("decimal", "decimal(65,30)"),
@@ -113,10 +113,11 @@ impl VersionChecker {
     }
 
     pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: &Table) {
-        if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull) {
-            if !is_prisma_1_or_11_list_table(table) && fk.on_delete_action != ForeignKeyAction::Cascade {
-                self.uses_on_delete = true
-            }
+        if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull)
+            && !is_prisma_1_or_11_list_table(table)
+            && fk.on_delete_action != ForeignKeyAction::Cascade
+        {
+            self.uses_on_delete = true
         }
     }
 
@@ -197,7 +198,7 @@ impl VersionChecker {
             SqlFamily::Postgres if self.is_prisma_1(warnings) => Version::Prisma1,
             SqlFamily::Postgres if self.is_prisma_1_1(warnings) => Version::Prisma11,
             SqlFamily::Postgres => Version::NonPrisma,
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
+            SqlFamily::Mssql => Version::NonPrisma,
         }
     }
 }

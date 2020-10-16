@@ -756,7 +756,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |model Parent{
         | id          String @id @default(cuid())
         | p           String @unique
-        | childrenOpt Child[] $relationInlineDirective
+        | childrenOpt Child[] $relationInlineAttribute
         |}
         |
         |model Child{
@@ -831,7 +831,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |model Parent{
         | id          String  @id @default(cuid())
         | p           String  @unique
-        | childrenOpt Child[] $relationInlineDirective
+        | childrenOpt Child[] $relationInlineAttribute
         |}
         |
         |model Child{
@@ -907,7 +907,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       s"""
         |model Todo{
         | id        String    @id @default(cuid())
-        | comments  Comment[] $relationInlineDirective
+        | comments  Comment[] $relationInlineAttribute
         |}
         |
         |model Comment{
@@ -1011,7 +1011,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       s"""
         |model Todo{
         | id       String    @id @default(cuid())
-        | comments Comment[] $relationInlineDirective
+        | comments Comment[] $relationInlineAttribute
         |}
         |
         |model Comment{
@@ -1076,7 +1076,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       s"""
         |model Todo{
         | id       String    @id @default(cuid())
-        | comments Comment[] $relationInlineDirective
+        | comments Comment[] $relationInlineAttribute
         |}
         |
         |model Comment{
@@ -1347,14 +1347,14 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String @id @default(cuid())
                                              |  nameTop String @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
                                              |  nameMiddle String @unique
                                              |  tops       Top[]
-                                             |  bottoms    Bottom[] $relationInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
@@ -1432,13 +1432,13 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String   @id @default(cuid())
                                              |  nameMiddle String   @unique
-                                             |  bottoms    Bottom[] $relationInlineDirective
+                                             |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
@@ -1515,7 +1515,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String @id @default(cuid())
                                              |  nameTop String @unique
-                                             |  middles Middle[] $relationInlineDirective
+                                             |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Middle {
@@ -1608,7 +1608,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |model Bottom {
                                              |  id         String  @id @default(cuid())
                                              |  nameBottom String  @unique
-                                             |  below      Below[] $relationInlineDirective
+                                             |  below      Below[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Below {

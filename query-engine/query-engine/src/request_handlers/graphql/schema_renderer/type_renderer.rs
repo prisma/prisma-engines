@@ -20,13 +20,13 @@ impl<'a> GqlTypeRenderer<'a> {
         match i {
             InputType::Object(ref obj) => {
                 let _ = obj.into_renderer().render(ctx);
-                format!("{}", obj.into_arc().name)
+                obj.into_arc().name.to_string()
             }
 
             InputType::Enum(et) => {
                 // Not sure how this fits together with the enum handling below.
                 let _ = et.into_renderer().render(ctx);
-                format!("{}", et.name())
+                et.name().to_string()
             }
 
             InputType::List(ref l) => {
@@ -36,7 +36,7 @@ impl<'a> GqlTypeRenderer<'a> {
 
             InputType::Scalar(ScalarType::Enum(et)) => {
                 let _ = et.into_renderer().render(ctx);
-                format!("{}", et.name())
+                et.name().to_string()
             }
 
             InputType::Scalar(ref scalar) => {
@@ -62,13 +62,13 @@ impl<'a> GqlTypeRenderer<'a> {
         match o {
             OutputType::Object(obj) => {
                 let _ = obj.into_renderer().render(ctx);
-                format!("{}", obj.into_arc().name())
+                obj.into_arc().name().to_string()
             }
 
             OutputType::Enum(et) => {
                 // Not sure how this fits together with the enum handling below.
                 let _ = et.into_renderer().render(ctx);
-                format!("{}", et.name())
+                et.name().to_string()
             }
 
             OutputType::List(l) => {
@@ -78,7 +78,7 @@ impl<'a> GqlTypeRenderer<'a> {
 
             OutputType::Scalar(ScalarType::Enum(et)) => {
                 let _ = et.into_renderer().render(ctx);
-                format!("{}", et.name())
+                et.name().to_string()
             }
 
             OutputType::Scalar(ref scalar) => {

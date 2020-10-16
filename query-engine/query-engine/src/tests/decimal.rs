@@ -12,7 +12,7 @@ static MODEL: &str = indoc! {"
 
 #[test_each_connector]
 async fn decimal_conversion(api: &TestApi) -> anyhow::Result<()> {
-    feature_flags::initialize(&vec![String::from("all")]).unwrap();
+    feature_flags::initialize(&[String::from("all")]).unwrap();
     let query_engine = api.create_engine(&MODEL).await?;
 
     let query = indoc! {r#"

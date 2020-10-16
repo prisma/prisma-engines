@@ -3,15 +3,26 @@
 use anyhow::format_err;
 use datamodel::ast::{self, ArgumentContainer, Identifier, SchemaAst};
 use migration_connector::steps::{self, CreateSource, DeleteSource, MigrationStep};
-use thiserror::Error;
+use std::{error::Error as StdError, fmt::Display};
 
 pub trait DataModelCalculator: Send + Sync + 'static {
     fn infer(&self, current: &SchemaAst, steps: &[MigrationStep]) -> Result<SchemaAst, CalculatorError>;
 }
 
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct CalculatorError(#[source] anyhow::Error);
+#[derive(Debug)]
+pub struct CalculatorError(anyhow::Error);
+
+impl Display for CalculatorError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl StdError for CalculatorError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        Some(self.0.as_ref())
+    }
+}
 
 impl From<anyhow::Error> for CalculatorError {
     fn from(fe: anyhow::Error) -> Self {
@@ -127,7 +138,7 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
         .iter()
         .map(|value_name| ast::EnumValue {
             name: Identifier::new(value_name),
-            directives: vec![],
+            attributes: vec![],
             documentation: None,
             span: new_span(),
             commented_out: false,
@@ -139,7 +150,7 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
         name: new_ident(name.clone()),
         span: new_span(),
         values,
-        directives: vec![],
+        attributes: vec![],
     };
 
     datamodel.tops.push(ast::Top::Enum(new_enum));
@@ -174,7 +185,7 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
         documentation: None,
         field_type: new_ident(tpe.clone()),
         span: new_span(),
-        directives: Vec::new(),
+        attributes: Vec::new(),
         is_commented_out: false,
     };
     model.fields.push(field);
@@ -196,7 +207,7 @@ fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel)
         name: new_ident(step.model.clone()),
         span: new_span(),
         fields: vec![],
-        directives: vec![],
+        attributes: vec![],
         commented_out: false,
     };
 
@@ -351,7 +362,7 @@ fn add_enum_values(r#enum: &mut ast::Enum, added_values: &[String]) {
         .values
         .extend(added_values.iter().map(|added_name| ast::EnumValue {
             name: Identifier::new(added_name),
-            directives: vec![],
+            attributes: vec![],
             documentation: None,
             span: new_span(),
             commented_out: false,
@@ -402,7 +413,7 @@ fn apply_create_directive(
     let directives = find_directives_mut(datamodel, &step.location.path)
         .ok_or_else(|| format_err!("CreateDirective on absent target: {:?}.", step))?;
 
-    let new_directive = ast::Directive {
+    let new_directive = ast::Attribute {
         name: new_ident(step.location.directive.clone()),
         arguments: step
             .location
@@ -485,7 +496,7 @@ fn apply_create_type_alias(
         name: new_ident(step.type_alias.clone()),
         span: new_span(),
         arity: step.arity.into(),
-        directives: vec![],
+        attributes: vec![],
         field_type: new_ident(step.r#type.clone()),
         is_commented_out: false,
     };
@@ -552,7 +563,7 @@ fn find_argument_container<'schema>(
             .find_source_mut(&source_location.source)
             .map(|sc| ArgumentContainer::SourceConfig(sc)),
         steps::ArgumentLocation::Directive(directive_location) => {
-            find_directive_mut(datamodel, directive_location).map(|d| ArgumentContainer::Directive(d))
+            find_directive_mut(datamodel, directive_location).map(|d| ArgumentContainer::Attribute(d))
         }
     }
 }
@@ -560,7 +571,7 @@ fn find_argument_container<'schema>(
 fn find_directive_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
     locator: &steps::DirectiveLocation,
-) -> Option<&'a mut ast::Directive> {
+) -> Option<&'a mut ast::Attribute> {
     find_directives_mut(datamodel, &locator.path)?
         .iter_mut()
         .find(|directive| directive.name.name == locator.directive)
@@ -569,11 +580,11 @@ fn find_directive_mut<'a>(
 fn find_directives_mut<'a>(
     datamodel: &'a mut ast::SchemaAst,
     location: &steps::DirectivePath,
-) -> Option<&'a mut Vec<ast::Directive>> {
+) -> Option<&'a mut Vec<ast::Attribute>> {
     let directives = match location {
-        steps::DirectivePath::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
-        steps::DirectivePath::Model { model, arguments: _ } => &mut datamodel.find_model_mut(&model)?.directives,
-        steps::DirectivePath::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::DirectivePath::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.attributes,
+        steps::DirectivePath::Model { model, arguments: _ } => &mut datamodel.find_model_mut(&model)?.attributes,
+        steps::DirectivePath::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.attributes,
         steps::DirectivePath::EnumValue { r#enum, value } => {
             let enum_struct = datamodel.find_enum_mut(&r#enum)?;
             let value = enum_struct
@@ -581,9 +592,9 @@ fn find_directives_mut<'a>(
                 .iter_mut()
                 .find(|value_struct| &value_struct.name.name == value)?;
 
-            &mut value.directives
+            &mut value.attributes
         }
-        steps::DirectivePath::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
+        steps::DirectivePath::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.attributes,
     };
 
     Some(directives)

@@ -36,8 +36,8 @@ impl DmmfObjectRenderer {
         let input_type = DmmfInputType {
             name: input_object.name.clone(),
             constraints: DmmfInputTypeConstraints {
-                max_num_fields: input_object.constraints.max_num_fields.clone(),
-                min_num_fields: input_object.constraints.min_num_fields.clone(),
+                max_num_fields: input_object.constraints.max_num_fields,
+                min_num_fields: input_object.constraints.min_num_fields,
             },
             fields: rendered_fields,
         };

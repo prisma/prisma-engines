@@ -1,8 +1,7 @@
 extern crate datamodel;
 
 use self::datamodel::{IndexDefinition, StringFromEnvVar};
-use datamodel::{dml, dml::ScalarType, error::*};
-use datamodel_connector::NativeTypeInstance;
+use datamodel::{diagnostics::*, dml, dml::ScalarType, Configuration, Datamodel, NativeTypeInstance};
 use pretty_assertions::assert_eq;
 
 pub trait DatasourceAsserts {
@@ -65,6 +64,10 @@ pub trait ErrorAsserts {
     fn assert_is_message(&self, msg: &str) -> &Self;
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
     fn assert_length(&self, length: usize) -> &Self;
+}
+
+pub trait WarningAsserts {
+    fn assert_is(&self, warning: DatamodelWarning) -> &Self;
 }
 
 impl DatasourceAsserts for datamodel::Datasource {
@@ -196,23 +199,23 @@ impl RelationFieldAsserts for dml::RelationField {
 impl DatamodelAsserts for dml::Datamodel {
     fn assert_has_model(&self, t: &str) -> &dml::Model {
         self.find_model(&t.to_owned())
-            .expect(format!("Model {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Model {} not found", t))
     }
     fn assert_has_enum(&self, t: &str) -> &dml::Enum {
         self.find_enum(&t.to_owned())
-            .expect(format!("Enum {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Enum {} not found", t))
     }
 }
 
 impl ModelAsserts for dml::Model {
     fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField {
         self.find_scalar_field(&t.to_owned())
-            .expect(format!("Field {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Field {} not found", t))
     }
 
     fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField {
         self.find_relation_field(&t.to_owned())
-            .expect(format!("Field {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Field {} not found", t))
     }
 
     fn assert_is_embedded(&self, t: bool) -> &Self {
@@ -253,7 +256,7 @@ impl EnumAsserts for dml::Enum {
     fn assert_has_value(&self, t: &str) -> &dml::EnumValue {
         self.values()
             .find(|x| *x.name == t.to_owned())
-            .expect(format!("Enum Value {} not found", t).as_str())
+            .unwrap_or_else(|| panic!("Enum Value {} not found", t))
     }
 
     fn assert_with_documentation(&self, t: &str) -> &Self {
@@ -271,7 +274,21 @@ impl EnumValueAsserts for dml::EnumValue {
     }
 }
 
-impl ErrorAsserts for ErrorCollection {
+impl WarningAsserts for Vec<DatamodelWarning> {
+    fn assert_is(&self, warning: DatamodelWarning) -> &Self {
+        assert_eq!(
+            self.len(),
+            1,
+            "Expected exactly one validation warning. Warnings are: {:?}",
+            &self
+        );
+        assert_eq!(self[0], warning);
+
+        self
+    }
+}
+
+impl ErrorAsserts for Diagnostics {
     fn assert_is(&self, error: DatamodelError) -> &Self {
         assert_eq!(
             self.errors.len(),
@@ -315,11 +332,56 @@ impl ErrorAsserts for ErrorCollection {
 }
 
 #[allow(dead_code)] // Not sure why the compiler thinks this is never used.
-pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
+pub fn parse(datamodel_string: &str) -> Datamodel {
+    match datamodel::parse_datamodel(datamodel_string) {
+        Ok(s) => s.subject,
+        Err(errs) => {
+            for err in errs.to_error_iter() {
+                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
+                    .unwrap();
+            }
+
+            panic!("Datamodel parsing failed. Please see error above.")
+        }
+    }
+}
+
+pub fn parse_configuration(datamodel_string: &str) -> Configuration {
+    match datamodel::parse_configuration(datamodel_string) {
+        Ok(c) => c.subject,
+        Err(errs) => {
+            for err in errs.to_error_iter() {
+                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
+                    .unwrap()
+            }
+
+            panic!("Configuration parsing failed. Please see error above.")
+        }
+    }
+}
+
+pub fn parse_configuration_with_url_overrides(
+    datamodel_string: &str,
+    datasource_url_overrides: Vec<(String, String)>,
+) -> Configuration {
+    match datamodel::parse_configuration_with_url_overrides(datamodel_string, datasource_url_overrides) {
+        Ok(c) => c.subject,
+        Err(errs) => {
+            for err in errs.to_error_iter() {
+                err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
+                    .unwrap()
+            }
+
+            panic!("Configuration parsing failed. Please see error above.")
+        }
+    }
+}
+
+pub fn parse_with_diagnostics(datamodel_string: &str) -> ValidatedDatamodel {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(s) => s,
         Err(errs) => {
-            for err in errs.to_iter() {
+            for err in errs.to_error_iter() {
                 err.pretty_print(&mut std::io::stderr().lock(), "", datamodel_string)
                     .unwrap();
             }
@@ -330,35 +392,35 @@ pub fn parse(datamodel_string: &str) -> datamodel::Datamodel {
 }
 
 #[allow(dead_code)] // Not sure why the compiler thinks this is never used.
-pub fn parse_error(datamodel_string: &str) -> ErrorCollection {
+pub fn parse_error(datamodel_string: &str) -> Diagnostics {
     match datamodel::parse_datamodel(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,
     }
 }
 
-pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> ErrorCollection {
+pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> Diagnostics {
     match datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string) {
         Ok(_) => panic!("Expected an error when parsing schema."),
         Err(errs) => errs,
     }
 }
 
-pub const SQLITE_SOURCE: &'static str = r#"
+pub const SQLITE_SOURCE: &str = r#"
     datasource db {
         provider = "sqlite"
         url      = "file:dev.db"
     }
 "#;
 
-pub const POSTGRES_SOURCE: &'static str = r#"
+pub const POSTGRES_SOURCE: &str = r#"
     datasource db {
         provider = "postgres"
         url      = "postgresql://localhost:5432"
     }
 "#;
 
-pub const MYSQL_SOURCE: &'static str = r#"
+pub const MYSQL_SOURCE: &str = r#"
     datasource db {
         provider = "mysql"
         url      = "mysql://localhost:3306"

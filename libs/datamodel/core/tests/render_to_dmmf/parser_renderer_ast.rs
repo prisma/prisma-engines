@@ -132,7 +132,7 @@ model Blog {
 }
 
 #[test]
-fn test_parser_renderer_order_of_field_directives_via_ast() {
+fn test_parser_renderer_order_of_field_attributes_via_ast() {
     let input = r#"model Post {
   id        Int      @default(autoincrement()) @id
   published Boolean  @map("_published") @default(false)
@@ -170,7 +170,7 @@ model Test {
 }
 
 #[test]
-fn test_parser_renderer_order_of_block_directives_via_ast() {
+fn test_parser_renderer_order_of_block_attributes_via_ast() {
     let input = r#"model Person {
   firstName   String
   lastName    String
@@ -304,6 +304,6 @@ fn render_schema_ast_to_string(schema: &datamodel::ast::SchemaAst) -> String {
     writable_string.into()
 }
 
-fn parse_to_ast(datamodel_string: &str) -> Result<datamodel::ast::SchemaAst, datamodel::error::ErrorCollection> {
+fn parse_to_ast(datamodel_string: &str) -> Result<datamodel::ast::SchemaAst, datamodel::diagnostics::Diagnostics> {
     datamodel::ast::parser::parse_schema(datamodel_string)
 }

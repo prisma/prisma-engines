@@ -1,5 +1,5 @@
 use crate::ast;
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::transform::helpers::ValueValidator;
 
 pub struct EnvFunction {

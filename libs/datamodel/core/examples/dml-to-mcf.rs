@@ -1,4 +1,3 @@
-use datamodel;
 use std::fs;
 
 use clap::{App, Arg};
@@ -17,21 +16,22 @@ fn main() {
         .get_matches();
 
     let file_name = matches.value_of("INPUT").unwrap();
-    let file = fs::read_to_string(&file_name).expect(&format!("Unable to open file {}", file_name));
+    let file = fs::read_to_string(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name));
 
     let res = datamodel::parse_configuration(&file);
 
     match &res {
         Err(errors) => {
-            for error in errors.to_iter() {
-                println!("");
+            for error in errors.to_error_iter() {
+                println!();
                 error
                     .pretty_print(&mut std::io::stderr().lock(), file_name, &file)
                     .expect("Failed to write errors to stderr");
             }
         }
         Ok(config) => {
-            let json = serde_json::to_string_pretty(&datamodel::json::mcf::config_to_mcf_json_value(&config)).unwrap();
+            let json =
+                serde_json::to_string_pretty(&datamodel::json::mcf::config_to_mcf_json_value(&config.subject)).unwrap();
             println!("{}", json);
         }
     }

@@ -191,7 +191,7 @@ pub struct DirectiveLocation {
 }
 
 impl DirectiveLocation {
-    pub fn matches_ast_directive(&self, directive: &ast::Directive) -> bool {
+    pub fn matches_ast_directive(&self, directive: &ast::Attribute) -> bool {
         if self.directive != directive.name.name {
             return false;
         }

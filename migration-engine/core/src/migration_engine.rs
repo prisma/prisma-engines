@@ -1,6 +1,7 @@
-use crate::migration::datamodel_calculator::*;
-use crate::migration::datamodel_migration_steps_inferrer::*;
-use crate::{commands::CommandResult, CoreResult};
+use crate::{
+    migration::{datamodel_calculator::*, datamodel_migration_steps_inferrer::*},
+    CoreResult,
+};
 use datamodel::ast::SchemaAst;
 use migration_connector::*;
 use std::sync::Arc;
@@ -32,12 +33,12 @@ where
         Ok(engine)
     }
 
-    pub async fn init(&self) -> CommandResult<()> {
+    pub async fn init(&self) -> CoreResult<()> {
         self.connector().initialize().await?;
         Ok(())
     }
 
-    pub async fn reset(&self) -> CommandResult<()> {
+    pub async fn reset(&self) -> CoreResult<()> {
         self.connector().reset().await?;
         Ok(())
     }

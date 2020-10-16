@@ -14,6 +14,7 @@ mod command;
 mod create_migration;
 mod debug_panic;
 mod diagnose_migration_history;
+mod evaluate_data_loss;
 mod get_database_version;
 #[allow(missing_docs)]
 mod infer_migration_steps;
@@ -32,13 +33,14 @@ pub use apply_migration::*;
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
 pub use calculate_database_steps::*;
 pub use calculate_datamodel::*;
-pub use command::{CommandError, CommandResult, MigrationCommand};
+pub use command::MigrationCommand;
 pub use create_migration::{CreateMigrationCommand, CreateMigrationInput, CreateMigrationOutput};
 pub use debug_panic::DebugPanicCommand;
 pub use diagnose_migration_history::{
     DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
     HistoryDiagnostic,
 };
+pub use evaluate_data_loss::*;
 pub use get_database_version::*;
 pub use infer_migration_steps::*;
 pub use initialize::{InitializeCommand, InitializeInput, InitializeOutput};

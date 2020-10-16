@@ -491,7 +491,7 @@ fn implicit_many_to_many_relation() {
 }
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
-    let datamodel = datamodel::parse_datamodel(datamodel).unwrap();
+    let datamodel = datamodel::parse_datamodel(datamodel).unwrap().subject;
     let template = DatamodelConverter::convert(&datamodel);
     template.build("not_important".to_string())
 }
@@ -530,15 +530,12 @@ impl ModelAssertions for Model {
             .find(|index| {
                 let has_right_type = index.typ == tpe;
                 let field_names: Vec<String> = index.fields().iter().map(|f| f.name.clone()).collect();
-                let expected_field_names: Vec<String> = fields.into_iter().map(|f| f.to_string()).collect();
+                let expected_field_names: Vec<String> = fields.iter().map(|f| f.to_string()).collect();
                 let is_for_right_fields = field_names == expected_field_names;
 
                 is_for_right_fields && has_right_type
             })
-            .expect(&format!(
-                "Could not find the index for fields {:?} and type {:?}",
-                fields, tpe
-            ));
+            .unwrap_or_else(|| panic!("Could not find the index for fields {:?} and type {:?}", fields, tpe));
         self
     }
 

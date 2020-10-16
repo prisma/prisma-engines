@@ -148,9 +148,7 @@ fn handle_one_to_many(
             QueryGraphDependency::ParentProjection(child_link, Box::new(move |mut parent_node, mut child_links| {
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
-                    None => Err(QueryGraphBuilderError::AssertionError(format!(
-                        "[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-many relation."
-                    ))),
+                    None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-many relation.".to_string())),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = parent_node {
@@ -171,9 +169,7 @@ fn handle_one_to_many(
                 QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut create_node, mut parent_links| {
                     let parent_link = match parent_links.pop() {
                         Some(link) => Ok(link),
-                        None => Err(QueryGraphBuilderError::AssertionError(format!(
-                            "[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-many relation."
-                        ))),
+                        None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-many relation.".to_string())),
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = create_node {
@@ -324,9 +320,7 @@ fn handle_one_to_one(
         QueryGraphDependency::ParentProjection(extractor, Box::new(move |mut child_node, mut links| {
             let link = match links.pop() {
             Some(link) => Ok(link),
-                None => Err(QueryGraphBuilderError::AssertionError(format!(
-                    "[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation."
-                ))),
+                None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation.".to_string())),
             }?;
 
             // We ONLY inject for creates here. Check end of doc comment for explanation.
@@ -352,7 +346,7 @@ fn handle_one_to_one(
             QueryGraphDependency::ParentProjection(child_link, Box::new(move |mut update_node, mut child_links| {
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
-                    None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent."))),
+                    None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent.".to_string())),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_node {
@@ -371,7 +365,7 @@ fn handle_one_to_one(
             QueryGraphDependency::ParentProjection(parent_model_identifier, Box::new(move |mut update_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent."))),
+                    None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent.".to_string())),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_node {

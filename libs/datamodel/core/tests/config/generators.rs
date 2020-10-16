@@ -1,5 +1,7 @@
+use crate::common::parse_configuration;
 use crate::common::ErrorAsserts;
-use datamodel::error::DatamodelError;
+use datamodel::common::preview_features::GENERATOR_PREVIEW_FEATURES;
+use datamodel::diagnostics::DatamodelError;
 
 #[test]
 fn serialize_generators_to_cmf() {
@@ -42,12 +44,12 @@ fn preview_features_setting_must_work() {
     let schema = r#"
         generator js {
             provider = "javascript"
-            previewFeatures = "foo"
+            previewFeatures = "connectOrCreate"
         }
         
         generator go {
             provider = "go"
-            previewFeatures = ["foo", "bar"]
+            previewFeatures = ["connectOrCreate", "transactionApi"]
         } 
     "#;
 
@@ -57,7 +59,7 @@ fn preview_features_setting_must_work() {
     "provider": "javascript",
     "output":null,
     "binaryTargets": [],
-    "previewFeatures": ["foo"],
+    "previewFeatures": ["connectOrCreate"],
     "config": {}
   },
   {
@@ -65,7 +67,7 @@ fn preview_features_setting_must_work() {
     "provider": "go",
     "output":null,
     "binaryTargets": [],
-    "previewFeatures": ["foo", "bar"],
+    "previewFeatures": ["connectOrCreate", "transactionApi"],
     "config": {}
   }
 ]"#;
@@ -129,8 +131,8 @@ generator js1 {
     "#;
     let res = datamodel::parse_configuration(schema);
 
-    if let Err(error) = res {
-        error.assert_is(DatamodelError::GeneratorArgumentNotFound {
+    if let Err(diagnostics) = res {
+        diagnostics.assert_is(DatamodelError::GeneratorArgumentNotFound {
             argument_name: String::from("provider"),
             generator_name: String::from("js1"),
             span: datamodel::ast::Span::new(1, 73),
@@ -140,8 +142,30 @@ generator js1 {
     }
 }
 
+#[test]
+fn nice_error_for_unknown_generator_preview_feature() {
+    let schema = r#"
+    generator client {
+      provider = "prisma-client-js"
+      previewFeatures = ["foo"]
+    }
+    "#;
+
+    let res = datamodel::parse_configuration(schema);
+
+    if let Err(diagnostics) = res {
+        diagnostics.assert_is(DatamodelError::new_preview_feature_not_known_error(
+            "foo",
+            Vec::from(GENERATOR_PREVIEW_FEATURES),
+            datamodel::ast::Span::new(84, 91),
+        ));
+    } else {
+        panic!("Expected error.")
+    }
+}
+
 fn assert_mcf(schema: &str, expected_mcf: &str) {
-    let config = datamodel::parse_configuration(schema).unwrap();
+    let config = parse_configuration(schema);
     let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
 
     print!("{}", &expected_mcf);

@@ -1,9 +1,9 @@
 use super::env_function::EnvFunction;
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
 use chrono::{DateTime, Utc};
-use datamodel_connector::scalars::ScalarType;
+use dml::scalars::ScalarType;
 use prisma_value::PrismaValue;
 use rust_decimal::Decimal;
 use std::error;
@@ -59,6 +59,7 @@ impl ValueValidator {
             ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
             ScalarType::String => self.as_str().map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(PrismaValue::String),
+            ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
             _ => todo!(),
         }
     }

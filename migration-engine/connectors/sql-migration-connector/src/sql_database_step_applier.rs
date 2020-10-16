@@ -2,26 +2,16 @@ use crate::{
     database_info::DatabaseInfo,
     sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
     sql_schema_differ::SqlSchemaDiffer,
-    Component, SqlFlavour,
+    SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{
-    ConnectorError, ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier,
-    DestructiveChangeDiagnostics, PrettyDatabaseMigrationStep,
+    ConnectorResult, DatabaseMigrationMarker, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics,
+    PrettyDatabaseMigrationStep,
 };
 use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 
-pub struct SqlDatabaseStepApplier<'a> {
-    pub connector: &'a crate::SqlMigrationConnector,
-}
-
-impl Component for SqlDatabaseStepApplier<'_> {
-    fn connector(&self) -> &crate::SqlMigrationConnector {
-        self.connector
-    }
-}
-
 #[async_trait::async_trait]
-impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
+impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
     #[tracing::instrument(skip(self, database_migration))]
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         self.apply_next_step(
@@ -56,19 +46,19 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
 
         // Note: it would be much nicer if we could place the warnings next to
         // the SQL for the steps that triggered them.
-        if diagnostics.has_warnings() || diagnostics.unexecutable_migrations.len() > 0 {
+        if diagnostics.has_warnings() || !diagnostics.unexecutable_migrations.is_empty() {
             script.push_str("/*\n  Warnings:\n\n");
 
             for warning in &diagnostics.warnings {
                 script.push_str("  - ");
                 script.push_str(&warning.description);
-                script.push_str("\n");
+                script.push('\n');
             }
 
             for unexecutable in &diagnostics.unexecutable_migrations {
                 script.push_str("  - ");
                 script.push_str(&unexecutable.description);
-                script.push_str("\n");
+                script.push('\n');
             }
 
             script.push_str("\n*/\n")
@@ -81,12 +71,11 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
                 self.database_info(),
                 &database_migration.before,
                 &database_migration.after,
-            )
-            .unwrap();
+            );
 
             script.push_str("-- ");
             script.push_str(step.description());
-            script.push_str("\n");
+            script.push('\n');
 
             for statement in statements {
                 script.push_str(&statement);
@@ -98,11 +87,11 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     }
 
     async fn apply_script(&self, script: &str) -> ConnectorResult<()> {
-        self.conn().raw_cmd(script).await
+        Ok(self.conn().raw_cmd(script).await?)
     }
 }
 
-impl SqlDatabaseStepApplier<'_> {
+impl SqlMigrationConnector {
     async fn apply_next_step(
         &self,
         steps: &[SqlMigrationStep],
@@ -120,9 +109,7 @@ impl SqlDatabaseStepApplier<'_> {
         let step = &steps[index];
         tracing::debug!(?step);
 
-        for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema, next_schema)
-            .map_err(|err| ConnectorError::generic(err))?
-        {
+        for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema, next_schema) {
             tracing::debug!(index, %sql_string);
 
             self.conn().raw_cmd(&sql_string).await?;
@@ -142,9 +129,7 @@ fn render_steps_pretty(
     let mut steps = Vec::with_capacity(database_migration.steps.len());
 
     for step in &database_migration.steps {
-        let sql = render_raw_sql(&step, renderer, database_info, current_schema, next_schema)
-            .map_err(|err: anyhow::Error| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err)))?
-            .join(";\n");
+        let sql = render_raw_sql(&step, renderer, database_info, current_schema, next_schema).join(";\n");
 
         if !sql.is_empty() {
             steps.push(PrettyDatabaseMigrationStep {
@@ -163,7 +148,7 @@ fn render_raw_sql(
     database_info: &DatabaseInfo,
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
-) -> Result<Vec<String>, anyhow::Error> {
+) -> Vec<String> {
     let differ = SqlSchemaDiffer {
         previous: current_schema,
         next: next_schema,
@@ -172,26 +157,25 @@ fn render_raw_sql(
     };
 
     match step {
-        SqlMigrationStep::RedefineTables { names } => Ok(renderer.render_redefine_tables(names, differ)),
-        SqlMigrationStep::CreateEnum(create_enum) => Ok(renderer.render_create_enum(create_enum)),
-        SqlMigrationStep::DropEnum(drop_enum) => Ok(renderer.render_drop_enum(drop_enum)),
+        SqlMigrationStep::RedefineTables { names } => renderer.render_redefine_tables(names, differ),
+        SqlMigrationStep::CreateEnum(create_enum) => renderer.render_create_enum(create_enum),
+        SqlMigrationStep::DropEnum(drop_enum) => renderer.render_drop_enum(drop_enum),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let table = next_schema
                 .table_walker(&table.name)
-                .expect("CreateTable referring to an unknown table.");
+                .ok_or_else(|| anyhow::anyhow!("CreateTable referring to an unknown table: `{}`.", &table.name))
+                .unwrap();
 
-            Ok(vec![renderer.render_create_table(&table)?])
+            vec![renderer.render_create_table(&table)]
         }
-        SqlMigrationStep::DropTable(DropTable { name }) => Ok(renderer.render_drop_table(name)),
-        SqlMigrationStep::RenameTable { name, new_name } => Ok(vec![renderer.render_rename_table(name, new_name)]),
-        SqlMigrationStep::AddForeignKey(add_foreign_key) => Ok(vec![renderer.render_add_foreign_key(add_foreign_key)]),
-        SqlMigrationStep::DropForeignKey(drop_foreign_key) => {
-            Ok(vec![renderer.render_drop_foreign_key(drop_foreign_key)])
-        }
-        SqlMigrationStep::AlterTable(alter_table) => Ok(renderer.render_alter_table(alter_table, &differ)),
-        SqlMigrationStep::CreateIndex(create_index) => Ok(vec![renderer.render_create_index(create_index)]),
-        SqlMigrationStep::DropIndex(drop_index) => Ok(vec![renderer.render_drop_index(drop_index)]),
+        SqlMigrationStep::DropTable(DropTable { name }) => renderer.render_drop_table(name),
+        SqlMigrationStep::RenameTable { name, new_name } => vec![renderer.render_rename_table(name, new_name)],
+        SqlMigrationStep::AddForeignKey(add_foreign_key) => vec![renderer.render_add_foreign_key(add_foreign_key)],
+        SqlMigrationStep::DropForeignKey(drop_foreign_key) => vec![renderer.render_drop_foreign_key(drop_foreign_key)],
+        SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &differ),
+        SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(create_index)],
+        SqlMigrationStep::DropIndex(drop_index) => vec![renderer.render_drop_index(drop_index)],
         SqlMigrationStep::AlterIndex(alter_index) => {
             renderer.render_alter_index(alter_index, database_info, current_schema)
         }

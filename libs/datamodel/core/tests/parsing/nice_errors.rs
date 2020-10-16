@@ -1,6 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::error::DatamodelError;
+use datamodel::common::preview_features::DATASOURCE_PREVIEW_FEATURES;
+use datamodel::diagnostics::DatamodelError;
 
 #[test]
 fn nice_error_for_missing_model_keyword() {
@@ -17,6 +18,30 @@ fn nice_error_for_missing_model_keyword() {
         Span::new(5, 36),
     ));
 }
+
+#[test]
+fn nice_error_for_unknown_datasource_preview_feature() {
+    let dml = r#"
+    datasource ds {
+        provider = "postgres"
+        url = "postgresql://"
+        previewFeatures = ["foo"]
+    }
+
+    model User {
+        id Int @id
+    }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_preview_feature_not_known_error(
+        "foo",
+        Vec::from(DATASOURCE_PREVIEW_FEATURES),
+        Span::new(107, 114),
+    ));
+}
+
 #[test]
 fn nice_error_for_missing_model_keyword_2() {
     let dml = r#"
@@ -72,7 +97,7 @@ fn nice_error_missing_type() {
 }
 
 #[test]
-fn nice_error_missing_directive_name() {
+fn nice_error_missing_attribute_name() {
     let dml = r#"
     model User {
         id Int @id @
@@ -82,7 +107,7 @@ fn nice_error_missing_directive_name() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "The name of a Directive must not be empty.",
+        "The name of a Attribute must not be empty.",
         Span::new(38, 38),
     ));
 }
@@ -333,7 +358,7 @@ fn invalid_field_line_must_error_nicely() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_validation_error(
-        "This line is not a valid field or directive definition.",
+        "This line is not a valid field or attribute definition.",
         Span::new(43, 57),
     ));
 }

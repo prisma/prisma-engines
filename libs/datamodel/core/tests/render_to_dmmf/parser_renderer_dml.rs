@@ -90,7 +90,7 @@ enum CategoryEnum {
 }
 
 #[test]
-fn test_parser_renderer_order_of_field_directives_via_dml() {
+fn test_parser_renderer_order_of_field_attributes_via_dml() {
     let input = r#"model Post {
   id        Int      @default(autoincrement()) @id
   published Boolean  @map("_published") @default(false)
@@ -137,7 +137,7 @@ model Test {
 }
 
 #[test]
-fn test_parser_renderer_order_of_block_directives_via_dml() {
+fn test_parser_renderer_order_of_block_attributes_via_dml() {
     let input = r#"model Person {
   firstName   String
   lastName    String
@@ -264,7 +264,7 @@ model Blog {
 
     println!("{:?}", dml);
 
-    let config = datamodel::parse_configuration(input).unwrap();
+    let config = parse_configuration(input);
     let dml = parse(input);
     let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config).unwrap();
 
@@ -298,14 +298,14 @@ datasource db {
 
     // check that `experimentalFeatures` is turned into `previewFeatures`.
     {
-        let config = datamodel::parse_configuration(input_with_experimental).unwrap();
+        let config = parse_configuration(input_with_experimental);
         let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config).unwrap();
         assert_eq!(rendered, input_with_preview);
     }
 
     // check that `previewFeatures` stays as is.
     {
-        let config = datamodel::parse_configuration(input_with_preview).unwrap();
+        let config = parse_configuration(input_with_preview);
         let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config).unwrap();
         println!("{}", rendered);
         assert_eq!(rendered, input_with_preview);

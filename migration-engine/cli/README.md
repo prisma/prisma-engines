@@ -5,16 +5,15 @@ The migration-engine CLI binary.
 ## Usage
 
 ```
-migration-engine-cli 0.1.0
-When no subcommand is specified, the migration engine will default to starting as a JSON-RPC server over stdio.
+migration-engine-cli 7205c372b546b3be4f6b6690b575dd5fa93bb5fa
+When no subcommand is specified, the migration engine will default to starting as a JSON-RPC server over stdio
 
 USAGE:
-    migration-engine [FLAGS] [OPTIONS] [SUBCOMMAND]
+    migration-engine [OPTIONS] [SUBCOMMAND]
 
 FLAGS:
-    -h, --help          Prints help information
-    -s, --single-cmd    Run only a single command, then exit
-        --version       Prints the server commit ID
+    -h, --help       Prints help information
+    -V, --version    Prints version information
 
 OPTIONS:
     -d, --datamodel <FILE>    Path to the datamodel
@@ -43,5 +42,6 @@ OPTIONS:
 SUBCOMMANDS:
     can-connect-to-database    Does the database connection string work?
     create-database            Create an empty database defined in the configuration string
-    help                         Prints this message or the help of the given subcommand(s)
+    help                       Prints this message or the help of the given subcommand(s)
+    qe-setup                   Set up the database for connector-test-kit
 ```

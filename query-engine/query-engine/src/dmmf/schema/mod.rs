@@ -104,11 +104,11 @@ impl RenderContext {
             let mapping = self.mappings.iter().find(|mapping| mapping.model_name == model_name);
 
             match mapping {
-                Some(ref existing) => existing.add_operation(tag_str, name.clone()),
+                Some(ref existing) => existing.add_operation(tag_str, name),
                 None => {
                     let new_mapping = DmmfMapping::new(model_name);
 
-                    new_mapping.add_operation(tag_str, name.clone());
+                    new_mapping.add_operation(tag_str, name);
                     self.mappings.push(new_mapping);
                 }
             };

@@ -319,7 +319,7 @@ fn CreateArgument_must_work() {
         {
             "tag": "CreateArgument",
             "location": {
-                "tag": "Directive",         
+                "tag": "Directive",
                 "directive": "map",
                 "path": {
                     "enum": "CatMood",

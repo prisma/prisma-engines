@@ -1,8 +1,8 @@
+pub mod attributes;
 pub mod base;
 pub mod capabilities;
 pub mod common;
 pub mod config;
-pub mod directives;
 pub mod functions;
 pub mod parsing;
 pub mod reformat;

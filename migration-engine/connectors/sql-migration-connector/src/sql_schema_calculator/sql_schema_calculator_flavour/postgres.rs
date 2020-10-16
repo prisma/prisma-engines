@@ -1,7 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::{flavour::PostgresFlavour, sql_schema_calculator::SqlSchemaCalculator};
-use datamodel::{walkers::ScalarFieldWalker, ScalarType, WithDatabaseName};
-use datamodel_connector::NativeTypeInstance;
+use datamodel::{walkers::ScalarFieldWalker, NativeTypeInstance, ScalarType, WithDatabaseName};
 use native_types::PostgresType;
 use sql_schema_describer::{self as sql};
 
@@ -28,7 +27,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         fn render(input: Option<u32>) -> String {
             match input {
                 None => "".to_string(),
-                Some(arg) => format!("({})", arg).to_string(),
+                Some(arg) => format!("({})", arg),
             }
         }
 

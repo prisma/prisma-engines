@@ -70,17 +70,11 @@ impl GraphQLProtocolAdapter {
     }
 
     fn convert_query(selection_set: SelectionSet<String>) -> PrismaResult<Vec<Operation>> {
-        Self::convert_selection_set(selection_set)
-            .map(|fields| fields.into_iter().map(|field| Operation::Read(field)).collect())
+        Self::convert_selection_set(selection_set).map(|fields| fields.into_iter().map(Operation::Read).collect())
     }
 
     fn convert_mutation(selection_set: SelectionSet<String>) -> PrismaResult<Vec<Operation>> {
-        Self::convert_selection_set(selection_set).map(|fields| {
-            fields
-                .into_iter()
-                .map(|selection| Operation::Write(selection))
-                .collect()
-        })
+        Self::convert_selection_set(selection_set).map(|fields| fields.into_iter().map(Operation::Write).collect())
     }
 
     fn convert_selection_set(selection_set: SelectionSet<String>) -> PrismaResult<Vec<Selection>> {

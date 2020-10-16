@@ -12,7 +12,7 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
       |   id            String   @id @default(cuid())
       |   outerString   String
       |   outerDateTime DateTime @unique
-      |   todos         Todo[]   $relationInlineDirective
+      |   todos         Todo[]   $relationInlineAttribute
       |}
       |
       |model Todo{

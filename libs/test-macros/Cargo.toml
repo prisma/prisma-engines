@@ -11,7 +11,6 @@ proc-macro = true
 
 [dependencies]
 test-setup = { path = "../test-setup" }
-feature-flags = { path = "../feature-flags" }
 
 darling = "0.10.1"
 enumflags2 = "0.6.0"

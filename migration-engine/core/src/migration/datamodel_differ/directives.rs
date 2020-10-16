@@ -3,8 +3,8 @@ use migration_connector::steps::MigrationExpression;
 
 #[derive(Debug)]
 pub(crate) struct DirectiveDiffer<'a> {
-    pub(crate) previous: &'a ast::Directive,
-    pub(crate) next: &'a ast::Directive,
+    pub(crate) previous: &'a ast::Attribute,
+    pub(crate) next: &'a ast::Attribute,
 }
 
 impl<'a> DirectiveDiffer<'a> {
@@ -41,7 +41,7 @@ impl<'a> DirectiveDiffer<'a> {
     }
 }
 
-pub(crate) fn directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
+pub(crate) fn directives_match(previous: &ast::Attribute, next: &ast::Attribute) -> bool {
     previous.name.name == next.name.name
 }
 
@@ -49,7 +49,7 @@ pub fn arguments_match(previous: &ast::Argument, next: &ast::Argument) -> bool {
     previous.name.name == next.name.name
 }
 
-pub(crate) fn directives_are_identical(previous: &ast::Directive, next: &ast::Directive) -> bool {
+pub(crate) fn directives_are_identical(previous: &ast::Attribute, next: &ast::Attribute) -> bool {
     if previous.name.name != next.name.name {
         return false;
     }

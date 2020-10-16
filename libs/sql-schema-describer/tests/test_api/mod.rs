@@ -73,7 +73,7 @@ impl TestApi {
 
 pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_url(db_name.as_ref());
+    let url = mysql_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     TestApi {
@@ -87,7 +87,7 @@ pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
 
 pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_8_url(db_name.as_ref());
+    let url = mysql_8_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     TestApi {
@@ -101,7 +101,7 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
 
 pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_5_6_url(db_name.as_ref());
+    let url = mysql_5_6_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     TestApi {
@@ -115,7 +115,7 @@ pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
 
 pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mariadb_url(db_name.as_ref());
+    let url = mariadb_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
 
     TestApi {
@@ -192,56 +192,12 @@ pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
 }
 
 pub async fn mssql_test_api(connection_string: String, schema: &'static str, connector_name: &'static str) -> TestApi {
+    use test_setup::connectors::mssql;
+
     let database = Quaint::new(&connection_string).await.unwrap();
     let connection_info = database.connection_info().to_owned();
 
-    // Mickie misses DROP SCHEMA .. CASCADE, so what we need to do here is to
-    // delete first the foreign keys, then all the tables from the test schema
-    // to allow a clean slate for the next test.
-
-    let drop_fks = format!(
-        r#"
-        DECLARE @stmt NVARCHAR(max)
-        DECLARE @n CHAR(1)
-
-        SET @n = CHAR(10)
-
-        SELECT @stmt = ISNULL(@stmt + @n, '') +
-            'ALTER TABLE [' + SCHEMA_NAME(schema_id) + '].[' + OBJECT_NAME(parent_object_id) + '] DROP CONSTRAINT [' + name + ']'
-        FROM sys.foreign_keys
-        WHERE SCHEMA_NAME(schema_id) = '{0}'
-
-        EXEC SP_EXECUTESQL @stmt
-        "#,
-        schema
-    );
-
-    let drop_tables = format!(
-        r#"
-        DECLARE @stmt NVARCHAR(max)
-        DECLARE @n CHAR(1)
-
-        SET @n = CHAR(10)
-
-        SELECT @stmt = ISNULL(@stmt + @n, '') +
-            'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + ']'
-        FROM sys.tables
-        WHERE SCHEMA_NAME(schema_id) = '{0}'
-
-        EXEC SP_EXECUTESQL @stmt
-        "#,
-        schema
-    );
-
-    database.raw_cmd(&drop_fks).await.unwrap();
-    database.raw_cmd(&drop_tables).await.unwrap();
-
-    database
-        .raw_cmd(&format!("DROP SCHEMA IF EXISTS {}", schema))
-        .await
-        .unwrap();
-
-    database.raw_cmd(&format!("CREATE SCHEMA {}", schema)).await.unwrap();
+    mssql::reset_schema(&database, schema).await.unwrap();
 
     TestApi {
         connector_name,
@@ -261,14 +217,14 @@ pub struct BarrelMigrationExecutor {
 impl BarrelMigrationExecutor {
     pub async fn execute<F>(&self, migration_fn: F)
     where
-        F: FnOnce(&mut Migration) -> (),
+        F: FnOnce(&mut Migration),
     {
         self.execute_with_schema(migration_fn, &self.schema_name).await
     }
 
     pub async fn execute_with_schema<F>(&self, migration_fn: F, schema_name: &str)
     where
-        F: FnOnce(&mut Migration) -> (),
+        F: FnOnce(&mut Migration),
     {
         let mut migration = Migration::new().schema(schema_name);
         migration_fn(&mut migration);
@@ -279,7 +235,7 @@ impl BarrelMigrationExecutor {
 }
 
 async fn run_full_sql(database: &Quaint, full_sql: &str) {
-    for sql in full_sql.split(";") {
+    for sql in full_sql.split(';') {
         if sql != "" {
             database.query_raw(&sql, &[]).await.unwrap();
         }

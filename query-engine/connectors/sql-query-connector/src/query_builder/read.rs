@@ -102,23 +102,23 @@ pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArgume
     let sub_table = Table::from(sub_query).alias("sub");
 
     aggregators
-        .into_iter()
+        .iter()
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
             Aggregator::Count => select.value(count(asterisk())),
 
-            Aggregator::Average(fields) => fields.into_iter().fold(select, |select, next_field| {
+            Aggregator::Average(fields) => fields.iter().fold(select, |select, next_field| {
                 select.value(avg(Column::from(next_field.db_name().to_owned())))
             }),
 
-            Aggregator::Sum(fields) => fields.into_iter().fold(select, |select, next_field| {
+            Aggregator::Sum(fields) => fields.iter().fold(select, |select, next_field| {
                 select.value(sum(Column::from(next_field.db_name().to_owned())))
             }),
 
-            Aggregator::Min(fields) => fields.into_iter().fold(select, |select, next_field| {
+            Aggregator::Min(fields) => fields.iter().fold(select, |select, next_field| {
                 select.value(min(Column::from(next_field.db_name().to_owned())))
             }),
 
-            Aggregator::Max(fields) => fields.into_iter().fold(select, |select, next_field| {
+            Aggregator::Max(fields) => fields.iter().fold(select, |select, next_field| {
                 select.value(max(Column::from(next_field.db_name().to_owned())))
             }),
         })

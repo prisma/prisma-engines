@@ -6,25 +6,15 @@ use migration_connector::*;
 use sql_migration::SqlMigrationStep;
 use sql_schema_describer::*;
 
-pub struct SqlDatabaseMigrationInferrer<'a> {
-    pub connector: &'a crate::SqlMigrationConnector,
-}
-
-impl Component for SqlDatabaseMigrationInferrer<'_> {
-    fn connector(&self) -> &crate::SqlMigrationConnector {
-        self.connector
-    }
-}
-
 #[async_trait::async_trait]
-impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_> {
+impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
     async fn infer(
         &self,
         _previous: &Datamodel,
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema: SqlSchema = self.describe().await?;
+        let current_database_schema: SqlSchema = self.describe_schema().await?;
         let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info(), self.flavour());
         Ok(infer(
             current_database_schema,
@@ -92,7 +82,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
             .sql_schema_from_migration_history(applied_migrations, self.conn())
             .await?;
 
-        let actual_schema = self.describe().await?;
+        let actual_schema = self.describe_schema().await?;
 
         let diff =
             SqlSchemaDiffer::diff(&actual_schema, &expected_schema, self.flavour(), self.database_info()).into_steps();

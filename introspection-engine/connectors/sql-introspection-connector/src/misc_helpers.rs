@@ -60,7 +60,7 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
         column.to_lowercase() == "b"
     }
 
-    table.name.starts_with("_")
+    table.name.starts_with('_')
         //UNIQUE INDEX [A,B]
         && table.indices.iter().any(|i| {
             i.columns.len() == 2
@@ -216,16 +216,12 @@ pub(crate) fn calculate_backrelation_field(
                 on_delete: OnDeleteStrategy::None,
             };
 
-            let other_is_unique = match &relation_info.fields.len() {
-                1 => {
-                    let column_name = &relation_info.fields.first().unwrap();
-                    table.is_column_unique(column_name)
-                }
-                _ => table
-                    .indices
-                    .iter()
-                    .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique),
-            };
+            // unique or id
+            let other_is_unique = table
+                .indices
+                .iter()
+                .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique)
+                || columns_match(&table.primary_key_columns(), &relation_info.fields);
 
             let arity = match relation_field.arity {
                 FieldArity::Required | FieldArity::Optional if other_is_unique => FieldArity::Optional,

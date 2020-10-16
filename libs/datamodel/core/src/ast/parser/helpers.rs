@@ -45,7 +45,7 @@ impl TokenExtensions for pest::iterators::Pair<'_, Rule> {
         self.relevant_children()
             .into_iter()
             .next()
-            .expect(&format!("Token `{}` had no children.", &self))
+            .unwrap_or_else(|| panic!("Token `{}` had no children.", &self))
     }
 
     fn relevant_children(&self) -> Vec<Token> {

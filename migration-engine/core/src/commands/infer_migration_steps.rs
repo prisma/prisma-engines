@@ -6,7 +6,6 @@ use datamodel::ast::{parser::parse_schema, SchemaAst};
 use migration_connector::*;
 use serde::Deserialize;
 use tracing::debug;
-use tracing_error::SpanTrace;
 
 pub struct InferMigrationStepsCommand<'a> {
     input: &'a InferMigrationStepsInput,
@@ -17,7 +16,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
     type Input = InferMigrationStepsInput;
     type Output = MigrationStepsResultOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Sync + Send + 'static,
@@ -31,14 +30,14 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
         let assume_to_be_applied = cmd.assume_to_be_applied();
 
-        cmd.validate_assumed_migrations_are_not_applied(migration_persistence.as_ref())
+        cmd.validate_assumed_migrations_are_not_applied(migration_persistence)
             .await?;
 
         let last_migration = migration_persistence.last().await?;
         let current_datamodel_ast = if let Some(migration) = last_migration.as_ref() {
             migration
                 .parse_schema_ast()
-                .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?
+                .map_err(CoreError::InvalidPersistedDatamodel)?
         } else {
             SchemaAst::empty()
         };
@@ -46,21 +45,20 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             .datamodel_calculator()
             .infer(&current_datamodel_ast, assume_to_be_applied.as_slice())?;
         let assumed_datamodel =
-            datamodel::lift_ast_to_datamodel(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
+            datamodel::lift_ast_to_datamodel(&assumed_datamodel_ast).map_err(CoreError::ProducedBadDatamodel)?;
 
         let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
         let version_check_errors = connector.check_database_version_compatibility(&next_datamodel);
 
-        let next_datamodel_ast = parse_schema(&cmd.input.datamodel).map_err(|err| {
-            CommandError::Input(anyhow::anyhow!("{}", err.to_pretty_string("", &cmd.input.datamodel)))
-        })?;
+        let next_datamodel_ast = parse_schema(&cmd.input.datamodel)
+            .map_err(|err| CoreError::Input(anyhow::anyhow!("{}", err.to_pretty_string("", &cmd.input.datamodel))))?;
 
         let model_migration_steps = engine
             .datamodel_migration_steps_inferrer()
             .infer(&assumed_datamodel_ast, &next_datamodel_ast);
 
         let database_migration = database_migration_inferrer
-            .infer(&assumed_datamodel, &next_datamodel, &model_migration_steps)
+            .infer(&assumed_datamodel.subject, &next_datamodel, &model_migration_steps)
             .await?;
 
         let DestructiveChangeDiagnostics {
@@ -80,11 +78,11 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
                     .as_ref()
                     .map(|m| m.parse_schema_ast())
                     .unwrap_or_else(|| Ok(SchemaAst::empty()))
-                    .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(CoreError::InvalidPersistedDatamodel)?;
                 let last_non_watch_datamodel = last_non_watch_applied_migration
                     .map(|m| m.parse_datamodel())
                     .unwrap_or_else(|| Ok(Datamodel::new()))
-                    .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+                    .map_err(CoreError::InvalidPersistedDatamodel)?;
                 let datamodel_steps = engine
                     .datamodel_migration_steps_inferrer()
                     .infer(&last_non_watch_datamodel_ast, &next_datamodel_ast);
@@ -139,21 +137,17 @@ impl InferMigrationStepsCommand<'_> {
     async fn validate_assumed_migrations_are_not_applied(
         &self,
         migration_persistence: &dyn MigrationPersistence,
-    ) -> CommandResult<()> {
+    ) -> CoreResult<()> {
         if let Some(migrations) = self.input.assume_applied_migrations.as_ref() {
             for migration in migrations {
                 if migration_persistence
                     .migration_is_already_applied(&migration.migration_id)
                     .await?
                 {
-                    return Err(CommandError::ConnectorError(ConnectorError {
-                        user_facing_error: None,
-                        kind: ErrorKind::Generic(anyhow::anyhow!(
-                            "Input is invalid. Migration {} is already applied.",
-                            migration.migration_id
-                        )),
-                        context: SpanTrace::capture(),
-                    }));
+                    return Err(CoreError::Generic(anyhow::anyhow!(
+                        "Input is invalid. Migration {} is already applied.",
+                        migration.migration_id
+                    )));
                 }
             }
         }

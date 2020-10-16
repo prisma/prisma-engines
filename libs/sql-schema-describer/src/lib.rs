@@ -3,14 +3,17 @@
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
+use fmt::Display;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
-use std::{fmt, str::FromStr};
-use thiserror::Error;
+use std::{
+    error::Error,
+    fmt::{self, Debug},
+    str::FromStr,
+};
 use tracing::debug;
 
 pub mod mssql;
@@ -20,12 +23,19 @@ pub mod sqlite;
 pub mod walkers;
 
 /// description errors.
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum SqlSchemaDescriberError {
     /// An unknown error occurred.
-    #[error("unknown")]
     UnknownError,
 }
+
+impl Display for SqlSchemaDescriberError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "unknown")
+    }
+}
+
+impl Error for SqlSchemaDescriberError {}
 
 /// The result type.
 pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescriberError>;
@@ -35,10 +45,13 @@ pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescribe
 pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.
     async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
+
     /// Get the databases metadata.
     async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
+
     /// Describe a database schema.
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
+
     /// Get the database version.
     async fn version(&self, schema: &str) -> SqlSchemaDescriberResult<Option<String>>;
 }
@@ -74,6 +87,18 @@ impl SqlSchema {
     /// Get an enum.
     pub fn get_enum(&self, name: &str) -> Option<&Enum> {
         self.enums.iter().find(|x| x.name == name)
+    }
+
+    /// Is this schema empty?
+    pub fn is_empty(&self) -> bool {
+        matches!(
+            self,
+            SqlSchema {
+                tables,
+                enums,
+                sequences,
+            } if tables.is_empty() && enums.is_empty() && sequences.is_empty()
+        )
     }
 
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
@@ -162,6 +187,13 @@ impl Table {
                 && index.columns.contains(&column_name.to_owned())
         })
     }
+
+    pub fn is_column_primary_key(&self, column_name: &str) -> bool {
+        match &self.primary_key {
+            None => false,
+            Some(key) => key.is_single_primary_key(column_name),
+        }
+    }
 }
 /// The type of an index.
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
@@ -175,10 +207,7 @@ pub enum IndexType {
 
 impl IndexType {
     pub fn is_unique(&self) -> bool {
-        match self {
-            IndexType::Unique => true,
-            _ => false,
-        }
+        matches!(self, IndexType::Unique)
     }
 }
 
@@ -550,6 +579,6 @@ mod tests {
 
         assert_eq!(unquote_string(&quoted_str), "abc $$ def");
 
-        assert_eq!(unquote_string("heh ".into()), "heh ");
+        assert_eq!(unquote_string("heh "), "heh ");
     }
 }

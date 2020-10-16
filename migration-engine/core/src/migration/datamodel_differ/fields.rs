@@ -10,7 +10,7 @@ pub(crate) struct FieldDiffer<'a> {
 
 impl<'a> FieldDiffer<'a> {
     /// Iterator over the directives present in `next` but not in `previous`.
-    pub(crate) fn created_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+    pub(crate) fn created_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
         self.next_directives().filter(move |next_directive| {
             self.previous_directives()
                 .find(|previous_directive| directives_match(previous_directive, next_directive))
@@ -19,7 +19,7 @@ impl<'a> FieldDiffer<'a> {
     }
 
     /// Iterator over the directives present in `previous` but not in `next`.
-    pub(crate) fn deleted_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+    pub(crate) fn deleted_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
         self.previous_directives().filter(move |previous_directive| {
             self.next_directives()
                 .find(|next_directive| directives_match(previous_directive, next_directive))
@@ -38,11 +38,11 @@ impl<'a> FieldDiffer<'a> {
         })
     }
 
-    fn previous_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.previous.directives.iter()
+    fn previous_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.previous.attributes.iter()
     }
 
-    fn next_directives(&self) -> impl Iterator<Item = &ast::Directive> {
-        self.next.directives.iter()
+    fn next_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
+        self.next.attributes.iter()
     }
 }

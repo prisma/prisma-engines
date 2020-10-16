@@ -28,6 +28,9 @@ pub trait Rpc {
 
     #[rpc(name = "introspect")]
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput>;
+
+    #[rpc(name = "debugPanic")]
+    fn debug_panic(&self) -> RpcFutureResult<()>;
 }
 
 pub struct RpcImpl;
@@ -52,6 +55,10 @@ impl Rpc for RpcImpl {
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
         Box::new(Self::introspect_internal(input.schema, input.force).boxed().compat())
     }
+
+    fn debug_panic(&self) -> RpcFutureResult<()> {
+        Box::new(Self::debug_panic().boxed().compat())
+    }
 }
 
 impl RpcImpl {
@@ -65,6 +72,7 @@ impl RpcImpl {
         let config = datamodel::parse_configuration(&schema)?;
 
         let url = config
+            .subject
             .datasources
             .first()
             .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?
@@ -73,7 +81,7 @@ impl RpcImpl {
             .value;
 
         Ok((
-            config,
+            config.subject,
             url.clone(),
             Box::new(SqlIntrospectionConnector::new(&url).await?),
         ))
@@ -90,7 +98,7 @@ impl RpcImpl {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
         let input_data_model = if !force {
-            datamodel::parse_datamodel(&schema).map_err(|err| {
+            datamodel::parse_datamodel(&schema).map(|d| d.subject).map_err(|err| {
                 Error::from(CommandError::ReceivedBadDatamodel(
                     err.to_pretty_string("schema.prisma", &schema),
                 ))
@@ -100,7 +108,7 @@ impl RpcImpl {
         };
 
         let native_types = match datamodel::parse_configuration(&schema) {
-            Ok(config) => config.datasources.first().has_preview_feature("nativeTypes"),
+            Ok(config) => config.subject.datasources.first().has_preview_feature("nativeTypes"),
             Err(_) => false,
         };
 
@@ -143,6 +151,10 @@ impl RpcImpl {
     pub async fn get_database_metadata_internal(schema: String) -> RpcResult<DatabaseMetadata> {
         let (_, _, connector) = RpcImpl::load_connector(&schema).await?;
         RpcImpl::catch(connector.get_metadata()).await
+    }
+
+    pub async fn debug_panic() -> RpcResult<()> {
+        panic!("This is the debugPanic artificial panic")
     }
 }
 

@@ -5,7 +5,6 @@
 mod database_migration_inferrer;
 mod database_migration_step_applier;
 mod destructive_change_checker;
-#[allow(missing_docs)]
 mod error;
 mod imperative_migrations_persistence;
 #[allow(missing_docs)]
@@ -22,12 +21,15 @@ pub use database_migration_inferrer::*;
 pub use database_migration_step_applier::*;
 pub use destructive_change_checker::*;
 pub use error::*;
-pub use imperative_migrations_persistence::{ImperativeMigrationsPersistence, MigrationRecord, Timestamp};
+pub use imperative_migrations_persistence::{
+    ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp,
+};
 pub use migration_applier::*;
 pub use migration_persistence::*;
 pub use migrations_directory::{create_migration_directory, list_migrations, ListMigrationsError, MigrationDirectory};
 pub use steps::MigrationStep;
 
+use sha2::{Digest, Sha256};
 use std::fmt::Debug;
 
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
@@ -66,21 +68,19 @@ pub trait MigrationConnector: Send + Sync + 'static {
     }
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
-    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
+    fn migration_persistence<'a>(&'a self) -> &dyn MigrationPersistence;
 
     /// See [ImperativeMigrationPersistence](trait.ImperativeMigrationPersistence.html).
     fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence;
 
     /// See [DatabaseMigrationInferrer](trait.DatabaseMigrationInferrer.html).
-    fn database_migration_inferrer<'a>(&'a self) -> Box<dyn DatabaseMigrationInferrer<Self::DatabaseMigration> + 'a>;
+    fn database_migration_inferrer(&self) -> &dyn DatabaseMigrationInferrer<Self::DatabaseMigration>;
 
     /// See [DatabaseMigrationStepApplier](trait.DatabaseMigrationStepApplier.html).
-    fn database_migration_step_applier<'a>(
-        &'a self,
-    ) -> Box<dyn DatabaseMigrationStepApplier<Self::DatabaseMigration> + 'a>;
+    fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier<Self::DatabaseMigration>;
 
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
-    fn destructive_change_checker<'a>(&'a self) -> Box<dyn DestructiveChangeChecker<Self::DatabaseMigration> + 'a>;
+    fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker<Self::DatabaseMigration>;
 
     // TODO: figure out if this is the best way to do this or move to a better place/interface
     // this is placed here so i can use the associated type
@@ -112,6 +112,14 @@ pub trait DatabaseMigrationMarker: Debug + Send + Sync {
 /// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
 /// variant is a [ConnectorError](/error/enum.ConnectorError.html).
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
+
+/// Compute the checksum for a migration script, and return it formatted to be human-readable.
+fn checksum(script: &str) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(script.as_bytes());
+    let checksum: [u8; 32] = hasher.finalize().into();
+    checksum.format_checksum()
+}
 
 /// Format a checksum to a hexadecimal string. This is used to checksum
 /// migration scripts with Sha256.

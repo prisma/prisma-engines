@@ -4,8 +4,8 @@ use crate::{
     flavour::PostgresFlavour,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, TableChange,
+        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
+        DropEnum, DropForeignKey, DropIndex, TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
 };
@@ -14,21 +14,50 @@ use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::walkers::*;
 use sql_schema_describer::*;
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt::Write as _};
 
-impl SqlRenderer for PostgresFlavour {
-    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
-        Quoted::postgres_ident(name)
-    }
-
+impl PostgresFlavour {
     fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
         QuotedWithSchema {
             schema_name: self.schema_name(),
             name: self.quote(name),
         }
     }
+}
 
-    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> anyhow::Result<Vec<String>> {
+impl SqlRenderer for PostgresFlavour {
+    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
+        Quoted::postgres_ident(name)
+    }
+
+    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
+        let AddForeignKey { foreign_key, table } = add_foreign_key;
+        let mut add_constraint = String::with_capacity(120);
+
+        write!(
+            add_constraint,
+            "ALTER TABLE {table} ADD ",
+            table = self.quote_with_schema(table)
+        )
+        .unwrap();
+
+        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
+            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
+        }
+
+        write!(
+            add_constraint,
+            "FOREIGN KEY ({})",
+            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
+        )
+        .unwrap();
+
+        add_constraint.push_str(&self.render_references(&table, &foreign_key));
+
+        add_constraint
+    }
+
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         if alter_enum.dropped_variants.is_empty() {
             let stmts: Vec<String> = alter_enum
                 .created_variants
@@ -42,13 +71,14 @@ impl SqlRenderer for PostgresFlavour {
                 })
                 .collect();
 
-            return Ok(stmts);
+            return stmts;
         }
 
         let new_enum = differ
             .next
             .get_enum(&alter_enum.name)
-            .ok_or_else(|| anyhow::anyhow!("Enum `{}` not found in target schema.", alter_enum.name))?;
+            .ok_or_else(|| anyhow::anyhow!("Enum `{}` not found in target schema.", alter_enum.name))
+            .unwrap();
 
         let mut stmts = Vec::with_capacity(10);
 
@@ -73,10 +103,7 @@ impl SqlRenderer for PostgresFlavour {
 
         // alter type of the current columns to new, with a cast
         {
-            let affected_columns = walk_columns(differ.next).filter(|column| match &column.column_type().family {
-                ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str() => true,
-                _ => false,
-            });
+            let affected_columns = walk_columns(differ.next).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str()));
 
             for column in affected_columns {
                 let sql = format!(
@@ -127,7 +154,7 @@ impl SqlRenderer for PostgresFlavour {
 
         stmts.push("Commit".to_string());
 
-        Ok(stmts)
+        stmts
     }
 
     fn render_alter_index(
@@ -135,12 +162,12 @@ impl SqlRenderer for PostgresFlavour {
         alter_index: &AlterIndex,
         _database_info: &DatabaseInfo,
         _current_schema: &SqlSchema,
-    ) -> anyhow::Result<Vec<String>> {
-        Ok(vec![format!(
+    ) -> Vec<String> {
+        vec![format!(
             "ALTER INDEX {} RENAME TO {}",
             self.quote_with_schema(&alter_index.index_name),
             self.quote(&alter_index.index_new_name)
-        )])
+        )]
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
@@ -206,13 +233,11 @@ impl SqlRenderer for PostgresFlavour {
             lines.join(",\n")
         );
 
-        let statements = before_statements
+        before_statements
             .into_iter()
             .chain(std::iter::once(alter_table))
             .chain(after_statements.into_iter())
-            .collect();
-
-        statements
+            .collect()
     }
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String {
@@ -296,23 +321,23 @@ impl SqlRenderer for PostgresFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> anyhow::Result<String> {
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_columns = table.table.primary_key_columns();
         let pk_column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-        let pk = if pk_column_names.len() > 0 {
+        let pk = if !pk_column_names.is_empty() {
             format!(",\nPRIMARY KEY ({})", pk_column_names)
         } else {
             String::new()
         };
 
-        Ok(format!(
+        format!(
             "CREATE TABLE {table_name} (\n{columns}{primary_key}\n)",
             table_name = self.quote_with_schema(table.name()),
             columns = columns,
             primary_key = pk,
-        ))
+        )
     }
 
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String> {

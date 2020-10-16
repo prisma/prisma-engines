@@ -165,10 +165,11 @@ fn read_datamodel_from_stdin() -> std::io::Result<String> {
 }
 
 fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
-    let provider = match url.split(':').next() {
+    let provider = match url.split("://").next() {
         Some("file") | Some("sqlite") => "sqlite",
         Some(s) if s.starts_with("postgres") => "postgresql",
         Some("mysql") => "mysql",
+        Some("sqlserver") | Some("jdbc:sqlserver") => "sqlserver",
         _ => anyhow::bail!("Could not extract a provider from the URL"),
     };
 
@@ -242,7 +243,7 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
         })
         .await?;
 
-    if response.warnings.len() > 0 {
+    if !response.warnings.is_empty() {
         eprintln!("⚠️  {}", "Warnings".bright_yellow().bold());
 
         for warning in &response.warnings {
@@ -250,7 +251,7 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
         }
     }
 
-    if response.unexecutable.len() > 0 {
+    if !response.unexecutable.is_empty() {
         eprintln!("☢️  {}", "Unexecutable steps".bright_red().bold());
 
         for unexecutable in &response.unexecutable {
@@ -264,21 +265,19 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
             "✔️".bold(),
             format!("Schema pushed to database. ({} steps)", response.executed_steps).green()
         );
+    } else if response.had_no_changes_to_push() {
+        eprintln!(
+            "{}  {}",
+            "✔️".bold(),
+            "No changes to push. Prisma schema and database are in sync.".green()
+        );
     } else {
-        if response.had_no_changes_to_push() {
-            eprintln!(
-                "{}  {}",
-                "✔️".bold(),
-                "No changes to push. Prisma schema and database are in sync.".green()
-            );
-        } else {
-            eprintln!(
-                "{}  {}",
-                "❌".bold(),
-                "The schema was not pushed. Pass the --force flag to ignore warnings."
-            );
-            std::process::exit(1);
-        }
+        eprintln!(
+            "{}  {}",
+            "❌".bold(),
+            "The schema was not pushed. Pass the --force flag to ignore warnings."
+        );
+        std::process::exit(1);
     }
 
     Ok(())

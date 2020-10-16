@@ -1,8 +1,7 @@
-use std::path::Path;
-
-use super::{CommandError, MigrationCommand};
-use crate::{migration_engine::MigrationEngine, parse_datamodel};
+use super::MigrationCommand;
+use crate::{migration_engine::MigrationEngine, parse_datamodel, CoreError, CoreResult};
 use serde::{Deserialize, Serialize};
+use std::path::Path;
 
 /// Create and potentially apply a new migration.
 pub struct CreateMigrationCommand;
@@ -35,7 +34,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
 
     type Output = CreateMigrationOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> super::CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector<DatabaseMigration = D>,
         D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
@@ -67,11 +66,11 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
             &Path::new(&input.migrations_directory_path),
             &input.migration_name,
         )
-        .map_err(|_| CommandError::Generic(anyhow::anyhow!("Failed to create a new migration directory.")))?;
+        .map_err(|_| CoreError::Generic(anyhow::anyhow!("Failed to create a new migration directory.")))?;
         directory
             .write_migration_script(&migration_script, D::FILE_EXTENSION)
             .map_err(|err| {
-                CommandError::Generic(anyhow::anyhow!(
+                CoreError::Generic(anyhow::anyhow!(
                     "Failed to write the migration script to `{:?}`. {}",
                     directory.path(),
                     err

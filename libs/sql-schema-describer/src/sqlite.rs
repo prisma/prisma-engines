@@ -89,7 +89,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_table_names(&self, _schema: &str) -> Vec<String> {
-        let sql = r#"SELECT name FROM sqlite_master WHERE type='table'"#;
+        let sql = r#"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
         debug!("describing table names with query: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("get table names");
         let names = result_set
@@ -386,7 +386,7 @@ impl SqlSchemaDescriber {
             // Exclude primary keys, they are inferred separately.
             .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk")
             // Exclude partial indices
-            .filter(|row| row.get("partial").and_then(|partial| partial.as_bool()).unwrap() != true);
+            .filter(|row| !row.get("partial").and_then(|partial| partial.as_bool()).unwrap());
 
         for row in filtered_rows {
             let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");

@@ -1,8 +1,8 @@
 use crate::common::*;
-use datamodel::{ast, error::DatamodelError};
+use datamodel::{ast, diagnostics::DatamodelError};
 
 #[test]
-fn shound_fail_on_directive_duplication() {
+fn shound_fail_on_attribute_duplication() {
     let dml = r#"
     type ID = String @id @default(cuid())
 
@@ -15,16 +15,16 @@ fn shound_fail_on_directive_duplication() {
 
     error.assert_is_at(
         0,
-        DatamodelError::new_duplicate_directive_error("id", ast::Span::new(23, 25)),
+        DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(23, 25)),
     );
     error.assert_is_at(
         1,
-        DatamodelError::new_duplicate_directive_error("id", ast::Span::new(77, 79)),
+        DatamodelError::new_duplicate_attribute_error("id", ast::Span::new(77, 79)),
     );
 }
 
 #[test]
-fn shound_fail_on_directive_duplication_recursive() {
+fn shound_fail_on_attribute_duplication_recursive() {
     let dml = r#"
     type MyStringWithDefault = String @default(cuid())
     type ID = MyStringWithDefault @id
@@ -38,11 +38,11 @@ fn shound_fail_on_directive_duplication_recursive() {
 
     error.assert_is_at(
         0,
-        DatamodelError::new_duplicate_directive_error("default", ast::Span::new(40, 47)),
+        DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(40, 47)),
     );
     error.assert_is_at(
         1,
-        DatamodelError::new_duplicate_directive_error("default", ast::Span::new(128, 135)),
+        DatamodelError::new_duplicate_attribute_error("default", ast::Span::new(128, 135)),
     );
 }
 
@@ -155,29 +155,6 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
         1,
         0,
         ast::Span::new(259, 271),
-    ));
-}
-
-#[test]
-fn should_fail_on_serial_native_type_and_default_autoincrement() {
-    let dml = r#"
-        datasource pg {
-          provider = "postgres"
-          url = "postgresql://"
-          previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id      Int @id
-            serial  Int @default(autoincrement()) @pg.Serial
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_directive_validation_error(
-        "The native type serial translates to an Integer column with an auto-incrementing counter as default. The field attribute @default(autoincrement()) translates to the serial type underneath. Please remove one of the two attributes.",
-        "default", ast::Span::new(218, 242),
     ));
 }
 

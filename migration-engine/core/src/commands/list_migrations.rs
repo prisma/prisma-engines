@@ -1,5 +1,5 @@
-use crate::commands::command::*;
 use crate::migration_engine::MigrationEngine;
+use crate::{commands::command::*, CoreResult};
 use migration_connector::steps::*;
 use migration_connector::*;
 use serde::Serialize;
@@ -11,14 +11,14 @@ impl<'a> MigrationCommand for ListMigrationsCommand {
     type Input = serde_json::Value;
     type Output = Vec<ListMigrationsOutput>;
 
-    async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let migration_persistence = engine.connector().migration_persistence();
 
-        let result: CommandResult<Self::Output> = migration_persistence
+        let result: CoreResult<Self::Output> = migration_persistence
             .load_all()
             .await?
             .into_iter()
@@ -40,7 +40,7 @@ impl<'a> MigrationCommand for ListMigrationsCommand {
 pub fn convert_migration_to_list_migration_steps_output<C, D>(
     engine: &MigrationEngine<C, D>,
     migration: Migration,
-) -> CommandResult<ListMigrationsOutput>
+) -> CoreResult<ListMigrationsOutput>
 where
     C: MigrationConnector<DatabaseMigration = D>,
     D: DatabaseMigrationMarker + 'static,

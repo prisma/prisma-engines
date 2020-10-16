@@ -7,8 +7,49 @@ use std::{
     convert::TryInto,
 };
 
-static DEFAULT_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
-static DEFAULT_NON_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
+/// Matches a default value in the schema, that is not a string.
+///
+/// Examples:
+///
+/// ```ignore
+/// ((1))
+/// ```
+///
+/// ```ignore
+/// ((1.123))
+/// ```
+///
+/// ```ignore
+/// ((true))
+/// ```
+static DEFAULT_NON_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
+
+/// Matches a default value in the schema, that is a string.
+///
+/// Example:
+///
+/// ```ignore
+/// ('this is a test')
+/// ```
+static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('(.*)'\)").unwrap());
+
+/// Matches a database-generated value in the schema.
+///
+/// Example:
+///
+/// ```ignore
+/// (current_timestamp)
+/// ```
+static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
+
+/// Matches a partial index condition, that filters out null values from the index.
+///
+/// Example:
+///
+/// ```ignore
+/// [id] IS NOT NULL
+/// ```
+static NULL_PARTIAL_INDEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[(.*)\] IS NOT NULL").unwrap());
 
 pub struct SqlSchemaDescriber {
     conn: Quaint,
@@ -66,7 +107,7 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
 
-        let sql = "SELECT name FROM master.sys.databases";
+        let sql = "SELECT name FROM sys.schemas";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names");
 
         let names = rows
@@ -93,7 +134,7 @@ impl SqlSchemaDescriber {
                 ON TABLE_NAME = st.name
                 AND SCHEMA_ID(t.TABLE_SCHEMA) = st.schema_id
             WHERE table_schema = @P1
-            AND st.is_ms_shipped = 'false'
+            AND st.is_ms_shipped = 0
             AND table_type = 'BASE TABLE'
             ORDER BY table_name ASC
         "#;
@@ -122,20 +163,20 @@ impl SqlSchemaDescriber {
         debug!("Getting db size");
 
         let sql = r#"
-            SELECT SUM(alloUni.used_pages) * 8000 AS size
-            FROM sys.tables sysTab
-            INNER JOIN sys.indexes ind
-            ON sysTab.OBJECT_ID = ind.OBJECT_ID
-            AND ind.Index_ID <= 1
-            INNER JOIN sys.partitions parti
-                ON ind.OBJECT_ID = parti.OBJECT_ID
-                AND ind.index_id = parti.index_id
-            INNER JOIN sys.allocation_units alloUni
-                ON parti.partition_id = alloUni.container_id
-            WHERE SCHEMA_NAME(sysTab.SCHEMA_ID) == @P1
-            AND sysTab.is_ms_shipped = 0
-            AND ind.OBJECT_ID > 255
-            AND parti.rows > 0
+            SELECT
+                SUM(a.total_pages) * 8000 AS size
+            FROM
+                sys.tables t
+            INNER JOIN
+                sys.partitions p ON t.object_id = p.object_id
+            INNER JOIN
+                sys.allocation_units a ON p.partition_id = a.container_id
+            WHERE schema_name(t.schema_id) = @P1
+                AND t.is_ms_shipped = 0
+            GROUP BY
+                t.schema_id
+            ORDER BY
+                size DESC;
         "#;
 
         let rows = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size");
@@ -245,12 +286,13 @@ impl SqlSchemaDescriber {
                 None => None,
                 Some(param_value) => match param_value.to_string() {
                     None => None,
-                    Some(x) if x == "NULL" => None,
+                    Some(x) if x == "(NULL)" => None,
                     Some(default_string) => {
-                        let default_string = DEFAULT_INT
+                        let default_string = DEFAULT_NON_STRING
                             .captures_iter(&default_string)
                             .next()
-                            .or_else(|| DEFAULT_NON_INT.captures_iter(&default_string).next())
+                            .or_else(|| DEFAULT_STRING.captures_iter(&default_string).next())
+                            .or_else(|| DEFAULT_DB_GEN.captures_iter(&default_string).next())
                             .map(|cap| cap[1].to_string())
                             .expect("Couldn't parse default value");
 
@@ -311,7 +353,8 @@ impl SqlSchemaDescriber {
                 ind.is_primary_key AS is_primary_key,
                 col.name AS column_name,
                 ic.index_column_id AS seq_in_index,
-                t.name AS table_name
+                t.name AS table_name,
+                ind.filter_definition AS filter_definition
             FROM
                 sys.indexes ind
             INNER JOIN sys.index_columns ic
@@ -322,6 +365,7 @@ impl SqlSchemaDescriber {
                 sys.tables t ON ind.object_id = t.object_id
             WHERE SCHEMA_NAME(t.schema_id) = @P1
                 AND t.is_ms_shipped = 0
+
             ORDER BY index_name, seq_in_index
         "#;
 
@@ -333,6 +377,28 @@ impl SqlSchemaDescriber {
 
         for row in rows {
             debug!("Got index row: {:#?}", row);
+
+            // Skip the index if it contains a partial index condition other
+            // than `[col] IS NOT NULL`.
+            //
+            // SQL Server allows only one null item per unique column by
+            // default, so we'll be having a partial index condition to filter
+            // nulls out from the index.
+            if let Some(filter_definition) = row
+                .get("filter_definition")
+                .and_then(|v| v.as_str())
+                .and_then(|v| DEFAULT_DB_GEN.captures_iter(v).next())
+                .and_then(|v| v.get(0))
+                .map(|v| v.as_str().to_string())
+            {
+                let is_user_defined_partial_index = filter_definition
+                    .split(" AND ")
+                    .any(|filter| NULL_PARTIAL_INDEX.captures_iter(filter).next().is_none());
+
+                if is_user_defined_partial_index {
+                    continue;
+                }
+            };
 
             let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
             let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");

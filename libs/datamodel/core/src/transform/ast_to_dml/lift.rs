@@ -1,11 +1,11 @@
-use super::super::directives::AllDirectives;
+use std::str::FromStr;
+
+use super::super::attributes::AllAttributes;
+use crate::diagnostics::{DatamodelError, Diagnostics};
+use crate::dml::ScalarType;
 use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
-use crate::{
-    ast, configuration, dml,
-    error::{DatamodelError, ErrorCollection},
-    Field, FieldType, ScalarType,
-};
+use crate::{ast, configuration, dml, Field, FieldType};
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 
@@ -15,25 +15,25 @@ use itertools::Itertools;
 /// AST is converted to the real datamodel, and
 /// additional semantics are attached.
 pub struct LiftAstToDml<'a> {
-    directives: AllDirectives,
+    attributes: AllAttributes,
     source: Option<&'a configuration::Datasource>,
 }
 
 impl<'a> LiftAstToDml<'a> {
-    /// Creates a new instance, with all builtin directives and
-    /// the directives defined by the given sources registered.
+    /// Creates a new instance, with all builtin attributes and
+    /// the attributes defined by the given sources registered.
     ///
-    /// The directives defined by the given sources will be namespaced.
+    /// The attributes defined by the given sources will be namespaced.
     pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml {
         LiftAstToDml {
-            directives: AllDirectives::new(),
+            attributes: AllAttributes::new(),
             source,
         }
     }
 
-    pub fn lift(&self, ast_schema: &ast::SchemaAst) -> Result<dml::Datamodel, ErrorCollection> {
+    pub fn lift(&self, ast_schema: &ast::SchemaAst) -> Result<dml::Datamodel, Diagnostics> {
         let mut schema = dml::Datamodel::new();
-        let mut errors = ErrorCollection::new();
+        let mut errors = Diagnostics::new();
 
         for ast_obj in &ast_schema.tops {
             match ast_obj {
@@ -60,11 +60,11 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates a model AST node and lifts it to a DML model.
-    fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::SchemaAst) -> Result<dml::Model, ErrorCollection> {
+    fn lift_model(&self, ast_model: &ast::Model, ast_schema: &ast::SchemaAst) -> Result<dml::Model, Diagnostics> {
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
 
-        let mut errors = ErrorCollection::new();
+        let mut errors = Diagnostics::new();
 
         for ast_field in &ast_model.fields {
             match self.lift_field(ast_field, ast_schema) {
@@ -73,7 +73,7 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
-        if let Err(mut err) = self.directives.model.validate_and_apply(ast_model, &mut model) {
+        if let Err(mut err) = self.attributes.model.validate_and_apply(ast_model, &mut model) {
             errors.append(&mut err);
         }
 
@@ -85,15 +85,15 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, ast_enum: &ast::Enum) -> Result<dml::Enum, ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    fn lift_enum(&self, ast_enum: &ast::Enum) -> Result<dml::Enum, Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         let supports_enums = match self.source {
             Some(source) => source.combined_connector.supports_enums(),
             None => true,
         };
         if !supports_enums {
-            errors.push(DatamodelError::new_validation_error(
+            errors.push_error(DatamodelError::new_validation_error(
                 &format!(
                     "You defined the enum `{}`. But the current connector does not support enums.",
                     &ast_enum.name.name
@@ -112,8 +112,8 @@ impl<'a> LiftAstToDml<'a> {
             }
         }
 
-        if en.values.len() == 0 {
-            errors.push(DatamodelError::new_validation_error(
+        if en.values.is_empty() {
+            errors.push_error(DatamodelError::new_validation_error(
                 "An enum must have at least one value.",
                 ast_enum.span,
             ))
@@ -121,7 +121,7 @@ impl<'a> LiftAstToDml<'a> {
 
         en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
-        if let Err(mut err) = self.directives.enm.validate_and_apply(ast_enum, &mut en) {
+        if let Err(mut err) = self.attributes.enm.validate_and_apply(ast_enum, &mut en) {
             errors.append(&mut err);
         }
 
@@ -133,11 +133,11 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates an enum value AST node.
-    fn lift_enum_value(&self, ast_enum_value: &ast::EnumValue) -> Result<dml::EnumValue, ErrorCollection> {
+    fn lift_enum_value(&self, ast_enum_value: &ast::EnumValue) -> Result<dml::EnumValue, Diagnostics> {
         let mut enum_value = dml::EnumValue::new(&ast_enum_value.name.name);
         enum_value.documentation = ast_enum_value.documentation.clone().map(|comment| comment.text);
 
-        self.directives
+        self.attributes
             .enm_value
             .validate_and_apply(ast_enum_value, &mut enum_value)?;
 
@@ -145,8 +145,8 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lift a field AST node to a DML field.
-    fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, Diagnostics> {
+        let mut errors = Diagnostics::new();
         // If we cannot parse the field type, we exit right away.
         let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, ast_schema, &mut Vec::new())?;
 
@@ -166,9 +166,9 @@ impl<'a> LiftAstToDml<'a> {
         };
 
         // We merge attributes so we can fail on duplicates.
-        let attributes = [&extra_attributes[..], &ast_field.directives[..]].concat();
+        let attributes = [&extra_attributes[..], &ast_field.attributes[..]].concat();
 
-        if let Err(mut err) = self.directives.field.validate_and_apply(&attributes, &mut field) {
+        if let Err(mut err) = self.attributes.field.validate_and_apply(&attributes, &mut field) {
             errors.append(&mut err);
         }
 
@@ -189,14 +189,14 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lift a field's type.
-    /// Auto resolves custom types and gathers directives, but without a stack overflow please.
+    /// Auto resolves custom types and gathers attributes, but without a stack overflow please.
     fn lift_field_type(
         &self,
         ast_field: &ast::Field,
         type_alias: Option<String>,
         ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
-    ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
+    ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
         let (supports_native_types, datasource_name) = match self.source {
@@ -214,21 +214,21 @@ impl<'a> LiftAstToDml<'a> {
                 let prefix = format!("{}{}", datasource_name, ".");
 
                 let type_specifications = ast_field
-                    .directives
+                    .attributes
                     .iter()
                     .filter(|dir| dir.name.name.starts_with(&prefix))
                     .collect_vec();
 
                 let type_specifications_with_invalid_datasource_name = ast_field
-                    .directives
+                    .attributes
                     .iter()
-                    .filter(|dir| dir.name.name.contains(".") && !dir.name.name.starts_with(&prefix))
+                    .filter(|dir| dir.name.name.contains('.') && !dir.name.name.starts_with(&prefix))
                     .collect_vec();
 
-                if type_specifications_with_invalid_datasource_name.len() > 0 {
+                if !type_specifications_with_invalid_datasource_name.is_empty() {
                     let incorrect_type_specification =
                         type_specifications_with_invalid_datasource_name.first().unwrap();
-                    let mut type_specification_name_split = incorrect_type_specification.name.name.split(".");
+                    let mut type_specification_name_split = incorrect_type_specification.name.name.split('.');
                     let given_prefix = type_specification_name_split.next().unwrap();
                     return Err(DatamodelError::new_connector_error(
                         &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
@@ -244,7 +244,7 @@ impl<'a> LiftAstToDml<'a> {
                 let type_specification = type_specifications.first();
 
                 if type_specifications.len() > 1 {
-                    return Err(DatamodelError::new_duplicate_directive_error(
+                    return Err(DatamodelError::new_duplicate_attribute_error(
                         &prefix,
                         type_specification.unwrap().span,
                     ));
@@ -309,12 +309,10 @@ impl<'a> LiftAstToDml<'a> {
 
                     let parse_native_type_result = connector.parse_native_type(x, args);
                     match parse_native_type_result {
-                        Err(connector_error) => {
-                            return Err(DatamodelError::new_connector_error(
-                                &connector_error.to_string(),
-                                type_specification.unwrap().span,
-                            ))
-                        }
+                        Err(connector_error) => Err(DatamodelError::new_connector_error(
+                            &connector_error.to_string(),
+                            type_specification.unwrap().span,
+                        )),
                         Ok(parsed_native_type) => {
                             Ok((dml::FieldType::NativeType(scalar_type, parsed_native_type), vec![]))
                         }
@@ -322,15 +320,14 @@ impl<'a> LiftAstToDml<'a> {
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
+            } else if let Some(native_type_attribute) = ast_field.attributes.iter().find(|d| d.name.name.contains('.'))
+            {
+                Err(DatamodelError::new_connector_error(
+                    &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
+                    native_type_attribute.span,
+                ))
             } else {
-                if let Some(native_type_attribute) = ast_field.directives.iter().find(|d| d.name.name.contains(".")) {
-                    return Err(DatamodelError::new_connector_error(
-                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
-                        native_type_attribute.span,
-                    ));
-                } else {
-                    Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
-                }
+                Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
@@ -346,7 +343,7 @@ impl<'a> LiftAstToDml<'a> {
         ast_field: &ast::Field,
         ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
-    ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
+    ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
         if checked_types.iter().any(|x| x == type_name) {
@@ -373,7 +370,7 @@ impl<'a> LiftAstToDml<'a> {
                 ));
             }
 
-            attrs.append(&mut custom_type.directives.clone());
+            attrs.append(&mut custom_type.attributes.clone());
             Ok((field_type, attrs))
         } else {
             Err(DatamodelError::new_type_not_found_error(

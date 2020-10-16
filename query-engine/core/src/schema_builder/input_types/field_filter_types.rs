@@ -59,7 +59,7 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
         vec![
             input_field("every", InputType::object(related_input_type.clone()), None).optional(),
             input_field("some", InputType::object(related_input_type.clone()), None).optional(),
-            input_field("none", InputType::object(related_input_type.clone()), None).optional(),
+            input_field("none", InputType::object(related_input_type), None).optional(),
         ]
     } else {
         vec![
@@ -159,7 +159,7 @@ fn alphanumeric_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField>
         input_field("lt", mapped_type.clone(), None).optional(),
         input_field("lte", mapped_type.clone(), None).optional(),
         input_field("gt", mapped_type.clone(), None).optional(),
-        input_field("gte", mapped_type.clone(), None).optional(),
+        input_field("gte", mapped_type, None).optional(),
     ]
     .into_iter()
 }
@@ -170,7 +170,7 @@ fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
     vec![
         input_field("contains", mapped_type.clone(), None).optional(),
         input_field("startsWith", mapped_type.clone(), None).optional(),
-        input_field("endsWith", mapped_type.clone(), None).optional(),
+        input_field("endsWith", mapped_type, None).optional(),
     ]
     .into_iter()
 }

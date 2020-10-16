@@ -15,7 +15,7 @@ impl<'a> EnumValueDiffer<'a> {
         })
     }
 
-    pub(crate) fn created_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+    pub(crate) fn created_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
         self.next_directives().filter(move |next| {
             !self
                 .previous_directives()
@@ -23,7 +23,7 @@ impl<'a> EnumValueDiffer<'a> {
         })
     }
 
-    pub(crate) fn deleted_directives(&self) -> impl Iterator<Item = &ast::Directive> {
+    pub(crate) fn deleted_directives(&self) -> impl Iterator<Item = &ast::Attribute> {
         self.previous_directives().filter(move |previous| {
             !self
                 .next_directives()
@@ -31,15 +31,15 @@ impl<'a> EnumValueDiffer<'a> {
         })
     }
 
-    fn previous_directives<'b>(&'b self) -> impl Iterator<Item = &'a ast::Directive> + 'b {
-        self.previous.directives.iter()
+    fn previous_directives<'b>(&'b self) -> impl Iterator<Item = &'a ast::Attribute> + 'b {
+        self.previous.attributes.iter()
     }
 
-    fn next_directives<'b>(&'b self) -> impl Iterator<Item = &'a ast::Directive> + 'b {
-        self.next.directives.iter()
+    fn next_directives<'b>(&'b self) -> impl Iterator<Item = &'a ast::Attribute> + 'b {
+        self.next.attributes.iter()
     }
 }
 
-fn enum_value_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
+fn enum_value_directives_match(previous: &ast::Attribute, next: &ast::Attribute) -> bool {
     previous.name.name == next.name.name
 }

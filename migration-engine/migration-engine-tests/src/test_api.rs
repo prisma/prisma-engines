@@ -3,9 +3,9 @@ mod apply_migrations;
 mod calculate_database_steps;
 mod create_migration;
 mod diagnose_migration_history;
+mod evaluate_data_loss;
 mod infer;
 mod infer_apply;
-mod plan_migration;
 mod reset;
 mod schema_push;
 mod unapply_migration;
@@ -15,9 +15,9 @@ pub use apply_migrations::ApplyMigrations;
 pub use calculate_database_steps::CalculateDatabaseSteps;
 pub use create_migration::CreateMigration;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
+pub use evaluate_data_loss::EvaluateDataLoss;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
-pub use plan_migration::PlanMigration;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
@@ -30,7 +30,9 @@ use super::{
     sql::barrel_migration_executor::BarrelMigrationExecutor,
     InferAndApplyOutput,
 };
-use migration_connector::{ImperativeMigrationsPersistence, MigrationPersistence, MigrationRecord, MigrationStep};
+use migration_connector::{
+    ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord, MigrationStep,
+};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyMigrationInput,
@@ -83,8 +85,8 @@ impl TestApi {
         self.connector_name == "mysql_mariadb"
     }
 
-    pub fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
-        self.api.migration_persistence()
+    pub fn migration_persistence(&self) -> &dyn MigrationPersistence {
+        self.api.connector().migration_persistence()
     }
 
     pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
@@ -192,34 +194,34 @@ impl TestApi {
         }
     }
 
-    pub fn infer<'a>(&'a self, dm: impl Into<String>) -> Infer<'a> {
+    pub fn infer(&self, dm: impl Into<String>) -> Infer<'_> {
         Infer::new(&self.api, dm)
     }
 
-    pub fn apply<'a>(&'a self) -> Apply<'a> {
+    pub fn apply(&self) -> Apply<'_> {
         Apply::new(&self.api)
     }
 
-    pub fn unapply_migration<'a>(&'a self) -> UnapplyMigration<'a> {
+    pub fn unapply_migration(&self) -> UnapplyMigration<'_> {
         UnapplyMigration {
             api: &self.api,
             force: None,
         }
     }
 
-    pub fn plan_migration<'a>(
+    pub fn evaluate_data_loss<'a>(
         &'a self,
         migrations_directory: &'a TempDir,
         prisma_schema: impl Into<String>,
-    ) -> PlanMigration<'a> {
-        PlanMigration::new(&self.api, migrations_directory, prisma_schema.into())
+    ) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
     }
 
-    pub fn reset<'a>(&'a self) -> Reset<'a> {
+    pub fn reset(&self) -> Reset<'_> {
         Reset::new(&self.api)
     }
 
-    pub fn schema_push<'a>(&'a self, dm: impl Into<String>) -> SchemaPush<'a> {
+    pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new(&self.api, dm.into())
     }
 
@@ -235,22 +237,8 @@ impl TestApi {
         }
     }
 
-    fn describer(&self) -> Box<dyn SqlSchemaDescriberBackend> {
-        let db = self.database.clone();
-        match self.api.connector_type() {
-            "postgresql" => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
-            "sqlite" => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
-            "mysql" => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
-            _ => unimplemented!(),
-        }
-    }
-
     pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
-        let mut result = self
-            .describer()
-            .describe(self.schema_name())
-            .await
-            .expect("Description failed");
+        let mut result = self.api.connector().describe_schema().await?;
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
         result.tables = result
@@ -288,7 +276,7 @@ impl TestApi {
         }
     }
 
-    pub fn calculate_database_steps<'a>(&'a self) -> CalculateDatabaseSteps<'a> {
+    pub fn calculate_database_steps(&self) -> CalculateDatabaseSteps<'_> {
         CalculateDatabaseSteps::new(&self.api)
     }
 }

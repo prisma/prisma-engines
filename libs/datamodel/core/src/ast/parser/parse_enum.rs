@@ -1,30 +1,30 @@
 use super::{
     helpers::{parsing_catch_all, ToIdentifier, Token},
+    parse_attribute::parse_attribute,
     parse_comments::*,
-    parse_directive::parse_directive,
     Rule,
 };
 use crate::ast::parser::helpers::TokenExtensions;
 use crate::ast::*;
-use crate::error::{DatamodelError, ErrorCollection};
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_enum(token: &Token) -> Result<Enum, ErrorCollection> {
-    let mut errors = ErrorCollection::new();
+pub fn parse_enum(token: &Token) -> Result<Enum, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
-    let mut directives: Vec<Directive> = vec![];
+    let mut attributes: Vec<Attribute> = vec![];
     let mut values: Vec<EnumValue> = vec![];
     let mut comment: Option<Comment> = None;
 
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::block_level_directive => directives.push(parse_directive(&current)),
+            Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::enum_value_declaration => match parse_enum_value(&name.as_ref().unwrap().name, &current) {
                 Ok(enum_value) => values.push(enum_value),
-                Err(err) => errors.push(err),
+                Err(err) => errors.push_error(err),
             },
             Rule::comment_block => comment = Some(parse_comment_block(&current)),
-            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push(DatamodelError::new_validation_error(
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
                 "This line is not a enum value definition.",
                 Span::from_pest(current.as_span()),
             )),
@@ -32,13 +32,13 @@ pub fn parse_enum(token: &Token) -> Result<Enum, ErrorCollection> {
         }
     }
 
-    errors.ok()?;
+    errors.to_result()?;
 
     match name {
         Some(name) => Ok(Enum {
             name,
             values,
-            directives,
+            attributes,
             documentation: comment,
             span: Span::from_pest(token.as_span()),
         }),
@@ -51,7 +51,7 @@ pub fn parse_enum(token: &Token) -> Result<Enum, ErrorCollection> {
 
 fn parse_enum_value(enum_name: &str, token: &Token) -> Result<EnumValue, DatamodelError> {
     let mut name: Option<Identifier> = None;
-    let mut directives: Vec<Directive> = vec![];
+    let mut attributes: Vec<Attribute> = vec![];
     let mut comments: Vec<String> = vec![];
 
     // todo validate that the identifier is valid???
@@ -59,7 +59,7 @@ fn parse_enum_value(enum_name: &str, token: &Token) -> Result<EnumValue, Datamod
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::maybe_empty_identifier => name = Some(current.to_id()),
-            Rule::directive => directives.push(parse_directive(&current)),
+            Rule::attribute => attributes.push(parse_attribute(&current)),
             Rule::number => {
                 return Err(DatamodelError::new_enum_validation_error(
                     &format!(
@@ -83,7 +83,7 @@ fn parse_enum_value(enum_name: &str, token: &Token) -> Result<EnumValue, Datamod
     match name {
         Some(name) => Ok(EnumValue {
             name,
-            directives,
+            attributes,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
             commented_out: false,

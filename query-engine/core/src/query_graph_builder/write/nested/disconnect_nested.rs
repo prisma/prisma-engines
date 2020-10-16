@@ -227,7 +227,7 @@ fn handle_one_to_x(
         QueryGraphDependency::ParentProjection(
             extractor_model_id,
             Box::new(move |mut update_node, links| {
-                if links.len() == 0 {
+                if links.is_empty() {
                     return Err(QueryGraphBuilderError::RecordsNotConnected {
                         relation_name,
                         parent_name,

@@ -1,6 +1,6 @@
 use crate::{error::ConnectorError, steps::*, ConnectorResult};
 use chrono::{DateTime, Utc};
-use datamodel::{ast::SchemaAst, error::ErrorCollection, Datamodel};
+use datamodel::{ast::SchemaAst, Datamodel};
 use serde::Serialize;
 use std::str::FromStr;
 
@@ -163,13 +163,15 @@ impl Migration {
         datetime
     }
 
-    pub fn parse_datamodel(&self) -> Result<Datamodel, (ErrorCollection, String)> {
+    pub fn parse_datamodel(&self) -> Result<Datamodel, String> {
         datamodel::parse_datamodel_and_ignore_datasource_urls(&self.datamodel_string)
-            .map_err(|err| (err, self.datamodel_string.clone()))
+            .map(|d| d.subject)
+            .map_err(|err| err.to_pretty_string("schema.prisma", &self.datamodel_string))
     }
 
-    pub fn parse_schema_ast(&self) -> Result<SchemaAst, (ErrorCollection, String)> {
-        datamodel::parse_schema_ast(&self.datamodel_string).map_err(|err| (err, self.datamodel_string.clone()))
+    pub fn parse_schema_ast(&self) -> Result<SchemaAst, String> {
+        datamodel::parse_schema_ast(&self.datamodel_string)
+            .map_err(|err| err.to_pretty_string("schema.prisma", &self.datamodel_string))
     }
 }
 
@@ -204,17 +206,11 @@ impl MigrationStatus {
     }
 
     pub fn is_success(&self) -> bool {
-        match self {
-            MigrationStatus::MigrationSuccess => true,
-            _ => false,
-        }
+        matches!(self, MigrationStatus::MigrationSuccess)
     }
 
     pub fn is_pending(&self) -> bool {
-        match self {
-            MigrationStatus::Pending => true,
-            _ => false,
-        }
+        matches!(self, MigrationStatus::Pending)
     }
 }
 

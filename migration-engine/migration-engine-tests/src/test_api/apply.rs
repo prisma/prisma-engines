@@ -3,6 +3,7 @@ use migration_connector::MigrationStep;
 use migration_core::{
     api::GenericApi,
     commands::{ApplyMigrationInput, MigrationStepsResultOutput},
+    CoreError, CoreResult,
 };
 
 #[derive(Clone)]
@@ -14,7 +15,7 @@ pub struct Apply<'a> {
 }
 
 impl Apply<'_> {
-    pub fn new<'a>(api: &'a dyn GenericApi) -> Apply<'a> {
+    pub fn new(api: &dyn GenericApi) -> Apply<'_> {
         Apply {
             api,
             migration_id: None,
@@ -43,11 +44,10 @@ impl Apply<'_> {
     }
 
     pub async fn send_user_facing(self) -> Result<MigrationStepsResultOutput, user_facing_errors::Error> {
-        let api = self.api;
-        self.send_inner().await.map_err(|err| api.render_error(err))
+        self.send_inner().await.map_err(CoreError::render_user_facing)
     }
 
-    async fn send_inner(self) -> Result<MigrationStepsResultOutput, migration_core::error::Error> {
+    async fn send_inner(self) -> CoreResult<MigrationStepsResultOutput> {
         let migration_id = self.migration_id.unwrap_or_else(unique_migration_id);
 
         let input = ApplyMigrationInput {

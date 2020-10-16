@@ -33,10 +33,6 @@ fn user_error_derive_on_struct(input: &DeriveInput) -> TokenStream {
     let message_template = input.message;
     let template_variables = message_template_variables(message_template.value().as_str(), &message_template.span());
 
-    // Transform from the spec string templates with `${var}` to a rust format string we can use
-    // with `format!()`.
-    let message_template = message_template.value().replace("${", "{");
-
     let template_variables = template_variables.iter();
 
     let output = quote! {
@@ -146,7 +142,7 @@ struct UserErrorDeriveInput {
 
 /// See MESSAGE_VARIABLE_REGEX
 const MESSAGE_VARIABLE_REGEX_PATTERN: &str = r##"(?x)
-    \$\{  # A curly brace preceded by a dollar sign
+    \{  # an opening curly brace
     (
         [a-zA-Z0-9_]+  # any number of alphanumeric characters and underscores
     )

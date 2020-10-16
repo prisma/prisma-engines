@@ -126,10 +126,7 @@ impl Relation {
     /// Returns `true` only if the `Relation` is just a link between two
     /// `RelationField`s.
     pub fn is_inline_relation(&self) -> bool {
-        match self.manifestation {
-            RelationLinkManifestation::Inline(_) => true,
-            _ => false,
-        }
+        matches!(self.manifestation, RelationLinkManifestation::Inline(_))
     }
 
     /// Returns `true` if the `Relation` is a table linking two models.
