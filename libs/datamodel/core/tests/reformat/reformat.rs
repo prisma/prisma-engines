@@ -525,12 +525,12 @@ fn reformatting_an_invalid_generator_block_must_work() {
 #[test]
 fn reformatting_a_model_with_native_type_definitions_must_work() {
     let input = r#"datasource pg {
-  provider        = "postgres"
-  url             = "postgresql://"
+  provider = "postgres"
+  url      = "postgresql://"
 }
 
 generator js {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["nativeTypes"]
 }
 
