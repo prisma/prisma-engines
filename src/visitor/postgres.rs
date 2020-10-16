@@ -227,7 +227,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    #[cfg(feature = "json-1")]
     fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         // LHS must be cast to json/xml-text if the right is a json/xml-text value and vice versa.
         let right_cast = match left {
@@ -253,13 +252,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write(right_cast)?;
 
         Ok(())
-    }
-
-    #[cfg(not(feature = "json-1"))]
-    fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        self.visit_expression(left)?;
-        self.write(" <> ")?;
-        self.visit_expression(right)
     }
 }
 
