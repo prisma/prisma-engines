@@ -433,16 +433,21 @@ async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
         api.datasource()
     );
 
-    let result = api.infer(dm).send().await?;
+    let result = api
+        .infer(dm)
+        .send()
+        .await
+        .unwrap_err()
+        .render_user_facing()
+        .unwrap_known();
 
-    assert_eq!(
-        result
-            .errors
-            .into_iter()
-            .map(|error| error.description.clone())
-            .collect::<Vec<String>>(),
-        &["The `Json` data type used in Test.j is not supported on MySQL 5.6."]
-    );
+    assert_eq!(result.error_code, "P1015");
+    assert!(result
+        .message
+        .contains("Your Prisma schema is using features that are not supported for the version of the database"));
+    assert!(result
+        .message
+        .contains("- The `Json` data type used in Test.j is not supported on MySQL 5.6.\n"));
 
     Ok(())
 }

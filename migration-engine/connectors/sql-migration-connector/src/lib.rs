@@ -136,7 +136,10 @@ impl MigrationConnector for SqlMigrationConnector {
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
     /// the specific database version being used.
-    fn check_database_version_compatibility(&self, datamodel: &datamodel::dml::Datamodel) -> Vec<MigrationError> {
+    fn check_database_version_compatibility(
+        &self,
+        datamodel: &datamodel::dml::Datamodel,
+    ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         self.database_info.check_database_version_compatibility(datamodel)
     }
 
