@@ -179,7 +179,6 @@ impl SqlRenderer for MssqlFlavour {
             table,
             index,
             caused_by_create_table: _,
-            contains_nullable_columns,
         } = create_index;
 
         let index_type = match index.tpe {
@@ -191,28 +190,14 @@ impl SqlRenderer for MssqlFlavour {
         let index_name = self.quote(&index_name);
         let table_reference = self.quote_with_schema(&table).to_string();
 
-        let condition = match index.tpe {
-            IndexType::Unique if *contains_nullable_columns => {
-                let columns = index
-                    .columns
-                    .iter()
-                    .map(|c| self.quote(c))
-                    .map(|c| format!("{} IS NOT NULL", c));
-
-                Cow::from(format!(" WHERE {}", columns.join(" AND ")))
-            }
-            _ => Cow::from(""),
-        };
-
         let columns = index.columns.iter().map(|c| self.quote(c));
 
         format!(
-            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns}){condition}",
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
             index_type = index_type,
             index_name = index_name,
             table_reference = table_reference,
             columns = columns.join(", "),
-            condition = condition,
         )
     }
 
@@ -230,11 +215,9 @@ impl SqlRenderer for MssqlFlavour {
             String::new()
         };
 
-        // We only render unique constraints here if the mapped columns can't be
-        // null.
         let constraints = table
             .indexes()
-            .filter(|index| index.index_type().is_unique() && !index.has_nullable_columns())
+            .filter(|index| index.index_type().is_unique())
             .collect::<Vec<_>>();
 
         let constraints = if !constraints.is_empty() {

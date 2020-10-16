@@ -7,7 +7,7 @@ import util._
 class NonEmbeddedSettingNodeSelectorToNullSpec extends FlatSpec with Matchers with ApiSpecBase {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "Setting a where value to null " should "should only update one if there are several nulls for the specified node selector" in {
+  "Setting a where value to null " should "should only update one if there are several nulls for the specified node selector" taggedAs (IgnoreMsSql) in {
     val project = SchemaDsl.fromStringV11() {
       """
         |model A {

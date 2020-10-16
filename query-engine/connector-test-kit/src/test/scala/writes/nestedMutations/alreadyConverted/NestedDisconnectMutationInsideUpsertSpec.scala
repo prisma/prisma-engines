@@ -18,7 +18,9 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         .query(
           s"""mutation {
           |  createParent(data: {
-          |    p: "p1", p_1: "p", p_2: "1"
+          |    p: "p1"
+          |    p_1: "p"
+          |    p_2: "1"
           |    childOpt: {
           |      create: {
           |        c: "c1"
@@ -48,7 +50,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
          |      p: { set: "p2" }
          |      childOpt: {disconnect: true}
          |    }
-         |    create:{p: "Should not Matter"}
+         |    create:{p: "Should not Matter", p_1: "lol", p_2: "woot"}
          |  ){
          |    childOpt {
          |      c
@@ -105,6 +107,8 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
          |  }
          |  create: {
          |    p:"Should not Matter"
+         |    p_1:"lol"
+         |    p_2:"woot"
          |  }
          |  ){
          |    childOpt {
@@ -133,7 +137,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: {c: "c1"}
+        |      create: {c: "c1", c_1: "foo", c_2: "bar"}
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -153,7 +157,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
          |    update:{
          |    childrenOpt: {disconnect: {c: "c1"}}
          |    }
-         |    create: {p: "Should not Matter"}
+         |    create: {p: "Should not Matter", p_1: "asd", p_2: "asdaf"}
          |  ){
          |    childrenOpt {
          |      c
@@ -181,7 +185,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
-        |      create: {c: "c1"}
+        |      create: {c: "c1", c_1: "foo", c_2: "bar"}
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -201,7 +205,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
          |  update:{
          |    childOpt: {disconnect: true}
          |  }
-         |  create: {p: "Should not Matter"}
+         |  create: {p: "Should not Matter", p_1: "foo", p_2: "bar"}
          |  ){
          |    childOpt {
          |      c
@@ -230,7 +234,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
           |  createParent(data: {
           |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
-          |      create: [{c: "c1"}, {c: "c2"}]
+          |      create: [{c: "c1", c_1: "foo", c_2: "bar"}, {c: "c2", c_1: "qaw1", c_2: "qqw3"}]
           |    }
           |  }){
           |    ${t.parent.selection}
@@ -251,7 +255,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
          |  update:{
          |    childrenOpt: {disconnect: [{c: "c2"}]}
          |  }
-         |  create: {p: "Should not Matter"}
+         |  create: {p: "Should not Matter", p_1: "foo", p_2: "bar"}
          |  ){
          |    childrenOpt {
          |      c
@@ -304,7 +308,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
          |    update:{
          |    childOpt: {disconnect: true}
          |  }
-         |    create: {p: "Should not Matter"}
+         |    create: {p: "Should not Matter", p_1: "foo", p_2: "bar"}
          |  ){
          |    childOpt{
          |      c
@@ -334,7 +338,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
+        |      create: [{c: "c1", c_1: "foo", c_2: "bar"},{c: "c2", c_1: "q124", c_2: "qawe"}]
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -355,7 +359,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
          |  update:{
          |    childrenOpt: {disconnect: [{c: "c1"}]}
          |  }
-         |  create: {p: "Should not Matter"}
+         |  create: {p: "Should not Matter", p_1: "foo", p_2: "bar"}
          |  ){
          |    childrenOpt{
          |      c

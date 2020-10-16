@@ -328,7 +328,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
+        |      create: [{c: "c1", c_1: "foo", c_2: "bar"},{c: "c2", c_1: "fo", c_2: "lo"}]
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -346,7 +346,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |  createParent(data: {
         |    p: "p2", p_1: "p", p_2: "2"
         |    childrenOpt: {
-        |      create: [{c: "c3"},{c: "c4"}]
+        |      create: [{c: "c3", c_1: "ao", c_2: "bo"},{c: "c4", c_1: "go", c_2: "zo"}]
         |    }
         |  }){
         |    ${t.parent.selection}

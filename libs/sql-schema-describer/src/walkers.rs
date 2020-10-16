@@ -257,11 +257,6 @@ impl<'a> IndexWalker<'a> {
             })
     }
 
-    /// Is any of the indexed columns nullable?
-    pub fn has_nullable_columns(&self) -> bool {
-        self.columns().any(|c| c.arity().is_nullable())
-    }
-
     /// The underlying index struct.
     pub fn index(&self) -> &Index {
         &self.index

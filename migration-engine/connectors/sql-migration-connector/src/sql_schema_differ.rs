@@ -288,9 +288,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 let walker = self.next.table_walker(&table.name).unwrap();
 
                 for walker in walker.indexes() {
-                    let contains_nullable_columns = walker.has_nullable_columns();
-
-                    if family.is_mssql() && walker.index_type().is_unique() && !contains_nullable_columns {
+                    if family.is_mssql() && walker.index_type().is_unique() {
                         continue;
                     }
 
@@ -298,7 +296,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                         table: table.name.clone(),
                         index: walker.index().clone(),
                         caused_by_create_table: true,
-                        contains_nullable_columns,
                     });
                 }
             }
@@ -313,7 +310,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     table: tables.next.name().to_owned(),
                     index: index.index().clone(),
                     caused_by_create_table: false,
-                    contains_nullable_columns: index.has_nullable_columns(),
                 })
             }
         }

@@ -1,7 +1,7 @@
 package queries.batch
 
 import org.scalatest.{FlatSpec, Matchers}
-import util.{ApiSpecBase, ProjectDsl}
+import util.{ApiSpecBase, IgnoreMsSql, ProjectDsl}
 
 class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
@@ -29,7 +29,7 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
     database.truncateProjectTables(project)
   }
 
-  "A transactional batch of successful queries" should "work" in {
+  "A transactional batch of successful queries" should "work" taggedAs (IgnoreMsSql) in {
     val queries = Seq(
       """mutation { createOneModelA(data: { id: 1 }) { id }}""",
       """mutation { createOneModelA(data: { id: 2 }) { id }}""",
