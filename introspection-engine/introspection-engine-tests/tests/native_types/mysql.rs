@@ -59,7 +59,11 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         datasource mysql {
             provider        = "mysql"
             url             = "mysql://localhost/test"
-            previewFeatures = ["nativeTypes"]
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
         }
     "#});
 
