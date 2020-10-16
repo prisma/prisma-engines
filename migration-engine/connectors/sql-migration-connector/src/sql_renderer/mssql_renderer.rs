@@ -85,7 +85,12 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::Float => "decimal(32,16)",
             ColumnTypeFamily::Int => "int",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
-            x => unimplemented!("{:?} not handled yet", x),
+            ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+            ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
+            ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
+            ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
+            ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+            ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
         };
 
         let nullability = common::render_nullability(&column);

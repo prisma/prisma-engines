@@ -1,5 +1,8 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
-use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
+use datamodel_connector::{Connector, ConnectorCapability};
+use dml::field::Field;
+use dml::native_type_constructor::NativeTypeConstructor;
+use dml::native_type_instance::NativeTypeInstance;
 
 pub struct MsSqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -26,6 +29,10 @@ impl MsSqlDatamodelConnector {
 impl Connector for MsSqlDatamodelConnector {
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
+    }
+
+    fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
+        Ok(())
     }
 
     fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {

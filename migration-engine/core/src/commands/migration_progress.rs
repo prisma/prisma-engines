@@ -1,5 +1,4 @@
-use crate::commands::command::*;
-use crate::migration_engine::MigrationEngine;
+use crate::{commands::command::*, migration_engine::MigrationEngine, CoreError, CoreResult};
 use chrono::{DateTime, Utc};
 use migration_connector::*;
 use serde::{Deserialize, Serialize};
@@ -11,7 +10,7 @@ impl MigrationCommand for MigrationProgressCommand {
     type Input = MigrationProgressInput;
     type Output = MigrationProgressOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CommandResult<Self::Output>
+    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
     where
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
@@ -27,7 +26,7 @@ impl MigrationCommand for MigrationProgressCommand {
                     &input.migration_id
                 );
 
-                CommandError::Input(error)
+                CoreError::Input(error)
             })?;
 
         Ok(MigrationProgressOutput {

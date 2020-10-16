@@ -406,7 +406,11 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
             format!("ENUM({})", variants).into()
         }
         ColumnTypeFamily::Json => "json".into(),
-        x => unimplemented!("{:?} not handled yet", x),
+        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
+        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
+        ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
 }
 

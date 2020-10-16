@@ -89,7 +89,7 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_table_names(&self, _schema: &str) -> Vec<String> {
-        let sql = r#"SELECT name FROM sqlite_master WHERE type='table'"#;
+        let sql = r#"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name ASC"#;
         debug!("describing table names with query: '{}'", sql);
         let result_set = self.conn.query_raw(&sql, &[]).await.expect("get table names");
         let names = result_set
@@ -188,10 +188,6 @@ impl SqlSchemaDescriber {
                                 ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(default_string)),
                                 ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                             })

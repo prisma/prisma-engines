@@ -235,6 +235,7 @@ impl SqlSchemaDescriber {
                 None => None,
                 Some(param_value) => match param_value.to_string() {
                     None => None,
+                    Some(x) if x.starts_with("NULL") => None,
                     Some(default_string) => {
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string) {
@@ -277,10 +278,6 @@ impl SqlSchemaDescriber {
                                 .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
                                 .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix_without_quotes = format!("::{}", enum_name);
                                 let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
@@ -616,14 +613,17 @@ impl SqlSchemaDescriber {
 
     async fn get_enums(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Enum>> {
         debug!("Getting enums");
+
         let sql = "SELECT t.typname as name, e.enumlabel as value
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1
-            ORDER BY name, value";
+            ORDER BY e.enumsortorder";
+
         let rows = self.conn.query_raw(&sql, &[schema.into()]).await.unwrap();
         let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
+
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);
             let name = row.get("name").and_then(|x| x.to_string()).unwrap();
@@ -696,7 +696,7 @@ fn get_column_type<'a>(
             )),
         ),
         "money" | "_money" => (Float, None),
-        "pg_lsn" | "_pg_lsn" => (LogSequenceNumber, None),
+        "pg_lsn" | "_pg_lsn" => (Unsupported(full_data_type.into()), None),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision()))),
         "timetz" | "_timetz" => (
             DateTime,
@@ -708,9 +708,9 @@ fn get_column_type<'a>(
             DateTime,
             Some(PostgresType::TimestampWithTimeZone(precision.time_precision())),
         ),
-        "tsquery" | "_tsquery" => (TextSearch, None),
-        "tsvector" | "_tsvector" => (TextSearch, None),
-        "txid_snapshot" | "_txid_snapshot" => (TransactionId, None),
+        "tsquery" | "_tsquery" => (Unsupported(full_data_type.into()), None),
+        "tsvector" | "_tsvector" => (Unsupported(full_data_type.into()), None),
+        "txid_snapshot" | "_txid_snapshot" => (Unsupported(full_data_type.into()), None),
         "inet" | "_inet" => (String, None),
         //geometric
         "box" | "_box" => (Unsupported(full_data_type.into()), None),

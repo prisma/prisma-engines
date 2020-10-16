@@ -6,10 +6,10 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::error::{DatamodelError, ErrorCollection};
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
-pub fn parse_model(token: &Token) -> Result<Model, ErrorCollection> {
-    let mut errors = ErrorCollection::new();
+pub fn parse_model(token: &Token) -> Result<Model, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let mut name: Option<Identifier> = None;
     let mut attributes: Vec<Attribute> = vec![];
     let mut fields: Vec<Field> = vec![];
@@ -17,7 +17,7 @@ pub fn parse_model(token: &Token) -> Result<Model, ErrorCollection> {
 
     for current in token.relevant_children() {
         match current.as_rule() {
-            Rule::TYPE_KEYWORD => errors.push(DatamodelError::new_legacy_parser_error(
+            Rule::TYPE_KEYWORD => errors.push_error(DatamodelError::new_legacy_parser_error(
                 "Model declarations have to be indicated with the `model` keyword.",
                 Span::from_pest(current.as_span()),
             )),
@@ -25,10 +25,10 @@ pub fn parse_model(token: &Token) -> Result<Model, ErrorCollection> {
             Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
-                Err(err) => errors.push(err),
+                Err(err) => errors.push_error(err),
             },
             Rule::comment_block => comment = Some(parse_comment_block(&current)),
-            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push(DatamodelError::new_validation_error(
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
                 "This line is not a valid field or attribute definition.",
                 Span::from_pest(current.as_span()),
             )),
@@ -36,7 +36,7 @@ pub fn parse_model(token: &Token) -> Result<Model, ErrorCollection> {
         }
     }
 
-    errors.ok()?;
+    errors.to_result()?;
 
     match name {
         Some(name) => Ok(Model {

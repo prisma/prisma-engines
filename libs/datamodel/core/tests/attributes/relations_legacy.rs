@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::dml;
-use datamodel::{ast::Span, error::DatamodelError};
+use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 // Ported from
 // https://github.com/prisma/prisma/blob/master/server/servers/deploy/src/test/scala/com/prisma/deploy/migration/validation/RelationAttributeSpec.scala

@@ -33,7 +33,7 @@ pub use apply_migration::*;
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
 pub use calculate_database_steps::*;
 pub use calculate_datamodel::*;
-pub use command::{CommandError, CommandResult, MigrationCommand};
+pub use command::MigrationCommand;
 pub use create_migration::{CreateMigrationCommand, CreateMigrationInput, CreateMigrationOutput};
 pub use debug_panic::DebugPanicCommand;
 pub use diagnose_migration_history::{
@@ -51,9 +51,7 @@ pub use reset::ResetCommand;
 pub use schema_push::{SchemaPushCommand, SchemaPushInput, SchemaPushOutput};
 pub use unapply_migration::*;
 
-use migration_connector::{
-    MigrationError, MigrationStep, MigrationWarning, PrettyDatabaseMigrationStep, UnexecutableMigration,
-};
+use migration_connector::{MigrationStep, MigrationWarning, PrettyDatabaseMigrationStep, UnexecutableMigration};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -64,7 +62,7 @@ pub struct MigrationStepsResultOutput {
     pub datamodel_steps: Vec<MigrationStep>,
     pub database_steps: Vec<PrettyDatabaseMigrationStep>,
     pub warnings: Vec<MigrationWarning>,
-    pub errors: Vec<MigrationError>,
-    pub general_errors: Vec<String>,
+    pub errors: [(); 0],
+    pub general_errors: [(); 0],
     pub unexecutable_migrations: Vec<UnexecutableMigration>,
 }

@@ -1,5 +1,5 @@
 use super::{super::helpers::*, AttributeValidator};
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::{ast, dml, ValueGenerator};
 use prisma_value::PrismaValue;
 

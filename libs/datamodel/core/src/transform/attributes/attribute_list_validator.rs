@@ -1,7 +1,7 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::ast;
+use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::dml;
-use crate::error::{DatamodelError, ErrorCollection};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.
@@ -33,8 +33,8 @@ impl<T: 'static> AttributeListValidator<T> {
 
     /// For each attribute in the given object, picks the correct
     /// attribute definition and uses it to validate and apply the attribute.
-    pub fn validate_and_apply(&self, ast: &dyn ast::WithAttributes, t: &mut T) -> Result<(), ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    pub fn validate_and_apply(&self, ast: &dyn ast::WithAttributes, t: &mut T) -> Result<(), Diagnostics> {
+        let mut errors = Diagnostics::new();
 
         let mut attribute_counts = HashMap::new();
         for attribute in ast.attributes() {
@@ -46,7 +46,7 @@ impl<T: 'static> AttributeListValidator<T> {
             }
         }
 
-        errors.ok()?;
+        errors.to_result()?;
 
         for attribute in ast.attributes() {
             match self.known_attributes.get(&attribute.name.name) {
@@ -55,7 +55,7 @@ impl<T: 'static> AttributeListValidator<T> {
 
                     let attribute_count = attribute_counts.get(&attribute.name.name).unwrap();
                     if *attribute_count > 1 && !validator.is_duplicate_definition_allowed() {
-                        errors.push(DatamodelError::new_duplicate_attribute_error(
+                        errors.push_error(DatamodelError::new_duplicate_attribute_error(
                             &attribute.name.name,
                             attribute.name.span,
                         ));
@@ -73,14 +73,14 @@ impl<T: 'static> AttributeListValidator<T> {
 
                     match attribute_validation_result {
                         Err(DatamodelError::ArgumentNotFound { argument_name, span }) => {
-                            errors.push(DatamodelError::new_attribute_argument_not_found_error(
+                            errors.push_error(DatamodelError::new_attribute_argument_not_found_error(
                                 &argument_name,
                                 &attribute.name.name,
                                 span,
                             ))
                         }
                         Err(err) => {
-                            errors.push(err);
+                            errors.push_error(err);
                         }
                         _ => {
                             // We only check for unused arguments if attribute parsing succeeded.
@@ -92,7 +92,7 @@ impl<T: 'static> AttributeListValidator<T> {
                 }
                 None => {
                     if !attribute.name.name.is_empty() && !attribute.name.name.contains('.') {
-                        errors.push(DatamodelError::new_attribute_not_known_error(
+                        errors.push_error(DatamodelError::new_attribute_not_known_error(
                             &attribute.name.name,
                             attribute.name.span,
                         ))
@@ -101,23 +101,23 @@ impl<T: 'static> AttributeListValidator<T> {
             };
         }
 
-        errors.ok()?;
+        errors.to_result()?;
 
         Ok(())
     }
 
-    pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, Diagnostics> {
+        let mut errors = Diagnostics::new();
         let mut result: Vec<ast::Attribute> = Vec::new();
 
         for attribute in self.known_attributes.values() {
             match attribute.serialize(t, datamodel) {
                 Ok(mut attributes) => result.append(&mut attributes),
-                Err(err) => errors.push(err),
+                Err(err) => errors.push_error(err),
             };
         }
 
-        errors.ok()?;
+        errors.to_result()?;
 
         Ok(result)
     }

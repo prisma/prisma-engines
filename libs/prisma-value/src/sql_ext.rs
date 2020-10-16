@@ -47,6 +47,7 @@ impl<'a> From<Value<'a>> for PrismaValue {
                     PrismaValue::String(s)
                 })
                 .unwrap_or(PrismaValue::Null),
+            Value::Xml(_) => todo!(),
         }
     }
 }
