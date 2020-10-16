@@ -13,6 +13,8 @@ pub trait Connector: Send + Sync {
         self.capabilities().contains(&capability)
     }
 
+    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
+
     /// Returns all available native type constructors available through this connector.
     /// Powers the auto completion of the vs code plugin.
     fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor>;

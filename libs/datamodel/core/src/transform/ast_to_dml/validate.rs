@@ -73,6 +73,12 @@ impl<'a> Validator<'a> {
             }
 
             if let Err(ref mut the_errors) =
+                self.validate_field_connector_specific(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors)
+            }
+
+            if let Err(ref mut the_errors) =
                 self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
                 errors_for_model.append(the_errors);
@@ -453,6 +459,28 @@ impl<'a> Validator<'a> {
         } else {
             Ok(())
         }
+    }
+
+    fn validate_field_connector_specific(
+        &self,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        if let Some(source) = self.source {
+            let connector = &source.active_connector;
+            for field in model.fields.iter() {
+                if let Err(err) = connector.validate_field(field) {
+                    errors.push(DatamodelError::new_connector_error(
+                        &err.to_string(),
+                        ast_model.find_field(&field.name()).span,
+                    ));
+                }
+            }
+        }
+
+        Ok(())
     }
 
     /// Ensures that embedded types do not have back relations
