@@ -493,7 +493,7 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "pg_lsn".into(),
                 full_data_type: "pg_lsn".into(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::LogSequenceNumber,
+                family: ColumnTypeFamily::Unsupported("pg_lsn".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
@@ -629,7 +629,7 @@ async fn all_postgres_column_types_must_work() {
                 full_data_type: "tsquery".into(),
                 character_maximum_length: None,
 
-                family: ColumnTypeFamily::TextSearch,
+                family: ColumnTypeFamily::Unsupported("tsquery".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
@@ -644,7 +644,7 @@ async fn all_postgres_column_types_must_work() {
                 full_data_type: "tsvector".into(),
                 character_maximum_length: None,
 
-                family: ColumnTypeFamily::TextSearch,
+                family: ColumnTypeFamily::Unsupported("tsvector".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
@@ -659,7 +659,7 @@ async fn all_postgres_column_types_must_work() {
                 full_data_type: "txid_snapshot".into(),
                 character_maximum_length: None,
 
-                family: ColumnTypeFamily::TransactionId,
+                family: ColumnTypeFamily::Unsupported("txid_snapshot".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },

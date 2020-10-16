@@ -1,6 +1,7 @@
 use super::Connector;
 use crate::error::ConnectorError;
 use crate::{ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
+use dml::field::Field;
 
 pub struct CombinedConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -30,6 +31,10 @@ impl CombinedConnector {
 impl Connector for CombinedConnector {
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
+    }
+
+    fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
+        Ok(())
     }
 
     fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {

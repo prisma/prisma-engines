@@ -14,20 +14,25 @@ use itertools::Itertools;
 /// When lifting, the
 /// AST is converted to the real datamodel, and
 /// additional semantics are attached.
-pub struct LiftAstToDml<'a> {
+pub struct LiftAstToDml<'a, 'b> {
     attributes: AllAttributes,
     source: Option<&'a configuration::Datasource>,
+    generators: &'b Vec<configuration::Generator>,
 }
 
-impl<'a> LiftAstToDml<'a> {
+impl<'a, 'b> LiftAstToDml<'a, 'b> {
     /// Creates a new instance, with all builtin attributes and
     /// the attributes defined by the given sources registered.
     ///
     /// The attributes defined by the given sources will be namespaced.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml {
+    pub fn new(
+        source: Option<&'a configuration::Datasource>,
+        generators: &'b Vec<configuration::Generator>,
+    ) -> LiftAstToDml<'a, 'b> {
         LiftAstToDml {
             attributes: AllAttributes::new(),
             source,
+            generators,
         }
     }
 
@@ -199,13 +204,15 @@ impl<'a> LiftAstToDml<'a> {
     ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
-        let (supports_native_types, datasource_name) = match self.source {
-            Some(source) => (source.has_preview_feature("nativeTypes"), source.name.as_str()),
-            _ => (false, ""),
+        let datasource_name = match self.source {
+            Some(source) => source.name.as_str(),
+            _ => "",
         };
 
+        let supports_native_types = self.generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
+
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
-            if supports_native_types {
+            if supports_native_types && !datasource_name.is_empty() {
                 let (connector_string, connector) = (
                     &self.source.unwrap().active_provider,
                     &self.source.unwrap().active_connector,

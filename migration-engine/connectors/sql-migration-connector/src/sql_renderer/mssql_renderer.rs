@@ -88,7 +88,10 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
             ColumnTypeFamily::Binary => "varbinary(max)",
             ColumnTypeFamily::Xml => "xml",
-            x => unimplemented!("{:?} not handled yet", x),
+            ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+            ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
+            ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+            ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
         };
 
         let nullability = common::render_nullability(&column);

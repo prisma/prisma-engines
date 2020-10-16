@@ -184,10 +184,6 @@ fn database_schema_is_serializable_for_every_column_type_family() {
         ColumnTypeFamily::Binary,
         ColumnTypeFamily::Json,
         ColumnTypeFamily::Uuid,
-        ColumnTypeFamily::Geometric,
-        ColumnTypeFamily::LogSequenceNumber,
-        ColumnTypeFamily::TextSearch,
-        ColumnTypeFamily::TransactionId,
     ]
     .iter()
     .enumerate()
@@ -197,7 +193,6 @@ fn database_schema_is_serializable_for_every_column_type_family() {
             data_type: "raw type".to_string(),
             full_data_type: "full raw type".to_string(),
             character_maximum_length: None,
-
             family: family.to_owned(),
             arity: ColumnArity::Nullable,
             native_type: None,

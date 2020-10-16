@@ -73,6 +73,12 @@ impl<'a> Validator<'a> {
             }
 
             if let Err(ref mut the_errors) =
+                self.validate_field_connector_specific(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors)
+            }
+
+            if let Err(ref mut the_errors) =
                 self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
                 errors_for_model.append(the_errors);
@@ -450,6 +456,28 @@ impl<'a> Validator<'a> {
         &dml_enum.name,
         ast_enum.span,
       ))
+        } else {
+            Ok(())
+        }
+    }
+
+    fn validate_field_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
+        let mut diagnostics = Diagnostics::new();
+
+        if let Some(source) = self.source {
+            let connector = &source.active_connector;
+            for field in model.fields.iter() {
+                if let Err(err) = connector.validate_field(field) {
+                    diagnostics.push_error(DatamodelError::new_connector_error(
+                        &err.to_string(),
+                        ast_model.find_field(&field.name()).span,
+                    ));
+                }
+            }
+        }
+
+        if diagnostics.has_errors() {
+            Err(diagnostics)
         } else {
             Ok(())
         }

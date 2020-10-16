@@ -287,6 +287,11 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::String => "TEXT",
         ColumnTypeFamily::Binary => "BLOB",
+        ColumnTypeFamily::Json => unimplemented!("Json not handled yet"),
+        ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
+        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+        ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
         x => unimplemented!("{:?} not handled yet", x),
     }
 }

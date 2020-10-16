@@ -174,7 +174,6 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         let DestructiveChangeDiagnostics {
             warnings,
-            errors,
             unexecutable_migrations,
         } = diagnostics;
 
@@ -182,9 +181,9 @@ impl<'a> ApplyMigrationCommand<'a> {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel.subject).unwrap(),
             datamodel_steps: self.input.steps.clone(),
             database_steps: database_steps_json_pretty,
-            errors,
+            errors: [],
             warnings,
-            general_errors: Vec::new(),
+            general_errors: [],
             unexecutable_migrations,
         })
     }

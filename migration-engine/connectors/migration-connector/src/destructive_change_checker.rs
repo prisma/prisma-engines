@@ -24,8 +24,6 @@ where
 /// The errors and warnings emitted by the [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
 #[derive(Debug, Default)]
 pub struct DestructiveChangeDiagnostics {
-    /// Soon to be deleted.
-    pub errors: Vec<MigrationError>,
     /// The warnings.
     pub warnings: Vec<MigrationWarning>,
     /// Steps that are not executable.
@@ -59,14 +57,6 @@ pub struct MigrationWarning {
     pub description: String,
     /// The index of the step in the migration that this warning applies to.
     pub step_index: usize,
-}
-
-/// An error emitted by the [DestructiveChangeChecker](trait.DestructiveChangeChecker.html). Errors will
-/// always prevent a migration from being applied.
-#[derive(Debug, Serialize, PartialEq, Deserialize)]
-pub struct MigrationError {
-    /// The user-facing error description.
-    pub description: String,
 }
 
 /// An unexecutable migration step detected by the DestructiveChangeChecker.

@@ -63,8 +63,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn check_database_version_compatibility(
         &self,
         _datamodel: &datamodel::dml::Datamodel,
-    ) -> Vec<destructive_change_checker::MigrationError> {
-        Vec::new()
+    ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
+        None
     }
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).

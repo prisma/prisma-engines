@@ -336,14 +336,6 @@ pub enum ColumnTypeFamily {
     Xml,
     /// UUID types.
     Uuid,
-    /// Geometric types.
-    Geometric,
-    /// Log sequence number types.
-    LogSequenceNumber,
-    /// Text search types.
-    TextSearch,
-    /// Transaction ID types.
-    TransactionId,
     ///Enum
     Enum(String),
     /// Unsupported
@@ -381,10 +373,6 @@ impl fmt::Display for ColumnTypeFamily {
             Self::Json => "json".to_string(),
             Self::Xml => "xml".to_string(),
             Self::Uuid => "uuid".to_string(),
-            Self::Geometric => "geometric".to_string(),
-            Self::LogSequenceNumber => "logSequenceNumber".to_string(),
-            Self::TextSearch => "textSearch".to_string(),
-            Self::TransactionId => "transactionId".to_string(),
             Self::Enum(x) => format!("Enum({})", &x),
             Self::Unsupported(x) => x.to_string(),
         };
