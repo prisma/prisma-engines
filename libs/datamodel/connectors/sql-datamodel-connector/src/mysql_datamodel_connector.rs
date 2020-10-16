@@ -140,16 +140,17 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         if let FieldType::NativeType(_scalar_type, native_type) = field.field_type() {
-            match native_type.name.as_str() {
-                TEXT_TYPE_NAME => {
-                    if field.is_unique() {
-                        return Err(ConnectorError::new_incompatible_native_type_with_unique(
-                            TEXT_TYPE_NAME,
-                            "MySQL",
-                        ));
-                    }
-                }
-                _ => {}
+            let native_type_name = native_type.name.as_str();
+            if (native_type_name == TEXT_TYPE_NAME
+                || native_type_name == TINY_TEXT_TYPE_NAME
+                || native_type_name == MEDIUM_TEXT_TYPE_NAME
+                || native_type_name == LONG_TEXT_TYPE_NAME)
+                && field.is_unique()
+            {
+                return Err(ConnectorError::new_incompatible_native_type_with_unique(
+                    native_type_name,
+                    "MySQL",
+                ));
             }
         }
         Ok(())
