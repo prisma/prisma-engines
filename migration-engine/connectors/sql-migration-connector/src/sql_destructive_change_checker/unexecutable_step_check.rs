@@ -95,7 +95,7 @@ impl Check for UnexecutableStepCheck {
                 match database_checks.get_row_count(table) {
                     None => Some(format!("Changed the type of `{column}` on the `{table}` table. No casts exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.", column = column, table = table)),
                     Some(0) => None,
-                    Some(_) => Some(format!("Changed the type of `{column}` on the `{table}` table. No casts exists, the column would be dropped and recreated, which cannot since the column is required and there is data in the table.", column = column, table = table)),
+                    Some(_) => Some(format!("Changed the type of `{column}` on the `{table}` table. No casts exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.", column = column, table = table)),
                 }
             }
         }

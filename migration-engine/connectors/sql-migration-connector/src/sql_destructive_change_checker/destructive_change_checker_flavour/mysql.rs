@@ -43,7 +43,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             return;
         }
 
-        if changes.only_type_changed() && diagnose_enum_change(columns, plan, step_index) {
+        if changes.only_type_changed() && is_safe_enum_change(columns, plan, step_index) {
             return;
         }
 
@@ -75,7 +75,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 }
 
 /// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.
-fn diagnose_enum_change(columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) -> bool {
+fn is_safe_enum_change(columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) -> bool {
     if let (Some(previous_enum), Some(next_enum)) = (
         columns.previous.column_type_family_as_enum(),
         columns.next.column_type_family_as_enum(),
