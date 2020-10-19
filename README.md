@@ -148,6 +148,25 @@ IntelliJ project for `./query-engine/connector-test-kit`, which makes test
 results much more accessible. You need to install the Scala plugin for Intellij
 if you want to do so.
 
+Remember to set IntelliJ to use the version 8 of OpenJDK distribution.
+
+**On windows:*
+If not using WSL, `make` is not available and you should just see what your
+command does and do it manually. Basically this means editing the
+`current_connector` file and starting the needed Docker containers.
+
+To actually get the tests working, read the contents of `.envrc`. Then `Edit
+environment variables for your account` from Windows settings, and add at least
+the correct values for the following variables:
+
+- `SERVER ROOT` should point to the root directory of `prisma-engines` project.
+- `PRISMA_BINARY_PATH` is usually
+  `%SERVER_ROOT%\target\release\query-engine.exe`.
+- `MIGRATION_ENGINE_BINARY_PATH` should be
+  `%SERVER_ROOT%\target\release\migration-engine.exe`.
+
+Other variables may or may not be useful.
+
 **Run:**
 If you're using Intellij, you can run all tests by right-clicking
 `src/test/scala` > `Run ScalaTests`.
