@@ -5,11 +5,8 @@ use crate::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
-    sql_migration::AlterColumn,
-    sql_migration::ColumnTypeChange,
-    sql_schema_differ::ColumnChange,
-    sql_schema_differ::ColumnChanges,
-    sql_schema_differ::ColumnDiffer,
+    sql_migration::{AlterColumn, ColumnTypeChange},
+    sql_schema_differ::{ColumnChanges, ColumnDiffer},
 };
 
 impl DestructiveChangeCheckerFlavour for MysqlFlavour {
@@ -21,7 +18,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         step_index: usize,
     ) {
         let AlterColumn {
-            column_name,
+            column_name: _,
             changes,
             type_change,
         } = alter_column;
@@ -68,10 +65,10 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        columns: &ColumnDiffer<'_>,
-        changes: ColumnChanges,
-        plan: &mut DestructiveCheckPlan,
-        step_index: usize,
+        _columns: &ColumnDiffer<'_>,
+        _changes: &ColumnChanges,
+        _plan: &mut DestructiveCheckPlan,
+        _step_index: usize,
     ) {
         panic!("check_drop_and_recreate_column on MySQL")
     }

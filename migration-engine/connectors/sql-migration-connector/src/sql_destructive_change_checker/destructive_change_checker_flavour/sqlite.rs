@@ -6,8 +6,7 @@ use crate::{
         warning_check::SqlMigrationWarningCheck,
     },
     sql_migration::AlterColumn,
-    sql_migration::ColumnTypeChange,
-    sql_schema_differ::ColumnDiffer,
+    sql_schema_differ::{ColumnChanges, ColumnDiffer, ColumnTypeChange},
 };
 use sql_schema_describer::ColumnArity;
 
@@ -25,6 +24,7 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
     fn check_drop_and_recreate_column(
         &self,
         columns: &ColumnDiffer<'_>,
+        _changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -68,6 +68,7 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
                     step_index,
                 );
             }
+            Some(ColumnTypeChange::NotCastable) => unreachable!("uncastable change on SQLite"),
         }
     }
 }

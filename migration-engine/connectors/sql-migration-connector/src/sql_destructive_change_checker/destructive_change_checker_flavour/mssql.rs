@@ -18,7 +18,7 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn check_drop_and_recreate_column(
         &self,
         _columns: &ColumnDiffer<'_>,
-        _changes: ColumnChanges,
+        _changes: &ColumnChanges,
         _plan: &mut DestructiveCheckPlan,
         _step_index: usize,
     ) {

@@ -138,7 +138,7 @@ impl SqlRenderer for MysqlFlavour {
                 TableChange::AlterColumn(AlterColumn {
                     column_name,
                     changes,
-                    type_change,
+                    type_change: _,
                 }) => {
                     let columns = differ
                         .diff_table(&table.name)
@@ -158,7 +158,7 @@ impl SqlRenderer for MysqlFlavour {
                         }
                     };
                 }
-                TableChange::DropAndRecreateColumn { column_name: _ } => unreachable!("DropAndRecreateColumn on MySQL"),
+                TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on MySQL"),
             };
         }
 

@@ -21,7 +21,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     fn check_drop_and_recreate_column(
         &self,
         columns: &ColumnDiffer<'_>,
-        changes: ColumnChanges,
+        changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     );

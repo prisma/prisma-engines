@@ -7,7 +7,7 @@ use crate::{
         AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
         DropForeignKey, DropIndex, TableChange,
     },
-    sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
+    sql_schema_differ::{ColumnChanges, ColumnDiffer, SqlSchemaDiffer},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -199,8 +199,8 @@ impl SqlRenderer for PostgresFlavour {
                 }
                 TableChange::AlterColumn(AlterColumn {
                     column_name,
-                    changes: _,
-                    type_change,
+                    changes,
+                    type_change: _,
                 }) => {
                     let column = differ
                         .diff_table(&table.name)
@@ -208,23 +208,31 @@ impl SqlRenderer for PostgresFlavour {
                         .diff_column(column_name)
                         .expect("AlterColumn on unknown column.");
 
-                    render_alter_column(self, &column, &mut before_statements, &mut lines, &mut after_statements);
+                    render_alter_column(
+                        self,
+                        &column,
+                        changes,
+                        &mut before_statements,
+                        &mut lines,
+                        &mut after_statements,
+                    );
                 }
                 TableChange::DropAndRecreateColumn {
                     column_name,
-                    column_index,
-                    changes,
+                    column_index: (_, next_idx),
+                    changes: _,
                 } => {
                     let name = self.quote(column_name);
                     lines.push(format!("DROP COLUMN {}", name));
 
                     let column = differ
-                        .diff_table(&table.name)
+                        .next
+                        .table_walker(&table.name)
                         .expect("AlterTable on unknown table")
-                        .diff_column(column_name)
+                        .column_at(*next_idx)
                         .expect("AlterColumn on unknown column.");
 
-                    let col_sql = self.render_column(column.next);
+                    let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
             };
@@ -424,6 +432,7 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 fn render_alter_column(
     renderer: &PostgresFlavour,
     differ: &ColumnDiffer<'_>,
+    column_changes: &ColumnChanges,
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
     after_statements: &mut Vec<String>,
@@ -432,7 +441,7 @@ fn render_alter_column(
     static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
 
-    let steps = expand_postgres_alter_column(differ);
+    let steps = expand_postgres_alter_column(differ, column_changes);
     let table_name = Quoted::postgres_ident(differ.previous.table().name());
     let column_name = Quoted::postgres_ident(differ.previous.name());
 

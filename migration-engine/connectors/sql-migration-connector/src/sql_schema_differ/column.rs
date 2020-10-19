@@ -18,7 +18,7 @@ impl<'a> ColumnDiffer<'a> {
         self.previous.name()
     }
 
-    pub(super) fn all_changes(&self) -> (ColumnChanges, Option<ColumnTypeChange>) {
+    pub(crate) fn all_changes(&self) -> (ColumnChanges, Option<ColumnTypeChange>) {
         let mut changes = BitFlags::empty();
         let column_type_change = self.column_type_change();
 
@@ -126,8 +126,10 @@ pub(crate) enum ColumnChange {
     Sequence = 0b0010000,
 }
 
+// This should be pub(crate), but SqlMigration is exported, so it has to be
+// public at the moment.
 #[derive(Debug, Clone, PartialEq, Default)]
-pub(crate) struct ColumnChanges {
+pub struct ColumnChanges {
     changes: BitFlags<ColumnChange>,
 }
 

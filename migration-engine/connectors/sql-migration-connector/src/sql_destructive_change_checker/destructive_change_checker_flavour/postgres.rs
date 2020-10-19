@@ -22,12 +22,12 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         step_index: usize,
     ) {
         let AlterColumn {
-            column_name,
+            column_name: _,
             changes,
             type_change,
         } = alter_column;
 
-        let steps = expand_postgres_alter_column(columns);
+        let steps = expand_postgres_alter_column(columns, changes);
 
         for step in steps {
             // We keep the match here to keep the exhaustiveness checking for when we add variants.
@@ -79,7 +79,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_drop_and_recreate_column(
         &self,
         columns: &ColumnDiffer<'_>,
-        changes: ColumnChanges,
+        changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {

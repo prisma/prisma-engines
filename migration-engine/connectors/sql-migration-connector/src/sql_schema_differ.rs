@@ -4,7 +4,7 @@ mod index;
 mod sql_schema_differ_flavour;
 mod table;
 
-pub(crate) use column::{ColumnChange, ColumnChanges, ColumnDiffer};
+pub(crate) use column::{ColumnChange, ColumnChanges, ColumnDiffer, ColumnTypeChange};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 pub(crate) use table::TableDiffer;
 
@@ -15,7 +15,6 @@ use crate::{
     },
     wrap_as_step, DatabaseInfo, SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
 };
-use column::ColumnTypeChange;
 use enums::EnumDiffer;
 use sql_schema_describer::{
     walkers::{ForeignKeyWalker, TableWalker},
@@ -45,7 +44,8 @@ pub struct SqlSchemaDiff {
     pub create_enums: Vec<CreateEnum>,
     pub drop_enums: Vec<DropEnum>,
     pub alter_enums: Vec<AlterEnum>,
-    pub tables_to_redefine: HashSet<String>,
+    /// The indexes of the tables to redefine in the (previous, next) schema.
+    tables_to_redefine: HashSet<String>,
 }
 
 impl SqlSchemaDiff {
@@ -236,7 +236,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             let column_name = column_differ.previous.name().to_owned();
 
             match type_change {
-                Some(ColumnTypeChange::NotCastable) => Some(TableChange::DropAndRecreateColumn { column_name }),
+                Some(ColumnTypeChange::NotCastable) => Some(TableChange::DropAndRecreateColumn {
+                    column_name,
+                    column_index: (column_differ.previous.column_index(), column_differ.next.column_index()),
+                    changes,
+                }),
                 Some(ColumnTypeChange::RiskyCast) => Some(TableChange::AlterColumn(AlterColumn {
                     column_name,
                     changes,

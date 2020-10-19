@@ -92,7 +92,7 @@ impl SqlMigrationConnector {
 
                     if let (Some(before_table), Some(after_table)) = (before_table, after_table) {
                         for change in changes {
-                            match *change {
+                            match change {
                                 TableChange::DropColumn(ref drop_column) => {
                                     let column = find_column(before, &table.name, &drop_column.name)
                                         .expect("Dropping of unknown column.");
@@ -114,8 +114,8 @@ impl SqlMigrationConnector {
                                         flavour: self.flavour(),
                                     };
 
-                                    todo!("sqlite check alter column")
-                                    // self.flavour().check_alter_column(&differ, &mut plan, step_index)
+                                    self.flavour()
+                                        .check_alter_column(&alter_column, &differ, &mut plan, step_index)
                                 }
                                 TableChange::AddColumn(ref add_column) => {
                                     let column = find_column(after, after_table.name(), &add_column.column.name)
@@ -130,14 +130,15 @@ impl SqlMigrationConnector {
                                     step_index,
                                 ),
                                 TableChange::DropAndRecreateColumn {
-                                    ref column_name,
-                                    column_index,
+                                    column_name: _,
+                                    column_index: (previous_idx, next_idx),
                                     changes,
                                 } => {
-                                    let previous_column =
-                                        before_table.column(&column_name).expect("unsupported column renaming");
+                                    let previous_column = before_table
+                                        .column_at(*previous_idx)
+                                        .expect("unsupported column renaming");
                                     let next_column =
-                                        after_table.column(&column_name).expect("unsupported column renaming");
+                                        after_table.column_at(*next_idx).expect("unsupported column renaming");
 
                                     let differ = ColumnDiffer {
                                         database_info: self.database_info(),
@@ -167,7 +168,9 @@ impl SqlMigrationConnector {
 
                         if differ.dropped_primary_key().is_some() {
                             plan.push_warning(
-                                SqlMigrationWarningCheck::PrimaryKeyChange { table: name.clone() },
+                                SqlMigrationWarningCheck::PrimaryKeyChange {
+                                    table: previous.name().to_owned(),
+                                },
                                 step_index,
                             )
                         }
@@ -181,8 +184,9 @@ impl SqlMigrationConnector {
                         }
 
                         for columns in differ.column_pairs() {
-                            todo!("sqlite alter column")
-                            // self.flavour().check_alter_column(&columns, &mut plan, step_index);
+                            let (changes, _) = columns.all_changes();
+                            self.flavour()
+                                .check_drop_and_recreate_column(&columns, &changes, &mut plan, step_index);
                         }
                     }
                 }

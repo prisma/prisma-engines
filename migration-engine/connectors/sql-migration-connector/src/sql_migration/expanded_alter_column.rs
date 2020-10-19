@@ -27,11 +27,14 @@ pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer<'_>, changes: &Co
     }
 }
 
-pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Vec<PostgresAlterColumn> {
+pub(crate) fn expand_postgres_alter_column(
+    columns: &ColumnDiffer<'_>,
+    column_changes: &ColumnChanges,
+) -> Vec<PostgresAlterColumn> {
     let mut changes = Vec::new();
     let mut set_type = false;
 
-    for change in columns.all_changes().0.iter() {
+    for change in column_changes.iter() {
         match change {
             ColumnChange::Default => match (&columns.previous.default(), &columns.next.default()) {
                 (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault((**next_default).clone())),
