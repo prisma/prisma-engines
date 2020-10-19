@@ -12,6 +12,9 @@ use thiserror::Error;
 pub enum DatamodelWarning {
   #[error("Preview feature \"{}\" is deprecated. The functionality can be used without specifying it as a preview feature.", preview_feature)]
   DeprecatedPreviewFeature { preview_feature: String, span: Span },
+
+  #[error("Using multiple providers is now deprecated. You should use a single provider instead.")]
+  DeprecatedProviderArray { span: Span },
 }
 
 #[rustfmt::skip]
@@ -23,9 +26,16 @@ impl DatamodelWarning {
     }
   }
 
+  pub fn new_deprecated_provider_array_warning(span: Span) -> DatamodelWarning {
+    DatamodelWarning::DeprecatedProviderArray {
+    span,
+    }
+  }
+
   pub fn span(&self) -> Span {
     match self {
      DatamodelWarning::DeprecatedPreviewFeature { span, .. } => *span,
+      DatamodelWarning::DeprecatedProviderArray { span, .. } => *span,
     }
   }
 
