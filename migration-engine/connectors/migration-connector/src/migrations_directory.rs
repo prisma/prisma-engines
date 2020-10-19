@@ -12,7 +12,7 @@ use sha2::{Digest, Sha256, Sha512};
 use std::{
     error::Error,
     fmt::Display,
-    fs::{create_dir, read_dir, DirEntry},
+    fs::{read_dir, DirEntry},
     io::{self, Write as _},
     path::{Path, PathBuf},
 };
@@ -46,7 +46,7 @@ pub fn create_migration_directory(
         ));
     }
 
-    create_dir(&directory_path)?;
+    std::fs::create_dir_all(&directory_path)?;
 
     Ok(MigrationDirectory { path: directory_path })
 }
@@ -74,10 +74,18 @@ impl From<io::Error> for ListMigrationsError {
 }
 
 /// List the migrations present in the migration directory, lexicographically sorted by name.
+///
+/// If the migrations directory does not exist, it will not error but return an empty Vec.
 pub fn list_migrations(migrations_directory_path: &Path) -> Result<Vec<MigrationDirectory>, ListMigrationsError> {
     let mut entries: Vec<MigrationDirectory> = Vec::new();
 
-    for entry in read_dir(migrations_directory_path)? {
+    let read_dir_entries = match read_dir(migrations_directory_path) {
+        Ok(read_dir_entries) => read_dir_entries,
+        Err(err) if matches!(err.kind(), std::io::ErrorKind::NotFound) => return Ok(entries),
+        Err(err) => return Err(err.into()),
+    };
+
+    for entry in read_dir_entries {
         let entry = entry?;
 
         if entry.file_type()?.is_dir() {
