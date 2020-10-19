@@ -1194,5 +1194,5 @@ async fn re_introspecting_mysql_enum_names(api: &TestApi) {
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq_json(&warnings, "[{\"code\":9,\"message\":\"These enums were enriched with `@@map` information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"BlackNWhite\"}]}]");
+    assert_eq_json(&warnings, "[]");
 }
