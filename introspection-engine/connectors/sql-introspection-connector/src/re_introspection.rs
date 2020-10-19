@@ -3,10 +3,11 @@ use crate::warnings::*;
 use datamodel::{Datamodel, DefaultValue, FieldType, ScalarType, ValueGenerator};
 use introspection_connector::Warning;
 use prisma_value::PrismaValue;
+use quaint::connector::SqlFamily;
 use std::cmp::Ordering;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
-pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
+pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
     let mut warnings = vec![];
 
     //@@map on models
@@ -241,6 +242,48 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                 {
                     field.default_value = Some(DefaultValue::Single(PrismaValue::Enum(changed_enum_value.1.clone())));
                 }
+            }
+        }
+    }
+
+    //mysql enum names
+    let mut changed_mysql_enum_names = vec![];
+    {
+        if family.is_mysql() {
+            for enm in new_data_model.enums() {
+                if let Some((model_name, field_name)) = &new_data_model.find_enum_fields(&enm.name).first() {
+                    if let Some(old_model) = old_data_model.find_model(model_name) {
+                        if let Some(old_field) = old_model.find_field(field_name) {
+                            if let FieldType::Enum(old_enum_name) = old_field.field_type() {
+                                let old_enum = old_data_model.find_enum(&old_enum_name).unwrap();
+                                if enm.values == old_enum.values {
+                                    if old_enum_name != enm.name
+                                        && !changed_mysql_enum_names
+                                            .iter()
+                                            .any(|x: &(String, String, ModelAndField)| x.1 == old_enum_name)
+                                    {
+                                        changed_mysql_enum_names.push((
+                                            enm.name.clone(),
+                                            old_enum.name.clone(),
+                                            ModelAndField::new(model_name, field_name),
+                                        ))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for changed_enum_name in &changed_mysql_enum_names {
+                //adjust enum name
+                let enm = new_data_model.find_enum_mut(&changed_enum_name.0);
+                enm.name = changed_enum_name.1.clone();
+
+                //adjust Fieldtype on field that uses it
+                let field =
+                    new_data_model.find_scalar_field_mut(&changed_enum_name.2.model, &changed_enum_name.2.field);
+                field.field_type = FieldType::Enum(changed_enum_name.1.clone());
             }
         }
     }

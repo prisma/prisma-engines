@@ -40,7 +40,7 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
 
   override def beforeEach(): Unit = database.truncateProjectTables(project)
 
-  "The updateMany Mutation" should "update the items matching the where relation filter" in {
+  "The updateMany Mutation" should "update the items matching the where relation filter" taggedAs (IgnoreMsSql) in {
     createTop("top1")
     createTop("top2")
 
@@ -76,7 +76,7 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     lastCount - firstCount should be(filterUpdatedCount)
   }
 
-  "The updateMany Mutation" should "update all items if the filter is empty" in {
+  "The updateMany Mutation" should "update all items if the filter is empty" taggedAs (IgnoreMsSql) in {
     createTop("top1")
     createTop("top2")
 
@@ -110,7 +110,7 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     lastCount - firstCount should be(filterUpdatedCount)
   }
 
-  "The updateMany Mutation" should "work for deeply nested filters" in {
+  "The updateMany Mutation" should "work for deeply nested filters" taggedAs (IgnoreMsSql) in {
     createTop("top1")
     createTop("top2")
 

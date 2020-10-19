@@ -152,7 +152,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       .toString should be("""{"data":{"posts":[{"title":"post 1"}]}}""")
   }
 
-  "Join Relation Filter on one to one relation" should "work on one level" in {
+  "Join Relation Filter on one to one relation" should "work on one level" taggedAs (IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       """
         |model Post {

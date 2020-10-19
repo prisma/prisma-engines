@@ -40,7 +40,7 @@ class DeleteManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
 
   override def beforeEach(): Unit = database.truncateProjectTables(project)
 
-  "The delete many Mutation" should "delete the items matching the where relation filter" in {
+  "The delete many Mutation" should "delete the items matching the where relation filter" taggedAs (IgnoreMsSql) in {
     createTop("top1")
     createTop("top2")
 
@@ -73,7 +73,7 @@ class DeleteManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     firstCount - filterDeleteCount should be(lastCount)
   }
 
-  "The delete many Mutation" should "delete all items if the filter is empty" in {
+  "The delete many Mutation" should "delete all items if the filter is empty" taggedAs (IgnoreMsSql) in {
     createTop("top1")
     createTop("top2")
 
@@ -105,7 +105,7 @@ class DeleteManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     firstCount - filterDeleteCount should be(lastCount)
   }
 
-  "The delete many Mutation" should "work for deeply nested filters" in {
+  "The delete many Mutation" should "work for deeply nested filters" taggedAs (IgnoreMsSql) in {
     createTop("top1")
     createTop("top2")
 
@@ -140,7 +140,7 @@ class DeleteManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     firstCount - filterDeleteCount should be(lastCount)
   }
 
-  "The delete many Mutation" should "work for named filters" in {
+  "The delete many Mutation" should "work for named filters" taggedAs (IgnoreMsSql) in {
     createTop("top1")
     createTop("top2")
 

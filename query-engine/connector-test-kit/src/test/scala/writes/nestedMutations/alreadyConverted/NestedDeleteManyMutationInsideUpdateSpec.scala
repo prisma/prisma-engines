@@ -265,7 +265,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
+        |      create: [{c: "c1", c_1: "dear", c_2: "god"},{c: "c2", c_1: "why", c_2: "me"}]
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -283,7 +283,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |  createParent(data: {
         |    p: "p2", p_1: "p", p_2: "2"
         |    childrenOpt: {
-        |      create: [{c: "c3"},{c: "c4"}]
+        |      create: [{c: "c3", c_1: "buu", c_2: "huu"},{c: "c4", c_1: "meow", c_2: "miau"}]
         |    }
         |  }){
         |    ${t.parent.selection}

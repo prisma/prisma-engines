@@ -71,7 +71,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     setupRockRelations
   }
 
-  "Filter Queries along self relations" should "succeed with one level " in {
+  "Filter Queries along self relations" should "succeed with one level " taggedAs (IgnoreMsSql) in {
     val filterKurt =
       s"""
          |query {
@@ -92,7 +92,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterKurt, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Gasag\"}]}")
   }
 
-  "Filter Queries along self relations" should "succeed with two levels" in {
+  "Filter Queries along self relations" should "succeed with two levels" taggedAs (IgnoreMsSql) in {
     val filterFrances =
       s"""
          |query {
@@ -117,7 +117,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterFrances, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"}]}")
   }
 
-  "Filter Queries along OneToOne self relations" should "succeed with two levels 2" in {
+  "Filter Queries along OneToOne self relations" should "succeed with two levels 2" taggedAs (IgnoreMsSql) in {
     val filterWife =
       s"""
          |query {
@@ -142,7 +142,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterWife, project, dataContains = "{\"songs\":[{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along OneToOne self relations" should "succeed with null filter" in {
+  "Filter Queries along OneToOne self relations" should "succeed with null filter" taggedAs (IgnoreMsSql) in {
     val filterWifeNull =
       s"""
          |query {
@@ -155,7 +155,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterWifeNull, project, dataContains = "{\"songs\":[{\"title\":\"Bicycle\"},{\"title\":\"Gasag\"}]}")
   }
 
-  "Filter Queries along OneToOne self relations" should "succeed with {} filter" in {
+  "Filter Queries along OneToOne self relations" should "succeed with {} filter" taggedAs (IgnoreMsSql) in {
     val filterWifeNull =
       s"""
          |query {
@@ -176,7 +176,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterWifeNull, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along OneToMany self relations" should "fail with null filter" taggedAs (IgnoreMongo) in {
+  "Filter Queries along OneToMany self relations" should "fail with null filter" taggedAs (IgnoreMongo, IgnoreMsSql) in {
     val filterDaughterNull =
       s"""
          | query {
@@ -203,7 +203,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Filter Queries along OneToMany self relations" should "succeed with empty filter {}" in {
+  "Filter Queries along OneToMany self relations" should "succeed with empty filter {}" taggedAs (IgnoreMsSql) in {
     val filterDaughter =
       s"""
          |query {
@@ -226,7 +226,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   // ManyToMany
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `some`" in {
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `some`" taggedAs (IgnoreMsSql) in {
     val filterGroupies =
       s"""
          |query {
@@ -242,7 +242,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `none`" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `none`" taggedAs (IgnoreMongo, IgnoreMsSql) in {
     val filterGroupies =
       s"""
          |query {
@@ -256,7 +256,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"Bicycle\"},{\"title\":\"Gasag\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `every`" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `every`" taggedAs (IgnoreMongo, IgnoreMsSql) in {
 
     val filterGroupies =
       s"""
@@ -270,7 +270,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"Imagine\"},{\"title\":\"Bicycle\"},{\"title\":\"Gasag\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "give an error with null" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "give an error with null" taggedAs (IgnoreMongo, IgnoreMsSql) in {
     val filterGroupies =
       s"""
          |query {
@@ -291,7 +291,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `some`" in {
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `some`" taggedAs (IgnoreMsSql) in {
     val filterGroupies =
       s"""
          |query {
@@ -305,7 +305,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `none`" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `none`" taggedAs (IgnoreMongo, IgnoreMsSql) in {
     val filterGroupies =
       s"""
          |query {
@@ -323,7 +323,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `every`" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `every`" taggedAs (IgnoreMongo, IgnoreMsSql) in {
     val filterGroupies =
       s"""
          |query {
@@ -343,7 +343,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   // Many to one
 
-  "Filter Queries along ManyToOne self relations" should "succeed valid filter" in {
+  "Filter Queries along ManyToOne self relations" should "succeed valid filter" taggedAs (IgnoreMsSql) in {
     val filterSingers =
       s"""
          |query {
@@ -356,7 +356,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterSingers, project, dataContains = "{\"humans\":[{\"name\":\"dave\"}]}")
   }
 
-  "Filter Queries along ManyToOne self relations" should "succeed with {} filter" in {
+  "Filter Queries along ManyToOne self relations" should "succeed with {} filter" taggedAs (IgnoreMsSql) in {
     val filterSingers =
       s"""
          |query {
@@ -369,7 +369,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterSingers, project, dataContains = "{\"humans\":[{\"name\":\"paul\"},{\"name\":\"dave\"}]}")
   }
 
-  "Filter Queries along ManyToOne self relations" should "succeed with null filter" in {
+  "Filter Queries along ManyToOne self relations" should "succeed with null filter" taggedAs (IgnoreMsSql) in {
 
     val filterSingers =
       s"""

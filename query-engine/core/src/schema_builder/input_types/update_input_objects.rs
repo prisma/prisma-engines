@@ -96,7 +96,7 @@ fn operations_object_type(
         .optional()
         .nullable_if(!field.is_required)];
 
-    if with_number_operators && feature_flags::get().atomicNumberOperations {
+    if with_number_operators {
         fields.push(input_field("increment", typ.clone(), None).optional());
         fields.push(input_field("decrement", typ.clone(), None).optional());
         fields.push(input_field("multiply", typ.clone(), None).optional());

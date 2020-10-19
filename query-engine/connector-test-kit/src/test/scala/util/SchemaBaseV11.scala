@@ -238,12 +238,13 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                                     }
                                                   })
       yield {
+
         val datamodel =
           s"""
                 model Parent {
                     p             String    @unique
-                    p_1           String?
-                    p_2           String?
+                    p_1           String
+                    p_2           String
                     ${onParent.field}         $parentReference
                     non_unique    String?
                     $parentId
@@ -253,8 +254,8 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
                 model Child {
                     c             String    @unique
-                    c_1           String?
-                    c_2           String?
+                    c_1           String
+                    c_2           String
                     ${onChild.field}          $childReference
                     non_unique    String?
                     $childId

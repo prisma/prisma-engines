@@ -128,7 +128,6 @@ pub struct CreateIndex {
     pub table: String,
     pub index: Index,
     pub caused_by_create_table: bool,
-    pub contains_nullable_columns: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
