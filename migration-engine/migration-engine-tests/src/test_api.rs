@@ -30,6 +30,8 @@ use super::{
     sql::barrel_migration_executor::BarrelMigrationExecutor,
     InferAndApplyOutput,
 };
+use crate::connectors::Tags;
+use enumflags2::BitFlags;
 use migration_connector::{
     ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord, MigrationStep,
 };
@@ -54,6 +56,7 @@ pub struct TestApi {
     database: Quaint,
     api: MigrationApi<SqlMigrationConnector, SqlMigration>,
     connection_info: ConnectionInfo,
+    tags: BitFlags<Tags>,
 }
 
 impl TestApi {
@@ -326,7 +329,8 @@ impl<'a> TestApiSelect<'a> {
     }
 }
 
-pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mysql_8_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
@@ -336,10 +340,12 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mysql_5_6_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
@@ -349,10 +355,12 @@ pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn mysql_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mysql_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
@@ -362,10 +370,12 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mariadb_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
@@ -375,10 +385,12 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn postgres9_test_api(db_name: &str) -> TestApi {
+pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_9_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
@@ -388,10 +400,12 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn postgres_test_api(db_name: &str) -> TestApi {
+pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_10_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
@@ -401,10 +415,12 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn postgres11_test_api(db_name: &str) -> TestApi {
+pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_11_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
@@ -414,10 +430,12 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn postgres12_test_api(db_name: &str) -> TestApi {
+pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_12_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
@@ -427,10 +445,12 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn postgres13_test_api(db_name: &str) -> TestApi {
+pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_13_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
@@ -440,10 +460,12 @@ pub async fn postgres13_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
-pub async fn sqlite_test_api(db_name: &str) -> TestApi {
+pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let connection_info = ConnectionInfo::from_url(&sqlite_test_url(db_name)).unwrap();
     let connector = sqlite_migration_connector(db_name).await;
 
@@ -452,6 +474,7 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
         connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
+        tags: args.test_tag,
     }
 }
 
