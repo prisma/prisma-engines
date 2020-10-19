@@ -257,7 +257,11 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                             if let FieldType::Enum(old_enum_name) = old_field.field_type() {
                                 let old_enum = old_data_model.find_enum(&old_enum_name).unwrap();
                                 if enm.values == old_enum.values {
-                                    if old_enum.name != enm.name {
+                                    if old_enum_name != enm.name
+                                        && !changed_mysql_enum_names
+                                            .iter()
+                                            .any(|x: &(String, String, ModelAndField)| x.1 == old_enum_name)
+                                    {
                                         changed_mysql_enum_names.push((
                                             enm.name.clone(),
                                             old_enum.name.clone(),
