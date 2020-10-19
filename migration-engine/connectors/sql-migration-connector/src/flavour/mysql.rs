@@ -87,6 +87,15 @@ impl SqlFlavour for MysqlFlavour {
             })
     }
 
+    async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
+        let connection = connect(database_url).await?;
+        let db_name = connection.connection_info().dbname().unwrap();
+
+        connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
+
+        Ok(())
+    }
+
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         connection.raw_cmd("SELECT 1").await?;
 

@@ -1,6 +1,7 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::path::Path;
 
@@ -60,6 +61,24 @@ impl SqlFlavour for SqliteFlavour {
                     ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
                 }
             })
+    }
+
+    async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
+        let file_path = match ConnectionInfo::from_url(database_url) {
+            Ok(ConnectionInfo::Sqlite { file_path, .. }) => file_path,
+            Ok(_) => unreachable!(),
+            Err(err) => return Err(ConnectorError::url_parse_error(err, database_url)),
+        };
+
+        std::fs::remove_file(&file_path).map_err(|err| {
+            ConnectorError::generic(anyhow::anyhow!(
+                "Failed to delete SQLite database at `{}`.\n{}",
+                file_path,
+                err
+            ))
+        })?;
+
+        Ok(())
     }
 
     async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
