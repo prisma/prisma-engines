@@ -1,5 +1,8 @@
 package util
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths}
+
 import scala.util.Try
 
 case class ConnectorConfig(
@@ -22,8 +25,15 @@ case class ConnectorConfig(
 object ConnectorConfig {
   lazy val instance: ConnectorConfig = {
     val filePath = EnvVars.serverRoot + "/current_connector"
+
+    val charset = if (EnvVars.isWindows) {
+      StandardCharsets.UTF_16
+    } else {
+      StandardCharsets.UTF_8
+    }
+
     val connectorToTest = Try {
-      scala.io.Source.fromFile(filePath).mkString.lines.next().trim
+      new String(Files.readAllBytes(Paths.get(filePath)), charset).trim
     }.getOrElse(sys.env.getOrElse("TEST_CONNECTOR",
                                   sys.error("Neither current_connector file nor TEST_CONNECTOR found to decide which connector to test with. Aborting.")))
 
