@@ -1,7 +1,7 @@
 use super::SqlFlavour;
 use crate::{connect, connection_wrapper::Connection};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
-use quaint::{connector::MssqlUrl, prelude::SqlFamily};
+use quaint::connector::MssqlUrl;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
 use std::collections::HashMap;
 
@@ -53,13 +53,31 @@ impl SqlFlavour for MssqlFlavour {
         Ok(db_name)
     }
 
+    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        let sql = r#"
+            CREATE TABLE [_prisma_migrations] (
+                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+                checksum                VARCHAR(64) NOT NULL,
+                finished_at             DATETIMEOFFSET,
+                migration_name          NVARCHAR(MAX) NOT NULL,
+                logs                    NVARCHAR(MAX) NOT NULL,
+                rolled_back_at          DATETIMEOFFSET,
+                started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                applied_steps_count     INT NOT NULL DEFAULT 0,
+                script                  NVARCHAR(MAX) NOT NULL
+            );
+        "#;
+
+        Ok(connection.raw_cmd(sql).await?)
+    }
+
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
         sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
             .await
             .map_err(|err| match err {
                 SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::query_error(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
+                    ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
                 }
             })
     }
@@ -134,32 +152,10 @@ impl SqlFlavour for MssqlFlavour {
         Ok(())
     }
 
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Mssql
-    }
-
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         connection.raw_cmd("SELECT 1").await?;
 
         Ok(())
-    }
-
-    async fn ensure_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE IF NOT EXISTS [_prisma_migrations] (
-                id                      VARCHAR(36) PRIMARY KEY NOT NULL,
-                checksum                VARCHAR(64) NOT NULL,
-                finished_at             DATETIMEOFFSET,
-                migration_name          NVARCHAR(MAX) NOT NULL,
-                logs                    NVARCHAR(MAX) NOT NULL,
-                rolled_back_at          DATETIMEOFFSET,
-                started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                applied_steps_count     INT NOT NULL DEFAULT 0,
-                script                  NVARCHAR(MAX) NOT NULL
-            );
-        "#;
-
-        connection.raw_cmd(sql).await
     }
 
     async fn sql_schema_from_migration_history(

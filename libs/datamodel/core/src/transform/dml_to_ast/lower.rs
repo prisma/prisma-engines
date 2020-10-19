@@ -1,27 +1,29 @@
 use super::super::attributes::AllAttributes;
 use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
-use crate::error::ErrorCollection;
-use crate::FieldType::NativeType;
-use crate::{ast, dml, Datasource};
+use crate::diagnostics::Diagnostics;
+use crate::dml::FieldType::NativeType;
+use crate::{ast, dml, Datasource, Generator};
 
 pub struct LowerDmlToAst<'a> {
     attributes: AllAttributes,
     datasource: Option<&'a Datasource>,
+    generators: &'a Vec<Generator>,
 }
 
 impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(datasource: Option<&'a Datasource>) -> Self {
+    pub fn new(datasource: Option<&'a Datasource>, generators: &'a Vec<Generator>) -> Self {
         Self {
             attributes: AllAttributes::new(),
             datasource,
+            generators,
         }
     }
 
-    pub fn lower(&self, datamodel: &dml::Datamodel) -> Result<ast::SchemaAst, ErrorCollection> {
+    pub fn lower(&self, datamodel: &dml::Datamodel) -> Result<ast::SchemaAst, Diagnostics> {
         let mut tops: Vec<ast::Top> = Vec::new();
-        let mut errors = ErrorCollection::new();
+        let mut errors = Diagnostics::new();
 
         for model in datamodel.models() {
             if !model.is_generated {
@@ -42,8 +44,8 @@ impl<'a> LowerDmlToAst<'a> {
         Ok(ast::SchemaAst { tops })
     }
 
-    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, Diagnostics> {
+        let mut errors = Diagnostics::new();
         let mut fields: Vec<ast::Field> = Vec::new();
 
         for field in model.fields() {
@@ -67,7 +69,7 @@ impl<'a> LowerDmlToAst<'a> {
         })
     }
 
-    fn lower_enum(&self, enm: &dml::Enum, datamodel: &dml::Datamodel) -> Result<ast::Enum, ErrorCollection> {
+    fn lower_enum(&self, enm: &dml::Enum, datamodel: &dml::Datamodel) -> Result<ast::Enum, Diagnostics> {
         Ok(ast::Enum {
             name: ast::Identifier::new(&enm.name),
             values: enm
@@ -86,11 +88,11 @@ impl<'a> LowerDmlToAst<'a> {
         })
     }
 
-    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
+    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, Diagnostics> {
         let mut attributes = self.attributes.field.serialize(field, datamodel)?;
         if let (dml::Field::ScalarField(sf), Some(datasource)) = (field, self.datasource) {
             if let NativeType(_prisma_tpe, native_tpe) = sf.clone().field_type {
-                if datasource.has_preview_feature("nativeTypes") {
+                if self.generators.iter().any(|g| g.has_preview_feature("nativeTypes")) {
                     let new_attribute_name = format!("{}.{}", datasource.name, native_tpe.name);
                     // lower native type arguments
                     let mut arguments = vec![];

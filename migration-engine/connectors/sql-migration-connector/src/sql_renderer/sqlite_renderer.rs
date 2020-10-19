@@ -259,7 +259,6 @@ impl SqlRenderer for SqliteFlavour {
                     table: differ.next.name().to_owned(),
                     index: index.clone(),
                     caused_by_create_table: false,
-                    contains_nullable_columns: false,
                 })
             }));
         }
@@ -282,7 +281,13 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Float => "REAL",
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::String => "TEXT",
-        x => unimplemented!("{:?} not handled yet", x),
+        ColumnTypeFamily::Json => unimplemented!("Json not handled yet"),
+        ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
+        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
+        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
+        ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
 }
 

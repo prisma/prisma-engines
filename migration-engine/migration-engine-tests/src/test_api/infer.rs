@@ -4,6 +4,7 @@ use migration_connector::MigrationStep;
 use migration_core::{
     api::GenericApi,
     commands::{AppliedMigration, InferMigrationStepsInput, MigrationStepsResultOutput},
+    CoreResult,
 };
 
 pub struct Infer<'a> {
@@ -47,7 +48,7 @@ impl<'a> Infer<'a> {
         Ok(InferAssertion { result, _api: api })
     }
 
-    pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
+    pub async fn send(self) -> CoreResult<MigrationStepsResultOutput> {
         let migration_id = self.migration_id.unwrap_or_else(unique_migration_id);
 
         let input = InferMigrationStepsInput {

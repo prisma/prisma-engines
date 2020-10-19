@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
+use datamodel::diagnostics::DatamodelError;
 use datamodel::dml::*;
-use datamodel::error::DatamodelError;
 use prisma_value::PrismaValue;
 
 #[test]

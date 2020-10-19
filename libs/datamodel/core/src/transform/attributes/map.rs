@@ -1,6 +1,6 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::ast::{Attribute, Span};
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::{ast, dml, Datamodel, WithDatabaseName};
 
 /// Prismas builtin `@map` attribute.

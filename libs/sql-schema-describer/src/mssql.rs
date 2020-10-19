@@ -7,8 +7,39 @@ use std::{
     convert::TryInto,
 };
 
-static DEFAULT_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
-static DEFAULT_NON_INT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('(.*)'\)").unwrap());
+/// Matches a default value in the schema, that is not a string.
+///
+/// Examples:
+///
+/// ```ignore
+/// ((1))
+/// ```
+///
+/// ```ignore
+/// ((1.123))
+/// ```
+///
+/// ```ignore
+/// ((true))
+/// ```
+static DEFAULT_NON_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)").unwrap());
+
+/// Matches a default value in the schema, that is a string.
+///
+/// Example:
+///
+/// ```ignore
+/// ('this is a test')
+/// ```
+static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('(.*)'\)").unwrap());
+
+/// Matches a database-generated value in the schema.
+///
+/// Example:
+///
+/// ```ignore
+/// (current_timestamp)
+/// ```
 static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
 
 pub struct SqlSchemaDescriber {
@@ -248,10 +279,10 @@ impl SqlSchemaDescriber {
                     None => None,
                     Some(x) if x == "(NULL)" => None,
                     Some(default_string) => {
-                        let default_string = DEFAULT_INT
+                        let default_string = DEFAULT_NON_STRING
                             .captures_iter(&default_string)
                             .next()
-                            .or_else(|| DEFAULT_NON_INT.captures_iter(&default_string).next())
+                            .or_else(|| DEFAULT_STRING.captures_iter(&default_string).next())
                             .or_else(|| DEFAULT_DB_GEN.captures_iter(&default_string).next())
                             .map(|cap| cap[1].to_string())
                             .expect("Couldn't parse default value");
@@ -283,10 +314,6 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                             ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
@@ -328,6 +355,8 @@ impl SqlSchemaDescriber {
                 sys.tables t ON ind.object_id = t.object_id
             WHERE SCHEMA_NAME(t.schema_id) = @P1
                 AND t.is_ms_shipped = 0
+                AND ind.filter_definition IS NULL
+
             ORDER BY index_name, seq_in_index
         "#;
 

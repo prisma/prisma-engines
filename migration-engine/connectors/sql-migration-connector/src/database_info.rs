@@ -1,6 +1,6 @@
 use crate::error::quaint_error_to_connector_error;
 use datamodel::{walkers::walk_scalar_fields, Datamodel};
-use migration_connector::{ConnectorResult, MigrationError};
+use migration_connector::ConnectorResult;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
@@ -51,27 +51,43 @@ impl DatabaseInfo {
         &self.connection_info
     }
 
-    pub(crate) fn check_database_version_compatibility(&self, datamodel: &Datamodel) -> Vec<MigrationError> {
+    pub(crate) fn check_database_version_compatibility(
+        &self,
+        datamodel: &Datamodel,
+    ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         let mut errors = Vec::new();
 
         if self.is_mysql_5_6() {
             check_datamodel_for_mysql_5_6(datamodel, &mut errors)
         }
 
-        errors
+        if errors.is_empty() {
+            return None;
+        }
+
+        let mut errors_string = String::with_capacity(errors.iter().map(|err| err.len() + 3).sum());
+
+        for error in &errors {
+            errors_string.push_str("- ");
+            errors_string.push_str(error);
+            errors_string.push_str("\n");
+        }
+
+        Some(user_facing_errors::common::DatabaseVersionIncompatibility {
+            errors: errors_string,
+            database_version: self.database_version.as_ref().unwrap().clone(),
+        })
     }
 }
 
-fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<MigrationError>) {
+fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<String>) {
     walk_scalar_fields(datamodel).for_each(|field| {
         if field.field_type().is_json() {
-            errors.push(MigrationError {
-                description: format!(
-                    "The `Json` data type used in {}.{} is not supported on MySQL 5.6.",
-                    field.model().name(),
-                    field.name()
-                ),
-            })
+            errors.push(format!(
+                "The `Json` data type used in {}.{} is not supported on MySQL 5.6.",
+                field.model().name(),
+                field.name()
+            ))
         }
     });
 }

@@ -161,6 +161,16 @@ pub struct InvalidModel {
     pub kind: ModelKind,
 }
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P1015",
+    message = "Your Prisma schema is using features that are not supported for the version of the database.\nDatabase version: {database_version}\nErrors:\n{errors}"
+)]
+pub struct DatabaseVersionIncompatibility {
+    pub database_version: String,
+    pub errors: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

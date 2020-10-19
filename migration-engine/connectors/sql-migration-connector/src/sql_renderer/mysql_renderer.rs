@@ -99,7 +99,6 @@ impl SqlRenderer for MysqlFlavour {
                     table: table.clone(),
                     index: new_index,
                     caused_by_create_table: false,
-                    contains_nullable_columns: false,
                 }),
                 mysql_drop_index(self, table, index_name),
             ]
@@ -406,7 +405,11 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
             format!("ENUM({})", variants).into()
         }
         ColumnTypeFamily::Json => "json".into(),
-        x => unimplemented!("{:?} not handled yet", x),
+        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
+        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
+        ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
 }
 

@@ -48,9 +48,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
 
     fn try_from(v: serde_json::Value) -> PrismaValueResult<Self> {
         match v {
-            serde_json::Value::String(s) => Ok(serde_json::from_str(&s)
-                .map(PrismaValue::Json)
-                .unwrap_or(PrismaValue::String(s))),
+            serde_json::Value::String(s) => Ok(PrismaValue::String(s)),
             serde_json::Value::Array(v) => {
                 let vals: PrismaValueResult<Vec<PrismaValue>> = v.into_iter().map(PrismaValue::try_from).collect();
                 Ok(PrismaValue::List(vals?))

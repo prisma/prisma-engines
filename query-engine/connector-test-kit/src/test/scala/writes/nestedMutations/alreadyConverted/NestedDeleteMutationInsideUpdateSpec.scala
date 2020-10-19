@@ -434,7 +434,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     }
   }
 
-  "a P1 to CM  relation " should "work" in {
+  "a P1 to CM  relation " should "work" taggedAs (IgnoreMsSql) in  {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel

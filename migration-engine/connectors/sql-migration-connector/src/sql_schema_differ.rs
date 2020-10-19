@@ -29,7 +29,7 @@ pub(crate) struct SqlSchemaDiffer<'a> {
     pub(crate) flavour: &'a dyn SqlFlavour,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SqlSchemaDiff {
     pub add_foreign_keys: Vec<AddForeignKey>,
     pub drop_foreign_keys: Vec<DropForeignKey>,
@@ -288,9 +288,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 let walker = self.next.table_walker(&table.name).unwrap();
 
                 for walker in walker.indexes() {
-                    let contains_nullable_columns = walker.has_nullable_columns();
-
-                    if family.is_mssql() && walker.index_type().is_unique() && !contains_nullable_columns {
+                    if family.is_mssql() && walker.index_type().is_unique() {
                         continue;
                     }
 
@@ -298,7 +296,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                         table: table.name.clone(),
                         index: walker.index().clone(),
                         caused_by_create_table: true,
-                        contains_nullable_columns,
                     });
                 }
             }
@@ -313,7 +310,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     table: tables.next.name().to_owned(),
                     index: index.index().clone(),
                     caused_by_create_table: false,
-                    contains_nullable_columns: index.has_nullable_columns(),
                 })
             }
         }
@@ -328,7 +324,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.flavour.sql_family().is_mysql() && index::index_covers_fk(&tables.previous, &index) {
+                if self.database_info.sql_family().is_mysql() && index::index_covers_fk(&tables.previous, &index) {
                     continue;
                 }
 

@@ -8,5 +8,6 @@ edition = "2018"
 
 [dependencies]
 datamodel-connector = { path = "../datamodel-connector" }
+dml = { path = "../dml" }
 native-types = { path = "../../../native-types" }
 serde_json = "1.0"

@@ -38,10 +38,12 @@ impl TestApi {
             .await
             .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
-        let dml = datamodel::parse_datamodel(&introspection_result.datamodel).unwrap();
+        let dml = datamodel::parse_datamodel(&introspection_result.datamodel)
+            .unwrap()
+            .subject;
         let config = datamodel::parse_configuration(&introspection_result.datamodel).unwrap();
 
-        let context = PrismaContext::builder(config, dml.clone())
+        let context = PrismaContext::builder(config.subject, dml.clone())
             .enable_raw_queries(true)
             .build()
             .await

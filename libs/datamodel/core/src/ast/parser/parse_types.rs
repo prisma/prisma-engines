@@ -5,7 +5,7 @@ use super::{
     Rule,
 };
 use crate::ast::*;
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 
 pub fn parse_type_alias(token: &Token) -> Field {
     let mut name: Option<Identifier> = None;

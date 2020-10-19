@@ -1,6 +1,6 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::common::RelationNames;
-use crate::error::DatamodelError;
+use crate::diagnostics::DatamodelError;
 use crate::{ast, dml, Field};
 
 /// Prismas builtin `@relation` attribute.

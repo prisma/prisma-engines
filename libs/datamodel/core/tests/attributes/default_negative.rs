@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, error::DatamodelError};
+use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
 fn must_error_if_default_value_for_relation_field() {

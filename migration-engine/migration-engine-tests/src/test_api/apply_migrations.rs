@@ -1,4 +1,4 @@
-use migration_core::{commands::ApplyMigrationsInput, commands::ApplyMigrationsOutput, GenericApi};
+use migration_core::{commands::ApplyMigrationsInput, commands::ApplyMigrationsOutput, CoreResult, GenericApi};
 use tempfile::TempDir;
 
 use crate::AssertionResult;
@@ -17,7 +17,7 @@ impl<'a> ApplyMigrations<'a> {
         }
     }
 
-    pub async fn send(self) -> anyhow::Result<ApplyMigrationsAssertion<'a>> {
+    pub async fn send(self) -> CoreResult<ApplyMigrationsAssertion<'a>> {
         let output = self
             .api
             .apply_migrations(&ApplyMigrationsInput {

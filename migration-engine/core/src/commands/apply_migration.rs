@@ -51,14 +51,14 @@ impl<'a> ApplyMigrationCommand<'a> {
         let current_datamodel = last_migration
             .map(|migration| migration.parse_datamodel())
             .unwrap_or_else(|| Ok(Datamodel::new()))
-            .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+            .map_err(CoreError::InvalidPersistedDatamodel)?;
 
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
             .await?
             .map(|m| m.parse_schema_ast())
             .unwrap_or_else(|| Ok(SchemaAst::empty()))
-            .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+            .map_err(CoreError::InvalidPersistedDatamodel)?;
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
@@ -93,11 +93,11 @@ impl<'a> ApplyMigrationCommand<'a> {
             .as_ref()
             .map(|migration| migration.parse_schema_ast())
             .unwrap_or_else(|| Ok(SchemaAst::empty()))
-            .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+            .map_err(CoreError::InvalidPersistedDatamodel)?;
         let current_datamodel = last_migration
             .map(|migration| migration.parse_datamodel())
             .unwrap_or_else(|| Ok(Datamodel::new()))
-            .map_err(|(err, schema)| CoreError::InvalidPersistedDatamodel(err, schema))?;
+            .map_err(CoreError::InvalidPersistedDatamodel)?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
@@ -124,7 +124,7 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         let database_migration = connector
             .database_migration_inferrer()
-            .infer(&current_datamodel, &next_datamodel, &self.input.steps)
+            .infer(&current_datamodel, &next_datamodel.subject, &self.input.steps)
             .await?;
 
         let database_steps_json_pretty = connector
@@ -174,17 +174,16 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         let DestructiveChangeDiagnostics {
             warnings,
-            errors,
             unexecutable_migrations,
         } = diagnostics;
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
+            datamodel: datamodel::render_datamodel_to_string(&next_datamodel.subject).unwrap(),
             datamodel_steps: self.input.steps.clone(),
             database_steps: database_steps_json_pretty,
-            errors,
+            errors: [],
             warnings,
-            general_errors: Vec::new(),
+            general_errors: [],
             unexecutable_migrations,
         })
     }

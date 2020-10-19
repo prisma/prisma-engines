@@ -55,6 +55,7 @@ pub struct MiniError {
     pub start: usize,
     pub end: usize,
     pub text: String,
+    pub is_warning: bool,
 }
 
 fn main() {

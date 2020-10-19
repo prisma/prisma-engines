@@ -46,12 +46,11 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
 
         let database_migration = connector
             .database_migration_inferrer()
-            .infer(&assumed_datamodel, &next_datamodel, &steps_to_apply)
+            .infer(&assumed_datamodel.subject, &next_datamodel.subject, &steps_to_apply)
             .await?;
 
         let DestructiveChangeDiagnostics {
             warnings,
-            errors: _,
             unexecutable_migrations,
         } = connector
             .destructive_change_checker()
@@ -66,9 +65,9 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
             datamodel: datamodel::render_schema_ast_to_string(&next_datamodel_ast).unwrap(),
             datamodel_steps: steps_to_apply.to_vec(),
             database_steps: database_steps_json,
-            errors: Vec::new(),
+            errors: [],
             warnings,
-            general_errors: Vec::new(),
+            general_errors: [],
             unexecutable_migrations,
         })
     }

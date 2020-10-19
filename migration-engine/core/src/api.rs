@@ -1,11 +1,10 @@
 mod error_rendering;
 mod rpc;
 
-pub use error_rendering::render_error;
 pub use rpc::*;
 
-use crate::{commands::*, migration_engine::MigrationEngine, CoreError, CoreResult};
-use migration_connector::{DatabaseMigrationMarker, MigrationConnector, MigrationPersistence};
+use crate::{commands::*, migration_engine::MigrationEngine, CoreResult};
+use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use tracing_futures::Instrument;
 
 pub struct MigrationApi<C, D>
@@ -64,16 +63,6 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
-    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
-    fn connector_type(&self) -> &'static str;
-
-    fn render_error(&self, error: CoreError) -> user_facing_errors::Error {
-        error_rendering::render_error(error)
-    }
-
-    fn render_jsonrpc_error(&self, error: CoreError) -> jsonrpc_core::error::Error {
-        error_rendering::render_jsonrpc_error(error)
-    }
 }
 
 #[async_trait::async_trait]
@@ -122,7 +111,8 @@ where
         self.handle_command::<CreateMigrationCommand>(input)
             .instrument(tracing::info_span!(
                 "CreateMigration",
-                migration_name = input.migration_name.as_str()
+                migration_name = input.migration_name.as_str(),
+                draft = input.draft,
             ))
             .await
     }
@@ -203,13 +193,5 @@ where
         self.handle_command::<UnapplyMigrationCommand<'_>>(input)
             .instrument(tracing::info_span!("UnapplyMigration"))
             .await
-    }
-
-    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
-        self.engine.connector().migration_persistence()
-    }
-
-    fn connector_type(&self) -> &'static str {
-        self.engine.connector().connector_type()
     }
 }

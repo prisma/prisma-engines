@@ -130,7 +130,7 @@ impl PrismaOpt {
 
         match datamodel {
             Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
-            _ => Ok(datamodel?),
+            _ => Ok(datamodel.unwrap().subject),
         }
     }
 
@@ -149,8 +149,9 @@ impl PrismaOpt {
         } else {
             datamodel::parse_configuration_with_url_overrides(datamodel_str, datasource_url_overrides)
         };
-
-        config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
+        config_result
+            .map(|config| config.subject)
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }
 
     /// Extract the log format from on the RUST_LOG_FORMAT env var.

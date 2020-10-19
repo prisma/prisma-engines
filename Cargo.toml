@@ -3,6 +3,7 @@ members = [
   "introspection-engine/core",
   "introspection-engine/connectors/introspection-connector",
   "introspection-engine/connectors/sql-introspection-connector",
+  "introspection-engine/introspection-engine-tests",
   "migration-engine/cli",
   "migration-engine/connectors/migration-connector",
   "migration-engine/connectors/sql-migration-connector",
@@ -29,3 +30,6 @@ members = [
 
 [patch.crates-io]
 rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
+
+[profile.dev.package.backtrace]
+opt-level = 3

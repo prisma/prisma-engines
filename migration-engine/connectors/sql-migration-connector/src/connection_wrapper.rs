@@ -1,6 +1,7 @@
 use crate::error::quaint_error_to_connector_error;
-use migration_connector::ConnectorResult;
+use migration_connector::ConnectorError;
 use quaint::{
+    error::{Error as QuaintError, ErrorKind as QuaintKind},
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
@@ -11,6 +12,26 @@ use quaint::{
 #[derive(Clone, Debug)]
 pub(crate) struct Connection(Quaint);
 
+#[derive(Debug)]
+pub(crate) struct ConnectionError<'a> {
+    quaint_error: QuaintError,
+    connection_info: &'a ConnectionInfo,
+}
+
+type ConnectionResult<'a, T> = Result<T, ConnectionError<'a>>;
+
+impl ConnectionError<'_> {
+    pub(crate) fn kind(&self) -> &QuaintKind {
+        self.quaint_error.kind()
+    }
+}
+
+impl From<ConnectionError<'_>> for ConnectorError {
+    fn from(err: ConnectionError<'_>) -> Self {
+        quaint_error_to_connector_error(err.quaint_error, err.connection_info)
+    }
+}
+
 impl Connection {
     pub(crate) fn new(quaint: Quaint) -> Self {
         Connection(quaint)
@@ -20,36 +41,45 @@ impl Connection {
         self.0.connection_info()
     }
 
-    pub(crate) async fn execute(&self, query: impl Into<Query<'_>>) -> ConnectorResult<u64> {
+    pub(crate) async fn execute(&self, query: impl Into<Query<'_>>) -> ConnectionResult<'_, u64> {
         self.0
             .execute(query.into())
             .await
-            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
+            .map_err(|quaint_error| ConnectionError {
+                quaint_error,
+                connection_info: self.connection_info(),
+            })
     }
 
     pub(crate) fn quaint(&self) -> &Quaint {
         &self.0
     }
 
-    pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> ConnectorResult<ResultSet> {
+    pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> ConnectionResult<'_, ResultSet> {
         self.0
             .query(query.into())
             .await
-            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
+            .map_err(|quaint_error| ConnectionError {
+                quaint_error,
+                connection_info: self.connection_info(),
+            })
     }
 
-    pub(crate) async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> ConnectorResult<ResultSet> {
+    pub(crate) async fn query_raw(&self, sql: &str, params: &[quaint::Value<'_>]) -> ConnectionResult<'_, ResultSet> {
         self.0
             .query_raw(sql, params)
             .await
-            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
+            .map_err(|quaint_error| ConnectionError {
+                quaint_error,
+                connection_info: self.connection_info(),
+            })
     }
 
-    pub(crate) async fn raw_cmd(&self, sql: &str) -> ConnectorResult<()> {
-        self.0
-            .raw_cmd(sql)
-            .await
-            .map_err(|err| quaint_error_to_connector_error(err, self.connection_info()))
+    pub(crate) async fn raw_cmd(&self, sql: &str) -> ConnectionResult<'_, ()> {
+        self.0.raw_cmd(sql).await.map_err(|quaint_error| ConnectionError {
+            quaint_error,
+            connection_info: self.connection_info(),
+        })
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.

@@ -3,7 +3,7 @@ use migration_connector::MigrationStep;
 use migration_core::{
     api::GenericApi,
     commands::{ApplyMigrationInput, MigrationStepsResultOutput},
-    CoreResult,
+    CoreError, CoreResult,
 };
 
 #[derive(Clone)]
@@ -44,8 +44,7 @@ impl Apply<'_> {
     }
 
     pub async fn send_user_facing(self) -> Result<MigrationStepsResultOutput, user_facing_errors::Error> {
-        let api = self.api;
-        self.send_inner().await.map_err(|err| api.render_error(err))
+        self.send_inner().await.map_err(CoreError::render_user_facing)
     }
 
     async fn send_inner(self) -> CoreResult<MigrationStepsResultOutput> {

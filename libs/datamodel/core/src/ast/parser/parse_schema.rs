@@ -9,11 +9,11 @@ use super::{
     PrismaDatamodelParser, Rule,
 };
 use crate::ast::*;
-use crate::error::{DatamodelError, ErrorCollection};
+use crate::diagnostics::{DatamodelError, Diagnostics};
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
-pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
-    let mut errors = ErrorCollection::new();
+pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, Diagnostics> {
+    let mut errors = Diagnostics::new();
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
     match datamodel_result {
@@ -41,11 +41,11 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection
                     Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
                     Rule::comment_block => (),
                     Rule::EOI => {}
-                    Rule::CATCH_ALL => errors.push(DatamodelError::new_validation_error(
+                    Rule::CATCH_ALL => errors.push_error(DatamodelError::new_validation_error(
                         &"This line is invalid. It does not start with any known Prisma schema keyword.".to_string(),
                         Span::from_pest(current.as_span()),
                     )),
-                    Rule::arbitrary_block => errors.push(DatamodelError::new_validation_error(
+                    Rule::arbitrary_block => errors.push_error(DatamodelError::new_validation_error(
                         &"This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \'model\', \'enum\', \'datasource\' and \'generator\'.".to_string(),
                         Span::from_pest(current.as_span()),
                     )),
@@ -53,7 +53,7 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection
                 }
             }
 
-            errors.ok()?;
+            errors.to_result()?;
 
             Ok(SchemaAst {
                 tops: top_level_definitions,
@@ -70,7 +70,7 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection
                 _ => panic!("Could not construct parsing error. This should never happend."),
             };
 
-            errors.push(DatamodelError::new_parser_error(&expected, location));
+            errors.push_error(DatamodelError::new_parser_error(&expected, location));
             Err(errors)
         }
     }

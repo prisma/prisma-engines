@@ -396,7 +396,11 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::String => format!("text {}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
         ColumnTypeFamily::Json => format!("jsonb {}", array),
-        x => unimplemented!("{:?} not handled yet", x),
+        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
+        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
+        ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
 }
 

@@ -1,10 +1,12 @@
-#![deny(rust_2018_idioms, unsafe_code)]
+//! The SQL migration connector.
+
+#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::trivial_regex)] // these will grow
 
 // This is public for test purposes.
+#[allow(missing_docs)]
 pub mod sql_migration;
 
-mod component;
 mod connection_wrapper;
 mod database_info;
 mod error;
@@ -22,18 +24,15 @@ use connection_wrapper::Connection;
 use error::quaint_error_to_connector_error;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
-use component::Component;
 use database_info::DatabaseInfo;
 use flavour::SqlFlavour;
 use migration_connector::*;
-use quaint::{prelude::ConnectionInfo, single::Quaint};
+use quaint::{prelude::ConnectionInfo, prelude::SqlFamily, single::Quaint};
 use sql_database_migration_inferrer::*;
-use sql_database_step_applier::*;
-use sql_destructive_change_checker::*;
 use sql_migration::SqlMigration;
-use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 
+/// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
     connection: Connection,
     database_info: DatabaseInfo,
@@ -41,6 +40,7 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
+    /// Construct and initialize the SQL migration connector.
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let connection = connect(database_str).await?;
         let database_info = DatabaseInfo::new(connection.quaint(), connection.connection_info().clone()).await?;
@@ -56,6 +56,7 @@ impl SqlMigrationConnector {
         })
     }
 
+    /// Create the database corresponding to the connection string, without initializing the connector.
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
@@ -63,6 +64,7 @@ impl SqlMigrationConnector {
         flavour.create_database(database_str).await
     }
 
+    /// Set up the database for connector-test-kit, without initializing the connector.
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
@@ -72,13 +74,34 @@ impl SqlMigrationConnector {
         flavour.qe_setup(database_str).await
     }
 
+    fn conn(&self) -> &Connection {
+        &self.connection
+    }
+
+    fn database_info(&self) -> &DatabaseInfo {
+        &self.database_info
+    }
+
+    fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync) {
+        self.flavour.as_ref()
+    }
+
     /// For tests.
     pub fn quaint(&self) -> &Quaint {
         self.connection.quaint()
     }
 
-    async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
+    /// Made public for tests.
+    pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         self.flavour.describe_schema(&self.connection).await
+    }
+
+    fn schema_name(&self) -> &str {
+        self.database_info.connection_info().schema_name()
+    }
+
+    fn sql_family(&self) -> SqlFamily {
+        self.database_info.sql_family()
     }
 }
 
@@ -113,24 +136,27 @@ impl MigrationConnector for SqlMigrationConnector {
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
     /// the specific database version being used.
-    fn check_database_version_compatibility(&self, datamodel: &datamodel::dml::Datamodel) -> Vec<MigrationError> {
+    fn check_database_version_compatibility(
+        &self,
+        datamodel: &datamodel::dml::Datamodel,
+    ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         self.database_info.check_database_version_compatibility(datamodel)
     }
 
-    fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
-        Box::new(SqlMigrationPersistence { connector: self })
+    fn migration_persistence(&self) -> &dyn MigrationPersistence {
+        self
     }
 
-    fn database_migration_inferrer<'a>(&'a self) -> Box<dyn DatabaseMigrationInferrer<SqlMigration> + 'a> {
-        Box::new(SqlDatabaseMigrationInferrer { connector: self })
+    fn database_migration_inferrer(&self) -> &dyn DatabaseMigrationInferrer<SqlMigration> {
+        self
     }
 
-    fn database_migration_step_applier<'a>(&'a self) -> Box<dyn DatabaseMigrationStepApplier<SqlMigration> + 'a> {
-        Box::new(SqlDatabaseStepApplier { connector: self })
+    fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier<SqlMigration> {
+        self
     }
 
-    fn destructive_change_checker<'a>(&'a self) -> Box<dyn DestructiveChangeChecker<SqlMigration> + 'a> {
-        Box::new(SqlDestructiveChangeChecker { connector: self })
+    fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker<SqlMigration> {
+        self
     }
 
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<SqlMigration> {
