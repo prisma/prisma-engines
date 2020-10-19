@@ -64,6 +64,9 @@ pub(crate) trait SqlFlavour:
     /// Introspect the SQL schema.
     async fn describe_schema<'a>(&'a self, conn: &Connection) -> ConnectorResult<SqlSchema>;
 
+    /// Drop the database for the provided URL on the server.
+    async fn drop_database(&self, database_url: &str) -> ConnectorResult<()>;
+
     /// Perform the initialization required by connector-test-kit tests.
     async fn qe_setup(&self, database_url: &str) -> ConnectorResult<()>;
 
