@@ -99,78 +99,46 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     val binaryLogLevel   = "RUST_LOG" -> s"query_engine=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
     val log_requests_env = if (log_requests) { "LOG_QUERIES" -> "y" } else { ("", "") }
 
-    val response = (project.isPgBouncer, legacy) match {
-      case (true, true) =>
-        Process(
-          Seq(
-            EnvVars.prismaBinaryPath,
-            "--enable-experimental=all",
-            "--enable-raw-queries",
-            "cli",
-            "execute-request",
-            "--legacy",
-            encoded_query
-          ),
-          None,
-          "PRISMA_DML"       -> project.pgBouncerEnvVar,
-          "QUERY_BATCH_SIZE" -> batchSize.toString,
-          binaryLogLevel,
-          log_requests_env
-        ).!!
+    val params = legacy match {
+      case true =>
+        Seq(
+          EnvVars.prismaBinaryPath,
+          "--enable-experimental=all",
+          "--enable-raw-queries",
+          "--datamodel",
+          project.envVar,
+          "cli",
+          "execute-request",
+          "--legacy",
+          encoded_query
+        )
 
-      case (true, false) =>
-        Process(
-          Seq(
-            EnvVars.prismaBinaryPath,
-            "--enable-experimental=all",
-            "--enable-raw-queries",
-            "cli",
-            "execute-request",
-            encoded_query
-          ),
-          None,
-          "PRISMA_DML"       -> project.pgBouncerEnvVar,
-          "QUERY_BATCH_SIZE" -> batchSize.toString,
-          binaryLogLevel,
-          log_requests_env
-        ).!!
-
-      case (false, true) =>
-        Process(
-          Seq(
-            EnvVars.prismaBinaryPath,
-            "--enable-experimental=all",
-            "--enable-raw-queries",
-            "cli",
-            "execute-request",
-            "--legacy",
-            encoded_query
-          ),
-          None,
-          "PRISMA_DML"       -> project.envVar,
-          "QUERY_BATCH_SIZE" -> batchSize.toString,
-          binaryLogLevel,
-          log_requests_env
-        ).!!
-
-      case (false, false) =>
-        Process(
-          Seq(
-            EnvVars.prismaBinaryPath,
-            "--enable-experimental=all",
-            "--enable-raw-queries",
-            "cli",
-            "execute-request",
-            encoded_query
-          ),
-          None,
-          "PRISMA_DML"       -> project.envVar,
-          "QUERY_BATCH_SIZE" -> batchSize.toString,
-          binaryLogLevel,
-          log_requests_env
-        ).!!
+      case false =>
+        Seq(
+          EnvVars.prismaBinaryPath,
+          "--enable-experimental=all",
+          "--enable-raw-queries",
+          "--datamodel",
+          project.envVar,
+          "cli",
+          "execute-request",
+          encoded_query
+        )
     }
 
+    val process = if (EnvVars.isWindows) {
+      Process(params)
+    } else {
+      Process(
+        params,
+        None,
+        "QUERY_BATCH_SIZE" -> batchSize.toString,
+        binaryLogLevel,
+        log_requests_env
+      )
+    }
+
+    val response = process.!!
     val lines = response.linesIterator.toVector
     debug(lines.mkString("\n"))
 
