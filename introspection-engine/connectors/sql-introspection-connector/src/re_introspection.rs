@@ -247,11 +247,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     }
 
     //mysql enum names
-    //if on MySQL
-    //if enum on same model, same field
-    //if the same values
-    //if non-standard name
-    //reapply the custom name
     let mut changed_mysql_enum_names = vec![];
     {
         if family.is_mysql() {
@@ -286,15 +281,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                     new_data_model.find_scalar_field_mut(&changed_enum_name.2.model, &changed_enum_name.2.field);
                 field.field_type = FieldType::Enum(changed_enum_name.1.clone());
             }
-            //
-            // for changed_enum_name in &changed_enum_names {
-            //     let fields_to_be_changed = new_data_model.find_enum_fields(&changed_enum_name.0.enm);
-            //
-            //     for change2 in fields_to_be_changed {
-            //         let field = new_data_model.find_scalar_field_mut(&change2.0, &change2.1);
-            //         field.field_type = FieldType::Enum(changed_enum_name.1.clone());
-            //     }
-            // }
         }
     }
 
