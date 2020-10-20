@@ -114,6 +114,12 @@ pub struct AlterColumn {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AddForeignKey {
     pub table: String,
+    /// The index of the table in the next schema.
+    #[serde(skip)]
+    pub table_index: usize,
+    /// The index of the foreign key in the table.
+    #[serde(skip)]
+    pub foreign_key_index: usize,
     pub foreign_key: ForeignKey,
 }
 

@@ -15,6 +15,7 @@ use std::{
     str::FromStr,
 };
 use tracing::debug;
+use walkers::TableWalker;
 
 pub mod mssql;
 pub mod mysql;
@@ -123,6 +124,10 @@ impl SqlSchema {
             enums: Vec::new(),
             sequences: Vec::new(),
         }
+    }
+
+    pub fn table_walkers<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> + 'a {
+        self.tables.iter().map(move |table| TableWalker::new(self, table))
     }
 }
 
