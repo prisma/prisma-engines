@@ -167,11 +167,7 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
-        let res = parse_u32_arguments(args);
-        if res.is_err() {
-            return Err(res.err().unwrap());
-        }
-        let parsed_arg = res.unwrap();
+        let parsed_args = parse_u32_arguments(args)?;
 
         let constructor = self.find_native_type_constructor(name);
         let native_type = match name {
@@ -186,45 +182,45 @@ impl Connector for MySqlDatamodelConnector {
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
             UNSIGNED_BIG_INT_TYPE_NAME => MySqlType::UnsignedBigInt,
             DECIMAL_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (parsed_arg.get(0), parsed_arg.get(1)) {
+                if let (Some(first_arg), Some(second_arg)) = (parsed_args.get(0), parsed_args.get(1)) {
                     MySqlType::Decimal(*first_arg, *second_arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         DECIMAL_TYPE_NAME,
                         2,
-                        parsed_arg.len(),
+                        parsed_args.len(),
                     ));
                 }
             }
             NUMERIC_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (parsed_arg.get(0), parsed_arg.get(1)) {
+                if let (Some(first_arg), Some(second_arg)) = (parsed_args.get(0), parsed_args.get(1)) {
                     MySqlType::Numeric(*first_arg, *second_arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         NUMERIC_TYPE_NAME,
                         2,
-                        parsed_arg.len(),
+                        parsed_args.len(),
                     ));
                 }
             }
             FLOAT_TYPE_NAME => MySqlType::Float,
             DOUBLE_TYPE_NAME => MySqlType::Double,
             BIT_TYPE_NAME => {
-                if let Some(arg) = parsed_arg.first() {
+                if let Some(arg) = parsed_args.first() {
                     MySqlType::Bit(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
                 }
             }
             CHAR_TYPE_NAME => {
-                if let Some(arg) = parsed_arg.first() {
+                if let Some(arg) = parsed_args.first() {
                     MySqlType::Char(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
                 }
             }
             VAR_CHAR_TYPE_NAME => {
-                if let Some(arg) = parsed_arg.first() {
+                if let Some(arg) = parsed_args.first() {
                     MySqlType::VarChar(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
@@ -235,7 +231,7 @@ impl Connector for MySqlDatamodelConnector {
                 }
             }
             BINARY_TYPE_NAME => {
-                if let Some(arg) = parsed_arg.first() {
+                if let Some(arg) = parsed_args.first() {
                     MySqlType::Binary(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
@@ -246,7 +242,7 @@ impl Connector for MySqlDatamodelConnector {
                 }
             }
             VAR_BINARY_TYPE_NAME => {
-                if let Some(arg) = parsed_arg.first() {
+                if let Some(arg) = parsed_args.first() {
                     MySqlType::VarBinary(*arg)
                 } else {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
@@ -265,9 +261,9 @@ impl Connector for MySqlDatamodelConnector {
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
-            TIME_TYPE_NAME => MySqlType::Time(parsed_arg.first().cloned()),
-            DATETIME_TYPE_NAME => MySqlType::DateTime(parsed_arg.first().cloned()),
-            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(parsed_arg.first().cloned()),
+            TIME_TYPE_NAME => MySqlType::Time(parsed_args.first().cloned()),
+            DATETIME_TYPE_NAME => MySqlType::DateTime(parsed_args.first().cloned()),
+            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(parsed_args.first().cloned()),
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
             x => unreachable!(format!(
@@ -278,7 +274,7 @@ impl Connector for MySqlDatamodelConnector {
 
         Ok(NativeTypeInstance::new(
             constructor.unwrap().name.as_str(),
-            parsed_arg,
+            parsed_args,
             &native_type,
         ))
     }
