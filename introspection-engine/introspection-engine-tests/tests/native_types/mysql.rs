@@ -8,7 +8,8 @@ const TYPES: &[(&str, &str)] = &[
     //fieldname, db datatype
     ("int", "int(11)"),
     ("smallint", "SmallInt"),
-    ("tinyint", "TinyInt"),
+    // ("tinyint", "TinyInt"),
+    ("tinyint_bool", "TinyInt(1)"),
     ("mediumint", "MediumInt"),
     ("bigint", "BigInt"),
     ("decimal", "Decimal(5, 3)"),
@@ -81,7 +82,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             id                             Int      @id @mysql.Int
             int                            Int      @mysql.Int
             smallint                       Int      @mysql.SmallInt
-            tinyint                        Int      @mysql.TinyInt
+            tinyint_bool                   Boolean  @mysql.TinyInt(1)
             mediumint                      Int      @mysql.MediumInt
             bigint                         Int      @mysql.BigInt
             decimal                        Decimal  @mysql.Decimal(5, 3)
@@ -114,7 +115,6 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
     json = json
     };
 
-    //Fixme parsing can't handle native types yet???
     let result = api.re_introspect(&dm).await?;
 
     dm.push_str(&types);
@@ -160,16 +160,12 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             url             = "mysql://localhost/test"
         }}
 
-        generator client {{
-          provider = "prisma-client-js"
-          previewFeatures = ["nativeTypes"]
-        }}
     
         model Blog {{
             id                             Int            @id
             int                            Int
             smallint                       Int
-            tinyint                        Int
+            tinyint_bool                   Boolean
             mediumint                      Int
             bigint                         Int
             decimal                        Float
@@ -201,8 +197,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             dateTimeWithPrecision          DateTime
             timestampWithPrecision         DateTime       {default}
             year                           Int
-            // This type is currently not supported.
-            // json                        {json}
+            json                           String
         }}
     "#,
     default = default,
