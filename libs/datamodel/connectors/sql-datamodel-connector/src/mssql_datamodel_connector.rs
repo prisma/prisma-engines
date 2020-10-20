@@ -1,4 +1,4 @@
-use datamodel_connector::error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::Field;
 use dml::native_type_constructor::NativeTypeConstructor;
@@ -39,7 +39,7 @@ impl Connector for MsSqlDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(&self, _name: &str, _args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
                 connector_name: "mssql".to_string(),

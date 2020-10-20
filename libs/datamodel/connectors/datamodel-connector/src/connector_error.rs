@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone)]
 #[error("{}", kind)]
 pub struct ConnectorError {
     /// The error information for internal use.
@@ -30,9 +30,17 @@ impl ConnectorError {
             connector_name: String::from(connector_name),
         })
     }
+
+    pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::ValueParserError {
+            expected_type: String::from(expected_type),
+            parser_error: String::from(parser_error),
+            raw: String::from(raw),
+        })
+    }
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone)]
 pub enum ErrorKind {
     #[error("Native types are not supported with {} connector", connector_name)]
     ConnectorNotSupportedForNativeTypes { connector_name: String },
@@ -91,5 +99,17 @@ pub enum ErrorKind {
     IncompatibleNativeTypeWithUniqueAttribute {
         native_type: String,
         connector_name: String,
+    },
+
+    #[error(
+        "Expected a {} value, but failed while parsing \"{}\": {}.",
+        expected_type,
+        raw,
+        parser_error
+    )]
+    ValueParserError {
+        expected_type: String,
+        parser_error: String,
+        raw: String,
     },
 }

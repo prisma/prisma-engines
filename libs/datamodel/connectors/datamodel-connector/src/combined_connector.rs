@@ -1,5 +1,5 @@
 use super::Connector;
-use crate::error::ConnectorError;
+use crate::connector_error::ConnectorError;
 use crate::{ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
 use dml::field::Field;
 
@@ -41,7 +41,7 @@ impl Connector for CombinedConnector {
         unimplemented!("A combined connector must not be used for native types")
     }
 
-    fn parse_native_type(&self, _name: &str, _args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         unimplemented!("A combined connector must not be used for native types")
     }
 
