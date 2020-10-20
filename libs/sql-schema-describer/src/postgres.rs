@@ -278,6 +278,7 @@ impl SqlSchemaDescriber {
                                 .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
                                 .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix_without_quotes = format!("::{}", enum_name);
                                 let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
@@ -685,6 +686,7 @@ fn get_column_type<'a>(
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
         "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
+        "xml" | "_xml" => (Xml, Some(PostgresType::XML)),
         // bit and varbit should be binary, but are currently mapped to strings.
         "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
         "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),

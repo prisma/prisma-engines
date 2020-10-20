@@ -98,6 +98,31 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
     }
 }
 
+/// Drop the database referenced by the passed in Prisma schema.
+pub async fn drop_database(schema: &str) -> CoreResult<()> {
+    let config = parse_configuration(schema)?;
+
+    let source = config
+        .datasources
+        .first()
+        .ok_or_else(|| CoreError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
+
+    match &source.active_provider {
+        provider
+            if [
+                MYSQL_SOURCE_NAME,
+                POSTGRES_SOURCE_NAME,
+                SQLITE_SOURCE_NAME,
+                MSSQL_SOURCE_NAME,
+            ]
+            .contains(&provider.as_str()) =>
+        {
+            Ok(SqlMigrationConnector::drop_database(&source.url().value).await?)
+        }
+        x => unimplemented!("Connector {} is not supported yet", x),
+    }
+}
+
 /// Database setup for connector-test-kit.
 pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
     let config = parse_configuration(prisma_schema)?;

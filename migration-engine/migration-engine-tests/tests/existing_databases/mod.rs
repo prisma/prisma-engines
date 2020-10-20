@@ -320,12 +320,15 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
 #[test_each_connector]
 async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model Blog {
-                id Int @id
-                title String
-            }
-        "#;
-    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
+        model Blog {
+            id Int @id
+            title String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let initial_result = api.assert_schema().await?.into_schema();
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
@@ -343,13 +346,15 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
     assert!(result.table_bang("Blog").column("new_title").is_some());
 
     let dm2 = r#"
-            model Blog {
-                id Int @id
-                title Float @map(name: "new_title")
-            }
-        "#;
+        model Blog {
+            id Int @id
+            title Float @map(name: "new_title")
+        }
+    "#;
 
-    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
+
+    let final_result = api.assert_schema().await?.into_schema();
 
     let final_column = final_result.table_bang("Blog").column_bang("new_title");
 

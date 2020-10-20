@@ -1,6 +1,7 @@
 use super::CliError;
 use quaint::{prelude::*, single::Quaint};
 use structopt::StructOpt;
+use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
 async fn run(args: &[&str]) -> Result<String, CliError> {
     let cli = super::Cli::from_iter(std::iter::once(&"migration-engine-cli-test").chain(args.iter()));
@@ -157,4 +158,71 @@ async fn test_create_sqlite_database() {
     assert!(msg.contains("test_create_sqlite_database.db"));
 
     assert!(sqlite_path.exists());
+}
+
+#[tokio::test]
+async fn test_drop_sqlite_database() {
+    let base_dir = tempfile::tempdir().unwrap();
+    let sqlite_path = base_dir.path().join("test.db");
+    let url = format!("file:{}", sqlite_path.to_string_lossy());
+
+    run(&["--datasource", &url, "create-database"]).await.unwrap();
+    run(&["--datasource", &url, "can-connect-to-database"]).await.unwrap();
+    run(&["--datasource", &url, "drop-database"]).await.unwrap();
+    assert!(!sqlite_path.exists());
+}
+
+#[tokio::test]
+async fn test_drop_postgres_database() {
+    let db_name = "this_should_be_dropped";
+
+    // Drop the database
+    {
+        let url = postgres_url(None);
+
+        let conn = Quaint::new(&url).await.unwrap();
+
+        conn.raw_cmd("DROP DATABASE IF EXISTS \"this_should_exist\"")
+            .await
+            .unwrap();
+    };
+
+    let url = postgres_url(Some(db_name));
+
+    run(&["--datasource", &url, "create-database"]).await.unwrap();
+
+    run(&["--datasource", &url, "can-connect-to-database"]).await.unwrap();
+
+    run(&["--datasource", &url, "drop-database"]).await.unwrap();
+
+    let err = run(&["--datasource", &url, "can-connect-to-database"])
+        .await
+        .unwrap_err();
+
+    assert_eq!(err.error_code(), Some(DatabaseDoesNotExist::ERROR_CODE));
+}
+
+#[tokio::test]
+async fn test_drop_mysql_database() {
+    let url = mysql_url(Some("this_should_be_dropped"));
+
+    // Drop the existing database
+    {
+        let url = mysql_url(Some("mysql"));
+        let conn = Quaint::new(&url).await.unwrap();
+
+        conn.raw_cmd("DROP DATABASE IF EXISTS `this_should_exist`")
+            .await
+            .unwrap();
+    }
+
+    run(&["--datasource", &url, "create-database"]).await.unwrap();
+    run(&["--datasource", &url, "can-connect-to-database"]).await.unwrap();
+    run(&["--datasource", &url, "drop-database"]).await.unwrap();
+
+    let err = run(&["--datasource", &url, "can-connect-to-database"])
+        .await
+        .unwrap_err();
+
+    assert_eq!(err.error_code(), Some(DatabaseDoesNotExist::ERROR_CODE));
 }

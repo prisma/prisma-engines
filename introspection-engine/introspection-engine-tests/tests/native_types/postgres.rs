@@ -91,8 +91,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             bit             String   @postgres.Bit(1)
             varbit          String   @postgres.VarBit(1)
             uuid            String   @postgres.Uuid
-            // This type is currently not supported.
-            // xml          xml
+            xml             XML      @postgres.Xml
             json            Json     @postgres.Json
             jsonb           Json     @postgres.JsonB
           }

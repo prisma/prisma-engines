@@ -157,7 +157,7 @@ fn render_raw_sql(
     };
 
     match step {
-        SqlMigrationStep::RedefineTables { names } => renderer.render_redefine_tables(names, differ),
+        SqlMigrationStep::RedefineTables { names, .. } => renderer.render_redefine_tables(names, differ),
         SqlMigrationStep::CreateEnum(create_enum) => renderer.render_create_enum(create_enum),
         SqlMigrationStep::DropEnum(drop_enum) => renderer.render_drop_enum(drop_enum),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
@@ -171,7 +171,12 @@ fn render_raw_sql(
         }
         SqlMigrationStep::DropTable(DropTable { name }) => renderer.render_drop_table(name),
         SqlMigrationStep::RenameTable { name, new_name } => vec![renderer.render_rename_table(name, new_name)],
-        SqlMigrationStep::AddForeignKey(add_foreign_key) => vec![renderer.render_add_foreign_key(add_foreign_key)],
+        SqlMigrationStep::AddForeignKey(add_foreign_key) => {
+            let foreign_key = next_schema
+                .table_walker_at(add_foreign_key.table_index)
+                .foreign_key_at(add_foreign_key.foreign_key_index);
+            vec![renderer.render_add_foreign_key(&foreign_key)]
+        }
         SqlMigrationStep::DropForeignKey(drop_foreign_key) => vec![renderer.render_drop_foreign_key(drop_foreign_key)],
         SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &differ),
         SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(create_index)],

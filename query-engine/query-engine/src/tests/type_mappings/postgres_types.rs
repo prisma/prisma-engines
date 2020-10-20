@@ -477,7 +477,7 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), log = "debug")]
+#[test_each_connector(tags("postgres"))]
 async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
     let identifier_types = &[
         ("int2", "12"),

@@ -1,5 +1,4 @@
-use super::SqlFlavour;
-use crate::{connect, connection_wrapper::Connection};
+use crate::{connect, connection_wrapper::Connection, SqlFlavour};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
@@ -84,6 +83,19 @@ impl SqlFlavour for PostgresFlavour {
                     ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
                 }
             })
+    }
+
+    async fn drop_database(&self, database_str: &str) -> ConnectorResult<()> {
+        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let db_name = url.path().trim_start_matches('/').to_owned();
+        assert!(!db_name.is_empty(), "Database name should not be empty.");
+
+        strip_schema_param_from_url(&mut url);
+        let conn = create_postgres_admin_conn(url.clone()).await?;
+
+        conn.raw_cmd(&format!("DROP DATABASE \"{}\"", db_name)).await?;
+
+        Ok(())
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {

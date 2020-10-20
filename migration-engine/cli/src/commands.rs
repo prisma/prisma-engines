@@ -48,6 +48,7 @@ impl Cli {
         match self.command {
             CliCommand::CreateDatabase => create_database(&self.datasource).await,
             CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
+            CliCommand::DropDatabase => drop_database(&self.datasource).await,
             CliCommand::QeSetup => {
                 qe_setup(&self.datasource).await?;
                 Ok(String::new())
@@ -62,6 +63,8 @@ enum CliCommand {
     CreateDatabase,
     /// Does the database connection string work?
     CanConnectToDatabase,
+    /// Drop the database.
+    DropDatabase,
     /// Set up the database for connector-test-kit.
     QeSetup,
 }
@@ -77,6 +80,13 @@ async fn create_database(database_str: &str) -> Result<String, CliError> {
     let db_name = migration_core::create_database(&datamodel).await?;
 
     Ok(format!("Database '{}' was successfully created.", db_name))
+}
+
+async fn drop_database(database_str: &str) -> Result<String, CliError> {
+    let datamodel = datasource_from_database_str(database_str)?;
+    migration_core::drop_database(&datamodel).await?;
+
+    Ok(format!("The database was successfully dropped."))
 }
 
 async fn qe_setup(prisma_schema: &str) -> Result<(), CliError> {
