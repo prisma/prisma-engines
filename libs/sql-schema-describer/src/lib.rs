@@ -580,6 +580,7 @@ impl Precision {
 
 pub trait Getter {
     fn get_expect_string(&self, name: &str) -> String;
+    fn get_expect_char(&self, name: &str) -> char;
     fn get_u32(&self, name: &str) -> Option<u32>;
 }
 
@@ -587,7 +588,13 @@ impl Getter for ResultRow {
     fn get_expect_string(&self, name: &str) -> String {
         self.get(name)
             .and_then(|x| x.to_string())
-            .expect(&format!("Getting {} from Resultrow {:?} failed", name, &self))
+            .expect(&format!("Getting {} from Resultrow {:?} as String failed", name, &self))
+    }
+
+    fn get_expect_char(&self, name: &str) -> char {
+        self.get(name)
+            .and_then(|x| x.as_char())
+            .expect(&format!("Getting {} from Resultrow {:?} as char failed", name, &self))
     }
 
     fn get_u32(&self, name: &str) -> Option<u32> {

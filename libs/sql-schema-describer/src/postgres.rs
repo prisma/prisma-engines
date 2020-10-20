@@ -168,12 +168,13 @@ impl SqlSchemaDescriber {
             let data_type = col.get_expect_string("data_type");
             let full_data_type = col.get_expect_string("full_data_type");
             let is_identity_str = col.get_expect_string("is_identity").to_lowercase();
+            let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
+
             let is_identity = match is_identity_str.as_str() {
                 "no" => false,
                 "yes" => true,
                 _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
             };
-            let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
             let is_required = match is_nullable.as_ref() {
                 "no" => true,
                 "yes" => false,
@@ -188,9 +189,7 @@ impl SqlSchemaDescriber {
                 ColumnArity::Nullable
             };
 
-            let character_maximum_length = col
-                .get("character_maximum_length")
-                .and_then(|x| x.as_i64().map(|x| x as u32));
+            let character_maximum_length = col.get_u32("character_maximum_length");
             let numeric_precision = col.get_u32("numeric_precision");
             let numeric_precision_radix = col.get_u32("numeric_precision_radix");
             let numeric_scale = col.get_u32("numeric_scale");
@@ -285,15 +284,10 @@ impl SqlSchemaDescriber {
             let referenced_table = row.get_expect_string("parent_table");
             let referenced_column = row.get_expect_string("parent_column");
             let table_name = row.get_expect_string("table_name");
-            let confdeltype = row
-                .get("confdeltype")
-                .and_then(|x| x.as_char())
-                .expect("get confdeltype");
-            let confupdtype = row
-                .get("confupdtype")
-                .and_then(|x| x.as_char())
-                .expect("get confupdtype");
+            let confdeltype = row.get_expect_char("confdeltype");
+            let confupdtype = row.get_expect_char("confupdtype");
             let constraint_name = row.get_expect_string("constraint_name");
+
             let on_delete_action = match confdeltype {
                 'a' => ForeignKeyAction::NoAction,
                 'r' => ForeignKeyAction::Restrict,
