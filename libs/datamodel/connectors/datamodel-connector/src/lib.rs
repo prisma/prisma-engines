@@ -71,6 +71,19 @@ pub trait Connector: Send + Sync {
     fn supports_non_indexed_auto_increment(&self) -> bool {
         self.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed)
     }
+
+    fn wrap_in_argument_count_mismatch_error(
+        &self,
+        native_type: &str,
+        required_count: usize,
+        given_count: usize,
+    ) -> Result<(), ConnectorError> {
+        Err(ConnectorError::new_argument_count_mismatch_error(
+            native_type,
+            required_count,
+            given_count,
+        ))
+    }
 }
 
 /// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.

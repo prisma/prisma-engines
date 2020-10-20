@@ -181,77 +181,48 @@ impl Connector for MySqlDatamodelConnector {
             UNSIGNED_MEDIUM_INT_TYPE_NAME => MySqlType::UnsignedMediumInt,
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
             UNSIGNED_BIG_INT_TYPE_NAME => MySqlType::UnsignedBigInt,
-            DECIMAL_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (parsed_args.get(0), parsed_args.get(1)) {
-                    MySqlType::Decimal(*first_arg, *second_arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        DECIMAL_TYPE_NAME,
-                        2,
-                        parsed_args.len(),
-                    ));
-                }
-            }
-            NUMERIC_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (parsed_args.get(0), parsed_args.get(1)) {
-                    MySqlType::Numeric(*first_arg, *second_arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        NUMERIC_TYPE_NAME,
-                        2,
-                        parsed_args.len(),
-                    ));
-                }
-            }
+            DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
+                [scale, precision] => MySqlType::Decimal(*scale, *precision),
+                _ => self.create_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, parsed_args.len())?,
+            },
+            NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
+                [scale, precision] => MySqlType::Numeric(*scale, *precision),
+                _ => self.create_argument_count_mismatch_error(NUMERIC_TYPE_NAME, 2, parsed_args.len())?,
+            },
             FLOAT_TYPE_NAME => MySqlType::Float,
             DOUBLE_TYPE_NAME => MySqlType::Double,
-            BIT_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    MySqlType::Bit(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
-                }
-            }
-            CHAR_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    MySqlType::Char(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
-                }
-            }
-            VAR_CHAR_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    MySqlType::VarChar(*arg)
-                } else {
+            BIT_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::Bit(*arg),
+                _ => {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_CHAR_TYPE_NAME,
+                        BIT_TYPE_NAME,
                         1,
-                        0,
-                    ));
+                        parsed_args.len(),
+                    ))
                 }
-            }
-            BINARY_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    MySqlType::Binary(*arg)
-                } else {
+            },
+            CHAR_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::Char(*arg),
+                _ => {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
-                        BINARY_TYPE_NAME,
+                        CHAR_TYPE_NAME,
                         1,
-                        0,
-                    ));
+                        parsed_args.len(),
+                    ))
                 }
-            }
-            VAR_BINARY_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    MySqlType::VarBinary(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_BINARY_TYPE_NAME,
-                        1,
-                        0,
-                    ));
-                }
-            }
+            },
+            VAR_CHAR_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::VarChar(*arg),
+                _ => self.wrap_in_argument_count_mismatch_error(VAR_CHAR_TYPE_NAME, 1, parsed_args.len())?,
+            },
+            BINARY_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::Binary(*arg),
+                _ => self.wrap_in_argument_count_mismatch_error(BINARY_TYPE_NAME, 1, parsed_args.len())?,
+            },
+            VAR_BINARY_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::VarBinary(*arg),
+                _ => self.wrap_in_argument_count_mismatch_error(VAR_BINARY_TYPE_NAME, 1, parsed_args.len())?,
+            },
             TINY_BLOB_TYPE_NAME => MySqlType::TinyBlob,
             BLOB_TYPE_NAME => MySqlType::Blob,
             MEDIUM_BLOB_TYPE_NAME => MySqlType::MediumBlob,
@@ -261,9 +232,21 @@ impl Connector for MySqlDatamodelConnector {
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
-            TIME_TYPE_NAME => MySqlType::Time(parsed_args.first().cloned()),
-            DATETIME_TYPE_NAME => MySqlType::DateTime(parsed_args.first().cloned()),
-            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(parsed_args.first().cloned()),
+            TIME_TYPE_NAME => match parsed_args.as_slice() {
+                [fractions] => MySqlType::Time(*fractions.clone()),
+                [] => MySqlType::Time(None),
+                _ => self.wrap_in_argument_count_mismatch_error(TIME_TYPE_NAME, 0, parsed_args.len())?,
+            },
+            DATETIME_TYPE_NAME => match parsed_args.as_slice() {
+                [fractions] => MySqlType::DateTime(*fractions.clone()),
+                [] => MySqlType::DateTime(None),
+                _ => self.wrap_in_argument_count_mismatch_error(DATETIME_TYPE_NAME, 0, parsed_args.len())?,
+            },
+            TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
+                [fractions] => MySqlType::Timestamp(*fractions.clone()),
+                [] => MySqlType::Timestamp(None),
+                _ => self.wrap_in_argument_count_mismatch_error(TIMESTAMP_TYPE_NAME, 0, parsed_args.len())?,
+            },
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
             x => unreachable!(format!(

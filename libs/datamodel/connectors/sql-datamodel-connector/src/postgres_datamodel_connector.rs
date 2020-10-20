@@ -141,78 +141,84 @@ impl Connector for PostgresDatamodelConnector {
             SMALL_INT_TYPE_NAME => PostgresType::SmallInt,
             INTEGER_TYPE_NAME => PostgresType::Integer,
             BIG_INT_TYPE_NAME => PostgresType::BigInt,
-            DECIMAL_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (parsed_args.get(0), parsed_args.get(1)) {
-                    PostgresType::Decimal(*first_arg, *second_arg)
-                } else {
+            DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
+                [scale, precision] => PostgresType::Decimal(*scale, *precision),
+                _ => {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         DECIMAL_TYPE_NAME,
                         parsed_args.len(),
                         2,
-                    ));
+                    ))
                 }
-            }
-            NUMERIC_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (parsed_args.get(0), parsed_args.get(1)) {
-                    PostgresType::Numeric(*first_arg, *second_arg)
-                } else {
+            },
+            NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
+                [scale, precision] => PostgresType::Numeric(*scale, *precision),
+                _ => {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         NUMERIC_TYPE_NAME,
                         parsed_args.len(),
                         2,
-                    ));
+                    ))
                 }
-            }
+            },
             REAL_TYPE_NAME => PostgresType::Real,
             DOUBLE_PRECISION_TYPE_NAME => PostgresType::DoublePrecision,
             SMALL_SERIAL_TYPE_NAME => PostgresType::SmallSerial,
             SERIAL_TYPE_NAME => PostgresType::Serial,
             BIG_SERIAL_TYPE_NAME => PostgresType::BigSerial,
-            VARCHAR_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    PostgresType::VarChar(*arg)
-                } else {
+            VARCHAR_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::VarChar(*arg),
+                _ => {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         VARCHAR_TYPE_NAME,
                         1,
                         0,
-                    ));
+                    ))
                 }
-            }
-            CHAR_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    PostgresType::Char(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
-                }
-            }
+            },
+            CHAR_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Char(*arg),
+                _ => return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0)),
+            },
             TEXT_TYPE_NAME => PostgresType::Text,
             BYTE_A_TYPE_NAME => PostgresType::ByteA,
-            TIMESTAMP_TYPE_NAME => PostgresType::Timestamp(parsed_args.first().cloned()),
+            TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Timestamp(*arg.clone()),
+                [] => PostgresType::Timestamp(None),
+                _ => self.wrap_in_argument_count_mismatch_error(TIMESTAMP_TYPE_NAME, 0, parsed_args.len()),
+            },
             TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimestampWithTimeZone(parsed_args.first().cloned()),
-            INTERVAL_TYPE_NAME => PostgresType::Interval(parsed_args.first().cloned()),
+            INTERVAL_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Interval(*arg.clone()),
+                [] => PostgresType::Interval(None),
+                _ => self.wrap_in_argument_count_mismatch_error(INTERVAL_TYPE_NAME, 0, parsed_args.len()),
+            },
             DATE_TYPE_NAME => PostgresType::Date,
-            TIME_TYPE_NAME => PostgresType::Time(parsed_args.first().cloned()),
-            TIME_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimeWithTimeZone(parsed_args.first().cloned()),
+            TIME_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Time(*arg.clone()),
+                [] => PostgresType::Time(None),
+                _ => self.wrap_in_argument_count_mismatch_error(TIME_TYPE_NAME, 0, parsed_args.len()),
+            },
+            TIME_WITH_TIMEZONE_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::TimeWithTimeZone(*arg.clone()),
+                [] => PostgresType::TimeWithTimeZone(None),
+                _ => self.wrap_in_argument_count_mismatch_error(TIME_WITH_TIMEZONE_TYPE_NAME, 1, parsed_args.len()),
+            },
             BOOLEAN_TYPE_NAME => PostgresType::Boolean,
-            BIT_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    PostgresType::Bit(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
-                }
-            }
-            VAR_BIT_TYPE_NAME => {
-                if let Some(arg) = parsed_args.first() {
-                    PostgresType::VarBit(*arg)
-                } else {
+            BIT_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Bit(*arg),
+                _ => return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0)),
+            },
+            VAR_BIT_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::VarBit(*arg),
+                _ => {
                     return Err(ConnectorError::new_argument_count_mismatch_error(
                         VAR_BIT_TYPE_NAME,
                         1,
                         0,
-                    ));
+                    ))
                 }
-            }
+            },
             UUID_TYPE_NAME => PostgresType::UUID,
             XML_TYPE_NAME => PostgresType::XML,
             JSON_TYPE_NAME => PostgresType::JSON,
