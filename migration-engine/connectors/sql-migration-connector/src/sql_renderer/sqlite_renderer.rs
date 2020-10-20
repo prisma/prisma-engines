@@ -138,10 +138,11 @@ impl SqlRenderer for SqliteFlavour {
                         column_definition = col_sql,
                     ));
                 }
-                TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
                 TableChange::AddPrimaryKey { .. } => unreachable!("AddPrimaryKey on SQLite"),
-                TableChange::DropColumn(_) => unreachable!("DropColumn on SQLite"),
                 TableChange::AlterColumn(_) => unreachable!("AlterColumn on SQLite"),
+                TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on SQLite"),
+                TableChange::DropColumn(_) => unreachable!("DropColumn on SQLite"),
+                TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
             };
         }
 
@@ -312,9 +313,9 @@ fn copy_current_table_into_new_table(
     let columns_that_became_required_with_a_default: Vec<ColumnDiffer<'_>> = differ
         .column_pairs()
         .filter(|columns| {
-            columns.all_changes().arity_changed()
-                && columns.next.arity().is_required()
-                && columns.next.default().is_some()
+            let (changes, _) = columns.all_changes();
+
+            changes.arity_changed() && columns.next.arity().is_required() && columns.next.default().is_some()
         })
         .collect();
 

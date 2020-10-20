@@ -135,14 +135,18 @@ impl SqlRenderer for MysqlFlavour {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
-                TableChange::AlterColumn(AlterColumn { name, column: _ }) => {
+                TableChange::AlterColumn(AlterColumn {
+                    column_name,
+                    changes,
+                    type_change: _,
+                }) => {
                     let columns = differ
                         .diff_table(&table.name)
                         .expect("AlterTable on unknown table.")
-                        .diff_column(name)
+                        .diff_column(column_name)
                         .expect("AlterColumn on unknown column.");
 
-                    let expanded = expand_mysql_alter_column(&columns);
+                    let expanded = expand_mysql_alter_column(&columns, &changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
@@ -154,6 +158,7 @@ impl SqlRenderer for MysqlFlavour {
                         }
                     };
                 }
+                TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on MySQL"),
             };
         }
 

@@ -398,12 +398,19 @@ pub enum ColumnArity {
 }
 
 impl ColumnArity {
-    pub fn is_required(&self) -> bool {
-        matches!(self, ColumnArity::Required)
+    /// The arity is ColumnArity::List.
+    pub fn is_list(&self) -> bool {
+        matches!(self, ColumnArity::List)
     }
 
+    /// The arity is ColumnArity::Nullable.
     pub fn is_nullable(&self) -> bool {
         matches!(self, ColumnArity::Nullable)
+    }
+
+    /// The arity is ColumnArity::Required.
+    pub fn is_required(&self) -> bool {
+        matches!(self, ColumnArity::Required)
     }
 }
 

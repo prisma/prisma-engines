@@ -313,6 +313,7 @@ impl<'a> TestApiSelect<'a> {
         self
     }
 
+    /// This is deprecated. Used row assertions instead with the ResultSetExt trait.
     pub async fn send_debug(self) -> Result<Vec<Vec<String>>, anyhow::Error> {
         let rows = self.send().await?;
 

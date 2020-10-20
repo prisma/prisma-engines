@@ -54,6 +54,15 @@ impl<'a> ColumnWalker<'a> {
         &self.column
     }
 
+    /// Walks the parent table's column to get to this column's index.
+    pub fn column_index(&self) -> usize {
+        self.table
+            .columns
+            .iter()
+            .position(|col| col.name == self.column.name)
+            .expect("Invariant violation: could not find index of column in parent table.")
+    }
+
     /// The type family.
     pub fn column_type_family(&self) -> &'a ColumnTypeFamily {
         &self.column.tpe.family
@@ -134,6 +143,15 @@ impl<'a> TableWalker<'a> {
     /// Get a column in the table, by name.
     pub fn column(&self, column_name: &str) -> Option<ColumnWalker<'a>> {
         self.columns().find(|column| column.name() == column_name)
+    }
+
+    /// Get a column in the table by index.
+    pub fn column_at(&self, idx: usize) -> Option<ColumnWalker<'a>> {
+        self.table.columns.get(idx).map(|column| ColumnWalker {
+            schema: self.schema,
+            column,
+            table: self.table,
+        })
     }
 
     /// Traverse the table's columns.

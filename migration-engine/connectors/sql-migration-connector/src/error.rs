@@ -16,8 +16,6 @@ pub(crate) struct SystemDatabase(pub(crate) String);
 
 impl From<SystemDatabase> for ConnectorError {
     fn from(err: SystemDatabase) -> ConnectorError {
-        ConnectorError::user_facing_error(MigrateSystemDatabase {
-            database_name: err.0.clone(),
-        })
+        ConnectorError::user_facing_error(MigrateSystemDatabase { database_name: err.0 })
     }
 }

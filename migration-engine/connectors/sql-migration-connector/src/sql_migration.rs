@@ -4,6 +4,8 @@ use migration_connector::DatabaseMigrationMarker;
 use serde::{Deserialize, Serialize};
 use sql_schema_describer::{Column, ForeignKey, Index, SqlSchema, Table};
 
+use crate::sql_schema_differ::ColumnChanges;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SqlMigration {
     pub before: SqlSchema,
@@ -91,8 +93,21 @@ pub enum TableChange {
     AddColumn(AddColumn),
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
-    DropPrimaryKey { constraint_name: Option<String> },
-    AddPrimaryKey { columns: Vec<String> },
+    DropAndRecreateColumn {
+        column_name: String,
+        /// The index of the column in the table in (previous schema, next schema).
+        #[serde(skip)]
+        column_index: (usize, usize),
+        /// The change mask for the column.
+        #[serde(skip)]
+        changes: ColumnChanges,
+    },
+    DropPrimaryKey {
+        constraint_name: Option<String>,
+    },
+    AddPrimaryKey {
+        columns: Vec<String>,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -107,8 +122,17 @@ pub struct DropColumn {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AlterColumn {
-    pub name: String,
-    pub column: Column,
+    pub column_name: String,
+    #[serde(skip)]
+    pub(crate) changes: ColumnChanges,
+    #[serde(skip)]
+    pub type_change: Option<ColumnTypeChange>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub enum ColumnTypeChange {
+    RiskyCast,
+    SafeCast,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]

@@ -60,6 +60,7 @@ impl SqlRenderer for MssqlFlavour {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
+                TableChange::DropAndRecreateColumn { .. } => todo!("DropAndRecreateColumn on MSSQL"),
                 TableChange::AlterColumn(AlterColumn { .. }) => todo!("We must handle altering columns in MSSQL"),
             };
         }
