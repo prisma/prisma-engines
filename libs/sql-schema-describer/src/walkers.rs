@@ -35,18 +35,23 @@ pub fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_name: &st
 /// Traverse a table column.
 #[derive(Debug, Clone, Copy)]
 pub struct ColumnWalker<'a> {
-    /// The schema the column is contained in. This field will become private.
-    pub schema: &'a SqlSchema,
-    /// The underlying column struct. This field will become private.
-    pub column: &'a Column,
-    /// The underlying table struct. This field will become private.
-    pub table: &'a Table,
+    /// The schema the column is contained in.
+    schema: &'a SqlSchema,
+    /// The underlying column struct.
+    column: &'a Column,
+    /// The underlying table struct.
+    table: &'a Table,
 }
 
 impl<'a> ColumnWalker<'a> {
     /// The nullability and arity of the column.
     pub fn arity(&self) -> &ColumnArity {
         &self.column.tpe.arity
+    }
+
+    /// A reference to the underlying Column struct.
+    pub fn column(&self) -> &Column {
+        &self.column
     }
 
     /// The type family.
@@ -121,7 +126,7 @@ pub struct TableWalker<'a> {
 }
 
 impl<'a> TableWalker<'a> {
-    /// Create a TableWalker from a schema and a reference to one of its tables.
+    /// Create a TableWalker from a schema and a reference to one of its tables. This should stay private.
     pub(crate) fn new(schema: &'a SqlSchema, table: &'a Table) -> Self {
         Self { schema, table }
     }

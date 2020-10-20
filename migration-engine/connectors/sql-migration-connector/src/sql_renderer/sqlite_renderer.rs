@@ -122,11 +122,13 @@ impl SqlRenderer for SqliteFlavour {
         for change in changes {
             match change {
                 TableChange::AddColumn(AddColumn { column }) => {
-                    let column = ColumnWalker {
-                        table,
-                        schema: differ.next,
-                        column,
-                    };
+                    let column = differ
+                        .next
+                        .table_walker(&table.name)
+                        .expect("Invariant violation: add column on unknown table")
+                        .columns()
+                        .find(|col| col.name() == column.name)
+                        .expect("Invariant violation: add column with unknown column");
 
                     let col_sql = self.render_column(column);
 

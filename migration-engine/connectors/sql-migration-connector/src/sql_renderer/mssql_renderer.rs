@@ -11,7 +11,7 @@ use crate::{
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
     walkers::ForeignKeyWalker,
-    walkers::{ColumnWalker, TableWalker},
+    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
     ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write};
@@ -46,11 +46,13 @@ impl SqlRenderer for MssqlFlavour {
                     lines.push(format!("ADD PRIMARY KEY ({})", columns));
                 }
                 TableChange::AddColumn(AddColumn { column }) => {
-                    let column = ColumnWalker {
-                        table,
-                        schema: differ.next,
-                        column,
-                    };
+                    let column = differ
+                        .next
+                        .table_walker(&table.name)
+                        .expect("Invariant violation: add column on unknown table")
+                        .columns()
+                        .find(|col| col.name() == column.name)
+                        .expect("Invariant violation: add column with unknown column");
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
@@ -99,7 +101,7 @@ impl SqlRenderer for MssqlFlavour {
         let default = column
             .default()
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
-            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
+            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column_type_family())))
             .unwrap_or_else(String::new);
 
         if column.is_autoincrement() {

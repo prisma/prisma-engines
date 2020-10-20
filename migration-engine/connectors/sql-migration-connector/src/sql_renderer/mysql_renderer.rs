@@ -16,7 +16,7 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, ForeignKeyWalker, TableWalker},
+    walkers::{ColumnWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker},
     ColumnTypeFamily, DefaultValue, Index, IndexType, SqlSchema,
 };
 use std::borrow::Cow;
@@ -121,11 +121,13 @@ impl SqlRenderer for MysqlFlavour {
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
                 TableChange::AddColumn(AddColumn { column }) => {
-                    let column = ColumnWalker {
-                        table,
-                        schema: differ.next,
-                        column,
-                    };
+                    let column = differ
+                        .next
+                        .table_walker(&table.name)
+                        .expect("Invariant violation: add column on unknown table")
+                        .columns()
+                        .find(|col| col.name() == column.name)
+                        .expect("Invariant violation: add column with unknown column");
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
@@ -407,9 +409,9 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
 }
 
 fn escape_string_literal(s: &str) -> Cow<'_, str> {
-    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'$0"#).unwrap());
+    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
 
-    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'")
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }
 
 fn mysql_drop_index(renderer: &dyn SqlFlavour, table_name: &str, index_name: &str) -> String {
