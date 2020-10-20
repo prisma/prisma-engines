@@ -6,6 +6,7 @@
 use fmt::Display;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
+use quaint::connector::ResultRow;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -574,6 +575,23 @@ impl Precision {
 
     fn time_precision(&self) -> Option<u32> {
         self.time_precision
+    }
+}
+
+pub trait Getter {
+    fn get_expect_string(&self, name: &str) -> String;
+    fn get_u32(&self, name: &str) -> Option<u32>;
+}
+
+impl Getter for ResultRow {
+    fn get_expect_string(&self, name: &str) -> String {
+        self.get(name)
+            .and_then(|x| x.to_string())
+            .expect(&format!("Getting {} from Resultrow {:?} failed", name, &self))
+    }
+
+    fn get_u32(&self, name: &str) -> Option<u32> {
+        self.get(name).and_then(|x| x.as_i64().map(|x| x as u32))
     }
 }
 
