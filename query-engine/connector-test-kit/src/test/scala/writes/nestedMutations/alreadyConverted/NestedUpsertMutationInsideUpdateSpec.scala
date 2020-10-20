@@ -22,7 +22,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: {c: "c1"}
+        |      create: {c: "c1", c_1: "foo", c_2: "bar"}
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -45,7 +45,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |        upsert: {
          |          where: {c: "DOES NOT EXIST"}
          |          update: {c: { set: "DOES NOT MATTER" }}
-         |          create :{c: "c2"}
+         |          create :{c: "c2", c_1: "asdf", c_2: "lol"}
          |        }
          |      }
          |   }
@@ -76,7 +76,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: {c: "c1"}
+        |      create: {c: "c1", c_1: "foo", c_2: "bar"}
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -98,7 +98,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    childrenOpt: {upsert: {
          |    where: {c: "c1"}
          |    update: {c: { set: "updated C" }}
-         |    create :{c: "DOES NOT MATTER"}
+         |    create :{c: "DOES NOT MATTER", c_1: "foo", c_2: "bar"}
          |    }}
          |  }){
          |    childrenOpt {
@@ -128,7 +128,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |  createParent(data: {
           |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
-          |      create: [{c: "c1"}, {c: "c2"}]
+          |      create: [{c: "c1", c_1: "foo", c_2: "bar"}, {c: "c2", c_1: "juuh", c_2: "lol"}]
           |    }
           |  }){
           |    ${t.parent.selection}
@@ -150,7 +150,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    childrenOpt: {upsert: [{
          |    where: {c: "DOES NOT EXIST"}
          |    update: {c: {set: "DOES NOT MATTER"}}
-         |    create :{c: "new C"}
+         |    create :{c: "new C", c_1: "omg", c_2: "lolz"}
          |    }]}
          |  }){
          |    childrenOpt {
@@ -180,7 +180,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |  createParent(data: {
           |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
-          |      create: [{c: "c1"}, {c: "c2"}]
+          |      create: [{c: "c1", c_1: "a", c_2: "b"}, {c: "c2", c_1: "a2", c_2: "b2"}]
           |    }
           |  }){
           |    ${t.parent.selection}
@@ -202,7 +202,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    childrenOpt: {upsert: [{
          |    where: {c: "c1"}
          |    update: {c: {set:"updated C"}}
-         |    create :{c: "DOES NOT MATTER"}
+         |    create :{c: "DOES NOT MATTER", c_1: "DOES NOT MATTER", c_2: "DOES NOT MATTER"}
          |    }]}
          |  }){
          |    childrenOpt (orderBy: { c: asc }){
@@ -231,7 +231,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
+        |      create: [{c: "c1", c_1: "foo", c_2: "bar"},{c: "c2", c_1: "buu", c_2: "quu"}]
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -254,7 +254,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |        upsert: [{
          |          where:  {c: "c2"}
          |          update: {c: {set: "updated C"}}
-         |          create: {c: "DOES NOT MATTER"}
+         |          create: {c: "DOES NOT MATTER", c_1: "foo", c_2: "bar"}
          |        }]
          |      }
          |  }){
@@ -287,7 +287,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
+        |      create: [{c: "c1", c_1: "foo", c_2: "bar"},{c: "c2", c_1: "puu", c_2: "quu"}]
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -309,7 +309,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    childrenOpt: {upsert: [{
          |      where: {c: "DOES NOT EXIST"}
          |      update: {c: {set: "DOES NOT MATTER"}}
-         |      create :{c: "updated C"}
+         |      create :{c: "updated C", c_1: "lolz", c_2: "miau"}
          |    }]}
          |  }){
          |    childrenOpt{

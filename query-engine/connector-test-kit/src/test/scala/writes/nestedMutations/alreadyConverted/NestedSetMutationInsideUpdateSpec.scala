@@ -20,7 +20,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
           |  createParent(data: {
           |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
-          |      create: [{c: "c1"}, {c: "c2"}]
+          |      create: [{c: "c1", c_1: "c1", c_2: "c2"}, {c: "c2", c_1: "c3", c_2: "c4"}]
           |    }
           |  }){
           |    ${t.parent.selection}
@@ -36,7 +36,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       val parentResult2 = server
         .query(
           s"""mutation {
-          |  createParent(data: {p: "p2", p_1: "p", p_2: "2"}){
+          |  createParent(data: {p: "p2", p_1: "wqe", p_2: "qt12t"}){
           |    p
           |    ${t.parent.selection}
           |  }
@@ -282,7 +282,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         |  createParent(data: {
         |    p: "p2", p_1: "p", p_2: "2"
         |    childrenOpt: {
-        |      create: [{c: "c3"},{c: "c4"}]
+        |      create: [{c: "c3", c_1: "u", c_2: "w"},{c: "c4", c_1: "g", c_2: "l"}]
         |    }
         |  }){
         |    ${t.parent.selection}

@@ -138,6 +138,7 @@ fn parse_datamodel_internal(
     let validator = ValidationPipeline::new(&sources.subject, &generators.subject);
 
     diagnostics.append_warning_vec(sources.warnings);
+    diagnostics.append_warning_vec(generators.warnings);
 
     match validator.validate(&ast) {
         Ok(mut src) => {
@@ -161,6 +162,7 @@ pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<ValidatedDatamodel,
     let validator = ValidationPipeline::new(&sources.subject, &generators.subject);
 
     diagnostics.append_warning_vec(sources.warnings);
+    diagnostics.append_warning_vec(generators.warnings);
 
     match validator.validate(&ast) {
         Ok(mut src) => {

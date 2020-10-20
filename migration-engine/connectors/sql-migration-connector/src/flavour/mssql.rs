@@ -82,6 +82,10 @@ impl SqlFlavour for MssqlFlavour {
             })
     }
 
+    async fn drop_database(&self, _database_url: &str) -> ConnectorResult<()> {
+        todo!("drop_database on MSSQL")
+    }
+
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let schema_name = connection.connection_info().schema_name();
         let drop_fks = format!(

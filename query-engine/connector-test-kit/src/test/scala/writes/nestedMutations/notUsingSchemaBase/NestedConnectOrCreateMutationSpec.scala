@@ -631,7 +631,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
     )
   }
 
-  "A 1:1! relation connectOrCreate" should "work and prevent relation violations" in {
+  "A 1:1! relation connectOrCreate" should "work and prevent relation violations" taggedAs (IgnoreMsSql) in {
     val project = SchemaDsl.fromStringV11() {
       """
         |model ModelA {

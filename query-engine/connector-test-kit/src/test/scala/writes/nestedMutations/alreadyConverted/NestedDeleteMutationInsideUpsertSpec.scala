@@ -48,7 +48,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |    p: { set: "p2" }
          |    childReq: {delete: true}
          |  }
-         |  create:{p: "Should not matter" childReq: {create: {c: "Should not matter"}}}
+         |  create:{p: "Should not matter", p_1: "lol", p_2: "muh", childReq: {create: {c: "Should not matter", c_1: "no no yes", c_2: "no no no"}}}
          |  ){
          |    childReq {
          |      c
@@ -104,7 +104,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |    p: { set: "p2" }
          |    childReq: { delete: true }
          |  }
-         |  create:{p: "Should not matter" childReq: {create: {c: "Should not matter"}}}
+         |  create:{p: "Should not matter", p_1: "lulz", p_2: "zlul", childReq: {create: {c: "Should not matter", c_1: "foo", c_2: "bar"}}}
          |  ){
          |    childReq {
          |      c
@@ -134,7 +134,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
           |  createParent(data: {
           |    p: "p1", p_1: "p", p_2: "1"
           |    childOpt: {
-          |      create: {c: "c1"}
+          |      create: {c: "c1", c_1: "foo", c_2: "bar"}
           |    }
           |  }){
           |    ${t.parent.selection}
@@ -158,7 +158,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |    p: { set: "p2" }
          |    childOpt: {delete: true}
          |  }
-         |  create:{p: "Should not matter"}
+         |  create:{p: "Should not matter", p_1: "no", p_2: "yes"}
          |  ){
          |    childOpt {
          |      c
@@ -216,7 +216,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |      p: { set: "p2" }
          |      childOpt: {delete: true}
          |    }
-         |    create:{p: "Should not matter"}
+         |    create:{p: "Should not matter", p_1: "nono", p_2: "yesyes"}
          |  ){
          |    childOpt {
          |      c
@@ -246,7 +246,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: {c: "c1"}
+        |      create: {c: "c1", c_1: "asdf", c_2: "qwer"}
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -267,7 +267,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |    update:{
          |    childrenOpt: {delete: {c: "c1"}}
          |  }
-         |  create:{p: "Should not matter"}
+         |  create:{p: "Should not matter", p_1: "foo", p_2: "bar"}
          |  ){
          |    childrenOpt {
          |      c
@@ -293,7 +293,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
-        |      create: {c: "c1"}
+        |      create: {c: "c1", c_1: "foo", c_2: "bar"}
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -314,7 +314,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  update:{
          |    childOpt: {delete: true}
          |  }
-         |  create:{p: "Should not matter"}
+         |  create:{p: "Should not matter", p_1: "no", p_2: "yes"}
          |  ){
          |    childOpt {
          |      c
@@ -341,7 +341,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
           |  createParent(data: {
           |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
-          |      create: [{c: "c1"}, {c: "c2"}]
+          |      create: [{c: "c1", c_1: "foo", c_2: "bar"}, {c: "c2", c_1: "nono", c_2: "yesyes"}]
           |    }
           |  }){
           |    ${t.parent.selection}
@@ -362,7 +362,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  update:{
          |    childrenOpt: {delete: [{c: "c2"}]}
          |  }
-         |   create:{p: "Should not matter"}
+         |   create:{p: "Should not matter", p_1: "no", p_2: "yes"}
          |  ){
          |    childrenOpt {
          |      c
@@ -414,7 +414,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  update:{
          |    childReq: {delete: true}
          |  }
-         |  create:{p: "Should not matter",childReq: {create:{c: "Should not matter"}}}
+         |  create:{p: "Should not matter", p_1: "nono", p_2: "noyes", childReq: {create:{c: "Should not matter", c_1: "foo", c_2: "bar"}}}
          |  ){
          |    childReq {
          |      c
@@ -467,7 +467,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  upsertParent(
          |    where: $parentIdentifier
          |    update:{childOpt: {delete: true}}
-         |    create:{p: "Should not matter"}
+         |    create:{p: "Should not matter", p_1: "no", p_2: "yes"}
          |  ){
          |    childOpt{
          |      c
@@ -497,7 +497,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
+        |      create: [{c: "c1", c_1: "foo", c_2: "bar"},{c: "c2", c_1: "wtf", c_2: "lol"}]
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -518,7 +518,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |  update:{
          |    childrenOpt: {delete: [{c: "c1"}, {c: "c2"}]}
          |  }
-         |  create:{p: "Should not matter"}
+         |  create:{p: "Should not matter", p_1: "foo", p_2: "bar"}
          |  ){
          |    childrenOpt{
          |      c
