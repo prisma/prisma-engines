@@ -404,6 +404,7 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
         ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
         ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+        ColumnTypeFamily::Xml => unimplemented!("Xml not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
 }

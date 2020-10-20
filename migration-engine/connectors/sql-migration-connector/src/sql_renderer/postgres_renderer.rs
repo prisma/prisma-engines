@@ -393,6 +393,7 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::String => format!("text {}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
         ColumnTypeFamily::Json => format!("jsonb {}", array),
+        ColumnTypeFamily::Xml => format!("xml {}", array),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
         ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
         ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),

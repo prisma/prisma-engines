@@ -1,6 +1,7 @@
 use super::super::test_api::QueryEngine;
 use crate::context::PrismaContext;
 use quaint::{prelude::Queryable, single::Quaint};
+use test_setup::TestAPIArgs;
 
 pub type TestResult = anyhow::Result<()>;
 
@@ -118,8 +119,8 @@ impl<'a> ModelAssertions<'a> {
     }
 }
 
-pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
-    let mysql_url = test_setup::mysql_8_url(db_name);
+pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
+    let mysql_url = test_setup::mysql_8_url(args.test_function_name);
 
     test_setup::create_mysql_database(&mysql_url.parse().unwrap())
         .await
@@ -133,8 +134,8 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
-    let mysql_url = test_setup::mysql_5_6_url(db_name);
+pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
+    let mysql_url = test_setup::mysql_5_6_url(args.test_function_name);
 
     test_setup::create_mysql_database(&mysql_url.parse().unwrap())
         .await
@@ -148,8 +149,8 @@ pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mysql_test_api(db_name: &str) -> TestApi {
-    let mysql_url = test_setup::mysql_url(db_name);
+pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
+    let mysql_url = test_setup::mysql_url(args.test_function_name);
 
     test_setup::create_mysql_database(&mysql_url.parse().unwrap())
         .await
@@ -163,8 +164,8 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
-    let mysql_url = test_setup::mariadb_url(db_name);
+pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
+    let mysql_url = test_setup::mariadb_url(args.test_function_name);
 
     test_setup::create_mysql_database(&mysql_url.parse().unwrap())
         .await
@@ -178,8 +179,8 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres_test_api(db_name: &str) -> TestApi {
-    let postgres_url = test_setup::postgres_10_url(db_name);
+pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
+    let postgres_url = test_setup::postgres_10_url(args.test_function_name);
 
     test_setup::create_postgres_database(&postgres_url.parse().unwrap())
         .await
@@ -193,8 +194,8 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres9_test_api(db_name: &str) -> TestApi {
-    let postgres_url = test_setup::postgres_9_url(db_name);
+pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
+    let postgres_url = test_setup::postgres_9_url(args.test_function_name);
 
     test_setup::create_postgres_database(&postgres_url.parse().unwrap())
         .await
@@ -208,8 +209,8 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres11_test_api(db_name: &str) -> TestApi {
-    let postgres_url = test_setup::postgres_11_url(db_name);
+pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
+    let postgres_url = test_setup::postgres_11_url(args.test_function_name);
 
     test_setup::create_postgres_database(&postgres_url.parse().unwrap())
         .await
@@ -223,8 +224,8 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres12_test_api(db_name: &str) -> TestApi {
-    let postgres_url = test_setup::postgres_12_url(db_name);
+pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
+    let postgres_url = test_setup::postgres_12_url(args.test_function_name);
 
     test_setup::create_postgres_database(&postgres_url.parse().unwrap())
         .await
@@ -238,8 +239,8 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres13_test_api(db_name: &str) -> TestApi {
-    let postgres_url = test_setup::postgres_13_url(db_name);
+pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
+    let postgres_url = test_setup::postgres_13_url(args.test_function_name);
 
     test_setup::create_postgres_database(&postgres_url.parse().unwrap())
         .await
@@ -253,8 +254,8 @@ pub async fn postgres13_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn _mssql_2017_test_api(db_name: &str) -> TestApi {
-    let url = test_setup::mssql_2019_url(db_name);
+pub async fn _mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
+    let url = test_setup::mssql_2019_url(args.test_function_name);
     test_setup::create_mssql_database(&url).await.unwrap();
 
     TestApi {
@@ -265,8 +266,8 @@ pub async fn _mssql_2017_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn _mssql_2019_test_api(db_name: &str) -> TestApi {
-    let url = test_setup::mssql_2019_url(db_name);
+pub async fn _mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
+    let url = test_setup::mssql_2019_url(args.test_function_name);
     test_setup::create_mssql_database(&url).await.unwrap();
 
     TestApi {
