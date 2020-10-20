@@ -4,17 +4,16 @@ use crate::{
     flavour::PostgresFlavour,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
-        DropEnum, DropForeignKey, DropIndex, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
+        DropForeignKey, DropIndex, TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_schema_describer::walkers::*;
-use sql_schema_describer::*;
-use std::{borrow::Cow, fmt::Write as _};
+use sql_schema_describer::{walkers::*, *};
+use std::borrow::Cow;
 
 impl PostgresFlavour {
     fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
@@ -30,31 +29,23 @@ impl SqlRenderer for PostgresFlavour {
         Quoted::postgres_ident(name)
     }
 
-    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
-        let AddForeignKey { foreign_key, table } = add_foreign_key;
-        let mut add_constraint = String::with_capacity(120);
+    fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+        let constraint_clause = foreign_key
+            .constraint_name()
+            .map(|constraint_name| format!("CONSTRAINT {} ", self.quote(constraint_name)))
+            .unwrap_or_else(String::new);
 
-        write!(
-            add_constraint,
-            "ALTER TABLE {table} ADD ",
-            table = self.quote_with_schema(table)
+        format!(
+            "ALTER TABLE {table} ADD {constraint_clause}FOREIGN KEY({columns}){references}",
+            table = self.quote_with_schema(foreign_key.table().name()),
+            constraint_clause = constraint_clause,
+            columns = foreign_key
+                .constrained_column_names()
+                .iter()
+                .map(Quoted::postgres_ident)
+                .join(", "),
+            references = self.render_references(foreign_key),
         )
-        .unwrap();
-
-        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
-            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
-        }
-
-        write!(
-            add_constraint,
-            "FOREIGN KEY ({})",
-            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
-        )
-        .unwrap();
-
-        add_constraint.push_str(&self.render_references(&table, &foreign_key));
-
-        add_constraint
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
@@ -258,18 +249,18 @@ impl SqlRenderer for PostgresFlavour {
         }
     }
 
-    fn render_references(&self, _table: &str, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
         let referenced_columns = foreign_key
-            .referenced_columns
+            .referenced_column_names()
             .iter()
             .map(Quoted::postgres_ident)
             .join(",");
 
         format!(
             "REFERENCES {}({}) {} ON UPDATE CASCADE",
-            self.quote_with_schema(&foreign_key.referenced_table),
+            self.quote_with_schema(&foreign_key.referenced_table().name()),
             referenced_columns,
-            render_on_delete(&foreign_key.on_delete_action)
+            render_on_delete(&foreign_key.on_delete_action())
         )
     }
 
@@ -321,11 +312,15 @@ impl SqlRenderer for PostgresFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
+    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
-        let primary_columns = table.table.primary_key_columns();
-        let pk_column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
+        let primary_columns = table.primary_key_column_names();
+        let pk_column_names = primary_columns
+            .into_iter()
+            .flat_map(|cols| cols.into_iter())
+            .map(|col| self.quote(col))
+            .join(",");
         let pk = if !pk_column_names.is_empty() {
             format!(",\nPRIMARY KEY ({})", pk_column_names)
         } else {
@@ -334,7 +329,7 @@ impl SqlRenderer for PostgresFlavour {
 
         format!(
             "CREATE TABLE {table_name} (\n{columns}{primary_key}\n)",
-            table_name = self.quote_with_schema(table.name()),
+            table_name = self.quote_with_schema(table_name),
             columns = columns,
             primary_key = pk,
         )

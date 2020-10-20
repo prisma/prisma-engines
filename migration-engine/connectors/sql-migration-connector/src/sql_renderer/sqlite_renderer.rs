@@ -3,8 +3,8 @@ use crate::{
     database_info::DatabaseInfo,
     flavour::SqliteFlavour,
     sql_migration::{
-        AddColumn, AddForeignKey, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey,
-        DropIndex, TableChange,
+        AddColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
+        TableChange,
     },
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
 };
@@ -77,18 +77,18 @@ impl SqlRenderer for SqliteFlavour {
         )
     }
 
-    fn render_references(&self, _table: &str, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
         let referenced_fields = foreign_key
-            .referenced_columns
+            .referenced_column_names()
             .iter()
             .map(Quoted::sqlite_ident)
             .join(",");
 
         format!(
             "REFERENCES {referenced_table}({referenced_fields}) {on_delete_action} ON UPDATE CASCADE",
-            referenced_table = self.quote(&foreign_key.referenced_table),
+            referenced_table = self.quote(foreign_key.referenced_table().name()),
             referenced_fields = referenced_fields,
-            on_delete_action = render_on_delete(&foreign_key.on_delete_action)
+            on_delete_action = render_on_delete(foreign_key.on_delete_action())
         )
     }
 
@@ -107,7 +107,7 @@ impl SqlRenderer for SqliteFlavour {
         }
     }
 
-    fn render_add_foreign_key(&self, _add_foreign_key: &AddForeignKey) -> String {
+    fn render_add_foreign_key(&self, _foreign_key: &ForeignKeyWalker<'_>) -> String {
         unreachable!("AddForeignKey on SQLite")
     }
 
@@ -150,13 +150,13 @@ impl SqlRenderer for SqliteFlavour {
         Vec::new()
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
+    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
         use std::fmt::Write;
 
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
         let primary_key_is_already_set = columns.contains("PRIMARY KEY");
-        let primary_columns = table.table.primary_key_columns();
+        let primary_columns = table.primary_key_column_names().unwrap_or(&[]);
 
         let primary_key = if !primary_columns.is_empty() && !primary_key_is_already_set {
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
@@ -165,8 +165,8 @@ impl SqlRenderer for SqliteFlavour {
             String::new()
         };
 
-        let foreign_keys = if !table.table.foreign_keys.is_empty() {
-            let mut fks = table.table.foreign_keys.iter().peekable();
+        let foreign_keys = if !table.foreign_keys().next().is_none() {
+            let mut fks = table.foreign_keys().peekable();
             let mut rendered_fks = String::new();
 
             while let Some(fk) = fks.next() {
@@ -174,8 +174,12 @@ impl SqlRenderer for SqliteFlavour {
                     rendered_fks,
                     "{indentation}FOREIGN KEY ({constrained_columns}) {references}{comma}",
                     indentation = SQL_INDENTATION,
-                    constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
-                    references = self.render_references(&table.table.name, fk),
+                    constrained_columns = fk
+                        .constrained_column_names()
+                        .iter()
+                        .map(|col| format!(r#""{}""#, col))
+                        .join(","),
+                    references = self.render_references(&fk),
                     comma = if fks.peek().is_some() { ",\n" } else { "" },
                 )
                 .expect("Error formatting to string buffer.");
@@ -188,7 +192,7 @@ impl SqlRenderer for SqliteFlavour {
 
         format!(
             "CREATE TABLE {table_name} (\n{columns}{foreign_keys}{primary_key}\n)",
-            table_name = self.quote(table.name()),
+            table_name = self.quote(table_name),
             columns = columns,
             foreign_keys = foreign_keys,
             primary_key = primary_key,
@@ -230,34 +234,26 @@ impl SqlRenderer for SqliteFlavour {
                 .diff_table(table_name)
                 .expect("Invariant violation: diffing unknown table.");
 
-            let name_of_temporary_table = format!("new_{}", &differ.next.name());
-            let mut temporary_table = differ.next.table.clone();
-            temporary_table.name = name_of_temporary_table.clone();
-
-            // This is a hack, just to be able to render the CREATE TABLE.
-            let temporary_table = TableWalker {
-                schema: differ.next.schema,
-                table: &temporary_table,
-            };
+            let temporary_table_name = format!("new_{}", &differ.next.name());
 
             // TODO start transaction now. Unclear if we really want to do that.
-            result.push(self.render_create_table(&temporary_table));
+            result.push(self.render_create_table_as(&differ.next, &temporary_table_name));
 
-            copy_current_table_into_new_table(&mut result, &differ, temporary_table.name(), self).unwrap();
+            copy_current_table_into_new_table(&mut result, &differ, &temporary_table_name, self).unwrap();
 
-            result.push(format!("DROP TABLE {}", self.quote(differ.next.name())));
+            result.push(format!("DROP TABLE {}", self.quote(differ.previous.name())));
 
             result.push(format!(
                 "ALTER TABLE {old_name} RENAME TO \"{new_name}\"",
-                old_name = self.quote(temporary_table.name()),
+                old_name = self.quote(&temporary_table_name),
                 new_name = differ.next.name()
             ));
 
             // Recreate the indices
-            result.extend(differ.next.table.indices.iter().map(|index| {
+            result.extend(differ.next.indexes().map(|index| {
                 self.render_create_index(&CreateIndex {
                     table: differ.next.name().to_owned(),
-                    index: index.clone(),
+                    index: index.index().clone(),
                     caused_by_create_table: false,
                 })
             }));

@@ -1,26 +1,25 @@
-use super::{common::*, SqlRenderer};
+use super::{
+    common::{render_nullability, render_on_delete, Quoted},
+    IteratorJoin, SqlRenderer,
+};
 use crate::{
     database_info::DatabaseInfo,
-    flavour::MYSQL_IDENTIFIER_SIZE_LIMIT,
-    flavour::{MysqlFlavour, SqlFlavour},
-    sql_migration::AddColumn,
-    sql_migration::AddForeignKey,
-    sql_migration::AlterColumn,
-    sql_migration::AlterTable,
-    sql_migration::DropColumn,
-    sql_migration::TableChange,
+    flavour::{MysqlFlavour, SqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
-        AlterEnum, AlterIndex, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
+        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
+        DropForeignKey, DropIndex, TableChange,
     },
     sql_schema_differ::{ColumnChanges, SqlSchemaDiffer},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_schema_describer::{walkers::ColumnWalker, *};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, ForeignKeyWalker, TableWalker},
+    ColumnTypeFamily, DefaultValue, Index, IndexType, SqlSchema,
+};
 use std::borrow::Cow;
-use walkers::TableWalker;
 
 const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
@@ -29,28 +28,25 @@ impl SqlRenderer for MysqlFlavour {
         Quoted::Backticks(name)
     }
 
-    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
-        use std::fmt::Write;
+    fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+        let constraint_clause = foreign_key
+            .constraint_name()
+            .map(|constraint_name| format!("CONSTRAINT {} ", self.quote(constraint_name)))
+            .unwrap_or_else(String::new);
 
-        let AddForeignKey { foreign_key, table } = add_foreign_key;
-        let mut add_constraint = String::with_capacity(120);
+        let columns = foreign_key
+            .constrained_column_names()
+            .iter()
+            .map(|col| self.quote(col))
+            .join(", ");
 
-        write!(add_constraint, "ALTER TABLE {table} ADD ", table = self.quote(table)).unwrap();
-
-        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
-            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
-        }
-
-        write!(
-            add_constraint,
-            "FOREIGN KEY ({})",
-            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
+        format!(
+            "ALTER TABLE `{table}` ADD {constraint_clause}FOREIGN KEY ({columns}){references}",
+            table = foreign_key.table().name(),
+            constraint_clause = constraint_clause,
+            columns = columns,
+            references = self.render_references(foreign_key),
         )
-        .unwrap();
-
-        add_constraint.push_str(&self.render_references(&table, &foreign_key));
-
-        add_constraint
     }
 
     fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
@@ -199,19 +195,18 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_references(&self, _table: &str, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
         let referenced_columns = foreign_key
-            .referenced_columns
+            .referenced_column_names()
             .iter()
             .map(|col| self.quote(col))
             .join(",");
 
         format!(
-            " REFERENCES `{}`.`{}`({}) {} ON UPDATE CASCADE",
-            self.schema_name(),
-            foreign_key.referenced_table,
-            referenced_columns,
-            render_on_delete(&foreign_key.on_delete_action)
+            " REFERENCES `{table_name}`({column_names}) {on_delete} ON UPDATE CASCADE",
+            table_name = foreign_key.referenced_table().name(),
+            column_names = referenced_columns,
+            on_delete = render_on_delete(foreign_key.on_delete_action())
         )
     }
 
@@ -259,36 +254,34 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
+    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
-        let primary_columns = table.table.primary_key_columns();
+        let primary_columns = table.primary_key_column_names();
 
-        let primary_key = if !primary_columns.is_empty() {
+        let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
             format!(",\nPRIMARY KEY ({})", column_names)
         } else {
             String::new()
         };
 
-        let indexes = if !table.table.indices.is_empty() {
+        let indexes = if !table.indexes().next().is_none() {
             let indices: String = table
-                .table
-                .indices
-                .iter()
+                .indexes()
                 .map(|index| {
-                    let tpe = if index.is_unique() { "UNIQUE " } else { "" };
-                    let index_name = if index.name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-                        &index.name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+                    let tpe = if index.index_type().is_unique() { "UNIQUE " } else { "" };
+                    let index_name = if index.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+                        &index.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
                     } else {
-                        &index.name
+                        &index.name()
                     };
 
                     format!(
                         "{}INDEX {}({})",
                         tpe,
                         self.quote(&index_name),
-                        index.columns.iter().map(|col| self.quote(&col)).join(",\n")
+                        index.columns().map(|col| self.quote(col.name())).join(",\n")
                     )
                 })
                 .join(",\n");
@@ -300,7 +293,7 @@ impl SqlRenderer for MysqlFlavour {
 
         format!(
             "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-            table_name = self.quote(table.name()),
+            table_name = self.quote(table_name),
             columns = columns,
             indexes = indexes,
             primary_key = primary_key,
@@ -414,9 +407,9 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
 }
 
 fn escape_string_literal(s: &str) -> Cow<'_, str> {
-    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
+    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'$0"#).unwrap());
 
-    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'")
 }
 
 fn mysql_drop_index(renderer: &dyn SqlFlavour, table_name: &str, index_name: &str) -> String {
