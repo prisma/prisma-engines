@@ -30,7 +30,7 @@ impl DatabaseInfo {
             && self
                 .database_version
                 .as_ref()
-                .map(|version| version.contains("5.6"))
+                .map(|version| version.starts_with("5.6"))
                 .unwrap_or(false)
     }
 

@@ -13,12 +13,6 @@ use url::Url;
 #[derive(Debug)]
 pub(crate) struct MysqlFlavour(pub(super) MysqlUrl);
 
-impl MysqlFlavour {
-    pub(crate) fn schema_name(&self) -> &str {
-        self.0.dbname()
-    }
-}
-
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
     fn check_database_info(&self, database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
@@ -85,6 +79,15 @@ impl SqlFlavour for MysqlFlavour {
                     ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
                 }
             })
+    }
+
+    async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
+        let connection = connect(database_url).await?;
+        let db_name = connection.connection_info().dbname().unwrap();
+
+        connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
+
+        Ok(())
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {

@@ -86,6 +86,19 @@ impl SqlFlavour for PostgresFlavour {
             })
     }
 
+    async fn drop_database(&self, database_str: &str) -> ConnectorResult<()> {
+        let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let db_name = url.path().trim_start_matches('/').to_owned();
+        assert!(!db_name.is_empty(), "Database name should not be empty.");
+
+        strip_schema_param_from_url(&mut url);
+        let conn = create_postgres_admin_conn(url.clone()).await?;
+
+        conn.raw_cmd(&format!("DROP DATABASE \"{}\"", db_name)).await?;
+
+        Ok(())
+    }
+
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         let schema_name = connection.connection_info().schema_name();
         let schema_exists_result = connection

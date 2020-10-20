@@ -3,8 +3,8 @@
 #![deny(missing_docs)]
 
 use crate::{
-    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, Index, IndexType, PrimaryKey,
-    SqlSchema, Table,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
+    IndexType, PrimaryKey, SqlSchema, Table,
 };
 
 /// Traverse all the columns in the schema.
@@ -35,18 +35,23 @@ pub fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_name: &st
 /// Traverse a table column.
 #[derive(Debug, Clone, Copy)]
 pub struct ColumnWalker<'a> {
-    /// The schema the column is contained in. This field will become private.
-    pub schema: &'a SqlSchema,
-    /// The underlying column struct. This field will become private.
-    pub column: &'a Column,
-    /// The underlying table struct. This field will become private.
-    pub table: &'a Table,
+    /// The schema the column is contained in.
+    schema: &'a SqlSchema,
+    /// The underlying column struct.
+    column: &'a Column,
+    /// The underlying table struct.
+    table: &'a Table,
 }
 
 impl<'a> ColumnWalker<'a> {
     /// The nullability and arity of the column.
     pub fn arity(&self) -> &ColumnArity {
         &self.column.tpe.arity
+    }
+
+    /// A reference to the underlying Column struct.
+    pub fn column(&self) -> &Column {
+        &self.column
     }
 
     /// The type family.
@@ -114,15 +119,15 @@ impl<'a> ColumnWalker<'a> {
 /// Traverse a table.
 #[derive(Clone, Copy)]
 pub struct TableWalker<'a> {
-    /// The schema the column is contained in. This field will become private.
-    pub schema: &'a SqlSchema,
-    /// The underlying table struct. This field will become private.
-    pub table: &'a Table,
+    /// The schema the column is contained in.
+    schema: &'a SqlSchema,
+    /// The underlying table struct.
+    table: &'a Table,
 }
 
 impl<'a> TableWalker<'a> {
-    /// Create a TableWalker from a schema and a reference to one of its tables.
-    pub fn new(schema: &'a SqlSchema, table: &'a Table) -> Self {
+    /// Create a TableWalker from a schema and a reference to one of its tables. This should stay private.
+    pub(crate) fn new(schema: &'a SqlSchema, table: &'a Table) -> Self {
         Self { schema, table }
     }
 
@@ -140,6 +145,11 @@ impl<'a> TableWalker<'a> {
         })
     }
 
+    /// The number of foreign key constraints on the table.
+    pub fn foreign_key_count(&self) -> usize {
+        self.table.foreign_keys.len()
+    }
+
     /// Traverse the indexes on the table.
     pub fn indexes<'b>(&'b self) -> impl Iterator<Item = IndexWalker<'a>> + 'b {
         self.table.indices.iter().map(move |index| IndexWalker {
@@ -149,12 +159,31 @@ impl<'a> TableWalker<'a> {
         })
     }
 
+    /// Same as `TableWalker::columns()`, but takes ownership.
+    pub fn into_columns(self) -> impl Iterator<Item = ColumnWalker<'a>> {
+        self.table.columns.iter().map(move |column| ColumnWalker {
+            column,
+            schema: self.schema,
+            table: self.table,
+        })
+    }
+
     /// Traverse the foreign keys on the table.
     pub fn foreign_keys(self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
         self.table.foreign_keys.iter().map(move |foreign_key| ForeignKeyWalker {
             foreign_key,
-            table: self,
+            table: self.table,
+            schema: self.schema,
         })
+    }
+
+    /// Get a foreign key by index.
+    pub fn foreign_key_at(&self, index: usize) -> ForeignKeyWalker<'a> {
+        ForeignKeyWalker {
+            schema: self.schema,
+            table: self.table,
+            foreign_key: &self.table.foreign_keys[index],
+        }
     }
 
     /// The table name.
@@ -171,12 +200,33 @@ impl<'a> TableWalker<'a> {
     pub fn primary_key(&self) -> Option<&'a PrimaryKey> {
         self.table.primary_key.as_ref()
     }
+
+    /// The names of the columns that are part of the primary key. `None` means
+    /// there is no primary key on the table.
+    pub fn primary_key_column_names(&self) -> Option<&[String]> {
+        self.table.primary_key.as_ref().map(|pk| pk.columns.as_slice())
+    }
+
+    /// Reference to the underlying `Table` struct.
+    pub fn table(&self) -> &Table {
+        &self.table
+    }
+
+    /// Walks the parent schema to find the index of the table inside it.
+    pub fn table_index(&self) -> usize {
+        self.schema
+            .tables
+            .iter()
+            .position(|table| table.name == self.table.name)
+            .unwrap()
+    }
 }
 
 /// Traverse a foreign key.
 pub struct ForeignKeyWalker<'schema> {
-    table: TableWalker<'schema>,
     foreign_key: &'schema ForeignKey,
+    table: &'schema Table,
+    schema: &'schema SqlSchema,
 }
 
 impl<'a, 'schema> ForeignKeyWalker<'schema> {
@@ -188,7 +238,7 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
     /// The foreign key columns on the referencing table.
     pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'b {
         self.table()
-            .columns()
+            .into_columns()
             .filter(move |column| self.foreign_key.columns.contains(&column.column.name))
     }
 
@@ -197,9 +247,40 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
         self.foreign_key.constraint_name.as_deref()
     }
 
+    /// The underlying ForeignKey struct.
+    pub fn foreign_key(&self) -> &ForeignKey {
+        &self.foreign_key
+    }
+
+    /// Walks the parent schema to find the index of the table inside it.
+    pub fn foreign_key_index(&self) -> usize {
+        self.table
+            .foreign_keys
+            .iter()
+            .position(|fk| {
+                fk.constraint_name == self.foreign_key.constraint_name && fk.columns == self.foreign_key.columns
+            })
+            .unwrap()
+    }
+
     /// Access the underlying ForeignKey struct.
     pub fn inner(&self) -> &'schema ForeignKey {
         self.foreign_key
+    }
+
+    /// The `ON DELETE` behaviour of the foreign key.
+    pub fn on_delete_action(&self) -> &ForeignKeyAction {
+        &self.foreign_key.on_delete_action
+    }
+
+    /// The `ON UPDATE` behaviour of the foreign key.
+    pub fn on_update_action(&self) -> &ForeignKeyAction {
+        &self.foreign_key.on_update_action
+    }
+
+    /// The names of the columns referenced by the foreign key on the referenced table.
+    pub fn referenced_column_names(&self) -> &[String] {
+        &self.foreign_key.referenced_columns
     }
 
     /// The number of columns referenced by the constraint.
@@ -210,9 +291,8 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
     /// The table the foreign key "points to".
     pub fn referenced_table(&self) -> TableWalker<'schema> {
         TableWalker {
-            schema: self.table.schema,
+            schema: self.schema,
             table: self
-                .table
                 .schema
                 .table(&self.foreign_key.referenced_table)
                 .expect("foreign key references unknown table"),
@@ -220,8 +300,11 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
     }
 
     /// Traverse to the referencing table.
-    pub fn table(&self) -> &TableWalker<'schema> {
-        &self.table
+    pub fn table(&self) -> TableWalker<'schema> {
+        TableWalker {
+            schema: self.schema,
+            table: self.table,
+        }
     }
 }
 
@@ -277,6 +360,9 @@ impl<'a> IndexWalker<'a> {
 pub trait SqlSchemaExt {
     /// Find a table by name.
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
+
+    /// Find a table by index.
+    fn table_walker_at<'a>(&'a self, index: usize) -> TableWalker<'a>;
 }
 
 impl SqlSchemaExt for SqlSchema {
@@ -285,5 +371,12 @@ impl SqlSchemaExt for SqlSchema {
             table: self.table(name).ok()?,
             schema: self,
         })
+    }
+
+    fn table_walker_at<'a>(&'a self, index: usize) -> TableWalker<'a> {
+        TableWalker {
+            table: &self.tables[index],
+            schema: self,
+        }
     }
 }
