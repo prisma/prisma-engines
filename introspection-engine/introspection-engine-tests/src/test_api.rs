@@ -193,7 +193,7 @@ pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
         database: conn,
         sql_family: SqlFamily::Mysql,
         introspection_connector,
-        db_name: args.test_function_name,
+        db_name,
         tags: args.test_tag,
     }
 }
