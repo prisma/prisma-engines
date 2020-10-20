@@ -32,7 +32,7 @@ case class Project(
     s"""
        |generator client {
        |  provider = "prisma-client-js"
-       |  previewFeatures = ["nativeTypes"]
+       |  previewFeatures = ["nativeTypes", "microsoftSqlServer"]
        |}
     """.stripMargin
   }
@@ -41,38 +41,7 @@ case class Project(
     dataSourceConfig + "\n" + generatorBlock + "\n" + dataModel
   }
 
-  val envVar = UTF8Base64.encode(fullDatamodel)
-
-  val pgBouncerEnvVar = {
-    val host = {
-      if (EnvVars.isBuildkite) {
-        "test-db-pgbouncer"
-      } else {
-        "127.0.0.1"
-      }
-    }
-
-    val url = s"postgresql://postgres:prisma@$host:6432/db?schema=$id&connection_limit=1&pgbouncer=true"
-
-    val config =
-      s"""
-         |datasource test {
-         |  provider = "${ConnectorConfig.instance.provider.stripSuffix("56")}"
-         |  url = "${url}"
-         |}
-         |
-         |generator client {
-         |  provider = "prisma-client-js"
-         |  previewFeatures = ["nativeTypes"]
-         |}
-         |
-         |$dataModel
-      """.stripMargin
-
-    UTF8Base64.encode(config)
-  }
-
-  val isPgBouncer = ConnectorConfig.instance.isBouncer
+  val fullDatamodelBase64Encoded = UTF8Base64.encode(fullDatamodel)
 
   val dataModelPath: String = {
     val pathName = s"${EnvVars.serverRoot}/db/$id.prisma"

@@ -106,7 +106,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           "--enable-experimental=all",
           "--enable-raw-queries",
           "--datamodel",
-          project.envVar,
+          project.fullDatamodelBase64Encoded,
           "cli",
           "execute-request",
           "--legacy",
@@ -119,7 +119,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           "--enable-experimental=all",
           "--enable-raw-queries",
           "--datamodel",
-          project.envVar,
+          project.fullDatamodelBase64Encoded,
           "cli",
           "execute-request",
           encoded_query
