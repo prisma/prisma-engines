@@ -217,7 +217,8 @@ impl PostgresUrl {
         self.query_params.pg_bouncer
     }
 
-    pub(crate) fn connect_timeout(&self) -> Option<Duration> {
+    /// The connection timeout.
+    pub fn connect_timeout(&self) -> Option<Duration> {
         self.query_params.connect_timeout
     }
 

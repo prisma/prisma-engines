@@ -1,3 +1,5 @@
+mod decimal;
+
 use crate::{
     ast::Value,
     connector::queryable::{GetRow, ToColumnNames},
@@ -7,6 +9,7 @@ use bit_vec::BitVec;
 use bytes::BytesMut;
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, NaiveDateTime, Utc};
+pub(crate) use decimal::DecimalWrapper;
 use postgres_types::{FromSql, ToSql};
 use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
@@ -111,7 +114,11 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Integer(None),
                 },
-                PostgresType::NUMERIC => Value::Real(row.try_get(i)?),
+                PostgresType::NUMERIC => {
+                    let dw: Option<DecimalWrapper> = row.try_get(i)?;
+
+                    Value::Real(dw.map(|dw| dw.0))
+                }
                 PostgresType::FLOAT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: Decimal = Decimal::from_f32(val).expect("f32 is not a Decimal");
@@ -275,9 +282,9 @@ impl GetRow for PostgresRow {
                 #[cfg(feature = "array")]
                 PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
                     Some(val) => {
-                        let val: Vec<Decimal> = val;
+                        let val: Vec<DecimalWrapper> = val;
 
-                        let decimals = val.into_iter().map(|x| Value::real(x.to_string().parse().unwrap()));
+                        let decimals = val.into_iter().map(|x| Value::real(x.0.to_string().parse().unwrap()));
 
                         Value::array(decimals)
                     }
@@ -535,8 +542,10 @@ impl<'a> ToSql for Value<'a> {
                 let i = i64::from_le_bytes(i64_bytes);
                 i.to_sql(ty, out)
             }),
-            (Value::Real(decimal), &PostgresType::NUMERIC) => decimal.map(|decimal| decimal.to_sql(ty, out)),
-            (Value::Real(float), _) => float.map(|float| float.to_sql(ty, out)),
+            (Value::Real(decimal), &PostgresType::NUMERIC) => {
+                decimal.map(|decimal| DecimalWrapper(decimal).to_sql(ty, out))
+            }
+            (Value::Real(float), _) => float.map(|float| DecimalWrapper(float).to_sql(ty, out)),
             #[cfg(feature = "uuid-0_8")]
             (Value::Text(string), &PostgresType::UUID) => string.as_ref().map(|string| {
                 let parsed_uuid: Uuid = string.parse()?;

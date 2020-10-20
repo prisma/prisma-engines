@@ -99,7 +99,8 @@ impl MysqlUrl {
         self.url.port().unwrap_or(3306)
     }
 
-    pub(crate) fn connect_timeout(&self) -> Option<Duration> {
+    /// The connection timeout.
+    pub fn connect_timeout(&self) -> Option<Duration> {
         self.query_params.connect_timeout
     }
 
