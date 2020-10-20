@@ -181,9 +181,9 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::DateTime => Self::DateTime,
             ScalarType::Json => Self::Json,
             ScalarType::Xml => Self::Xml,
-            ScalarType::Decimal => Self::Float,
-            ScalarType::Duration => todo!("No idea what this is supposed to be"),
+            ScalarType::Decimal => Self::Decimal,
             ScalarType::Bytes => Self::Bytes,
+            ScalarType::Duration => todo!("No idea what this is supposed to be"),
         }
     }
 }
