@@ -348,7 +348,7 @@ async fn get_all_indexes(
             Some(column_name) => {
                 let seq_in_index = row.get_expect_i64("seq_in_index");
                 let pos = seq_in_index - 1;
-                let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
+                let is_unique = !row.get_expect_bool("non_unique");
 
                 // Multi-column indices will return more than one row (with different column_name values).
                 // We cannot assume that one row corresponds to one index.

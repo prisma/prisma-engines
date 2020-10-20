@@ -103,10 +103,7 @@ impl SqlSchemaDescriber {
              FROM pg_tables
              WHERE schemaname = $1::text";
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
-        let size: i64 = result
-            .first()
-            .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
-            .unwrap();
+        let size: i64 = result.first().map(|row| row.get_i64("size").unwrap_or(0)).unwrap();
 
         debug!("Found db size: {:?}", size);
         size.try_into().unwrap()
@@ -279,7 +276,7 @@ impl SqlSchemaDescriber {
         let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
         for row in result_set.into_iter() {
             debug!("Got description FK row {:?}", row);
-            let id = row.get("con_id").and_then(|x| x.as_i64()).expect("get con_id");
+            let id = row.get_expect_i64("con_id");
             let column = row.get_expect_string("child_column");
             let referenced_table = row.get_expect_string("parent_table");
             let referenced_column = row.get_expect_string("parent_column");
