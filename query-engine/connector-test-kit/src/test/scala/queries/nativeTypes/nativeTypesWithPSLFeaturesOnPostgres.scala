@@ -299,7 +299,7 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
         assert(database.setupWithStatusCode(project) == 0)
       }
   }
-/*
+
   "Using Prisma scalar type Bytes with native types and PSL features" should "work" in {
     val prisma_type = Vector("Bytes")
     val native_type = Vector("ByteA")
@@ -362,7 +362,7 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
         }
         assert(database.setupWithStatusCode(project) == 0)
       }
-  } */
+  }
 
   "Using Prisma scalar type datetime with native type and PSL features" should "work" in {
     val prisma_type = Vector("DateTime")
