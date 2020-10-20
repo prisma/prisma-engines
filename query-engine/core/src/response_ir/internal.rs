@@ -38,7 +38,6 @@ pub fn serialize_internal(
     field: &OutputFieldRef,
     is_list: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
-    dbg!(format!("Serializing: {}", &field.name));
     match result {
         QueryResult::RecordSelection(rs) => serialize_record_selection(rs, field, &field.field_type, is_list),
         QueryResult::RecordAggregation(ra) => serialize_aggregation(field, ra),
