@@ -76,7 +76,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
        |      float: 1.1
        |      dfloat: 2.2
        |      decFloat: 3.1234
-       |      numFloat: 4.12345
+       |      numFloat: "4.12345"
        |    }
        |  ) {
        |    float
@@ -90,7 +90,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
     )
 
     // decFloat is cut due to precision
-    res.toString should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"decFloat":3.1,"numFloat":4.12345}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"decFloat":"3.1","numFloat":"4.12345"}}}""")
   }
 
   "MySQL native string types" should "work" in {
