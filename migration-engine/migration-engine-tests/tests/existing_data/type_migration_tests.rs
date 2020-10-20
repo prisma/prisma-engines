@@ -186,7 +186,7 @@ async fn changing_an_int_array_column_to_scalar_is_not_possible(api: &TestApi) -
         .send()
         .await?
         .assert_no_warning()?
-        .assert_unexecutable(&["Changed the type of `mainProtagonist` on the `Film` table. No casts exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()])?;
+        .assert_unexecutable(&["Changed the type of `mainProtagonist` on the `Film` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()])?;
 
     api.assert_schema().await?.assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_list())
@@ -328,7 +328,7 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
                 .send()
                 .await?
                 .assert_no_warning()?
-                .assert_unexecutable(&["Changed the type of `tag` on the `Cat` table. No casts exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()])?;
+                .assert_unexecutable(&["Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()])?;
         }
         // Executable, conditionally.
         SqlFamily::Sqlite | SqlFamily::Mysql => {
