@@ -3361,6 +3361,8 @@ dependencies = [
  "test-setup",
  "tokio",
  "tracing",
+ "tracing-error",
+ "tracing-futures",
 ]
 
 [[package]]

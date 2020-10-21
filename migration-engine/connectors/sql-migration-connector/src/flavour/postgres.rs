@@ -1,7 +1,7 @@
-use crate::{connect, connection_wrapper::Connection, SqlFlavour};
+use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
+use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
 use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, migration_engine, UserFacingError};
@@ -78,9 +78,9 @@ impl SqlFlavour for PostgresFlavour {
         sql_schema_describer::postgres::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
             .await
-            .map_err(|err| match err {
-                SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
+            .map_err(|err| match err.into_kind() {
+                DescriberErrorKind::QuaintError(err) => {
+                    quaint_error_to_connector_error(err, connection.connection_info())
                 }
             })
     }

@@ -7,6 +7,7 @@ use std::{
     collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
 };
+use tracing::trace;
 
 /// Matches a default value in the schema, that is not a string.
 ///
@@ -43,19 +44,20 @@ static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('(.*)'\)").unwr
 /// ```
 static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
 
+#[derive(Debug)]
 pub struct SqlSchemaDescriber {
     conn: Quaint,
 }
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
-    async fn list_databases(&self) -> crate::SqlSchemaDescriberResult<Vec<String>> {
-        Ok(self.get_databases().await)
+    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
+        Ok(self.get_databases().await?)
     }
 
-    async fn get_metadata(&self, schema: &str) -> crate::SqlSchemaDescriberResult<SQLMetadata> {
-        let table_count = self.get_table_names(schema).await.len();
-        let size_in_bytes = self.get_size(schema).await;
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata> {
+        let table_count = self.get_table_names(schema).await?.len();
+        let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SQLMetadata {
             table_count,
@@ -63,14 +65,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         })
     }
 
-    async fn describe(&self, schema: &str) -> crate::SqlSchemaDescriberResult<crate::SqlSchema> {
-        debug!("describing schema '{}'", schema);
+    #[tracing::instrument]
+    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
+        let mut columns = self.get_all_columns(schema).await?;
+        let mut indexes = self.get_all_indices(schema).await?;
+        let mut foreign_keys = self.get_foreign_keys(schema).await?;
 
-        let mut columns = self.get_all_columns(schema).await;
-        let mut indexes = self.get_all_indices(schema).await;
-        let mut foreign_keys = self.get_foreign_keys(schema).await;
-
-        let table_names = self.get_table_names(schema).await;
+        let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
 
         for table_name in table_names {
@@ -85,9 +86,9 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         })
     }
 
-    async fn version(&self, schema: &str) -> crate::SqlSchemaDescriberResult<Option<String>> {
-        debug!("getting db version '{}'", schema);
-        Ok(self.conn.version().await.unwrap())
+    #[tracing::instrument]
+    async fn version(&self, schema: &str) -> DescriberResult<Option<String>> {
+        Ok(self.conn.version().await?)
     }
 }
 
@@ -96,22 +97,20 @@ impl SqlSchemaDescriber {
         Self { conn }
     }
 
-    async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting databases");
-
+    #[tracing::instrument]
+    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "SELECT name FROM sys.schemas";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names");
+        let rows = self.conn.query_raw(sql, &[]).await?;
 
         let names = rows.into_iter().map(|row| row.get_expect_string("name")).collect();
 
-        debug!("Found schema names: {:?}", names);
+        trace!("Found schema names: {:?}", names);
 
-        names
+        Ok(names)
     }
 
-    async fn get_table_names(&self, schema: &str) -> Vec<String> {
-        debug!("Getting table names");
-
+    #[tracing::instrument]
+    async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
         let select = r#"
             SELECT table_name
             FROM information_schema.tables t
@@ -124,25 +123,20 @@ impl SqlSchemaDescriber {
             ORDER BY table_name ASC
         "#;
 
-        let rows = self
-            .conn
-            .query_raw(select, &[schema.into()])
-            .await
-            .expect("get table names");
+        let rows = self.conn.query_raw(select, &[schema.into()]).await?;
 
         let names = rows
             .into_iter()
             .map(|row| row.get_expect_string("table_name"))
             .collect();
 
-        debug!("Found table names: {:?}", names);
+        trace!("Found table names: {:?}", names);
 
-        names
+        Ok(names)
     }
 
-    async fn get_size(&self, schema: &str) -> usize {
-        debug!("Getting db size");
-
+    #[tracing::instrument]
+    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
         let sql = r#"
             SELECT
                 SUM(a.total_pages) * 8000 AS size
@@ -160,14 +154,16 @@ impl SqlSchemaDescriber {
                 size DESC;
         "#;
 
-        let rows = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size");
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         let size: i64 = rows
             .into_single()
             .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
             .unwrap_or(0);
 
-        size.try_into().unwrap()
+        Ok(size
+            .try_into()
+            .expect("Invariant violation: size is not a valid usize value."))
     }
 
     fn get_table(
@@ -191,7 +187,7 @@ impl SqlSchemaDescriber {
         }
     }
 
-    async fn get_all_columns(&self, schema: &str) -> HashMap<String, Vec<Column>> {
+    async fn get_all_columns(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<Column>>> {
         let sql = r#"
             SELECT
                 column_name,
@@ -211,11 +207,7 @@ impl SqlSchemaDescriber {
 
         let mut map = HashMap::new();
 
-        let rows = self
-            .conn
-            .query_raw(sql, &[schema.into()])
-            .await
-            .expect("querying for columns");
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for col in rows {
             debug!("Got column: {:?}", col);
@@ -302,10 +294,13 @@ impl SqlSchemaDescriber {
             });
         }
 
-        map
+        Ok(map)
     }
 
-    async fn get_all_indices(&self, schema: &str) -> HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)> {
+    async fn get_all_indices(
+        &self,
+        schema: &str,
+    ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
         let mut map = HashMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
 
@@ -332,14 +327,10 @@ impl SqlSchemaDescriber {
             ORDER BY index_name, seq_in_index
         "#;
 
-        let rows = self
-            .conn
-            .query_raw(sql, &[schema.into()])
-            .await
-            .expect("querying for indices");
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for row in rows {
-            debug!("Got index row: {:#?}", row);
+            trace!("Got index row: {:#?}", row);
 
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
@@ -416,10 +407,10 @@ impl SqlSchemaDescriber {
             }
         }
 
-        map
+        Ok(map)
     }
 
-    async fn get_foreign_keys(&self, schema: &str) -> HashMap<String, Vec<ForeignKey>> {
+    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
         // Foreign keys covering multiple columns will return multiple rows, which we need to
         // merge.
         let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
@@ -461,11 +452,7 @@ impl SqlSchemaDescriber {
                 ordinal_position
         "#;
 
-        let result_set = self
-            .conn
-            .query_raw(sql, &[schema.into()])
-            .await
-            .expect("querying for foreign keys");
+        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for row in result_set.into_iter() {
             debug!("Got description FK row {:#?}", row);
@@ -527,7 +514,8 @@ impl SqlSchemaDescriber {
             };
         }
 
-        map.into_iter()
+        let fks = map
+            .into_iter()
             .map(|(k, v)| {
                 let mut fks: Vec<ForeignKey> = v.into_iter().map(|(_k, v)| v).collect();
 
@@ -535,7 +523,9 @@ impl SqlSchemaDescriber {
 
                 (k, fks)
             })
-            .collect()
+            .collect();
+
+        Ok(fks)
     }
 
     fn get_column_type(
