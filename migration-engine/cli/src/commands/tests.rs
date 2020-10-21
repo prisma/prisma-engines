@@ -1,11 +1,12 @@
 use super::CliError;
+use migration_core::GateKeeper;
 use quaint::{prelude::*, single::Quaint};
 use structopt::StructOpt;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
 async fn run(args: &[&str]) -> Result<String, CliError> {
     let cli = super::Cli::from_iter(std::iter::once(&"migration-engine-cli-test").chain(args.iter()));
-    cli.run_inner().await
+    cli.run_inner(GateKeeper::allow_all_whitelist()).await
 }
 
 fn postgres_url(db: Option<&str>) -> String {

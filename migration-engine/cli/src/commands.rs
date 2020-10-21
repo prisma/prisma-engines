@@ -18,8 +18,11 @@ pub(crate) struct Cli {
 }
 
 impl Cli {
-    pub(crate) async fn run(self) -> ! {
-        match std::panic::AssertUnwindSafe(self.run_inner()).catch_unwind().await {
+    pub(crate) async fn run(self, enabled_preview_features: Vec<String>) -> ! {
+        match std::panic::AssertUnwindSafe(self.run_inner(enabled_preview_features))
+            .catch_unwind()
+            .await
+        {
             Ok(Ok(msg)) => {
                 tracing::info!("{}", msg);
                 std::process::exit(0);
@@ -44,10 +47,10 @@ impl Cli {
         }
     }
 
-    pub(crate) async fn run_inner(self) -> Result<String, CliError> {
+    pub(crate) async fn run_inner(self, enabled_preview_features: Vec<String>) -> Result<String, CliError> {
         match self.command {
             CliCommand::CreateDatabase => create_database(&self.datasource).await,
-            CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
+            CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource, enabled_preview_features).await,
             CliCommand::DropDatabase => drop_database(&self.datasource).await,
             CliCommand::QeSetup => {
                 qe_setup(&self.datasource).await?;
@@ -69,9 +72,9 @@ enum CliCommand {
     QeSetup,
 }
 
-async fn connect_to_database(database_str: &str) -> Result<String, CliError> {
+async fn connect_to_database(database_str: &str, enabled_preview_features: Vec<String>) -> Result<String, CliError> {
     let datamodel = datasource_from_database_str(database_str)?;
-    migration_api(&datamodel).await?;
+    migration_api(&datamodel, enabled_preview_features).await?;
     Ok("Connection successful".to_owned())
 }
 

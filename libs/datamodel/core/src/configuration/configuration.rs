@@ -1,5 +1,6 @@
 use super::{Datasource, Generator};
 use crate::diagnostics::{DatamodelError, Diagnostics};
+use crate::preview_features::PreviewFeatures;
 
 pub struct Configuration {
     pub generators: Vec<Generator>,
@@ -17,5 +18,11 @@ impl Configuration {
         } else {
             Ok(self)
         }
+    }
+
+    pub fn preview_features(&self) -> impl Iterator<Item = &str> {
+        self.generators
+            .iter()
+            .flat_map(|generator| generator.preview_features().iter().map(|feat| feat.as_str()))
     }
 }

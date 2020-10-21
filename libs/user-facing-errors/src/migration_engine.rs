@@ -76,6 +76,21 @@ impl crate::UserFacingError for MigrationDoesNotApplyCleanly {
     }
 }
 
+#[derive(Debug, Serialize)]
+pub struct PreviewFeaturesBlocked {
+    pub features: Vec<String>,
+}
+
+impl crate::UserFacingError for PreviewFeaturesBlocked {
+    const ERROR_CODE: &'static str = "P3007";
+
+    fn message(&self) -> String {
+        format!(
+            "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations."
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
