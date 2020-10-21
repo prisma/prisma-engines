@@ -6,7 +6,7 @@ use crate::dml::ScalarType;
 use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
 use crate::{ast, configuration, dml, Field, FieldType};
-use datamodel_connector::error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
 
 /// Helper for lifting a datamodel.
@@ -259,17 +259,13 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
 
                 let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
 
-                // convert arguments to u32 if possible
+                // convert arguments to string if possible
                 let number_args = type_specification.map(|dir| dir.arguments.clone());
                 let args = if let Some(number) = number_args {
-                    let p = number
+                    number
                         .iter()
-                        .map(|arg| ValueValidator::new(&arg.value).as_int())
-                        .collect_vec();
-                    if let Some(error) = p.iter().find(|arg| arg.is_err()) {
-                        return Err(error.clone().err().unwrap());
-                    }
-                    p.iter().map(|arg| *arg.as_ref().unwrap() as u32).collect_vec()
+                        .map(|arg| ValueValidator::new(&arg.value).raw())
+                        .collect_vec()
                 } else {
                     vec![]
                 };
@@ -290,12 +286,25 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
 
                     let number_of_args = args.iter().count();
                     if number_of_args < constructor._number_of_args
-                        || number_of_args > constructor._number_of_args + constructor._number_of_optional_args
+                        || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
                     {
                         return Err(DatamodelError::new_argument_count_missmatch_error(
                             x,
                             constructor._number_of_args,
                             number_of_args,
+                            type_specification.unwrap().span,
+                        ));
+                    }
+                    if number_of_args > constructor._number_of_args + constructor._number_of_optional_args
+                        && constructor._number_of_optional_args > 0
+                    {
+                        return Err(DatamodelError::new_connector_error(
+                            &ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
+                                native_type: x.parse().unwrap(),
+                                optional_count: constructor._number_of_optional_args,
+                                given_count: number_of_args,
+                            })
+                            .to_string(),
                             type_specification.unwrap().span,
                         ));
                     }

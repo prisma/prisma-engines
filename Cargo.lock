@@ -861,6 +861,7 @@ name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "dml",
+ "itertools",
  "serde_json",
  "thiserror",
 ]

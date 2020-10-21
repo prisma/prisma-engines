@@ -1,4 +1,5 @@
-use datamodel_connector::error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
+use datamodel_connector::helper::parse_u32_arguments;
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
 use dml::native_type_constructor::NativeTypeConstructor;
@@ -146,84 +147,92 @@ impl Connector for PostgresDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+        let parsed_args = parse_u32_arguments(args)?;
+
         let constructor = self.find_native_type_constructor(name);
         let native_type = match name {
             SMALL_INT_TYPE_NAME => PostgresType::SmallInt,
             INTEGER_TYPE_NAME => PostgresType::Integer,
             BIG_INT_TYPE_NAME => PostgresType::BigInt,
-            DECIMAL_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    PostgresType::Decimal(*first_arg, *second_arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        DECIMAL_TYPE_NAME,
-                        args.len(),
-                        2,
-                    ));
-                }
-            }
-            NUMERIC_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    PostgresType::Numeric(*first_arg, *second_arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        NUMERIC_TYPE_NAME,
-                        args.len(),
-                        2,
-                    ));
-                }
-            }
+            DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
+                [scale, precision] => PostgresType::Decimal(*scale, *precision),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, parsed_args.len())),
+            },
+            NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
+                [scale, precision] => PostgresType::Numeric(*scale, *precision),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(NUMERIC_TYPE_NAME, 2, parsed_args.len())),
+            },
             REAL_TYPE_NAME => PostgresType::Real,
             DOUBLE_PRECISION_TYPE_NAME => PostgresType::DoublePrecision,
             SMALL_SERIAL_TYPE_NAME => PostgresType::SmallSerial,
             SERIAL_TYPE_NAME => PostgresType::Serial,
             BIG_SERIAL_TYPE_NAME => PostgresType::BigSerial,
-            VARCHAR_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    PostgresType::VarChar(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VARCHAR_TYPE_NAME,
-                        1,
-                        0,
-                    ));
-                }
-            }
-            CHAR_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    PostgresType::Char(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
-                }
-            }
+            VARCHAR_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::VarChar(*arg),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(VARCHAR_TYPE_NAME, 1, parsed_args.len())),
+            },
+            CHAR_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Char(*arg),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, parsed_args.len())),
+            },
             TEXT_TYPE_NAME => PostgresType::Text,
             BYTE_A_TYPE_NAME => PostgresType::ByteA,
-            TIMESTAMP_TYPE_NAME => PostgresType::Timestamp(args.first().cloned()),
-            TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimestampWithTimeZone(args.first().cloned()),
-            INTERVAL_TYPE_NAME => PostgresType::Interval(args.first().cloned()),
-            DATE_TYPE_NAME => PostgresType::Date,
-            TIME_TYPE_NAME => PostgresType::Time(args.first().cloned()),
-            TIME_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimeWithTimeZone(args.first().cloned()),
-            BOOLEAN_TYPE_NAME => PostgresType::Boolean,
-            BIT_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    PostgresType::Bit(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
-                }
-            }
-            VAR_BIT_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    PostgresType::VarBit(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_BIT_TYPE_NAME,
+            TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Timestamp(Option::Some(*arg)),
+                [] => PostgresType::Timestamp(None),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIMESTAMP_TYPE_NAME,
                         1,
-                        0,
-                    ));
+                        parsed_args.len(),
+                    ))
                 }
-            }
+            },
+            TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimestampWithTimeZone(parsed_args.first().cloned()),
+            INTERVAL_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Interval(Option::Some(*arg)),
+                [] => PostgresType::Interval(None),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        INTERVAL_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
+            },
+            DATE_TYPE_NAME => PostgresType::Date,
+            TIME_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Time(Option::Some(*arg)),
+                [] => PostgresType::Time(None),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIME_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
+            },
+            TIME_WITH_TIMEZONE_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::TimeWithTimeZone(Option::Some(*arg)),
+                [] => PostgresType::TimeWithTimeZone(None),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIME_WITH_TIMEZONE_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
+            },
+            BOOLEAN_TYPE_NAME => PostgresType::Boolean,
+            BIT_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::Bit(*arg),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(BIT_TYPE_NAME, 1, parsed_args.len())),
+            },
+            VAR_BIT_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => PostgresType::VarBit(*arg),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(VAR_BIT_TYPE_NAME, 1, parsed_args.len())),
+            },
             UUID_TYPE_NAME => PostgresType::UUID,
             XML_TYPE_NAME => PostgresType::Xml,
             JSON_TYPE_NAME => PostgresType::JSON,
@@ -233,7 +242,7 @@ impl Connector for PostgresDatamodelConnector {
 
         Ok(NativeTypeInstance::new(
             constructor.unwrap().name.as_str(),
-            args,
+            parsed_args,
             &native_type,
         ))
     }

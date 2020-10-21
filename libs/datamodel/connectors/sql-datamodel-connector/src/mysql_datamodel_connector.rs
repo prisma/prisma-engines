@@ -1,10 +1,12 @@
-use datamodel_connector::error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
+use datamodel_connector::helper::parse_u32_arguments;
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
 use native_types::MySqlType;
+use std::error;
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -175,7 +177,9 @@ impl Connector for MySqlDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+        let parsed_args = parse_u32_arguments(args)?;
+
         let constructor = self.find_native_type_constructor(name);
         let native_type = match name {
             INT_TYPE_NAME => MySqlType::Int,
@@ -188,77 +192,38 @@ impl Connector for MySqlDatamodelConnector {
             UNSIGNED_MEDIUM_INT_TYPE_NAME => MySqlType::UnsignedMediumInt,
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
             UNSIGNED_BIG_INT_TYPE_NAME => MySqlType::UnsignedBigInt,
-            DECIMAL_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    MySqlType::Decimal(*first_arg, *second_arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        DECIMAL_TYPE_NAME,
-                        2,
-                        args.len(),
-                    ));
-                }
-            }
-            NUMERIC_TYPE_NAME => {
-                if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    MySqlType::Numeric(*first_arg, *second_arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        NUMERIC_TYPE_NAME,
-                        2,
-                        args.len(),
-                    ));
-                }
-            }
+            DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
+                [scale, precision] => MySqlType::Decimal(*scale, *precision),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, parsed_args.len())),
+            },
+            NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
+                [scale, precision] => MySqlType::Numeric(*scale, *precision),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(NUMERIC_TYPE_NAME, 2, parsed_args.len())),
+            },
             FLOAT_TYPE_NAME => MySqlType::Float,
             DOUBLE_TYPE_NAME => MySqlType::Double,
-            BIT_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::Bit(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
+            BIT_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::Bit(*arg),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(BIT_TYPE_NAME, 1, parsed_args.len())),
+            },
+            CHAR_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::Char(*arg),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, parsed_args.len())),
+            },
+            VAR_CHAR_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::VarChar(*arg),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(VAR_CHAR_TYPE_NAME, 1, parsed_args.len())),
+            },
+            BINARY_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::Binary(*arg),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(BINARY_TYPE_NAME, 1, parsed_args.len())),
+            },
+            VAR_BINARY_TYPE_NAME => match parsed_args.as_slice() {
+                [arg] => MySqlType::VarBinary(*arg),
+                _ => {
+                    return Err(self.wrap_in_argument_count_mismatch_error(VAR_BINARY_TYPE_NAME, 1, parsed_args.len()))
                 }
-            }
-            CHAR_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::Char(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
-                }
-            }
-            VAR_CHAR_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::VarChar(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_CHAR_TYPE_NAME,
-                        1,
-                        0,
-                    ));
-                }
-            }
-            BINARY_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::Binary(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        BINARY_TYPE_NAME,
-                        1,
-                        0,
-                    ));
-                }
-            }
-            VAR_BINARY_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    MySqlType::VarBinary(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_BINARY_TYPE_NAME,
-                        1,
-                        0,
-                    ));
-                }
-            }
+            },
             TINY_BLOB_TYPE_NAME => MySqlType::TinyBlob,
             BLOB_TYPE_NAME => MySqlType::Blob,
             MEDIUM_BLOB_TYPE_NAME => MySqlType::MediumBlob,
@@ -268,9 +233,39 @@ impl Connector for MySqlDatamodelConnector {
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
-            TIME_TYPE_NAME => MySqlType::Time(args.first().cloned()),
-            DATETIME_TYPE_NAME => MySqlType::DateTime(args.first().cloned()),
-            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(args.first().cloned()),
+            TIME_TYPE_NAME => match parsed_args.as_slice() {
+                [fractions] => MySqlType::Time(Option::Some(*fractions)),
+                [] => MySqlType::Time(None),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIME_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
+            },
+            DATETIME_TYPE_NAME => match parsed_args.as_slice() {
+                [fractions] => MySqlType::DateTime(Option::Some(*fractions)),
+                [] => MySqlType::DateTime(None),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        DATETIME_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
+            },
+            TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
+                [fractions] => MySqlType::Timestamp(Option::Some(*fractions)),
+                [] => MySqlType::Timestamp(None),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIMESTAMP_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
+            },
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
             x => unreachable!(format!(
@@ -281,7 +276,7 @@ impl Connector for MySqlDatamodelConnector {
 
         Ok(NativeTypeInstance::new(
             constructor.unwrap().name.as_str(),
-            args,
+            parsed_args,
             &native_type,
         ))
     }
