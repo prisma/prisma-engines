@@ -229,13 +229,14 @@ impl SqlRenderer for SqliteFlavour {
         ]
     }
 
-    fn render_redefine_tables(&self, tables: &[String], differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, tables: &[AlterTable], differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
         let mut result: Vec<String> = Vec::new();
 
         result.push("PRAGMA foreign_keys=OFF".to_string());
 
-        for table_name in tables {
+        for table in tables {
+            let table_name = &table.table.name;
             let differ = differ
                 .diff_table(table_name)
                 .expect("Invariant violation: diffing unknown table.");

@@ -131,7 +131,7 @@ impl SqlRenderer for MysqlFlavour {
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name }) => {
+                TableChange::DropColumn(DropColumn { name, .. }) => {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
@@ -146,7 +146,7 @@ impl SqlRenderer for MysqlFlavour {
                         .diff_column(column_name)
                         .expect("AlterColumn on unknown column.");
 
-                    let expanded = expand_mysql_alter_column(&columns, &changes);
+                    let expanded = expand_mysql_alter_column((&columns.previous, &columns.next), &changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
@@ -329,7 +329,7 @@ impl SqlRenderer for MysqlFlavour {
         vec![format!("DROP TABLE {}", self.quote(&table_name))]
     }
 
-    fn render_redefine_tables(&self, _names: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[AlterTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on MySQL")
     }
 

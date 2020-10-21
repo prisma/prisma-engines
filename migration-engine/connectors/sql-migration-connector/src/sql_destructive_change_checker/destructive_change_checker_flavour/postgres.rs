@@ -11,13 +11,13 @@ use crate::{
     sql_schema_differ::ColumnChanges,
     sql_schema_differ::ColumnDiffer,
 };
-use sql_schema_describer::{ColumnArity, DefaultValue};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnArity, DefaultValue};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: &ColumnDiffer<'_>,
+        (previous, next): (&ColumnWalker<'_>, &ColumnWalker<'_>),
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -27,26 +27,24 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             type_change,
         } = alter_column;
 
-        let steps = expand_postgres_alter_column(columns, changes);
+        let steps = expand_postgres_alter_column((previous, next), changes);
 
         for step in steps {
             // We keep the match here to keep the exhaustiveness checking for when we add variants.
             match step {
                 PostgresAlterColumn::SetNotNull => plan.push_unexecutable(
                     UnexecutableStepCheck::MadeOptionalFieldRequired {
-                        column: columns.previous.name().to_owned(),
-                        table: columns.previous.table().name().to_owned(),
+                        column: previous.name().to_owned(),
+                        table: previous.table().name().to_owned(),
                     },
                     step_index,
                 ),
                 PostgresAlterColumn::SetType(_) => {
-                    if !matches!(columns.previous.arity(), ColumnArity::List)
-                        && matches!(columns.next.arity(), ColumnArity::List)
-                    {
+                    if !matches!(previous.arity(), ColumnArity::List) && matches!(next.arity(), ColumnArity::List) {
                         plan.push_unexecutable(
                             UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-                                table: columns.previous.table().name().to_owned(),
-                                column: columns.previous.name().to_owned(),
+                                table: previous.table().name().to_owned(),
+                                column: previous.name().to_owned(),
                             },
                             step_index,
                         )
@@ -57,10 +55,10 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                             Some(ColumnTypeChange::RiskyCast) => {
                                 plan.push_warning(
                                     SqlMigrationWarningCheck::RiskyCast {
-                                        table: columns.previous.table().name().to_owned(),
-                                        column: columns.previous.name().to_owned(),
-                                        previous_type: format!("{:?}", columns.previous.column_type_family()),
-                                        next_type: format!("{:?}", columns.next.column_type_family()),
+                                        table: previous.table().name().to_owned(),
+                                        column: previous.name().to_owned(),
+                                        previous_type: format!("{:?}", previous.column_type_family()),
+                                        next_type: format!("{:?}", next.column_type_family()),
                                     },
                                     step_index,
                                 );

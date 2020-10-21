@@ -25,7 +25,7 @@ pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavo
 
 use crate::{
     sql_migration::{AlterEnum, AlterTable, CreateIndex, DropTable, SqlMigrationStep, TableChange},
-    sql_schema_differ::{ColumnDiffer, TableDiffer},
+    sql_schema_differ::ColumnDiffer,
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
@@ -107,15 +107,12 @@ impl SqlMigrationConnector {
                                         .column(&alter_column.column_name)
                                         .expect("unsupported column renaming");
 
-                                    let differ = ColumnDiffer {
-                                        database_info: self.database_info(),
-                                        previous: previous_column,
-                                        next: next_column,
-                                        flavour: self.flavour(),
-                                    };
-
-                                    self.flavour()
-                                        .check_alter_column(&alter_column, &differ, &mut plan, step_index)
+                                    self.flavour().check_alter_column(
+                                        &alter_column,
+                                        (&previous_column, &next_column),
+                                        &mut plan,
+                                        step_index,
+                                    )
                                 }
                                 TableChange::AddColumn(ref add_column) => {
                                     let column = find_column(after, after_table.name(), &add_column.column.name)
@@ -134,11 +131,8 @@ impl SqlMigrationConnector {
                                     column_index: (previous_idx, next_idx),
                                     changes,
                                 } => {
-                                    let previous_column = before_table
-                                        .column_at(*previous_idx)
-                                        .expect("unsupported column renaming");
-                                    let next_column =
-                                        after_table.column_at(*next_idx).expect("unsupported column renaming");
+                                    let previous_column = before_table.column_at(*previous_idx);
+                                    let next_column = after_table.column_at(*next_idx);
 
                                     let differ = ColumnDiffer {
                                         database_info: self.database_info(),
@@ -155,18 +149,17 @@ impl SqlMigrationConnector {
                         }
                     }
                 }
-                SqlMigrationStep::RedefineTables { names } => {
-                    for name in names {
+                SqlMigrationStep::RedefineTables { tables } => {
+                    for table in tables {
+                        let name = &table.table.name;
                         let previous = before.table_walker(&name).expect("Redefining unknown table.");
                         let next = after.table_walker(&name).expect("Redefining unknown table.");
-                        let differ = TableDiffer {
-                            database_info: self.database_info(),
-                            flavour: self.flavour(),
-                            previous,
-                            next,
-                        };
 
-                        if differ.dropped_primary_key().is_some() {
+                        if table
+                            .changes
+                            .iter()
+                            .any(|change| matches!(change, TableChange::DropPrimaryKey { .. }))
+                        {
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: previous.name().to_owned(),
@@ -175,18 +168,32 @@ impl SqlMigrationConnector {
                             )
                         }
 
-                        for added_column in differ.added_columns() {
-                            self.check_add_column(&added_column, &mut plan, step_index);
+                        for add_column in table.changes.iter().filter_map(|change| change.as_add_column()) {
+                            let column_walker = next
+                                .column(&add_column.column.name)
+                                .expect("AddColumn for unknown column");
+                            self.check_add_column(&column_walker, &mut plan, step_index);
                         }
 
-                        for dropped_column in differ.dropped_columns() {
-                            self.check_column_drop(&dropped_column, &mut plan, step_index);
+                        for drop_column in table.changes.iter().filter_map(|change| change.as_drop_column()) {
+                            let column = previous.column_at(drop_column.index);
+                            self.check_column_drop(&column, &mut plan, step_index);
                         }
 
-                        for columns in differ.column_pairs() {
-                            let (changes, _) = columns.all_changes();
-                            self.flavour()
-                                .check_drop_and_recreate_column(&columns, &changes, &mut plan, step_index);
+                        for alter_column in table.changes.iter().filter_map(|change| change.as_alter_column()) {
+                            let previous_column = previous
+                                .column(&alter_column.column_name)
+                                .expect("AlterColumn on unknown column");
+                            let next_column = next
+                                .column(&alter_column.column_name)
+                                .expect("AlterColumn on unknown column");
+
+                            self.flavour().check_alter_column(
+                                &alter_column,
+                                (&previous_column, &next_column),
+                                &mut plan,
+                                step_index,
+                            );
                         }
                     }
                 }

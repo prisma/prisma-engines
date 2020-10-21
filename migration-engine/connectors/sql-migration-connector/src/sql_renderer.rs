@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 mod common;
 mod mssql_renderer;
 mod mysql_renderer;
@@ -73,7 +71,7 @@ pub(crate) trait SqlRenderer {
     }
 
     /// Render a `RedefineTables` step.
-    fn render_redefine_tables(&self, tables: &[String], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
+    fn render_redefine_tables(&self, tables: &[AlterTable], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
 
     /// Render a table renaming step.
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;
