@@ -5,11 +5,11 @@ use crate::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
-    sql_migration::expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-    sql_migration::AlterColumn,
-    sql_migration::ColumnTypeChange,
+    sql_migration::{
+        expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
+        AlterColumn, ColumnTypeChange,
+    },
     sql_schema_differ::ColumnChanges,
-    sql_schema_differ::ColumnDiffer,
 };
 use sql_schema_describer::{walkers::ColumnWalker, ColumnArity, DefaultValue};
 
@@ -76,38 +76,38 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        columns: &ColumnDiffer<'_>,
+        (previous_column, next_column): (&ColumnWalker<'_>, &ColumnWalker<'_>),
         changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
         // Unexecutable drop and recreate.
         if changes.arity_changed()
-            && columns.previous.arity().is_nullable()
-            && columns.next.arity().is_required()
-            && !default_can_be_rendered(columns.next.default())
+            && previous_column.arity().is_nullable()
+            && next_column.arity().is_required()
+            && !default_can_be_rendered(next_column.default())
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous.name().to_owned(),
-                    table: columns.previous.table().name().to_owned(),
+                    column: previous_column.name().to_owned(),
+                    table: previous_column.table().name().to_owned(),
                 },
                 step_index,
             )
         } else {
-            if columns.next.arity().is_required() && columns.next.default().is_none() {
+            if next_column.arity().is_required() && next_column.default().is_none() {
                 plan.push_unexecutable(
                     UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                        column: columns.previous.name().to_owned(),
-                        table: columns.previous.table().name().to_owned(),
+                        column: previous_column.name().to_owned(),
+                        table: previous_column.table().name().to_owned(),
                     },
                     step_index,
                 )
             } else {
                 plan.push_warning(
                     SqlMigrationWarningCheck::DropAndRecreateColumn {
-                        column: columns.previous.name().to_owned(),
-                        table: columns.previous.table().name().to_owned(),
+                        column: previous_column.name().to_owned(),
+                        table: previous_column.table().name().to_owned(),
                     },
                     step_index,
                 )

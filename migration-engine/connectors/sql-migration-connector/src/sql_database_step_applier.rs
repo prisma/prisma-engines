@@ -146,18 +146,18 @@ fn render_raw_sql(
     step: &SqlMigrationStep,
     renderer: &(dyn SqlFlavour + Send + Sync),
     database_info: &DatabaseInfo,
-    current_schema: &SqlSchema,
+    previous_schema: &SqlSchema,
     next_schema: &SqlSchema,
 ) -> Vec<String> {
     let differ = SqlSchemaDiffer {
-        previous: current_schema,
+        previous: previous_schema,
         next: next_schema,
         database_info,
         flavour: renderer,
     };
 
     match step {
-        SqlMigrationStep::RedefineTables { tables } => renderer.render_redefine_tables(tables, differ),
+        SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, differ),
         SqlMigrationStep::CreateEnum(create_enum) => renderer.render_create_enum(create_enum),
         SqlMigrationStep::DropEnum(drop_enum) => renderer.render_drop_enum(drop_enum),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
@@ -170,7 +170,10 @@ fn render_raw_sql(
             vec![renderer.render_create_table(&table)]
         }
         SqlMigrationStep::DropTable(DropTable { name }) => renderer.render_drop_table(name),
-        SqlMigrationStep::RenameTable { name, new_name } => vec![renderer.render_rename_table(name, new_name)],
+        SqlMigrationStep::RenameTable(previous_idx, next_idx) => vec![renderer.render_rename_table(
+            previous_schema.table_walker_at(*previous_idx).name(),
+            next_schema.table_walker_at(*next_idx).name(),
+        )],
         SqlMigrationStep::AddForeignKey(add_foreign_key) => {
             let foreign_key = next_schema
                 .table_walker_at(add_foreign_key.table_index)
@@ -182,7 +185,7 @@ fn render_raw_sql(
         SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(create_index)],
         SqlMigrationStep::DropIndex(drop_index) => vec![renderer.render_drop_index(drop_index)],
         SqlMigrationStep::AlterIndex(alter_index) => {
-            renderer.render_alter_index(alter_index, database_info, current_schema)
+            renderer.render_alter_index(alter_index, database_info, previous_schema)
         }
     }
 }

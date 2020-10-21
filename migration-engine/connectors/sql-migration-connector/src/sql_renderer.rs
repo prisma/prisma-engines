@@ -8,7 +8,9 @@ pub(crate) use common::IteratorJoin;
 
 use crate::{
     database_info::DatabaseInfo,
-    sql_migration::{AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex},
+    sql_migration::{
+        AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex, RedefineTable,
+    },
     sql_schema_differ::SqlSchemaDiffer,
 };
 use common::{Quoted, QuotedWithSchema};
@@ -71,7 +73,7 @@ pub(crate) trait SqlRenderer {
     }
 
     /// Render a `RedefineTables` step.
-    fn render_redefine_tables(&self, tables: &[AlterTable], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
+    fn render_redefine_tables(&self, tables: &[RedefineTable], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
 
     /// Render a table renaming step.
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;

@@ -41,8 +41,9 @@ pub enum SqlMigrationStep {
     AlterTable(AlterTable),
     DropForeignKey(DropForeignKey),
     DropTable(DropTable),
-    RenameTable { name: String, new_name: String },
-    RedefineTables { tables: Vec<AlterTable> },
+    /// Rename a table. (previous_table_index, next_table_index).
+    RenameTable(usize, usize),
+    RedefineTables(Vec<RedefineTable>),
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
     AlterIndex(AlterIndex),
@@ -84,6 +85,9 @@ pub struct DropTable {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AlterTable {
     pub table: Table,
+    /// Index in (previous_schema, next_schema).
+    #[serde(skip)]
+    pub table_index: (usize, usize),
     pub changes: Vec<TableChange>,
 }
 
@@ -107,29 +111,6 @@ pub enum TableChange {
     AddPrimaryKey {
         columns: Vec<String>,
     },
-}
-
-impl TableChange {
-    pub(crate) fn as_add_column(&self) -> Option<&AddColumn> {
-        match self {
-            TableChange::AddColumn(add_column) => Some(add_column),
-            _ => None,
-        }
-    }
-
-    pub(crate) fn as_alter_column(&self) -> Option<&AlterColumn> {
-        match self {
-            TableChange::AlterColumn(alter_column) => Some(alter_column),
-            _ => None,
-        }
-    }
-
-    pub(crate) fn as_drop_column(&self) -> Option<&DropColumn> {
-        match self {
-            TableChange::DropColumn(drop_column) => Some(drop_column),
-            _ => None,
-        }
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -218,5 +199,30 @@ pub struct AlterEnum {
 impl AlterEnum {
     pub(crate) fn is_empty(&self) -> bool {
         self.created_variants.is_empty() && self.dropped_variants.is_empty()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct RedefineTable {
+    #[serde(skip)]
+    pub added_columns: Vec<usize>,
+    #[serde(skip)]
+    pub dropped_columns: Vec<usize>,
+    #[serde(skip)]
+    pub columns_that_became_required_with_a_default: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
+    #[serde(skip)]
+    pub dropped_primary_key: bool,
+    #[serde(skip)]
+    pub other_columns: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
+    pub table_index: (usize, usize),
+}
+
+impl RedefineTable {
+    pub(crate) fn intersection_columns(
+        &self,
+    ) -> impl Iterator<Item = &(usize, usize, ColumnChanges, Option<ColumnTypeChange>)> {
+        self.columns_that_became_required_with_a_default
+            .iter()
+            .chain(self.other_columns.iter())
     }
 }

@@ -7,7 +7,6 @@ use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
 use native_types::MySqlType;
-use std::error;
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";

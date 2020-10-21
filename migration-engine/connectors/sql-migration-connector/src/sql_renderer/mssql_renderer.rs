@@ -4,7 +4,7 @@ use crate::{
     flavour::MssqlFlavour,
     sql_migration::{
         AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, TableChange,
+        DropForeignKey, DropIndex, RedefineTable, TableChange,
     },
     sql_schema_differ::SqlSchemaDiffer,
 };
@@ -31,7 +31,13 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable { table, changes } = alter_table;
+        let AlterTable {
+            table,
+            table_index: (_, next_idx),
+            changes,
+        } = alter_table;
+
+        let next_table = differ.next.table_walker_at(*next_idx);
 
         let mut lines = Vec::new();
 
@@ -46,12 +52,8 @@ impl SqlRenderer for MssqlFlavour {
                     lines.push(format!("ADD PRIMARY KEY ({})", columns));
                 }
                 TableChange::AddColumn(AddColumn { column }) => {
-                    let column = differ
-                        .next
-                        .table_walker(&table.name)
-                        .expect("Invariant violation: add column on unknown table")
-                        .columns()
-                        .find(|col| col.name() == column.name)
+                    let column = next_table
+                        .column(&column.name)
                         .expect("Invariant violation: add column with unknown column");
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
@@ -278,7 +280,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_redefine_tables(&self, _tables: &[AlterTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _tables: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on MSSQL")
     }
 

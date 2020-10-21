@@ -1,7 +1,9 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::PostgresFlavour, sql_migration::AlterEnum, sql_schema_differ::column::ColumnTypeChange,
-    sql_schema_differ::ColumnDiffer, sql_schema_differ::SqlSchemaDiffer,
+    flavour::PostgresFlavour,
+    sql_migration::AlterEnum,
+    sql_schema_differ::column::{ColumnDiffer, ColumnTypeChange},
+    sql_schema_differ::SqlSchemaDiffer,
 };
 use once_cell::sync::Lazy;
 use regex::RegexSet;

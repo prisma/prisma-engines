@@ -6,7 +6,7 @@ use crate::{
         warning_check::SqlMigrationWarningCheck,
     },
     sql_migration::{AlterColumn, ColumnTypeChange},
-    sql_schema_differ::{ColumnChanges, ColumnDiffer},
+    sql_schema_differ::ColumnChanges,
 };
 use sql_schema_describer::walkers::ColumnWalker;
 
@@ -66,7 +66,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        _columns: &ColumnDiffer<'_>,
+        _columns: (&ColumnWalker<'_>, &ColumnWalker<'_>),
         _changes: &ColumnChanges,
         _plan: &mut DestructiveCheckPlan,
         _step_index: usize,

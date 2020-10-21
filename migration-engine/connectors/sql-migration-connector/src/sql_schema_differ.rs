@@ -4,24 +4,25 @@ mod index;
 mod sql_schema_differ_flavour;
 mod table;
 
-pub(crate) use column::{ColumnChange, ColumnChanges, ColumnDiffer, ColumnTypeChange};
+pub(crate) use column::{ColumnChange, ColumnChanges};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
-pub(crate) use table::TableDiffer;
 
 use crate::{
     sql_migration::{
-        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, CreateTable,
-        DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, SqlMigrationStep, TableChange,
+        self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex,
+        CreateTable, DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep,
+        TableChange,
     },
     wrap_as_step, DatabaseInfo, SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
 };
+use column::ColumnTypeChange;
 use enums::EnumDiffer;
 use sql_schema_describer::{
-    walkers::{ForeignKeyWalker, TableWalker},
-    *,
+    walkers::{ForeignKeyWalker, SqlSchemaExt, TableWalker},
+    Enum,
 };
 use std::collections::HashSet;
-use walkers::SqlSchemaExt;
+use table::TableDiffer;
 
 #[derive(Debug)]
 pub(crate) struct SqlSchemaDiffer<'a> {
@@ -33,20 +34,20 @@ pub(crate) struct SqlSchemaDiffer<'a> {
 
 #[derive(Debug)]
 pub struct SqlSchemaDiff {
-    pub add_foreign_keys: Vec<AddForeignKey>,
-    pub drop_foreign_keys: Vec<DropForeignKey>,
-    pub drop_tables: Vec<DropTable>,
-    pub create_tables: Vec<CreateTable>,
-    pub alter_tables: Vec<AlterTable>,
-    pub create_indexes: Vec<CreateIndex>,
-    pub drop_indexes: Vec<DropIndex>,
-    pub alter_indexes: Vec<AlterIndex>,
-    pub create_enums: Vec<CreateEnum>,
-    pub drop_enums: Vec<DropEnum>,
-    pub alter_enums: Vec<AlterEnum>,
+    add_foreign_keys: Vec<AddForeignKey>,
+    drop_foreign_keys: Vec<DropForeignKey>,
+    drop_tables: Vec<DropTable>,
+    create_tables: Vec<CreateTable>,
+    alter_tables: Vec<AlterTable>,
+    create_indexes: Vec<CreateIndex>,
+    drop_indexes: Vec<DropIndex>,
+    alter_indexes: Vec<AlterIndex>,
+    create_enums: Vec<CreateEnum>,
+    drop_enums: Vec<DropEnum>,
+    alter_enums: Vec<AlterEnum>,
     /// The names of the tables to redefine.
     tables_to_redefine: HashSet<String>,
-    redefine_tables: Vec<AlterTable>,
+    redefine_tables: Vec<RedefineTable>,
 }
 
 impl SqlSchemaDiff {
@@ -55,7 +56,7 @@ impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
         let redefine_tables = Some(self.redefine_tables)
             .filter(|tables| !tables.is_empty())
-            .map(|tables| SqlMigrationStep::RedefineTables { tables });
+            .map(SqlMigrationStep::RedefineTables);
 
         wrap_as_step(self.create_enums, SqlMigrationStep::CreateEnum)
             .chain(wrap_as_step(self.alter_enums, SqlMigrationStep::AlterEnum))
@@ -197,6 +198,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     .filter(|changes| !changes.is_empty())
                     .map(|changes| AlterTable {
                         table: tables.next.table().clone(),
+                        table_index: (tables.previous.table_index(), tables.next.table_index()),
                         changes,
                     })
             })
@@ -377,22 +379,43 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         self.flavour.alter_enums(self)
     }
 
-    fn redefine_tables(&self, tables_to_redefine: &HashSet<String>) -> Vec<AlterTable> {
+    fn redefine_tables(&self, tables_to_redefine: &HashSet<String>) -> Vec<RedefineTable> {
         self.table_pairs()
             .filter(|tables| tables_to_redefine.contains(tables.next.name()))
             .map(|tables| {
-                // Order matters.
-                let changes: Vec<TableChange> = SqlSchemaDiffer::drop_primary_key(&tables)
-                    .into_iter()
-                    .chain(SqlSchemaDiffer::drop_columns(&tables))
-                    .chain(SqlSchemaDiffer::add_columns(&tables))
-                    .chain(SqlSchemaDiffer::alter_columns(&tables))
-                    .chain(SqlSchemaDiffer::add_primary_key(&tables))
-                    .collect();
+                let mut other_columns = Vec::new();
+                let mut columns_that_became_required_with_a_default = Vec::new();
 
-                AlterTable {
-                    table: tables.next.table().clone(),
-                    changes,
+                for columns in tables.column_pairs() {
+                    let (changes, type_change) = columns.all_changes();
+                    let item = (
+                        columns.previous.column_index(),
+                        columns.next.column_index(),
+                        changes.clone(),
+                        type_change.map(|tc| match tc {
+                            ColumnTypeChange::SafeCast => sql_migration::ColumnTypeChange::SafeCast,
+                            ColumnTypeChange::RiskyCast => sql_migration::ColumnTypeChange::RiskyCast,
+                            ColumnTypeChange::NotCastable => {
+                                unreachable!("ColumnTypeChange::NotCastable in redefine_tables")
+                            }
+                        }),
+                    );
+
+                    if changes.arity_changed() && columns.next.arity().is_required() && columns.next.default().is_some()
+                    {
+                        columns_that_became_required_with_a_default.push(item);
+                    } else {
+                        other_columns.push(item);
+                    }
+                }
+
+                RedefineTable {
+                    table_index: (tables.previous.table_index(), tables.next.table_index()),
+                    dropped_primary_key: SqlSchemaDiffer::drop_primary_key(&tables).is_some(),
+                    added_columns: tables.added_columns().map(|col| col.column_index()).collect(),
+                    dropped_columns: tables.dropped_columns().map(|col| col.column_index()).collect(),
+                    other_columns,
+                    columns_that_became_required_with_a_default,
                 }
             })
             .collect()

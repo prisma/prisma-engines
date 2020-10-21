@@ -80,9 +80,9 @@ async fn schema_push_warns_about_destructive_changes(api: &TestApi) -> TestResul
         .await?;
 
     let dm2 = r#"
-    model Cat {
-        id Int @id
-    }
+        model Cat {
+            id Int @id
+        }
     "#;
 
     let expected_warning = "You are about to drop the `Box` table, which is not empty (1 rows).";
