@@ -85,8 +85,11 @@ impl crate::UserFacingError for PreviewFeaturesBlocked {
     const ERROR_CODE: &'static str = "P3007";
 
     fn message(&self) -> String {
+        let blocked: Vec<_> = self.features.iter().map(|s| format!("`{}`", s)).collect();
+
         format!(
-            "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations."
+            "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: {})",
+            blocked.join(", "),
         )
     }
 }

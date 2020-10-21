@@ -505,7 +505,7 @@ async fn microsoft_sql_server_is_not_allowed_in_migration_engine() {
 
     let expected = json!({
         "is_panic": false,
-        "message": "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations.",
+        "message": "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: `microsoftSqlServer`)",
         "meta": {
             "features": ["microsoftSqlServer"]
         },
@@ -543,7 +543,7 @@ async fn native_types_are_not_allowed_in_migration_engine() {
 
     let expected = json!({
         "is_panic": false,
-        "message": "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations.",
+        "message": "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: `nativeTypes`)",
         "meta": {
             "features": ["nativeTypes"]
         },
