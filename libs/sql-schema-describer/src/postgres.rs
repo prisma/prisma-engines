@@ -173,41 +173,23 @@ impl SqlSchemaDescriber {
         for col in rows {
             debug!("Got column: {:?}", col);
             let table_name = col.get_expect_string("table_name");
-            let col_name = col.get_expect_string("column_name");
-            let data_type = col.get_expect_string("data_type");
-            let full_data_type = col.get_expect_string("full_data_type");
+            let name = col.get_expect_string("column_name");
+
             let is_identity_str = col.get_expect_string("is_identity").to_lowercase();
-            let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
 
             let is_identity = match is_identity_str.as_str() {
                 "no" => false,
                 "yes" => true,
                 _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
             };
-            let is_required = match is_nullable.as_ref() {
-                "no" => true,
-                "yes" => false,
-                x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
-            };
 
-            let arity = if data_type == "ARRAY" {
-                ColumnArity::List
-            } else if is_required {
-                ColumnArity::Required
-            } else {
-                ColumnArity::Nullable
-            };
-
-            let precision = SqlSchemaDescriber::get_precision(&col);
-
-            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums, precision);
-
-            let default = get_default_value(schema, col, &table_name, &col_name, &tpe);
+            let tpe = get_column_type(&col, enums);
+            let default = get_default_value(schema, &col, &tpe);
 
             let auto_increment = is_identity || matches!(default, Some(DefaultValue::SEQUENCE(_)));
 
             let col = Column {
-                name: col_name,
+                name,
                 tpe,
                 default,
                 auto_increment,
@@ -227,6 +209,19 @@ impl SqlSchemaDescriber {
         let numeric_precision_radix = col.get_u32("numeric_precision_radix");
         let numeric_scale = col.get_u32("numeric_scale");
         let time_precision = col.get_u32("datetime_precision");
+        let formatted_type = col.get_string("formatted_type");
+
+        let col_name = col.get_expect_string("column_name");
+        println!("{:?}", col_name);
+        println!("CharMaxLength {:?}", character_maximum_length);
+        println!("NumPrecision {:?}", numeric_precision);
+        println!("TimePrecision {:?}", time_precision);
+        println!("Formatted {:?}", formatted_type);
+
+        // needs to handle
+        //numeric numeric(42,0)[]
+        //varchar character varying(42)[]
+        //time timestamp(4) without time zone[]
 
         Precision {
             character_maximum_length,
@@ -552,13 +547,9 @@ struct IndexRow {
     sequence_name: Option<String>,
 }
 
-fn get_default_value(
-    schema: &str,
-    col: ResultRow,
-    table_name: &String,
-    col_name: &String,
-    tpe: &ColumnType,
-) -> Option<DefaultValue> {
+fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<DefaultValue> {
+    let table_name = col.get_expect_string("table_name");
+    let col_name = col.get_expect_string("column_name");
     match col.get("column_default") {
         None => None,
         Some(param_value) => match param_value.to_string() {
@@ -630,20 +621,31 @@ fn get_default_value(
     }
 }
 
-fn get_column_type<'a>(
-    data_type: &str,
-    full_data_type: &'a str,
-    arity: ColumnArity,
-    enums: &[Enum],
-    precision: Precision,
-) -> ColumnType {
+fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     use ColumnTypeFamily::*;
-    let trim = |name: &'a str| name.trim_start_matches('_');
-    let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
+    let data_type = row.get_expect_string("data_type");
+    let full_data_type = row.get_expect_string("full_data_type");
+    let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
+        "no" => true,
+        "yes" => false,
+        x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+    };
 
-    let (family, native_type) = match full_data_type {
-        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), None),
-        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => (Enum(trim(x).to_owned()), None),
+    let arity = match matches!(data_type.as_str(), "ARRAY") {
+        true => ColumnArity::List,
+        false if is_required => ColumnArity::Required,
+        false => ColumnArity::Nullable,
+    };
+
+    let precision = SqlSchemaDescriber::get_precision(&row);
+    let unsupported = || (Unsupported(full_data_type.clone()), None);
+    let enum_exists = |name| enums.iter().any(|e| e.name == name);
+
+    let (family, native_type) = match full_data_type.as_str() {
+        name if data_type == "USER-DEFINED" && enum_exists(name) => (Enum(name.to_owned()), None),
+        name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
+            (Enum(name.trim_start_matches('_').to_owned()), None)
+        }
         "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
         "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
         "int8" | "_int8" => (Int, Some(PostgresType::BigInt)),
@@ -672,7 +674,7 @@ fn get_column_type<'a>(
             )),
         ),
         "money" | "_money" => (Float, None),
-        "pg_lsn" | "_pg_lsn" => (Unsupported(full_data_type.into()), None),
+        "pg_lsn" | "_pg_lsn" => unsupported(),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision()))),
         "timetz" | "_timetz" => (
             DateTime,
@@ -684,18 +686,18 @@ fn get_column_type<'a>(
             DateTime,
             Some(PostgresType::TimestampWithTimeZone(precision.time_precision())),
         ),
-        "tsquery" | "_tsquery" => (Unsupported(full_data_type.into()), None),
-        "tsvector" | "_tsvector" => (Unsupported(full_data_type.into()), None),
-        "txid_snapshot" | "_txid_snapshot" => (Unsupported(full_data_type.into()), None),
+        "tsquery" | "_tsquery" => unsupported(),
+        "tsvector" | "_tsvector" => unsupported(),
+        "txid_snapshot" | "_txid_snapshot" => unsupported(),
         "inet" | "_inet" => (String, None),
         //geometric
-        "box" | "_box" => (Unsupported(full_data_type.into()), None),
-        "circle" | "_circle" => (Unsupported(full_data_type.into()), None),
-        "line" | "_line" => (Unsupported(full_data_type.into()), None),
-        "lseg" | "_lseg" => (Unsupported(full_data_type.into()), None),
-        "path" | "_path" => (Unsupported(full_data_type.into()), None),
-        "polygon" | "_polygon" => (Unsupported(full_data_type.into()), None),
-        _ => (Unsupported(full_data_type.into()), None),
+        "box" | "_box" => unsupported(),
+        "circle" | "_circle" => unsupported(),
+        "line" | "_line" => unsupported(),
+        "lseg" | "_lseg" => unsupported(),
+        "path" | "_path" => unsupported(),
+        "polygon" | "_polygon" => unsupported(),
+        _ => unsupported(),
     };
 
     ColumnType {

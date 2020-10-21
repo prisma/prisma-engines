@@ -116,6 +116,16 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
             migration.create_table("Blog", move |t| {
                 t.inject_custom("id Integer Primary Key");
                 t.inject_custom("decimal_array Decimal(42,0)[] ");
+                t.inject_custom("numeric_array Numeric(4, 2)[] ");
+                t.inject_custom("varchar_array Varchar(42)[] ");
+                t.inject_custom("char_array Char(200)[] ");
+                t.inject_custom("bit_array Bit(20)[] ");
+                t.inject_custom("varbit_array Varbit(2)[] ");
+                t.inject_custom("timestamp_array Timestamp(4)[] ");
+                t.inject_custom("timestamptz_array Timestamptz(4)[] ");
+                t.inject_custom("time_array Time(4)[] ");
+                t.inject_custom("timetz_array Timetz(3)[] ");
+                t.inject_custom("interval_array Interval(1)[] ");
             });
         })
         .await?;
