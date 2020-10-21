@@ -1,6 +1,6 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
-use dml::field::Field;
+use dml::field::{Field, FieldType};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
@@ -124,7 +124,21 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
-    fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
+        if let FieldType::NativeType(_scalar_type, native_type) = field.field_type() {
+            let native_type_name = native_type.name.as_str();
+            if native_type_name == DECIMAL_TYPE_NAME || native_type_name == NUMERIC_TYPE_NAME {
+                match native_type.args.as_slice() {
+                    [precision, scale] if scale > precision => {
+                        return Err(ConnectorError::new_scale_larger_than_precision_error(
+                            native_type_name,
+                            "Postgres",
+                        ));
+                    }
+                    _ => {}
+                }
+            }
+        }
         Ok(())
     }
 
