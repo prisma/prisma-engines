@@ -1,6 +1,8 @@
 //! Postgres description.
 use super::*;
+use crate::getters::Getter;
 use native_types::{NativeType, PostgresType};
+use quaint::connector::ResultRow;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
@@ -66,11 +68,7 @@ impl SqlSchemaDescriber {
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
-            .map(|row| {
-                row.get("schema_name")
-                    .and_then(|x| x.to_string())
-                    .expect("convert schema names")
-            })
+            .map(|row| row.get_expect_string("schema_name"))
             .collect();
 
         debug!("Found schema names: {:?}", names);
@@ -91,11 +89,7 @@ impl SqlSchemaDescriber {
             .expect("get table names ");
         let names = rows
             .into_iter()
-            .map(|row| {
-                row.get("table_name")
-                    .and_then(|x| x.to_string())
-                    .expect("get table name")
-            })
+            .map(|row| row.get_expect_string("table_name"))
             .collect();
 
         debug!("Found table names: {:?}", names);
@@ -108,11 +102,13 @@ impl SqlSchemaDescriber {
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
              FROM pg_tables
              WHERE schemaname = $1::text";
-        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
-        let size: i64 = result
-            .first()
-            .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
-            .unwrap();
+        let mut result_iter = self
+            .conn
+            .query_raw(sql, &[schema.into()])
+            .await
+            .expect("get db size ")
+            .into_iter();
+        let size: i64 = result_iter.next().and_then(|row| row.get_i64("size")).unwrap_or(0);
 
         debug!("Found db size: {:?}", size);
         size.try_into().unwrap()
@@ -150,7 +146,6 @@ impl SqlSchemaDescriber {
                 column_default,
                 is_nullable,
                 is_identity,
-                data_type,
                 character_maximum_length,
                 numeric_precision,
                 numeric_scale,
@@ -169,34 +164,18 @@ impl SqlSchemaDescriber {
 
         for col in rows {
             debug!("Got column: {:?}", col);
-            let table_name = col
-                .get("table_name")
-                .and_then(|x| x.to_string())
-                .expect("get table name");
-            let col_name = col
-                .get("column_name")
-                .and_then(|x| x.to_string())
-                .expect("get column name");
-            let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
-            let full_data_type = col
-                .get("full_data_type")
-                .and_then(|x| x.to_string())
-                .expect("get full_data_type aka udt_name");
-            let is_identity_str = col
-                .get("is_identity")
-                .and_then(|x| x.to_string())
-                .expect("get is_identity")
-                .to_lowercase();
+            let table_name = col.get_expect_string("table_name");
+            let col_name = col.get_expect_string("column_name");
+            let data_type = col.get_expect_string("data_type");
+            let full_data_type = col.get_expect_string("full_data_type");
+            let is_identity_str = col.get_expect_string("is_identity").to_lowercase();
+            let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
+
             let is_identity = match is_identity_str.as_str() {
                 "no" => false,
                 "yes" => true,
                 _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
             };
-            let is_nullable = col
-                .get("is_nullable")
-                .and_then(|x| x.to_string())
-                .expect("get is_nullable")
-                .to_lowercase();
             let is_required = match is_nullable.as_ref() {
                 "no" => true,
                 "yes" => false,
@@ -211,98 +190,11 @@ impl SqlSchemaDescriber {
                 ColumnArity::Nullable
             };
 
-            let character_maximum_length = col
-                .get("character_maximum_length")
-                .and_then(|x| x.as_i64().map(|x| x as u32));
-            let numeric_precision = col.get("numeric_precision").and_then(|x| x.as_i64().map(|x| x as u32));
-            let numeric_precision_radix = col
-                .get("numeric_precision_radix")
-                .and_then(|x| x.as_i64().map(|x| x as u32));
-            let numeric_scale = col.get("numeric_scale").and_then(|x| x.as_i64().map(|x| x as u32));
-            let time_precision = col.get("datetime_precision").and_then(|x| x.as_i64().map(|x| x as u32));
-
-            let precision = Precision {
-                character_maximum_length,
-                numeric_precision,
-                numeric_precision_radix,
-                numeric_scale,
-                time_precision,
-            };
+            let precision = SqlSchemaDescriber::get_precision(&col);
 
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums, precision);
 
-            let default = match col.get("column_default") {
-                None => None,
-                Some(param_value) => match param_value.to_string() {
-                    None => None,
-                    Some(x) if x.starts_with("NULL") => None,
-                    Some(default_string) => {
-                        Some(match &tpe.family {
-                            ColumnTypeFamily::Int => match parse_int(&default_string) {
-                                Some(int_value) => DefaultValue::VALUE(int_value),
-                                None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
-                                    true => DefaultValue::SEQUENCE(default_string),
-                                    false => DefaultValue::DBGENERATED(default_string),
-                                },
-                            },
-                            ColumnTypeFamily::Float => match parse_float(&default_string) {
-                                Some(float_value) => DefaultValue::VALUE(float_value),
-                                None => DefaultValue::DBGENERATED(default_string),
-                            },
-                            ColumnTypeFamily::Decimal => match parse_float(&default_string) {
-                                Some(float_value) => DefaultValue::VALUE(float_value),
-                                None => DefaultValue::DBGENERATED(default_string),
-                            },
-                            ColumnTypeFamily::Boolean => match parse_bool(&default_string) {
-                                Some(bool_value) => DefaultValue::VALUE(bool_value),
-                                None => DefaultValue::DBGENERATED(default_string),
-                            },
-                            ColumnTypeFamily::String => {
-                                match unsuffix_default_literal(&default_string, &data_type, &full_data_type) {
-                                    Some(default_literal) => DefaultValue::VALUE(PrismaValue::String(
-                                        process_string_literal(default_literal.as_ref()).into(),
-                                    )),
-                                    None => DefaultValue::DBGENERATED(default_string),
-                                }
-                            }
-                            ColumnTypeFamily::DateTime => {
-                                match default_string.to_lowercase().as_str() {
-                                    "now()" | "current_timestamp" => DefaultValue::NOW,
-                                    _ => DefaultValue::DBGENERATED(default_string), //todo parse values
-                                }
-                            }
-                            ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
-                            // JSON/JSONB defaults come in the '{}'::jsonb form.
-                            ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
-                                .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
-                                .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
-                                .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
-                            // XML defaults come in the '<...>...</...>'::xml form.
-                            ColumnTypeFamily::Xml => unsuffix_default_literal(&default_string, "xml", "xml")
-                                .map(|default| DefaultValue::VALUE(PrismaValue::Xml(unquote_string(&default))))
-                                .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
-                            ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Enum(enum_name) => {
-                                let enum_suffix_without_quotes = format!("::{}", enum_name);
-                                let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
-                                if default_string.ends_with(&enum_suffix_with_quotes) {
-                                    DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
-                                        &default_string.replace(&enum_suffix_with_quotes, ""),
-                                    )))
-                                } else if default_string.ends_with(&enum_suffix_without_quotes) {
-                                    DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
-                                        &default_string.replace(&enum_suffix_without_quotes, ""),
-                                    )))
-                                } else {
-                                    DefaultValue::DBGENERATED(default_string)
-                                }
-                            }
-                            ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
-                        })
-                    }
-                },
-            };
+            let default = get_default_value(schema, col, &table_name, &col_name, &tpe);
 
             let auto_increment = is_identity || matches!(default, Some(DefaultValue::SEQUENCE(_)));
 
@@ -319,6 +211,22 @@ impl SqlSchemaDescriber {
         debug!("Found table columns: {:?}", columns);
 
         columns
+    }
+
+    fn get_precision(col: &ResultRow) -> Precision {
+        let character_maximum_length = col.get_u32("character_maximum_length");
+        let numeric_precision = col.get_u32("numeric_precision");
+        let numeric_precision_radix = col.get_u32("numeric_precision_radix");
+        let numeric_scale = col.get_u32("numeric_scale");
+        let time_precision = col.get_u32("datetime_precision");
+
+        Precision {
+            character_maximum_length,
+            numeric_precision,
+            numeric_precision_radix,
+            numeric_scale,
+            time_precision,
+        }
     }
 
     /// Returns a map from table name to foreign keys.
@@ -376,35 +284,15 @@ impl SqlSchemaDescriber {
         let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
         for row in result_set.into_iter() {
             debug!("Got description FK row {:?}", row);
-            let id = row.get("con_id").and_then(|x| x.as_i64()).expect("get con_id");
-            let column = row
-                .get("child_column")
-                .and_then(|x| x.to_string())
-                .expect("get child_column");
-            let referenced_table = row
-                .get("parent_table")
-                .and_then(|x| x.to_string())
-                .expect("get parent_table");
-            let referenced_column = row
-                .get("parent_column")
-                .and_then(|x| x.to_string())
-                .expect("get parent_column");
-            let table_name = row
-                .get("table_name")
-                .and_then(|x| x.to_string())
-                .expect("get table_name");
-            let confdeltype = row
-                .get("confdeltype")
-                .and_then(|x| x.as_char())
-                .expect("get confdeltype");
-            let confupdtype = row
-                .get("confupdtype")
-                .and_then(|x| x.as_char())
-                .expect("get confupdtype");
-            let constraint_name = row
-                .get("constraint_name")
-                .and_then(|x| x.to_string())
-                .expect("get constraint_name");
+            let id = row.get_expect_i64("con_id");
+            let column = row.get_expect_string("child_column");
+            let referenced_table = row.get_expect_string("parent_table");
+            let referenced_column = row.get_expect_string("parent_column");
+            let table_name = row.get_expect_string("table_name");
+            let confdeltype = row.get_expect_char("confdeltype");
+            let confupdtype = row.get_expect_char("confupdtype");
+            let constraint_name = row.get_expect_string("constraint_name");
+
             let on_delete_action = match confdeltype {
                 'a' => ForeignKeyAction::NoAction,
                 'r' => ForeignKeyAction::Restrict,
@@ -603,10 +491,7 @@ impl SqlSchemaDescriber {
                     // hardcodes this as 1
                     allocation_size: 1,
                     initial_value,
-                    name: seq
-                        .get("sequence_name")
-                        .and_then(|x| x.to_string())
-                        .expect("get sequence_name"),
+                    name: seq.get_expect_string("sequence_name"),
                 }
             })
             .collect();
@@ -630,8 +515,8 @@ impl SqlSchemaDescriber {
 
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);
-            let name = row.get("name").and_then(|x| x.to_string()).unwrap();
-            let value = row.get("value").and_then(|x| x.to_string()).unwrap();
+            let name = row.get_expect_string("name");
+            let value = row.get_expect_string("value");
 
             let values = enum_values.entry(name).or_insert_with(Vec::new);
             values.push(value);
@@ -657,6 +542,84 @@ struct IndexRow {
     is_primary_key: bool,
     table_name: String,
     sequence_name: Option<String>,
+}
+
+fn get_default_value(
+    schema: &str,
+    col: ResultRow,
+    table_name: &String,
+    col_name: &String,
+    tpe: &ColumnType,
+) -> Option<DefaultValue> {
+    match col.get("column_default") {
+        None => None,
+        Some(param_value) => match param_value.to_string() {
+            None => None,
+            Some(x) if x.starts_with("NULL") => None,
+            Some(default_string) => {
+                Some(match &tpe.family {
+                    ColumnTypeFamily::Int => match parse_int(&default_string) {
+                        Some(int_value) => DefaultValue::VALUE(int_value),
+                        None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
+                            true => DefaultValue::SEQUENCE(default_string),
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                    },
+                    ColumnTypeFamily::Float => match parse_float(&default_string) {
+                        Some(float_value) => DefaultValue::VALUE(float_value),
+                        None => DefaultValue::DBGENERATED(default_string),
+                    },
+                    ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                        Some(float_value) => DefaultValue::VALUE(float_value),
+                        None => DefaultValue::DBGENERATED(default_string),
+                    },
+                    ColumnTypeFamily::Boolean => match parse_bool(&default_string) {
+                        Some(bool_value) => DefaultValue::VALUE(bool_value),
+                        None => DefaultValue::DBGENERATED(default_string),
+                    },
+                    ColumnTypeFamily::String => {
+                        match unsuffix_default_literal(&default_string, &tpe.data_type, &tpe.full_data_type) {
+                            Some(default_literal) => DefaultValue::VALUE(PrismaValue::String(
+                                process_string_literal(default_literal.as_ref()).into(),
+                            )),
+                            None => DefaultValue::DBGENERATED(default_string),
+                        }
+                    }
+                    ColumnTypeFamily::DateTime => {
+                        match default_string.to_lowercase().as_str() {
+                            "now()" | "current_timestamp" => DefaultValue::NOW,
+                            _ => DefaultValue::DBGENERATED(default_string), //todo parse values
+                        }
+                    }
+                    ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                    // JSON/JSONB defaults come in the '{}'::jsonb form.
+                    ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
+                        .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
+                        .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
+                        .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
+                    ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                    ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
+                    ColumnTypeFamily::Enum(enum_name) => {
+                        let enum_suffix_without_quotes = format!("::{}", enum_name);
+                        let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
+                        if default_string.ends_with(&enum_suffix_with_quotes) {
+                            DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                                &default_string.replace(&enum_suffix_with_quotes, ""),
+                            )))
+                        } else if default_string.ends_with(&enum_suffix_without_quotes) {
+                            DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                                &default_string.replace(&enum_suffix_without_quotes, ""),
+                            )))
+                        } else {
+                            DefaultValue::DBGENERATED(default_string)
+                        }
+                    }
+                    ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
+                    ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                })
+            }
+        },
+    }
 }
 
 fn get_column_type<'a>(
@@ -724,7 +687,7 @@ fn get_column_type<'a>(
         "lseg" | "_lseg" => (Unsupported(full_data_type.into()), None),
         "path" | "_path" => (Unsupported(full_data_type.into()), None),
         "polygon" | "_polygon" => (Unsupported(full_data_type.into()), None),
-        full_data_type => (Unsupported(full_data_type.into()), None),
+        _ => (Unsupported(full_data_type.into()), None),
     };
 
     ColumnType {

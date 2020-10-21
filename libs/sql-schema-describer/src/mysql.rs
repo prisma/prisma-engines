@@ -1,4 +1,5 @@
 use super::*;
+use crate::getters::Getter;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint, Value};
 use serde_json::from_str;
@@ -91,11 +92,7 @@ impl SqlSchemaDescriber {
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
-            .map(|row| {
-                row.get("schema_name")
-                    .and_then(|x| x.to_string())
-                    .expect("convert schema names")
-            })
+            .map(|row| row.get_expect_string("schema_name"))
             .collect();
 
         debug!("Found schema names: {:?}", names);
@@ -116,11 +113,7 @@ impl SqlSchemaDescriber {
             .expect("get table names ");
         let names = rows
             .into_iter()
-            .map(|row| {
-                row.get("table_name")
-                    .and_then(|x| x.to_string())
-                    .expect("get table name")
-            })
+            .map(|row| row.get_expect_string("table_name"))
             .collect();
 
         debug!("Found table names: {:?}", names);
@@ -211,25 +204,12 @@ async fn get_all_columns(
 
     for col in rows {
         debug!("Got column: {:?}", col);
-        let table_name = col
-            .get("table_name")
-            .and_then(|x| x.to_string())
-            .expect("get table name");
-        let name = col
-            .get("column_name")
-            .and_then(|x| x.to_string())
-            .expect("get column name");
+        let table_name = col.get_expect_string("table_name");
+        let name = col.get_expect_string("column_name");
         let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
-        let full_data_type = col
-            .get("full_data_type")
-            .and_then(|x| x.to_string())
-            .expect("get full_data_type aka column_type");
+        let full_data_type = col.get_expect_string("full_data_type");
 
-        let is_nullable = col
-            .get("is_nullable")
-            .and_then(|x| x.to_string())
-            .expect("get is_nullable")
-            .to_lowercase();
+        let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
         let is_required = match is_nullable.as_ref() {
             "no" => true,
             "yes" => false,
@@ -242,13 +222,10 @@ async fn get_all_columns(
             ColumnArity::Nullable
         };
 
-        let character_maximum_length = col
-            .get("character_maximum_length")
-            .and_then(|x| x.as_i64().map(|x| x as u32));
-        let numeric_precision = col.get("numeric_precision").and_then(|x| x.as_i64().map(|x| x as u32));
-
-        let numeric_scale = col.get("numeric_scale").and_then(|x| x.as_i64().map(|x| x as u32));
-        let time_precision = col.get("datetime_precision").and_then(|x| x.as_i64().map(|x| x as u32));
+        let character_maximum_length = col.get_u32("character_maximum_length");
+        let numeric_precision = col.get_u32("numeric_precision");
+        let numeric_scale = col.get_u32("numeric_scale");
+        let time_precision = col.get_u32("datetime_precision");
 
         let precision = Precision {
             character_maximum_length,
@@ -269,11 +246,7 @@ async fn get_all_columns(
             arity,
             default_value,
         );
-        let extra = col
-            .get("extra")
-            .and_then(|x| x.to_string())
-            .expect("get extra")
-            .to_lowercase();
+        let extra = col.get_expect_string("extra").to_lowercase();
         let auto_increment = matches!(extra.as_str(), "auto_increment");
 
         let entry = map.entry(table_name).or_insert((Vec::new(), Vec::new()));
@@ -369,13 +342,13 @@ async fn get_all_indexes(
 
     for row in rows {
         debug!("Got index row: {:#?}", row);
-        let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
-        let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
-        match row.get("column_name").and_then(|x| x.to_string()) {
+        let table_name = row.get_expect_string("table_name");
+        let index_name = row.get_expect_string("index_name");
+        match row.get_string("column_name") {
             Some(column_name) => {
-                let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
+                let seq_in_index = row.get_expect_i64("seq_in_index");
                 let pos = seq_in_index - 1;
-                let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
+                let is_unique = !row.get_expect_bool("non_unique");
 
                 // Multi-column indices will return more than one row (with different column_name values).
                 // We cannot assume that one row corresponds to one index.
@@ -482,37 +455,13 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
 
     for row in result_set.into_iter() {
         debug!("Got description FK row {:#?}", row);
-        let table_name = row
-            .get("table_name")
-            .and_then(|x| x.to_string())
-            .expect("get table_name");
-        let constraint_name = row
-            .get("constraint_name")
-            .and_then(|x| x.to_string())
-            .expect("get constraint_name");
-        let column = row
-            .get("column_name")
-            .and_then(|x| x.to_string())
-            .expect("get column_name");
-        let referenced_table = row
-            .get("referenced_table_name")
-            .and_then(|x| x.to_string())
-            .expect("get referenced_table_name");
-        let referenced_column = row
-            .get("referenced_column_name")
-            .and_then(|x| x.to_string())
-            .expect("get referenced_column_name");
-        let ord_pos = row
-            .get("ordinal_position")
-            .and_then(|x| x.as_i64())
-            .expect("get ordinal_position");
-        let on_delete_action = match row
-            .get("delete_rule")
-            .and_then(|x| x.to_string())
-            .expect("get delete_rule")
-            .to_lowercase()
-            .as_str()
-        {
+        let table_name = row.get_expect_string("table_name");
+        let constraint_name = row.get_expect_string("constraint_name");
+        let column = row.get_expect_string("column_name");
+        let referenced_table = row.get_expect_string("referenced_table_name");
+        let referenced_column = row.get_expect_string("referenced_column_name");
+        let ord_pos = row.get_expect_i64("ordinal_position");
+        let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
             "cascade" => ForeignKeyAction::Cascade,
             "set null" => ForeignKeyAction::SetNull,
             "set default" => ForeignKeyAction::SetDefault,
@@ -520,13 +469,7 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             "no action" => ForeignKeyAction::NoAction,
             s => panic!(format!("Unrecognized on delete action '{}'", s)),
         };
-        let on_update_action = match row
-            .get("update_rule")
-            .and_then(|x| x.to_string())
-            .expect("get update_rule")
-            .to_lowercase()
-            .as_str()
-        {
+        let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
             "cascade" => ForeignKeyAction::Cascade,
             "set null" => ForeignKeyAction::SetNull,
             "set default" => ForeignKeyAction::SetDefault,

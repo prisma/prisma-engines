@@ -108,6 +108,45 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 
     Ok(())
 }
+//
+// #[test_each_connector(tags("postgres"))]
+// async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResult {
+//     api.barrel()
+//         .execute(move |migration| {
+//             migration.create_table("Blog", move |t| {
+//                 t.inject_custom("id Integer Primary Key");
+//                 t.inject_custom("decimal_array Decimal(42,0)[] ");
+//             });
+//         })
+//         .await?;
+//
+//     let mut dm = indoc! {r#"
+//          generator client {
+//             provider = "prisma-client-js"
+//             previewFeatures = ["nativeTypes"]
+//          }
+//
+//          datasource postgres {
+//             provider        = "postgresql"
+//             url             = "postgres://localhost/test"
+//          }
+//
+//          model Blog {
+//             id              Int      @id @postgres.Integer
+//             decimal_array Decimal[] @postgres.Numeric(42, 0)
+//           }
+//     "#}
+//     .to_string();
+//
+//     let result = api.re_introspect(&dm).await?;
+//
+//     println!("EXPECTATION: \n {:#}", dm);
+//     println!("RESULT: \n {:#}", result);
+//
+//     assert!(result.replace(" ", "").contains(&dm.replace(" ", "")));
+//
+//     Ok(())
+// }
 
 #[test_each_connector(tags("postgres"))]
 async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {

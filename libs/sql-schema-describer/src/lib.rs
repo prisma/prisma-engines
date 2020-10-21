@@ -17,6 +17,7 @@ use std::{
 use tracing::debug;
 use walkers::TableWalker;
 
+pub mod getters;
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
@@ -564,7 +565,7 @@ impl Precision {
         // base 10 for numeric types usually
         // base 2 for bits usually
         // on Postgres `decimal_column decimal` will not return precision
-        // on Postgres `decimal_array_column decimal(30,5)[]` will also not return numeric precision
+        // on Postgres `decimal_array_column decimal(30,5)[]` will also not return numeric precision since none is specified
         // workaround https://stackoverflow.com/questions/57336645/how-to-get-array-elements-numeric-precision-numeric-scale-and-datetime-pr
         self.numeric_precision.unwrap_or(65)
     }
