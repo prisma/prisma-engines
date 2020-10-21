@@ -1,8 +1,11 @@
 use super::SqlSchemaDifferFlavour;
-use crate::{flavour::PostgresFlavour, sql_migration::AlterEnum, sql_schema_differ::SqlSchemaDiffer};
+use crate::{
+    flavour::PostgresFlavour, sql_migration::AlterEnum, sql_schema_differ::column::ColumnTypeChange,
+    sql_schema_differ::ColumnDiffer, sql_schema_differ::SqlSchemaDiffer,
+};
 use once_cell::sync::Lazy;
 use regex::RegexSet;
-use sql_schema_describer::walkers::IndexWalker;
+use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
 
 /// The maximum length of postgres identifiers, in bytes.
 ///
@@ -27,6 +30,27 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 }
             })
             .collect()
+    }
+
+    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+        if differ.previous.arity().is_list() && !differ.next.arity().is_list() {
+            return match (differ.previous.column_type_family(), differ.next.column_type_family()) {
+                (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
+                (_, _) => Some(ColumnTypeChange::NotCastable),
+            };
+        }
+
+        if differ.previous.column_type_family() == differ.next.column_type_family() {
+            return None;
+        }
+
+        match (differ.previous.column_type_family(), differ.next.column_type_family()) {
+            (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
+            (ColumnTypeFamily::String, ColumnTypeFamily::Int)
+            | (ColumnTypeFamily::DateTime, ColumnTypeFamily::Float)
+            | (ColumnTypeFamily::String, ColumnTypeFamily::Float) => Some(ColumnTypeChange::NotCastable),
+            (_, _) => Some(ColumnTypeChange::RiskyCast),
+        }
     }
 
     fn index_should_be_renamed(&self, previous: &IndexWalker<'_>, next: &IndexWalker<'_>) -> bool {

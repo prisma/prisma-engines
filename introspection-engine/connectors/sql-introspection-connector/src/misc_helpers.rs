@@ -353,6 +353,7 @@ pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
+        ColumnTypeFamily::Xml => FieldType::Unsupported(fdt),
         ColumnTypeFamily::Binary => FieldType::Unsupported(fdt),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
@@ -371,6 +372,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
         ColumnTypeFamily::Duration => FieldType::Base(ScalarType::Duration, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
+        ColumnTypeFamily::Xml => FieldType::Base(ScalarType::XML, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Binary => FieldType::Base(ScalarType::Bytes, None),

@@ -15,6 +15,7 @@ use std::{
     str::FromStr,
 };
 use tracing::debug;
+use walkers::TableWalker;
 
 pub mod mssql;
 pub mod mysql;
@@ -123,6 +124,10 @@ impl SqlSchema {
             enums: Vec::new(),
             sequences: Vec::new(),
         }
+    }
+
+    pub fn table_walkers<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> + 'a {
+        self.tables.iter().map(move |table| TableWalker::new(self, table))
     }
 }
 
@@ -333,6 +338,8 @@ pub enum ColumnTypeFamily {
     /// JSON types.
     Json,
     /// UUID types.
+    Xml,
+    /// UUID types.
     Uuid,
     ///Enum
     Enum(String),
@@ -369,6 +376,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::Duration => "duration".to_string(),
             Self::Binary => "binary".to_string(),
             Self::Json => "json".to_string(),
+            Self::Xml => "xml".to_string(),
             Self::Uuid => "uuid".to_string(),
             Self::Enum(x) => format!("Enum({})", &x),
             Self::Unsupported(x) => x.to_string(),
@@ -390,12 +398,19 @@ pub enum ColumnArity {
 }
 
 impl ColumnArity {
-    pub fn is_required(&self) -> bool {
-        matches!(self, ColumnArity::Required)
+    /// The arity is ColumnArity::List.
+    pub fn is_list(&self) -> bool {
+        matches!(self, ColumnArity::List)
     }
 
+    /// The arity is ColumnArity::Nullable.
     pub fn is_nullable(&self) -> bool {
         matches!(self, ColumnArity::Nullable)
+    }
+
+    /// The arity is ColumnArity::Required.
+    pub fn is_required(&self) -> bool {
+        matches!(self, ColumnArity::Required)
     }
 }
 
