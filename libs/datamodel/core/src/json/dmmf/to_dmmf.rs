@@ -120,6 +120,7 @@ fn get_field_kind(field: &dml::Field) -> String {
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
         dml::FieldType::Base(_, _) => String::from("scalar"),
+        dml::FieldType::NativeType(_, _) => String::from("scalar"),
         tpe => unimplemented!("DMMF does not support field type {:?}", tpe),
     }
 }
@@ -147,6 +148,8 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::List(value_vec) => {
             serde_json::Value::Array(value_vec.iter().map(|pv| prisma_value_to_serde(pv)).collect())
         }
+        PrismaValue::Xml(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::Bytes(b) => serde_json::Value::String(prisma_value::encode_bytes(b)),
     }
 }
 

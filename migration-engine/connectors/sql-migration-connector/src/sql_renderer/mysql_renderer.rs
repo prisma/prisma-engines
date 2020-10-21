@@ -135,14 +135,18 @@ impl SqlRenderer for MysqlFlavour {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
-                TableChange::AlterColumn(AlterColumn { name, column: _ }) => {
+                TableChange::AlterColumn(AlterColumn {
+                    column_name,
+                    changes,
+                    type_change: _,
+                }) => {
                     let columns = differ
                         .diff_table(&table.name)
                         .expect("AlterTable on unknown table.")
-                        .diff_column(name)
+                        .diff_column(column_name)
                         .expect("AlterColumn on unknown column.");
 
-                    let expanded = expand_mysql_alter_column(&columns);
+                    let expanded = expand_mysql_alter_column(&columns, &changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
@@ -154,6 +158,7 @@ impl SqlRenderer for MysqlFlavour {
                         }
                     };
                 }
+                TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on MySQL"),
             };
         }
 
@@ -178,6 +183,8 @@ impl SqlRenderer for MysqlFlavour {
                 !matches!(default, DefaultValue::DBGENERATED(_) | DefaultValue::SEQUENCE(_))
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
+                    // We do not want to render binary defaults because they are not supported by MySQL.
+                    && !matches!(column.column_type_family(), ColumnTypeFamily::Binary)
             })
             .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column_type_family())))
             .unwrap_or_else(String::new);
@@ -385,6 +392,7 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
         ColumnTypeFamily::Boolean => "boolean".into(),
         ColumnTypeFamily::DateTime => "datetime(3)".into(),
         ColumnTypeFamily::Float => "decimal(65,30)".into(),
+        ColumnTypeFamily::Decimal => "decimal(65,30)".into(),
         ColumnTypeFamily::Int => "int".into(),
         // we use varchar right now as mediumtext doesn't allow default values
         // a bigger length would not allow to use such a column as primary key
@@ -400,9 +408,8 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
             format!("ENUM({})", variants).into()
         }
         ColumnTypeFamily::Json => "json".into(),
+        ColumnTypeFamily::Binary => "mediumblob".into(),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
-        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
-        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Xml => unimplemented!("Xml not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),

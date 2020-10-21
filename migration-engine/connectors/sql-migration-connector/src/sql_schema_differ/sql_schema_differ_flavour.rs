@@ -1,6 +1,6 @@
 use sql_schema_describer::walkers::IndexWalker;
 
-use super::{ColumnDiffer, SqlSchemaDiffer};
+use super::{ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
 use crate::sql_migration::AlterEnum;
 use std::collections::HashSet;
 
@@ -16,9 +16,13 @@ pub(crate) trait SqlSchemaDifferFlavour {
         Vec::new()
     }
 
-    /// Return whether a column's type needs to be migrated.
-    fn column_type_changed(&self, differ: &ColumnDiffer<'_>) -> bool {
-        differ.previous.column_type_family() != differ.next.column_type_family()
+    /// Return whether a column's type needs to be migrated, and how.
+    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+        if differ.previous.column_type_family() != differ.next.column_type_family() {
+            Some(ColumnTypeChange::RiskyCast)
+        } else {
+            None
+        }
     }
 
     /// Return whether an index should be renamed by the migration.
@@ -36,7 +40,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
         HashSet::new()
     }
 
-    /// By implementing this method, the flavour signals the differ that specific tables should be ignored. This is mostly for system tables.
+    /// By implementing this method, the flavour signals the differ that
+    /// specific tables should be ignored. This is mostly for system tables.
     fn table_should_be_ignored(&self, _table_name: &str) -> bool {
         false
     }

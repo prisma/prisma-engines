@@ -1,5 +1,4 @@
-use super::SqlFlavour;
-use crate::{connect, connection_wrapper::Connection};
+use crate::{connect, connection_wrapper::Connection, SqlFlavour};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::connector::MssqlUrl;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};

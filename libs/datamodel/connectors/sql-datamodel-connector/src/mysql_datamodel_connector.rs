@@ -156,6 +156,17 @@ impl Connector for MySqlDatamodelConnector {
                     "MySQL",
                 ));
             }
+            if native_type_name == DECIMAL_TYPE_NAME || native_type_name == NUMERIC_TYPE_NAME {
+                match native_type.args.as_slice() {
+                    [precision, scale] if scale > precision => {
+                        return Err(ConnectorError::new_scale_larger_than_precision_error(
+                            native_type_name,
+                            "MySQL",
+                        ));
+                    }
+                    _ => {}
+                }
+            }
         }
         Ok(())
     }

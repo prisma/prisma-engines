@@ -99,6 +99,9 @@ impl SqlRenderer for SqliteFlavour {
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
                 format!("'{}'", escape_quotes(&val)).into()
             }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("'{}'", format_hex(b)).into()
+            }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
@@ -138,10 +141,11 @@ impl SqlRenderer for SqliteFlavour {
                         column_definition = col_sql,
                     ));
                 }
-                TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
                 TableChange::AddPrimaryKey { .. } => unreachable!("AddPrimaryKey on SQLite"),
-                TableChange::DropColumn(_) => unreachable!("DropColumn on SQLite"),
                 TableChange::AlterColumn(_) => unreachable!("AlterColumn on SQLite"),
+                TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on SQLite"),
+                TableChange::DropColumn(_) => unreachable!("DropColumn on SQLite"),
+                TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
             };
         }
 
@@ -277,13 +281,13 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Boolean => "BOOLEAN",
         ColumnTypeFamily::DateTime => "DATETIME",
         ColumnTypeFamily::Float => "REAL",
+        ColumnTypeFamily::Decimal => "REAL",
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::String => "TEXT",
+        ColumnTypeFamily::Binary => "BLOB",
         ColumnTypeFamily::Json => unimplemented!("Json not handled yet"),
         ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
-        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
-        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Xml => unimplemented!("Xml not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
@@ -312,9 +316,9 @@ fn copy_current_table_into_new_table(
     let columns_that_became_required_with_a_default: Vec<ColumnDiffer<'_>> = differ
         .column_pairs()
         .filter(|columns| {
-            columns.all_changes().arity_changed()
-                && columns.next.arity().is_required()
-                && columns.next.default().is_some()
+            let (changes, _) = columns.all_changes();
+
+            changes.arity_changed() && columns.next.arity().is_required() && columns.next.default().is_some()
         })
         .collect();
 

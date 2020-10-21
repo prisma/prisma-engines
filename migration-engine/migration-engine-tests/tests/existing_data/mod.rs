@@ -129,8 +129,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     "#;
 
     api.infer_apply(&dm2).send().await?.assert_warnings(&[
-        "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
-         The data in that column could be lost."
+        "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `Int` to `Float`."
             .into(),
     ])?;
 
@@ -302,30 +301,13 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
 
     let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
 
-    // On MySQL we can't safely restate the type in a CHANGE clause, so this change is still destructive.
-    if api.is_mysql() {
-        anyhow::ensure!(
-            migration_output.warnings.len() == 1,
-            "Migration warnings should have one warning on mysql. Got {:#?}",
-            migration_output.warnings
-        );
+    anyhow::ensure!(
+        migration_output.warnings.is_empty(),
+        "Migration warnings should be empty. Got {:#?}",
+        migration_output.warnings
+    );
 
-        assert_eq!(
-            migration_output.warnings.get(0).unwrap().description,
-            "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column could be lost.",
-        );
-
-        api.assert_schema().await?.assert_equals(&original_database_schema)?;
-    } else {
-        // On other databases, the migration should be successful.
-        anyhow::ensure!(
-            migration_output.warnings.is_empty(),
-            "Migration warnings should be empty. Got {:#?}",
-            migration_output.warnings
-        );
-
-        api.assert_schema().await?.assert_ne(&original_database_schema)?;
-    }
+    api.assert_schema().await?.assert_ne(&original_database_schema)?;
 
     // Check that no data was lost.
     {
@@ -843,7 +825,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.insert("Dog")
         .value("name", "Marnie")
@@ -858,6 +840,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         .result_raw()
         .await?;
 
+    // Make Dog#passportNumber a String.
     let dm2 = r#"
         model Dog {
             name String
@@ -874,16 +857,13 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         }
     "#;
 
-    api.infer_apply(dm2)
-        .force(Some(true))
+    api.schema_push(dm2)
+        .force(true)
         .send()
         .await?
         .assert_executable()?
-        .assert_no_error()?
         .assert_warnings(&[
             "The migration will change the primary key for the `Dog` table. If it partially fails, the table could be left without primary key constraint.".into(),
-            "You are about to alter the column `passportNumber` on the `Dog` table, which still contains 1 non-null values. The data in that column could be lost.".into(),
-            "You are about to alter the column `motherPassportNumber` on the `Puppy` table, which still contains 1 non-null values. The data in that column could be lost.".into(),
         ])?;
 
     api.assert_schema().await?.assert_table("Dog", |table| {

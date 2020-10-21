@@ -4,16 +4,18 @@ mod index;
 mod sql_schema_differ_flavour;
 mod table;
 
-pub(crate) use column::{ColumnChange, ColumnChanges, ColumnDiffer};
+pub(crate) use column::{ColumnChange, ColumnChanges, ColumnDiffer, ColumnTypeChange};
 pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 pub(crate) use table::TableDiffer;
 
-use crate::*;
-use enums::EnumDiffer;
-use sql_migration::{
-    AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, CreateTable,
-    DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, SqlMigrationStep, TableChange,
+use crate::{
+    sql_migration::{
+        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, CreateTable,
+        DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, SqlMigrationStep, TableChange,
+    },
+    wrap_as_step, DatabaseInfo, SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
 };
+use enums::EnumDiffer;
 use sql_schema_describer::{
     walkers::{ForeignKeyWalker, TableWalker},
     *,
@@ -42,7 +44,8 @@ pub struct SqlSchemaDiff {
     pub create_enums: Vec<CreateEnum>,
     pub drop_enums: Vec<DropEnum>,
     pub alter_enums: Vec<AlterEnum>,
-    pub tables_to_redefine: HashSet<String>,
+    /// The indexes of the tables to redefine in the (previous, next) schema.
+    tables_to_redefine: HashSet<String>,
 }
 
 impl SqlSchemaDiff {
@@ -224,16 +227,36 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn alter_columns<'a>(table_differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         table_differ.column_pairs().filter_map(move |column_differ| {
-            if column_differ.differs_in_something() {
-                let change = AlterColumn {
-                    name: column_differ.previous.name().to_owned(),
-                    column: column_differ.next.column().clone(),
-                };
+            let (changes, type_change) = column_differ.all_changes();
 
-                return Some(TableChange::AlterColumn(change));
+            if !changes.differs_in_something() {
+                return None;
             }
 
-            None
+            let column_name = column_differ.previous.name().to_owned();
+
+            match type_change {
+                Some(ColumnTypeChange::NotCastable) => Some(TableChange::DropAndRecreateColumn {
+                    column_name,
+                    column_index: (column_differ.previous.column_index(), column_differ.next.column_index()),
+                    changes,
+                }),
+                Some(ColumnTypeChange::RiskyCast) => Some(TableChange::AlterColumn(AlterColumn {
+                    column_name,
+                    changes,
+                    type_change: Some(crate::sql_migration::ColumnTypeChange::RiskyCast),
+                })),
+                Some(ColumnTypeChange::SafeCast) => Some(TableChange::AlterColumn(AlterColumn {
+                    column_name,
+                    changes,
+                    type_change: Some(crate::sql_migration::ColumnTypeChange::SafeCast),
+                })),
+                None => Some(TableChange::AlterColumn(AlterColumn {
+                    column_name,
+                    changes,
+                    type_change: None,
+                })),
+            }
         })
     }
 

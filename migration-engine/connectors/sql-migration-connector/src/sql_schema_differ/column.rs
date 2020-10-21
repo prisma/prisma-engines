@@ -18,12 +18,9 @@ impl<'a> ColumnDiffer<'a> {
         self.previous.name()
     }
 
-    pub(crate) fn differs_in_something(&self) -> bool {
-        self.all_changes().iter().count() > 0
-    }
-
-    pub(crate) fn all_changes(&self) -> ColumnChanges {
+    pub(crate) fn all_changes(&self) -> (ColumnChanges, Option<ColumnTypeChange>) {
         let mut changes = BitFlags::empty();
+        let column_type_change = self.column_type_change();
 
         if self.previous.name() != self.next.name() {
             changes |= ColumnChange::Renaming;
@@ -33,7 +30,7 @@ impl<'a> ColumnDiffer<'a> {
             changes |= ColumnChange::Arity
         };
 
-        if self.column_type_changed() {
+        if column_type_change.is_some() {
             changes |= ColumnChange::TypeChanged;
         };
 
@@ -45,16 +42,16 @@ impl<'a> ColumnDiffer<'a> {
             changes |= ColumnChange::Sequence;
         };
 
-        ColumnChanges { changes }
+        (ColumnChanges { changes }, column_type_change)
     }
 
-    fn column_type_changed(&self) -> bool {
+    fn column_type_change(&self) -> Option<ColumnTypeChange> {
         match (self.previous.column_type_family(), self.next.column_type_family()) {
-            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal) => false,
-            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float) => false,
-            (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal) => false,
-            (ColumnTypeFamily::Float, ColumnTypeFamily::Float) => false,
-            (_, _) => self.flavour.column_type_changed(self),
+            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal) => None,
+            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float) => None,
+            (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal) => None,
+            (ColumnTypeFamily::Float, ColumnTypeFamily::Float) => None,
+            (_, _) => self.flavour.column_type_change(self),
         }
     }
 
@@ -129,12 +126,18 @@ pub(crate) enum ColumnChange {
     Sequence = 0b0010000,
 }
 
-#[derive(Debug, Clone)]
-pub(crate) struct ColumnChanges {
+// This should be pub(crate), but SqlMigration is exported, so it has to be
+// public at the moment.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct ColumnChanges {
     changes: BitFlags<ColumnChange>,
 }
 
 impl ColumnChanges {
+    pub(crate) fn differs_in_something(&self) -> bool {
+        !self.changes.is_empty()
+    }
+
     pub(crate) fn iter<'a>(&'a self) -> impl Iterator<Item = ColumnChange> + 'a {
         self.changes.iter()
     }
@@ -158,4 +161,11 @@ impl ColumnChanges {
     pub(crate) fn column_was_renamed(&self) -> bool {
         self.changes.contains(ColumnChange::Renaming)
     }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ColumnTypeChange {
+    SafeCast,
+    RiskyCast,
+    NotCastable,
 }

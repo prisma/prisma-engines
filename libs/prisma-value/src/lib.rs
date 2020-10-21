@@ -24,23 +24,34 @@ pub enum PrismaValue {
     Boolean(bool),
     Enum(String),
     Int(i64),
+    Uuid(Uuid),
+    List(PrismaListValue),
+    Json(String),
+    Xml(String),
 
     #[serde(serialize_with = "serialize_null")]
     Null,
 
-    Uuid(Uuid),
-    List(PrismaListValue),
-    Json(String),
-
     #[serde(serialize_with = "serialize_date")]
-    DateTime(DateTime<Utc>),
+    DateTime(DateTime<FixedOffset>),
 
     #[serde(serialize_with = "serialize_decimal")]
     Float(Decimal),
+
+    #[serde(serialize_with = "serialize_bytes")]
+    Bytes(Vec<u8>),
 }
 
-pub fn stringify_date(date: &DateTime<Utc>) -> String {
-    format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ"))
+pub fn stringify_date(date: &DateTime<FixedOffset>) -> String {
+    date.to_rfc3339()
+}
+
+pub fn encode_bytes(bytes: &[u8]) -> String {
+    base64::encode(bytes)
+}
+
+pub fn decode_bytes(s: &str) -> PrismaValueResult<Vec<u8>> {
+    base64::decode(s).map_err(|_| ConversionFailure::new("base64 encoded bytes", "PrismaValue::Bytes"))
 }
 
 impl TryFrom<serde_json::Value> for PrismaValue {
@@ -84,11 +95,18 @@ impl TryFrom<serde_json::Value> for PrismaValue {
     }
 }
 
-fn serialize_date<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_date<S>(date: &DateTime<FixedOffset>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
     stringify_date(date).serialize(serializer)
+}
+
+fn serialize_bytes<S>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    encode_bytes(bytes).serialize(serializer)
 }
 
 fn serialize_null<S>(serializer: S) -> Result<S::Ok, S::Error>
@@ -129,7 +147,7 @@ impl PrismaValue {
     }
 
     pub fn new_datetime(datetime: &str) -> PrismaValue {
-        PrismaValue::DateTime(DateTime::<Utc>::from_str(datetime).unwrap())
+        PrismaValue::DateTime(DateTime::parse_from_rfc3339(datetime).unwrap())
     }
 }
 
@@ -145,10 +163,12 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Null => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),
             PrismaValue::Json(x) => x.fmt(f),
+            PrismaValue::Xml(x) => x.fmt(f),
             PrismaValue::List(x) => {
                 let as_string = format!("{:?}", x);
                 as_string.fmt(f)
             }
+            PrismaValue::Bytes(b) => encode_bytes(b).fmt(f),
         }
     }
 }
