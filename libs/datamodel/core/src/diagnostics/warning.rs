@@ -13,7 +13,7 @@ pub enum DatamodelWarning {
   #[error("Preview feature \"{}\" is deprecated. The functionality can be used without specifying it as a preview feature.", preview_feature)]
   DeprecatedPreviewFeature { preview_feature: String, span: Span },
 
-  #[error("Using multiple providers is now deprecated. You should use a single provider instead.")]
+  #[error("Using multiple providers is now deprecated. You should use a single provider instead. Read more at https://pris.ly/multi-provider-deprecation")]
   DeprecatedProviderArray { span: Span },
 }
 
