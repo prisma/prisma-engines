@@ -1,12 +1,12 @@
 //! Postgres description.
 use super::*;
+use crate::getters::Getter;
 use native_types::{NativeType, PostgresType};
 use quaint::connector::ResultRow;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::debug;
-use Getter;
 
 pub struct SqlSchemaDescriber {
     conn: Quaint,
@@ -102,8 +102,13 @@ impl SqlSchemaDescriber {
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
              FROM pg_tables
              WHERE schemaname = $1::text";
-        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
-        let size: i64 = result.first().map(|row| row.get_i64("size").unwrap_or(0)).unwrap();
+        let mut result_iter = self
+            .conn
+            .query_raw(sql, &[schema.into()])
+            .await
+            .expect("get db size ")
+            .into_iter();
+        let size: i64 = result_iter.next().and_then(|row| row.get_i64("size")).unwrap_or(0);
 
         debug!("Found db size: {:?}", size);
         size.try_into().unwrap()

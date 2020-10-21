@@ -1,11 +1,11 @@
 use super::*;
+use crate::getters::Getter;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint, Value};
 use serde_json::from_str;
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use tracing::debug;
-use Getter;
 
 fn is_mariadb(version: &str) -> bool {
     version.contains("MariaDB")

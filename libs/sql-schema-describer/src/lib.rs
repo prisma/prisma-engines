@@ -6,7 +6,6 @@
 use fmt::Display;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
-use quaint::connector::ResultRow;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -18,6 +17,7 @@ use std::{
 use tracing::debug;
 use walkers::TableWalker;
 
+pub mod getters;
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
@@ -575,55 +575,6 @@ impl Precision {
 
     fn time_precision(&self) -> Option<u32> {
         self.time_precision
-    }
-}
-
-pub trait Getter {
-    fn get_expect_string(&self, name: &str) -> String;
-    fn get_expect_char(&self, name: &str) -> char;
-    fn get_expect_i64(&self, name: &str) -> i64;
-    fn get_expect_bool(&self, name: &str) -> bool;
-
-    fn get_string(&self, name: &str) -> Option<String>;
-    fn get_u32(&self, name: &str) -> Option<u32>;
-    fn get_i64(&self, name: &str) -> Option<i64>;
-}
-
-impl Getter for ResultRow {
-    fn get_expect_string(&self, name: &str) -> String {
-        self.get(name)
-            .and_then(|x| x.to_string())
-            .expect(&format!("Getting {} from Resultrow {:?} as String failed", name, &self))
-    }
-
-    fn get_expect_char(&self, name: &str) -> char {
-        self.get(name)
-            .and_then(|x| x.as_char())
-            .expect(&format!("Getting {} from Resultrow {:?} as char failed", name, &self))
-    }
-
-    fn get_expect_i64(&self, name: &str) -> i64 {
-        self.get(name)
-            .and_then(|x| x.as_i64())
-            .expect(&format!("Getting {} from Resultrow {:?} as i64 failed", name, &self))
-    }
-
-    fn get_expect_bool(&self, name: &str) -> bool {
-        self.get(name)
-            .and_then(|x| x.as_bool())
-            .expect(&format!("Getting {} from Resultrow {:?} as bool failed", name, &self))
-    }
-
-    fn get_string(&self, name: &str) -> Option<String> {
-        self.get(name).and_then(|x| x.to_string())
-    }
-
-    fn get_u32(&self, name: &str) -> Option<u32> {
-        self.get(name).and_then(|x| x.as_i64().map(|x| x as u32))
-    }
-
-    fn get_i64(&self, name: &str) -> Option<i64> {
-        self.get(name).and_then(|x| x.as_i64())
     }
 }
 

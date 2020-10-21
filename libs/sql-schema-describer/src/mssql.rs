@@ -1,4 +1,5 @@
 use super::*;
+use crate::getters::Getter;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
