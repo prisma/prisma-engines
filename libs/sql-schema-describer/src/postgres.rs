@@ -191,19 +191,7 @@ impl SqlSchemaDescriber {
                 ColumnArity::Nullable
             };
 
-            let character_maximum_length = col.get_u32("character_maximum_length");
-            let numeric_precision = col.get_u32("numeric_precision");
-            let numeric_precision_radix = col.get_u32("numeric_precision_radix");
-            let numeric_scale = col.get_u32("numeric_scale");
-            let time_precision = col.get_u32("datetime_precision");
-
-            let precision = Precision {
-                character_maximum_length,
-                numeric_precision,
-                numeric_precision_radix,
-                numeric_scale,
-                time_precision,
-            };
+            let precision = SqlSchemaDescriber::get_precision(&col);
 
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums, precision);
 
@@ -224,6 +212,22 @@ impl SqlSchemaDescriber {
         debug!("Found table columns: {:?}", columns);
 
         columns
+    }
+
+    fn get_precision(col: &ResultRow) -> Precision {
+        let character_maximum_length = col.get_u32("character_maximum_length");
+        let numeric_precision = col.get_u32("numeric_precision");
+        let numeric_precision_radix = col.get_u32("numeric_precision_radix");
+        let numeric_scale = col.get_u32("numeric_scale");
+        let time_precision = col.get_u32("datetime_precision");
+
+        Precision {
+            character_maximum_length,
+            numeric_precision,
+            numeric_precision_radix,
+            numeric_scale,
+            time_precision,
+        }
     }
 
     /// Returns a map from table name to foreign keys.
