@@ -5,6 +5,7 @@ pub(crate) enum UnexecutableStepCheck {
     AddedRequiredFieldToTable { table: String, column: String },
     MadeOptionalFieldRequired { table: String, column: String },
     MadeScalarFieldIntoArrayField { table: String, column: String },
+    DropAndRecreateRequiredColumn { table: String, column: String },
 }
 
 impl Check for UnexecutableStepCheck {
@@ -12,7 +13,8 @@ impl Check for UnexecutableStepCheck {
         match self {
             UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: _ }
             | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column: _ }
-            | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: _ } => Some(table),
+            | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: _ }
+            | UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column: _ } => Some(table),
         }
     }
 
@@ -20,7 +22,8 @@ impl Check for UnexecutableStepCheck {
         match self {
             UnexecutableStepCheck::MadeOptionalFieldRequired { table, column }
             | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => Some((table, column)),
-            UnexecutableStepCheck::AddedRequiredFieldToTable { .. } => None,
+            UnexecutableStepCheck::AddedRequiredFieldToTable { .. }
+            | UnexecutableStepCheck::DropAndRecreateRequiredColumn { .. } => None,
         }
     }
 
@@ -86,6 +89,13 @@ impl Check for UnexecutableStepCheck {
                     (_, _) => Some(message(format_args!(
                         "If there are non-null values in that column, this migration step will fail."
                     ))),
+                }
+            }
+            UnexecutableStepCheck::DropAndRecreateRequiredColumn { table, column } => {
+                match database_checks.get_row_count(table) {
+                    None => Some(format!("Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.", column = column, table = table)),
+                    Some(0) => None,
+                    Some(_) => Some(format!("Changed the type of `{column}` on the `{table}` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.", column = column, table = table)),
                 }
             }
         }

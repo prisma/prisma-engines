@@ -13,12 +13,6 @@ use url::Url;
 #[derive(Debug)]
 pub(crate) struct MysqlFlavour(pub(super) MysqlUrl);
 
-impl MysqlFlavour {
-    pub(crate) fn schema_name(&self) -> &str {
-        self.0.dbname()
-    }
-}
-
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
     fn check_database_info(&self, database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {

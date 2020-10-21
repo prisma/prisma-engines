@@ -150,7 +150,7 @@ impl SqlSchemaDescriber {
                 column_default,
                 is_nullable,
                 is_identity,
-                data_type, 
+                data_type,
                 character_maximum_length,
                 numeric_precision,
                 numeric_scale,
@@ -689,6 +689,7 @@ fn get_column_type<'a>(
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
         "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
+        "xml" | "_xml" => (Xml, Some(PostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
         "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
         "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),

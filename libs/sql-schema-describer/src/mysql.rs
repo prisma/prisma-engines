@@ -316,13 +316,13 @@ async fn get_all_columns(
                         },
                         ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
                             &default_string.replace("_utf8mb4", "").replace("\\\'", ""),
                         ))),
                         ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Xml => unreachable!("No XML for MySQL."),
                     })
                 }
             },

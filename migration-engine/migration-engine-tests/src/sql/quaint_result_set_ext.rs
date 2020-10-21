@@ -49,6 +49,63 @@ impl ResultSetExt for ResultSet {
 pub struct RowAssertion<'a>(ResultRowRef<'a>);
 
 impl<'a> RowAssertion<'a> {
+    pub fn assert_array_value(self, column_name: &str, expected_value: &[Value<'_>]) -> AssertionResult<Self> {
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| match col {
+            Value::Array(x) => x.as_ref(),
+            _ => panic!("as_array"),
+        });
+
+        anyhow::ensure!(
+            actual_value.map(|v| v.as_ref()) == Some(expected_value),
+            "Value assertion failed for {}. Expected: {:?}, got: {:?}",
+            column_name,
+            expected_value,
+            actual_value,
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_datetime_value(
+        self,
+        column_name: &str,
+        expected_value: chrono::DateTime<chrono::Utc>,
+    ) -> AssertionResult<Self> {
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| col.as_datetime());
+
+        anyhow::ensure!(
+            actual_value == Some(expected_value),
+            "Value assertion failed for {}. Expected: {:?}, got: {:?}",
+            column_name,
+            expected_value,
+            actual_value,
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_float_value(self, column_name: &str, expected_value: f64) -> AssertionResult<Self> {
+        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| col.as_f64());
+
+        anyhow::ensure!(
+            actual_value == Some(expected_value),
+            "Value assertion failed for {}. Expected: {:?}, got: {:?}",
+            column_name,
+            expected_value,
+            actual_value,
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_null_value(self, column_name: &str) -> AssertionResult<Self> {
+        if !self.0.get(column_name).expect("not in result set").is_null() {
+            anyhow::bail!("Expected a null value for {}, but got something else.", column_name)
+        }
+
+        Ok(self)
+    }
+
     pub fn assert_text_value(self, column_name: &str, expected_value: &str) -> AssertionResult<Self> {
         let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| (*col).to_string());
 
