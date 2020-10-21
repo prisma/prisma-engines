@@ -18,7 +18,7 @@ fn should_handle_default_on_byte_a() {
 
         model Blog {
             id     Int    @id
-            foo    Bytes @pg.ByteA @default("\\xDEADBEEF")
+            foo    Bytes @pg.ByteA @default("aGVsbG8=")
         }
     "#;
 
@@ -28,7 +28,7 @@ fn should_handle_default_on_byte_a() {
 
     user_model
         .assert_has_scalar_field("foo")
-        .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from("\\xDEADBEEF"))));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Bytes(vec![104, 101, 108, 108, 111])));
 
     let sft = user_model.assert_has_scalar_field("foo").assert_native_type();
 
