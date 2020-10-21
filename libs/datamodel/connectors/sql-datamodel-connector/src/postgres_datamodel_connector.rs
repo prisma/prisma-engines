@@ -143,23 +143,11 @@ impl Connector for PostgresDatamodelConnector {
             BIG_INT_TYPE_NAME => PostgresType::BigInt,
             DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
                 [scale, precision] => PostgresType::Decimal(*scale, *precision),
-                _ => {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        DECIMAL_TYPE_NAME,
-                        parsed_args.len(),
-                        2,
-                    ))
-                }
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, parsed_args.len())),
             },
             NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
                 [scale, precision] => PostgresType::Numeric(*scale, *precision),
-                _ => {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        NUMERIC_TYPE_NAME,
-                        parsed_args.len(),
-                        2,
-                    ))
-                }
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(NUMERIC_TYPE_NAME, 2, parsed_args.len())),
             },
             REAL_TYPE_NAME => PostgresType::Real,
             DOUBLE_PRECISION_TYPE_NAME => PostgresType::DoublePrecision,
@@ -168,56 +156,50 @@ impl Connector for PostgresDatamodelConnector {
             BIG_SERIAL_TYPE_NAME => PostgresType::BigSerial,
             VARCHAR_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::VarChar(*arg),
-                _ => {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VARCHAR_TYPE_NAME,
-                        1,
-                        0,
-                    ))
-                }
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(VARCHAR_TYPE_NAME, 1, parsed_args.len())),
             },
             CHAR_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::Char(*arg),
-                _ => return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0)),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, parsed_args.len())),
             },
             TEXT_TYPE_NAME => PostgresType::Text,
             BYTE_A_TYPE_NAME => PostgresType::ByteA,
             TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Timestamp(*arg.clone()),
+                [arg] => PostgresType::Timestamp(Option::Some(*arg)),
                 [] => PostgresType::Timestamp(None),
-                _ => self.wrap_in_argument_count_mismatch_error(TIMESTAMP_TYPE_NAME, 0, parsed_args.len()),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(TIMESTAMP_TYPE_NAME, 0, parsed_args.len())),
             },
             TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimestampWithTimeZone(parsed_args.first().cloned()),
             INTERVAL_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Interval(*arg.clone()),
+                [arg] => PostgresType::Interval(Option::Some(*arg)),
                 [] => PostgresType::Interval(None),
-                _ => self.wrap_in_argument_count_mismatch_error(INTERVAL_TYPE_NAME, 0, parsed_args.len()),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(INTERVAL_TYPE_NAME, 0, parsed_args.len())),
             },
             DATE_TYPE_NAME => PostgresType::Date,
             TIME_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Time(*arg.clone()),
+                [arg] => PostgresType::Time(Option::Some(*arg)),
                 [] => PostgresType::Time(None),
-                _ => self.wrap_in_argument_count_mismatch_error(TIME_TYPE_NAME, 0, parsed_args.len()),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(TIME_TYPE_NAME, 0, parsed_args.len())),
             },
             TIME_WITH_TIMEZONE_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::TimeWithTimeZone(*arg.clone()),
+                [arg] => PostgresType::TimeWithTimeZone(Option::Some(*arg)),
                 [] => PostgresType::TimeWithTimeZone(None),
-                _ => self.wrap_in_argument_count_mismatch_error(TIME_WITH_TIMEZONE_TYPE_NAME, 1, parsed_args.len()),
+                _ => {
+                    return Err(self.wrap_in_argument_count_mismatch_error(
+                        TIME_WITH_TIMEZONE_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
             },
             BOOLEAN_TYPE_NAME => PostgresType::Boolean,
             BIT_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::Bit(*arg),
-                _ => return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0)),
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(BIT_TYPE_NAME, 1, parsed_args.len())),
             },
             VAR_BIT_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::VarBit(*arg),
-                _ => {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_BIT_TYPE_NAME,
-                        1,
-                        0,
-                    ))
-                }
+                _ => return Err(self.wrap_in_argument_count_mismatch_error(VAR_BIT_TYPE_NAME, 1, parsed_args.len())),
             },
             UUID_TYPE_NAME => PostgresType::UUID,
             XML_TYPE_NAME => PostgresType::XML,

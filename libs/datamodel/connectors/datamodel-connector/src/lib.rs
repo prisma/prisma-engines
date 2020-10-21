@@ -77,12 +77,8 @@ pub trait Connector: Send + Sync {
         native_type: &str,
         required_count: usize,
         given_count: usize,
-    ) -> Result<(), ConnectorError> {
-        Err(ConnectorError::new_argument_count_mismatch_error(
-            native_type,
-            required_count,
-            given_count,
-        ))
+    ) -> ConnectorError {
+        ConnectorError::new_argument_count_mismatch_error(native_type, required_count, given_count)
     }
 }
 
