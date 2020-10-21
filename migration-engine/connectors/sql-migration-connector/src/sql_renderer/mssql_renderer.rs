@@ -87,14 +87,14 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::Boolean => "bit",
             ColumnTypeFamily::DateTime => "datetime2",
             ColumnTypeFamily::Float => "decimal(32,16)",
+            ColumnTypeFamily::Decimal => "decimal(32,16)",
             ColumnTypeFamily::Int => "int",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
+            ColumnTypeFamily::Binary => "varbinary(max)",
+            ColumnTypeFamily::Xml => "xml",
             ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
             ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
-            ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
-            ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
             ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
-            ColumnTypeFamily::Xml => unimplemented!("Xml not handled yet"),
             ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
         };
 
@@ -143,8 +143,12 @@ impl SqlRenderer for MssqlFlavour {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_))
+            | (DefaultValue::VALUE(PrismaValue::Xml(val)), ColumnTypeFamily::Xml) => {
                 format!("'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("0x{}", common::format_hex(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),

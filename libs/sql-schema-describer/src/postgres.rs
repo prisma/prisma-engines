@@ -150,7 +150,7 @@ impl SqlSchemaDescriber {
                 column_default,
                 is_nullable,
                 is_identity,
-                data_type, 
+                data_type,
                 character_maximum_length,
                 numeric_precision,
                 numeric_scale,
@@ -277,8 +277,11 @@ impl SqlSchemaDescriber {
                                 .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
                                 .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
                                 .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
+                            // XML defaults come in the '<...>...</...>'::xml form.
+                            ColumnTypeFamily::Xml => unsuffix_default_literal(&default_string, "xml", "xml")
+                                .map(|default| DefaultValue::VALUE(PrismaValue::Xml(unquote_string(&default))))
+                                .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix_without_quotes = format!("::{}", enum_name);
                                 let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
@@ -686,7 +689,7 @@ fn get_column_type<'a>(
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
         "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
-        "xml" | "_xml" => (Xml, Some(PostgresType::XML)),
+        "xml" | "_xml" => (Xml, Some(PostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
         "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
         "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),

@@ -106,6 +106,18 @@ pub(crate) fn render_on_update(on_update: &ForeignKeyAction) -> &'static str {
     }
 }
 
+pub(crate) fn format_hex(bytes: &[u8]) -> String {
+    use std::fmt::Write as _;
+
+    let mut out = String::with_capacity(bytes.len() * 2);
+
+    for byte in bytes {
+        write!(out, "{:02x}", byte).expect("failed to hex format a byte");
+    }
+
+    out
+}
+
 pub(crate) trait IteratorJoin {
     fn join(self, sep: &str) -> String;
 }

@@ -104,12 +104,17 @@ fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested
             .chain(query_mode_field(ctx, nested))
             .collect(),
 
-        TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::DateTime => equality_filters(sf)
-            .chain(inclusion_filters(sf))
-            .chain(alphanumeric_filters(sf))
-            .collect(),
+        TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::DateTime | TypeIdentifier::Decimal => {
+            equality_filters(sf)
+                .chain(inclusion_filters(sf))
+                .chain(alphanumeric_filters(sf))
+                .collect()
+        }
 
-        TypeIdentifier::Boolean | TypeIdentifier::Json => equality_filters(sf).collect(),
+        TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
+            equality_filters(sf).collect()
+        }
+
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
     };
 
@@ -209,9 +214,12 @@ fn scalar_filter_name(sf: &ScalarFieldRef, nested: bool) -> String {
         TypeIdentifier::String => format!("{}String{}{}Filter", nested, nullable, list),
         TypeIdentifier::Int => format!("{}Int{}{}Filter", nested, nullable, list),
         TypeIdentifier::Float => format!("{}Float{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Decimal => format!("{}Decimal{}{}Filter", nested, nullable, list),
         TypeIdentifier::Boolean => format!("{}Bool{}{}Filter", nested, nullable, list),
         TypeIdentifier::DateTime => format!("{}DateTime{}{}Filter", nested, nullable, list),
         TypeIdentifier::Json => format!("{}Json{}{}Filter", nested, nullable, list),
         TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}Filter", nested, e, nullable, list),
+        TypeIdentifier::Xml => format!("{}Xml{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Bytes => format!("{}Bytes{}{}Filter", nested, nullable, list),
     }
 }

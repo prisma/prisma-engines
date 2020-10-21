@@ -1,14 +1,15 @@
-package writes.dataTypes.json
+package writes.dataTypes.decimal
 
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
-class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
-  "Using a json field" should "work" taggedAs (IgnoreMySql56, IgnoreSQLite, IgnoreMsSql) in {
+// Ignored for MSSQL and SQLite because of low precision issues.
+class DecimalSpec extends FlatSpec with Matchers with ApiSpecBase {
+  "Using a Decimal field" should "work" taggedAs (IgnoreSQLite, IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       """|model Model {
-         | id    String @id
-         | field Json?  @default("{}")
+         | id    Int      @id
+         | field Decimal? @default("1.00112233445566778899")
          |}"""
     }
 
@@ -19,7 +20,7 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
          |mutation {
          |  createOneModel(
          |    data: {
-         |      id: "A"
+         |      id: 1
          |    }
          |  ) {
          |    field
@@ -29,15 +30,15 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"field":"{}"}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"field":"1.00112233445566778899"}}}""")
 
     res = server.query(
       s"""
          |mutation {
          |  updateOneModel(
-         |    where: { id: "A" }
+         |    where: { id: 1 }
          |    data: {
-         |      field: "{\\"a\\":\\"b\\"}"
+         |      field: "0.09988776655443322"
          |    }
          |  ) {
          |    field
@@ -47,13 +48,13 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString should be("""{"data":{"updateOneModel":{"field":"{\"a\":\"b\"}"}}}""")
+    res.toString should be("""{"data":{"updateOneModel":{"field":"0.09988776655443322"}}}""")
 
     res = server.query(
       s"""
          |mutation {
          |  updateOneModel(
-         |    where: { id: "A" }
+         |    where: { id: 1 }
          |    data: {
          |      field: null
          |    }

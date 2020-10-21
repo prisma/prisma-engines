@@ -4,16 +4,13 @@ use chrono::prelude::*;
 use indexmap::IndexMap;
 use prisma_value::PrismaValue;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
-use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, sync::Arc};
+use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
 // todo: validate is one of!
 
 pub struct QueryDocumentParser;
 
-// Todo:
-// - Use error collections instead of letting first error win.
-// - UUID ids are not encoded in any useful way in the schema.
 impl QueryDocumentParser {
     /// Parses and validates a set of selections against a schema (output) object.
     /// On an output object, optional types designate whether or not an output field can be nulled.
@@ -227,10 +224,15 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::Json) => {
                 Ok(PrismaValue::Json(Self::parse_json(parent_path, &s).map(|_| s)?))
             }
+            (QueryValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
             (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(parent_path, &s),
             (QueryValue::String(s), ScalarType::UUID) => {
                 Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
             }
+            (QueryValue::String(s), ScalarType::Bytes) => Self::parse_bytes(parent_path, s),
+            (QueryValue::String(s), ScalarType::Decimal) => Self::parse_decimal(parent_path, s),
+            (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
+            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(Decimal::from(i))),
             (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(Decimal::from(i))),
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
@@ -248,16 +250,34 @@ impl QueryDocumentParser {
         }
     }
 
-    pub fn parse_datetime(path: &QueryPath, s: &str) -> QueryParserResult<DateTime<Utc>> {
-        let fmt = "%Y-%m-%dT%H:%M:%S%.3f";
-        Utc.datetime_from_str(s.trim_end_matches('Z'), fmt)
-            .map(|dt| DateTime::<Utc>::from_utc(dt.naive_utc(), Utc))
-            .map_err(|err| QueryParserError {
+    pub fn parse_datetime(path: &QueryPath, s: &str) -> QueryParserResult<DateTime<FixedOffset>> {
+        DateTime::parse_from_rfc3339(s).map_err(|err| QueryParserError {
+            path: path.clone(),
+            error_kind: QueryParserErrorKind::ValueParseError(format!(
+                "Invalid DateTime: '{}' (must be ISO 8601 compatible). Underlying error: {}",
+                s, err
+            )),
+        })
+    }
+
+    pub fn parse_bytes(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
+        prisma_value::decode_bytes(&s)
+            .map(PrismaValue::Bytes)
+            .map_err(|_| QueryParserError {
                 path: path.clone(),
                 error_kind: QueryParserErrorKind::ValueParseError(format!(
-                    "Invalid DateTime: {} DateTime must adhere to format: %Y-%m-%dT%H:%M:%S%.3f",
-                    err
+                    "'{}' is not a valid base64 encoded string.",
+                    s
                 )),
+            })
+    }
+
+    pub fn parse_decimal(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
+        Decimal::from_str(&s)
+            .map(PrismaValue::Float)
+            .map_err(|_| QueryParserError {
+                path: path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid decimal string.", s)),
             })
     }
 

@@ -40,7 +40,7 @@ pub fn serialize_internal(
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
         QueryResult::RecordSelection(rs) => serialize_record_selection(rs, field, &field.field_type, is_list),
-        QueryResult::RecordAggregation(ra) => serialize_aggregation(ra),
+        QueryResult::RecordAggregation(ra) => serialize_aggregation(field, ra),
 
         QueryResult::Count(c) => {
             // Todo needs a real implementation or needs to move to RecordAggregation
@@ -59,11 +59,20 @@ pub fn serialize_internal(
     }
 }
 
-fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result<CheckedItemsWithParents> {
+fn serialize_aggregation(
+    output_field: &OutputFieldRef,
+    record_aggregation: RecordAggregation,
+) -> crate::Result<CheckedItemsWithParents> {
+    dbg!(&output_field.name);
+
     let ordering = record_aggregation.selection_order;
     let results = record_aggregation.results;
 
     let mut flattened = HashMap::with_capacity(ordering.len());
+    let aggregate_object_type = match output_field.field_type.borrow() {
+        OutputType::Object(obj) => obj.into_arc(),
+        _ => unreachable!("Aggregate output must be an object."),
+    };
 
     for result in results {
         match result {
@@ -72,19 +81,23 @@ fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result
             }
 
             AggregationResult::Average(field, value) => {
-                flattened.insert(format!("avg_{}", &field.name), Item::Value(value));
+                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "avg", &field.name);
+                flattened.insert(format!("avg_{}", &field.name), serialize_scalar(&output_field, value)?);
             }
 
             AggregationResult::Sum(field, value) => {
-                flattened.insert(format!("sum_{}", &field.name), Item::Value(value));
+                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "sum", &field.name);
+                flattened.insert(format!("sum_{}", &field.name), serialize_scalar(&output_field, value)?);
             }
 
             AggregationResult::Min(field, value) => {
-                flattened.insert(format!("min_{}", &field.name), Item::Value(value));
+                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "min", &field.name);
+                flattened.insert(format!("min_{}", &field.name), serialize_scalar(&output_field, value)?);
             }
 
             AggregationResult::Max(field, value) => {
-                flattened.insert(format!("max_{}", &field.name), Item::Value(value));
+                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "max", &field.name);
+                flattened.insert(format!("max_{}", &field.name), serialize_scalar(&output_field, value)?);
             }
         }
     }
@@ -111,6 +124,21 @@ fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result
     envelope.insert(None, Item::Map(inner_map));
 
     Ok(envelope)
+}
+
+// Workaround until we streamline serialization.
+fn find_nested_aggregate_output_field(
+    object_type: &ObjectTypeStrongRef,
+    nested_obj_name: &str,
+    nested_field_name: &str,
+) -> OutputFieldRef {
+    let nested_field = object_type.find_field(nested_obj_name).unwrap();
+    let nested_object_type = match nested_field.field_type.borrow() {
+        OutputType::Object(obj) => obj.into_arc(),
+        _ => unreachable!(format!("{} output must be an object.", nested_obj_name)),
+    };
+
+    nested_object_type.find_field(nested_field_name).unwrap()
 }
 
 fn serialize_record_selection(
@@ -367,9 +395,14 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
             PrismaValue::Int(i.to_i64().expect("Unable to convert Decimal to i64."))
         }
 
+        (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
+        (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
+
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
         (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
+        (ScalarType::Bytes, PrismaValue::Bytes(b)) => PrismaValue::Bytes(b),
+        (ScalarType::Xml, PrismaValue::Xml(b)) => PrismaValue::Xml(b),
 
         (st, pv) => {
             return Err(CoreError::SerializationError(format!(

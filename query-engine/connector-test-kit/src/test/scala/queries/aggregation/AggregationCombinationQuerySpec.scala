@@ -7,9 +7,10 @@ import util._
 class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model Item {
-      |  id    String @id @default(cuid())
-      |  float Float  @map("db_float")
-      |  int   Int    @map("db_int")
+      |  id    String  @id @default(cuid())
+      |  float Float   @map("db_float")
+      |  int   Int     @map("db_int")
+      |  dec   Decimal @map("db_dec")
       |}
     """.stripMargin
   }
@@ -19,7 +20,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     database.setup(project)
   }
 
-  def createItem(float: Double, int: Int, id: Option[String] = None) = {
+  def createItem(float: Double, int: Int, dec: String, id: Option[String] = None) = {
     val idString = id match {
       case Some(i) => s"""id: "$i","""
       case None    => ""
@@ -27,7 +28,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
 
     server.query(
       s"""mutation {
-         |  createItem(data: { $idString float: $float, int: $int }) {
+         |  createItem(data: { $idString float: $float, int: $int, dec: $dec }) {
          |    id
          |  }
          |}""".stripMargin,
@@ -43,18 +44,22 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
          |    sum {
          |      float
          |      int
+         |      dec
          |    }
          |    avg {
          |      float
          |      int
+         |      dec
          |    }
          |    min {
          |      float
          |      int
+         |      dec
          |    }
          |    max {
          |      float
          |      int
+         |      dec
          |    }
          |  }
          |}""".stripMargin,
@@ -62,12 +67,12 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":0,"sum":{"float":0,"int":0},"avg":{"float":0,"int":0},"min":{"float":0,"int":0},"max":{"float":0,"int":0}}}}""")
+      """{"data":{"aggregateItem":{"count":0,"sum":{"float":0,"int":0,"dec":"0"},"avg":{"float":0,"int":0,"dec":"0"},"min":{"float":0,"int":0,"dec":"0"},"max":{"float":0,"int":0,"dec":"0"}}}}""")
   }
 
   "Using a combination of aggregations with some records in the database" should "return the correct results for each aggregation" in {
-    createItem(5.5, 5)
-    createItem(4.5, 10)
+    createItem(5.5, 5, "5.5")
+    createItem(4.5, 10, "4.5")
 
     val result = server.query(
       s"""
@@ -77,18 +82,22 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
          |    sum {
          |      float
          |      int
+         |      dec
          |    }
          |    avg {
          |      float
          |      int
+         |      dec
          |    }
          |    min {
          |      float
          |      int
+         |      dec
          |    }
          |    max {
          |      float
          |      int
+         |      dec
          |    }
          |  }
          |}
@@ -97,14 +106,14 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":2,"sum":{"float":10,"int":15},"avg":{"float":5,"int":7.5},"min":{"float":4.5,"int":5},"max":{"float":5.5,"int":10}}}}""")
+      """{"data":{"aggregateItem":{"count":2,"sum":{"float":10,"int":15,"dec":"10"},"avg":{"float":5,"int":7.5,"dec":"5"},"min":{"float":4.5,"int":5,"dec":"4.5"},"max":{"float":5.5,"int":10,"dec":"5.5"}}}}""")
   }
 
   "Using a combination of aggregations with all sorts of query arguments" should "work" in {
-    createItem(5.5, 5, Some("1"))
-    createItem(4.5, 10, Some("2"))
-    createItem(1.5, 2, Some("3"))
-    createItem(0.0, 1, Some("4"))
+    createItem(5.5, 5, "5.5", Some("1"))
+    createItem(4.5, 10, "4.5", Some("2"))
+    createItem(1.5, 2, "1.5", Some("3"))
+    createItem(0.0, 1, "0", Some("4"))
 
     var result = server.query(
       """
@@ -114,18 +123,22 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
         |    sum {
         |      float
         |      int
+        |      dec
         |    }
         |    avg {
         |      float
         |      int
+        |      dec
         |    }
         |    min {
         |      float
         |      int
+        |      dec
         |    }
         |    max {
         |      float
         |      int
+        |      dec
         |    }
         |  }
         |}
@@ -134,7 +147,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":2,"sum":{"float":10,"int":15},"avg":{"float":5,"int":7.5},"min":{"float":4.5,"int":5},"max":{"float":5.5,"int":10}}}}""")
+      """{"data":{"aggregateItem":{"count":2,"sum":{"float":10,"int":15,"dec":"10"},"avg":{"float":5,"int":7.5,"dec":"5"},"min":{"float":4.5,"int":5,"dec":"4.5"},"max":{"float":5.5,"int":10,"dec":"5.5"}}}}""")
 
     result = server.query(
       """{
@@ -143,18 +156,22 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
         |    sum {
         |      float
         |      int
+        |      dec
         |    }
         |    avg {
         |      float
         |      int
+        |      dec
         |    }
         |    min {
         |      float
         |      int
+        |      dec
         |    }
         |    max {
         |      float
         |      int
+        |      dec
         |    }
         |  }
         |}
@@ -163,7 +180,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":4,"sum":{"float":11.5,"int":18},"avg":{"float":2.875,"int":4.5},"min":{"float":0,"int":1},"max":{"float":5.5,"int":10}}}}""")
+      """{"data":{"aggregateItem":{"count":4,"sum":{"float":11.5,"int":18,"dec":"11.5"},"avg":{"float":2.875,"int":4.5,"dec":"2.875"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":5.5,"int":10,"dec":"5.5"}}}}""")
 
     result = server.query(
       """{
@@ -172,18 +189,22 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
         |    sum {
         |      float
         |      int
+        |      dec
         |    }
         |    avg {
         |      float
         |      int
+        |      dec
         |    }
         |    min {
         |      float
         |      int
+        |      dec
         |    }
         |    max {
         |      float
         |      int
+        |      dec
         |    }
         |  }
         |}
@@ -192,7 +213,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":4,"sum":{"float":11.5,"int":18},"avg":{"float":2.875,"int":4.5},"min":{"float":0,"int":1},"max":{"float":5.5,"int":10}}}}""")
+      """{"data":{"aggregateItem":{"count":4,"sum":{"float":11.5,"int":18,"dec":"11.5"},"avg":{"float":2.875,"int":4.5,"dec":"2.875"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":5.5,"int":10,"dec":"5.5"}}}}""")
 
     result = server.query(
       """{
@@ -201,18 +222,22 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
         |    sum {
         |      float
         |      int
+        |      dec
         |    }
         |    avg {
         |      float
         |      int
+        |      dec
         |    }
         |    min {
         |      float
         |      int
+        |      dec
         |    }
         |    max {
         |      float
         |      int
+        |      dec
         |    }
         |  }
         |}
@@ -221,7 +246,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":2,"sum":{"float":1.5,"int":3},"avg":{"float":0.75,"int":1.5},"min":{"float":0,"int":1},"max":{"float":1.5,"int":2}}}}""")
+      """{"data":{"aggregateItem":{"count":2,"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":0.75,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
 
     result = server.query(
       """{
@@ -230,18 +255,22 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
         |    sum {
         |      float
         |      int
+        |      dec
         |    }
         |    avg {
         |      float
         |      int
+        |      dec
         |    }
         |    min {
         |      float
         |      int
+        |      dec
         |    }
         |    max {
         |      float
         |      int
+        |      dec
         |    }
         |  }
         |}
@@ -250,7 +279,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":2,"sum":{"float":1.5,"int":3},"avg":{"float":0.75,"int":1.5},"min":{"float":0,"int":1},"max":{"float":1.5,"int":2}}}}""")
+      """{"data":{"aggregateItem":{"count":2,"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":0.75,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
 
     result = server.query(
       s"""{
@@ -259,18 +288,22 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
         |    sum {
         |      float
         |      int
+        |      dec
         |    }
         |    avg {
         |      float
         |      int
+        |      dec
         |    }
         |    min {
         |      float
         |      int
+        |      dec
         |    }
         |    max {
         |      float
         |      int
+        |      dec
         |    }
         |  }
         |}
@@ -279,14 +312,14 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":2,"sum":{"float":1.5,"int":3},"avg":{"float":0.75,"int":1.5},"min":{"float":0,"int":1},"max":{"float":1.5,"int":2}}}}""")
+      """{"data":{"aggregateItem":{"count":2,"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":0.75,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
   }
 
   "Using any aggregation with an unstable cursor" should "fail" in {
-    createItem(5.5, 5, Some("1"))
-    createItem(4.5, 10, Some("2"))
-    createItem(1.5, 2, Some("3"))
-    createItem(0.0, 1, Some("4"))
+    createItem(5.5, 5, "5.5", Some("1"))
+    createItem(4.5, 10, "4.5", Some("2"))
+    createItem(1.5, 2, "1.5", Some("3"))
+    createItem(0.0, 1, "0", Some("4"))
 
     server.queryThatMustFail(
       s"""{
