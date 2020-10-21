@@ -105,7 +105,7 @@ pub enum ErrorKind {
     #[error(
         "Native type {} takes {} optional arguments, but received {}.",
         native_type,
-        required_count,
+        optional_count,
         given_count
     )]
     OptionalArgumentCountMismatchError {

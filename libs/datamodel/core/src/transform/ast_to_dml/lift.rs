@@ -286,12 +286,25 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
 
                     let number_of_args = args.iter().count();
                     if number_of_args < constructor._number_of_args
-                        || number_of_args > constructor._number_of_args + constructor._number_of_optional_args
+                        || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
                     {
                         return Err(DatamodelError::new_argument_count_missmatch_error(
                             x,
                             constructor._number_of_args,
                             number_of_args,
+                            type_specification.unwrap().span,
+                        ));
+                    }
+                    if number_of_args > constructor._number_of_args + constructor._number_of_optional_args
+                        && constructor._number_of_optional_args > 0
+                    {
+                        return Err(DatamodelError::new_connector_error(
+                            &ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
+                                native_type: x.parse().unwrap(),
+                                optional_count: constructor._number_of_optional_args,
+                                given_count: number_of_args,
+                            })
+                            .to_string(),
                             type_specification.unwrap().span,
                         ));
                     }
