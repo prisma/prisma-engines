@@ -167,25 +167,43 @@ impl Connector for PostgresDatamodelConnector {
             TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::Timestamp(Option::Some(*arg)),
                 [] => PostgresType::Timestamp(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(TIMESTAMP_TYPE_NAME, 0, parsed_args.len())),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIMESTAMP_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
             },
             TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimestampWithTimeZone(parsed_args.first().cloned()),
             INTERVAL_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::Interval(Option::Some(*arg)),
                 [] => PostgresType::Interval(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(INTERVAL_TYPE_NAME, 0, parsed_args.len())),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        INTERVAL_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
             },
             DATE_TYPE_NAME => PostgresType::Date,
             TIME_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::Time(Option::Some(*arg)),
                 [] => PostgresType::Time(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(TIME_TYPE_NAME, 0, parsed_args.len())),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIME_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
             },
             TIME_WITH_TIMEZONE_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::TimeWithTimeZone(Option::Some(*arg)),
                 [] => PostgresType::TimeWithTimeZone(None),
                 _ => {
-                    return Err(self.wrap_in_argument_count_mismatch_error(
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
                         TIME_WITH_TIMEZONE_TYPE_NAME,
                         1,
                         parsed_args.len(),

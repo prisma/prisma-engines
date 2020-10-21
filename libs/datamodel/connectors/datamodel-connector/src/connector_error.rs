@@ -24,6 +24,18 @@ impl ConnectorError {
         })
     }
 
+    pub fn new_optional_argument_count_mismatch_error(
+        native_type: &str,
+        optional_count: usize,
+        given_count: usize,
+    ) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
+            native_type: String::from(native_type),
+            optional_count,
+            given_count,
+        })
+    }
+
     pub fn new_incompatible_native_type_with_unique(native_type: &str, connector_name: &str) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithUniqueAttribute {
             native_type: String::from(native_type),
@@ -87,6 +99,18 @@ pub enum ErrorKind {
     ArgumentCountMisMatchError {
         native_type: String,
         required_count: usize,
+        given_count: usize,
+    },
+
+    #[error(
+        "Native type {} takes {} optional arguments, but received {}.",
+        native_type,
+        required_count,
+        given_count
+    )]
+    OptionalArgumentCountMismatchError {
+        native_type: String,
+        optional_count: usize,
         given_count: usize,
     },
 

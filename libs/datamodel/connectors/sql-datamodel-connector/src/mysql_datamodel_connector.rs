@@ -225,17 +225,35 @@ impl Connector for MySqlDatamodelConnector {
             TIME_TYPE_NAME => match parsed_args.as_slice() {
                 [fractions] => MySqlType::Time(Option::Some(*fractions)),
                 [] => MySqlType::Time(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(TIME_TYPE_NAME, 0, parsed_args.len())),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIME_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
             },
             DATETIME_TYPE_NAME => match parsed_args.as_slice() {
                 [fractions] => MySqlType::DateTime(Option::Some(*fractions)),
                 [] => MySqlType::DateTime(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DATETIME_TYPE_NAME, 0, parsed_args.len())),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        DATETIME_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
             },
             TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
                 [fractions] => MySqlType::Timestamp(Option::Some(*fractions)),
                 [] => MySqlType::Timestamp(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(TIMESTAMP_TYPE_NAME, 0, parsed_args.len())),
+                _ => {
+                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
+                        TIMESTAMP_TYPE_NAME,
+                        1,
+                        parsed_args.len(),
+                    ))
+                }
             },
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,

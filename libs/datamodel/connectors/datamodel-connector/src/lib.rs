@@ -80,6 +80,15 @@ pub trait Connector: Send + Sync {
     ) -> ConnectorError {
         ConnectorError::new_argument_count_mismatch_error(native_type, required_count, given_count)
     }
+
+    fn wrap_in_optional_argument_count_mismatch_error(
+        &self,
+        native_type: &str,
+        optional_count: usize,
+        given_count: usize,
+    ) -> ConnectorError {
+        ConnectorError::new_optional_argument_count_mismatch_error(native_type, optional_count, given_count)
+    }
 }
 
 /// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
