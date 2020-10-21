@@ -1,10 +1,9 @@
 pub(crate) mod expanded_alter_column;
 
+use crate::sql_schema_differ::ColumnChanges;
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Deserialize, Serialize};
 use sql_schema_describer::{Column, ForeignKey, Index, SqlSchema, Table};
-
-use crate::sql_schema_differ::ColumnChanges;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SqlMigration {
@@ -43,7 +42,7 @@ pub enum SqlMigrationStep {
     DropForeignKey(DropForeignKey),
     DropTable(DropTable),
     RenameTable { name: String, new_name: String },
-    RedefineTables { names: Vec<String> },
+    RedefineTables { tables: Vec<AlterTable> },
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
     AlterIndex(AlterIndex),
@@ -110,6 +109,29 @@ pub enum TableChange {
     },
 }
 
+impl TableChange {
+    pub(crate) fn as_add_column(&self) -> Option<&AddColumn> {
+        match self {
+            TableChange::AddColumn(add_column) => Some(add_column),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn as_alter_column(&self) -> Option<&AlterColumn> {
+        match self {
+            TableChange::AlterColumn(alter_column) => Some(alter_column),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn as_drop_column(&self) -> Option<&DropColumn> {
+        match self {
+            TableChange::DropColumn(drop_column) => Some(drop_column),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AddColumn {
     pub column: Column,
@@ -118,6 +140,8 @@ pub struct AddColumn {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropColumn {
     pub name: String,
+    #[serde(skip)]
+    pub(crate) index: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -195,9 +219,4 @@ impl AlterEnum {
     pub(crate) fn is_empty(&self) -> bool {
         self.created_variants.is_empty() && self.dropped_variants.is_empty()
     }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
-pub struct RedefineTable {
-    pub name: String,
 }

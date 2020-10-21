@@ -3,6 +3,8 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
+use sql_schema_describer::walkers::ColumnWalker;
+
 use super::DestructiveCheckPlan;
 use crate::{sql_migration::AlterColumn, sql_schema_differ::ColumnChanges, sql_schema_differ::ColumnDiffer};
 
@@ -12,7 +14,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: &ColumnDiffer<'_>,
+        columns: (&ColumnWalker<'_>, &ColumnWalker<'_>),
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     );

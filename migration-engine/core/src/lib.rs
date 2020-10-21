@@ -14,9 +14,9 @@ mod core_error;
 
 pub use api::GenericApi;
 pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, SchemaPushInput};
-use commands::{MigrationCommand, SchemaPushCommand};
 pub use core_error::{CoreError, CoreResult};
 
+use commands::{MigrationCommand, SchemaPushCommand};
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,

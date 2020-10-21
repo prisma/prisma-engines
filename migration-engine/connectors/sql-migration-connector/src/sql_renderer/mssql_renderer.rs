@@ -56,7 +56,7 @@ impl SqlRenderer for MssqlFlavour {
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name }) => {
+                TableChange::DropColumn(DropColumn { name, .. }) => {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
@@ -278,7 +278,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_redefine_tables(&self, _tables: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _tables: &[AlterTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on MSSQL")
     }
 

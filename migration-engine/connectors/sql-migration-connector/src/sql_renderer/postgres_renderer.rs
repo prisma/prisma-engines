@@ -193,7 +193,7 @@ impl SqlRenderer for PostgresFlavour {
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name }) => {
+                TableChange::DropColumn(DropColumn { name, .. }) => {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
@@ -229,8 +229,7 @@ impl SqlRenderer for PostgresFlavour {
                         .next
                         .table_walker(&table.name)
                         .expect("AlterTable on unknown table")
-                        .column_at(*next_idx)
-                        .expect("AlterColumn on unknown column.");
+                        .column_at(*next_idx);
 
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
@@ -388,7 +387,7 @@ impl SqlRenderer for PostgresFlavour {
         vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
     }
 
-    fn render_redefine_tables(&self, _names: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[AlterTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on Postgres")
     }
 
@@ -446,7 +445,7 @@ fn render_alter_column(
     static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
 
-    let steps = expand_postgres_alter_column(differ, column_changes);
+    let steps = expand_postgres_alter_column((&differ.previous, &differ.next), column_changes);
     let table_name = Quoted::postgres_ident(differ.previous.table().name());
     let column_name = Quoted::postgres_ident(differ.previous.name());
 

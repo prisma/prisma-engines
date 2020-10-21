@@ -157,7 +157,7 @@ fn render_raw_sql(
     };
 
     match step {
-        SqlMigrationStep::RedefineTables { names, .. } => renderer.render_redefine_tables(names, differ),
+        SqlMigrationStep::RedefineTables { tables } => renderer.render_redefine_tables(tables, differ),
         SqlMigrationStep::CreateEnum(create_enum) => renderer.render_create_enum(create_enum),
         SqlMigrationStep::DropEnum(drop_enum) => renderer.render_drop_enum(drop_enum),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),

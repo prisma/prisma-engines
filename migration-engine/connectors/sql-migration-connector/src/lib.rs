@@ -21,6 +21,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::Connection;
+use datamodel::Datamodel;
 use error::quaint_error_to_connector_error;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
@@ -147,7 +148,7 @@ impl MigrationConnector for SqlMigrationConnector {
     /// the specific database version being used.
     fn check_database_version_compatibility(
         &self,
-        datamodel: &datamodel::dml::Datamodel,
+        datamodel: &Datamodel,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         self.database_info.check_database_version_compatibility(datamodel)
     }

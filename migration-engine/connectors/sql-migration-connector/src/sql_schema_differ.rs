@@ -44,21 +44,18 @@ pub struct SqlSchemaDiff {
     pub create_enums: Vec<CreateEnum>,
     pub drop_enums: Vec<DropEnum>,
     pub alter_enums: Vec<AlterEnum>,
-    /// The indexes of the tables to redefine in the (previous, next) schema.
+    /// The names of the tables to redefine.
     tables_to_redefine: HashSet<String>,
+    redefine_tables: Vec<AlterTable>,
 }
 
 impl SqlSchemaDiff {
     /// Translate the diff into steps that should be executed in order. The general idea in the
     /// ordering of steps is to drop obsolete constraints first, alter/create tables, then add the new constraints.
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
-        let redefine_tables = Some(self.tables_to_redefine)
+        let redefine_tables = Some(self.redefine_tables)
             .filter(|tables| !tables.is_empty())
-            .map(|names| {
-                let mut names: Vec<String> = names.into_iter().collect();
-                names.sort();
-                SqlMigrationStep::RedefineTables { names }
-            });
+            .map(|tables| SqlMigrationStep::RedefineTables { tables });
 
         wrap_as_step(self.create_enums, SqlMigrationStep::CreateEnum)
             .chain(wrap_as_step(self.alter_enums, SqlMigrationStep::AlterEnum))
@@ -126,6 +123,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             create_enums: self.create_enums(),
             drop_enums: self.drop_enums(),
             alter_enums: self.alter_enums(),
+            redefine_tables: self.redefine_tables(&tables_to_redefine),
             tables_to_redefine,
         }
     }
@@ -187,12 +185,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .filter(|tables| !tables_to_redefine.contains(tables.next.name()))
             .filter_map(|tables| {
                 // Order matters.
-                let changes: Vec<TableChange> = Self::drop_primary_key(&tables)
+                let changes: Vec<TableChange> = SqlSchemaDiffer::drop_primary_key(&tables)
                     .into_iter()
-                    .chain(Self::drop_columns(&tables))
-                    .chain(Self::add_columns(&tables))
-                    .chain(Self::alter_columns(&tables))
-                    .chain(Self::add_primary_key(&tables))
+                    .chain(SqlSchemaDiffer::drop_columns(&tables))
+                    .chain(SqlSchemaDiffer::add_columns(&tables))
+                    .chain(SqlSchemaDiffer::alter_columns(&tables))
+                    .chain(SqlSchemaDiffer::add_primary_key(&tables))
                     .collect();
 
                 Some(changes)
@@ -209,6 +207,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         differ.dropped_columns().map(|column| {
             let change = DropColumn {
                 name: column.name().to_owned(),
+                index: column.column_index(),
             };
 
             TableChange::DropColumn(change)
@@ -376,6 +375,27 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn alter_enums(&self) -> Vec<AlterEnum> {
         self.flavour.alter_enums(self)
+    }
+
+    fn redefine_tables(&self, tables_to_redefine: &HashSet<String>) -> Vec<AlterTable> {
+        self.table_pairs()
+            .filter(|tables| tables_to_redefine.contains(tables.next.name()))
+            .map(|tables| {
+                // Order matters.
+                let changes: Vec<TableChange> = SqlSchemaDiffer::drop_primary_key(&tables)
+                    .into_iter()
+                    .chain(SqlSchemaDiffer::drop_columns(&tables))
+                    .chain(SqlSchemaDiffer::add_columns(&tables))
+                    .chain(SqlSchemaDiffer::alter_columns(&tables))
+                    .chain(SqlSchemaDiffer::add_primary_key(&tables))
+                    .collect();
+
+                AlterTable {
+                    table: tables.next.table().clone(),
+                    changes,
+                }
+            })
+            .collect()
     }
 
     /// An iterator over the tables that are present in both schemas.

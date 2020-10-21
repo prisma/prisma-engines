@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 //! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
