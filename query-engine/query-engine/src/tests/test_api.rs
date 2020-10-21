@@ -21,6 +21,7 @@ pub struct QueryEngine {
 }
 
 impl QueryEngine {
+    #[allow(dead_code)]
     pub fn new(ctx: PrismaContext) -> Self {
         QueryEngine { context: Arc::new(ctx) }
     }
