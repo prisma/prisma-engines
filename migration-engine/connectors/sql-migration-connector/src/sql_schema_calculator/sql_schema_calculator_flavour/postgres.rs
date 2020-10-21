@@ -56,7 +56,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             PostgresType::Bit(size) => format!("BIT({})", size),
             PostgresType::VarBit(size) => format!("VARBIT({})", size),
             PostgresType::UUID => "UUID".to_owned(),
-            PostgresType::XML => "XML".to_owned(),
+            PostgresType::Xml => "XML".to_owned(),
             PostgresType::JSON => "JSON".to_owned(),
             PostgresType::JSONB => "JSONB".to_owned(),
         };

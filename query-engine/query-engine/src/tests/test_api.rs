@@ -21,6 +21,7 @@ pub struct QueryEngine {
 }
 
 impl QueryEngine {
+    #[allow(dead_code)]
     pub fn new(ctx: PrismaContext) -> Self {
         QueryEngine { context: Arc::new(ctx) }
     }
@@ -43,6 +44,8 @@ pub struct TestApi {
 
 impl TestApi {
     pub async fn create_engine(&self, datamodel: &str) -> anyhow::Result<QueryEngine> {
+        feature_flags::initialize(&[String::from("all")]).unwrap();
+
         let datamodel_string = format!("{}\n\n{}", self.config, datamodel);
         let dml = datamodel::parse_datamodel(&datamodel_string).unwrap().subject;
         let config = datamodel::parse_configuration(&datamodel_string).unwrap();

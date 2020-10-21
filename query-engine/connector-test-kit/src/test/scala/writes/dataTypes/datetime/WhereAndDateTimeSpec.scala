@@ -24,9 +24,8 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Using the same input in an update using where as used during creation of the item" should "work" in {
-
-    val outerWhere = """"2018-12-05T12:34:23.000Z""""
-    val innerWhere = """"2019-12-05T12:34:23.000Z""""
+    val outerWhere = """"2018-12-05T12:34:23+00:00""""
+    val innerWhere = """"2019-12-05T12:34:23+00:00""""
 
     database.setup(project)
 
@@ -74,19 +73,19 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(
       s"""query{note(where:{outerDateTime:$outerWhere}){outerString, outerDateTime}}""",
       project,
-      dataContains = """{"note":{"outerString":"Changed Outer String","outerDateTime":"2018-12-05T12:34:23.000Z"}}"""
+      dataContains = """{"note":{"outerString":"Changed Outer String","outerDateTime":"2018-12-05T12:34:23+00:00"}}"""
     )
 
     server.query(
       s"""query{todo(where:{innerDateTime:$innerWhere}){innerString, innerDateTime}}""",
       project,
-      dataContains = """{"todo":{"innerString":"Changed Inner String","innerDateTime":"2019-12-05T12:34:23.000Z"}}"""
+      dataContains = """{"todo":{"innerString":"Changed Inner String","innerDateTime":"2019-12-05T12:34:23+00:00"}}"""
     )
   }
 
   "Using the same input in an update using where as used during creation of the item" should "work with the same time for inner and outer" in {
-    val outerWhere = """"2018-01-03T11:27:38.000Z""""
-    val innerWhere = """"2018-01-03T11:27:38.000Z""""
+    val outerWhere = """"2018-01-03T11:27:38+00:00""""
+    val innerWhere = """"2018-01-03T11:27:38+00:00""""
 
     database.setup(project)
 
@@ -136,12 +135,12 @@ class WhereAndDateTimeSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(
       s"""query{note(where:{outerDateTime:$outerWhere}){outerString, outerDateTime}}""",
       project,
-      dataContains = s"""{"note":{"outerString":"Changed Outer String","outerDateTime":"2018-01-03T11:27:38.000Z"}}"""
+      dataContains = s"""{"note":{"outerString":"Changed Outer String","outerDateTime":"2018-01-03T11:27:38+00:00"}}"""
     )
     server.query(
       s"""query{todo(where:{innerDateTime:$innerWhere}){innerString, innerDateTime}}""",
       project,
-      dataContains = s"""{"todo":{"innerString":"Changed Inner String","innerDateTime":"2018-01-03T11:27:38.000Z"}}"""
+      dataContains = s"""{"todo":{"innerString":"Changed Inner String","innerDateTime":"2018-01-03T11:27:38+00:00"}}"""
     )
   }
 

@@ -160,7 +160,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             url             = "mysql://localhost/test"
         }}
 
-    
+
         model Blog {{
             id                             Int            @id
             int                            Int

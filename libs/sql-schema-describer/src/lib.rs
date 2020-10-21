@@ -337,7 +337,7 @@ pub enum ColumnTypeFamily {
     Binary,
     /// JSON types.
     Json,
-    /// UUID types.
+    /// Xml types.
     Xml,
     /// UUID types.
     Uuid,
