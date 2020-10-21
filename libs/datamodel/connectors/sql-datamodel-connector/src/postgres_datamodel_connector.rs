@@ -135,7 +135,7 @@ impl Connector for PostgresDatamodelConnector {
                             "Postgres",
                         ));
                     }
-                    _ => panic!(),
+                    _ => {}
                 }
             }
         }
