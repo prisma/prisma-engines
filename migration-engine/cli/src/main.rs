@@ -16,6 +16,9 @@ struct MigrationEngineCli {
     /// Path to the datamodel
     #[structopt(short = "d", long, name = "FILE")]
     datamodel: Option<String>,
+    /// A list of blocked preview features to enable (`all` enables everything).
+    #[structopt(long, use_delimiter = true)]
+    enabled_preview_features: Vec<String>,
     #[structopt(subcommand)]
     cli_subcommand: Option<SubCommand>,
 }
@@ -46,19 +49,19 @@ async fn main() {
     match input.cli_subcommand {
         None => {
             if let Some(datamodel_location) = input.datamodel.as_ref() {
-                start_engine(datamodel_location).await
+                start_engine(datamodel_location, input.enabled_preview_features).await
             } else {
                 panic!("Missing --datamodel");
             }
         }
         Some(SubCommand::Cli(cli_command)) => {
             tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
-            cli_command.run().await;
+            cli_command.run(input.enabled_preview_features).await;
         }
     }
 }
 
-async fn start_engine(datamodel_location: &str) -> ! {
+async fn start_engine(datamodel_location: &str, enabled_preview_features: Vec<String>) -> ! {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
@@ -67,7 +70,7 @@ async fn start_engine(datamodel_location: &str) -> ! {
     let mut datamodel = String::new();
     file.read_to_string(&mut datamodel).unwrap();
 
-    match RpcApi::new(&datamodel).await {
+    match RpcApi::new(&datamodel, enabled_preview_features).await {
         // Block the thread and handle IO in async until EOF.
         Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
         Err(err) => {

@@ -76,10 +76,10 @@ const AVAILABLE_COMMANDS: &[RpcCommand] = &[
 ];
 
 impl RpcApi {
-    pub async fn new(datamodel: &str) -> CoreResult<Self> {
+    pub async fn new(datamodel: &str, enabled_preview_features: Vec<String>) -> CoreResult<Self> {
         let mut rpc_api = Self {
             io_handler: IoHandler::default(),
-            executor: crate::migration_api(datamodel).await?,
+            executor: crate::migration_api(datamodel, enabled_preview_features).await?,
         };
 
         for cmd in AVAILABLE_COMMANDS {

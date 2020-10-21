@@ -1,5 +1,5 @@
 use migration_connector::steps::{DeleteModel, MigrationStep};
-use migration_core::api::RpcApi;
+use migration_core::{api::RpcApi, GateKeeper};
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
@@ -22,7 +22,10 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+        .await
+        .map(|_| ())
+        .unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -59,7 +62,10 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+        .await
+        .map(|_| ())
+        .unwrap_err();
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -96,7 +102,10 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+        .await
+        .map(|_| ())
+        .unwrap_err();
 
     let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
@@ -133,7 +142,10 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+        .await
+        .map(|_| ())
+        .unwrap_err();
 
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap();
@@ -171,7 +183,10 @@ async fn database_does_not_exist_must_return_a_proper_error() {
         url
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+        .await
+        .map(|_| ())
+        .unwrap_err();
 
     let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
     let expected = json!({
@@ -214,7 +229,10 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
         url,
     );
 
-    let error = RpcApi::new(&dm).await.map(|_| ()).unwrap_err();
+    let error = RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+        .await
+        .map(|_| ())
+        .unwrap_err();
     let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
 
     let expected = json!({
@@ -243,7 +261,10 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
         postgres_10_url(db_name),
     );
 
-    let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
+    let error = RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+        .await
+        .map(drop)
+        .unwrap_err();
 
     let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
 
@@ -283,7 +304,10 @@ async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> Tes
         // "mysql" is the default in Quaint.
         let name = if name == &"" { "mysql" } else { name };
 
-        let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
+        let error = RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+            .await
+            .map(drop)
+            .unwrap_err();
 
         let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
 
@@ -398,6 +422,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
     } else {
         "Unique constraint failed on the fields: (`name`)"
     };
+
     let expected_target = if api.sql_family().is_mysql() {
         json!("name_unique")
     } else {
@@ -450,4 +475,155 @@ async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
         .contains("- The `Json` data type used in Test.j is not supported on MySQL 5.6.\n"));
 
     Ok(())
+}
+
+#[tokio::test]
+async fn microsoft_sql_server_is_not_allowed_in_migration_engine() {
+    let url = mssql_2019_url("master");
+
+    let dm = format!(
+        r#"
+            datasource db {{
+              provider = "sqlserver"
+              url = "{}"
+            }}
+
+            generator js {{
+              provider = "prisma-client-js"
+              previewFeatures = ["microsoftSqlServer"]
+            }}
+        "#,
+        url
+    );
+
+    let error = RpcApi::new(&dm, vec![String::from("nativeTypes")])
+        .await
+        .map(|_| ())
+        .unwrap_err();
+
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+
+    let expected = json!({
+        "is_panic": false,
+        "message": "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations.",
+        "meta": {
+            "features": ["microsoftSqlServer"]
+        },
+        "error_code": "P3007"
+    });
+
+    assert_eq!(expected, json_error);
+}
+
+#[tokio::test]
+async fn native_types_are_not_allowed_in_migration_engine() {
+    let url = mysql_5_6_url("master");
+
+    let dm = format!(
+        r#"
+            datasource db {{
+              provider = "mysql"
+              url = "{}"
+            }}
+
+            generator js {{
+              provider = "prisma-client-js"
+              previewFeatures = ["nativeTypes"]
+            }}
+        "#,
+        url
+    );
+
+    let error = RpcApi::new(&dm, vec![String::from("microsoftSqlServer")])
+        .await
+        .map(|_| ())
+        .unwrap_err();
+
+    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
+
+    let expected = json!({
+        "is_panic": false,
+        "message": "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations.",
+        "meta": {
+            "features": ["nativeTypes"]
+        },
+        "error_code": "P3007"
+    });
+
+    assert_eq!(expected, json_error);
+}
+
+#[tokio::test]
+async fn one_can_allow_all_preview_features() {
+    let url = mssql_2019_url("master");
+
+    let dm = format!(
+        r#"
+            datasource db {{
+              provider = "sqlserver"
+              url = "{}"
+            }}
+
+            generator js {{
+              provider = "prisma-client-js"
+              previewFeatures = ["microsoftSqlServer", "nativeTypes"]
+            }}
+        "#,
+        url
+    );
+
+    assert!(RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
+        .await
+        .map(|_| ())
+        .is_ok());
+}
+
+#[tokio::test]
+async fn one_can_allow_microsoft_sql_server() {
+    let url = mssql_2019_url("master");
+
+    let dm = format!(
+        r#"
+            datasource db {{
+              provider = "sqlserver"
+              url = "{}"
+            }}
+
+            generator js {{
+              provider = "prisma-client-js"
+              previewFeatures = ["microsoftSqlServer"]
+            }}
+        "#,
+        url
+    );
+
+    assert!(RpcApi::new(&dm, vec![String::from("microsoftSqlServer")])
+        .await
+        .map(|_| ())
+        .is_ok());
+}
+
+#[tokio::test]
+async fn one_can_allow_native_types() {
+    let url = mssql_2019_url("master");
+
+    let dm = format!(
+        r#"
+            datasource db {{
+              provider = "sqlserver"
+              url = "{}"
+            }}
+
+            generator js {{
+              provider = "prisma-client-js"
+              previewFeatures = ["nativeTypes"]
+            }}
+        "#,
+        url
+    );
+
+    assert!(RpcApi::new(&dm, vec![String::from("nativeTypes")])
+        .await
+        .map(|_| ())
+        .is_ok());
 }
