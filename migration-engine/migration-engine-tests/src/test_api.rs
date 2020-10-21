@@ -55,7 +55,6 @@ pub struct TestApi {
     connector_name: &'static str,
     database: Quaint,
     api: MigrationApi<SqlMigrationConnector, SqlMigration>,
-    connection_info: ConnectionInfo,
     tags: BitFlags<Tags>,
 }
 
@@ -65,7 +64,7 @@ impl TestApi {
     }
 
     pub fn schema_name(&self) -> &str {
-        self.connection_info.schema_name()
+        self.connection_info().schema_name()
     }
 
     pub fn database(&self) -> &Quaint {
@@ -73,11 +72,11 @@ impl TestApi {
     }
 
     pub fn is_sqlite(&self) -> bool {
-        self.sql_family() == SqlFamily::Sqlite
+        self.tags.contains(Tags::Sqlite)
     }
 
     pub fn is_mysql(&self) -> bool {
-        self.sql_family() == SqlFamily::Mysql
+        self.tags.contains(Tags::Mysql)
     }
 
     pub fn is_mysql_8(&self) -> bool {
@@ -97,7 +96,7 @@ impl TestApi {
     }
 
     pub fn connection_info(&self) -> &ConnectionInfo {
-        &self.connection_info
+        &self.database.connection_info()
     }
 
     pub fn sql_family(&self) -> SqlFamily {
@@ -115,7 +114,7 @@ impl TestApi {
 
     /// Render a table name with the required prefixing for use with quaint query building.
     pub fn render_table_name<'a>(&'a self, table_name: &'a str) -> quaint::ast::Table<'a> {
-        if self.connection_info().sql_family().is_sqlite() {
+        if self.is_sqlite() {
             table_name.into()
         } else {
             (self.connection_info().schema_name(), table_name).into()
@@ -333,12 +332,10 @@ impl<'a> TestApiSelect<'a> {
 pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_8_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
         connector_name: "mysql_8",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -348,12 +345,10 @@ pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
 pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_5_6_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
         connector_name: "mysql_5_6",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -363,12 +358,10 @@ pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
 pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
         connector_name: "mysql",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -378,12 +371,10 @@ pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
 pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mariadb_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
         connector_name: "mysql_mariadb",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -393,12 +384,10 @@ pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
 pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_9_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
         connector_name: "postgres9",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -408,12 +397,10 @@ pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
 pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_10_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
         connector_name: "postgres",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -423,12 +410,10 @@ pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
 pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_11_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
         connector_name: "postgres11",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -436,14 +421,11 @@ pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
 }
 
 pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_12_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let url = postgres_12_url(args.test_function_name);
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
         connector_name: "postgres12",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -451,14 +433,11 @@ pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
 }
 
 pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_13_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let url = postgres_13_url(args.test_function_name);
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
         connector_name: "postgres13",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -467,12 +446,10 @@ pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
 
 pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
-    let connection_info = ConnectionInfo::from_url(&sqlite_test_url(db_name)).unwrap();
     let connector = sqlite_migration_connector(db_name).await;
 
     TestApi {
         connector_name: "sqlite",
-        connection_info,
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,

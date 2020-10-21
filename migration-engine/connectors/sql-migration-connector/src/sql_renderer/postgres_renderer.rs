@@ -292,8 +292,12 @@ impl SqlRenderer for PostgresFlavour {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_))
+            | (DefaultValue::VALUE(PrismaValue::Xml(val)), ColumnTypeFamily::Xml) => {
                 format!("E'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("'{}'", format_hex(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
@@ -411,14 +415,14 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::Boolean => format!("boolean {}", array),
         ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),
         ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
+        ColumnTypeFamily::Decimal => format!("Decimal(65,30) {}", array),
         ColumnTypeFamily::Int => format!("integer {}", array),
         ColumnTypeFamily::String => format!("text {}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
         ColumnTypeFamily::Json => format!("jsonb {}", array),
+        ColumnTypeFamily::Binary => format!("bytea {}", array),
         ColumnTypeFamily::Xml => format!("xml {}", array),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
-        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
-        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }

@@ -138,7 +138,7 @@ impl ValueGeneratorFn {
     }
 
     fn generate_now() -> Option<PrismaValue> {
-        Some(PrismaValue::DateTime(Utc::now()))
+        Some(PrismaValue::DateTime(Utc::now().into()))
     }
 }
 

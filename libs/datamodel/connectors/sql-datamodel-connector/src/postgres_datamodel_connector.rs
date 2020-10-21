@@ -1,6 +1,6 @@
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
-use dml::field::Field;
+use dml::field::{Field, FieldType};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
@@ -78,7 +78,7 @@ impl PostgresDatamodelConnector {
         let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, ScalarType::String);
         let varbit = NativeTypeConstructor::with_args(VAR_BIT_TYPE_NAME, 1, ScalarType::String);
         let uuid = NativeTypeConstructor::without_args(UUID_TYPE_NAME, ScalarType::String);
-        let xml = NativeTypeConstructor::without_args(XML_TYPE_NAME, ScalarType::XML);
+        let xml = NativeTypeConstructor::without_args(XML_TYPE_NAME, ScalarType::Xml);
         let json = NativeTypeConstructor::without_args(JSON_TYPE_NAME, ScalarType::Json);
         let json_b = NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, ScalarType::Json);
 
@@ -124,7 +124,21 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
-    fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
+    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
+        if let FieldType::NativeType(_scalar_type, native_type) = field.field_type() {
+            let native_type_name = native_type.name.as_str();
+            if native_type_name == DECIMAL_TYPE_NAME || native_type_name == NUMERIC_TYPE_NAME {
+                match native_type.args.as_slice() {
+                    [precision, scale] if scale > precision => {
+                        return Err(ConnectorError::new_scale_larger_than_precision_error(
+                            native_type_name,
+                            "Postgres",
+                        ));
+                    }
+                    _ => {}
+                }
+            }
+        }
         Ok(())
     }
 
@@ -211,7 +225,7 @@ impl Connector for PostgresDatamodelConnector {
                 }
             }
             UUID_TYPE_NAME => PostgresType::UUID,
-            XML_TYPE_NAME => PostgresType::XML,
+            XML_TYPE_NAME => PostgresType::Xml,
             JSON_TYPE_NAME => PostgresType::JSON,
             JSON_B_TYPE_NAME => PostgresType::JSONB,
             _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
@@ -251,7 +265,7 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::Bit(x) => (BIT_TYPE_NAME, vec![x]),
             PostgresType::VarBit(x) => (VAR_BIT_TYPE_NAME, vec![x]),
             PostgresType::UUID => (UUID_TYPE_NAME, vec![]),
-            PostgresType::XML => (XML_TYPE_NAME, vec![]),
+            PostgresType::Xml => (XML_TYPE_NAME, vec![]),
             PostgresType::JSON => (JSON_TYPE_NAME, vec![]),
             PostgresType::JSONB => (JSON_B_TYPE_NAME, vec![]),
         };

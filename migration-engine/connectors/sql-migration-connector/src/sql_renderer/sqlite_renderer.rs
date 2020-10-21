@@ -99,6 +99,9 @@ impl SqlRenderer for SqliteFlavour {
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
                 format!("'{}'", escape_quotes(&val)).into()
             }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("'{}'", format_hex(b)).into()
+            }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
@@ -278,13 +281,13 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Boolean => "BOOLEAN",
         ColumnTypeFamily::DateTime => "DATETIME",
         ColumnTypeFamily::Float => "REAL",
+        ColumnTypeFamily::Decimal => "REAL",
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::String => "TEXT",
+        ColumnTypeFamily::Binary => "BLOB",
         ColumnTypeFamily::Json => unimplemented!("Json not handled yet"),
         ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
-        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
-        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Xml => unimplemented!("Xml not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),

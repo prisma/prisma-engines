@@ -61,33 +61,41 @@ pub(crate) fn map_field(ctx: &mut BuilderContext, model_field: &ModelField) -> O
 }
 
 pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputType {
-    let output_type = match model_field {
-        ModelField::Relation(rf) => {
-            let related_model_obj = OutputType::object(map_model_object_type(ctx, &rf.related_model()));
+    match model_field {
+        ModelField::Scalar(sf) => map_scalar_output_type(sf),
+        ModelField::Relation(rf) => map_relation_output_type(ctx, rf),
+    }
+}
 
-            if rf.is_list {
-                OutputType::list(related_model_obj)
-            } else {
-                related_model_obj
-            }
-        }
-
-        ModelField::Scalar(sf) => match sf.type_identifier {
-            TypeIdentifier::String => OutputType::string(),
-            TypeIdentifier::Float => OutputType::float(),
-            TypeIdentifier::Boolean => OutputType::boolean(),
-            TypeIdentifier::Enum(_) => map_enum_field(sf).into(),
-            TypeIdentifier::Json => OutputType::json(),
-            TypeIdentifier::DateTime => OutputType::date_time(),
-            TypeIdentifier::UUID => OutputType::uuid(),
-            TypeIdentifier::Int => OutputType::int(),
-        },
+pub(crate) fn map_scalar_output_type(field: &ScalarFieldRef) -> OutputType {
+    let output_type = match field.type_identifier {
+        TypeIdentifier::String => OutputType::string(),
+        TypeIdentifier::Float => OutputType::float(),
+        TypeIdentifier::Decimal => OutputType::decimal(),
+        TypeIdentifier::Boolean => OutputType::boolean(),
+        TypeIdentifier::Enum(_) => map_enum_field(field).into(),
+        TypeIdentifier::Json => OutputType::json(),
+        TypeIdentifier::DateTime => OutputType::date_time(),
+        TypeIdentifier::UUID => OutputType::uuid(),
+        TypeIdentifier::Int => OutputType::int(),
+        TypeIdentifier::Xml => OutputType::xml(),
+        TypeIdentifier::Bytes => OutputType::bytes(),
     };
 
-    if model_field.is_scalar() && model_field.is_list() {
+    if field.is_list {
         OutputType::list(output_type)
     } else {
         output_type
+    }
+}
+
+pub(crate) fn map_relation_output_type(ctx: &mut BuilderContext, field: &RelationFieldRef) -> OutputType {
+    let related_model_obj = OutputType::object(map_model_object_type(ctx, &field.related_model()));
+
+    if field.is_list {
+        OutputType::list(related_model_obj)
+    } else {
+        related_model_obj
     }
 }
 
@@ -128,12 +136,23 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
 
     append_opt(
         &mut fields,
-        numeric_aggregation_field(ctx, "avg", &model, Some(OutputType::float())),
+        numeric_aggregation_field(ctx, "avg", &model, field_avg_output_type),
     );
 
-    append_opt(&mut fields, numeric_aggregation_field(ctx, "sum", &model, None));
-    append_opt(&mut fields, numeric_aggregation_field(ctx, "min", &model, None));
-    append_opt(&mut fields, numeric_aggregation_field(ctx, "max", &model, None));
+    append_opt(
+        &mut fields,
+        numeric_aggregation_field(ctx, "sum", &model, map_scalar_output_type),
+    );
+
+    append_opt(
+        &mut fields,
+        numeric_aggregation_field(ctx, "min", &model, map_scalar_output_type),
+    );
+
+    append_opt(
+        &mut fields,
+        numeric_aggregation_field(ctx, "max", &model, map_scalar_output_type),
+    );
 
     object.set_fields(fields);
     ctx.cache_output_type(name, ObjectTypeStrongRef::clone(&object));
@@ -147,12 +166,15 @@ pub(crate) fn count_field() -> OutputField {
 
 /// Returns an aggregation field with given name if the model contains any numeric fields.
 /// Fields inside the object type of the field may have a fixed output type.
-pub(crate) fn numeric_aggregation_field(
+pub(crate) fn numeric_aggregation_field<F>(
     ctx: &mut BuilderContext,
     name: &str,
     model: &ModelRef,
-    fixed_field_type: Option<OutputType>,
-) -> Option<OutputField> {
+    type_mapper: F,
+) -> Option<OutputField>
+where
+    F: Fn(&ScalarFieldRef) -> OutputType,
+{
     let numeric_fields = collect_numeric_fields(model);
 
     if numeric_fields.is_empty() {
@@ -163,7 +185,7 @@ pub(crate) fn numeric_aggregation_field(
             model,
             name,
             &numeric_fields,
-            fixed_field_type,
+            type_mapper,
         ));
 
         Some(field(name, vec![], object_type, None).optional())
@@ -172,29 +194,22 @@ pub(crate) fn numeric_aggregation_field(
 
 /// Maps the object type for aggregations that operate on a (numeric) field level, rather than the entire model.
 /// Fields inside the object may have a fixed output type.
-pub(crate) fn map_numeric_field_aggregation_object(
+pub(crate) fn map_numeric_field_aggregation_object<F>(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     suffix: &str,
     fields: &[ScalarFieldRef],
-    fixed_field_type: Option<OutputType>,
-) -> ObjectTypeWeakRef {
+    type_mapper: F,
+) -> ObjectTypeWeakRef
+where
+    F: Fn(&ScalarFieldRef) -> OutputType,
+{
     let name = format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix));
     return_cached_output!(ctx, &name);
 
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|sf| {
-            field(
-                sf.name.clone(),
-                vec![],
-                fixed_field_type
-                    .clone()
-                    .unwrap_or(map_output_type(ctx, &ModelField::Scalar(sf.clone()))),
-                None,
-            )
-            .optional_if(!sf.is_required)
-        })
+        .map(|sf| field(sf.name.clone(), vec![], type_mapper(sf), None).optional_if(!sf.is_required))
         .collect();
 
     let object = Arc::new(object_type(name.clone(), fields, None));
@@ -203,15 +218,24 @@ pub(crate) fn map_numeric_field_aggregation_object(
     Arc::downgrade(&object)
 }
 
+fn field_avg_output_type(field: &ScalarFieldRef) -> OutputType {
+    match field.type_identifier {
+        TypeIdentifier::Int | TypeIdentifier::Float => OutputType::float(),
+        TypeIdentifier::Decimal => OutputType::decimal(),
+        _ => map_scalar_output_type(field),
+    }
+}
+
 fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
     model
         .fields()
         .scalar()
         .into_iter()
-        .filter(|f| match f.type_identifier {
-            TypeIdentifier::Int => true,
-            TypeIdentifier::Float => true,
-            _ => false,
+        .filter(|f| {
+            matches!(
+                f.type_identifier,
+                TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::Decimal
+            )
         })
         .collect()
 }
