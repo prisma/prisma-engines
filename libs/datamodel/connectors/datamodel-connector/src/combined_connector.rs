@@ -2,6 +2,7 @@ use super::Connector;
 use crate::connector_error::ConnectorError;
 use crate::{ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
 use dml::field::Field;
+use dml::model::Model;
 
 pub struct CombinedConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -34,6 +35,10 @@ impl Connector for CombinedConnector {
     }
 
     fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
+        Ok(())
+    }
+
+    fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
         Ok(())
     }
 

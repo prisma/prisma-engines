@@ -1,6 +1,7 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::Field;
+use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 
@@ -27,6 +28,10 @@ impl Connector for SqliteDatamodelConnector {
     }
 
     fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
+        Ok(())
+    }
+
+    fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
         Ok(())
     }
 

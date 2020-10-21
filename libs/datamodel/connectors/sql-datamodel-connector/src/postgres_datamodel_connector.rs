@@ -2,6 +2,7 @@ use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::parse_u32_arguments;
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
+use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
@@ -140,6 +141,10 @@ impl Connector for PostgresDatamodelConnector {
                 }
             }
         }
+        Ok(())
+    }
+
+    fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
         Ok(())
     }
 

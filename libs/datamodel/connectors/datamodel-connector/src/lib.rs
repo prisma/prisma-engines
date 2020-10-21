@@ -6,6 +6,7 @@ pub mod helper;
 use crate::connector_error::ConnectorError;
 pub use combined_connector::CombinedConnector;
 use dml::field::Field;
+use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 
@@ -17,6 +18,8 @@ pub trait Connector: Send + Sync {
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
+
+    fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;
 
     /// Returns all available native type constructors available through this connector.
     /// Powers the auto completion of the vs code plugin.

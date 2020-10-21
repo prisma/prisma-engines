@@ -2,6 +2,7 @@ use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::parse_u32_arguments;
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
+use dml::model::{IndexType, Model};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
@@ -141,23 +142,8 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
-        if let FieldType::NativeType(_scalar_type, native_type) = field.field_type() {
+        if let FieldType::NativeType(_, native_type) = field.field_type() {
             let native_type_name = native_type.name.as_str();
-            if (native_type_name == TEXT_TYPE_NAME
-                || native_type_name == TINY_TEXT_TYPE_NAME
-                || native_type_name == MEDIUM_TEXT_TYPE_NAME
-                || native_type_name == LONG_TEXT_TYPE_NAME
-                || native_type_name == BLOB_TYPE_NAME
-                || native_type_name == LONG_BLOB_TYPE_NAME
-                || native_type_name == TINY_BLOB_TYPE_NAME
-                || native_type_name == MEDIUM_BLOB_TYPE_NAME)
-                && field.is_unique()
-            {
-                return Err(ConnectorError::new_incompatible_native_type_with_unique(
-                    native_type_name,
-                    "MySQL",
-                ));
-            }
             if native_type_name == DECIMAL_TYPE_NAME || native_type_name == NUMERIC_TYPE_NAME {
                 match native_type.args.as_slice() {
                     [precision, scale] if scale > precision => {
@@ -167,6 +153,24 @@ impl Connector for MySqlDatamodelConnector {
                         ));
                     }
                     _ => {}
+                }
+            }
+            if field.is_unique() {
+                validate_native_type_incompatibilities_with_unique(native_type_name)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn validate_model(&self, model: &Model) -> Result<(), ConnectorError> {
+        for index_definition in model.indices.iter() {
+            if index_definition.tpe == IndexType::Unique {
+                let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+                for f in fields {
+                    if let FieldType::NativeType(_, native_type) = f.field_type() {
+                        let native_type_name = native_type.name.as_str();
+                        validate_native_type_incompatibilities_with_unique(native_type_name)?
+                    }
                 }
             }
         }
@@ -335,4 +339,22 @@ impl Connector for MySqlDatamodelConnector {
             }))
         }
     }
+}
+
+fn validate_native_type_incompatibilities_with_unique(native_type_name: &str) -> Result<(), ConnectorError> {
+    if native_type_name == TEXT_TYPE_NAME
+        || native_type_name == TINY_TEXT_TYPE_NAME
+        || native_type_name == MEDIUM_TEXT_TYPE_NAME
+        || native_type_name == LONG_TEXT_TYPE_NAME
+        || native_type_name == BLOB_TYPE_NAME
+        || native_type_name == LONG_BLOB_TYPE_NAME
+        || native_type_name == TINY_BLOB_TYPE_NAME
+        || native_type_name == MEDIUM_BLOB_TYPE_NAME
+    {
+        return Err(ConnectorError::new_incompatible_native_type_with_unique(
+            native_type_name,
+            "MySQL",
+        ));
+    }
+    Ok(())
 }
