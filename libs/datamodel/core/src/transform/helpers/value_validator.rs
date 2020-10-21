@@ -60,6 +60,7 @@ impl ValueValidator {
             ScalarType::String => self.as_str().map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(PrismaValue::String),
             ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
+            ScalarType::Bytes => self.as_str().map(PrismaValue::String),
             _ => todo!(),
         }
     }

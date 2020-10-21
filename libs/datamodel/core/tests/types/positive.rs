@@ -193,6 +193,7 @@ fn should_handle_type_specifications_on_postgres() {
             id     Int    @id
             bigInt Int    @pg.BigInt
             foobar String @pg.VarChar(26)
+            foo    Bytes @pg.ByteA
         }
     "#;
 
@@ -209,6 +210,11 @@ fn should_handle_type_specifications_on_postgres() {
 
     let postgres_type: PostgresType = sft.deserialize_native_type();
     assert_eq!(postgres_type, PostgresType::VarChar(26));
+
+    let sft = user_model.assert_has_scalar_field("foo").assert_native_type();
+
+    let postgres_type: PostgresType = sft.deserialize_native_type();
+    assert_eq!(postgres_type, PostgresType::ByteA);
 }
 
 #[test]
