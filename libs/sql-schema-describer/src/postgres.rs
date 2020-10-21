@@ -139,21 +139,29 @@ impl SqlSchemaDescriber {
 
         let sql = r#"
             SELECT
-                table_name,
-                column_name,
-                data_type,
-                udt_name as full_data_type,
-                column_default,
-                is_nullable,
-                is_identity,
-                character_maximum_length,
-                numeric_precision,
-                numeric_scale,
-                numeric_precision_radix,
-                datetime_precision
-            FROM information_schema.columns
-            WHERE table_schema = $1
-            ORDER BY ordinal_position
+               info.table_name,
+                info.column_name,
+                format_type(att.atttypid, att.atttypmod) as formatted_type,
+                info.numeric_precision,
+                info.numeric_scale,
+                info.numeric_precision_radix,
+                info.datetime_precision,
+                info.data_type,
+                info.udt_name as full_data_type,
+                info.column_default,
+                info.is_nullable,
+                info.is_identity,
+                info.data_type, 
+                info.character_maximum_length
+            FROM information_schema.columns info
+            JOIN pg_attribute  att on att.attname = info.column_name
+            And att.attrelid = (
+            	SELECT pg_class.oid 
+            	FROM pg_class 
+            	WHERE relname = "table_name"
+            	)
+            WHERE table_schema = $1	
+            ORDER BY ordinal_position;
         "#;
 
         let rows = self
