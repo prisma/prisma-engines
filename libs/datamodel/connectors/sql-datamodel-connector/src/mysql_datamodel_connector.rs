@@ -43,6 +43,17 @@ const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const YEAR_TYPE_NAME: &str = "Year";
 const JSON_TYPE_NAME: &str = "JSON";
 
+const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&'static str] = &[
+    TEXT_TYPE_NAME,
+    LONG_TEXT_TYPE_NAME,
+    MEDIUM_TEXT_TYPE_NAME,
+    TINY_TEXT_TYPE_NAME,
+    BLOB_TYPE_NAME,
+    TINY_BLOB_TYPE_NAME,
+    MEDIUM_BLOB_TYPE_NAME,
+    LONG_BLOB_TYPE_NAME,
+];
+
 pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
     constructors: Vec<NativeTypeConstructor>,
@@ -155,8 +166,17 @@ impl Connector for MySqlDatamodelConnector {
                     _ => {}
                 }
             }
-            if field.is_unique() {
-                validate_native_type_incompatibilities_with_unique(native_type_name)?;
+            if field.is_unique() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                return Err(ConnectorError::new_incompatible_native_type_with_unique(
+                    native_type_name,
+                    "MySQL",
+                ));
+            }
+            if field.is_id() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                return Err(ConnectorError::new_incompatible_native_type_with_id(
+                    native_type_name,
+                    "MySQL",
+                ));
             }
         }
         Ok(())
@@ -169,8 +189,25 @@ impl Connector for MySqlDatamodelConnector {
                 for f in fields {
                     if let FieldType::NativeType(_, native_type) = f.field_type() {
                         let native_type_name = native_type.name.as_str();
-                        validate_native_type_incompatibilities_with_unique(native_type_name)?
+                        if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                            return Err(ConnectorError::new_incompatible_native_type_with_unique(
+                                native_type_name,
+                                "MySQL",
+                            ));
+                        }
                     }
+                }
+            }
+        }
+        for id_field in model.id_fields.iter() {
+            let field = model.find_field(id_field).unwrap();
+            if let FieldType::NativeType(_, native_type) = field.field_type() {
+                let native_type_name = native_type.name.as_str();
+                if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                    return Err(ConnectorError::new_incompatible_native_type_with_id(
+                        native_type_name,
+                        "MySQL",
+                    ));
                 }
             }
         }
@@ -339,22 +376,4 @@ impl Connector for MySqlDatamodelConnector {
             }))
         }
     }
-}
-
-fn validate_native_type_incompatibilities_with_unique(native_type_name: &str) -> Result<(), ConnectorError> {
-    if native_type_name == TEXT_TYPE_NAME
-        || native_type_name == TINY_TEXT_TYPE_NAME
-        || native_type_name == MEDIUM_TEXT_TYPE_NAME
-        || native_type_name == LONG_TEXT_TYPE_NAME
-        || native_type_name == BLOB_TYPE_NAME
-        || native_type_name == LONG_BLOB_TYPE_NAME
-        || native_type_name == TINY_BLOB_TYPE_NAME
-        || native_type_name == MEDIUM_BLOB_TYPE_NAME
-    {
-        return Err(ConnectorError::new_incompatible_native_type_with_unique(
-            native_type_name,
-            "MySQL",
-        ));
-    }
-    Ok(())
 }

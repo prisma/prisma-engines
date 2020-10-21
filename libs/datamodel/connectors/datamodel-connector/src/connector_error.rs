@@ -50,6 +50,13 @@ impl ConnectorError {
         })
     }
 
+    pub fn new_incompatible_native_type_with_id(native_type: &str, connector_name: &str) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithIdAttribute {
+            native_type: String::from(native_type),
+            connector_name: String::from(connector_name),
+        })
+    }
+
     pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::ValueParserError {
             expected_type: String::from(expected_type),
@@ -128,6 +135,12 @@ pub enum ErrorKind {
 
     #[error("Native type {} can not be unique in {}.", native_type, connector_name)]
     IncompatibleNativeTypeWithUniqueAttribute {
+        native_type: String,
+        connector_name: String,
+    },
+
+    #[error("Native type {} can not be used in an ID field in {}.", native_type, connector_name)]
+    IncompatibleNativeTypeWithIdAttribute {
         native_type: String,
         connector_name: String,
     },
