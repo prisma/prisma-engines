@@ -21,17 +21,27 @@ case class Project(
 
     s"""
            |datasource test {
-           |  provider = "${config.provider}"
-           |  url = "${dataSourceUrl}"
+           |  provider = "${config.provider.stripSuffix("56")}"
+           |  url = "$dataSourceUrl"
            |}
     """.stripMargin
   }
 
-  val dataModelWithDataSourceConfig = {
-    dataSourceConfig + "\n" + dataModel
+  // Completely useless, but required since previewFeatures are a complete mess.
+  val generatorBlock: String = {
+    s"""
+       |generator client {
+       |  provider = "prisma-client-js"
+       |  previewFeatures = ["nativeTypes"]
+       |}
+    """.stripMargin
   }
 
-  val envVar = UTF8Base64.encode(dataModelWithDataSourceConfig)
+  val fullDatamodel = {
+    dataSourceConfig + "\n" + generatorBlock + "\n" + dataModel
+  }
+
+  val envVar = UTF8Base64.encode(fullDatamodel)
 
   val pgBouncerEnvVar = {
     val host = {
@@ -47,8 +57,13 @@ case class Project(
     val config =
       s"""
          |datasource test {
-         |  provider = "${ConnectorConfig.instance.provider}"
+         |  provider = "${ConnectorConfig.instance.provider.stripSuffix("56")}"
          |  url = "${url}"
+         |}
+         |
+         |generator client {
+         |  provider = "prisma-client-js"
+         |  previewFeatures = ["nativeTypes"]
          |}
          |
          |$dataModel
@@ -65,7 +80,7 @@ case class Project(
     val writer   = new PrintWriter(file)
 
     try {
-      dataModelWithDataSourceConfig.foreach(writer.print)
+      fullDatamodel.foreach(writer.print)
     } finally {
       writer.close()
     }

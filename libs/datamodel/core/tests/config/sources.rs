@@ -185,7 +185,7 @@ fn new_lines_in_source_must_work() {
         datasource ds {
           provider = "postgresql"
           url = "postgresql://localhost"
-        
+
         }
     "#;
 
@@ -199,7 +199,7 @@ fn new_lines_in_source_must_work() {
           "activeProvider": "postgresql",
           "url": {
               "fromEnvVar": null,
-              "value": "postgresql://localhost"       
+              "value": "postgresql://localhost"
           }
         }
     ]"#;
@@ -215,7 +215,7 @@ fn must_error_if_env_var_is_missing() {
     let schema = r#"
         datasource ds {
           provider = "postgresql"
-          url = env("DATABASE_URL")        
+          url = env("DATABASE_URL")
         }
     "#;
 
@@ -234,7 +234,7 @@ fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
     let schema = r#"
         datasource ds {
           provider = "postgresql"
-          url = env("DATABASE_URL")        
+          url = env("DATABASE_URL")
         }
     "#;
 
@@ -256,7 +256,7 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
     let schema = r#"
         datasource ds {
           provider = "postgresql"
-          url = env("DATABASE_URL")        
+          url = env("DATABASE_URL")
         }
     "#;
     std::env::set_var("DATABASE_URL", "postgres://hostfoo");
@@ -279,7 +279,7 @@ fn must_succeed_with_overrides() {
     let schema = r#"
         datasource ds {
           provider = "postgresql"
-          url = "postgres://hostfoo"     
+          url = "postgres://hostfoo"
         }
     "#;
 

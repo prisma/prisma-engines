@@ -446,6 +446,10 @@ impl InputType {
         InputType::Scalar(ScalarType::Float)
     }
 
+    pub fn decimal() -> InputType {
+        InputType::Scalar(ScalarType::Decimal)
+    }
+
     pub fn boolean() -> InputType {
         InputType::Scalar(ScalarType::Boolean)
     }
@@ -464,6 +468,14 @@ impl InputType {
 
     pub fn uuid() -> InputType {
         InputType::Scalar(ScalarType::UUID)
+    }
+
+    pub fn xml() -> InputType {
+        InputType::Scalar(ScalarType::Xml)
+    }
+
+    pub fn bytes() -> InputType {
+        InputType::Scalar(ScalarType::Bytes)
     }
 
     pub fn null() -> InputType {
@@ -504,6 +516,10 @@ impl OutputType {
         OutputType::Scalar(ScalarType::Float)
     }
 
+    pub fn decimal() -> OutputType {
+        OutputType::Scalar(ScalarType::Decimal)
+    }
+
     pub fn boolean() -> OutputType {
         OutputType::Scalar(ScalarType::Boolean)
     }
@@ -518,6 +534,14 @@ impl OutputType {
 
     pub fn uuid() -> OutputType {
         OutputType::Scalar(ScalarType::UUID)
+    }
+
+    pub fn xml() -> OutputType {
+        OutputType::Scalar(ScalarType::Xml)
+    }
+
+    pub fn bytes() -> OutputType {
+        OutputType::Scalar(ScalarType::Bytes)
     }
 
     /// Attempts to recurse through the type until an object type is found.
@@ -546,12 +570,15 @@ pub enum ScalarType {
     String,
     Int,
     Float,
+    Decimal,
     Boolean,
     Enum(EnumTypeRef),
     DateTime,
     Json,
     JsonList,
     UUID,
+    Xml,
+    Bytes,
 }
 
 impl From<EnumType> for OutputType {

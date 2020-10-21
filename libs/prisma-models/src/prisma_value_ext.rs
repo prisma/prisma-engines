@@ -26,9 +26,6 @@ impl PrismaValueExtensions for PrismaValue {
             (PrismaValue::Int(i), TypeIdentifier::String) => PrismaValue::String(format!("{}", i)),
             (PrismaValue::Float(f), TypeIdentifier::String) => PrismaValue::String(f.to_string()),
             (PrismaValue::Boolean(b), TypeIdentifier::String) => PrismaValue::String(format!("{}", b)),
-            (PrismaValue::DateTime(dt), TypeIdentifier::String) => {
-                PrismaValue::String(prisma_value::stringify_date(&dt))
-            }
             (PrismaValue::Enum(e), TypeIdentifier::String) => PrismaValue::String(e),
             (PrismaValue::Uuid(u), TypeIdentifier::String) => PrismaValue::String(u.to_string()),
 

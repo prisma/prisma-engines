@@ -1,5 +1,5 @@
 use crate::common::*;
-use chrono::{DateTime, Utc};
+use chrono::DateTime;
 use datamodel::{DefaultValue, ScalarType, ValueGenerator};
 use prisma_value::PrismaValue;
 use rust_decimal::prelude::FromPrimitive;
@@ -43,7 +43,7 @@ fn should_set_default_for_all_scalar_types() {
         .assert_has_scalar_field("dateTime")
         .assert_base_type(&ScalarType::DateTime)
         .assert_default_value(DefaultValue::Single(PrismaValue::DateTime(
-            "2019-06-17T14:20:57Z".parse::<DateTime<Utc>>().unwrap(),
+            DateTime::parse_from_rfc3339("2019-06-17T14:20:57Z").unwrap(),
         )));
 }
 

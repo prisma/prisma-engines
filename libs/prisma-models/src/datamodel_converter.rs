@@ -336,7 +336,6 @@ trait DatamodelFieldExtensions {
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
     fn internal_enum_value(&self, enum_value: &dml::EnumValue) -> InternalEnumValue;
-    // fn default_value(&self) -> Option<dml::DefaultValue>; todo this is not applicable anymore
 }
 
 impl DatamodelFieldExtensions for dml::ScalarField {
@@ -348,13 +347,16 @@ impl DatamodelFieldExtensions for dml::ScalarField {
                 dml::ScalarType::Boolean => TypeIdentifier::Boolean,
                 dml::ScalarType::DateTime => TypeIdentifier::DateTime,
                 dml::ScalarType::Float => TypeIdentifier::Float,
+                dml::ScalarType::Decimal => TypeIdentifier::Decimal,
                 dml::ScalarType::Int => TypeIdentifier::Int,
                 dml::ScalarType::String => TypeIdentifier::String,
                 dml::ScalarType::Json => TypeIdentifier::Json,
-                _ => todo!(),
+                dml::ScalarType::Bytes => TypeIdentifier::Bytes,
+                dml::ScalarType::Xml => TypeIdentifier::Xml,
+                dml::ScalarType::Duration => unimplemented!(),
             },
             dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
-            dml::FieldType::NativeType(prisma_tpe, _native_type) => TypeIdentifier::from(*prisma_tpe),
+            dml::FieldType::NativeType(scalar_type, _) => (*scalar_type).into(),
         }
     }
 

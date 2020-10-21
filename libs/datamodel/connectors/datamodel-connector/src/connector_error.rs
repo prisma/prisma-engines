@@ -36,6 +36,13 @@ impl ConnectorError {
         })
     }
 
+    pub fn new_scale_larger_than_precision_error(native_type: &str, connector_name: &str) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::ScaleLargerThanPrecisionError {
+            native_type: String::from(native_type),
+            connector_name: String::from(connector_name),
+        })
+    }
+
     pub fn new_incompatible_native_type_with_unique(native_type: &str, connector_name: &str) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithUniqueAttribute {
             native_type: String::from(native_type),
@@ -135,5 +142,15 @@ pub enum ErrorKind {
         expected_type: String,
         parser_error: String,
         raw: String,
+    },
+
+    #[error(
+        "The scale must not be larger than the precision for the {} native type in {}.",
+        native_type,
+        connector_name
+    )]
+    ScaleLargerThanPrecisionError {
+        native_type: String,
+        connector_name: String,
     },
 }
