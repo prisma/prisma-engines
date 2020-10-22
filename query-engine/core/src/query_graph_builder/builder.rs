@@ -8,24 +8,6 @@ pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
 }
 
-pub enum QueryType {
-    Graph(QueryGraph),
-    Raw {
-        query: String,
-        parameters: Vec<PrismaValue>,
-        raw_type: RawQueryType,
-    },
-}
-
-impl QueryType {
-    pub fn needs_transaction(&self) -> bool {
-        match self {
-            Self::Graph(qg) => qg.needs_transaction(),
-            Self::Raw { .. } => false,
-        }
-    }
-}
-
 #[derive(Default)]
 struct RawArgs {
     query: String,
@@ -61,72 +43,71 @@ impl QueryGraphBuilder {
     }
 
     /// Maps an operation to a query.
-    pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
+    pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         match operation {
-            Operation::Read(selection) => self.map_read_operation(selection),
-            Operation::Write(selection) => self.map_write_operation(selection),
+            Operation::Read(selection) => self.build_internal(selection, &self.query_schema.query()),
+            Operation::Write(selection) => self.build_internal(selection, &self.query_schema.mutation()),
         }
     }
 
-    /// Maps a read operation to one or more queries.
-    fn map_read_operation(&self, read_selection: Selection) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
-        let query_object = self.query_schema.query();
-        Self::process(read_selection, &query_object)
-    }
-
-    /// Maps a write operation to one or more queries.
-    fn map_write_operation(&self, write_selection: Selection) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
-        let mutation_object = self.query_schema.mutation();
-        let (mut graph, ir_ser) = Self::process(write_selection, &mutation_object)?;
-
-        if let QueryType::Graph(ref mut graph) = graph {
-            graph.flag_transactional();
-        };
-
-        Ok((graph, ir_ser))
-    }
-
-    fn process(
+    fn build_internal(
+        &self,
         selection: Selection,
-        object: &ObjectTypeStrongRef,
-    ) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
+        root_object: &ObjectTypeStrongRef, // Either the query or mutation object.
+    ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         let mut selections = vec![selection];
-        let mut parsed_object = QueryDocumentParser::parse_object(QueryPath::default(), &selections, object)?;
+        let mut parsed_object = QueryDocumentParser::parse_object(QueryPath::default(), &selections, root_object)?;
 
-        let parsed_field = parsed_object.fields.pop().unwrap();
-        let result_info = Self::derive_serializer(&selections.pop().unwrap(), &parsed_field);
+        // Because we're processing root objects, there can only be one query / mutation.
+        let field_pair = parsed_object.fields.pop().unwrap();
+        let serializer = Self::derive_serializer(&selections.pop().unwrap(), &field_pair.schema_field);
 
-        let schema_field = parsed_field.schema_field.clone();
-        let builder = schema_field.query_builder();
+        if field_pair.schema_field.query_info.is_some() {
+            let graph = self.dispatch_build(field_pair)?;
+            Ok((graph, serializer))
+        } else {
+            Err(QueryGraphBuilderError::SchemaError(format!(
+                "Expected query information to be attached on schema object '{}', field '{}'.",
+                root_object.name(),
+                field_pair.parsed_field.name
+            )))
+        }
+    }
 
-        let query_type = match (builder, parsed_field.raw_query_type()) {
-            (Some(builder), None) => Ok(QueryType::Graph(builder.build(parsed_field)?)),
-            (_, Some(raw_type)) => {
-                let raw_args = RawArgs::from(parsed_field.arguments);
+    fn dispatch_build(&self, field_pair: FieldPair) -> QueryGraphBuilderResult<QueryGraph> {
+        let query_info = field_pair.schema_field.query_info.as_ref().unwrap();
+        let parsed_field = field_pair.parsed_field;
 
-                Ok(QueryType::Raw {
-                    query: raw_args.query,
-                    parameters: raw_args.parameters,
-                    raw_type,
-                })
-            }
-            (None, None) => Err(QueryGraphBuilderError::SchemaError(format!(
-                "Expected attached query builder on {} object, root level field '{}'.",
-                object.name(),
-                parsed_field.name
-            ))),
+        let mut graph = match (&query_info.tag, query_info.model.clone()) {
+            (QueryTag::FindOne, Some(m)) => read::find_one(parsed_field, m).map(Into::into),
+            (QueryTag::FindFirst, Some(m)) => read::find_first(parsed_field, m).map(Into::into),
+            (QueryTag::FindMany, Some(m)) => read::find_many(parsed_field, m).map(Into::into),
+            (QueryTag::Aggregate, Some(m)) => read::aggregate(parsed_field, m).map(Into::into),
+            (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, m, parsed_field)),
+            (QueryTag::UpdateOne, Some(m)) => QueryGraph::root(|g| write::update_record(g, m, parsed_field)),
+            (QueryTag::UpdateMany, Some(m)) => QueryGraph::root(|g| write::update_many_records(g, m, parsed_field)),
+            (QueryTag::UpsertOne, Some(m)) => QueryGraph::root(|g| write::upsert_record(g, m, parsed_field)),
+            (QueryTag::DeleteOne, Some(m)) => QueryGraph::root(|g| write::delete_record(g, m, parsed_field)),
+            (QueryTag::DeleteMany, Some(m)) => QueryGraph::root(|g| write::delete_many_records(g, m, parsed_field)),
+            (QueryTag::ExecuteRaw, _) => QueryGraph::root(|g| write::execute_raw(g, parsed_field)),
+            (QueryTag::QueryRaw, _) => QueryGraph::root(|g| write::query_raw(g, parsed_field)),
+            _ => unreachable!("Query builder dispatching failed."),
         }?;
 
-        Ok((query_type, result_info))
+        // Run final transformations.
+        graph.finalize()?;
+        trace!("{}", graph);
+
+        Ok(graph)
     }
 
-    fn derive_serializer(selection: &Selection, field: &ParsedField) -> IrSerializer {
+    fn derive_serializer(selection: &Selection, field: &OutputFieldRef) -> IrSerializer {
         IrSerializer {
             key: selection
                 .alias()
                 .clone()
                 .unwrap_or_else(|| selection.name().to_string()),
-            output_field: field.schema_field.clone(),
+            output_field: field.clone(),
         }
     }
 }
