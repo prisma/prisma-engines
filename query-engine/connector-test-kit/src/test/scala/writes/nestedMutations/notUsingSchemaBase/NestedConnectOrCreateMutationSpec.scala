@@ -811,4 +811,72 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
       legacy = false,
     )
   }
+
+  // Regression test for failing internal graph transformations.
+  "Query reordering" should "not break connectOrCreate" in {
+    val project = SchemaDsl.fromStringV11() {
+      """
+        |model A {
+        |  id     String  @id
+        |  fieldA String?
+        |  A2B    A2B[]   @relation("A2_A2B")
+        |}
+        |
+        |model B {
+        |  id     String @id
+        |  fieldB String
+        |  A2B    A2B[]  @relation("B2_A2B")
+        |}
+        |
+        |model A2B {
+        |  a_id    String
+        |  b_id    String
+        |  fieldAB Int
+        |  a       A      @relation("A2_A2B", fields: [a_id], references: [id])
+        |  b       B      @relation("B2_A2B", fields: [b_id], references: [id])
+        |
+        |  @@id([a_id, b_id])
+        |  @@index([b_id], name: "fk_b")
+        |  @@map("_A2B")
+        |}
+      """.stripMargin
+    }
+    database.setup(project)
+
+    val result = server.query(
+      s"""mutation {upsertOneA2B(
+         |  where: {
+         |    a_id_b_id: {
+         |      a_id: "a"
+         |      b_id: "b"
+         |    }
+         |  },
+         |  create: {
+         |    a: {
+         |      connectOrCreate: {
+         |        where:  { id: "a" }
+         |        create: { id: "a", fieldA: "Field A" }
+         |      }
+         |    }
+         |    b: {
+         |      connectOrCreate: {
+         |        where:  { id: "b" }
+         |        create: { id: "b", fieldB: "Field B" }
+         |      }
+         |    }
+         |    fieldAB: 1
+         |  }
+         |  update: {
+         |    fieldAB: 1
+         |  }) {
+         |    fieldAB
+         |  }
+         |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be("""{"data":{"upsertOneA2B":{"fieldAB":1}}}""")
+  }
 }
