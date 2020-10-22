@@ -109,9 +109,8 @@ test-setup = {path = "test-setup"}
 tokio = {version = "0.2", features = ["rt-threaded", "macros"]}
 
 [dependencies.tiberius]
-version = "0.4.12"
+version = "0.4.13"
 features = ["rust_decimal", "sql-browser-tokio", "chrono"]
-git = "https://github.com/prisma/tiberius"
 optional = true
 
 [dependencies.tokio-postgres]
