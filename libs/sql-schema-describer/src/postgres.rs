@@ -216,7 +216,7 @@ impl SqlSchemaDescriber {
                 }
 
                 fn get_dual(formatted_type: &String) -> (Option<u32>, Option<u32>) {
-                    static DUAL_REGEX_REGEX: Lazy<Regex> =
+                    static DUAL_REGEX: Lazy<Regex> =
                         Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
                     let first = DUAL_REGEX
                         .captures(formatted_type.as_str())
