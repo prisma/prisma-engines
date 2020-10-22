@@ -167,6 +167,18 @@ impl Connector for MySqlDatamodelConnector {
                     _ => {}
                 }
             }
+            if matches!(native_type_name, BIT_TYPE_NAME) {
+                match native_type.args.as_slice() {
+                    [length] if length == &0 || length > &64 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "M can range from 1 to 64",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    _ => {}
+                }
+            }
             if field.is_unique() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
                 return Err(ConnectorError::new_incompatible_native_type_with_unique(
                     native_type_name,
