@@ -8,7 +8,6 @@ use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
 use native_types::PostgresType;
-use prisma_value::PrismaValue;
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -147,7 +146,17 @@ impl Connector for PostgresDatamodelConnector {
                 || native_type_name == BIG_SERIAL_TYPE_NAME
             {
                 if let Some(default_value) = field.default_value() {
-                    println!("default value: {:?}", default_value);
+                    match default_value {
+                        DefaultValue::Single(_) => {
+                            return Err(
+                                ConnectorError::new_incompatible_sequential_type_with_static_default_value_error(
+                                    native_type_name,
+                                    "Postgres",
+                                ),
+                            )
+                        }
+                        _ => {}
+                    }
                 }
             }
         }

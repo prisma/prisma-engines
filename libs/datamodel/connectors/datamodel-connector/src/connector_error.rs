@@ -71,6 +71,16 @@ impl ConnectorError {
             raw: String::from(raw),
         })
     }
+
+    pub fn new_incompatible_sequential_type_with_static_default_value_error(
+        native_type: &str,
+        connector_name: &str,
+    ) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::IncompatibleSequentialTypeWithStaticDefaultValue {
+            native_type: String::from(native_type),
+            connector_name: String::from(connector_name),
+        })
+    }
 }
 
 #[derive(Debug, Error, Clone)]
@@ -184,6 +194,16 @@ pub enum ErrorKind {
         connector_name
     )]
     ScaleLargerThanPrecisionError {
+        native_type: String,
+        connector_name: String,
+    },
+
+    #[error(
+        "Sequential native type {} of {} must not have a static default value.",
+        native_type,
+        connector_name
+    )]
+    IncompatibleSequentialTypeWithStaticDefaultValue {
         native_type: String,
         connector_name: String,
     },

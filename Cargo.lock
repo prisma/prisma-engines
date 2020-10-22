@@ -3254,7 +3254,6 @@ dependencies = [
  "datamodel-connector",
  "dml",
  "native-types",
- "prisma-value",
  "serde_json",
 ]
 
