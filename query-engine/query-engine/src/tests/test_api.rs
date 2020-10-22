@@ -79,6 +79,7 @@ impl TestApi {
             ConnectionInfo::Mysql(..) => visitor::Mysql::build(query),
             ConnectionInfo::Sqlite { .. } => visitor::Sqlite::build(query),
             ConnectionInfo::Mssql(_) => visitor::Mssql::build(query),
+            ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
         }
     }
 }
