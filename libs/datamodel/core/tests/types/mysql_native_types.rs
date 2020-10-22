@@ -2,6 +2,33 @@ use crate::common::*;
 use datamodel::{ast, diagnostics::DatamodelError};
 
 #[test]
+fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
+    let dml = r#"
+        datasource db {
+          provider = "mysql"
+          url = "mysql://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt DateTime @db.TinyInt
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type TinyInt is not compatible with declared field type DateTime, expected field type Boolean or Int.",
+        ast::Span::new(294, 304),
+    ));
+}
+
+#[test]
 fn should_fail_on_native_type_text_with_unique_attribute() {
     let dml = r#"
         datasource db {
