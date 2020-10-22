@@ -1,360 +1,94 @@
 use crate::common::*;
 use datamodel::{ast, diagnostics::DatamodelError};
 
+const BLOB_TYPES: &[&'static str] = &["Blob", "LongBlob", "MediumBlob", "TinyBlob"];
+const TEXT_TYPES: &[&'static str] = &["Text", "LongText", "MediumText", "TinyText"];
+
 #[test]
-fn should_fail_on_native_type_text_with_unique_attribute() {
-    let dml = r#"
-        datasource db {
-          provider = "mysql"
-          url = "mysql://"
-        }
+fn text_and_blob_data_types_can_not_be_unique() {
+    fn error_msg(type_name: &str) -> String {
+        format!("Native type {} can not be unique in MySQL.", type_name)
+    }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
+    for tpe in BLOB_TYPES {
+        test_field_and_block_attribute_support(tpe, "Bytes", "unique", &error_msg(tpe));
+    }
 
-        model Blog {
-            id     Int    @id
-            bigInt String @db.Text @unique
-        }
-
-        model User {
-            id        Int     @default(autoincrement()) @id
-            firstname String @db.Text
-            lastname  String @db.Text
-            @@unique([firstname, lastname])
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_length(2);
-
-    error.assert_is_at(
-        0,
-        DatamodelError::new_connector_error("Native type Text can not be unique in MySQL.", ast::Span::new(277, 308)),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_connector_error("Native type Text can not be unique in MySQL.", ast::Span::new(327, 529)),
-    );
+    for tpe in TEXT_TYPES {
+        test_field_and_block_attribute_support(tpe, "String", "unique", &error_msg(tpe));
+    }
 }
 
 #[test]
-fn should_fail_on_native_type_long_text_with_unique_attribute() {
-    let dml = r#"
-        datasource db {
-          provider = "mysql"
-          url = "mysql://"
-        }
+fn text_and_blob_data_types_should_fail_on_id_attribute() {
+    fn error_msg(type_name: &str) -> String {
+        format!(
+            "Native type {} of MySQL can not be used on a field that is `@id` or `@@id`.",
+            type_name
+        )
+    }
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
+    for tpe in BLOB_TYPES {
+        test_field_and_block_attribute_support(tpe, "Bytes", "id", &error_msg(tpe));
+    }
 
-        model Blog {
-            id     Int    @id
-            bigInt String @db.LongText @unique
-        }
-
-        model User {
-            id        Int     @default(autoincrement()) @id
-            firstname String @db.LongText
-            lastname  String @db.LongText
-            @@unique([firstname, lastname])
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_length(2);
-
-    error.assert_is_at(
-        0,
-        DatamodelError::new_connector_error(
-            "Native type LongText can not be unique in MySQL.",
-            ast::Span::new(277, 312),
-        ),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_connector_error(
-            "Native type LongText can not be unique in MySQL.",
-            ast::Span::new(331, 541),
-        ),
-    );
+    for tpe in TEXT_TYPES {
+        test_field_and_block_attribute_support(tpe, "String", "id", &error_msg(tpe));
+    }
 }
 
-#[test]
-fn should_fail_on_native_type_medium_text_with_unique_attribute() {
-    let dml = r#"
-        datasource db {
-          provider = "mysql"
-          url = "mysql://"
-        }
+fn test_field_and_block_attribute_support(native_type: &str, scalar_type: &str, attribute_name: &str, error_msg: &str) {
+    let id_field = if attribute_name == "id" {
+        ""
+    } else {
+        "id     Int    @id"
+    };
+    let dml = format!(
+        r#"
+    model Blog {{
+      {id_field}
+      bigInt {scalar_type} @db.{native_type} @{attribute_name}
+    }}
 
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id     Int    @id
-            bigInt String @db.MediumText @unique
-        }
-
-        model User {
-            id        Int     @default(autoincrement()) @id
-            firstname String @db.MediumText
-            lastname  String @db.MediumText
-            @@unique([firstname, lastname])
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_length(2);
-
-    error.assert_is_at(
-        0,
-        DatamodelError::new_connector_error(
-            "Native type MediumText can not be unique in MySQL.",
-            ast::Span::new(277, 314),
-        ),
+    model User {{
+      {id_field}
+      firstname {scalar_type} @db.{native_type}
+      lastname  {scalar_type} @db.{native_type}
+      @@{attribute_name}([firstname, lastname])
+    }}
+    "#,
+        id_field = id_field,
+        native_type = native_type,
+        scalar_type = scalar_type,
+        attribute_name = attribute_name
     );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_connector_error(
-            "Native type MediumText can not be unique in MySQL.",
-            ast::Span::new(333, 547),
-        ),
-    );
+
+    test_compatibility(&dml, &error_msg);
 }
 
-#[test]
-fn should_fail_on_native_type_tiny_text_with_unique_attribute() {
-    let dml = r#"
-        datasource db {
+fn test_compatibility(datamodel: &str, error_msg: &str) {
+    let dml = format!(
+        r#"
+    datasource db {{
           provider = "mysql"
           url = "mysql://"
-        }
+        }}
 
-        generator js {
+        generator js {{
             provider = "prisma-client-js"
             previewFeatures = ["nativeTypes"]
-        }
+        }}
 
-        model Blog {
-            id     Int    @id
-            bigInt String @db.TinyText @unique
-        }
+    {datamodel}
+    "#,
+        datamodel = datamodel,
+    );
 
-        model User {
-            id        Int     @default(autoincrement()) @id
-            firstname String @db.TinyText
-            lastname  String @db.TinyText
-            @@unique([firstname, lastname])
-        }
-    "#;
-
-    let error = parse_error(dml);
+    let error = parse_error(&dml);
 
     error.assert_length(2);
-
-    error.assert_is_at(
-        0,
-        DatamodelError::new_connector_error(
-            "Native type TinyText can not be unique in MySQL.",
-            ast::Span::new(277, 312),
-        ),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_connector_error(
-            "Native type TinyText can not be unique in MySQL.",
-            ast::Span::new(331, 541),
-        ),
-    );
-}
-
-#[test]
-fn should_fail_on_native_type_blob_with_unique_attribute() {
-    let dml = r#"
-        datasource db {
-          provider = "mysql"
-          url = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id     Int   @id
-            bigInt Bytes @db.Blob @unique
-        }
-
-        model User {
-            id        Int     @default(autoincrement()) @id
-            firstname Bytes @db.Blob
-            lastname  Bytes @db.Blob
-            @@unique([firstname, lastname])
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_length(2);
-
-    error.assert_is_at(
-        0,
-        DatamodelError::new_connector_error("Native type Blob can not be unique in MySQL.", ast::Span::new(276, 306)),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_connector_error("Native type Blob can not be unique in MySQL.", ast::Span::new(325, 525)),
-    );
-}
-
-#[test]
-fn should_fail_on_native_type_tiny_blob_with_unique_attribute() {
-    let dml = r#"
-        datasource db {
-          provider = "mysql"
-          url = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id     Int    @id
-            bigInt Bytes @db.TinyBlob @unique
-        }
-
-        model User {
-            id        Int     @default(autoincrement()) @id
-            firstname Bytes @db.TinyBlob
-            lastname  Bytes @db.TinyBlob
-            @@unique([firstname, lastname])
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_length(2);
-
-    error.assert_is_at(
-        0,
-        DatamodelError::new_connector_error(
-            "Native type TinyBlob can not be unique in MySQL.",
-            ast::Span::new(277, 311),
-        ),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_connector_error(
-            "Native type TinyBlob can not be unique in MySQL.",
-            ast::Span::new(330, 538),
-        ),
-    );
-}
-
-#[test]
-fn should_fail_on_native_type_medium_blob_with_unique_attribute() {
-    let dml = r#"
-        datasource db {
-          provider = "mysql"
-          url = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id     Int    @id
-            bigInt Bytes @db.MediumBlob @unique
-        }
-
-        model User {
-            id        Int     @default(autoincrement()) @id
-            firstname Bytes @db.MediumBlob
-            lastname  Bytes @db.MediumBlob
-            @@unique([firstname, lastname])
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_length(2);
-
-    error.assert_is_at(
-        0,
-        DatamodelError::new_connector_error(
-            "Native type MediumBlob can not be unique in MySQL.",
-            ast::Span::new(277, 313),
-        ),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_connector_error(
-            "Native type MediumBlob can not be unique in MySQL.",
-            ast::Span::new(332, 544),
-        ),
-    );
-}
-
-#[test]
-fn should_fail_on_native_type_long_blob_with_unique_attribute() {
-    let dml = r#"
-        datasource db {
-          provider = "mysql"
-          url      = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id     Int   @id
-            bigInt Bytes @db.LongBlob @unique
-        }
-
-        model User {
-            id        Int     @default(autoincrement()) @id
-            firstname Bytes @db.LongBlob
-            lastname  Bytes @db.LongBlob
-            @@unique([firstname, lastname])
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_length(2);
-
-    error.assert_is_at(
-        0,
-        DatamodelError::new_connector_error(
-            "Native type LongBlob can not be unique in MySQL.",
-            ast::Span::new(281, 315),
-        ),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_connector_error(
-            "Native type LongBlob can not be unique in MySQL.",
-            ast::Span::new(334, 542),
-        ),
-    );
+    error.assert_is_message_at(0, error_msg);
+    error.assert_is_message_at(1, error_msg);
 }
 
 #[test]
