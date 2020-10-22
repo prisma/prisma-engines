@@ -310,16 +310,12 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
                     }
 
                     // check for compatability with scalar type
-                    let compatible_prisma_scalar_types = constructor.prisma_types.clone();
-                    if !compatible_prisma_scalar_types.contains(&scalar_type) {
+                    if !constructor.prisma_types.contains(&scalar_type) {
                         return Err(DatamodelError::new_connector_error(
                             &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
                                 native_type: x.parse().unwrap(),
                                 field_type: scalar_type.to_string(),
-                                expected_types: compatible_prisma_scalar_types
-                                    .iter()
-                                    .map(|s| s.to_string())
-                                    .join(" or "),
+                                expected_types: constructor.prisma_types.iter().map(|s| s.to_string()).join(" or "),
                             })
                             .to_string(),
                             type_specification.unwrap().span,
