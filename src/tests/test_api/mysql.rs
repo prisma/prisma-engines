@@ -53,7 +53,7 @@ impl<'a> TestApi for MySql<'a> {
     fn render_create_table(&mut self, table_name: &str, columns: &str) -> (String, String) {
         let create = format!(
             r##"
-            CREATE TEMPORARY TABLE `{}` ({}) ENGINE=InnoDB DEFAULT CHARSET=latin1
+            CREATE TEMPORARY TABLE `{}` ({}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
             "##,
             table_name, columns,
         );
