@@ -14,14 +14,14 @@ use rusqlite::NO_PARAMS;
 use std::{collections::HashSet, convert::TryFrom, path::Path, time::Duration};
 use tokio::sync::Mutex;
 
-const DEFAULT_SCHEMA_NAME: &str = "quaint";
+pub(crate) const DEFAULT_SQLITE_SCHEMA_NAME: &str = "quaint";
 
 /// A connector interface for the SQLite database
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
     /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
-    /// only be done with UTF-8 paths.
-    pub(crate) file_path: String,
+    /// only be done with UTF-8 paths. This is `None` for purely in-memory databases.
+    pub(crate) file_path: Option<String>,
 }
 
 #[derive(Debug)]
@@ -93,7 +93,7 @@ impl TryFrom<&str> for SqliteParams {
             Ok(Self {
                 connection_limit,
                 file_path: path_str.to_owned(),
-                db_name: db_name.unwrap_or_else(|| DEFAULT_SCHEMA_NAME.to_owned()),
+                db_name: db_name.unwrap_or_else(|| DEFAULT_SQLITE_SCHEMA_NAME.to_owned()),
                 socket_timeout,
             })
         }
@@ -115,13 +115,27 @@ impl TryFrom<&str> for Sqlite {
 
         let client = Mutex::new(conn);
 
-        Ok(Sqlite { client, file_path })
+        Ok(Sqlite {
+            client,
+            file_path: Some(file_path),
+        })
     }
 }
 
 impl Sqlite {
     pub fn new(file_path: &str) -> crate::Result<Sqlite> {
         Self::try_from(file_path)
+    }
+
+    /// Open a new SQLite database in memory.
+    pub fn new_in_memory(attached_name: String) -> crate::Result<Sqlite> {
+        let client = rusqlite::Connection::open_in_memory()?;
+        rusqlite::Connection::execute(&client, "ATTACH DATABASE ':memory:' AS ?", &[&attached_name])?;
+
+        Ok(Sqlite {
+            client: Mutex::new(client),
+            file_path: None,
+        })
     }
 
     pub async fn attach_database(&mut self, db_name: &str) -> crate::Result<()> {
@@ -137,8 +151,8 @@ impl Sqlite {
             .map(|res| res.unwrap())
             .collect();
 
-        if !databases.contains(db_name) {
-            rusqlite::Connection::execute(&client, "ATTACH DATABASE ? AS ?", &[self.file_path.as_str(), db_name])?;
+        if let (true, Some(file_path)) = (!databases.contains(db_name), &self.file_path) {
+            rusqlite::Connection::execute(&client, "ATTACH DATABASE ? AS ?", &[file_path.as_str(), db_name])?;
         }
 
         rusqlite::Connection::execute(&client, "PRAGMA foreign_keys = ON", NO_PARAMS)?;
@@ -245,5 +259,30 @@ mod tests {
             }
             e => panic!("Expected error TableDoesNotExist, got {:?}", e),
         }
+    }
+
+    #[tokio::test]
+    async fn in_memory_sqlite_works() {
+        let conn = Sqlite::new_in_memory("quaint".into()).unwrap();
+
+        conn.raw_cmd("CREATE TABLE test (id INTEGER PRIMARY KEY, txt TEXT NOT NULL);")
+            .await
+            .unwrap();
+
+        let insert = Insert::single_into("test").value("txt", "henlo");
+        conn.insert(insert.into()).await.unwrap();
+
+        let select = Select::from_table("test").value(asterisk());
+        let result = conn.select(select.clone()).await.unwrap();
+        let result = result.into_single().unwrap();
+
+        assert_eq!(result.get("id").unwrap(), &Value::integer(1));
+        assert_eq!(result.get("txt").unwrap(), &Value::text("henlo"));
+
+        // Check that we do get a separate, new database.
+        let other_conn = Sqlite::new_in_memory("quaint".into()).unwrap();
+
+        let err = other_conn.select(select).await.unwrap_err();
+        assert!(matches!(err.kind(), ErrorKind::TableDoesNotExist { .. }));
     }
 }

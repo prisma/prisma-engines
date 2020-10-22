@@ -2,7 +2,7 @@
 
 use crate::{
     ast,
-    connector::{self, ConnectionInfo, Queryable, TransactionCapable},
+    connector::{self, ConnectionInfo, Queryable, TransactionCapable, DEFAULT_SQLITE_SCHEMA_NAME},
 };
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
@@ -158,6 +158,17 @@ impl Quaint {
         Self::log_start(&connection_info);
 
         Ok(Self { inner, connection_info })
+    }
+
+    #[cfg(feature = "sqlite")]
+    /// Open a new SQLite database in memory.
+    pub fn new_in_memory(attached_name: Option<String>) -> crate::Result<Quaint> {
+        let attached_name = attached_name.unwrap_or_else(|| DEFAULT_SQLITE_SCHEMA_NAME.into());
+
+        Ok(Quaint {
+            inner: Arc::new(connector::Sqlite::new_in_memory(attached_name.clone())?),
+            connection_info: Arc::new(ConnectionInfo::InMemorySqlite { db_name: attached_name }),
+        })
     }
 
     /// Info about the connection and underlying database.
