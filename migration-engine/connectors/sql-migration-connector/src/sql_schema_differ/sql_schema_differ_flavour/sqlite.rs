@@ -2,7 +2,8 @@ use sql_schema_describer::ColumnTypeFamily;
 
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::SqliteFlavour, sql_schema_differ::column::ColumnTypeChange, sql_schema_differ::ColumnDiffer,
+    flavour::SqliteFlavour,
+    sql_schema_differ::column::{ColumnDiffer, ColumnTypeChange},
     sql_schema_differ::SqlSchemaDiffer,
 };
 use std::collections::HashSet;

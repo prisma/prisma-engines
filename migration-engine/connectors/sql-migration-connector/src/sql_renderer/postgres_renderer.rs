@@ -5,9 +5,9 @@ use crate::{
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
         AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, TableChange,
+        DropForeignKey, DropIndex, RedefineTable, TableChange,
     },
-    sql_schema_differ::{ColumnChanges, ColumnDiffer, SqlSchemaDiffer},
+    sql_schema_differ::{ColumnChanges, SqlSchemaDiffer},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -162,7 +162,11 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable { table, changes } = alter_table;
+        let AlterTable {
+            table,
+            changes,
+            table_index,
+        } = alter_table;
 
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
@@ -202,15 +206,20 @@ impl SqlRenderer for PostgresFlavour {
                     changes,
                     type_change: _,
                 }) => {
-                    let column = differ
-                        .diff_table(&table.name)
-                        .expect("AlterTable on unknown table.")
-                        .diff_column(column_name)
-                        .expect("AlterColumn on unknown column.");
+                    let previous_column = differ
+                        .previous
+                        .table_walker_at(table_index.0)
+                        .column(&column_name)
+                        .expect("AlterColumn on unknown column");
+                    let next_column = differ
+                        .next
+                        .table_walker_at(table_index.1)
+                        .column(&column_name)
+                        .expect("AlterColumn on unknown column");
 
                     render_alter_column(
                         self,
-                        &column,
+                        (&previous_column, &next_column),
                         changes,
                         &mut before_statements,
                         &mut lines,
@@ -387,15 +396,15 @@ impl SqlRenderer for PostgresFlavour {
         vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
     }
 
-    fn render_redefine_tables(&self, _names: &[AlterTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on Postgres")
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(&name),
-            new_name = self.quote_with_schema(&new_name).to_string(),
+            self.quote_with_schema(name),
+            new_name = self.quote_with_schema(new_name),
         )
     }
 }
@@ -435,7 +444,7 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 
 fn render_alter_column(
     renderer: &PostgresFlavour,
-    differ: &ColumnDiffer<'_>,
+    (previous_column, next_column): (&ColumnWalker<'_>, &ColumnWalker<'_>),
     column_changes: &ColumnChanges,
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
@@ -445,9 +454,9 @@ fn render_alter_column(
     static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
 
-    let steps = expand_postgres_alter_column((&differ.previous, &differ.next), column_changes);
-    let table_name = Quoted::postgres_ident(differ.previous.table().name());
-    let column_name = Quoted::postgres_ident(differ.previous.name());
+    let steps = expand_postgres_alter_column((&previous_column, &next_column), column_changes);
+    let table_name = Quoted::postgres_ident(previous_column.table().name());
+    let column_name = Quoted::postgres_ident(previous_column.name());
 
     let alter_column_prefix = format!("ALTER COLUMN {}", column_name);
 
@@ -457,14 +466,14 @@ fn render_alter_column(
                 clauses.push(format!("{} DROP DEFAULT", &alter_column_prefix));
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
-                if let Some(DefaultValue::SEQUENCE(sequence_expression)) = differ.previous.default() {
+                if let Some(DefaultValue::SEQUENCE(sequence_expression)) = previous_column.default() {
                     let sequence_name = SEQUENCE_DEFAULT_RE
                         .captures(sequence_expression)
                         .and_then(|captures| captures.get(1))
                         .map(|capture| capture.as_str())
                         .unwrap_or_else(|| panic!("Failed to extract sequence name from `{}`", sequence_expression));
 
-                    let sequence_is_still_used = walk_columns(differ.next.schema()).any(|column| matches!(column.default(), Some(DefaultValue::SEQUENCE(other_sequence)) if other_sequence == sequence_expression) && !column.is_same_column(&differ.next));
+                    let sequence_is_still_used = walk_columns(next_column.schema()).any(|column| matches!(column.default(), Some(DefaultValue::SEQUENCE(other_sequence)) if other_sequence == sequence_expression) && !column.is_same_column(&next_column));
 
                     if !sequence_is_still_used {
                         after_statements.push(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));
@@ -474,7 +483,7 @@ fn render_alter_column(
             PostgresAlterColumn::SetDefault(new_default) => clauses.push(format!(
                 "{} SET DEFAULT {}",
                 &alter_column_prefix,
-                renderer.render_default(&new_default, differ.next.column_type_family())
+                renderer.render_default(&new_default, next_column.column_type_family())
             )),
             PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", &alter_column_prefix)),
@@ -490,8 +499,8 @@ fn render_alter_column(
                 // https://www.postgresql.org/docs/12/datatype-numeric.html#DATATYPE-SERIAL
                 let sequence_name = format!(
                     "{table_name}_{column_name}_seq",
-                    table_name = differ.next.table().name(),
-                    column_name = differ.next.name()
+                    table_name = next_column.table().name(),
+                    column_name = next_column.name()
                 )
                 .to_lowercase();
 

@@ -24,15 +24,15 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
+    sql_migration::ColumnTypeChange,
     sql_migration::{AlterEnum, AlterTable, CreateIndex, DropTable, SqlMigrationStep, TableChange},
-    sql_schema_differ::ColumnDiffer,
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
 use sql_schema_describer::{
     walkers::{find_column, ColumnWalker, SqlSchemaExt},
-    SqlSchema,
+    ColumnArity, SqlSchema,
 };
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
@@ -84,82 +84,77 @@ impl SqlMigrationConnector {
 
         for (step_index, step) in steps.iter().enumerate() {
             match step {
-                SqlMigrationStep::AlterTable(AlterTable { table, changes }) => {
+                SqlMigrationStep::AlterTable(AlterTable {
+                    table,
+                    table_index: (prev_idx, next_idx),
+                    changes,
+                }) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = before.table_walker(&table.name);
-                    let after_table = after.table_walker(&table.name);
+                    let before_table = before.table_walker_at(*prev_idx);
+                    let after_table = after.table_walker_at(*next_idx);
 
-                    if let (Some(before_table), Some(after_table)) = (before_table, after_table) {
-                        for change in changes {
-                            match change {
-                                TableChange::DropColumn(ref drop_column) => {
-                                    let column = find_column(before, &table.name, &drop_column.name)
-                                        .expect("Dropping of unknown column.");
+                    for change in changes {
+                        match change {
+                            TableChange::DropColumn(ref drop_column) => {
+                                let column = find_column(before, &table.name, &drop_column.name)
+                                    .expect("Dropping of unknown column.");
 
-                                    self.check_column_drop(&column, &mut plan, step_index);
-                                }
-                                TableChange::AlterColumn(ref alter_column) => {
-                                    let previous_column = before_table
-                                        .column(&alter_column.column_name)
-                                        .expect("unsupported column renaming");
-                                    let next_column = after_table
-                                        .column(&alter_column.column_name)
-                                        .expect("unsupported column renaming");
-
-                                    self.flavour().check_alter_column(
-                                        &alter_column,
-                                        (&previous_column, &next_column),
-                                        &mut plan,
-                                        step_index,
-                                    )
-                                }
-                                TableChange::AddColumn(ref add_column) => {
-                                    let column = find_column(after, after_table.name(), &add_column.column.name)
-                                        .expect("Could not find column in AddColumn");
-
-                                    self.check_add_column(&column, &mut plan, step_index)
-                                }
-                                TableChange::DropPrimaryKey { .. } => plan.push_warning(
-                                    SqlMigrationWarningCheck::PrimaryKeyChange {
-                                        table: table.name.clone(),
-                                    },
-                                    step_index,
-                                ),
-                                TableChange::DropAndRecreateColumn {
-                                    column_name: _,
-                                    column_index: (previous_idx, next_idx),
-                                    changes,
-                                } => {
-                                    let previous_column = before_table.column_at(*previous_idx);
-                                    let next_column = after_table.column_at(*next_idx);
-
-                                    let differ = ColumnDiffer {
-                                        database_info: self.database_info(),
-                                        previous: previous_column,
-                                        next: next_column,
-                                        flavour: self.flavour(),
-                                    };
-
-                                    self.flavour
-                                        .check_drop_and_recreate_column(&differ, changes, &mut plan, step_index)
-                                }
-                                TableChange::AddPrimaryKey { .. } => (),
+                                self.check_column_drop(&column, &mut plan, step_index);
                             }
+                            TableChange::AlterColumn(ref alter_column) => {
+                                let previous_column = before_table
+                                    .column(&alter_column.column_name)
+                                    .expect("unsupported column renaming");
+                                let next_column = after_table
+                                    .column(&alter_column.column_name)
+                                    .expect("unsupported column renaming");
+
+                                self.flavour().check_alter_column(
+                                    &alter_column,
+                                    (&previous_column, &next_column),
+                                    &mut plan,
+                                    step_index,
+                                )
+                            }
+                            TableChange::AddColumn(ref add_column) => {
+                                let column = find_column(after, after_table.name(), &add_column.column.name)
+                                    .expect("Could not find column in AddColumn");
+
+                                self.check_add_column(&column, &mut plan, step_index)
+                            }
+                            TableChange::DropPrimaryKey { .. } => plan.push_warning(
+                                SqlMigrationWarningCheck::PrimaryKeyChange {
+                                    table: table.name.clone(),
+                                },
+                                step_index,
+                            ),
+                            TableChange::DropAndRecreateColumn {
+                                column_name: _,
+                                column_index: (previous_idx, next_idx),
+                                changes,
+                            } => {
+                                let previous_column = before_table.column_at(*previous_idx);
+                                let next_column = after_table.column_at(*next_idx);
+
+                                self.flavour.check_drop_and_recreate_column(
+                                    (&previous_column, &next_column),
+                                    changes,
+                                    &mut plan,
+                                    step_index,
+                                )
+                            }
+                            TableChange::AddPrimaryKey { .. } => (),
                         }
                     }
                 }
-                SqlMigrationStep::RedefineTables { tables } => {
-                    for table in tables {
-                        let name = &table.table.name;
-                        let previous = before.table_walker(&name).expect("Redefining unknown table.");
-                        let next = after.table_walker(&name).expect("Redefining unknown table.");
+                SqlMigrationStep::RedefineTables(redefine_tables) => {
+                    for redefine_table in redefine_tables {
+                        let (previous_table_idx, next_table_idx) = redefine_table.table_index;
+                        let previous = before.table_walker_at(previous_table_idx);
+                        let next = after.table_walker_at(next_table_idx);
 
-                        if table
-                            .changes
-                            .iter()
-                            .any(|change| matches!(change, TableChange::DropPrimaryKey { .. }))
-                        {
+                        if redefine_table.dropped_primary_key {
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
                                     table: previous.name().to_owned(),
@@ -168,32 +163,62 @@ impl SqlMigrationConnector {
                             )
                         }
 
-                        for add_column in table.changes.iter().filter_map(|change| change.as_add_column()) {
-                            let column_walker = next
-                                .column(&add_column.column.name)
-                                .expect("AddColumn for unknown column");
-                            self.check_add_column(&column_walker, &mut plan, step_index);
+                        for added_column_idx in &redefine_table.added_columns {
+                            let column = next.column_at(*added_column_idx);
+                            self.check_add_column(&column, &mut plan, step_index);
                         }
 
-                        for drop_column in table.changes.iter().filter_map(|change| change.as_drop_column()) {
-                            let column = previous.column_at(drop_column.index);
+                        for dropped_column_idx in &redefine_table.dropped_columns {
+                            let column = previous.column_at(*dropped_column_idx);
                             self.check_column_drop(&column, &mut plan, step_index);
                         }
 
-                        for alter_column in table.changes.iter().filter_map(|change| change.as_alter_column()) {
-                            let previous_column = previous
-                                .column(&alter_column.column_name)
-                                .expect("AlterColumn on unknown column");
-                            let next_column = next
-                                .column(&alter_column.column_name)
-                                .expect("AlterColumn on unknown column");
+                        for (previous_column_index, next_column_index, changes, type_change) in
+                            redefine_table.intersection_columns()
+                        {
+                            let previous = previous.column_at(*previous_column_index);
+                            let next = next.column_at(*next_column_index);
 
-                            self.flavour().check_alter_column(
-                                &alter_column,
-                                (&previous_column, &next_column),
-                                &mut plan,
-                                step_index,
-                            );
+                            let arity_change_is_safe = match (&previous.arity(), &next.arity()) {
+                                // column became required
+                                (ColumnArity::Nullable, ColumnArity::Required) => false,
+                                // column became nullable
+                                (ColumnArity::Required, ColumnArity::Nullable) => true,
+                                // nothing changed
+                                (ColumnArity::Required, ColumnArity::Required)
+                                | (ColumnArity::Nullable, ColumnArity::Nullable) => true,
+                                // not supported on SQLite
+                                (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
+                            };
+
+                            if !changes.type_changed() && arity_change_is_safe {
+                                continue;
+                            }
+
+                            if changes.arity_changed() && next.arity().is_required() && next.default().is_none() {
+                                plan.push_unexecutable(
+                                    UnexecutableStepCheck::MadeOptionalFieldRequired {
+                                        table: previous.table().name().to_owned(),
+                                        column: previous.name().to_owned(),
+                                    },
+                                    step_index,
+                                );
+                            }
+
+                            match type_change {
+                                Some(ColumnTypeChange::SafeCast) | None => (),
+                                Some(ColumnTypeChange::RiskyCast) => {
+                                    plan.push_warning(
+                                        SqlMigrationWarningCheck::RiskyCast {
+                                            table: previous.table().name().to_owned(),
+                                            column: previous.name().to_owned(),
+                                            previous_type: format!("{:?}", previous.column_type_family()),
+                                            next_type: format!("{:?}", next.column_type_family()),
+                                        },
+                                        step_index,
+                                    );
+                                }
+                            }
                         }
                     }
                 }

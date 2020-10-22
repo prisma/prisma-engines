@@ -4,9 +4,9 @@ use crate::{
     flavour::SqliteFlavour,
     sql_migration::{
         AddColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
-        TableChange,
+        RedefineTable, TableChange,
     },
-    sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
+    sql_schema_differ::SqlSchemaDiffer,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -115,7 +115,13 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable { table, changes } = alter_table;
+        let AlterTable {
+            table,
+            changes,
+            table_index: (_, next_idx),
+        } = alter_table;
+
+        let next_table = differ.next.table_walker_at(*next_idx);
 
         let mut statements = Vec::new();
 
@@ -125,12 +131,8 @@ impl SqlRenderer for SqliteFlavour {
         for change in changes {
             match change {
                 TableChange::AddColumn(AddColumn { column }) => {
-                    let column = differ
-                        .next
-                        .table_walker(&table.name)
-                        .expect("Invariant violation: add column on unknown table")
-                        .columns()
-                        .find(|col| col.name() == column.name)
+                    let column = next_table
+                        .column(&column.name)
                         .expect("Invariant violation: add column with unknown column");
 
                     let col_sql = self.render_column(column);
@@ -229,37 +231,39 @@ impl SqlRenderer for SqliteFlavour {
         ]
     }
 
-    fn render_redefine_tables(&self, tables: &[AlterTable], differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, tables: &[RedefineTable], differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
         let mut result: Vec<String> = Vec::new();
 
         result.push("PRAGMA foreign_keys=OFF".to_string());
 
-        for table in tables {
-            let table_name = &table.table.name;
-            let differ = differ
-                .diff_table(table_name)
-                .expect("Invariant violation: diffing unknown table.");
+        for redefine_table in tables {
+            let previous_table = differ.previous.table_walker_at(redefine_table.table_index.0);
+            let next_table = differ.next.table_walker_at(redefine_table.table_index.1);
+            let temporary_table_name = format!("new_{}", &next_table.name());
 
-            let temporary_table_name = format!("new_{}", &differ.next.name());
+            result.push(self.render_create_table_as(&next_table, &temporary_table_name));
 
-            // TODO start transaction now. Unclear if we really want to do that.
-            result.push(self.render_create_table_as(&differ.next, &temporary_table_name));
+            copy_current_table_into_new_table(
+                &mut result,
+                redefine_table,
+                (&previous_table, &next_table),
+                &temporary_table_name,
+                self,
+            );
 
-            copy_current_table_into_new_table(&mut result, &differ, &temporary_table_name, self).unwrap();
-
-            result.push(format!("DROP TABLE {}", self.quote(differ.previous.name())));
+            result.push(format!(r#"DROP TABLE "{}""#, previous_table.name()));
 
             result.push(format!(
-                "ALTER TABLE {old_name} RENAME TO \"{new_name}\"",
-                old_name = self.quote(&temporary_table_name),
-                new_name = differ.next.name()
+                r#"ALTER TABLE "{old_name}" RENAME TO "{new_name}""#,
+                old_name = temporary_table_name,
+                new_name = next_table.name(),
             ));
 
             // Recreate the indices
-            result.extend(differ.next.indexes().map(|index| {
+            result.extend(next_table.indexes().map(|index| {
                 self.render_create_index(&CreateIndex {
-                    table: differ.next.name().to_owned(),
+                    table: next_table.name().to_owned(),
                     index: index.index().clone(),
                     caused_by_create_table: false,
                 })
@@ -273,7 +277,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
-        format!("ALTER TABLE {} RENAME TO {}", self.quote(&name), self.quote(new_name),)
+        format!(r#"ALTER TABLE "{}" RENAME TO "{}""#, name, new_name)
     }
 }
 
@@ -286,10 +290,10 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::String => "TEXT",
         ColumnTypeFamily::Binary => "BLOB",
-        ColumnTypeFamily::Json => unimplemented!("Json not handled yet"),
-        ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
+        ColumnTypeFamily::Json => unreachable!("ColumnTypeFamily::Json on SQLite"),
+        ColumnTypeFamily::Enum(_) => unreachable!("ColumnTypeFamily::Enum on SQLite"),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
-        ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+        ColumnTypeFamily::Uuid => unimplemented!("ColumnTypeFamily::Uuid on SQLite"),
         ColumnTypeFamily::Xml => unimplemented!("Xml not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
@@ -308,81 +312,45 @@ fn escape_quotes(s: &str) -> Cow<'_, str> {
 /// default value, since SQLite does not have the `DEFAULT` keyword.
 fn copy_current_table_into_new_table(
     steps: &mut Vec<String>,
-    differ: &TableDiffer<'_>,
-    temporary_table: &str,
+    redefine_table: &RedefineTable,
+    (previous_table, next_table): (&TableWalker<'_>, &TableWalker<'_>),
+    temporary_table_name: &str,
     flavour: &SqliteFlavour,
-) -> std::fmt::Result {
-    use std::fmt::Write as _;
-
-    let columns_that_became_required_with_a_default: Vec<ColumnDiffer<'_>> = differ
-        .column_pairs()
-        .filter(|columns| {
-            let (changes, _) = columns.all_changes();
-
-            changes.arity_changed() && columns.next.arity().is_required() && columns.next.default().is_some()
-        })
-        .collect();
-
-    let intersection_columns: Vec<&str> = differ
-        .column_pairs()
-        .filter(|columns| {
-            !columns_that_became_required_with_a_default
-                .iter()
-                .any(|excluded| excluded.name() == columns.name())
-        })
-        .map(|columns| columns.name())
-        .collect();
-
-    let mut query = String::with_capacity(40);
-
-    write!(query, "INSERT INTO {} (", Quoted::sqlite_ident(temporary_table))?;
-
-    let mut destination_columns = intersection_columns
+) {
+    let destination_columns = redefine_table
+        .other_columns
         .iter()
-        .copied()
-        .chain(
-            columns_that_became_required_with_a_default
-                .iter()
-                .map(|columns| columns.name()),
-        )
-        .peekable();
+        .chain(redefine_table.columns_that_became_required_with_a_default.iter())
+        .map(|(_, next_colidx, _, _)| next_table.column_at(*next_colidx).name());
 
-    while let Some(destination_column) = destination_columns.next() {
-        write!(query, "{}", Quoted::sqlite_ident(destination_column))?;
-
-        if destination_columns.peek().is_some() {
-            write!(query, ", ")?;
-        }
-    }
-
-    write!(query, r#") SELECT "#)?;
-
-    let mut source_columns = intersection_columns
+    let source_columns = redefine_table
+        .other_columns
         .iter()
-        .map(|s| format!("{}", Quoted::sqlite_ident(s)))
-        .chain(columns_that_became_required_with_a_default.iter().map(|columns| {
-            format!(
-                "coalesce({column_name}, {default_value}) AS {column_name}",
-                column_name = Quoted::sqlite_ident(columns.name()),
-                default_value = flavour.render_default(
-                    columns.next.default().expect("default on required column with default"),
-                    &columns.next.column_type_family()
+        .map(|(previous_colidx, _, _, _)| previous_table.column_at(*previous_colidx))
+        .map(|col| format!("{}", Quoted::sqlite_ident(col.name())))
+        .chain(redefine_table.columns_that_became_required_with_a_default.iter().map(
+            |(previous_colidx, next_colidx, _, _)| {
+                let previous_column = previous_table.column_at(*previous_colidx);
+                let next_column = next_table.column_at(*next_colidx);
+
+                format!(
+                    "coalesce({column_name}, {default_value}) AS {column_name}",
+                    column_name = Quoted::sqlite_ident(previous_column.name()),
+                    default_value = flavour.render_default(
+                        next_column.default().expect("default on required column with default"),
+                        &next_column.column_type_family()
+                    )
                 )
-            )
-        }))
-        .peekable();
+            },
+        ));
 
-    while let Some(source_column) = source_columns.next() {
-        write!(query, "{}", source_column)?;
+    let query = format!(
+        r#"INSERT INTO "{temporary_table_name}" ({destination_columns}) SELECT {source_columns} FROM "{previous_table_name}""#,
+        temporary_table_name = temporary_table_name,
+        destination_columns = destination_columns.map(Quoted::sqlite_ident).join(", "),
+        source_columns = source_columns.join(", "),
+        previous_table_name = previous_table.name(),
+    );
 
-        if source_columns.peek().is_some() {
-            write!(query, ", ")?;
-        }
-    }
-
-    write!(query, " FROM {}", Quoted::sqlite_ident(&differ.next.name()))?;
-
-    steps.push(query);
-
-    Ok(())
+    steps.push(query)
 }

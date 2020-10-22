@@ -12,12 +12,6 @@ pub(crate) struct ColumnDiffer<'a> {
 }
 
 impl<'a> ColumnDiffer<'a> {
-    pub(crate) fn name(&self) -> &'a str {
-        debug_assert_eq!(self.previous.name(), self.next.name());
-
-        self.previous.name()
-    }
-
     pub(crate) fn all_changes(&self) -> (ColumnChanges, Option<ColumnTypeChange>) {
         let mut changes = BitFlags::empty();
         let column_type_change = self.column_type_change();
@@ -26,7 +20,7 @@ impl<'a> ColumnDiffer<'a> {
             changes |= ColumnChange::Renaming;
         };
 
-        if self.previous.arity() != self.next.arity() {
+        if self.arity_changed() {
             changes |= ColumnChange::Arity
         };
 
@@ -43,6 +37,10 @@ impl<'a> ColumnDiffer<'a> {
         };
 
         (ColumnChanges { changes }, column_type_change)
+    }
+
+    pub(crate) fn arity_changed(&self) -> bool {
+        self.previous.arity() != self.next.arity()
     }
 
     fn column_type_change(&self) -> Option<ColumnTypeChange> {

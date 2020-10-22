@@ -1,6 +1,6 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, sql_schema_differ::ColumnDiffer,
+    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, sql_schema_differ::column::ColumnDiffer,
     sql_schema_differ::ColumnTypeChange,
 };
 use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
