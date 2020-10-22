@@ -139,7 +139,11 @@ pub enum ErrorKind {
         connector_name: String,
     },
 
-    #[error("Native type {} can not be used in an ID field in {}.", native_type, connector_name)]
+    #[error(
+        "Native type {} of {} can not be used on a field that is `@id` or `@@id`.",
+        native_type,
+        connector_name
+    )]
     IncompatibleNativeTypeWithIdAttribute {
         native_type: String,
         connector_name: String,
