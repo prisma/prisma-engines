@@ -33,13 +33,13 @@ where
         query_schema: QuerySchemaRef,
     ) -> crate::Result<ResponseData> {
         // Parse, validate, and extract query graph from query document.
-        let (query, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-        let needs_transaction = force_transactions || query.needs_transaction();
+        let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
+        let is_transactional = force_transactions || query_graph.needs_transaction();
 
-        if needs_transaction {
+        if is_transactional {
             let tx = conn.start_transaction().await?;
             let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
-            let result = QueryPipeline::new(query, interpreter, serializer).execute().await;
+            let result = QueryPipeline::new(query_graph, interpreter, serializer).execute().await;
 
             if result.is_ok() {
                 tx.commit().await?;
@@ -50,7 +50,7 @@ where
             result
         } else {
             let interpreter = QueryInterpreter::new(ConnectionLike::Connection(conn.as_ref()));
-            QueryPipeline::new(query, interpreter, serializer).execute().await
+            QueryPipeline::new(query_graph, interpreter, serializer).execute().await
         }
     }
 }
@@ -78,7 +78,6 @@ where
         query_schema: QuerySchemaRef,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if transactional {
-            // Transactional batches are currently experimental
             if !feature_flags::get().transaction {
                 return Err(crate::CoreError::UnsupportedFeatureError(
                     "Batch transactions (experimental feature, needs to be enabled).".to_owned(),
