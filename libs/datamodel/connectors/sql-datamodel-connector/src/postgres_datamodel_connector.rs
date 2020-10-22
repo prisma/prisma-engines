@@ -1,12 +1,14 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::parse_u32_arguments;
 use datamodel_connector::{Connector, ConnectorCapability};
+use dml::default_value::DefaultValue;
 use dml::field::{Field, FieldType};
 use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
 use native_types::PostgresType;
+use prisma_value::PrismaValue;
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -138,6 +140,14 @@ impl Connector for PostgresDatamodelConnector {
                         ));
                     }
                     _ => {}
+                }
+            }
+            if native_type_name == SMALL_SERIAL_TYPE_NAME
+                || native_type_name == SERIAL_TYPE_NAME
+                || native_type_name == BIG_SERIAL_TYPE_NAME
+            {
+                if let Some(default_value) = field.default_value() {
+                    println!("default value: {:?}", default_value);
                 }
             }
         }

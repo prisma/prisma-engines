@@ -10,4 +10,5 @@ edition = "2018"
 datamodel-connector = { path = "../datamodel-connector" }
 dml = { path = "../dml" }
 native-types = { path = "../../../native-types" }
+prisma-value = {path = "../../../prisma-value"}
 serde_json = "1.0"
