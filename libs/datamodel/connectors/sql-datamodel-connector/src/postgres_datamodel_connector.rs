@@ -1,6 +1,7 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::parse_u32_arguments;
 use datamodel_connector::{Connector, ConnectorCapability};
+use dml::default_value::DefaultValue;
 use dml::field::{Field, FieldType};
 use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
@@ -128,7 +129,7 @@ impl Connector for PostgresDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         if let FieldType::NativeType(_scalar_type, native_type) = field.field_type() {
             let native_type_name = native_type.name.as_str();
-            if native_type_name == DECIMAL_TYPE_NAME || native_type_name == NUMERIC_TYPE_NAME {
+            if matches!(native_type_name, DECIMAL_TYPE_NAME | NUMERIC_TYPE_NAME) {
                 match native_type.args.as_slice() {
                     [precision, scale] if scale > precision => {
                         return Err(ConnectorError::new_scale_larger_than_precision_error(
@@ -137,6 +138,19 @@ impl Connector for PostgresDatamodelConnector {
                         ));
                     }
                     _ => {}
+                }
+            }
+            if matches!(
+                native_type_name,
+                SMALL_SERIAL_TYPE_NAME | SERIAL_TYPE_NAME | BIG_SERIAL_TYPE_NAME
+            ) {
+                if let Some(DefaultValue::Single(_)) = field.default_value() {
+                    return Err(
+                        ConnectorError::new_incompatible_sequential_type_with_static_default_value_error(
+                            native_type_name,
+                            "Postgres",
+                        ),
+                    );
                 }
             }
         }

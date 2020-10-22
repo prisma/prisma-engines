@@ -156,7 +156,7 @@ impl Connector for MySqlDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         if let FieldType::NativeType(_, native_type) = field.field_type() {
             let native_type_name = native_type.name.as_str();
-            if native_type_name == DECIMAL_TYPE_NAME || native_type_name == NUMERIC_TYPE_NAME {
+            if matches!(native_type_name, DECIMAL_TYPE_NAME | NUMERIC_TYPE_NAME) {
                 match native_type.args.as_slice() {
                     [precision, scale] if scale > precision => {
                         return Err(ConnectorError::new_scale_larger_than_precision_error(
