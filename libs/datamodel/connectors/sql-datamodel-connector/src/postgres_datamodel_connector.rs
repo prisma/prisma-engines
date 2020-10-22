@@ -54,35 +54,35 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::RelationsOverNullableField,
         ];
 
-        let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, ScalarType::Int);
-        let integer = NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, ScalarType::Int);
-        let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, ScalarType::Int);
-        let decimal = NativeTypeConstructor::with_args(DECIMAL_TYPE_NAME, 2, ScalarType::Decimal);
-        let numeric = NativeTypeConstructor::with_args(NUMERIC_TYPE_NAME, 2, ScalarType::Decimal);
-        let real = NativeTypeConstructor::without_args(REAL_TYPE_NAME, ScalarType::Float);
-        let double_precision = NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, ScalarType::Float);
-        let small_serial = NativeTypeConstructor::without_args(SMALL_SERIAL_TYPE_NAME, ScalarType::Int);
-        let serial = NativeTypeConstructor::without_args(SERIAL_TYPE_NAME, ScalarType::Int);
-        let big_serial = NativeTypeConstructor::without_args(BIG_SERIAL_TYPE_NAME, ScalarType::Int);
-        let varchar = NativeTypeConstructor::with_args(VARCHAR_TYPE_NAME, 1, ScalarType::String);
-        let char = NativeTypeConstructor::with_args(CHAR_TYPE_NAME, 1, ScalarType::String);
-        let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, ScalarType::String);
-        let byte_a = NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, ScalarType::Bytes);
-        let timestamp = NativeTypeConstructor::with_args(TIMESTAMP_TYPE_NAME, 1, ScalarType::DateTime);
+        let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);
+        let integer = NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, vec![ScalarType::Int]);
+        let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, vec![ScalarType::Int]);
+        let decimal = NativeTypeConstructor::with_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
+        let numeric = NativeTypeConstructor::with_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]);
+        let real = NativeTypeConstructor::without_args(REAL_TYPE_NAME, vec![ScalarType::Float]);
+        let double_precision = NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, vec![ScalarType::Float]);
+        let small_serial = NativeTypeConstructor::without_args(SMALL_SERIAL_TYPE_NAME, vec![ScalarType::Int]);
+        let serial = NativeTypeConstructor::without_args(SERIAL_TYPE_NAME, vec![ScalarType::Int]);
+        let big_serial = NativeTypeConstructor::without_args(BIG_SERIAL_TYPE_NAME, vec![ScalarType::Int]);
+        let varchar = NativeTypeConstructor::with_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]);
+        let char = NativeTypeConstructor::with_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
+        let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]);
+        let byte_a = NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, vec![ScalarType::Bytes]);
+        let timestamp = NativeTypeConstructor::with_args(TIMESTAMP_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let timestamp_with_timezone =
-            NativeTypeConstructor::with_args(TIMESTAMP_WITH_TIMEZONE_TYPE_NAME, 1, ScalarType::DateTime);
-        let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, ScalarType::DateTime);
-        let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, ScalarType::DateTime);
+            NativeTypeConstructor::with_args(TIMESTAMP_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, vec![ScalarType::DateTime]);
+        let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let time_with_timezone =
-            NativeTypeConstructor::with_args(TIME_WITH_TIMEZONE_TYPE_NAME, 1, ScalarType::DateTime);
-        let interval = NativeTypeConstructor::with_args(INTERVAL_TYPE_NAME, 1, ScalarType::Duration);
-        let boolean = NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, ScalarType::Boolean);
-        let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, ScalarType::String);
-        let varbit = NativeTypeConstructor::with_args(VAR_BIT_TYPE_NAME, 1, ScalarType::String);
-        let uuid = NativeTypeConstructor::without_args(UUID_TYPE_NAME, ScalarType::String);
-        let xml = NativeTypeConstructor::without_args(XML_TYPE_NAME, ScalarType::Xml);
-        let json = NativeTypeConstructor::without_args(JSON_TYPE_NAME, ScalarType::Json);
-        let json_b = NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, ScalarType::Json);
+            NativeTypeConstructor::with_args(TIME_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let interval = NativeTypeConstructor::with_args(INTERVAL_TYPE_NAME, 1, vec![ScalarType::Duration]);
+        let boolean = NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, vec![ScalarType::Boolean]);
+        let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, vec![ScalarType::String]);
+        let varbit = NativeTypeConstructor::with_args(VAR_BIT_TYPE_NAME, 1, vec![ScalarType::String]);
+        let uuid = NativeTypeConstructor::without_args(UUID_TYPE_NAME, vec![ScalarType::String]);
+        let xml = NativeTypeConstructor::without_args(XML_TYPE_NAME, vec![ScalarType::Xml]);
+        let json = NativeTypeConstructor::without_args(JSON_TYPE_NAME, vec![ScalarType::Json]);
+        let json_b = NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, vec![ScalarType::Json]);
 
         let constructors = vec![
             small_int,

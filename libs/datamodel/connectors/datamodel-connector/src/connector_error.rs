@@ -87,12 +87,12 @@ pub enum ErrorKind {
         "Native type {} is not compatible with declared field type {}, expected field type {}.",
         native_type,
         field_type,
-        expected_type
+        expected_types
     )]
     IncompatibleNativeType {
         native_type: String,
         field_type: String,
-        expected_type: String,
+        expected_types: String,
     },
 
     #[error("Attribute @{} is defined twice.", attribute_name)]
