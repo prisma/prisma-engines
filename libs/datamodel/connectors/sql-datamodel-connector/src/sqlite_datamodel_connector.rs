@@ -12,7 +12,7 @@ pub struct SqliteDatamodelConnector {
 
 impl SqliteDatamodelConnector {
     pub fn new() -> SqliteDatamodelConnector {
-        let capabilities = vec![ConnectorCapability::RelationsOverNullableField];
+        let capabilities = vec![];
         let constructors: Vec<NativeTypeConstructor> = vec![];
 
         SqliteDatamodelConnector {
