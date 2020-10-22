@@ -140,6 +140,18 @@ impl Connector for PostgresDatamodelConnector {
                     _ => {}
                 }
             }
+            if matches!(native_type_name, BIT_TYPE_NAME | VAR_BIT_TYPE_NAME) {
+                match native_type.args.as_slice() {
+                    [length] if length == &0 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "M must be a positive integer.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    _ => {}
+                }
+            }
             if matches!(
                 native_type_name,
                 SMALL_SERIAL_TYPE_NAME | SERIAL_TYPE_NAME | BIG_SERIAL_TYPE_NAME

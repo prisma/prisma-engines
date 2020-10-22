@@ -1,5 +1,8 @@
 use crate::common::*;
-use crate::types::helper::{test_native_types_compatibility, test_native_types_with_field_attribute_support};
+use crate::types::helper::{
+    test_native_types_compatibility, test_native_types_with_field_attribute_support,
+    test_native_types_without_attributes,
+};
 use datamodel::{ast, diagnostics::DatamodelError};
 
 const BLOB_TYPES: &[&'static str] = &["Blob", "LongBlob", "MediumBlob", "TinyBlob"];
@@ -82,6 +85,15 @@ fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_
     );
 
     test_native_types_compatibility(&dml, &error_msg, MYSQL_SOURCE);
+}
+
+#[test]
+fn should_fail_on_argument_out_of_range_for_bit_type() {
+    let error_msg = "Argument M is out of range for Native type Bit of MySQL: M can range from 1 to 64";
+
+    for tpe in &["Bit(0)", "Bit(65)"] {
+        test_native_types_without_attributes(tpe, "Bytes", error_msg, MYSQL_SOURCE);
+    }
 }
 
 #[test]

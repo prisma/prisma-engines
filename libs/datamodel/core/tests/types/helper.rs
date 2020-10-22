@@ -48,3 +48,18 @@ pub fn test_native_types_with_field_attribute_support(
 
     test_native_types_compatibility(&dml, &error_msg, datasource);
 }
+
+pub fn test_native_types_without_attributes(native_type: &str, scalar_type: &str, error_msg: &str, datasource: &str) {
+    let dml = format!(
+        r#"
+    model Blog {{
+      id     Int    @id
+      bigInt {scalar_type} @db.{native_type}
+    }}
+    "#,
+        native_type = native_type,
+        scalar_type = scalar_type,
+    );
+
+    test_native_types_compatibility(&dml, &error_msg, datasource);
+}
