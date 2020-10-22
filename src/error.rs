@@ -184,6 +184,13 @@ impl From<Error> for ErrorKind {
     }
 }
 
+impl From<rust_decimal::Error> for Error {
+    fn from(e: rust_decimal::Error) -> Self {
+        let kind = ErrorKind::conversion(format!("{}", e));
+        Self::builder(kind).build()
+    }
+}
+
 #[cfg(feature = "json-1")]
 impl From<serde_json::Error> for Error {
     fn from(_: serde_json::Error) -> Self {

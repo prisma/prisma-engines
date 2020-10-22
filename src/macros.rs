@@ -161,6 +161,42 @@ macro_rules! expression {
 /// A test-generator to test types in the defined database.
 #[cfg(test)]
 macro_rules! test_type {
+    ($name:ident($db:ident, $sql_type:literal, $(($input:expr, $output:expr)),+ $(,)?)) => {
+        paste::item! {
+            #[test]
+            fn [< test_type_ $name >] () -> crate::Result<()> {
+                use crate::ast::*;
+                use crate::connector::Queryable;
+                use crate::tests::test_api::TestApi;
+                use tokio::runtime::Builder;
+
+                let mut rt = Builder::new().threaded_scheduler().enable_io().enable_time().build().unwrap();
+
+                rt.block_on(async {
+                    let mut setup = [< $db _test_api >]().await?;
+                    let table = setup.create_type_table($sql_type).await?;
+
+                    $(
+                        let input = $input;
+                        let output = $output;
+
+                        let insert = Insert::single_into(&table).value("value", input);
+                        setup.conn().insert(insert.into()).await?;
+
+                        let select = Select::from_table(&table).column("value").order_by("id".descend());
+                        let res = setup.conn().select(select).await?.into_single()?;
+
+                        assert_eq!(Some(&output), res.at(0));
+                    )+
+
+                    Result::<(), crate::error::Error>::Ok(())
+                }).unwrap();
+
+                Ok(())
+            }
+        }
+    };
+
     ($name:ident($db:ident, $sql_type:literal, $($value:expr),+ $(,)?)) => {
         paste::item! {
             #[test]
@@ -193,5 +229,5 @@ macro_rules! test_type {
                 Ok(())
             }
         }
-    }
+    };
 }
