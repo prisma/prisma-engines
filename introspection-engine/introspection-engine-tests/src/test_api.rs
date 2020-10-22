@@ -57,7 +57,8 @@ impl TestApi {
             ConnectionInfo::Sqlite {
                 file_path: _,
                 db_name: _,
-            } => {
+            }
+            | ConnectionInfo::InMemorySqlite { .. } => {
                 let sql_schema = sqlite::SqlSchemaDescriber::new(self.database.clone())
                     .describe(self.connection_info.schema_name())
                     .await?;

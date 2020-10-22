@@ -293,7 +293,7 @@ async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow:
     match api.connection_info() {
         ConnectionInfo::Postgres(..) => assert_eq!(Some("42601"), error_code),
         ConnectionInfo::Mysql(..) => assert_eq!(Some("1064"), error_code),
-        ConnectionInfo::Sqlite { .. } => assert_eq!(Some("1"), error_code),
+        ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => assert_eq!(Some("1"), error_code),
         ConnectionInfo::Mssql(..) => assert_eq!(Some("102"), error_code),
         ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
     }
@@ -324,7 +324,7 @@ async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Res
     match api.connection_info() {
         ConnectionInfo::Postgres(..) => assert_eq!(Some("23505"), error_code),
         ConnectionInfo::Mysql(..) => assert_eq!(Some("1062"), error_code),
-        ConnectionInfo::Sqlite { .. } => assert_eq!(Some("1555"), error_code),
+        ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => assert_eq!(Some("1555"), error_code),
         ConnectionInfo::Mssql { .. } => assert_eq!(Some("2627"), error_code),
         ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
     }
