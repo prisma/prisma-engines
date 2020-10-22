@@ -295,6 +295,7 @@ async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow:
         ConnectionInfo::Mysql(..) => assert_eq!(Some("1064"), error_code),
         ConnectionInfo::Sqlite { .. } => assert_eq!(Some("1"), error_code),
         ConnectionInfo::Mssql(..) => assert_eq!(Some("102"), error_code),
+        ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
     }
 
     Ok(())
@@ -325,6 +326,7 @@ async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Res
         ConnectionInfo::Mysql(..) => assert_eq!(Some("1062"), error_code),
         ConnectionInfo::Sqlite { .. } => assert_eq!(Some("1555"), error_code),
         ConnectionInfo::Mssql { .. } => assert_eq!(Some("2627"), error_code),
+        ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
     }
 
     Ok(())
