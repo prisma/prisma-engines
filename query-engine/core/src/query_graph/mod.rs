@@ -1,7 +1,3 @@
-//! Query graph abstraction for simple high-level query representation and manipulation.
-//! Wraps Petgraph crate graph.
-//!
-//! Considered not stable. Will change in the future.
 mod error;
 mod formatters;
 mod guard;
@@ -210,6 +206,7 @@ impl QueryGraph {
         if !self.finalized {
             self.swap_marked()?;
             self.insert_reloads()?;
+            self.normalize_if_nodes()?;
             self.finalized = true;
         }
 
@@ -568,6 +565,30 @@ impl QueryGraph {
             if let Some(edge) = existing_edge {
                 let content = self.remove_edge(edge).unwrap();
                 self.create_edge(&child_node, &parent_node, content)?;
+            }
+        }
+
+        Ok(())
+    }
+
+    // This is a bandaid fix.
+    fn normalize_if_nodes(&mut self) -> QueryGraphResult<()> {
+        for node_ix in self.graph.node_indices() {
+            let node = NodeRef { node_ix };
+
+            if let Node::Flow(Flow::If(_)) = self.node_content(&node).unwrap() {
+                let parents = self.incoming_edges(&node);
+
+                for parent_edge in parents {
+                    let parent = self.edge_source(&parent_edge);
+                    let siblings = self.direct_child_pairs(&parent);
+
+                    for (_, sibling) in siblings {
+                        if sibling != node {
+                            self.create_edge(&node, &sibling, QueryGraphDependency::ExecutionOrder)?;
+                        }
+                    }
+                }
             }
         }
 
