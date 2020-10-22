@@ -732,25 +732,6 @@ impl<'a> Validator<'a> {
                         );
                 }
 
-                let references_nullable_field = rel_info.to_fields.iter().any(|field_name| {
-                    let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
-                    referenced_field.is_optional()
-                });
-
-                let must_not_reference_nullable_field = match self.source {
-                    Some(source) => !source.combined_connector.supports_relations_over_nullable_field(),
-                    None => false,
-                };
-
-                if references_nullable_field && must_not_reference_nullable_field {
-                    errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must not refer to a nullable field in the related model `{}`. But it is referencing the following fields that are nullable: {}",
-                                &related_model.name,
-                                rel_info.to_fields.join(", ")),
-                    ast_field.span)
-                    );
-                }
-
                 // TODO: This error is only valid for connectors that don't support native many to manys.
                 // We only render this error if there's a singular id field. Otherwise we render a better error in a different function.
                 if is_many_to_many && !references_singular_id_field && related_model.has_single_id_field() {

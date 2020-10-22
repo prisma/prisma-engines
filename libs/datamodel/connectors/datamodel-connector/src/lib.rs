@@ -51,10 +51,6 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::RelationsOverNonUniqueCriteria)
     }
 
-    fn supports_relations_over_nullable_field(&self) -> bool {
-        self.has_capability(ConnectorCapability::RelationsOverNullableField)
-    }
-
     fn supports_enums(&self) -> bool {
         self.has_capability(ConnectorCapability::Enums)
     }
@@ -107,7 +103,6 @@ pub enum ConnectorCapability {
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
-    RelationsOverNullableField,
     // start of Query Engine Capabilities
     InsensitiveFilters,
 }
