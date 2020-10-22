@@ -11,7 +11,7 @@ fn should_fail_on_serial_data_types_with_number_default() {
         )
     }
 
-    for tpe in vec!["SmallSerial", "Serial", "BigSerial"] {
+    for tpe in &["SmallSerial", "Serial", "BigSerial"] {
         test_native_types_with_field_attribute_support(tpe, "Int", "default(4)", &error_msg(tpe), POSTGRES_SOURCE);
     }
 }
