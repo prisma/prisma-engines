@@ -57,6 +57,13 @@ impl ConnectorError {
         })
     }
 
+    pub fn new_incompatible_native_type_with_index(native_type: &str, connector_name: &str) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithIndexAttribute {
+            native_type: String::from(native_type),
+            connector_name: String::from(connector_name),
+        })
+    }
+
     pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::ValueParserError {
             expected_type: String::from(expected_type),
@@ -145,6 +152,16 @@ pub enum ErrorKind {
         connector_name
     )]
     IncompatibleNativeTypeWithIdAttribute {
+        native_type: String,
+        connector_name: String,
+    },
+
+    #[error(
+        "You can not define an index on fields with Native type {} of {}.",
+        native_type,
+        connector_name
+    )]
+    IncompatibleNativeTypeWithIndexAttribute {
         native_type: String,
         connector_name: String,
     },
