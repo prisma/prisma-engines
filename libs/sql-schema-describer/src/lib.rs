@@ -338,8 +338,6 @@ pub enum ColumnTypeFamily {
     Binary,
     /// JSON types.
     Json,
-    /// Xml types.
-    Xml,
     /// UUID types.
     Uuid,
     ///Enum
@@ -377,7 +375,6 @@ impl fmt::Display for ColumnTypeFamily {
             Self::Duration => "duration".to_string(),
             Self::Binary => "binary".to_string(),
             Self::Json => "json".to_string(),
-            Self::Xml => "xml".to_string(),
             Self::Uuid => "uuid".to_string(),
             Self::Enum(x) => format!("Enum({})", &x),
             Self::Unsupported(x) => x.to_string(),
