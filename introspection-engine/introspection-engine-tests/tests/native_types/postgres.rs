@@ -130,7 +130,7 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
         })
         .await?;
 
-    let mut dm = indoc! {r#"
+    let dm = indoc! {r#"
          generator client {
             provider = "prisma-client-js"
             previewFeatures = ["nativeTypes"]
@@ -142,9 +142,19 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
          }
 
          model Blog {
-            id              Int      @id @postgres.Integer
-            decimal_array Decimal[] @postgres.Numeric(42, 0)
-          }
+          id                Int        @id @postgres.Integer
+          decimal_array     Decimal[]  @postgres.Numeric(42, 0)
+          numeric_array     Decimal[]  @postgres.Numeric(4, 2)
+          varchar_array     String[]   @postgres.VarChar(42)
+          char_array        String[]   @postgres.Char(200)
+          bit_array         String[]   @postgres.Bit(20)
+          varbit_array      String[]   @postgres.VarBit(2)
+          timestamp_array   DateTime[] @postgres.Timestamp(4)
+          timestamptz_array DateTime[] @postgres.TimestampWithTimeZone(4)
+          time_array        DateTime[] @postgres.Time(4)
+          timetz_array      DateTime[] @postgres.TimeWithTimeZone(3)
+          interval_array    Duration[] @postgres.Interval(1)
+        }
     "#}
     .to_string();
 

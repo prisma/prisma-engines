@@ -230,7 +230,6 @@ async fn get_all_columns(
         let precision = Precision {
             character_maximum_length,
             numeric_precision,
-            numeric_precision_radix: None,
             numeric_scale,
             time_precision,
         };
@@ -552,15 +551,15 @@ fn get_column_type_and_enum(
         "decimal" => (
             ColumnTypeFamily::Decimal,
             Some(MySqlType::Decimal(
-                precision.numeric_precision(),
-                precision.numeric_scale(),
+                precision.numeric_precision.unwrap_or(65),
+                precision.numeric_scale.unwrap_or(30),
             )),
         ),
         "numeric" => (
             ColumnTypeFamily::Decimal,
             Some(MySqlType::Numeric(
-                precision.numeric_precision(),
-                precision.numeric_scale(),
+                precision.numeric_precision.unwrap_or(65),
+                precision.numeric_scale.unwrap_or(30),
             )),
         ),
         "float" => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
@@ -568,11 +567,11 @@ fn get_column_type_and_enum(
 
         "char" => (
             ColumnTypeFamily::String,
-            Some(MySqlType::Char(precision.character_max_length())),
+            Some(MySqlType::Char(precision.expect_char_max_length())),
         ),
         "varchar" => (
             ColumnTypeFamily::String,
-            Some(MySqlType::VarChar(precision.character_max_length())),
+            Some(MySqlType::VarChar(precision.expect_char_max_length())),
         ),
         "text" => (ColumnTypeFamily::String, Some(MySqlType::Text)),
         "tinytext" => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
@@ -586,29 +585,29 @@ fn get_column_type_and_enum(
         "time" => (
             //Fixme this can either be a time or a duration -.-
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::Time(precision.time_precision())),
+            Some(MySqlType::Time(precision.time_precision)),
         ),
         "datetime" => (
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::DateTime(precision.time_precision())),
+            Some(MySqlType::DateTime(precision.time_precision)),
         ),
         "timestamp" => (
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::Timestamp(precision.time_precision())),
+            Some(MySqlType::Timestamp(precision.time_precision)),
         ),
         "year" => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
         //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
         "bit" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::Bit(precision.numeric_precision())),
+            Some(MySqlType::Bit(precision.numeric_precision.unwrap_or(100))), //fixme ???
         ),
         "binary" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::Binary(precision.character_max_length())),
+            Some(MySqlType::Binary(precision.expect_char_max_length())),
         ),
         "varbinary" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::VarBinary(precision.character_max_length())),
+            Some(MySqlType::VarBinary(precision.expect_char_max_length())),
         ),
         "blob" => (ColumnTypeFamily::Binary, Some(MySqlType::Blob)),
         "tinyblob" => (ColumnTypeFamily::Binary, Some(MySqlType::TinyBlob)),

@@ -5,6 +5,7 @@ use native_types::{NativeType, PostgresType};
 use quaint::connector::ResultRow;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
+use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::debug;
 
@@ -204,29 +205,63 @@ impl SqlSchemaDescriber {
     }
 
     fn get_precision(col: &ResultRow) -> Precision {
-        let character_maximum_length = col.get_u32("character_maximum_length");
-        let numeric_precision = col.get_u32("numeric_precision");
-        let numeric_precision_radix = col.get_u32("numeric_precision_radix");
-        let numeric_scale = col.get_u32("numeric_scale");
-        let time_precision = col.get_u32("datetime_precision");
-        let formatted_type = col.get_string("formatted_type");
+        let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
+            if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
+                fn get_single(formatted_type: &String) -> Option<u32> {
+                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0-9]*)\).*\[\]$"#).unwrap());
 
-        let col_name = col.get_expect_string("column_name");
-        println!("{:?}", col_name);
-        println!("CharMaxLength {:?}", character_maximum_length);
-        println!("NumPrecision {:?}", numeric_precision);
-        println!("TimePrecision {:?}", time_precision);
-        println!("Formatted {:?}", formatted_type);
+                    SINGLE_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
+                }
 
-        // needs to handle
-        //numeric numeric(42,0)[]
-        //varchar character varying(42)[]
-        //time timestamp(4) without time zone[]
+                fn get_dual(formatted_type: &String) -> (Option<u32>, Option<u32>) {
+                    static DUAL_REGEX_REGEX: Lazy<Regex> =
+                        Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
+                    let first = DUAL_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+
+                    let second = DUAL_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(2).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+                    (first, second)
+                }
+
+                let formatted_type = col.get_expect_string("formatted_type");
+                let fdt = col.get_expect_string("full_data_type");
+                let char_max_length = if matches!(fdt.as_str(), "_bpchar" | "_varchar" | "_bit" | "_varbit") {
+                    get_single(&formatted_type)
+                } else {
+                    None
+                };
+                let (num, num_scale) = if matches!(fdt.as_str(), "_numeric") {
+                    get_dual(&formatted_type)
+                } else {
+                    (None, None)
+                };
+                let time = if matches!(
+                    fdt.as_str(),
+                    "_timestamptz" | "_timestamp" | "_timetz" | "_time" | "_interval"
+                ) {
+                    get_single(&formatted_type)
+                } else {
+                    None
+                };
+
+                (char_max_length, num, num_scale, time)
+            } else {
+                (
+                    col.get_u32("character_maximum_length"),
+                    col.get_u32("numeric_precision"),
+                    col.get_u32("numeric_scale"),
+                    col.get_u32("datetime_precision"),
+                )
+            };
 
         Precision {
             character_maximum_length,
             numeric_precision,
-            numeric_precision_radix,
             numeric_scale,
             time_precision,
         }
@@ -655,8 +690,8 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
         "text" | "_text" => (String, Some(PostgresType::Text)),
         "citext" | "_citext" => (String, None),
-        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
-        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_max_length()))),
+        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.expect_char_max_length()))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.expect_char_max_length()))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
@@ -664,27 +699,25 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
         "xml" | "_xml" => (Xml, Some(PostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
-        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),
+        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.expect_char_max_length()))),
+        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.expect_char_max_length()))),
         "numeric" | "_numeric" => (
             Decimal,
             Some(PostgresType::Numeric(
-                precision.numeric_precision(),
-                precision.numeric_scale(),
+                //fixme these should be optional
+                precision.numeric_precision.unwrap_or(65),
+                precision.numeric_scale.unwrap_or(30),
             )),
         ),
         "money" | "_money" => (Float, None),
         "pg_lsn" | "_pg_lsn" => unsupported(),
-        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision()))),
-        "timetz" | "_timetz" => (
-            DateTime,
-            Some(PostgresType::TimeWithTimeZone(precision.time_precision())),
-        ),
-        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision()))),
-        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision()))),
+        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
+        "timetz" | "_timetz" => (DateTime, Some(PostgresType::TimeWithTimeZone(precision.time_precision))),
+        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision))),
+        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision))),
         "timestamptz" | "_timestamptz" => (
             DateTime,
-            Some(PostgresType::TimestampWithTimeZone(precision.time_precision())),
+            Some(PostgresType::TimestampWithTimeZone(precision.time_precision)),
         ),
         "tsquery" | "_tsquery" => unsupported(),
         "tsvector" | "_tsvector" => unsupported(),
