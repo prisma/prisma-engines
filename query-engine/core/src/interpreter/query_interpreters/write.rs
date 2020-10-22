@@ -1,7 +1,7 @@
 use crate::{
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::*,
-    QueryResult, RawQueryType,
+    QueryResult,
 };
 use connector::{ConnectionLike, WriteOperations};
 use prisma_value::PrismaValue;
@@ -18,14 +18,8 @@ pub async fn execute<'a, 'b>(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
-        WriteQuery::Raw {
-            query,
-            parameters,
-            raw_type,
-        } => match raw_type {
-            RawQueryType::Execute => execute_raw(tx, query, parameters).await,
-            RawQueryType::Query => query_raw(tx, query, parameters).await,
-        },
+        WriteQuery::ExecuteRaw(rq) => execute_raw(tx, rq.query, rq.parameters).await,
+        WriteQuery::QueryRaw(rq) => query_raw(tx, rq.query, rq.parameters).await,
     }
 }
 

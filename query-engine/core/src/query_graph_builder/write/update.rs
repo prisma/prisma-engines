@@ -3,7 +3,7 @@ use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
+    ArgumentListLookup, ParsedField, ParsedInputMap,
 };
 use connector::{Filter, IdFilter};
 use prisma_models::ModelRef;
@@ -21,7 +21,7 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
 
     let update_node = update_record_node(graph, filter, Arc::clone(&model), data_map)?;
 
-    let read_query = ReadOneRecordBuilder::new(field, model.clone()).build()?;
+    let read_query = read::find_one(field, model.clone())?;
     let read_node = graph.create_node(Query::Read(read_query));
 
     graph.add_result_node(&read_node);
@@ -56,6 +56,8 @@ pub fn update_many_records(
     model: ModelRef,
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
+    graph.flag_transactional();
+
     let filter = match field.arguments.lookup("where") {
         Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
@@ -89,6 +91,8 @@ pub fn update_record_node<T>(
 where
     T: Into<Filter>,
 {
+    graph.flag_transactional();
+
     let update_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = update_args.args;
 

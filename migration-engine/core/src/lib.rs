@@ -11,10 +11,13 @@ pub mod migration;
 pub mod migration_engine;
 
 mod core_error;
+mod gate_keeper;
 
+use anyhow::anyhow;
 pub use api::GenericApi;
 pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, SchemaPushInput};
 pub use core_error::{CoreError, CoreResult};
+pub use gate_keeper::GateKeeper;
 
 use commands::{MigrationCommand, SchemaPushCommand};
 use datamodel::{
@@ -28,13 +31,18 @@ use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 
 /// Top-level constructor for the migration engine API.
-pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericApi>> {
+pub async fn migration_api(
+    datamodel: &str,
+    enabled_preview_features: Vec<String>,
+) -> CoreResult<Arc<dyn api::GenericApi>> {
     let config = parse_configuration(datamodel)?;
+
+    GateKeeper::new(enabled_preview_features).any_blocked(config.preview_features())?;
 
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
+        .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
 
     let connector = match &source.active_provider {
         #[cfg(feature = "sql")]
@@ -80,7 +88,7 @@ pub async fn create_database(schema: &str) -> CoreResult<String> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
+        .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
 
     match &source.active_provider {
         provider
@@ -105,7 +113,7 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
+        .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
 
     match &source.active_provider {
         provider
@@ -130,7 +138,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
+        .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
 
     let connector = match &source.active_provider {
         provider

@@ -8,7 +8,16 @@ pub type ParsedInputMap = IndexMap<String, ParsedInputValue>;
 
 #[derive(Debug, Clone)]
 pub struct ParsedObject {
-    pub fields: Vec<ParsedField>,
+    pub fields: Vec<FieldPair>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FieldPair {
+    /// The field parsed from the incoming query.
+    pub parsed_field: ParsedField,
+
+    /// The schema field that the parsed field corresponds to.
+    pub schema_field: OutputFieldRef,
 }
 
 #[derive(Debug, Clone)]
@@ -17,30 +26,6 @@ pub struct ParsedField {
     pub alias: Option<String>,
     pub arguments: Vec<ParsedArgument>,
     pub nested_fields: Option<ParsedObject>,
-
-    /// Associated schema field
-    pub schema_field: OutputFieldRef,
-}
-
-/// Indicator for a query that should be ran as-is in the database, as plain
-/// SQL.
-#[derive(Debug, Clone, Copy)]
-pub enum RawQueryType {
-    /// Execute the query and return the number of changed rows.
-    Execute,
-    /// Execute the query, returning rows from the database.
-    Query,
-}
-
-impl ParsedField {
-    /// For raw SQL queries, returns the expected type of the result sets.
-    pub fn raw_query_type(&self) -> Option<RawQueryType> {
-        match self.name.as_str() {
-            "executeRaw" => Some(RawQueryType::Execute),
-            "queryRaw" => Some(RawQueryType::Query),
-            _ => None,
-        }
-    }
 }
 
 #[derive(Debug, Clone)]

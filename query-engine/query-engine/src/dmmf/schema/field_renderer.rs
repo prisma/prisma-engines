@@ -33,7 +33,7 @@ pub(super) fn render_output_field(field: &OutputFieldRef, ctx: &mut RenderContex
         is_nullable: !field.is_required,
     };
 
-    ctx.add_mapping(field.name.clone(), field.query_builder.as_ref());
+    ctx.add_mapping(field.name.clone(), field.query_info.as_ref());
 
     output_field
 }

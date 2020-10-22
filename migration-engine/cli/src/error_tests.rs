@@ -1,3 +1,4 @@
+use migration_core::GateKeeper;
 use quaint::{prelude::*, single::Quaint};
 use serde_json::json;
 use test_setup::*;
@@ -131,7 +132,7 @@ async fn get_cli_error(cli_args: &[&str]) -> user_facing_errors::Error {
     let cli_command = matches.cli_subcommand.expect("cli subcommand is passed");
     cli_command
         .unwrap_cli()
-        .run_inner()
+        .run_inner(GateKeeper::allow_all_whitelist())
         .await
         .map_err(crate::commands::error::render_error)
         .unwrap_err()
