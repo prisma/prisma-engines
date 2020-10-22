@@ -187,17 +187,22 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_model(&self, model: &Model) -> Result<(), ConnectorError> {
         for index_definition in model.indices.iter() {
-            if index_definition.tpe == IndexType::Unique {
-                let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
-                for f in fields {
-                    if let FieldType::NativeType(_, native_type) = f.field_type() {
-                        let native_type_name = native_type.name.as_str();
-                        if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                            return Err(ConnectorError::new_incompatible_native_type_with_unique(
+            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+            for f in fields {
+                if let FieldType::NativeType(_, native_type) = f.field_type() {
+                    let native_type_name = native_type.name.as_str();
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                        return if index_definition.tpe == IndexType::Unique {
+                            Err(ConnectorError::new_incompatible_native_type_with_unique(
                                 native_type_name,
                                 "MySQL",
-                            ));
-                        }
+                            ))
+                        } else {
+                            Err(ConnectorError::new_incompatible_native_type_with_index(
+                                native_type_name,
+                                "MySQL",
+                            ))
+                        };
                     }
                 }
             }

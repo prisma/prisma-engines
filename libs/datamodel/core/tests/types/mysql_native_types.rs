@@ -5,17 +5,37 @@ const BLOB_TYPES: &[&'static str] = &["Blob", "LongBlob", "MediumBlob", "TinyBlo
 const TEXT_TYPES: &[&'static str] = &["Text", "LongText", "MediumText", "TinyText"];
 
 #[test]
+fn text_and_blob_data_types_should_fail_on_index() {
+    fn error_msg(type_name: &str) -> String {
+        format!(
+            "You can not define an index on fields with Native type {} of MySQL.",
+            type_name
+        )
+    }
+
+    for tpe in BLOB_TYPES {
+        test_block_attribute_support(tpe, "Bytes", "index", &error_msg(tpe));
+    }
+
+    for tpe in TEXT_TYPES {
+        test_block_attribute_support(tpe, "String", "index", &error_msg(tpe));
+    }
+}
+
+#[test]
 fn text_and_blob_data_types_can_not_be_unique() {
     fn error_msg(type_name: &str) -> String {
         format!("Native type {} can not be unique in MySQL.", type_name)
     }
 
     for tpe in BLOB_TYPES {
-        test_field_and_block_attribute_support(tpe, "Bytes", "unique", &error_msg(tpe));
+        test_field_attribute_support(tpe, "Bytes", "unique", &error_msg(tpe));
+        test_block_attribute_support(tpe, "Bytes", "unique", &error_msg(tpe));
     }
 
     for tpe in TEXT_TYPES {
-        test_field_and_block_attribute_support(tpe, "String", "unique", &error_msg(tpe));
+        test_field_attribute_support(tpe, "String", "unique", &error_msg(tpe));
+        test_block_attribute_support(tpe, "String", "unique", &error_msg(tpe));
     }
 }
 
@@ -29,15 +49,17 @@ fn text_and_blob_data_types_should_fail_on_id_attribute() {
     }
 
     for tpe in BLOB_TYPES {
-        test_field_and_block_attribute_support(tpe, "Bytes", "id", &error_msg(tpe));
+        test_field_attribute_support(tpe, "Bytes", "id", &error_msg(tpe));
+        test_block_attribute_support(tpe, "Bytes", "id", &error_msg(tpe));
     }
 
     for tpe in TEXT_TYPES {
-        test_field_and_block_attribute_support(tpe, "String", "id", &error_msg(tpe));
+        test_field_attribute_support(tpe, "String", "id", &error_msg(tpe));
+        test_block_attribute_support(tpe, "String", "id", &error_msg(tpe));
     }
 }
 
-fn test_field_and_block_attribute_support(native_type: &str, scalar_type: &str, attribute_name: &str, error_msg: &str) {
+fn test_field_attribute_support(native_type: &str, scalar_type: &str, attribute_name: &str, error_msg: &str) {
     let id_field = if attribute_name == "id" {
         ""
     } else {
@@ -49,7 +71,24 @@ fn test_field_and_block_attribute_support(native_type: &str, scalar_type: &str, 
       {id_field}
       bigInt {scalar_type} @db.{native_type} @{attribute_name}
     }}
+    "#,
+        id_field = id_field,
+        native_type = native_type,
+        scalar_type = scalar_type,
+        attribute_name = attribute_name
+    );
 
+    test_compatibility(&dml, &error_msg);
+}
+
+fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_name: &str, error_msg: &str) {
+    let id_field = if attribute_name == "id" {
+        ""
+    } else {
+        "id     Int    @id"
+    };
+    let dml = format!(
+        r#"
     model User {{
       {id_field}
       firstname {scalar_type} @db.{native_type}
@@ -86,9 +125,7 @@ fn test_compatibility(datamodel: &str, error_msg: &str) {
 
     let error = parse_error(&dml);
 
-    error.assert_length(2);
-    error.assert_is_message_at(0, error_msg);
-    error.assert_is_message_at(1, error_msg);
+    error.assert_is_message(error_msg);
 }
 
 #[test]
