@@ -223,9 +223,9 @@ async fn get_all_columns(
         };
 
         let character_maximum_length = col.get_u32("character_maximum_length");
+        let time_precision = col.get_u32("datetime_precision");
         let numeric_precision = col.get_u32("numeric_precision");
         let numeric_scale = col.get_u32("numeric_scale");
-        let time_precision = col.get_u32("datetime_precision");
 
         let precision = Precision {
             character_maximum_length,
@@ -551,15 +551,15 @@ fn get_column_type_and_enum(
         "decimal" => (
             ColumnTypeFamily::Decimal,
             Some(MySqlType::Decimal(
-                precision.numeric_precision.unwrap_or(65),
-                precision.numeric_scale.unwrap_or(30),
+                precision.numeric_precision.unwrap(),
+                precision.numeric_scale.unwrap(),
             )),
         ),
         "numeric" => (
             ColumnTypeFamily::Decimal,
             Some(MySqlType::Numeric(
-                precision.numeric_precision.unwrap_or(65),
-                precision.numeric_scale.unwrap_or(30),
+                precision.numeric_precision.unwrap(),
+                precision.numeric_scale.unwrap(),
             )),
         ),
         "float" => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
@@ -567,11 +567,11 @@ fn get_column_type_and_enum(
 
         "char" => (
             ColumnTypeFamily::String,
-            Some(MySqlType::Char(precision.expect_char_max_length())),
+            Some(MySqlType::Char(precision.character_maximum_length.unwrap())),
         ),
         "varchar" => (
             ColumnTypeFamily::String,
-            Some(MySqlType::VarChar(precision.expect_char_max_length())),
+            Some(MySqlType::VarChar(precision.character_maximum_length.unwrap())),
         ),
         "text" => (ColumnTypeFamily::String, Some(MySqlType::Text)),
         "tinytext" => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
@@ -599,15 +599,15 @@ fn get_column_type_and_enum(
         //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
         "bit" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::Bit(precision.numeric_precision.unwrap_or(100))), //fixme ???
+            Some(MySqlType::Bit(precision.numeric_precision.unwrap())),
         ),
         "binary" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::Binary(precision.expect_char_max_length())),
+            Some(MySqlType::Binary(precision.character_maximum_length.unwrap())),
         ),
         "varbinary" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::VarBinary(precision.expect_char_max_length())),
+            Some(MySqlType::VarBinary(precision.character_maximum_length.unwrap())),
         ),
         "blob" => (ColumnTypeFamily::Binary, Some(MySqlType::Blob)),
         "tinyblob" => (ColumnTypeFamily::Binary, Some(MySqlType::TinyBlob)),

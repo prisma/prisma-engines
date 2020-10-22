@@ -154,24 +154,16 @@ impl Connector for PostgresDatamodelConnector {
             BIG_INT_TYPE_NAME => PostgresType::BigInt,
             DECIMAL_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    PostgresType::Decimal(*first_arg, *second_arg)
+                    PostgresType::Decimal(Some((*first_arg, *second_arg)))
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        DECIMAL_TYPE_NAME,
-                        args.len(),
-                        2,
-                    ));
+                    PostgresType::Decimal(None)
                 }
             }
             NUMERIC_TYPE_NAME => {
                 if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
-                    PostgresType::Numeric(*first_arg, *second_arg)
+                    PostgresType::Numeric(Some((*first_arg, *second_arg)))
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        NUMERIC_TYPE_NAME,
-                        args.len(),
-                        2,
-                    ));
+                    PostgresType::Numeric(None)
                 }
             }
             REAL_TYPE_NAME => PostgresType::Real,
@@ -179,24 +171,8 @@ impl Connector for PostgresDatamodelConnector {
             SMALL_SERIAL_TYPE_NAME => PostgresType::SmallSerial,
             SERIAL_TYPE_NAME => PostgresType::Serial,
             BIG_SERIAL_TYPE_NAME => PostgresType::BigSerial,
-            VARCHAR_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    PostgresType::VarChar(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VARCHAR_TYPE_NAME,
-                        1,
-                        0,
-                    ));
-                }
-            }
-            CHAR_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    PostgresType::Char(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
-                }
-            }
+            VARCHAR_TYPE_NAME => PostgresType::VarChar(args.first().cloned()),
+            CHAR_TYPE_NAME => PostgresType::Char(args.first().cloned()),
             TEXT_TYPE_NAME => PostgresType::Text,
             BYTE_A_TYPE_NAME => PostgresType::ByteA,
             TIMESTAMP_TYPE_NAME => PostgresType::Timestamp(args.first().cloned()),
@@ -206,24 +182,8 @@ impl Connector for PostgresDatamodelConnector {
             TIME_TYPE_NAME => PostgresType::Time(args.first().cloned()),
             TIME_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimeWithTimeZone(args.first().cloned()),
             BOOLEAN_TYPE_NAME => PostgresType::Boolean,
-            BIT_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    PostgresType::Bit(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
-                }
-            }
-            VAR_BIT_TYPE_NAME => {
-                if let Some(arg) = args.first() {
-                    PostgresType::VarBit(*arg)
-                } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_BIT_TYPE_NAME,
-                        1,
-                        0,
-                    ));
-                }
-            }
+            BIT_TYPE_NAME => PostgresType::Bit(args.first().cloned()),
+            VAR_BIT_TYPE_NAME => PostgresType::VarBit(args.first().cloned()),
             UUID_TYPE_NAME => PostgresType::UUID,
             XML_TYPE_NAME => PostgresType::Xml,
             JSON_TYPE_NAME => PostgresType::JSON,
@@ -244,15 +204,15 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             PostgresType::Integer => (INTEGER_TYPE_NAME, vec![]),
             PostgresType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
-            PostgresType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x, y]),
-            PostgresType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x, y]),
+            PostgresType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
+            PostgresType::Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             PostgresType::Real => (REAL_TYPE_NAME, vec![]),
             PostgresType::DoublePrecision => (DOUBLE_PRECISION_TYPE_NAME, vec![]),
             PostgresType::SmallSerial => (SMALL_SERIAL_TYPE_NAME, vec![]),
             PostgresType::Serial => (SMALL_SERIAL_TYPE_NAME, vec![]),
             PostgresType::BigSerial => (BIG_SERIAL_TYPE_NAME, vec![]),
-            PostgresType::VarChar(x) => (VARCHAR_TYPE_NAME, vec![x]),
-            PostgresType::Char(x) => (CHAR_TYPE_NAME, vec![x]),
+            PostgresType::VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_from_opt(x)),
+            PostgresType::Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Text => (TEXT_TYPE_NAME, vec![]),
             PostgresType::ByteA => (BYTE_A_TYPE_NAME, vec![]),
             PostgresType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
@@ -262,8 +222,8 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::TimeWithTimeZone(x) => (TIME_WITH_TIMEZONE_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Interval(x) => (INTERVAL_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Boolean => (BOOLEAN_TYPE_NAME, vec![]),
-            PostgresType::Bit(x) => (BIT_TYPE_NAME, vec![x]),
-            PostgresType::VarBit(x) => (VAR_BIT_TYPE_NAME, vec![x]),
+            PostgresType::Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
+            PostgresType::VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::UUID => (UUID_TYPE_NAME, vec![]),
             PostgresType::Xml => (XML_TYPE_NAME, vec![]),
             PostgresType::JSON => (JSON_TYPE_NAME, vec![]),
@@ -276,6 +236,14 @@ impl Connector for PostgresDatamodelConnector {
                 None => vec![],
             }
         }
+
+        fn args_vec_from_opt(input: Option<(u32, u32)>) -> Vec<u32> {
+            match input {
+                Some((x, y)) => vec![x, y],
+                None => vec![],
+            }
+        }
+
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {

@@ -48,7 +48,7 @@ fn database_schema_is_serializable() {
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Nullable,
-                            native_type: Some(PostgresType::VarChar(255).to_json()),
+                            native_type: Some(PostgresType::VarChar(Some(255)).to_json()),
                         },
                         default: Some(DefaultValue::VALUE(PrismaValue::String("default value".to_string()))),
                         auto_increment: false,

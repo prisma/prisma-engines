@@ -557,13 +557,6 @@ struct Precision {
     time_precision: Option<u32>,
 }
 
-impl Precision {
-    pub fn expect_char_max_length(&self) -> u32 {
-        self.character_maximum_length
-            .expect("Expected a character max length to be defined.")
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

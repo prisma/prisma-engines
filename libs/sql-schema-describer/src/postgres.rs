@@ -225,6 +225,7 @@ impl SqlSchemaDescriber {
                     let second = DUAL_REGEX
                         .captures(formatted_type.as_str())
                         .and_then(|cap| cap.get(2).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+
                     (first, second)
                 }
 
@@ -235,7 +236,7 @@ impl SqlSchemaDescriber {
                 } else {
                     None
                 };
-                let (num, num_scale) = if matches!(fdt.as_str(), "_numeric") {
+                let (num_precision, num_scale) = if matches!(fdt.as_str(), "_numeric") {
                     get_dual(&formatted_type)
                 } else {
                     (None, None)
@@ -249,7 +250,7 @@ impl SqlSchemaDescriber {
                     None
                 };
 
-                (char_max_length, num, num_scale, time)
+                (char_max_length, num_precision, num_scale, time)
             } else {
                 (
                     col.get_u32("character_maximum_length"),
@@ -690,8 +691,8 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
         "text" | "_text" => (String, Some(PostgresType::Text)),
         "citext" | "_citext" => (String, None),
-        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.expect_char_max_length()))),
-        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.expect_char_max_length()))),
+        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_maximum_length))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
@@ -699,14 +700,16 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
         "xml" | "_xml" => (Xml, Some(PostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.expect_char_max_length()))),
-        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.expect_char_max_length()))),
+        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_maximum_length))),
+        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_maximum_length))),
         "numeric" | "_numeric" => (
             Decimal,
             Some(PostgresType::Numeric(
-                //fixme these should be optional
-                precision.numeric_precision.unwrap_or(65),
-                precision.numeric_scale.unwrap_or(30),
+                match (precision.numeric_precision, precision.numeric_scale) {
+                    (None, None) => None,
+                    (Some(prec), Some(scale)) => Some((prec, scale)),
+                    _ => None,
+                },
             )),
         ),
         "money" | "_money" => (Float, None),
