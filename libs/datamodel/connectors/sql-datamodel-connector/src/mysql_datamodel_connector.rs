@@ -66,8 +66,8 @@ impl MySqlDatamodelConnector {
         let unsigned_medium_int = NativeTypeConstructor::without_args(UNSIGNED_MEDIUM_INT_TYPE_NAME, ScalarType::Int);
         let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, ScalarType::Int);
         let unsigned_big_int = NativeTypeConstructor::without_args(UNSIGNED_BIG_INT_TYPE_NAME, ScalarType::Int);
-        let decimal = NativeTypeConstructor::with_args(DECIMAL_TYPE_NAME, 2, ScalarType::Decimal);
-        let numeric = NativeTypeConstructor::with_args(NUMERIC_TYPE_NAME, 2, ScalarType::Decimal);
+        let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, ScalarType::Decimal);
+        let numeric = NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, ScalarType::Decimal);
         let float = NativeTypeConstructor::without_args(FLOAT_TYPE_NAME, ScalarType::Float);
         let double = NativeTypeConstructor::without_args(DOUBLE_TYPE_NAME, ScalarType::Float);
         let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, ScalarType::Bytes);
