@@ -1,7 +1,7 @@
 package queries.batch
 
 import org.scalatest.{FlatSpec, Matchers}
-import util.{ApiSpecBase, IgnoreMsSql, ProjectDsl}
+import util.{ApiSpecBase, IgnoreMsSql, IgnoreMySql, IgnorePostgres, IgnoreSQLite, ProjectDsl}
 
 class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
@@ -15,6 +15,10 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
       |model ModelB {
       |  id Int @id
       |  a  ModelA
+      |}
+      |
+      |model ModelC {
+      |  id Int @id
       |}
       """
   }
@@ -92,5 +96,24 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false)
 
     result.toString() should be("""{"data":{"findManyModelB":[]}}""")
+  }
+
+  // Postgres only for basic testing.
+  "A batch with a raw and regular queries mixed" should "be able to execute" taggedAs(IgnoreMySql, IgnoreSQLite, IgnoreMsSql) in {
+    server.query("""
+                   |mutation {
+                   |  createOneModelA(data: { id: 1 }) {
+                   |    id
+                   |  }
+                   |}
+                 """, project, legacy = false)
+
+    val queries = Seq(
+      """mutation { createOneModelB(data: { id: 1, a: { connect: { id: 1 } } }) { id }}""",
+      """mutation { executeRaw(query: "INSERT INTO \"ModelA\" (id, b_id) VALUES(2, NULL)", parameters: "[]") }""",
+      """mutation { queryRaw(query: "SELECT * FROM \"ModelC\"", parameters: "[]") }"""
+    )
+
+    server.batch(queries, transaction = true, project, legacy = false).toString should be("""[{"data":{"createOneModelB":{"id":1}}},{"data":{"executeRaw":1}},{"data":{"queryRaw":[]}}]""")
   }
 }

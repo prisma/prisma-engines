@@ -1763,7 +1763,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn foreign_keys_can_be_added_on_existing_columns(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {

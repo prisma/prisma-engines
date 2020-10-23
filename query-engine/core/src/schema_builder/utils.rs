@@ -55,7 +55,7 @@ pub fn field<T>(
     name: T,
     arguments: Vec<InputField>,
     field_type: OutputType,
-    query_builder: Option<SchemaQueryBuilder>,
+    query_info: Option<QueryInfo>,
 ) -> OutputField
 where
     T: Into<String>,
@@ -64,7 +64,7 @@ where
         name: name.into(),
         arguments: arguments.into_iter().map(Arc::new).collect(),
         field_type: Arc::new(field_type),
-        query_builder,
+        query_info,
         is_required: true,
     }
 }

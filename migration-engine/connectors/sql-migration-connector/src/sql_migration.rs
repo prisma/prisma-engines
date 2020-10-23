@@ -1,10 +1,9 @@
 pub(crate) mod expanded_alter_column;
 
+use crate::sql_schema_differ::ColumnChanges;
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Deserialize, Serialize};
 use sql_schema_describer::{Column, ForeignKey, Index, SqlSchema, Table};
-
-use crate::sql_schema_differ::ColumnChanges;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SqlMigration {
@@ -42,8 +41,9 @@ pub enum SqlMigrationStep {
     AlterTable(AlterTable),
     DropForeignKey(DropForeignKey),
     DropTable(DropTable),
-    RenameTable { name: String, new_name: String },
-    RedefineTables { names: Vec<String> },
+    /// Rename a table. (previous_table_index, next_table_index).
+    RenameTable(usize, usize),
+    RedefineTables(Vec<RedefineTable>),
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
     AlterIndex(AlterIndex),
@@ -85,6 +85,9 @@ pub struct DropTable {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AlterTable {
     pub table: Table,
+    /// Index in (previous_schema, next_schema).
+    #[serde(skip)]
+    pub table_index: (usize, usize),
     pub changes: Vec<TableChange>,
 }
 
@@ -118,6 +121,8 @@ pub struct AddColumn {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropColumn {
     pub name: String,
+    #[serde(skip)]
+    pub(crate) index: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -199,5 +204,25 @@ impl AlterEnum {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct RedefineTable {
-    pub name: String,
+    #[serde(skip)]
+    pub added_columns: Vec<usize>,
+    #[serde(skip)]
+    pub dropped_columns: Vec<usize>,
+    #[serde(skip)]
+    pub columns_that_became_required_with_a_default: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
+    #[serde(skip)]
+    pub dropped_primary_key: bool,
+    #[serde(skip)]
+    pub other_columns: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
+    pub table_index: (usize, usize),
+}
+
+impl RedefineTable {
+    pub(crate) fn intersection_columns(
+        &self,
+    ) -> impl Iterator<Item = &(usize, usize, ColumnChanges, Option<ColumnTypeChange>)> {
+        self.columns_that_became_required_with_a_default
+            .iter()
+            .chain(self.other_columns.iter())
+    }
 }

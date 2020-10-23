@@ -1,5 +1,6 @@
 use crate::common::ErrorAsserts;
 use crate::common::*;
+use indoc::indoc;
 
 #[test]
 fn enums_must_only_be_supported_if_all_specified_providers_support_them() {
@@ -26,11 +27,11 @@ fn test_enum_support(providers: &[&str], must_error: bool) {
       id     Int    @id
       status Status
     }
-    
+
     enum Status {
       DONE
       NOT_DONE
-    }  
+    }
     "#;
 
     let error_msg =
@@ -62,7 +63,7 @@ fn test_scalar_list_support(providers: &[&str], must_error: bool) {
     model Todo {
       id     Int      @id
       tags   String[]
-    }   
+    }
     "#;
 
     let error_msg = "Field \"tags\" in model \"Todo\" can\'t be a list. The current connector does not support lists of primitive types.";
@@ -130,7 +131,7 @@ fn test_json_support(providers: &[&str], must_error: bool) {
     model Todo {
       id     Int      @id
       json   Json
-    }   
+    }
     "#;
 
     let error_msg = "Error validating field `json` in model `Todo`: Field `json` in model `Todo` can\'t be of type Json. The current connector does not support the Json type.";
@@ -161,13 +162,13 @@ fn test_relations_over_non_unique_criteria_support(providers: &[&str], must_erro
     model Todo {
       id           Int    @id
       assigneeName String
-      assignee     User   @relation(fields: assigneeName, references: name) 
+      assignee     User   @relation(fields: assigneeName, references: name)
     }
-    
+
     model User {
       id   Int    @id
       name String
-    }    
+    }
     "#;
 
     let error_msg = "Error validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: name";
@@ -192,12 +193,37 @@ fn auto_increment_on_non_primary_columns_must_only_be_supported_if_all_specified
     test_auto_increment_on_non_primary_columns(&["sqlite"], true);
 }
 
+#[test]
+fn enforcing_key_order() {
+    let dml = indoc! {r#"
+        model Todo {
+          id1 Int
+          id2 Int
+
+          @@id([id1, id2])
+        }
+
+        model Cat {
+          id    Int @id
+          todo1 Int
+          todo2 Int
+
+          rel Todo @relation(fields: [todo1, todo2], references: [id2, id1])
+        }
+    "#};
+
+    let error_msg = "Error validating: The argument `references` must refer to a unique criteria in the related model `Todo` using the same order of fields. Please check the ordering in the following fields: `id2, id1`.";
+
+    test_capability_support(&["sqlserver"], true, dml, error_msg);
+    test_capability_support(&["mysql", "sqlite", "postgres"], false, dml, error_msg);
+}
+
 fn test_auto_increment_on_non_primary_columns(providers: &[&str], must_error: bool) {
     let dml = r#"
     model Todo {
       id           Int    @id
       non_primary  Int    @default(autoincrement()) @unique
-    }    
+    }
     "#;
 
     let error_msg = "Error parsing attribute \"@default\": The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.";
@@ -213,8 +239,8 @@ fn test_capability_support(providers: &[&str], must_error: bool, datamodel: &str
       provider = [{provider_strings}]
       url = "{url}"
     }}
-    
-    {datamodel}    
+
+    {datamodel}
     "#,
         provider_strings = provider_strings.join(","),
         url = format!("{}://", first_provider),

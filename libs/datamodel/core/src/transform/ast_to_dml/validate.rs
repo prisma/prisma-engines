@@ -79,6 +79,12 @@ impl<'a> Validator<'a> {
             }
 
             if let Err(ref mut the_errors) =
+                self.validate_model_connector_specific(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors)
+            }
+
+            if let Err(ref mut the_errors) =
                 self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
                 errors_for_model.append(the_errors);
@@ -483,6 +489,23 @@ impl<'a> Validator<'a> {
         }
     }
 
+    fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
+        let mut diagnostics = Diagnostics::new();
+
+        if let Some(source) = self.source {
+            let connector = &source.active_connector;
+            if let Err(err) = connector.validate_model(model) {
+                diagnostics.push_error(DatamodelError::new_connector_error(&err.to_string(), ast_model.span))
+            }
+        }
+
+        if diagnostics.has_errors() {
+            Err(diagnostics)
+        } else {
+            Ok(())
+        }
+    }
+
     /// Ensures that embedded types do not have back relations
     /// to their parent types.
     fn validate_embedded_types_have_no_back_relation(
@@ -612,6 +635,7 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
+
             let unknown_fields: Vec<String> = rel_info
                 .to_fields
                 .iter()
@@ -668,6 +692,11 @@ impl<'a> Validator<'a> {
             }
 
             if !rel_info.to_fields.is_empty() && !errors.has_errors() {
+                let strict_relation_field_order = self
+                    .source
+                    .map(|s| !s.active_connector.allows_relation_fields_in_arbitrary_order())
+                    .unwrap_or(false);
+
                 // when we have other errors already don't push this error additionally
                 let references_unique_criteria = related_model.loose_unique_criterias().iter().any(|criteria| {
                     let mut criteria_field_names: Vec<_> = criteria.fields.iter().map(|f| f.name.to_owned()).collect();
@@ -679,6 +708,20 @@ impl<'a> Validator<'a> {
                     criteria_field_names == to_fields_sorted
                 });
 
+                let reference_order_correct = if strict_relation_field_order && rel_info.to_fields.len() > 1 {
+                    related_model.loose_unique_criterias().iter().any(|criteria| {
+                        let criteria_fields = criteria.fields.iter().map(|f| f.name.as_str());
+                        let to_fields = rel_info.to_fields.iter().map(|f| f.as_str());
+
+                        let same_length = criteria_fields.len() == to_fields.len();
+                        let same_order = criteria_fields.zip(to_fields).all(|(a, b)| a == b);
+
+                        same_length && same_order
+                    })
+                } else {
+                    true
+                };
+
                 let references_singular_id_field = if rel_info.to_fields.len() == 1 {
                     let field_name = rel_info.to_fields.first().unwrap();
                     // the unwrap is safe. We error out earlier if an unknown field is referenced.
@@ -687,6 +730,7 @@ impl<'a> Validator<'a> {
                 } else {
                     false
                 };
+
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.
                     match datamodel.find_related_field(&field) {
@@ -707,24 +751,12 @@ impl<'a> Validator<'a> {
                                      rel_info.to_fields.join(", ")),
                             ast_field.span)
                         );
-                }
-
-                let references_nullable_field = rel_info.to_fields.iter().any(|field_name| {
-                    let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
-                    referenced_field.is_optional()
-                });
-
-                let must_not_reference_nullable_field = match self.source {
-                    Some(source) => !source.combined_connector.supports_relations_over_nullable_field(),
-                    None => false,
-                };
-
-                if references_nullable_field && must_not_reference_nullable_field {
+                } else if !reference_order_correct {
                     errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must not refer to a nullable field in the related model `{}`. But it is referencing the following fields that are nullable: {}",
-                                &related_model.name,
-                                rel_info.to_fields.join(", ")),
-                    ast_field.span)
+                        &format!("The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
+                                 &related_model.name,
+                                 rel_info.to_fields.join(", ")),
+                        ast_field.span)
                     );
                 }
 

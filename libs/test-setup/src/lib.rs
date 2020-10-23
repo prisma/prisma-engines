@@ -40,7 +40,6 @@ impl TestAPIArgs {
     }
 }
 
-/// DANGER. This will be used for destructive filesystem access, be careful when changing this. DANGER.
 pub fn server_root() -> &'static str {
     static SERVER_ROOT: Lazy<String> =
         Lazy::new(|| std::env::var("SERVER_ROOT").expect("SERVER_ROOT env var is not defined"));

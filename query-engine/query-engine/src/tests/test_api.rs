@@ -77,8 +77,9 @@ impl TestApi {
         match self.connection_info() {
             ConnectionInfo::Postgres(..) => visitor::Postgres::build(query),
             ConnectionInfo::Mysql(..) => visitor::Mysql::build(query),
-            ConnectionInfo::Sqlite { .. } => visitor::Sqlite::build(query),
+            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => visitor::Sqlite::build(query),
             ConnectionInfo::Mssql(_) => visitor::Mssql::build(query),
+            ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
         }
     }
 }

@@ -28,8 +28,5 @@ members = [
   "libs/native-types",
 ]
 
-[patch.crates-io]
-rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
-
 [profile.dev.package.backtrace]
 opt-level = 3

@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 //! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
@@ -38,6 +36,7 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
             attached_name: db_name.clone(),
         }),
         ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour(url.clone())),
+        ConnectionInfo::InMemorySqlite { .. } => unreachable!("SqlFlavour for in-memory SQLite"),
     }
 }
 

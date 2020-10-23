@@ -54,7 +54,9 @@ impl<'a> ColumnWalker<'a> {
         &self.column
     }
 
-    /// Walks the parent table's column to get to this column's index.
+    /// Walks the parent table's column to get to this column's index. This
+    /// should be considered a temporary crutch. We should strive to keep track
+    /// of indexes where we need them.
     pub fn column_index(&self) -> usize {
         self.table
             .columns
@@ -146,12 +148,12 @@ impl<'a> TableWalker<'a> {
     }
 
     /// Get a column in the table by index.
-    pub fn column_at(&self, idx: usize) -> Option<ColumnWalker<'a>> {
-        self.table.columns.get(idx).map(|column| ColumnWalker {
+    pub fn column_at(&self, idx: usize) -> ColumnWalker<'a> {
+        ColumnWalker {
             schema: self.schema,
-            column,
+            column: &self.table.columns[idx],
             table: self.table,
-        })
+        }
     }
 
     /// Traverse the table's columns.
@@ -230,7 +232,9 @@ impl<'a> TableWalker<'a> {
         &self.table
     }
 
-    /// Walks the parent schema to find the index of the table inside it.
+    /// Walks the parent schema to find the index of the table inside it. This
+    /// should be considered a temporary crutch. We should strive to keep track
+    /// of indexes where we need them.
     pub fn table_index(&self) -> usize {
         self.schema
             .tables

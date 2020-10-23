@@ -1,7 +1,6 @@
-use sql_schema_describer::walkers::IndexWalker;
-
-use super::{ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
+use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
 use crate::sql_migration::AlterEnum;
+use sql_schema_describer::walkers::IndexWalker;
 use std::collections::HashSet;
 
 mod mssql;

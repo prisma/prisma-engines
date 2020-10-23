@@ -113,7 +113,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 
     let mysql_type: MySqlType = sft.deserialize_native_type();
 
-    assert_eq!(mysql_type, MySqlType::Decimal(8, 2));
+    assert_eq!(mysql_type, MySqlType::Decimal(Some((8, 2))));
 }
 
 #[test]
@@ -232,7 +232,8 @@ fn should_handle_type_specifications_on_mysql() {
             id       Int      @id
             smallInt Int      @mys.SmallInt
             foobar   DateTime @mys.Datetime(6)
-            fooInt   Boolean @mys.TinyInt
+            fooBool  Boolean  @mys.TinyInt
+            fooInt   Int      @mys.TinyInt
         }
     "#;
 
@@ -249,6 +250,11 @@ fn should_handle_type_specifications_on_mysql() {
 
     let mysql_type: MySqlType = sft.deserialize_native_type();
     assert_eq!(mysql_type, MySqlType::DateTime(Some(6)));
+
+    let sft = user_model.assert_has_scalar_field("fooBool").assert_native_type();
+
+    let mysql_type: MySqlType = sft.deserialize_native_type();
+    assert_eq!(mysql_type, MySqlType::TinyInt);
 
     let sft = user_model.assert_has_scalar_field("fooInt").assert_native_type();
 

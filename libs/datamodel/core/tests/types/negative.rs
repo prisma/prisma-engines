@@ -158,10 +158,8 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_argument_count_missmatch_error(
-        "VarChar",
-        0,
-        3,
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type VarChar takes 1 optional arguments, but received 3.",
         ast::Span::new(337, 356),
     ));
 }
@@ -266,10 +264,8 @@ fn should_fail_on_native_type_with_invalid_arguments() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_type_mismatch_error(
-        "numeric",
-        "literal",
-        "a",
-        ast::Span::new(348, 349),
+    error.assert_is(DatamodelError::new_connector_error(
+        "Expected a numeric value, but failed while parsing \"a\": invalid digit found in string.",
+        ast::Span::new(337, 350),
     ));
 }

@@ -153,23 +153,21 @@ impl ObjectType {
 #[derive(Debug)]
 pub struct OutputField {
     pub name: String,
+    pub field_type: OutputTypeRef,
 
     /// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
     pub arguments: Vec<InputFieldRef>,
-    pub field_type: OutputTypeRef,
 
     /// Indicates if the presence of the field on the higher output objects.
     /// As opposed to input fields, optional output fields are also automatically nullable.
     pub is_required: bool,
-    pub query_builder: Option<SchemaQueryBuilder>,
+
+    /// Relevant for resolving top level queries.
+    pub query_info: Option<QueryInfo>,
 }
 
 impl OutputField {
-    pub fn query_builder(&self) -> Option<&SchemaQueryBuilder> {
-        self.query_builder.as_ref()
-    }
-
     pub fn optional(mut self) -> Self {
         self.is_required = false;
         self
@@ -184,64 +182,16 @@ impl OutputField {
     }
 }
 
-/// Todo rework description.
-/// A query builder allows to attach queries to the schema:
-/// on a field:
-/// - A `ModelQueryBuilder` builds queries specific to models, such as `findOne<Model>`.
-///   It requires additional context compared to a `GenericQueryBuilder`.
-///
-/// - A `GenericQueryBuilder` is a query builder that requires no additional context but
-///   the parsed query document data from the incoming query and is thus not associated to any particular
-///   model. The `ResetData` query is such an example.
-#[derive(Debug)]
-pub enum SchemaQueryBuilder {
-    ModelQueryBuilder(ModelQueryBuilder),
-    GenericQueryBuilder(GenericQueryBuilder),
-}
-
-impl SchemaQueryBuilder {
-    pub fn build(&self, parsed_field: ParsedField) -> QueryGraphBuilderResult<QueryGraph> {
-        match self {
-            Self::ModelQueryBuilder(m) => m.build(parsed_field),
-            _ => unimplemented!(),
-        }
-    }
-}
-
 pub type QueryBuilderFn = dyn (Fn(ModelRef, ParsedField) -> QueryGraphBuilderResult<QueryGraph>) + Send + Sync;
 
 /// Designates a specific top-level operation on a corresponding model.
-pub struct ModelQueryBuilder {
-    pub model: ModelRef,
+#[derive(Debug)]
+pub struct QueryInfo {
+    pub model: Option<ModelRef>,
     pub tag: QueryTag,
-
-    /// An associated builder is responsible for building queries
-    /// that the executer will execute. The result info is required
-    /// by the serialization to correctly build the response.
-    pub builder_fn: Box<QueryBuilderFn>,
 }
 
-impl Debug for ModelQueryBuilder {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ModelQueryBuilder")
-            .field("model", &self.model)
-            .field("tag", &self.tag)
-            .field("builder_fn", &"#BuilderFn")
-            .finish()
-    }
-}
-
-impl ModelQueryBuilder {
-    pub fn new(model: ModelRef, tag: QueryTag, builder_fn: Box<QueryBuilderFn>) -> Self {
-        Self { model, tag, builder_fn }
-    }
-
-    pub fn build(&self, parsed_field: ParsedField) -> QueryGraphBuilderResult<QueryGraph> {
-        (self.builder_fn)(Arc::clone(&self.model), parsed_field)
-    }
-}
-
-/// Designates top level model queries. Used for DMMF serialization.
+/// A `QueryTag` designates a top level query possible with Prisma.
 #[derive(Debug, Clone, PartialEq)]
 pub enum QueryTag {
     FindOne,
@@ -254,30 +204,29 @@ pub enum QueryTag {
     DeleteMany,
     UpsertOne,
     Aggregate,
+    ExecuteRaw,
+    QueryRaw,
 }
 
 impl fmt::Display for QueryTag {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            QueryTag::FindOne => "findOne",
-            QueryTag::FindFirst => "findFirst",
-            QueryTag::FindMany => "findMany",
-            QueryTag::CreateOne => "createOne",
-            QueryTag::UpdateOne => "updateOne",
-            QueryTag::UpdateMany => "updateMany",
-            QueryTag::DeleteOne => "deleteOne",
-            QueryTag::DeleteMany => "deleteMany",
-            QueryTag::UpsertOne => "upsertOne",
-            QueryTag::Aggregate => "aggregate",
+            Self::FindOne => "findOne",
+            Self::FindFirst => "findFirst",
+            Self::FindMany => "findMany",
+            Self::CreateOne => "createOne",
+            Self::UpdateOne => "updateOne",
+            Self::UpdateMany => "updateMany",
+            Self::DeleteOne => "deleteOne",
+            Self::DeleteMany => "deleteMany",
+            Self::UpsertOne => "upsertOne",
+            Self::Aggregate => "aggregate",
+            Self::ExecuteRaw => "executeRaw",
+            Self::QueryRaw => "queryRaw",
         };
 
         write!(f, "{}", s)
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct GenericQueryBuilder {
-    // WIP
 }
 
 #[derive(PartialEq)]

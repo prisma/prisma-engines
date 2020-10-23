@@ -12,18 +12,35 @@ pub struct DataModelMetaFormat {
     #[serde(rename = "datamodel")]
     pub data_model: serde_json::Value,
     pub schema: DmmfSchema,
-    pub mappings: Vec<DmmfMapping>,
+    pub mappings: DmmfOperationMappings,
 }
 
-#[derive(Debug)]
-pub struct DmmfMapping {
+/// Model operations are serialized as an array of objects, each one
+/// corresponding to a model. All other operations are simply an object
+/// of read and write operation names that can be called on the engine.
+#[derive(Debug, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct DmmfOperationMappings {
+    pub model_operations: Vec<DmmfModelOperations>,
+    pub other_operations: DmmfNonModelOperations,
+}
+
+#[derive(Debug, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct DmmfNonModelOperations {
+    pub read: Vec<String>,
+    pub write: Vec<String>,
+}
+
+#[derive(Debug, Default)]
+pub struct DmmfModelOperations {
     model_name: String,
     operations: RefCell<HashMap<String, String>>,
 }
 
-impl DmmfMapping {
+impl DmmfModelOperations {
     fn new(model_name: String) -> Self {
-        DmmfMapping {
+        Self {
             model_name,
             operations: RefCell::new(HashMap::new()),
         }
@@ -43,7 +60,7 @@ impl DmmfMapping {
 }
 
 /// Serializes a DmmfMapping into a single map.
-impl Serialize for DmmfMapping {
+impl Serialize for DmmfModelOperations {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,

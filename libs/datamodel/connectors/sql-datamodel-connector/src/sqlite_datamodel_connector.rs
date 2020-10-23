@@ -1,6 +1,7 @@
-use datamodel_connector::error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::Field;
+use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 
@@ -11,7 +12,7 @@ pub struct SqliteDatamodelConnector {
 
 impl SqliteDatamodelConnector {
     pub fn new() -> SqliteDatamodelConnector {
-        let capabilities = vec![ConnectorCapability::RelationsOverNullableField];
+        let capabilities = vec![ConnectorCapability::RelationFieldsInArbitraryOrder];
         let constructors: Vec<NativeTypeConstructor> = vec![];
 
         SqliteDatamodelConnector {
@@ -30,11 +31,15 @@ impl Connector for SqliteDatamodelConnector {
         Ok(())
     }
 
+    fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
+        Ok(())
+    }
+
     fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
         &self.constructors
     }
 
-    fn parse_native_type(&self, _name: &str, _args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
                 connector_name: "sqlite".to_string(),

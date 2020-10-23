@@ -25,6 +25,9 @@ pub enum CoreError {
     /// Errors from the connector.
     ConnectorError(ConnectorError),
 
+    /// Using gated preview features.
+    GatedPreviewFeatures(Vec<String>),
+
     /// Generic unspecified errors.
     Generic(anyhow::Error),
 
@@ -46,6 +49,11 @@ impl Display for CoreError {
             }
             CoreError::DatamodelRenderingError(err) => write!(f, "Failed to render the schema to a string ({:?})", err),
             CoreError::ConnectorError(err) => write!(f, "Connector error: {}", err),
+            CoreError::GatedPreviewFeatures(features) => {
+                let feats: Vec<_> = features.iter().map(|f| format!("`{}`", f)).collect();
+
+                write!(f, "Blocked preview features: {}", feats.join(", "))
+            }
             CoreError::Generic(src) => write!(f, "Generic error: {}", src),
             CoreError::Input(src) => write!(f, "Error in command input: {}", src),
         }
@@ -59,6 +67,7 @@ impl StdError for CoreError {
             CoreError::ProducedBadDatamodel(_) => None,
             CoreError::InvalidPersistedDatamodel(_) => None,
             CoreError::DatamodelRenderingError(_) => None,
+            CoreError::GatedPreviewFeatures(_) => None,
             CoreError::ConnectorError(err) => Some(err),
             CoreError::Generic(err) => Some(err.as_ref()),
             CoreError::Input(err) => Some(err.as_ref()),
@@ -73,6 +82,9 @@ impl CoreError {
             CoreError::ConnectorError(err) => err.to_user_facing(),
             CoreError::ReceivedBadDatamodel(full_error) => {
                 KnownError::new(user_facing_errors::common::SchemaParserError { full_error }).into()
+            }
+            CoreError::GatedPreviewFeatures(features) => {
+                KnownError::new(user_facing_errors::migration_engine::PreviewFeaturesBlocked { features }).into()
             }
             crate_error => user_facing_errors::Error::from_dyn_error(&crate_error),
         }
