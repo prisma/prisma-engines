@@ -71,6 +71,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed)
     }
 
+    fn allows_relation_fields_in_arbitrary_order(&self) -> bool {
+        self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
+    }
+
     fn wrap_in_argument_count_mismatch_error(
         &self,
         native_type: &str,
@@ -103,6 +107,7 @@ pub enum ConnectorCapability {
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
+    RelationFieldsInArbitraryOrder,
     // start of Query Engine Capabilities
     InsensitiveFilters,
 }
