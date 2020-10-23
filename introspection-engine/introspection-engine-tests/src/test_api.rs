@@ -65,7 +65,6 @@ impl TestApi {
 
                 Ok(sql_schema)
             }
-            ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
         }
     }
 
