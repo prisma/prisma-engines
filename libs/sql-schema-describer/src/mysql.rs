@@ -550,17 +550,17 @@ fn get_column_type_and_enum(
         "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
         "decimal" => (
             ColumnTypeFamily::Decimal,
-            Some(MySqlType::Decimal(
+            Some(MySqlType::Decimal(Some((
                 precision.numeric_precision.unwrap(),
                 precision.numeric_scale.unwrap(),
-            )),
+            )))),
         ),
         "numeric" => (
             ColumnTypeFamily::Decimal,
-            Some(MySqlType::Numeric(
+            Some(MySqlType::Numeric(Some((
                 precision.numeric_precision.unwrap(),
                 precision.numeric_scale.unwrap(),
-            )),
+            )))),
         ),
         "float" => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
         "double" => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
