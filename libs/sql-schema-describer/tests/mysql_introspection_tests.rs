@@ -169,7 +169,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::Decimal(10, 0).to_json()),
+                native_type: Some(MySqlType::Decimal(Some((10, 0))).to_json()),
             },
 
             default: None,
@@ -183,7 +183,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::Decimal(10, 0).to_json()),
+                native_type: Some(MySqlType::Decimal(Some((10, 0))).to_json()),
             },
 
             default: None,
