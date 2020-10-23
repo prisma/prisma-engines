@@ -584,7 +584,7 @@ impl QueryGraph {
                     let siblings = self.direct_child_pairs(&parent);
 
                     for (_, sibling) in siblings {
-                        if sibling != node {
+                        if sibling != node && !matches!(self.node_content(&sibling).unwrap(), Node::Flow(_)) {
                             self.create_edge(&node, &sibling, QueryGraphDependency::ExecutionOrder)?;
                         }
                     }
