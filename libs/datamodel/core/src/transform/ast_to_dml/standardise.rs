@@ -6,6 +6,7 @@ use crate::{
     diagnostics::Diagnostics,
     dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
+use std::collections::HashMap;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -27,14 +28,16 @@ impl Standardiser {
         // This is intentionally disabled for now, since the generated types would surface in the
         // client schema.
         // self.add_missing_relation_tables(ast_schema, schema)?;
-        self.set_relation_to_field_to_id_if_missing(schema);
+        self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
 
         Ok(())
     }
 
     /// For any relations which are missing to_fields, sets them to the @id fields
     /// of the foreign model.
-    fn set_relation_to_field_to_id_if_missing(&self, schema: &mut dml::Datamodel) {
+    /// Also adds missing underlying scalar fields.
+    fn set_relation_to_field_to_id_if_missing(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics>  {
+        let mut errors = Diagnostics::new();
         let schema_copy = schema.clone();
 
         // Iterate and mutate models.
@@ -84,7 +87,20 @@ impl Standardiser {
                         // user input has precedence
                         if !is_m2m && (rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty()) {
                             rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
+
+                            // check for duplicates
+                            let cloned_fields = underlying_fields.clone();
+                            let map: HashMap<&String, i32> = cloned_fields.iter().fold(HashMap::new(), |mut acc, c| {
+                                *acc.entry(&c.name).or_insert(0) += 1;
+                                acc
+                            });
+
                             for underlying_field in underlying_fields {
+                                println!("{:?}", map);
+                                if matches!(map.get(&underlying_field.name), Some(&x) if x > 1) {
+                                    // found duplicate
+                                    errors.push_error(field_validation_error("", &cloned_model, &Field::ScalarField(underlying_field.clone()), &ast_schema));
+                                }
                                 fields_to_add.push(Field::ScalarField(underlying_field));
                             }
                         }
@@ -96,10 +112,17 @@ impl Standardiser {
                 model.add_field(field);
             }
         }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
     }
 
     /// Identifies and adds missing back relations. For 1:1 and 1:N relations.
     /// Explicit n:m relations are not touched, as they already have a back relation field.
+    /// Underlying scalar fields are not added here.
     fn add_missing_back_relations(
         &self,
         ast_schema: &ast::SchemaAst,
@@ -253,7 +276,7 @@ impl Standardiser {
                     };
 
                     let back_relation_field = dml::RelationField::new_generated(&model.name, relation_info);
-
+                    println!("missing field: {:?}", back_relation_field);
                     result.push(AddMissingBackRelationField {
                         model: rel_info.to.clone(),
                         field: back_relation_field,
