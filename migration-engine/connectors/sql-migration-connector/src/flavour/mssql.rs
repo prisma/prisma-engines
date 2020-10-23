@@ -1,5 +1,5 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
-use migration_connector::{ConnectorResult, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::connector::MssqlUrl;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
