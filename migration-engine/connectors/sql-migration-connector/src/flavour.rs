@@ -36,7 +36,7 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
             attached_name: db_name.clone(),
         }),
         ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour(url.clone())),
-        ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
+        ConnectionInfo::InMemorySqlite { .. } => unreachable!("SqlFlavour for in-memory SQLite"),
     }
 }
 

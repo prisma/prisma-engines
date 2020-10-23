@@ -82,7 +82,10 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     async fn drop_database(&self, _database_url: &str) -> ConnectorResult<()> {
-        todo!("drop_database on MSSQL")
+        let features = vec!["microsoftSqlServer".into()];
+        return Err(ConnectorError::user_facing_error(
+            user_facing_errors::migration_engine::PreviewFeaturesBlocked { features },
+        ));
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
