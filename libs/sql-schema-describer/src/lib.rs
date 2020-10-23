@@ -3,17 +3,12 @@
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
-use fmt::Display;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use std::{
-    error::Error,
-    fmt::{self, Debug},
-    str::FromStr,
-};
+use std::{fmt, str::FromStr};
 use tracing::debug;
 use walkers::TableWalker;
 
@@ -24,38 +19,24 @@ pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
 
-/// description errors.
-#[derive(Debug)]
-pub enum SqlSchemaDescriberError {
-    /// An unknown error occurred.
-    UnknownError,
-}
+mod error;
 
-impl Display for SqlSchemaDescriberError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "unknown")
-    }
-}
-
-impl Error for SqlSchemaDescriberError {}
-
-/// The result type.
-pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescriberError>;
+pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 
 /// A database description connector.
 #[async_trait::async_trait]
 pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.
-    async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
+    async fn list_databases(&self) -> DescriberResult<Vec<String>>;
 
     /// Get the databases metadata.
-    async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata>;
 
     /// Describe a database schema.
-    async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
+    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema>;
 
     /// Get the database version.
-    async fn version(&self, schema: &str) -> SqlSchemaDescriberResult<Option<String>>;
+    async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
 }
 
 #[derive(Serialize, Deserialize)]

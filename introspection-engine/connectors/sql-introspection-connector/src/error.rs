@@ -193,8 +193,8 @@ impl From<QuaintError> for SqlError {
     }
 }
 
-impl From<sql_schema_describer::SqlSchemaDescriberError> for SqlError {
-    fn from(error: sql_schema_describer::SqlSchemaDescriberError) -> Self {
+impl From<sql_schema_describer::DescriberError> for SqlError {
+    fn from(error: sql_schema_describer::DescriberError) -> Self {
         SqlError::QueryError(anyhow::anyhow!("{}", error))
     }
 }
