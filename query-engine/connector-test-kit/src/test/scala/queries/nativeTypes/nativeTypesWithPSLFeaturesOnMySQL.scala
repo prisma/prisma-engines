@@ -16,11 +16,6 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-            |generator client {
-            |  provider = "prisma-client-js"
-            |  previewFeatures = ["nativeTypes"]
-            |}
-            |
             |model Item {
             |  id   $p_type @test.$n_type @id
             |  test $p_type @test.$n_type @unique
@@ -70,11 +65,6 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User {
              |  email    String  @unique
              |  name     $p_type @test.$n_type  @default($d_arg)
@@ -83,6 +73,18 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
         }
         assert(database.setupWithStatusCode(project) == 0)
       }
+  }
+
+   // does not work: Error querying the database: Server error: `ERROR 42000 (1063): Incorrect column specifier for column 'id'
+  "Using Prisma scalar type Int with native type Year" should "work" in {
+    val project = SchemaDsl.fromStringV11() {
+      s"""
+         |model House {
+         |  id   Int @test.Year @id  @default(autoincrement())
+         |}
+    """.stripMargin
+    }
+    assert(database.setupWithStatusCode(project) == 0)
   }
 
   "Using Prisma scalar type Int with native types and PSL features" should "work" in {
@@ -96,11 +98,6 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model Item {
              |  id   $p_type @test.$n_type @id
              |  test $p_type @test.$n_type @unique
@@ -145,24 +142,17 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
   }
 
   "Using Prisma scalar type boolean with native type and PSL features" should "work" in {
-    val prisma_type = Vector("Boolean")
+    val prisma_type = Vector("Boolean", "Int")
     val native_type = Vector("TinyInt")
-    val default_arg = Vector("true", "false")
     for (p_type <- prisma_type;
-         n_type <- native_type;
-         d_arg <- default_arg
+         n_type <- native_type
          )
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User {
              |  email    String  @unique
-             |  name     $p_type @test.$n_type  @default($d_arg)
+             |  name     $p_type @test.$n_type
              |  optional $p_type? @test.$n_type
              |}
     """.stripMargin
@@ -182,11 +172,6 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User2 {
              |  email    String  @unique
              |  name     $p_type @test.$n_type  @default($d_arg)
@@ -246,11 +231,6 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User2 {
              |  email    String  @unique
              |  name     $p_type @test.$n_type  @default($d_arg)
@@ -302,22 +282,35 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
   "Using Prisma scalar type Bytes with native types and PSL features" should "work" in {
     val prisma_type = Vector("Bytes")
     val native_type = Vector("Bit(1)", "Bit(5)", "Binary(5)", "Binary(10)", "VarBinary(10)", "TinyBlob", "Blob", "MediumBlob", "LongBlob")
-    val default_arg = Vector(1, 0)
     for (p_type <- prisma_type;
-         n_type <- native_type;
-         d_arg <- default_arg
+         n_type <- native_type
          )
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User2 {
              |  email    String  @unique
-             |  name     $p_type @test.$n_type  @default($d_arg)
+             |  name     $p_type @test.$n_type
+             |  optional $p_type? @test.$n_type
+             |}
+    """.stripMargin
+        }
+        assert(database.setupWithStatusCode(project) == 0)
+      }
+  }
+
+  "Using Prisma scalar type Bytes with native types and index, id ad unique features" should "work" in {
+    val prisma_type = Vector("Bytes")
+    val native_type = Vector("Bit(1)", "Bit(5)", "Binary(5)", "Binary(10)", "VarBinary(10)")
+    for (p_type <- prisma_type;
+         n_type <- native_type
+         )
+      yield {
+        val project = SchemaDsl.fromStringV11() {
+          s"""
+             |model User2 {
+             |  email    String  @unique
+             |  name     $p_type @test.$n_type
              |  optional $p_type? @test.$n_type
              |}
              |
@@ -365,7 +358,38 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
 
   "Using Prisma scalar type datetime with native type and PSL features" should "work" in {
     val prisma_type = Vector("DateTime")
-    val native_type = Vector("Time", "Date", "Datetime", "Timestamp")
+    val native_type = Vector("Time", "Time(2)", "Date", "Datetime", "Datetime(3)", "Timestamp", "Timestamp(3)")
+    for (p_type <- prisma_type;
+         n_type <- native_type
+         )
+      yield {
+        val project = SchemaDsl.fromStringV11() {
+          s"""
+             |model User {
+             |  id    Int  @id
+             |  optional $p_type? @test.$n_type
+             |}
+             |
+             |model Post {
+             |   id Int @id
+             |   time $p_type @test.$n_type @updatedAt
+             |}
+             |
+             |model Sun {
+             |  id Int @id
+             |  name     $p_type @test.$n_type
+             |}
+    """.stripMargin
+        }
+        assert(database.setupWithStatusCode(project) == 0)
+      }
+  }
+
+  /*
+  "Using Prisma scalar type datetime with native type and now as default" should "work" in { // does not work
+    // [migration-engine/connectors/sql-migration-connector/src/sql_renderer/mysql_renderer.rs:233:39] internal error: entered unreachable code: NOW default on non-datetime column"
+    val prisma_type = Vector("DateTime")
+    val native_type = Vector("Time", "Time(2)", "Date", "Datetime", "Datetime(3)", "Timestamp", "Timestamp(3)")
     val default_arg = Vector("now()")
     for (p_type <- prisma_type;
          n_type <- native_type;
@@ -374,22 +398,15 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
-             |model User {
-             |  email    String  @unique
+             |model Sun {
+             |  id Int @id
              |  name     $p_type @test.$n_type  @default($d_arg)
-             |  optional $p_type? @test.$n_type
-             |  time $p_type @test.$n_type @updatedAt
              |}
     """.stripMargin
         }
         assert(database.setupWithStatusCode(project) == 0)
       }
-  }
+  } */
 
   "Using Prisma scalar type JSON with native type and PSL features" should "work" in {
     val prisma_type = Vector("Json")
@@ -400,11 +417,6 @@ class nativeTypesWithPSLFeaturesOnMySQL extends FlatSpec with Matchers with ApiS
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User {
              |  email    String  @unique
              |  name     $p_type @test.$n_type

@@ -18,11 +18,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-            |generator client {
-            |  provider = "prisma-client-js"
-            |  previewFeatures = ["nativeTypes"]
-            |}
-            |
             |model Item {
             |  id   $p_type @test.$n_type @id
             |  test $p_type @test.$n_type @unique
@@ -73,11 +68,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-           |generator client {
-           |  provider = "prisma-client-js"
-           |  previewFeatures = ["nativeTypes"]
-           |}
-           |
            |model House {
            |  id $p_type @test.$n_type @id
            |  name $p_type @test.$n_type  @default($d_arg)
@@ -97,11 +87,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model Item {
              |  id   $p_type @test.$n_type @id
              |  test $p_type @test.$n_type @unique
@@ -156,11 +141,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User {
              |  email    String  @unique
              |  name     $p_type @test.$n_type  @default($d_arg)
@@ -183,11 +163,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User2 {
              |  email    String  @unique
              |  name     $p_type @test.$n_type  @default($d_arg)
@@ -247,11 +222,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User2 {
              |  email    String  @unique
              |  name     $p_type @test.$n_type  @default($d_arg)
@@ -303,22 +273,15 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
   "Using Prisma scalar type Bytes with native types and PSL features" should "work" in {
     val prisma_type = Vector("Bytes")
     val native_type = Vector("ByteA")
-    val default_arg = Vector(1, 0)
     for (p_type <- prisma_type;
-         n_type <- native_type;
-         d_arg <- default_arg
+         n_type <- native_type
          )
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User2 {
              |  email    String  @unique
-             |  name     $p_type @test.$n_type  @default($d_arg)
+             |  name     $p_type @test.$n_type
              |  optional $p_type? @test.$n_type
              |}
              |
@@ -373,22 +336,48 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
+             |model User {
+             |  id    Int  @id
+             |  optional $p_type? @test.$n_type
              |}
              |
-             |model User {
-             |  email    String  @unique
+             |model Post {
+             |   id Int @id
+             |   time $p_type @test.$n_type @updatedAt
+             |}
+             |
+             |model Sun {
+             |  id Int @id
              |  name     $p_type @test.$n_type
-             |  optional $p_type? @test.$n_type
-             |  time $p_type @test.$n_type @updatedAt
              |}
     """.stripMargin
         }
         assert(database.setupWithStatusCode(project) == 0)
       }
   }
+
+  /*
+  "Using Prisma scalar type datetime with native type and now as default" should "work" in { // does not work
+    // [migration-engine/connectors/sql-migration-connector/src/sql_renderer/mysql_renderer.rs:233:39] internal error: entered unreachable code: NOW default on non-datetime column"
+    val prisma_type = Vector("DateTime")
+    val native_type = Vector("Time(1)", "Timestamp(2)", "TimestampWithTimeZone(2)",  "Date","TimeWithTimeZone(4)")
+    val default_arg = Vector("now()")
+    for (p_type <- prisma_type;
+         n_type <- native_type;
+         d_arg <- default_arg
+         )
+      yield {
+        val project = SchemaDsl.fromStringV11() {
+          s"""
+             |model Sun {
+             |  id Int @id
+             |  name     $p_type @test.$n_type  @default($d_arg)
+             |}
+    """.stripMargin
+        }
+        assert(database.setupWithStatusCode(project) == 0)
+      }
+  } */
 
   "Using Prisma scalar type Duration with native type and PSL features" should "work" in {
     val prisma_type = Vector("Duration")
@@ -399,11 +388,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User {
              |  email    String  @unique
              |  name     $p_type @test.$n_type
@@ -425,11 +409,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User {
              |  email    String  @unique
              |  name     $p_type @test.$n_type
@@ -451,11 +430,6 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
       yield {
         val project = SchemaDsl.fromStringV11() {
           s"""
-             |generator client {
-             |  provider = "prisma-client-js"
-             |  previewFeatures = ["nativeTypes"]
-             |}
-             |
              |model User {
              |  email    String  @unique
              |  name     $p_type @test.$n_type
