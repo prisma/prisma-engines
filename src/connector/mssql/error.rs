@@ -3,6 +3,14 @@ use crate::error::{DatabaseConstraint, Error, ErrorKind};
 impl From<tiberius::error::Error> for Error {
     fn from(e: tiberius::error::Error) -> Error {
         match e {
+            tiberius::error::Error::Tls(message) => {
+                let message = format!(
+                    "The TLS settings didn't allow the connection to be established. Please review your connection string. Note that TLS encryption is currently not supported on macOS devices. You can subscribe to the following issue: https://github.com/prisma/prisma-engines/issues/1140 (error: `{}`)",
+                    message
+                );
+
+                Error::builder(ErrorKind::TlsError { message }).build()
+            }
             tiberius::error::Error::Server(e) if e.code() == 18456 => {
                 let user = e.message().split('\'').nth(1).unwrap().to_string();
                 let mut builder = Error::builder(ErrorKind::AuthenticationFailed { user });
