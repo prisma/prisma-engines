@@ -23,6 +23,25 @@ fn should_fail_on_ambiguous_relations_with_automatic_names_1() {
 }
 
 #[test]
+fn should_fail_on_colliding_implicit_relations() {
+    let dml = r#"
+    model User {
+        id          Int      @id @default(autoincrement())
+        name        String?
+
+        husband     User?    @relation("MarriagePartners")
+        wife        User     @relation("MarriagePartners")
+
+        teacher     User?    @relation("TeacherStudents")
+        students    User[]   @relation("TeacherStudents")
+}
+"#;
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_model_validation_error("", "User", Span::new(3, 4)));
+}
+
+#[test]
 fn should_fail_on_ambiguous_relations_with_automatic_names_2() {
     // test case based on: https://github.com/prisma/prisma2/issues/976
     let dml = r#"
