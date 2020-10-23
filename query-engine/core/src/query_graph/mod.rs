@@ -571,7 +571,25 @@ impl QueryGraph {
         Ok(())
     }
 
-    // This is a bandaid fix.
+    /// Inserts ordering edges into the graph to prevent interdependency issues when rotating
+    /// nodes for `if`-flow nodes.
+    /// All sibling nodes of an if that are _not_ an if node themself will be ordered below the if
+    /// node in execution predence.
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─
+    ///     Parent   │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+    /// └ ─ ─ ─ ─ ─ ─            │                 │
+    ///        │
+    ///        │                 │                 │
+    ///        │
+    ///        ▼                 ▼                 ▼
+    /// ┌ ─ ─ ─ ─ ─ ─     ┌ ─ ─ ─ ─ ─ ─     ┌ ─ ─ ─ ─ ─ ─
+    ///       If     │       Sibling   │      Sibling If │
+    /// └ ─ ─ ─ ─ ─ ─     └ ─ ─ ─ ─ ─ ─     └ ─ ─ ─ ─ ─ ─
+    ///        │                 ▲
+    ///        │                 │
+    ///        └─────Ordering────┘
+    /// ```
     fn normalize_if_nodes(&mut self) -> QueryGraphResult<()> {
         for node_ix in self.graph.node_indices() {
             let node = NodeRef { node_ix };
