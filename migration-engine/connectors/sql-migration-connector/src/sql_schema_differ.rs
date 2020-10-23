@@ -69,13 +69,16 @@ impl SqlSchemaDiff {
             .chain(wrap_as_step(self.drop_enums, SqlMigrationStep::DropEnum))
             .chain(wrap_as_step(self.create_tables, SqlMigrationStep::CreateTable))
             .chain(redefine_tables.into_iter())
+            // Order matters: we must drop tables before we create indexes,
+            // because on Postgres and SQLite, we may create indexes whose names
+            // clash with the names of indexes on the dropped tables.
+            .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
             // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
             // on fields that are dropped/created there.
             .chain(wrap_as_step(self.create_indexes, SqlMigrationStep::CreateIndex))
             // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
             // indexes created there.
             .chain(wrap_as_step(self.add_foreign_keys, SqlMigrationStep::AddForeignKey))
-            .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
             .chain(wrap_as_step(self.alter_indexes, SqlMigrationStep::AlterIndex))
             .collect()
     }
@@ -119,7 +122,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             create_tables: self.create_tables(),
             alter_tables: self.alter_tables(&tables_to_redefine),
             create_indexes: self.create_indexes(&tables_to_redefine),
-            drop_indexes: self.drop_indexes(),
+            drop_indexes: self.drop_indexes(&tables_to_redefine),
             alter_indexes,
             create_enums: self.create_enums(),
             drop_enums: self.drop_enums(),
@@ -303,6 +306,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         let family = self.database_info.sql_family();
 
+        // TODO: move this into SqlSchemaDescriberFlavour methods, it is
+        // extremely ugly.
         if !family.is_mysql() {
             for table in self.created_tables() {
                 let walker = self.next.table_walker(table.name()).unwrap();
@@ -337,7 +342,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         steps
     }
 
-    fn drop_indexes(&self) -> Vec<DropIndex> {
+    fn drop_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<DropIndex> {
         let mut drop_indexes = Vec::new();
 
         for tables in self.table_pairs() {
@@ -353,6 +358,17 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     name: index.name().to_owned(),
                 })
             }
+        }
+
+        // On SQLite, we will recreate indexes in the RedefineTables step,
+        // because they are needed for implementing new foreign key constraints.
+        if !tables_to_redefine.is_empty() && self.flavour.should_drop_indexes_from_dropped_tables() {
+            drop_indexes.extend(self.dropped_tables().flat_map(|table| {
+                table.into_indexes().map(move |index| DropIndex {
+                    table: table.name().to_owned(),
+                    name: index.name().to_owned(),
+                })
+            }))
         }
 
         drop_indexes

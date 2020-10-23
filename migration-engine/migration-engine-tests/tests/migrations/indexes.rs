@@ -224,16 +224,17 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResul
 #[test_each_connector]
 async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "customName")
-                @@index([secondField, field], name: "customNameNonUnique")
-            }
-        "#;
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+            @@unique([field, secondField], name: "customName")
+            @@index([secondField, field], name: "customNameNonUnique")
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
@@ -246,17 +247,18 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     })?;
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "customNameA")
-                @@index([secondField, field], name: "customNameNonUniqueA")
-            }
-        "#;
+            @@unique([field, secondField], name: "customNameA")
+            @@index([secondField, field], name: "customNameNonUniqueA")
+        }
+    "#;
 
     let result = api.infer_apply(&dm2).send().await?.into_inner();
+
     api.assert_schema().await?.assert_table("A", |table| {
         table
             .assert_indexes_count(2)?
@@ -478,7 +480,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector(tags("postgres", "mysql"), log = "sql-schema-describer=info,debug")]
+#[test_each_connector(tags("postgres", "mysql"))]
 async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestApi) -> TestResult {
     let dm = r#"
         model TestModelWithALongName {
@@ -515,6 +517,58 @@ async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestA
         })?;
 
     api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+            ownerid String
+            owner Owner @relation(fields: [ownerid])
+
+            @@index([ownerid])
+        }
+
+        model Other {
+            id Int @id
+            ownerid String
+
+            @@index([ownerid], name: "ownerid")
+        }
+
+        model Owner {
+            id String @id
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table.assert_column("ownerid", |col| col.assert_is_required())
+    })?;
+
+    let dm2 = r#"
+        model Owner {
+            id Int @id
+            ownerid String
+            owner Cat @relation(fields: [ownerid])
+
+            @@index([ownerid], name: "ownerid")
+        }
+
+        model Cat {
+            id String @id
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Owner", |table| {
+        table.assert_column("ownerid", |col| col.assert_is_required())
+    })?;
 
     Ok(())
 }

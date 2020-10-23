@@ -167,8 +167,12 @@ impl SqlRenderer for SqliteFlavour {
         let primary_columns = table.primary_key_column_names().unwrap_or(&[]);
 
         let primary_key = if !primary_columns.is_empty() && !primary_key_is_already_set {
-            let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-            format!(",\nPRIMARY KEY ({})", column_names)
+            let column_names = primary_columns.iter().map(Quoted::sqlite_ident).join(",");
+            format!(
+                ",\n{indentation}PRIMARY KEY ({column_names})",
+                indentation = SQL_INDENTATION,
+                column_names = column_names
+            )
         } else {
             String::new()
         };
@@ -180,7 +184,11 @@ impl SqlRenderer for SqliteFlavour {
             while let Some(fk) = fks.next() {
                 write!(
                     rendered_fks,
-                    "{indentation}FOREIGN KEY ({constrained_columns}) {references}{comma}",
+                    "{indentation}{constraint_clause}FOREIGN KEY ({constrained_columns}) {references}{comma}",
+                    constraint_clause = fk
+                        .constraint_name()
+                        .map(|name| format!("CONSTRAINT {} ", name))
+                        .unwrap_or_default(),
                     indentation = SQL_INDENTATION,
                     constrained_columns = fk
                         .constrained_column_names()
@@ -260,14 +268,13 @@ impl SqlRenderer for SqliteFlavour {
                 new_name = next_table.name(),
             ));
 
-            // Recreate the indices
-            result.extend(next_table.indexes().map(|index| {
-                self.render_create_index(&CreateIndex {
+            for index in next_table.indexes() {
+                result.push(self.render_create_index(&CreateIndex {
                     table: next_table.name().to_owned(),
                     index: index.index().clone(),
                     caused_by_create_table: false,
-                })
-            }));
+                }))
+            }
         }
 
         result.push("PRAGMA foreign_key_check".to_string());
