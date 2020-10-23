@@ -422,7 +422,7 @@ class nativeTypesWithPSLFeaturesOnPostgres extends FlatSpec with Matchers with A
   }
 
   "Using Prisma scalar type XML with native type and PSL features" should "work" in {
-    val prisma_type = Vector("XML")
+    val prisma_type = Vector("Xml")
     val native_type = Vector("Xml")
     for (p_type <- prisma_type;
          n_type <- native_type
