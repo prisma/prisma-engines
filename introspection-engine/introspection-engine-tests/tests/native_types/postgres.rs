@@ -22,6 +22,7 @@ const TYPES: &[(&str, &str)] = &[
     ("tstz", "Timestamptz(0)"),
     ("date", "Date"),
     ("time", "Time(2)"),
+    ("time_2", "Time"),
     ("timetz", "Timetz(2)"),
     ("interval", "Interval(2)"),
     ("bool", "Boolean"),
@@ -85,6 +86,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             tstz            DateTime @postgres.TimestampWithTimeZone(0)
             date            DateTime @postgres.Date
             time            DateTime @postgres.Time(2)
+            time_2          DateTime @postgres.Time(6)
             timetz          DateTime @postgres.TimeWithTimeZone(2)
             interval        Duration @postgres.Interval(2)
             bool            Boolean  @postgres.Boolean
@@ -228,6 +230,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             tstz            DateTime
             date            DateTime
             time            DateTime
+            time_2          DateTime
             timetz          DateTime
             interval        String
             bool            Boolean

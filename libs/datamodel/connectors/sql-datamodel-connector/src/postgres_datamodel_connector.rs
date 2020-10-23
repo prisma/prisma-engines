@@ -69,14 +69,14 @@ impl PostgresDatamodelConnector {
         let char = NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
         let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]);
         let byte_a = NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, vec![ScalarType::Bytes]);
-        let timestamp = NativeTypeConstructor::with_args(TIMESTAMP_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let timestamp = NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let timestamp_with_timezone =
-            NativeTypeConstructor::with_args(TIMESTAMP_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+            NativeTypeConstructor::with_optional_args(TIMESTAMP_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, vec![ScalarType::DateTime]);
-        let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let time = NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let time_with_timezone =
-            NativeTypeConstructor::with_args(TIME_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
-        let interval = NativeTypeConstructor::with_args(INTERVAL_TYPE_NAME, 1, vec![ScalarType::Duration]);
+            NativeTypeConstructor::with_optional_args(TIME_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let interval = NativeTypeConstructor::with_optional_args(INTERVAL_TYPE_NAME, 1, vec![ScalarType::Duration]);
         let boolean = NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, vec![ScalarType::Boolean]);
         let bit = NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, vec![ScalarType::String]);
         let varbit = NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, vec![ScalarType::String]);
