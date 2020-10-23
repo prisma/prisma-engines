@@ -197,6 +197,15 @@ impl QueryGraph {
         }
     }
 
+    pub fn root<F>(f: F) -> QueryGraphBuilderResult<QueryGraph>
+    where
+        F: FnOnce(&mut QueryGraph) -> QueryGraphBuilderResult<()>,
+    {
+        let mut graph = QueryGraph::new();
+        f(&mut graph)?;
+        Ok(graph)
+    }
+
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;

@@ -159,14 +159,14 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
         },
         TypeIdentifier::DateTime => match p_value {
             value if value.is_null() => PrismaValue::Null,
-            Value::DateTime(Some(dt)) => PrismaValue::DateTime(dt),
+            Value::DateTime(Some(dt)) => PrismaValue::DateTime(dt.into()),
             Value::Integer(Some(ts)) => {
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
                 let secs = (ts / 1000) as i64;
                 let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
                 let datetime: DateTime<Utc> = DateTime::from_utc(naive, Utc);
 
-                PrismaValue::DateTime(datetime)
+                PrismaValue::DateTime(datetime.into())
             }
             Value::Text(Some(dt_string)) => {
                 let dt = DateTime::parse_from_rfc3339(dt_string.borrow())
@@ -176,16 +176,16 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
                     })
                     .unwrap();
 
-                PrismaValue::DateTime(dt.with_timezone(&Utc))
+                PrismaValue::DateTime(dt.with_timezone(&Utc).into())
             }
             Value::Date(Some(d)) => {
                 let dt = DateTime::<Utc>::from_utc(d.and_hms(0, 0, 0), Utc);
-                PrismaValue::DateTime(dt)
+                PrismaValue::DateTime(dt.into())
             }
             Value::Time(Some(t)) => {
                 let d = NaiveDate::from_ymd(1970, 1, 1);
                 let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
-                PrismaValue::DateTime(dt)
+                PrismaValue::DateTime(dt.into())
             }
             _ => {
                 let error = io::Error::new(
@@ -195,7 +195,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
-        TypeIdentifier::Float => match p_value {
+        TypeIdentifier::Float | TypeIdentifier::Decimal => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Real(Some(f)) => PrismaValue::Float(f.normalize()),
             Value::Integer(Some(i)) => {
@@ -214,7 +214,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             _ => {
                 let error = io::Error::new(
                     io::ErrorKind::InvalidData,
-                    "Float value not stored as float, int or text",
+                    "Float/Decimal value not stored as float, int or text",
                 );
                 return Err(SqlError::ConversionError(error.into()));
             }
@@ -234,6 +234,26 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
                 PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))
             }
             other => PrismaValue::from(other),
+        },
+        TypeIdentifier::Bytes => match p_value {
+            value if value.is_null() => PrismaValue::Null,
+            Value::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
+            _ => {
+                let error = io::Error::new(io::ErrorKind::InvalidData, "Byte-type value not stored as bytes.");
+                return Err(SqlError::ConversionError(error.into()));
+            }
+        },
+        TypeIdentifier::Xml => match p_value {
+            value if value.is_null() => PrismaValue::Null,
+            Value::Xml(Some(xml)) => PrismaValue::Xml(xml.to_string()),
+            Value::Text(Some(s)) => PrismaValue::Xml(s.into_owned()),
+            _ => {
+                let error = io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    format!("Xml-type value '{:?}' not stored as XML.", p_value),
+                );
+                return Err(SqlError::ConversionError(error.into()));
+            }
         },
     })
 }

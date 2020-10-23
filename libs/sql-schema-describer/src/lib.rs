@@ -15,7 +15,9 @@ use std::{
     str::FromStr,
 };
 use tracing::debug;
+use walkers::TableWalker;
 
+pub mod getters;
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
@@ -123,6 +125,10 @@ impl SqlSchema {
             enums: Vec::new(),
             sequences: Vec::new(),
         }
+    }
+
+    pub fn table_walkers<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> + 'a {
+        self.tables.iter().map(move |table| TableWalker::new(self, table))
     }
 }
 
@@ -332,6 +338,8 @@ pub enum ColumnTypeFamily {
     Binary,
     /// JSON types.
     Json,
+    /// Xml types.
+    Xml,
     /// UUID types.
     Uuid,
     ///Enum
@@ -369,6 +377,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::Duration => "duration".to_string(),
             Self::Binary => "binary".to_string(),
             Self::Json => "json".to_string(),
+            Self::Xml => "xml".to_string(),
             Self::Uuid => "uuid".to_string(),
             Self::Enum(x) => format!("Enum({})", &x),
             Self::Unsupported(x) => x.to_string(),
@@ -390,12 +399,19 @@ pub enum ColumnArity {
 }
 
 impl ColumnArity {
-    pub fn is_required(&self) -> bool {
-        matches!(self, ColumnArity::Required)
+    /// The arity is ColumnArity::List.
+    pub fn is_list(&self) -> bool {
+        matches!(self, ColumnArity::List)
     }
 
+    /// The arity is ColumnArity::Nullable.
     pub fn is_nullable(&self) -> bool {
         matches!(self, ColumnArity::Nullable)
+    }
+
+    /// The arity is ColumnArity::Required.
+    pub fn is_required(&self) -> bool {
+        matches!(self, ColumnArity::Required)
     }
 }
 
@@ -549,7 +565,7 @@ impl Precision {
         // base 10 for numeric types usually
         // base 2 for bits usually
         // on Postgres `decimal_column decimal` will not return precision
-        // on Postgres `decimal_array_column decimal(30,5)[]` will also not return numeric precision
+        // on Postgres `decimal_array_column decimal(30,5)[]` will also not return numeric precision since none is specified
         // workaround https://stackoverflow.com/questions/57336645/how-to-get-array-elements-numeric-precision-numeric-scale-and-datetime-pr
         self.numeric_precision.unwrap_or(65)
     }

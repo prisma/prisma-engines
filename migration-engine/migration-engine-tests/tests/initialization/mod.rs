@@ -1,4 +1,4 @@
-use migration_core::migration_api;
+use migration_core::{migration_api, GateKeeper};
 use migration_engine_tests::postgres_10_url;
 use quaint::prelude::Queryable;
 use url::Url;
@@ -61,7 +61,9 @@ async fn connecting_to_a_postgres_database_with_missing_schema_creates_it() {
             url
         );
 
-        migration_api(&datamodel).await.unwrap();
+        migration_api(&datamodel, GateKeeper::allow_all_whitelist())
+            .await
+            .unwrap();
     }
 
     // Check that the "unexpected" schema now exists.

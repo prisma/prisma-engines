@@ -4,7 +4,7 @@ use quaint::{prelude::Insert, prelude::Queryable, Value};
 use sql_schema_describer::DefaultValue;
 
 #[test_each_connector(tags("sqlite"))]
-async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) -> TestResult {
+async fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -12,7 +12,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         }
     "#;
 
-    api.infer_apply(&dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
         .values(("a", 12))
@@ -28,14 +28,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         }
     "#;
 
-    // TODO: this should not warn, since this specific migration is safe.
-    api.infer_apply(&dm2)
-        .force(Some(true))
-        .send()
-        .await?
-        .assert_executable()?
-        .assert_no_error()?
-        .assert_warnings(&["You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column could be lost.".into()])?;
+    api.schema_push(dm2).force(true).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("age", |column| {

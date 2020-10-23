@@ -3,15 +3,16 @@ use crate::{
     database_info::DatabaseInfo,
     flavour::MssqlFlavour,
     sql_migration::{
-        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
-        DropEnum, DropForeignKey, DropIndex, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
+        DropForeignKey, DropIndex, RedefineTable, TableChange,
     },
     sql_schema_differ::SqlSchemaDiffer,
 };
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, TableWalker},
-    ColumnTypeFamily, DefaultValue, ForeignKey, IndexType, SqlSchema,
+    walkers::ForeignKeyWalker,
+    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
+    ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write};
 
@@ -30,7 +31,13 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable { table, changes } = alter_table;
+        let AlterTable {
+            table,
+            table_index: (_, next_idx),
+            changes,
+        } = alter_table;
+
+        let next_table = differ.next.table_walker_at(*next_idx);
 
         let mut lines = Vec::new();
 
@@ -45,18 +52,17 @@ impl SqlRenderer for MssqlFlavour {
                     lines.push(format!("ADD PRIMARY KEY ({})", columns));
                 }
                 TableChange::AddColumn(AddColumn { column }) => {
-                    let column = ColumnWalker {
-                        table,
-                        schema: differ.next,
-                        column,
-                    };
+                    let column = next_table
+                        .column(&column.name)
+                        .expect("Invariant violation: add column with unknown column");
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name }) => {
+                TableChange::DropColumn(DropColumn { name, .. }) => {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
+                TableChange::DropAndRecreateColumn { .. } => todo!("DropAndRecreateColumn on MSSQL"),
                 TableChange::AlterColumn(AlterColumn { .. }) => todo!("We must handle altering columns in MSSQL"),
             };
         }
@@ -83,12 +89,13 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::Boolean => "bit",
             ColumnTypeFamily::DateTime => "datetime2",
             ColumnTypeFamily::Float => "decimal(32,16)",
+            ColumnTypeFamily::Decimal => "decimal(32,16)",
             ColumnTypeFamily::Int => "int",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
+            ColumnTypeFamily::Binary => "varbinary(max)",
+            ColumnTypeFamily::Xml => "xml",
             ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
             ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
-            ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
-            ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
             ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
             ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
         };
@@ -98,7 +105,7 @@ impl SqlRenderer for MssqlFlavour {
         let default = column
             .default()
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
-            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
+            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column_type_family())))
             .unwrap_or_else(String::new);
 
         if column.is_autoincrement() {
@@ -108,22 +115,26 @@ impl SqlRenderer for MssqlFlavour {
         }
     }
 
-    fn render_references(&self, table: &str, foreign_key: &ForeignKey) -> String {
-        let cols = foreign_key.referenced_columns.iter().map(Quoted::mssql_ident).join(",");
-        let is_self_relation = table == foreign_key.referenced_table;
+    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+        let cols = foreign_key
+            .referenced_column_names()
+            .iter()
+            .map(Quoted::mssql_ident)
+            .join(",");
+        let is_self_relation = foreign_key.table().name() == foreign_key.referenced_table().name();
 
         let (on_delete, on_update) = if is_self_relation {
             ("ON DELETE NO ACTION", "ON UPDATE NO ACTION")
         } else {
-            let on_delete = common::render_on_delete(&foreign_key.on_delete_action);
-            let on_update = common::render_on_update(&foreign_key.on_update_action);
+            let on_delete = common::render_on_delete(&foreign_key.on_delete_action());
+            let on_update = common::render_on_update(&foreign_key.on_update_action());
 
             (on_delete, on_update)
         };
 
         format!(
             " REFERENCES {}({}) {} {}",
-            self.quote_with_schema(&foreign_key.referenced_table),
+            self.quote_with_schema(&foreign_key.referenced_table().name()),
             cols,
             on_delete,
             on_update
@@ -134,8 +145,12 @@ impl SqlRenderer for MssqlFlavour {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_))
+            | (DefaultValue::VALUE(PrismaValue::Xml(val)), ColumnTypeFamily::Xml) => {
                 format!("'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("0x{}", common::format_hex(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
@@ -179,7 +194,6 @@ impl SqlRenderer for MssqlFlavour {
             table,
             index,
             caused_by_create_table: _,
-            contains_nullable_columns,
         } = create_index;
 
         let index_type = match index.tpe {
@@ -191,38 +205,24 @@ impl SqlRenderer for MssqlFlavour {
         let index_name = self.quote(&index_name);
         let table_reference = self.quote_with_schema(&table).to_string();
 
-        let condition = match index.tpe {
-            IndexType::Unique if *contains_nullable_columns => {
-                let columns = index
-                    .columns
-                    .iter()
-                    .map(|c| self.quote(c))
-                    .map(|c| format!("{} IS NOT NULL", c));
-
-                Cow::from(format!(" WHERE {}", columns.join(" AND ")))
-            }
-            _ => Cow::from(""),
-        };
-
         let columns = index.columns.iter().map(|c| self.quote(c));
 
         format!(
-            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns}){condition}",
+            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
             index_type = index_type,
             index_name = index_name,
             table_reference = table_reference,
             columns = columns.join(", "),
-            condition = condition,
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
+    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
-        let primary_columns = table.table.primary_key_columns();
+        let primary_columns = table.primary_key_column_names();
 
-        let primary_key = if !primary_columns.is_empty() {
-            let index_name = format!("PK_{}_{}", table.table.name, primary_columns.iter().join("_"));
+        let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
+            let index_name = format!("PK_{}_{}", table.name(), primary_columns.iter().join("_"));
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
 
             format!(",\nCONSTRAINT {} PRIMARY KEY ({})", index_name, column_names)
@@ -230,11 +230,9 @@ impl SqlRenderer for MssqlFlavour {
             String::new()
         };
 
-        // We only render unique constraints here if the mapped columns can't be
-        // null.
         let constraints = table
             .indexes()
-            .filter(|index| index.index_type().is_unique() && !index.has_nullable_columns())
+            .filter(|index| index.index_type().is_unique())
             .collect::<Vec<_>>();
 
         let constraints = if !constraints.is_empty() {
@@ -255,7 +253,7 @@ impl SqlRenderer for MssqlFlavour {
 
         format!(
             "CREATE TABLE {} ({columns}{primary_key}{constraints})",
-            table_name = self.quote_with_schema(table.name()),
+            table_name = self.quote_with_schema(table_name),
             columns = columns,
             primary_key = primary_key,
             constraints = constraints,
@@ -282,7 +280,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_redefine_tables(&self, _tables: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _tables: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on MSSQL")
     }
 
@@ -296,29 +294,32 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
-        let AddForeignKey { foreign_key, table } = add_foreign_key;
+    fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
         let mut add_constraint = String::with_capacity(120);
 
         write!(
             add_constraint,
             "ALTER TABLE {table} ADD ",
-            table = self.quote_with_schema(table)
+            table = self.quote_with_schema(foreign_key.table().name())
         )
         .unwrap();
 
-        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
+        if let Some(constraint_name) = foreign_key.constraint_name() {
             write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
         }
 
         write!(
             add_constraint,
             "FOREIGN KEY ({})",
-            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
+            foreign_key
+                .constrained_column_names()
+                .iter()
+                .map(|col| self.quote(col))
+                .join(", ")
         )
         .unwrap();
 
-        add_constraint.push_str(&self.render_references(&table, &foreign_key));
+        add_constraint.push_str(&self.render_references(foreign_key));
 
         add_constraint
     }

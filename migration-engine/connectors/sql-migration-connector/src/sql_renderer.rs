@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 mod common;
 mod mssql_renderer;
 mod mysql_renderer;
@@ -11,27 +9,28 @@ pub(crate) use common::IteratorJoin;
 use crate::{
     database_info::DatabaseInfo,
     sql_migration::{
-        AddForeignKey, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
+        AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex, RedefineTable,
     },
     sql_schema_differ::SqlSchemaDiffer,
 };
 use common::{Quoted, QuotedWithSchema};
 use sql_schema_describer::{
+    walkers::ForeignKeyWalker,
     walkers::{ColumnWalker, TableWalker},
-    ColumnTypeFamily, DefaultValue, ForeignKey, SqlSchema,
+    ColumnTypeFamily, DefaultValue, SqlSchema,
 };
 use std::borrow::Cow;
 
 pub(crate) trait SqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str>;
 
-    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String;
+    fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String;
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> Vec<String>;
 
     fn render_column(&self, column: ColumnWalker<'_>) -> String;
 
-    fn render_references(&self, table: &str, foreign_key: &ForeignKey) -> String;
+    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String;
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
 
@@ -52,7 +51,12 @@ pub(crate) trait SqlRenderer {
     fn render_create_index(&self, create_index: &CreateIndex) -> String;
 
     /// Render a `CreateTable` step.
-    fn render_create_table(&self, table: &TableWalker<'_>) -> String;
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
+        self.render_create_table_as(table, table.name())
+    }
+
+    /// Render a `CreateTable` step with the provided table name.
+    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String;
 
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
@@ -69,7 +73,7 @@ pub(crate) trait SqlRenderer {
     }
 
     /// Render a `RedefineTables` step.
-    fn render_redefine_tables(&self, tables: &[String], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
+    fn render_redefine_tables(&self, tables: &[RedefineTable], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
 
     /// Render a table renaming step.
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;

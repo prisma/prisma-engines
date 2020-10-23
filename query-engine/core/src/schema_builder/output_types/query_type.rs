@@ -1,8 +1,4 @@
 use super::*;
-use crate::{
-    AggregateRecordsBuilder, Builder, Query, QueryGraph, ReadFirstRecordBuilder, ReadManyRecordsBuilder,
-    ReadOneRecordBuilder,
-};
 
 /// Builds the root `Query` type.
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
@@ -37,17 +33,10 @@ fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputFi
             field_name,
             vec![arg],
             OutputType::object(output_objects::map_model_object_type(ctx, &model)),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                model.clone(),
-                QueryTag::FindOne,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-                    let query = ReadOneRecordBuilder::new(parsed_field, model).build()?;
-
-                    graph.create_node(Query::Read(query));
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::FindOne,
+            }),
         )
         .optional()
     })
@@ -62,17 +51,10 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
         field_name,
         args,
         OutputType::object(output_objects::map_model_object_type(ctx, &model)),
-        Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-            model.clone(),
-            QueryTag::FindFirst,
-            Box::new(|model, parsed_field| {
-                let mut graph = QueryGraph::new();
-                let query = ReadFirstRecordBuilder(ReadManyRecordsBuilder::new(parsed_field, model)).build()?;
-
-                graph.create_node(Query::Read(query));
-                Ok(graph)
-            }),
-        ))),
+        Some(QueryInfo {
+            model: Some(Arc::clone(&model)),
+            tag: QueryTag::FindFirst,
+        }),
     )
     .optional()
 }
@@ -86,17 +68,10 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
         field_name,
         args,
         OutputType::list(OutputType::object(output_objects::map_model_object_type(ctx, &model))),
-        Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-            model.clone(),
-            QueryTag::FindMany,
-            Box::new(|model, parsed_field| {
-                let mut graph = QueryGraph::new();
-                let query = ReadManyRecordsBuilder::new(parsed_field, model).build()?;
-
-                graph.create_node(Query::Read(query));
-                Ok(graph)
-            }),
-        ))),
+        Some(QueryInfo {
+            model: Some(Arc::clone(&model)),
+            tag: QueryTag::FindMany,
+        }),
     )
 }
 
@@ -112,16 +87,9 @@ fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
         field_name,
         args,
         OutputType::object(output_objects::aggregation_object_type(ctx, &model)),
-        Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-            model.clone(),
-            QueryTag::Aggregate,
-            Box::new(|model, parsed_field| {
-                let mut graph = QueryGraph::new();
-                let query = AggregateRecordsBuilder::new(parsed_field, model).build()?;
-
-                graph.create_node(Query::Read(query));
-                Ok(graph)
-            }),
-        ))),
+        Some(QueryInfo {
+            model: Some(Arc::clone(&model)),
+            tag: QueryTag::Aggregate,
+        }),
     )
 }

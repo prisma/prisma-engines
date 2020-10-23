@@ -37,11 +37,14 @@ fn map_scalar_input_type(field: &ScalarFieldRef) -> InputType {
         TypeIdentifier::String => InputType::string(),
         TypeIdentifier::Int => InputType::int(),
         TypeIdentifier::Float => InputType::float(),
+        TypeIdentifier::Decimal => InputType::decimal(),
         TypeIdentifier::Boolean => InputType::boolean(),
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
         TypeIdentifier::Enum(_) => map_enum_input_type(&field),
+        TypeIdentifier::Xml => InputType::xml(),
+        TypeIdentifier::Bytes => InputType::bytes(),
     };
 
     if field.is_list {

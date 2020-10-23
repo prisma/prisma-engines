@@ -24,7 +24,7 @@ case class MigrationEngine(project: Project) {
 
   def resetAndSetupDatabase(): Int = {
     import scala.sys.process._
-    val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-d", project.dataModelWithDataSourceConfig, "qe-setup")
+    val cmd = List(EnvVars.migrationEngineBinaryPath, "--enabled-preview-features=all", "cli", "-d", project.fullDatamodelBase64Encoded, "qe-setup")
 
     cmd.!
   }

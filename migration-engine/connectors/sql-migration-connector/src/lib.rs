@@ -21,6 +21,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::Connection;
+use datamodel::Datamodel;
 use error::quaint_error_to_connector_error;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
@@ -62,6 +63,15 @@ impl SqlMigrationConnector {
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         let flavour = flavour::from_connection_info(&connection_info);
         flavour.create_database(database_str).await
+    }
+
+    /// Drop the database corresponding to the connection string, without initializing the connector.
+    pub async fn drop_database(database_str: &str) -> ConnectorResult<()> {
+        let connection_info =
+            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let flavour = flavour::from_connection_info(&connection_info);
+
+        flavour.drop_database(database_str).await
     }
 
     /// Set up the database for connector-test-kit, without initializing the connector.
@@ -138,7 +148,7 @@ impl MigrationConnector for SqlMigrationConnector {
     /// the specific database version being used.
     fn check_database_version_compatibility(
         &self,
-        datamodel: &datamodel::dml::Datamodel,
+        datamodel: &Datamodel,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         self.database_info.check_database_version_compatibility(datamodel)
     }

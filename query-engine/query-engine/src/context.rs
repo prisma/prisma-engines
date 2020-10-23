@@ -64,11 +64,20 @@ impl PrismaContext {
             data_source.capabilities(),
         ));
 
-        Ok(Self {
+        let context = Self {
             query_schema,
             dm,
             executor,
-        })
+        };
+
+        context.verify_connection().await?;
+
+        Ok(context)
+    }
+
+    async fn verify_connection(&self) -> PrismaResult<()> {
+        self.executor.primary_connector().get_connection().await?;
+        Ok(())
     }
 
     pub fn builder(config: Configuration, datamodel: Datamodel) -> ContextBuilder {

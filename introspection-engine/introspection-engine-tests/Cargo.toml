@@ -13,6 +13,7 @@ sql-schema-describer = { path = "../../libs/sql-schema-describer" }
 datamodel = { path = "../../libs/datamodel/core" }
 test-macros = { path = "../../libs/test-macros" }
 test-setup = { path = "../../libs/test-setup" }
+enumflags2 = "0.6.0"
 
 serde = { version = "1", features = ["derive"] }
 pretty_assertions = "0.6.1"

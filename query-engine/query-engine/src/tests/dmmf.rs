@@ -117,9 +117,9 @@ fn must_not_fail_if_an_invalid_datasource_url_is_provided() {
     let schema = r#"
         datasource pg {
             provider = "postgresql"
-            url      = "mysql:://"            
+            url      = "mysql:://"
         }
-        
+
         model Blog {
             blogId String @id
         }
@@ -142,7 +142,7 @@ fn must_fail_if_the_schema_is_invalid() {
 }
 
 fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
-    feature_flags::initialize(&[]).unwrap();
+    feature_flags::initialize(&[String::from("all")]).unwrap();
 
     let prisma_opt = PrismaOpt {
         host: "".to_string(),

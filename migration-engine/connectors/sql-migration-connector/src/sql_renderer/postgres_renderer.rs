@@ -4,17 +4,16 @@ use crate::{
     flavour::PostgresFlavour,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-        AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn,
-        DropEnum, DropForeignKey, DropIndex, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
+        DropForeignKey, DropIndex, RedefineTable, TableChange,
     },
-    sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
+    sql_schema_differ::{ColumnChanges, SqlSchemaDiffer},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_schema_describer::walkers::*;
-use sql_schema_describer::*;
-use std::{borrow::Cow, fmt::Write as _};
+use sql_schema_describer::{walkers::*, *};
+use std::borrow::Cow;
 
 impl PostgresFlavour {
     fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
@@ -30,31 +29,23 @@ impl SqlRenderer for PostgresFlavour {
         Quoted::postgres_ident(name)
     }
 
-    fn render_add_foreign_key(&self, add_foreign_key: &AddForeignKey) -> String {
-        let AddForeignKey { foreign_key, table } = add_foreign_key;
-        let mut add_constraint = String::with_capacity(120);
+    fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
+        let constraint_clause = foreign_key
+            .constraint_name()
+            .map(|constraint_name| format!("CONSTRAINT {} ", self.quote(constraint_name)))
+            .unwrap_or_else(String::new);
 
-        write!(
-            add_constraint,
-            "ALTER TABLE {table} ADD ",
-            table = self.quote_with_schema(table)
+        format!(
+            "ALTER TABLE {table} ADD {constraint_clause}FOREIGN KEY({columns}){references}",
+            table = self.quote_with_schema(foreign_key.table().name()),
+            constraint_clause = constraint_clause,
+            columns = foreign_key
+                .constrained_column_names()
+                .iter()
+                .map(Quoted::postgres_ident)
+                .join(", "),
+            references = self.render_references(foreign_key),
         )
-        .unwrap();
-
-        if let Some(constraint_name) = foreign_key.constraint_name.as_ref() {
-            write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
-        }
-
-        write!(
-            add_constraint,
-            "FOREIGN KEY ({})",
-            foreign_key.columns.iter().map(|col| self.quote(col)).join(", ")
-        )
-        .unwrap();
-
-        add_constraint.push_str(&self.render_references(&table, &foreign_key));
-
-        add_constraint
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
@@ -171,7 +162,11 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable { table, changes } = alter_table;
+        let AlterTable {
+            table,
+            changes,
+            table_index,
+        } = alter_table;
 
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
@@ -192,33 +187,61 @@ impl SqlRenderer for PostgresFlavour {
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
                 TableChange::AddColumn(AddColumn { column }) => {
-                    let column = ColumnWalker {
-                        table,
-                        schema: differ.next,
-                        column,
-                    };
+                    let column = differ
+                        .next
+                        .table_walker(&table.name)
+                        .expect("Invariant violation: add column on unknown table")
+                        .columns()
+                        .find(|col| col.name() == column.name)
+                        .expect("Invariant violation: add column with unknown column");
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name }) => {
+                TableChange::DropColumn(DropColumn { name, .. }) => {
                     let name = self.quote(&name);
                     lines.push(format!("DROP COLUMN {}", name));
                 }
-                TableChange::AlterColumn(AlterColumn { name, column: _ }) => {
-                    let column = differ
-                        .diff_table(&table.name)
-                        .expect("AlterTable on unknown table.")
-                        .diff_column(name)
-                        .expect("AlterColumn on unknown column.");
-                    if render_alter_column(self, &column, &mut before_statements, &mut lines, &mut after_statements)
-                        .is_none()
-                    {
-                        let name = self.quote(&name);
-                        lines.push(format!("DROP COLUMN {}", name));
+                TableChange::AlterColumn(AlterColumn {
+                    column_name,
+                    changes,
+                    type_change: _,
+                }) => {
+                    let previous_column = differ
+                        .previous
+                        .table_walker_at(table_index.0)
+                        .column(&column_name)
+                        .expect("AlterColumn on unknown column");
+                    let next_column = differ
+                        .next
+                        .table_walker_at(table_index.1)
+                        .column(&column_name)
+                        .expect("AlterColumn on unknown column");
 
-                        let col_sql = self.render_column(column.next);
-                        lines.push(format!("ADD COLUMN {}", col_sql));
-                    }
+                    render_alter_column(
+                        self,
+                        (&previous_column, &next_column),
+                        changes,
+                        &mut before_statements,
+                        &mut lines,
+                        &mut after_statements,
+                    );
+                }
+                TableChange::DropAndRecreateColumn {
+                    column_name,
+                    column_index: (_, next_idx),
+                    changes: _,
+                } => {
+                    let name = self.quote(column_name);
+                    lines.push(format!("DROP COLUMN {}", name));
+
+                    let column = differ
+                        .next
+                        .table_walker(&table.name)
+                        .expect("AlterTable on unknown table")
+                        .column_at(*next_idx);
+
+                    let col_sql = self.render_column(column);
+                    lines.push(format!("ADD COLUMN {}", col_sql));
                 }
             };
         }
@@ -258,18 +281,18 @@ impl SqlRenderer for PostgresFlavour {
         }
     }
 
-    fn render_references(&self, _table: &str, foreign_key: &ForeignKey) -> String {
+    fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
         let referenced_columns = foreign_key
-            .referenced_columns
+            .referenced_column_names()
             .iter()
             .map(Quoted::postgres_ident)
             .join(",");
 
         format!(
             "REFERENCES {}({}) {} ON UPDATE CASCADE",
-            self.quote_with_schema(&foreign_key.referenced_table),
+            self.quote_with_schema(&foreign_key.referenced_table().name()),
             referenced_columns,
-            render_on_delete(&foreign_key.on_delete_action)
+            render_on_delete(&foreign_key.on_delete_action())
         )
     }
 
@@ -277,8 +300,12 @@ impl SqlRenderer for PostgresFlavour {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_))
+            | (DefaultValue::VALUE(PrismaValue::Xml(val)), ColumnTypeFamily::Xml) => {
                 format!("E'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+                format!("'{}'", format_hex(b)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
@@ -321,11 +348,15 @@ impl SqlRenderer for PostgresFlavour {
         )
     }
 
-    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
+    fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
         let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
 
-        let primary_columns = table.table.primary_key_columns();
-        let pk_column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
+        let primary_columns = table.primary_key_column_names();
+        let pk_column_names = primary_columns
+            .into_iter()
+            .flat_map(|cols| cols.into_iter())
+            .map(|col| self.quote(col))
+            .join(",");
         let pk = if !pk_column_names.is_empty() {
             format!(",\nPRIMARY KEY ({})", pk_column_names)
         } else {
@@ -334,7 +365,7 @@ impl SqlRenderer for PostgresFlavour {
 
         format!(
             "CREATE TABLE {table_name} (\n{columns}{primary_key}\n)",
-            table_name = self.quote_with_schema(table.name()),
+            table_name = self.quote_with_schema(table_name),
             columns = columns,
             primary_key = pk,
         )
@@ -365,15 +396,15 @@ impl SqlRenderer for PostgresFlavour {
         vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
     }
 
-    fn render_redefine_tables(&self, _names: &[String], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
         unreachable!("render_redefine_table on Postgres")
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
         format!(
             "ALTER TABLE {} RENAME TO {}",
-            self.quote_with_schema(&name),
-            new_name = self.quote_with_schema(&new_name).to_string(),
+            self.quote_with_schema(name),
+            new_name = self.quote_with_schema(new_name),
         )
     }
 }
@@ -392,13 +423,14 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::Boolean => format!("boolean {}", array),
         ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),
         ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
+        ColumnTypeFamily::Decimal => format!("Decimal(65,30) {}", array),
         ColumnTypeFamily::Int => format!("integer {}", array),
         ColumnTypeFamily::String => format!("text {}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
         ColumnTypeFamily::Json => format!("jsonb {}", array),
+        ColumnTypeFamily::Binary => format!("bytea {}", array),
+        ColumnTypeFamily::Xml => format!("xml {}", array),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
-        ColumnTypeFamily::Decimal => unimplemented!("Decimal not handled yet"),
-        ColumnTypeFamily::Binary => unimplemented!("Binary not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
@@ -412,18 +444,19 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 
 fn render_alter_column(
     renderer: &PostgresFlavour,
-    differ: &ColumnDiffer<'_>,
+    (previous_column, next_column): (&ColumnWalker<'_>, &ColumnWalker<'_>),
+    column_changes: &ColumnChanges,
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
     after_statements: &mut Vec<String>,
-) -> Option<()> {
+) {
     // Matches the sequence name from inside an autoincrement default expression.
     static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
 
-    let steps = expand_postgres_alter_column(differ)?;
-    let table_name = Quoted::postgres_ident(differ.previous.table().name());
-    let column_name = Quoted::postgres_ident(differ.previous.name());
+    let steps = expand_postgres_alter_column((&previous_column, &next_column), column_changes);
+    let table_name = Quoted::postgres_ident(previous_column.table().name());
+    let column_name = Quoted::postgres_ident(previous_column.name());
 
     let alter_column_prefix = format!("ALTER COLUMN {}", column_name);
 
@@ -433,14 +466,14 @@ fn render_alter_column(
                 clauses.push(format!("{} DROP DEFAULT", &alter_column_prefix));
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
-                if let Some(DefaultValue::SEQUENCE(sequence_expression)) = differ.previous.default() {
+                if let Some(DefaultValue::SEQUENCE(sequence_expression)) = previous_column.default() {
                     let sequence_name = SEQUENCE_DEFAULT_RE
                         .captures(sequence_expression)
                         .and_then(|captures| captures.get(1))
                         .map(|capture| capture.as_str())
                         .unwrap_or_else(|| panic!("Failed to extract sequence name from `{}`", sequence_expression));
 
-                    let sequence_is_still_used = walk_columns(differ.next.schema()).any(|column| matches!(column.default(), Some(DefaultValue::SEQUENCE(other_sequence)) if other_sequence == sequence_expression) && !column.is_same_column(&differ.next));
+                    let sequence_is_still_used = walk_columns(next_column.schema()).any(|column| matches!(column.default(), Some(DefaultValue::SEQUENCE(other_sequence)) if other_sequence == sequence_expression) && !column.is_same_column(&next_column));
 
                     if !sequence_is_still_used {
                         after_statements.push(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));
@@ -450,7 +483,7 @@ fn render_alter_column(
             PostgresAlterColumn::SetDefault(new_default) => clauses.push(format!(
                 "{} SET DEFAULT {}",
                 &alter_column_prefix,
-                renderer.render_default(&new_default, differ.next.column_type_family())
+                renderer.render_default(&new_default, next_column.column_type_family())
             )),
             PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", &alter_column_prefix)),
@@ -466,8 +499,8 @@ fn render_alter_column(
                 // https://www.postgresql.org/docs/12/datatype-numeric.html#DATATYPE-SERIAL
                 let sequence_name = format!(
                     "{table_name}_{column_name}_seq",
-                    table_name = differ.next.table().name(),
-                    column_name = differ.next.name()
+                    table_name = next_column.table().name(),
+                    column_name = next_column.name()
                 )
                 .to_lowercase();
 
@@ -489,6 +522,4 @@ fn render_alter_column(
             }
         }
     }
-
-    Some(())
 }

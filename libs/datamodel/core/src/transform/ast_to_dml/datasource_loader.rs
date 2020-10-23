@@ -7,7 +7,7 @@ use super::{
 use crate::ast::Span;
 use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
-use crate::diagnostics::{DatamodelError, Diagnostics, ValidatedDatasource, ValidatedDatasources};
+use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics, ValidatedDatasource, ValidatedDatasources};
 use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
@@ -194,6 +194,12 @@ impl DatasourceLoader {
                     provider_arg.span(),
                 )),
             );
+        }
+
+        if all_datasource_providers.len() > 1 {
+            diagnostics.push_warning(DatamodelWarning::new_deprecated_provider_array_warning(
+                provider_arg.span(),
+            ))
         }
 
         let validated_providers: Vec<_> = all_datasource_providers

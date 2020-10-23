@@ -129,8 +129,8 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     // We currently have a datetime precision of 3, so Prisma will add .000
-    res.pathAsString("data.createUser.createdAt") should be("2000-01-01T00:00:00.000Z")
-    res.pathAsString("data.createUser.updatedAt") should be("2001-01-01T00:00:00.000Z")
+    res.pathAsString("data.createUser.createdAt") should be("2000-01-01T00:00:00+00:00")
+    res.pathAsString("data.createUser.updatedAt") should be("2001-01-01T00:00:00+00:00")
   }
 
   "Remapped enum default values" should "work" taggedAs (IgnoreSQLite, IgnoreMsSql) in {

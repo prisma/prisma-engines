@@ -126,7 +126,7 @@ impl Datamodel {
     }
 
     /// Returns (model_name, field_name) for all fields using a specific enum.
-    pub fn find_enum_fields(&mut self, enum_name: &str) -> Vec<(String, String)> {
+    pub fn find_enum_fields(&self, enum_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
         for model in self.models() {
             for field in model.scalar_fields() {

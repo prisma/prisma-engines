@@ -1,11 +1,13 @@
 #![allow(dead_code)]
 
 use barrel::Migration;
+use enumflags2::BitFlags;
 use quaint::{
     prelude::{Queryable, SqlFamily},
     single::Quaint,
 };
 use sql_schema_describer::*;
+use test_setup::connectors::Tags;
 use test_setup::*;
 
 pub type TestResult = anyhow::Result<()>;
@@ -17,6 +19,7 @@ pub struct TestApi {
     connection_info: quaint::prelude::ConnectionInfo,
     sql_family: SqlFamily,
     database: Quaint,
+    tags: BitFlags<Tags>,
 }
 
 impl TestApi {
@@ -71,7 +74,8 @@ impl TestApi {
     }
 }
 
-pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
+pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mysql_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
@@ -82,10 +86,12 @@ pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
         db_name,
         database: conn,
         sql_family: SqlFamily::Mysql,
+        tags: args.test_tag,
     }
 }
 
-pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
+pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mysql_8_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
@@ -96,10 +102,12 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
         db_name,
         database: conn,
         sql_family: SqlFamily::Mysql,
+        tags: args.test_tag,
     }
 }
 
-pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
+pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mysql_5_6_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
@@ -110,10 +118,12 @@ pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
         db_name,
         database: conn,
         sql_family: SqlFamily::Mysql,
+        tags: args.test_tag,
     }
 }
 
-pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
+pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mariadb_url(db_name);
     let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
@@ -124,30 +134,31 @@ pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
         connection_info: conn.connection_info().to_owned(),
         database: conn,
         sql_family: SqlFamily::Mysql,
+        tags: args.test_tag,
     }
 }
 
-pub async fn postgres_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_10_url(db_name), db_name, "postgres10").await
+pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
+    test_api_helper_for_postgres(postgres_10_url(args.test_function_name), args, "postgres10").await
 }
 
-pub async fn postgres9_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_9_url(db_name), db_name, "postgres9").await
+pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
+    test_api_helper_for_postgres(postgres_9_url(args.test_function_name), args, "postgres9").await
 }
 
-pub async fn postgres11_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_11_url(db_name), db_name, "postgres11").await
+pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
+    test_api_helper_for_postgres(postgres_11_url(args.test_function_name), args, "postgres11").await
 }
 
-pub async fn postgres12_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_12_url(db_name), db_name, "postgres12").await
+pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
+    test_api_helper_for_postgres(postgres_12_url(args.test_function_name), args, "postgres12").await
 }
 
-pub async fn postgres13_test_api(db_name: &'static str) -> TestApi {
-    test_api_helper_for_postgres(postgres_13_url(db_name), db_name, "postgres13").await
+pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
+    test_api_helper_for_postgres(postgres_13_url(args.test_function_name), args, "postgres13").await
 }
 
-pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str, connector_name: &'static str) -> TestApi {
+pub async fn test_api_helper_for_postgres(url: String, args: TestAPIArgs, connector_name: &'static str) -> TestApi {
     let database = test_setup::create_postgres_database(&url.parse().unwrap())
         .await
         .unwrap();
@@ -162,16 +173,19 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str, co
     TestApi {
         connector_name,
         connection_info,
-        db_name,
+        db_name: args.test_function_name,
         database,
         sql_family: SqlFamily::Postgres,
+        tags: args.test_tag,
     }
 }
 
-pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
+pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
+
     let database_file_path = sqlite_test_file(db_name);
     std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
-    let connection_string = sqlite_test_url(db_name);
+    let connection_string = sqlite_test_url(args.test_function_name);
     let database = Quaint::new(&connection_string).await.unwrap();
 
     TestApi {
@@ -180,20 +194,22 @@ pub async fn sqlite_test_api(db_name: &'static str) -> TestApi {
         connection_info: database.connection_info().to_owned(),
         database,
         sql_family: SqlFamily::Sqlite,
+        tags: args.test_tag,
     }
 }
 
-pub async fn mssql_2017_test_api(schema: &'static str) -> TestApi {
-    mssql_test_api(mssql_2017_url("master"), schema, "mssql2017").await
+pub async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
+    mssql_test_api(mssql_2017_url("master"), args, "mssql2017").await
 }
 
-pub async fn mssql_2019_test_api(schema: &'static str) -> TestApi {
-    mssql_test_api(mssql_2019_url("master"), schema, "mssql2017").await
+pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
+    mssql_test_api(mssql_2019_url("master"), args, "mssql2017").await
 }
 
-pub async fn mssql_test_api(connection_string: String, schema: &'static str, connector_name: &'static str) -> TestApi {
+pub async fn mssql_test_api(connection_string: String, args: TestAPIArgs, connector_name: &'static str) -> TestApi {
     use test_setup::connectors::mssql;
 
+    let schema = args.test_function_name;
     let database = Quaint::new(&connection_string).await.unwrap();
     let connection_info = database.connection_info().to_owned();
 
@@ -205,6 +221,7 @@ pub async fn mssql_test_api(connection_string: String, schema: &'static str, con
         connection_info,
         database,
         sql_family: SqlFamily::Mssql,
+        tags: args.test_tag,
     }
 }
 

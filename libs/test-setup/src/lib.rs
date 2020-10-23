@@ -1,3 +1,5 @@
+#![deny(unsafe_code, rust_2018_idioms)]
+
 //! This crate contains constants and utilities that are useful for writing tests across the
 //! engines.
 
@@ -12,6 +14,8 @@ pub mod runtime;
 /// The built-in connectors database.
 pub mod connectors;
 
+use crate::connectors::Tags;
+use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
 use std::collections::BTreeMap;
@@ -21,7 +25,21 @@ type AnyError = Box<dyn std::error::Error + Send + Sync>;
 
 const SCHEMA_NAME: &str = "prisma-tests";
 
-/// DANGER. This will be used for destructive filesystem access, be careful when changing this. DANGER.
+pub struct TestAPIArgs {
+    pub test_function_name: &'static str,
+    pub test_tag: BitFlags<Tags>,
+}
+
+impl TestAPIArgs {
+    pub fn new(name: &'static str, tags: u8) -> Self {
+        let tags: BitFlags<Tags> = BitFlags::from_bits(tags).unwrap();
+        TestAPIArgs {
+            test_function_name: name,
+            test_tag: tags,
+        }
+    }
+}
+
 pub fn server_root() -> &'static str {
     static SERVER_ROOT: Lazy<String> =
         Lazy::new(|| std::env::var("SERVER_ROOT").expect("SERVER_ROOT env var is not defined"));

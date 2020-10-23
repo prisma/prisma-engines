@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 //! SQL flavours implement behaviour specific to a given SQL implementation (PostgreSQL, SQLite...),
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
@@ -38,6 +36,7 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
             attached_name: db_name.clone(),
         }),
         ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour(url.clone())),
+        ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
     }
 }
 
@@ -45,24 +44,27 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
 pub(crate) trait SqlFlavour:
     DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
 {
-    /// Create a database for the given URL on the server, if applicable.
-    async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
-
     /// Optionally validate the database info.
     fn check_database_info(&self, _database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
         Ok(())
     }
 
-    /// Make sure that the `_prisma_migrations` table exists.
+    /// Create a database for the given URL on the server, if applicable.
+    async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
+
+    /// Initialize the `_prisma_migrations` table.
     async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
+
+    /// Describe the SQL schema.
+    async fn describe_schema<'a>(&'a self, conn: &Connection) -> ConnectorResult<SqlSchema>;
+
+    /// Drop the database for the provided URL on the server.
+    async fn drop_database(&self, database_url: &str) -> ConnectorResult<()>;
 
     /// Check a connection to make sure it is usable by the migration engine.
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()>;
-
-    /// Introspect the SQL schema.
-    async fn describe_schema<'a>(&'a self, conn: &Connection) -> ConnectorResult<SqlSchema>;
 
     /// Perform the initialization required by connector-test-kit tests.
     async fn qe_setup(&self, database_url: &str) -> ConnectorResult<()>;

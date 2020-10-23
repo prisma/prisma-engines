@@ -79,6 +79,12 @@ impl<'a> Validator<'a> {
             }
 
             if let Err(ref mut the_errors) =
+                self.validate_model_connector_specific(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors)
+            }
+
+            if let Err(ref mut the_errors) =
                 self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
                 errors_for_model.append(the_errors);
@@ -483,6 +489,23 @@ impl<'a> Validator<'a> {
         }
     }
 
+    fn validate_model_connector_specific(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), Diagnostics> {
+        let mut diagnostics = Diagnostics::new();
+
+        if let Some(source) = self.source {
+            let connector = &source.active_connector;
+            if let Err(err) = connector.validate_model(model) {
+                diagnostics.push_error(DatamodelError::new_connector_error(&err.to_string(), ast_model.span))
+            }
+        }
+
+        if diagnostics.has_errors() {
+            Err(diagnostics)
+        } else {
+            Ok(())
+        }
+    }
+
     /// Ensures that embedded types do not have back relations
     /// to their parent types.
     fn validate_embedded_types_have_no_back_relation(
@@ -707,25 +730,6 @@ impl<'a> Validator<'a> {
                                      rel_info.to_fields.join(", ")),
                             ast_field.span)
                         );
-                }
-
-                let references_nullable_field = rel_info.to_fields.iter().any(|field_name| {
-                    let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
-                    referenced_field.is_optional()
-                });
-
-                let must_not_reference_nullable_field = match self.source {
-                    Some(source) => !source.combined_connector.supports_relations_over_nullable_field(),
-                    None => false,
-                };
-
-                if references_nullable_field && must_not_reference_nullable_field {
-                    errors.push_error(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must not refer to a nullable field in the related model `{}`. But it is referencing the following fields that are nullable: {}",
-                                &related_model.name,
-                                rel_info.to_fields.join(", ")),
-                    ast_field.span)
-                    );
                 }
 
                 // TODO: This error is only valid for connectors that don't support native many to manys.

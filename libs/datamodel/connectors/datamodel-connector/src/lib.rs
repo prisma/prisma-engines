@@ -1,9 +1,12 @@
 mod combined_connector;
 
-pub mod error;
-use crate::error::ConnectorError;
+pub mod connector_error;
+pub mod helper;
+
+use crate::connector_error::ConnectorError;
 pub use combined_connector::CombinedConnector;
 use dml::field::Field;
+use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 
@@ -15,6 +18,8 @@ pub trait Connector: Send + Sync {
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
+
+    fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;
 
     /// Returns all available native type constructors available through this connector.
     /// Powers the auto completion of the vs code plugin.
@@ -28,7 +33,7 @@ pub trait Connector: Send + Sync {
 
     /// This function is used during Schema parsing to calculate the concrete native type.
     /// This powers the use of native types for QE + ME.
-    fn parse_native_type(&self, name: &str, args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError>;
+    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError>;
 
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
     /// powers IE
@@ -44,10 +49,6 @@ pub trait Connector: Send + Sync {
 
     fn supports_relations_over_non_unique_criteria(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationsOverNonUniqueCriteria)
-    }
-
-    fn supports_relations_over_nullable_field(&self) -> bool {
-        self.has_capability(ConnectorCapability::RelationsOverNullableField)
     }
 
     fn supports_enums(&self) -> bool {
@@ -69,6 +70,24 @@ pub trait Connector: Send + Sync {
     fn supports_non_indexed_auto_increment(&self) -> bool {
         self.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed)
     }
+
+    fn wrap_in_argument_count_mismatch_error(
+        &self,
+        native_type: &str,
+        required_count: usize,
+        given_count: usize,
+    ) -> ConnectorError {
+        ConnectorError::new_argument_count_mismatch_error(native_type, required_count, given_count)
+    }
+
+    fn wrap_in_optional_argument_count_mismatch_error(
+        &self,
+        native_type: &str,
+        optional_count: usize,
+        given_count: usize,
+    ) -> ConnectorError {
+        ConnectorError::new_optional_argument_count_mismatch_error(native_type, optional_count, given_count)
+    }
 }
 
 /// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
@@ -84,7 +103,6 @@ pub enum ConnectorCapability {
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
-    RelationsOverNullableField,
     // start of Query Engine Capabilities
     InsensitiveFilters,
 }

@@ -5,76 +5,112 @@ use crate::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
-    sql_migration::expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-    sql_schema_differ::ColumnDiffer,
+    sql_migration::{
+        expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
+        AlterColumn, ColumnTypeChange,
+    },
+    sql_schema_differ::ColumnChanges,
 };
-use sql_schema_describer::{ColumnArity, DefaultValue};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnArity, DefaultValue};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
-    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan, step_index: usize) {
-        let expanded = expand_postgres_alter_column(columns);
+    fn check_alter_column(
+        &self,
+        alter_column: &AlterColumn,
+        (previous, next): (&ColumnWalker<'_>, &ColumnWalker<'_>),
+        plan: &mut DestructiveCheckPlan,
+        step_index: usize,
+    ) {
+        let AlterColumn {
+            column_name: _,
+            changes,
+            type_change,
+        } = alter_column;
 
-        if let Some(steps) = expanded {
-            for step in steps {
-                // We keep the match here to keep the exhaustiveness checking for when we add variants.
-                match step {
-                    PostgresAlterColumn::SetNotNull => plan.push_unexecutable(
-                        UnexecutableStepCheck::MadeOptionalFieldRequired {
-                            column: columns.previous.name().to_owned(),
-                            table: columns.previous.table().name().to_owned(),
-                        },
-                        step_index,
-                    ),
-                    PostgresAlterColumn::SetType(_) => {
-                        if !matches!(columns.previous.arity(), ColumnArity::List)
-                            && matches!(columns.next.arity(), ColumnArity::List)
-                        {
-                            plan.push_unexecutable(
-                                UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-                                    table: columns.previous.table().name().to_owned(),
-                                    column: columns.previous.name().to_owned(),
-                                },
-                                step_index,
-                            )
-                        } else {
-                            plan.push_warning(
-                                SqlMigrationWarningCheck::AlterColumn {
-                                    table: columns.previous.table().name().to_owned(),
-                                    column: columns.previous.name().to_owned(),
-                                },
-                                step_index,
-                            );
-                        }
+        let steps = expand_postgres_alter_column((previous, next), changes);
+
+        for step in steps {
+            // We keep the match here to keep the exhaustiveness checking for when we add variants.
+            match step {
+                PostgresAlterColumn::SetNotNull => plan.push_unexecutable(
+                    UnexecutableStepCheck::MadeOptionalFieldRequired {
+                        column: previous.name().to_owned(),
+                        table: previous.table().name().to_owned(),
+                    },
+                    step_index,
+                ),
+                PostgresAlterColumn::SetType(_) => {
+                    if !matches!(previous.arity(), ColumnArity::List) && matches!(next.arity(), ColumnArity::List) {
+                        plan.push_unexecutable(
+                            UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
+                                table: previous.table().name().to_owned(),
+                                column: previous.name().to_owned(),
+                            },
+                            step_index,
+                        )
+                    } else {
+                        match type_change {
+                            None => unreachable!("column_type_change is None on a Postgres SetType"),
+                            Some(ColumnTypeChange::SafeCast) => (),
+                            Some(ColumnTypeChange::RiskyCast) => {
+                                plan.push_warning(
+                                    SqlMigrationWarningCheck::RiskyCast {
+                                        table: previous.table().name().to_owned(),
+                                        column: previous.name().to_owned(),
+                                        previous_type: format!("{:?}", previous.column_type_family()),
+                                        next_type: format!("{:?}", next.column_type_family()),
+                                    },
+                                    step_index,
+                                );
+                            }
+                        };
                     }
-                    PostgresAlterColumn::SetDefault(_)
-                    | PostgresAlterColumn::AddSequence
-                    | PostgresAlterColumn::DropDefault
-                    | PostgresAlterColumn::DropNotNull => (),
                 }
+                PostgresAlterColumn::SetDefault(_)
+                | PostgresAlterColumn::AddSequence
+                | PostgresAlterColumn::DropDefault
+                | PostgresAlterColumn::DropNotNull => (),
             }
+        }
+    }
+
+    fn check_drop_and_recreate_column(
+        &self,
+        (previous_column, next_column): (&ColumnWalker<'_>, &ColumnWalker<'_>),
+        changes: &ColumnChanges,
+        plan: &mut DestructiveCheckPlan,
+        step_index: usize,
+    ) {
+        // Unexecutable drop and recreate.
+        if changes.arity_changed()
+            && previous_column.arity().is_nullable()
+            && next_column.arity().is_required()
+            && !default_can_be_rendered(next_column.default())
+        {
+            plan.push_unexecutable(
+                UnexecutableStepCheck::AddedRequiredFieldToTable {
+                    column: previous_column.name().to_owned(),
+                    table: previous_column.table().name().to_owned(),
+                },
+                step_index,
+            )
         } else {
-            // Unexecutable drop and recreate.
-            if columns.all_changes().arity_changed()
-                && columns.previous.arity().is_nullable()
-                && columns.next.arity().is_required()
-                && !default_can_be_rendered(columns.next.default())
-            {
+            if next_column.arity().is_required() && next_column.default().is_none() {
                 plan.push_unexecutable(
-                    UnexecutableStepCheck::AddedRequiredFieldToTable {
-                        column: columns.previous.name().to_owned(),
-                        table: columns.previous.table().name().to_owned(),
+                    UnexecutableStepCheck::DropAndRecreateRequiredColumn {
+                        column: previous_column.name().to_owned(),
+                        table: previous_column.table().name().to_owned(),
                     },
                     step_index,
                 )
             } else {
-                // Executable drop and recreate.
                 plan.push_warning(
-                    SqlMigrationWarningCheck::AlterColumn {
-                        table: columns.previous.table().name().to_owned(),
-                        column: columns.next.name().to_owned(),
+                    SqlMigrationWarningCheck::DropAndRecreateColumn {
+                        column: previous_column.name().to_owned(),
+                        table: previous_column.table().name().to_owned(),
                     },
                     step_index,
-                );
+                )
             }
         }
     }

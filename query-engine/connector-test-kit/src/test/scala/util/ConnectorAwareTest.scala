@@ -13,6 +13,9 @@ object IgnorePostgres extends Tag("ignore.postgres") with AssociatedWithConnecto
 object IgnoreMySql extends Tag("ignore.mysql") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.MySqlConnectorTag
 }
+object IgnoreMySql56 extends Tag("ignore.mysql56") with AssociatedWithConnectorTags {
+  override def tag = ConnectorTag.Mysql56ConnectorTag
+}
 object IgnoreMongo extends Tag("ignore.mongo") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.MongoConnectorTag
 }
@@ -24,23 +27,30 @@ object IgnoreMsSql extends Tag("ignore.mssql") with AssociatedWithConnectorTags 
 }
 
 object IgnoreSet {
-  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMongo, IgnoreSQLite, IgnoreMsSql)
+  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMySql56, IgnoreMongo, IgnoreSQLite, IgnoreMsSql)
 
   def byName(name: String): Option[AssociatedWithConnectorTags] = ignoreConnectorTags.find(_.name == name)
 }
 
-sealed trait ConnectorTag extends EnumEntry
+sealed trait ConnectorTag extends EnumEntry {
+  def superTags(): Seq[ConnectorTag] = Seq()
+}
+
 object ConnectorTag extends Enum[ConnectorTag] {
   def values = findValues
 
   sealed trait RelationalConnectorTag extends ConnectorTag
-  object MySqlConnectorTag            extends RelationalConnectorTag
-  object Mysql56ConnectorTag          extends RelationalConnectorTag
-  object PostgresConnectorTag         extends RelationalConnectorTag
-  object SQLiteConnectorTag           extends RelationalConnectorTag
-  object MsSqlConnectorTag            extends RelationalConnectorTag
-  sealed trait DocumentConnectorTag   extends ConnectorTag
-  object MongoConnectorTag            extends DocumentConnectorTag
+
+  object MySqlConnectorTag extends RelationalConnectorTag
+  object Mysql56ConnectorTag extends RelationalConnectorTag {
+    override def superTags() = Seq(MySqlConnectorTag)
+  }
+
+  object PostgresConnectorTag       extends RelationalConnectorTag
+  object SQLiteConnectorTag         extends RelationalConnectorTag
+  object MsSqlConnectorTag          extends RelationalConnectorTag
+  sealed trait DocumentConnectorTag extends ConnectorTag
+  object MongoConnectorTag          extends DocumentConnectorTag
 }
 
 trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
@@ -49,13 +59,13 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   lazy val connectorConfig = ConnectorConfig.instance
   lazy val connector       = connectorConfig.provider
 
-  // TODO: cleanup those providers once we have moved everything
   lazy val connectorTag = connector match {
-    case "mongo"                                                 => ConnectorTag.MongoConnectorTag
-    case "mysql" | "mysql-native"                                => ConnectorTag.MySqlConnectorTag
-    case "postgres" | "postgres-native" | "postgresql"           => ConnectorTag.PostgresConnectorTag
-    case "sqlite" | "sqlite-native" | "native-integration-tests" => ConnectorTag.SQLiteConnectorTag
-    case "sqlserver"                                             => ConnectorTag.MsSqlConnectorTag
+    case "mongo"                   => ConnectorTag.MongoConnectorTag
+    case "mysql56"                 => ConnectorTag.Mysql56ConnectorTag
+    case "mysql"                   => ConnectorTag.MySqlConnectorTag
+    case "postgres" | "postgresql" => ConnectorTag.PostgresConnectorTag
+    case "sqlite"                  => ConnectorTag.SQLiteConnectorTag
+    case "sqlserver"               => ConnectorTag.MsSqlConnectorTag
   }
 
   def capabilities: ConnectorCapabilities               = connectorConfig.capabilities
@@ -121,7 +131,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
         ignoreTag <- IgnoreSet.byName(tagName)
       } yield ignoreTag.tag
 
-      val isIgnored = connectorTagsToIgnore.contains(connectorTag)
+      val isIgnored = connectorTagsToIgnore.contains(connectorTag) || connectorTag.superTags().exists(st => connectorTagsToIgnore.contains(st))
       if (isIgnored) {
         tagNames ++ Set("org.scalatest.Ignore")
       } else {

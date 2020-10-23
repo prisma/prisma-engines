@@ -55,12 +55,12 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val id = res.pathAsString("data.createScalarModel.id")
 
     res should be(
-      s"""{"data":{"createScalarModel":{"id":"$id","optInt":1337,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01.000Z","optString":"lala${TroubleCharacters.value}","optEnum":"A","optFloat":1.234}}}""".parseJson)
+      s"""{"data":{"createScalarModel":{"id":"$id","optInt":1337,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01+00:00","optString":"lala${TroubleCharacters.value}","optEnum":"A","optFloat":1.234}}}""".parseJson)
 
     val queryRes = server.query("""{ scalarModels{optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}""", project = project)
 
     queryRes should be(
-      s"""{"data":{"scalarModels":[{"optInt":1337,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01.000Z","optString":"lala${TroubleCharacters.value}","optEnum":"A","optFloat":1.234}]}}""".parseJson)
+      s"""{"data":{"scalarModels":[{"optInt":1337,"optBoolean":true,"optDateTime":"2016-07-31T23:59:01+00:00","optString":"lala${TroubleCharacters.value}","optEnum":"A","optFloat":1.234}]}}""".parseJson)
   }
 
   "A Create Mutation" should "create and return item with empty string" in {
@@ -125,7 +125,8 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  ){optString, optInt, optFloat, optBoolean, optEnum, optDateTime}}""".stripMargin,
       project = project,
       0,
-      errorContains = "Invalid DateTime: input contains invalid characters DateTime must adhere to format"
+      errorContains =
+        "`Mutation.createScalarModel.data.ScalarModelCreateInput.optDateTime`: Error parsing value: Invalid DateTime: '2016-0B-31T23:59:01.000Z' (must be ISO 8601 compatible). Underlying error: input contains invalid characters."
     )
   }
 

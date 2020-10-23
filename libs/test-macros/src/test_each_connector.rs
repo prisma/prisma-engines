@@ -185,18 +185,19 @@ fn test_each_connector_async_wrapper_functions(
     test_function: &ItemFn,
     with_mssql: bool,
 ) -> Vec<proc_macro2::TokenStream> {
-    let test_fn_name_str = test_function.sig.ident.to_string();
-
     let mut tests = Vec::with_capacity(CONNECTORS.len());
+    let test_fn_name_str = test_function.sig.ident.to_string();
 
     for connector in args.connectors_to_test(with_mssql) {
         let connector_test_fn_name = Ident::new(connector.name(), Span::call_site());
         let connector_api_factory = Ident::new(connector.test_api(), Span::call_site());
+        let tags = connector.tags.bits();
 
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
-                run(Box::pin(super::#connector_api_factory(#test_fn_name_str)))
+                let test_api_args = test_setup::TestAPIArgs::new(#test_fn_name_str, #tags);
+                run(Box::pin(super::#connector_api_factory(test_api_args)))
             }
         };
 

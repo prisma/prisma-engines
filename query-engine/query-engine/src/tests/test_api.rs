@@ -21,6 +21,7 @@ pub struct QueryEngine {
 }
 
 impl QueryEngine {
+    #[allow(dead_code)]
     pub fn new(ctx: PrismaContext) -> Self {
         QueryEngine { context: Arc::new(ctx) }
     }
@@ -43,6 +44,8 @@ pub struct TestApi {
 
 impl TestApi {
     pub async fn create_engine(&self, datamodel: &str) -> anyhow::Result<QueryEngine> {
+        feature_flags::initialize(&[String::from("all")]).unwrap();
+
         let datamodel_string = format!("{}\n\n{}", self.config, datamodel);
         let dml = datamodel::parse_datamodel(&datamodel_string).unwrap().subject;
         let config = datamodel::parse_configuration(&datamodel_string).unwrap();
@@ -76,11 +79,13 @@ impl TestApi {
             ConnectionInfo::Mysql(..) => visitor::Mysql::build(query),
             ConnectionInfo::Sqlite { .. } => visitor::Sqlite::build(query),
             ConnectionInfo::Mssql(_) => visitor::Mssql::build(query),
+            ConnectionInfo::InMemorySqlite { .. } => todo!("Not yet"),
         }
     }
 }
 
-pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mysql_8_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -95,7 +100,8 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mysql_5_6_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -110,7 +116,8 @@ pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mysql_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mysql_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -125,7 +132,8 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
+pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mariadb_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -140,7 +148,8 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres9_test_api(db_name: &str) -> TestApi {
+pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_9_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -157,7 +166,8 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres_test_api(db_name: &str) -> TestApi {
+pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_10_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -174,7 +184,8 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres11_test_api(db_name: &str) -> TestApi {
+pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_11_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -191,7 +202,8 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres12_test_api(db_name: &str) -> TestApi {
+pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_12_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -208,7 +220,8 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn postgres13_test_api(db_name: &str) -> TestApi {
+pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = postgres_13_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -225,7 +238,8 @@ pub async fn postgres13_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn sqlite_test_api(db_name: &str) -> TestApi {
+pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = sqlite_test_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -242,7 +256,8 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mssql_2017_test_api(db_name: &str) -> TestApi {
+pub async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mssql_2017_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
@@ -257,7 +272,8 @@ pub async fn mssql_2017_test_api(db_name: &str) -> TestApi {
     }
 }
 
-pub async fn mssql_2019_test_api(db_name: &str) -> TestApi {
+pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
+    let db_name = args.test_function_name;
     let url = mssql_2019_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 

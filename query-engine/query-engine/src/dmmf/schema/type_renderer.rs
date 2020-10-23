@@ -50,10 +50,13 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
                 ScalarType::Int => "Int",
                 ScalarType::Boolean => "Boolean",
                 ScalarType::Float => "Float",
+                ScalarType::Decimal => "Decimal",
                 ScalarType::DateTime => "DateTime",
                 ScalarType::Json => "Json",
                 ScalarType::UUID => "UUID",
                 ScalarType::JsonList => "Json",
+                ScalarType::Xml => "Xml",
+                ScalarType::Bytes => "Bytes",
                 ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 
@@ -124,10 +127,13 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
                 ScalarType::Int => "Int",
                 ScalarType::Boolean => "Boolean",
                 ScalarType::Float => "Float",
+                ScalarType::Decimal => "Decimal",
                 ScalarType::DateTime => "DateTime",
                 ScalarType::Json => "Json",
                 ScalarType::UUID => "UUID",
                 ScalarType::JsonList => "Json",
+                ScalarType::Xml => "Xml",
+                ScalarType::Bytes => "Bytes",
                 ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 

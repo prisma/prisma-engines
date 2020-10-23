@@ -1,5 +1,4 @@
-use super::SqlFlavour;
-use crate::{connect, connection_wrapper::Connection};
+use crate::{connect, connection_wrapper::Connection, SqlFlavour};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::connector::MssqlUrl;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
@@ -80,6 +79,10 @@ impl SqlFlavour for MssqlFlavour {
                     ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
                 }
             })
+    }
+
+    async fn drop_database(&self, _database_url: &str) -> ConnectorResult<()> {
+        todo!("drop_database on MSSQL")
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {

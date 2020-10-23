@@ -21,43 +21,27 @@ case class Project(
 
     s"""
            |datasource test {
-           |  provider = "${config.provider}"
-           |  url = "${dataSourceUrl}"
+           |  provider = "${config.provider.stripSuffix("56")}"
+           |  url = "$dataSourceUrl"
            |}
     """.stripMargin
   }
 
-  val dataModelWithDataSourceConfig = {
-    dataSourceConfig + "\n" + dataModel
+  // Completely useless, but required since previewFeatures are a complete mess.
+  val generatorBlock: String = {
+    s"""
+       |generator client {
+       |  provider = "prisma-client-js"
+       |  previewFeatures = ["nativeTypes", "microsoftSqlServer"]
+       |}
+    """.stripMargin
   }
 
-  val envVar = UTF8Base64.encode(dataModelWithDataSourceConfig)
-
-  val pgBouncerEnvVar = {
-    val host = {
-      if (EnvVars.isBuildkite) {
-        "test-db-pgbouncer"
-      } else {
-        "127.0.0.1"
-      }
-    }
-
-    val url = s"postgresql://postgres:prisma@$host:6432/db?schema=$id&connection_limit=1&pgbouncer=true"
-
-    val config =
-      s"""
-         |datasource test {
-         |  provider = "${ConnectorConfig.instance.provider}"
-         |  url = "${url}"
-         |}
-         |
-         |$dataModel
-      """.stripMargin
-
-    UTF8Base64.encode(config)
+  val fullDatamodel = {
+    dataSourceConfig + "\n" + generatorBlock + "\n" + dataModel
   }
 
-  val isPgBouncer = ConnectorConfig.instance.isBouncer
+  val fullDatamodelBase64Encoded = UTF8Base64.encode(fullDatamodel)
 
   val dataModelPath: String = {
     val pathName = s"${EnvVars.serverRoot}/db/$id.prisma"
@@ -65,7 +49,7 @@ case class Project(
     val writer   = new PrintWriter(file)
 
     try {
-      dataModelWithDataSourceConfig.foreach(writer.print)
+      fullDatamodel.foreach(writer.print)
     } finally {
       writer.close()
     }

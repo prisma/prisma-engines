@@ -402,10 +402,10 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_is_required(self) -> AssertionResult<Self> {
+    pub fn assert_is_list(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.tpe.arity.is_required(),
-            "Assertion failed. Expected column `{}` to be NOT NULL, got {:?}",
+            self.0.tpe.arity.is_list(),
+            "Assertion failed. Expected column `{}` to be a list, got {:?}",
             self.0.name,
             self.0.tpe.arity,
         );
@@ -417,6 +417,17 @@ impl<'a> ColumnAssertion<'a> {
         anyhow::ensure!(
             self.0.tpe.arity.is_nullable(),
             "Assertion failed. Expected column `{}` to be nullable, got {:?}",
+            self.0.name,
+            self.0.tpe.arity,
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_is_required(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.tpe.arity.is_required(),
+            "Assertion failed. Expected column `{}` to be NOT NULL, got {:?}",
             self.0.name,
             self.0.tpe.arity,
         );

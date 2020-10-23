@@ -1,4 +1,5 @@
 use super::*;
+use crate::getters::Getter;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
@@ -41,15 +42,6 @@ static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('(.*)'\)").unwr
 /// (current_timestamp)
 /// ```
 static DEFAULT_DB_GEN: Lazy<Regex> = Lazy::new(|| Regex::new(r"\((.*)\)").unwrap());
-
-/// Matches a partial index condition, that filters out null values from the index.
-///
-/// Example:
-///
-/// ```ignore
-/// [id] IS NOT NULL
-/// ```
-static NULL_PARTIAL_INDEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"\[(.*)\] IS NOT NULL").unwrap());
 
 pub struct SqlSchemaDescriber {
     conn: Quaint,
@@ -110,14 +102,7 @@ impl SqlSchemaDescriber {
         let sql = "SELECT name FROM sys.schemas";
         let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names");
 
-        let names = rows
-            .into_iter()
-            .map(|row| {
-                row.get("name")
-                    .and_then(|x| x.to_string())
-                    .expect("convert schema names")
-            })
-            .collect();
+        let names = rows.into_iter().map(|row| row.get_expect_string("name")).collect();
 
         debug!("Found schema names: {:?}", names);
 
@@ -147,11 +132,7 @@ impl SqlSchemaDescriber {
 
         let names = rows
             .into_iter()
-            .map(|row| {
-                row.get("table_name")
-                    .and_then(|x| x.to_string())
-                    .expect("get table name")
-            })
+            .map(|row| row.get_expect_string("table_name"))
             .collect();
 
         debug!("Found table names: {:?}", names);
@@ -239,27 +220,11 @@ impl SqlSchemaDescriber {
         for col in rows {
             debug!("Got column: {:?}", col);
 
-            let table_name = col
-                .get("table_name")
-                .and_then(|x| x.to_string())
-                .expect("get table name");
-
-            let name = col
-                .get("column_name")
-                .and_then(|x| x.to_string())
-                .expect("get column name");
-
-            let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
-
-            let character_maximum_length = col
-                .get("character_maximum_length")
-                .and_then(|x| x.as_i64().map(|x| x as u32));
-
-            let is_nullable = col
-                .get("is_nullable")
-                .and_then(|x| x.to_string())
-                .expect("get is_nullable")
-                .to_lowercase();
+            let table_name = col.get_expect_string("table_name");
+            let name = col.get_expect_string("column_name");
+            let data_type = col.get_expect_string("data_type");
+            let character_maximum_length = col.get_u32("character_maximum_length");
+            let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
 
             let is_required = match is_nullable.as_ref() {
                 "no" => true,
@@ -275,10 +240,7 @@ impl SqlSchemaDescriber {
 
             let tpe = self.get_column_type(&data_type, character_maximum_length, arity);
 
-            let auto_increment = col
-                .get("is_identity")
-                .and_then(|x| x.as_bool())
-                .expect("get is_identity");
+            let auto_increment = col.get_expect_bool("is_identity");
 
             let entry = map.entry(table_name).or_insert_with(Vec::new);
 
@@ -322,10 +284,11 @@ impl SqlSchemaDescriber {
                             },
                             ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                             ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                         })
                     }
                 },
@@ -353,8 +316,7 @@ impl SqlSchemaDescriber {
                 ind.is_primary_key AS is_primary_key,
                 col.name AS column_name,
                 ic.index_column_id AS seq_in_index,
-                t.name AS table_name,
-                ind.filter_definition AS filter_definition
+                t.name AS table_name
             FROM
                 sys.indexes ind
             INNER JOIN sys.index_columns ic
@@ -365,6 +327,7 @@ impl SqlSchemaDescriber {
                 sys.tables t ON ind.object_id = t.object_id
             WHERE SCHEMA_NAME(t.schema_id) = @P1
                 AND t.is_ms_shipped = 0
+                AND ind.filter_definition IS NULL
 
             ORDER BY index_name, seq_in_index
         "#;
@@ -378,36 +341,14 @@ impl SqlSchemaDescriber {
         for row in rows {
             debug!("Got index row: {:#?}", row);
 
-            // Skip the index if it contains a partial index condition other
-            // than `[col] IS NOT NULL`.
-            //
-            // SQL Server allows only one null item per unique column by
-            // default, so we'll be having a partial index condition to filter
-            // nulls out from the index.
-            if let Some(filter_definition) = row
-                .get("filter_definition")
-                .and_then(|v| v.as_str())
-                .and_then(|v| DEFAULT_DB_GEN.captures_iter(v).next())
-                .and_then(|v| v.get(0))
-                .map(|v| v.as_str().to_string())
-            {
-                let is_user_defined_partial_index = filter_definition
-                    .split(" AND ")
-                    .any(|filter| NULL_PARTIAL_INDEX.captures_iter(filter).next().is_none());
-
-                if is_user_defined_partial_index {
-                    continue;
-                }
-            };
-
-            let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
-            let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
+            let table_name = row.get_expect_string("table_name");
+            let index_name = row.get_expect_string("index_name");
 
             match row.get("column_name").and_then(|x| x.to_string()) {
                 Some(column_name) => {
-                    let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
+                    let seq_in_index = row.get_expect_i64("seq_in_index");
                     let pos = seq_in_index - 1;
-                    let is_unique = row.get("is_unique").and_then(|x| x.as_bool()).expect("is_unique");
+                    let is_unique = row.get_expect_bool("is_unique");
 
                     // Multi-column indices will return more than one row (with different column_name values).
                     // We cannot assume that one row corresponds to one index.
@@ -415,10 +356,7 @@ impl SqlSchemaDescriber {
                         .entry(table_name)
                         .or_insert((BTreeMap::<String, Index>::new(), None));
 
-                    let is_pk = row
-                        .get("is_primary_key")
-                        .and_then(|x| x.as_bool())
-                        .expect("is_primary_key");
+                    let is_pk = row.get_expect_bool("is_primary_key");
 
                     if is_pk {
                         debug!("Column '{}' is part of the primary key", column_name);
@@ -532,43 +470,13 @@ impl SqlSchemaDescriber {
         for row in result_set.into_iter() {
             debug!("Got description FK row {:#?}", row);
 
-            let table_name = row
-                .get("table_name")
-                .and_then(|x| x.to_string())
-                .expect("get table_name");
-
-            let constraint_name = row
-                .get("constraint_name")
-                .and_then(|x| x.to_string())
-                .expect("get constraint_name");
-
-            let column = row
-                .get("column_name")
-                .and_then(|x| x.to_string())
-                .expect("get column_name");
-
-            let referenced_table = row
-                .get("referenced_table_name")
-                .and_then(|x| x.to_string())
-                .expect("get referenced_table_name");
-
-            let referenced_column = row
-                .get("referenced_column_name")
-                .and_then(|x| x.to_string())
-                .expect("get referenced_column_name");
-
-            let ord_pos = row
-                .get("ordinal_position")
-                .and_then(|x| x.as_i64())
-                .expect("get ordinal_position");
-
-            let on_delete_action = match row
-                .get("delete_rule")
-                .and_then(|x| x.to_string())
-                .expect("get delete_rule")
-                .to_lowercase()
-                .as_str()
-            {
+            let table_name = row.get_expect_string("table_name");
+            let constraint_name = row.get_expect_string("constraint_name");
+            let column = row.get_expect_string("column_name");
+            let referenced_table = row.get_expect_string("referenced_table_name");
+            let referenced_column = row.get_expect_string("referenced_column_name");
+            let ord_pos = row.get_expect_i64("ordinal_position");
+            let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
                 "cascade" => ForeignKeyAction::Cascade,
                 "set null" => ForeignKeyAction::SetNull,
                 "set default" => ForeignKeyAction::SetDefault,
@@ -577,13 +485,7 @@ impl SqlSchemaDescriber {
                 s => panic!(format!("Unrecognized on delete action '{}'", s)),
             };
 
-            let on_update_action = match row
-                .get("update_rule")
-                .and_then(|x| x.to_string())
-                .expect("get update_rule")
-                .to_lowercase()
-                .as_str()
-            {
+            let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
                 "cascade" => ForeignKeyAction::Cascade,
                 "set null" => ForeignKeyAction::SetNull,
                 "set default" => ForeignKeyAction::SetDefault,
