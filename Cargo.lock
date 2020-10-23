@@ -3290,7 +3290,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-schema-describer",
- "tempfile",
  "tokio",
  "tracing",
  "tracing-futures",
