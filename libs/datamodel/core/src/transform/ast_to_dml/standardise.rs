@@ -6,7 +6,7 @@ use crate::{
     diagnostics::Diagnostics,
     dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -40,9 +40,11 @@ impl Standardiser {
         let mut errors = Diagnostics::new();
         let schema_copy = schema.clone();
 
+
         // Iterate and mutate models.
         for model in schema.models_mut() {
             let cloned_model = model.clone();
+            let mut set = HashSet::new();
 
             let mut fields_to_add = vec![];
             for field in model.fields_mut() {
@@ -88,18 +90,12 @@ impl Standardiser {
                         if !is_m2m && (rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty()) {
                             rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
 
-                            // check for duplicates
-                            let cloned_fields = underlying_fields.clone();
-                            let map: HashMap<&String, i32> = cloned_fields.iter().fold(HashMap::new(), |mut acc, c| {
-                                *acc.entry(&c.name).or_insert(0) += 1;
-                                acc
-                            });
-
                             for underlying_field in underlying_fields {
-                                println!("{:?}", map);
-                                if matches!(map.get(&underlying_field.name), Some(&x) if x > 1) {
-                                    // found duplicate
-                                    errors.push_error(field_validation_error("", &cloned_model, &Field::ScalarField(underlying_field.clone()), &ast_schema));
+                                let cloned_underlying_field = underlying_field.clone();
+                                if set.contains(cloned_underlying_field.name.as_str()) {
+                                    errors.push_error(field_validation_error(&format!("Automated underlying scalar field generation would cause duplicates. Please separate scalar field for {}", format!("{}id", field.name)), &cloned_model, &Field::ScalarField(cloned_underlying_field.clone()), &ast_schema));
+                                } else {
+                                    set.insert(cloned_underlying_field.name.as_str());
                                 }
                                 fields_to_add.push(Field::ScalarField(underlying_field));
                             }
