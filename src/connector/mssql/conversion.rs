@@ -1,7 +1,4 @@
-use crate::{
-    ast::Value,
-    error::{Error, ErrorKind},
-};
+use crate::ast::Value;
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::{borrow::Cow, convert::TryFrom};
 use tiberius::{ColumnData, FromSql, IntoSql, ToSql};
@@ -10,17 +7,7 @@ pub fn conv_params<'a>(params: &'a [Value<'a>]) -> crate::Result<Vec<&'a dyn ToS
     let mut converted = Vec::with_capacity(params.len());
 
     for param in params.iter() {
-        if param.is_array() {
-            let msg = "Arrays are not supported in T-SQL.";
-            let kind = ErrorKind::conversion(msg);
-
-            let mut builder = Error::builder(kind);
-            builder.set_original_message(msg);
-
-            return Err(builder.build());
-        } else {
-            converted.push(param as &dyn ToSql)
-        }
+        converted.push(param as &dyn ToSql)
     }
 
     Ok(converted)
@@ -48,6 +35,7 @@ impl<'a> ToSql for Value<'a> {
             Value::Time(val) => val.to_sql(),
             #[cfg(feature = "xml")]
             Value::Xml(val) => val.to_sql(),
+            #[cfg(feature = "array")]
             p => todo!("Type {:?} is not supported", p),
         }
     }

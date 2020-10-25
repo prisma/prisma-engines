@@ -1,11 +1,14 @@
 //! A single connection abstraction to a SQL database.
 
+#[cfg(feature = "sqlite")]
+use crate::connector::DEFAULT_SQLITE_SCHEMA_NAME;
 use crate::{
     ast,
-    connector::{self, ConnectionInfo, Queryable, TransactionCapable, DEFAULT_SQLITE_SCHEMA_NAME},
+    connector::{self, ConnectionInfo, Queryable, TransactionCapable},
 };
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 use url::Url;
 
 #[cfg(feature = "sqlite")]

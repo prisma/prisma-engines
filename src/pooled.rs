@@ -149,6 +149,7 @@ pub use manager::*;
 use crate::connector::ConnectionInfo;
 use mobc::Pool;
 use std::{sync::Arc, time::Duration};
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 use url::Url;
 
 #[cfg(feature = "sqlite")]

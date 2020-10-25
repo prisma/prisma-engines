@@ -25,13 +25,13 @@ features = ["full", "serde-support", "json-1", "uuid-0_8", "chrono-0_4", "array"
 default = []
 
 full = ["pooled", "sqlite", "json-1", "postgresql", "uuid-0_8", "chrono-0_4", "mysql", "mssql"]
-full-mssql = ["pooled", "mssql", "xml"]
+full-mssql = ["pooled", "mssql", "xml", "tokio/time"]
 full-mysql = ["pooled", "mysql", "json-1", "uuid-0_8", "chrono-0_4"]
 full-postgresql = ["pooled", "postgresql", "json-1", "xml", "uuid-0_8", "chrono-0_4", "array"]
 full-sqlite = ["pooled", "sqlite", "json-1", "uuid-0_8", "chrono-0_4"]
 
 single = ["sqlite", "json-1", "xml", "postgresql", "uuid-0_8", "chrono-0_4", "mysql", "mssql"]
-single-mssql = ["mssql", "xml"]
+single-mssql = ["mssql", "xml", "tokio/time"]
 single-mysql = ["mysql", "json-1", "uuid-0_8", "chrono-0_4"]
 single-postgresql = ["postgresql", "json-1", "xml", "uuid-0_8", "chrono-0_4", "array"]
 single-sqlite = ["sqlite", "json-1", "uuid-0_8", "chrono-0_4"]

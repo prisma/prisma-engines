@@ -165,6 +165,7 @@ pub enum ErrorKind {
 }
 
 impl ErrorKind {
+    #[cfg(feature = "mysql")]
     pub(crate) fn value_out_of_range(msg: impl Into<String>) -> Self {
         Self::ValueOutOfRange { message: msg.into() }
     }
@@ -231,7 +232,7 @@ impl From<mobc::Error<Error>> for Error {
     }
 }
 
-#[cfg(any(feature = "postgresql", feature = "mysql"))]
+#[cfg(any(feature = "postgresql", feature = "mysql", feature = "mssql"))]
 impl From<tokio::time::Elapsed> for Error {
     fn from(_: tokio::time::Elapsed) -> Self {
         let kind = ErrorKind::Timeout("tokio timeout".into());

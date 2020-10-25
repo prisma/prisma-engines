@@ -37,4 +37,5 @@ pub use queryable::*;
 #[cfg(feature = "sqlite")]
 pub use sqlite::*;
 pub use transaction::*;
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub(crate) use type_identifier::*;

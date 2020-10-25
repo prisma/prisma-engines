@@ -6,14 +6,22 @@
 //! [ast](../ast/index.html) module.
 //!
 //! For prelude, all important imports are in `quaint::visitor::*`;
+#[cfg(feature = "mssql")]
 mod mssql;
+#[cfg(feature = "mysql")]
 mod mysql;
+#[cfg(feature = "postgresql")]
 mod postgres;
+#[cfg(feature = "sqlite")]
 mod sqlite;
 
+#[cfg(feature = "mssql")]
 pub use self::mssql::Mssql;
+#[cfg(feature = "mysql")]
 pub use self::mysql::Mysql;
+#[cfg(feature = "postgresql")]
 pub use self::postgres::Postgres;
+#[cfg(feature = "sqlite")]
 pub use self::sqlite::Sqlite;
 
 use crate::ast::*;

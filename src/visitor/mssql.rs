@@ -1,9 +1,10 @@
 use super::Visitor;
+#[cfg(all(feature = "array", feature = "postgresql"))]
+use crate::error::{Error, ErrorKind};
 use crate::prelude::Aliasable;
 use crate::prelude::Query;
 use crate::{
     ast::{Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Values},
-    error::{Error, ErrorKind},
     prelude::Average,
     visitor, Value,
 };
