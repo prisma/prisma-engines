@@ -1,7 +1,6 @@
 use crate::common::*;
 use datamodel::{ast, diagnostics::DatamodelError};
-use dml::scalars::ScalarType;
-use native_types::{MySqlType, PostgresType};
+use native_types::PostgresType;
 
 #[test]
 fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
