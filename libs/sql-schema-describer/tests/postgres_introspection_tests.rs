@@ -171,11 +171,10 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_varchar".into(),
-                character_maximum_length: None,
-
+                character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
-                native_type: Some(PostgresType::VarChar(64000).to_json()),
+                native_type: Some(PostgresType::VarChar(Some(255)).to_json()),
             },
             default: None,
             auto_increment: false,
@@ -309,7 +308,7 @@ async fn all_postgres_column_types_must_work() {
                 character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::VarChar(1).to_json()),
+                native_type: Some(PostgresType::VarChar(Some(1)).to_json()),
             },
 
             default: None,
@@ -355,7 +354,7 @@ async fn all_postgres_column_types_must_work() {
                 character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Bit(1).to_json()),
+                native_type: Some(PostgresType::Bit(Some(1)).to_json()),
             },
 
             default: None,
@@ -369,7 +368,7 @@ async fn all_postgres_column_types_must_work() {
                 character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::VarBit(1).to_json()),
+                native_type: Some(PostgresType::VarBit(Some(1)).to_json()),
             },
 
             default: None,
@@ -397,7 +396,7 @@ async fn all_postgres_column_types_must_work() {
                 character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Char(1).to_json()),
+                native_type: Some(PostgresType::Char(Some(1)).to_json()),
             },
 
             default: None,
@@ -467,7 +466,7 @@ async fn all_postgres_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Numeric(65, 30).to_json()),
+                native_type: Some(PostgresType::Numeric(None).to_json()),
             },
 
             default: None,

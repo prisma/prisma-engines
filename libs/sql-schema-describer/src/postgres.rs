@@ -6,6 +6,7 @@ use native_types::{NativeType, PostgresType};
 use quaint::connector::ResultRow;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
+use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
 
@@ -136,21 +137,29 @@ impl SqlSchemaDescriber {
 
         let sql = r#"
             SELECT
-                table_name,
-                column_name,
-                data_type,
-                udt_name as full_data_type,
-                column_default,
-                is_nullable,
-                is_identity,
-                character_maximum_length,
-                numeric_precision,
-                numeric_scale,
-                numeric_precision_radix,
-                datetime_precision
-            FROM information_schema.columns
-            WHERE table_schema = $1
-            ORDER BY ordinal_position
+               info.table_name,
+                info.column_name,
+                format_type(att.atttypid, att.atttypmod) as formatted_type,
+                info.numeric_precision,
+                info.numeric_scale,
+                info.numeric_precision_radix,
+                info.datetime_precision,
+                info.data_type,
+                info.udt_name as full_data_type,
+                info.column_default,
+                info.is_nullable,
+                info.is_identity,
+                info.data_type, 
+                info.character_maximum_length
+            FROM information_schema.columns info
+            JOIN pg_attribute  att on att.attname = info.column_name
+            And att.attrelid = (
+            	SELECT pg_class.oid 
+            	FROM pg_class 
+            	WHERE relname = "table_name"
+            	)
+            WHERE table_schema = $1	
+            ORDER BY ordinal_position;
         "#;
 
         let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
@@ -158,41 +167,23 @@ impl SqlSchemaDescriber {
         for col in rows {
             trace!("Got column: {:?}", col);
             let table_name = col.get_expect_string("table_name");
-            let col_name = col.get_expect_string("column_name");
-            let data_type = col.get_expect_string("data_type");
-            let full_data_type = col.get_expect_string("full_data_type");
+            let name = col.get_expect_string("column_name");
+
             let is_identity_str = col.get_expect_string("is_identity").to_lowercase();
-            let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
 
             let is_identity = match is_identity_str.as_str() {
                 "no" => false,
                 "yes" => true,
                 _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
             };
-            let is_required = match is_nullable.as_ref() {
-                "no" => true,
-                "yes" => false,
-                x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
-            };
 
-            let arity = if data_type == "ARRAY" {
-                ColumnArity::List
-            } else if is_required {
-                ColumnArity::Required
-            } else {
-                ColumnArity::Nullable
-            };
-
-            let precision = SqlSchemaDescriber::get_precision(&col);
-
-            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums, precision);
-
-            let default = get_default_value(schema, col, &table_name, &col_name, &tpe);
+            let tpe = get_column_type(&col, enums);
+            let default = get_default_value(schema, &col, &tpe);
 
             let auto_increment = is_identity || matches!(default, Some(DefaultValue::SEQUENCE(_)));
 
             let col = Column {
-                name: col_name,
+                name,
                 tpe,
                 default,
                 auto_increment,
@@ -207,16 +198,58 @@ impl SqlSchemaDescriber {
     }
 
     fn get_precision(col: &ResultRow) -> Precision {
-        let character_maximum_length = col.get_u32("character_maximum_length");
-        let numeric_precision = col.get_u32("numeric_precision");
-        let numeric_precision_radix = col.get_u32("numeric_precision_radix");
-        let numeric_scale = col.get_u32("numeric_scale");
-        let time_precision = col.get_u32("datetime_precision");
+        let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
+            if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
+                fn get_single(formatted_type: &String) -> Option<u32> {
+                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0-9]*)\).*\[\]$"#).unwrap());
+
+                    SINGLE_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
+                }
+
+                fn get_dual(formatted_type: &String) -> (Option<u32>, Option<u32>) {
+                    static DUAL_REGEX: Lazy<Regex> =
+                        Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
+                    let first = DUAL_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+
+                    let second = DUAL_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(2).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+
+                    (first, second)
+                }
+
+                let formatted_type = col.get_expect_string("formatted_type");
+                let fdt = col.get_expect_string("full_data_type");
+                let char_max_length = match fdt.as_str() {
+                    "_bpchar" | "_varchar" | "_bit" | "_varbit" => get_single(&formatted_type),
+                    _ => None,
+                };
+                let (num_precision, num_scale) = match fdt.as_str() {
+                    "_numeric" => get_dual(&formatted_type),
+                    _ => (None, None),
+                };
+                let time = match fdt.as_str() {
+                    "_timestamptz" | "_timestamp" | "_timetz" | "_time" | "_interval" => get_single(&formatted_type),
+                    _ => None,
+                };
+
+                (char_max_length, num_precision, num_scale, time)
+            } else {
+                (
+                    col.get_u32("character_maximum_length"),
+                    col.get_u32("numeric_precision"),
+                    col.get_u32("numeric_scale"),
+                    col.get_u32("datetime_precision"),
+                )
+            };
 
         Precision {
             character_maximum_length,
             numeric_precision,
-            numeric_precision_radix,
             numeric_scale,
             time_precision,
         }
@@ -529,13 +562,9 @@ struct IndexRow {
     sequence_name: Option<String>,
 }
 
-fn get_default_value(
-    schema: &str,
-    col: ResultRow,
-    table_name: &String,
-    col_name: &String,
-    tpe: &ColumnType,
-) -> Option<DefaultValue> {
+fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<DefaultValue> {
+    let table_name = col.get_expect_string("table_name");
+    let col_name = col.get_expect_string("column_name");
     match col.get("column_default") {
         None => None,
         Some(param_value) => match param_value.to_string() {
@@ -607,20 +636,31 @@ fn get_default_value(
     }
 }
 
-fn get_column_type<'a>(
-    data_type: &str,
-    full_data_type: &'a str,
-    arity: ColumnArity,
-    enums: &[Enum],
-    precision: Precision,
-) -> ColumnType {
+fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     use ColumnTypeFamily::*;
-    let trim = |name: &'a str| name.trim_start_matches('_');
-    let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
+    let data_type = row.get_expect_string("data_type");
+    let full_data_type = row.get_expect_string("full_data_type");
+    let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
+        "no" => true,
+        "yes" => false,
+        x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+    };
 
-    let (family, native_type) = match full_data_type {
-        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), None),
-        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => (Enum(trim(x).to_owned()), None),
+    let arity = match matches!(data_type.as_str(), "ARRAY") {
+        true => ColumnArity::List,
+        false if is_required => ColumnArity::Required,
+        false => ColumnArity::Nullable,
+    };
+
+    let precision = SqlSchemaDescriber::get_precision(&row);
+    let unsupported_type = || (Unsupported(full_data_type.clone()), None);
+    let enum_exists = |name| enums.iter().any(|e| e.name == name);
+
+    let (family, native_type) = match full_data_type.as_str() {
+        name if data_type == "USER-DEFINED" && enum_exists(name) => (Enum(name.to_owned()), None),
+        name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
+            (Enum(name.trim_start_matches('_').to_owned()), None)
+        }
         "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
         "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
         "int8" | "_int8" => (Int, Some(PostgresType::BigInt)),
@@ -630,8 +670,8 @@ fn get_column_type<'a>(
         "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
         "text" | "_text" => (String, Some(PostgresType::Text)),
         "citext" | "_citext" => (String, None),
-        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
-        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_max_length()))),
+        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_maximum_length))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
@@ -639,40 +679,40 @@ fn get_column_type<'a>(
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
         "xml" | "_xml" => (Xml, Some(PostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
-        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),
+        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_maximum_length))),
+        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_maximum_length))),
         "numeric" | "_numeric" => (
             Decimal,
             Some(PostgresType::Numeric(
-                precision.numeric_precision(),
-                precision.numeric_scale(),
+                match (precision.numeric_precision, precision.numeric_scale) {
+                    (None, None) => None,
+                    (Some(prec), Some(scale)) => Some((prec, scale)),
+                    _ => None,
+                },
             )),
         ),
         "money" | "_money" => (Float, None),
-        "pg_lsn" | "_pg_lsn" => (Unsupported(full_data_type.into()), None),
-        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision()))),
-        "timetz" | "_timetz" => (
-            DateTime,
-            Some(PostgresType::TimeWithTimeZone(precision.time_precision())),
-        ),
-        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision()))),
-        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision()))),
+        "pg_lsn" | "_pg_lsn" => unsupported_type(),
+        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
+        "timetz" | "_timetz" => (DateTime, Some(PostgresType::TimeWithTimeZone(precision.time_precision))),
+        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision))),
+        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision))),
         "timestamptz" | "_timestamptz" => (
             DateTime,
-            Some(PostgresType::TimestampWithTimeZone(precision.time_precision())),
+            Some(PostgresType::TimestampWithTimeZone(precision.time_precision)),
         ),
-        "tsquery" | "_tsquery" => (Unsupported(full_data_type.into()), None),
-        "tsvector" | "_tsvector" => (Unsupported(full_data_type.into()), None),
-        "txid_snapshot" | "_txid_snapshot" => (Unsupported(full_data_type.into()), None),
+        "tsquery" | "_tsquery" => unsupported_type(),
+        "tsvector" | "_tsvector" => unsupported_type(),
+        "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
         "inet" | "_inet" => (String, None),
         //geometric
-        "box" | "_box" => (Unsupported(full_data_type.into()), None),
-        "circle" | "_circle" => (Unsupported(full_data_type.into()), None),
-        "line" | "_line" => (Unsupported(full_data_type.into()), None),
-        "lseg" | "_lseg" => (Unsupported(full_data_type.into()), None),
-        "path" | "_path" => (Unsupported(full_data_type.into()), None),
-        "polygon" | "_polygon" => (Unsupported(full_data_type.into()), None),
-        _ => (Unsupported(full_data_type.into()), None),
+        "box" | "_box" => unsupported_type(),
+        "circle" | "_circle" => unsupported_type(),
+        "line" | "_line" => unsupported_type(),
+        "lseg" | "_lseg" => unsupported_type(),
+        "path" | "_path" => unsupported_type(),
+        "polygon" | "_polygon" => unsupported_type(),
+        _ => unsupported_type(),
     };
 
     ColumnType {
