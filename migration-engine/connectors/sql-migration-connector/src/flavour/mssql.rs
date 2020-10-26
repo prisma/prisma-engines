@@ -1,5 +1,4 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
-use anyhow::format_err;
 use connection_string::JdbcString;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::connector::MssqlUrl;
@@ -20,8 +19,6 @@ impl MssqlFlavour {
         let params = conn.properties_mut();
 
         let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
-        let params: Vec<_> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
-
         Ok((db_name, conn.to_string()))
     }
 }

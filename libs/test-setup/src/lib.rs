@@ -538,7 +538,7 @@ pub async fn create_mssql_database(jdbc_string: &str) -> Result<Quaint, AnyError
     match params.remove("database") {
         Some(ref db_name) if db_name != "master" => {
             params.insert("database".into(), "master".into());
-            let conn = Quaint::new(conn.to_string()).await?;
+            let conn = Quaint::new(&conn.to_string()).await?;
             conn.raw_cmd(&format!("DROP DATABASE IF EXISTS {}", db_name)).await?;
             conn.raw_cmd(&format!("CREATE DATABASE {}", db_name)).await?;
         }
