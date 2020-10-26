@@ -93,49 +93,36 @@ impl<'a> Expression<'a> {
 
     /// Finds all comparisons between a tuple and a selection. If returning some
     /// CTEs, they should be handled in the calling layer.
-    pub(crate) fn convert_tuple_selects_to_ctes(
-        self,
-        level: &mut usize,
-    ) -> (Self, Option<Vec<CommonTableExpression<'a>>>) {
+    pub(crate) fn convert_tuple_selects_to_ctes(self, level: &mut usize) -> (Self, Vec<CommonTableExpression<'a>>) {
         match self.kind {
-            ExpressionKind::Selection(SelectQuery::Select(select)) => {
-                let select = select.convert_tuple_selects_to_ctes(level);
+            ExpressionKind::Selection(s) => {
+                let (selection, ctes) = s.convert_tuple_selects_to_ctes(level);
 
                 let expr = Expression {
-                    kind: ExpressionKind::Selection(SelectQuery::Select(Box::new(select))),
+                    kind: ExpressionKind::Selection(selection),
                     alias: self.alias,
                 };
 
-                (expr, None)
-            }
-            ExpressionKind::Selection(SelectQuery::Union(union)) => {
-                let union = union.convert_tuple_selects_into_ctes(level);
-
-                let expr = Expression {
-                    kind: ExpressionKind::Selection(SelectQuery::Union(Box::new(union))),
-                    alias: self.alias,
-                };
-
-                (expr, None)
+                (expr, ctes)
             }
             ExpressionKind::Compare(compare) => match compare.convert_tuple_select_to_cte(level) {
-                // Conversion happened
-                Either::Left((comp, cte)) => {
-                    let expr = Expression {
-                        kind: ExpressionKind::Compare(comp),
-                        alias: self.alias,
-                    };
-
-                    (expr, Some(vec![cte]))
-                }
                 // No conversion
-                Either::Right(compare) => {
+                Either::Left(compare) => {
                     let expr = Expression {
                         kind: ExpressionKind::Compare(compare),
                         alias: self.alias,
                     };
 
-                    (expr, None)
+                    (expr, Vec::new())
+                }
+                // Conversion happened
+                Either::Right((comp, ctes)) => {
+                    let expr = Expression {
+                        kind: ExpressionKind::Compare(comp),
+                        alias: self.alias,
+                    };
+
+                    (expr, ctes)
                 }
             },
             ExpressionKind::ConditionTree(tree) => {
@@ -148,7 +135,7 @@ impl<'a> Expression<'a> {
 
                 (expr, ctes)
             }
-            _ => (self, None),
+            _ => (self, Vec::new()),
         }
     }
 }

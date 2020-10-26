@@ -20,11 +20,11 @@ pub enum ConditionTree<'a> {
 impl<'a> ConditionTree<'a> {
     // Finds all possible comparisons between a tuple and a select. If returning
     // a vector of CTEs, they should be handled by the calling party.
-    pub(crate) fn convert_tuple_selects_to_ctes(
-        self,
-        level: &mut usize,
-    ) -> (Self, Option<Vec<CommonTableExpression<'a>>>) {
-        let mut convert_many = |exprs: Vec<Expression<'a>>| {
+    pub(crate) fn convert_tuple_selects_to_ctes(self, level: &mut usize) -> (Self, Vec<CommonTableExpression<'a>>) {
+        fn convert_many<'a>(
+            exprs: Vec<Expression<'a>>,
+            level: &mut usize,
+        ) -> (Vec<Expression<'a>>, Vec<CommonTableExpression<'a>>) {
             let mut converted = Vec::with_capacity(exprs.len());
             let mut result_ctes = Vec::new();
 
@@ -32,20 +32,11 @@ impl<'a> ConditionTree<'a> {
                 let (expr, ctes) = expr.convert_tuple_selects_to_ctes(level);
 
                 converted.push(expr);
-
-                if let Some(ctes) = ctes {
-                    result_ctes.extend(ctes);
-                };
+                result_ctes.extend(ctes);
             }
 
-            let ctes = if result_ctes.is_empty() {
-                None
-            } else {
-                Some(result_ctes)
-            };
-
-            (converted, ctes)
-        };
+            (converted, result_ctes)
+        }
 
         match self {
             Self::Single(expr) => {
@@ -59,14 +50,14 @@ impl<'a> ConditionTree<'a> {
                 (expr.not(), ctes)
             }
             Self::And(exprs) => {
-                let (converted, ctes) = convert_many(exprs);
+                let (converted, ctes) = convert_many(exprs, level);
                 (Self::And(converted), ctes)
             }
             Self::Or(exprs) => {
-                let (converted, ctes) = convert_many(exprs);
+                let (converted, ctes) = convert_many(exprs, level);
                 (Self::Or(converted), ctes)
             }
-            tree => (tree, None),
+            tree => (tree, Vec::new()),
         }
     }
 

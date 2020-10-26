@@ -1,6 +1,7 @@
 use crate::ast::{Expression, Query, Select};
 use std::{collections::BTreeSet, fmt};
 
+use super::CommonTableExpression;
 use super::IntoCommonTableExpression;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -23,6 +24,7 @@ impl fmt::Display for UnionType {
 pub struct Union<'a> {
     pub(crate) selects: Vec<Select<'a>>,
     pub(crate) types: Vec<UnionType>,
+    pub(crate) ctes: Vec<CommonTableExpression<'a>>,
 }
 
 impl<'a> From<Union<'a>> for Query<'a> {
@@ -42,6 +44,7 @@ impl<'a> Union<'a> {
         Self {
             selects: vec![q],
             types: Vec::new(),
+            ctes: Vec::new(),
         }
     }
 
@@ -114,16 +117,31 @@ impl<'a> Union<'a> {
     /// Finds all comparisons between tuples and selects in the queries and
     /// converts them to common table expressions for making the query
     /// compatible with databases not supporting tuples.
-    pub(crate) fn convert_tuple_selects_into_ctes(mut self, level: &mut usize) -> Self {
-        let mut converted = Vec::with_capacity(self.selects.len());
+    pub(crate) fn convert_tuple_selects_into_ctes(
+        mut self,
+        top_level: bool,
+        level: &mut usize,
+    ) -> either::Either<Self, (Self, Vec<CommonTableExpression<'a>>)> {
+        let mut queries = Vec::with_capacity(self.selects.len());
+        let mut combined_ctes = Vec::new();
 
         for select in self.selects.drain(0..) {
-            converted.push(select.convert_tuple_selects_to_ctes(level));
+            let (select, ctes) = select
+                .convert_tuple_selects_to_ctes(false, level)
+                .expect_right("Nested select should always be right.");
+
+            queries.push(select);
+            combined_ctes.extend(ctes);
         }
 
-        self.selects = converted;
+        self.selects = queries;
 
-        self
+        if top_level {
+            self.ctes = combined_ctes;
+            either::Either::Left(self)
+        } else {
+            either::Either::Right((self, combined_ctes))
+        }
     }
 }
 

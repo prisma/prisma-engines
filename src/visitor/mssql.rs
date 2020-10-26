@@ -70,7 +70,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         match query {
             // Finding possible `(a, b) (NOT) IN (SELECT x, y ...)` comparisons,
             // and replacing them with common table expressions.
-            Query::Select(select) => select.convert_tuple_selects_to_ctes(&mut 0).into(),
+            Query::Select(select) => select
+                .convert_tuple_selects_to_ctes(true, &mut 0)
+                .expect_left("Top-level query was right")
+                .into(),
             // Replacing the `ON CONFLICT DO NOTHING` clause with a `MERGE` statement.
             Query::Insert(insert) => match insert.on_conflict {
                 Some(OnConflict::DoNothing) => Merge::try_from(*insert).unwrap().into(),

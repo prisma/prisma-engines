@@ -617,25 +617,35 @@ impl<'a> Select<'a> {
     /// - Not comparing a tuple (e.g. `x IN (SELECT ...)`)
     /// - Not using a `IN` or `NOT IN` operation
     /// - Imbalanced number of variables (e.g. `(x, y, z) IN (SELECT a, b ...)`)
-    pub(crate) fn convert_tuple_selects_to_ctes(mut self, level: &mut usize) -> Self {
-        if let Some(tree) = self.conditions.take() {
-            let (tree, ctes) = tree.convert_tuple_selects_to_ctes(level);
+    pub(crate) fn convert_tuple_selects_to_ctes(
+        mut self,
+        top_level: bool,
+        level: &mut usize,
+    ) -> either::Either<Self, (Self, Vec<CommonTableExpression<'a>>)> {
+        let ctes: Vec<CommonTableExpression<'_>> = self
+            .conditions
+            .take()
+            .map(|tree| {
+                let (tree, ctes) = tree.convert_tuple_selects_to_ctes(level);
+                self.conditions = Some(tree);
 
-            self.conditions = Some(tree);
+                ctes.into_iter().collect()
+            })
+            .unwrap_or_else(|| Vec::new());
 
-            if let Some(ctes) = ctes {
-                let clashing_names = self
-                    .ctes
-                    .iter()
-                    .any(|c| ctes.iter().any(|c2| c.identifier == c2.identifier));
+        if top_level {
+            let clashing_names = self
+                .ctes
+                .iter()
+                .any(|c| ctes.iter().any(|c2| c.identifier == c2.identifier));
 
-                assert!(!clashing_names);
+            assert!(!clashing_names);
+            self.ctes.extend(ctes);
 
-                self.ctes.extend(ctes);
-            }
-        };
-
-        self
+            either::Either::Left(self)
+        } else {
+            either::Either::Right((self, ctes))
+        }
     }
 
     /// A list of item names in the query, skipping the anonymous values or

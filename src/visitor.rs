@@ -329,6 +329,22 @@ pub trait Visitor<'a> {
 
     /// A walk through a union of `SELECT` statements
     fn visit_union(&mut self, mut ua: Union<'a>) -> Result {
+        let number_of_ctes = ua.ctes.len();
+
+        if number_of_ctes > 0 {
+            self.write("WITH ")?;
+
+            for (i, cte) in ua.ctes.into_iter().enumerate() {
+                self.visit_cte(cte)?;
+
+                if i < (number_of_ctes - 1) {
+                    self.write(", ")?;
+                }
+            }
+
+            self.write(" ")?;
+        }
+
         let len = ua.selects.len();
         let mut types = ua.types.drain(0..);
 

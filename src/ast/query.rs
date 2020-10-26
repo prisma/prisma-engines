@@ -1,6 +1,7 @@
 use crate::ast::{Delete, Insert, Merge, Select, Union, Update};
 use std::borrow::Cow;
 
+use super::CommonTableExpression;
 use super::IntoCommonTableExpression;
 
 /// A database query
@@ -59,6 +60,25 @@ impl<'a> SelectQuery<'a> {
         match self {
             Self::Select(s) => s.named_selection(),
             Self::Union(u) => u.named_selection(),
+        }
+    }
+
+    pub(crate) fn convert_tuple_selects_to_ctes(self, level: &mut usize) -> (Self, Vec<CommonTableExpression<'a>>) {
+        match self {
+            Self::Select(select) => match select.convert_tuple_selects_to_ctes(false, level) {
+                either::Either::Left(select) => (Self::Select(Box::new(select)), Vec::new()),
+                either::Either::Right((select, ctes)) => {
+                    let select = Self::Select(Box::new(select));
+                    (select, ctes)
+                }
+            },
+            Self::Union(union) => match union.convert_tuple_selects_into_ctes(false, level) {
+                either::Either::Left(union) => (Self::Union(Box::new(union)), Vec::new()),
+                either::Either::Right((union, ctes)) => {
+                    let union = Self::Union(Box::new(union));
+                    (union, ctes)
+                }
+            },
         }
     }
 }
