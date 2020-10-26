@@ -17,22 +17,12 @@ impl MssqlFlavour {
     /// Get the url as a JDBC string, extract the database name, and re-encode the string.
     fn master_url(input: &str) -> ConnectorResult<(String, String)> {
         let mut conn = JdbcString::from_str(input).map_err(|e| ConnectorError::generic(anyhow::Error::new(e)))?;
-        let server_name = conn.server_name().ok_or_else(|| {
-            ConnectorError::generic(format_err!("JDBC connection string did not contain a server name"))
-        })?;
-
-        let host = match conn.instance_name() {
-            Some(instance_name) => format!(r#"{}\{}"#, server_name, instance_name),
-            None => server_name.to_string(),
-        };
         let params = conn.properties_mut();
 
         let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
         let params: Vec<_> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
 
-        let master_url = format!("{};{}", host, params.join(";"));
-
-        Ok((db_name, master_url))
+        Ok((db_name, conn.to_string()))
     }
 }
 

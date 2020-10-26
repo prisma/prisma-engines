@@ -534,26 +534,11 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
 pub async fn create_mssql_database(jdbc_string: &str) -> Result<Quaint, AnyError> {
     let mut conn = connection_string::JdbcString::from_str(jdbc_string)?;
 
-    let server_name = conn
-        .server_name()
-        .expect("failed to get a server name from the connection string")
-        .to_owned();
-
-    let host = match conn.instance_name() {
-        Some(instance_name) => format!(r#"{}\{}"#, server_name, instance_name),
-        None => server_name.to_owned(),
-    };
-
     let params = conn.properties_mut();
     match params.remove("database") {
         Some(ref db_name) if db_name != "master" => {
             params.insert("database".into(), "master".into());
-
-            let params: Vec<_> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
-            let conn_str = format!("{};{}", host, params.join(";"));
-
-            let conn = Quaint::new(conn_str.as_str()).await?;
-
+            let conn = Quaint::new(conn.to_string()).await?;
             conn.raw_cmd(&format!("DROP DATABASE IF EXISTS {}", db_name)).await?;
             conn.raw_cmd(&format!("CREATE DATABASE {}", db_name)).await?;
         }
