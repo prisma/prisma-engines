@@ -1,7 +1,7 @@
-use crate::{connect, connection_wrapper::Connection, flavour::SqlFlavour};
+use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::prelude::ConnectionInfo;
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
+use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::path::Path;
 
 #[derive(Debug)]
@@ -46,7 +46,7 @@ impl SqlFlavour for SqliteFlavour {
                 "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
                 "script"                TEXT NOT NULL
             );
-            "#;
+        "#;
 
         Ok(connection.raw_cmd(sql).await?)
     }
@@ -55,9 +55,9 @@ impl SqlFlavour for SqliteFlavour {
         sql_schema_describer::sqlite::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
             .await
-            .map_err(|err| match err {
-                SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
+            .map_err(|err| match err.into_kind() {
+                DescriberErrorKind::QuaintError(err) => {
+                    quaint_error_to_connector_error(err, connection.connection_info())
                 }
             })
     }
@@ -104,16 +104,16 @@ impl SqlFlavour for SqliteFlavour {
         migrations: &[MigrationDirectory],
         _connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
-        let temp_dir = tempfile::tempdir().expect("Failed to create temporary directory.");
-        let database_url = format!(
-            "file:{}/scratch.db?db_name={}",
-            temp_dir.path().to_str().unwrap(),
-            self.attached_name
-        );
-
-        tracing::debug!("Applying migrations to temporary SQLite database at `{}`", database_url);
-
-        let conn = crate::connect(&database_url).await?;
+        tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
+        let quaint = quaint::single::Quaint::new_in_memory(Some(self.attached_name.clone())).map_err(|err| {
+            quaint_error_to_connector_error(
+                err,
+                &ConnectionInfo::InMemorySqlite {
+                    db_name: self.attached_name.clone(),
+                },
+            )
+        })?;
+        let conn = Connection::new(quaint);
 
         for migration in migrations {
             let script = migration.read_migration_script()?;

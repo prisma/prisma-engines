@@ -1,6 +1,7 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use datamodel_connector::helper::parse_u32_arguments;
+use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_u32_arguments};
 use datamodel_connector::{Connector, ConnectorCapability};
+use dml::default_value::DefaultValue;
 use dml::field::{Field, FieldType};
 use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
@@ -51,33 +52,34 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
             ConnectorCapability::InsensitiveFilters,
+            ConnectorCapability::RelationFieldsInArbitraryOrder,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);
         let integer = NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, vec![ScalarType::Int]);
         let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, vec![ScalarType::Int]);
-        let decimal = NativeTypeConstructor::with_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
-        let numeric = NativeTypeConstructor::with_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]);
+        let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
+        let numeric = NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]);
         let real = NativeTypeConstructor::without_args(REAL_TYPE_NAME, vec![ScalarType::Float]);
         let double_precision = NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, vec![ScalarType::Float]);
         let small_serial = NativeTypeConstructor::without_args(SMALL_SERIAL_TYPE_NAME, vec![ScalarType::Int]);
         let serial = NativeTypeConstructor::without_args(SERIAL_TYPE_NAME, vec![ScalarType::Int]);
         let big_serial = NativeTypeConstructor::without_args(BIG_SERIAL_TYPE_NAME, vec![ScalarType::Int]);
-        let varchar = NativeTypeConstructor::with_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]);
-        let char = NativeTypeConstructor::with_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
+        let varchar = NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]);
+        let char = NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
         let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]);
         let byte_a = NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, vec![ScalarType::Bytes]);
-        let timestamp = NativeTypeConstructor::with_args(TIMESTAMP_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let timestamp = NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let timestamp_with_timezone =
-            NativeTypeConstructor::with_args(TIMESTAMP_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+            NativeTypeConstructor::with_optional_args(TIMESTAMP_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, vec![ScalarType::DateTime]);
-        let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let time = NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let time_with_timezone =
-            NativeTypeConstructor::with_args(TIME_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
-        let interval = NativeTypeConstructor::with_args(INTERVAL_TYPE_NAME, 1, vec![ScalarType::Duration]);
+            NativeTypeConstructor::with_optional_args(TIME_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let interval = NativeTypeConstructor::with_optional_args(INTERVAL_TYPE_NAME, 1, vec![ScalarType::Duration]);
         let boolean = NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, vec![ScalarType::Boolean]);
-        let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, vec![ScalarType::String]);
-        let varbit = NativeTypeConstructor::with_args(VAR_BIT_TYPE_NAME, 1, vec![ScalarType::String]);
+        let bit = NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, vec![ScalarType::String]);
+        let varbit = NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, vec![ScalarType::String]);
         let uuid = NativeTypeConstructor::without_args(UUID_TYPE_NAME, vec![ScalarType::String]);
         let xml = NativeTypeConstructor::without_args(XML_TYPE_NAME, vec![ScalarType::String]);
         let json = NativeTypeConstructor::without_args(JSON_TYPE_NAME, vec![ScalarType::Json]);
@@ -128,7 +130,7 @@ impl Connector for PostgresDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         if let FieldType::NativeType(_scalar_type, native_type) = field.field_type() {
             let native_type_name = native_type.name.as_str();
-            if native_type_name == DECIMAL_TYPE_NAME || native_type_name == NUMERIC_TYPE_NAME {
+            if matches!(native_type_name, DECIMAL_TYPE_NAME | NUMERIC_TYPE_NAME) {
                 match native_type.args.as_slice() {
                     [precision, scale] if scale > precision => {
                         return Err(ConnectorError::new_scale_larger_than_precision_error(
@@ -137,6 +139,31 @@ impl Connector for PostgresDatamodelConnector {
                         ));
                     }
                     _ => {}
+                }
+            }
+            if matches!(native_type_name, BIT_TYPE_NAME | VAR_BIT_TYPE_NAME) {
+                match native_type.args.as_slice() {
+                    [length] if length == &0 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "M must be a positive integer.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    _ => {}
+                }
+            }
+            if matches!(
+                native_type_name,
+                SMALL_SERIAL_TYPE_NAME | SERIAL_TYPE_NAME | BIG_SERIAL_TYPE_NAME
+            ) {
+                if let Some(DefaultValue::Single(_)) = field.default_value() {
+                    return Err(
+                        ConnectorError::new_incompatible_sequential_type_with_static_default_value_error(
+                            native_type_name,
+                            "Postgres",
+                        ),
+                    );
                 }
             }
         }
@@ -160,11 +187,13 @@ impl Connector for PostgresDatamodelConnector {
             INTEGER_TYPE_NAME => PostgresType::Integer,
             BIG_INT_TYPE_NAME => PostgresType::BigInt,
             DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
-                [scale, precision] => PostgresType::Decimal(*scale, *precision),
+                [precision, scale] => PostgresType::Decimal(Some((*precision, *scale))),
+                [] => PostgresType::Decimal(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, parsed_args.len())),
             },
             NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
-                [scale, precision] => PostgresType::Numeric(*scale, *precision),
+                [scale, precision] => PostgresType::Numeric(Some((*scale, *precision))),
+                [] => PostgresType::Numeric(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(NUMERIC_TYPE_NAME, 2, parsed_args.len())),
             },
             REAL_TYPE_NAME => PostgresType::Real,
@@ -173,11 +202,13 @@ impl Connector for PostgresDatamodelConnector {
             SERIAL_TYPE_NAME => PostgresType::Serial,
             BIG_SERIAL_TYPE_NAME => PostgresType::BigSerial,
             VARCHAR_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::VarChar(*arg),
+                [arg] => PostgresType::VarChar(Some(*arg)),
+                [] => PostgresType::VarChar(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(VARCHAR_TYPE_NAME, 1, parsed_args.len())),
             },
             CHAR_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Char(*arg),
+                [arg] => PostgresType::Char(Some(*arg)),
+                [] => PostgresType::Char(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, parsed_args.len())),
             },
             TEXT_TYPE_NAME => PostgresType::Text,
@@ -230,11 +261,13 @@ impl Connector for PostgresDatamodelConnector {
             },
             BOOLEAN_TYPE_NAME => PostgresType::Boolean,
             BIT_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Bit(*arg),
+                [arg] => PostgresType::Bit(Some(*arg)),
+                [] => PostgresType::Bit(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(BIT_TYPE_NAME, 1, parsed_args.len())),
             },
             VAR_BIT_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::VarBit(*arg),
+                [arg] => PostgresType::VarBit(Some(*arg)),
+                [] => PostgresType::VarBit(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(VAR_BIT_TYPE_NAME, 1, parsed_args.len())),
             },
             UUID_TYPE_NAME => PostgresType::UUID,
@@ -257,15 +290,15 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             PostgresType::Integer => (INTEGER_TYPE_NAME, vec![]),
             PostgresType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
-            PostgresType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x, y]),
-            PostgresType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x, y]),
+            PostgresType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
+            PostgresType::Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             PostgresType::Real => (REAL_TYPE_NAME, vec![]),
             PostgresType::DoublePrecision => (DOUBLE_PRECISION_TYPE_NAME, vec![]),
             PostgresType::SmallSerial => (SMALL_SERIAL_TYPE_NAME, vec![]),
             PostgresType::Serial => (SMALL_SERIAL_TYPE_NAME, vec![]),
             PostgresType::BigSerial => (BIG_SERIAL_TYPE_NAME, vec![]),
-            PostgresType::VarChar(x) => (VARCHAR_TYPE_NAME, vec![x]),
-            PostgresType::Char(x) => (CHAR_TYPE_NAME, vec![x]),
+            PostgresType::VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_from_opt(x)),
+            PostgresType::Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Text => (TEXT_TYPE_NAME, vec![]),
             PostgresType::ByteA => (BYTE_A_TYPE_NAME, vec![]),
             PostgresType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
@@ -275,20 +308,14 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::TimeWithTimeZone(x) => (TIME_WITH_TIMEZONE_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Interval(x) => (INTERVAL_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Boolean => (BOOLEAN_TYPE_NAME, vec![]),
-            PostgresType::Bit(x) => (BIT_TYPE_NAME, vec![x]),
-            PostgresType::VarBit(x) => (VAR_BIT_TYPE_NAME, vec![x]),
+            PostgresType::Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
+            PostgresType::VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::UUID => (UUID_TYPE_NAME, vec![]),
             PostgresType::Xml => (XML_TYPE_NAME, vec![]),
             PostgresType::JSON => (JSON_TYPE_NAME, vec![]),
             PostgresType::JSONB => (JSON_B_TYPE_NAME, vec![]),
         };
 
-        fn arg_vec_from_opt(input: Option<u32>) -> Vec<u32> {
-            match input {
-                Some(arg) => vec![arg],
-                None => vec![],
-            }
-        }
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {

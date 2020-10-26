@@ -71,6 +71,24 @@ impl ConnectorError {
             raw: String::from(raw),
         })
     }
+
+    pub fn new_incompatible_sequential_type_with_static_default_value_error(
+        native_type: &str,
+        connector_name: &str,
+    ) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::IncompatibleSequentialTypeWithStaticDefaultValue {
+            native_type: String::from(native_type),
+            connector_name: String::from(connector_name),
+        })
+    }
+
+    pub fn new_argument_m_out_of_range_error(message: &str, native_type: &str, connector_name: &str) -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::ArgumentOutOfRangeError {
+            native_type: String::from(native_type),
+            connector_name: String::from(connector_name),
+            message: String::from(message),
+        })
+    }
 }
 
 #[derive(Debug, Error, Clone)]
@@ -186,5 +204,27 @@ pub enum ErrorKind {
     ScaleLargerThanPrecisionError {
         native_type: String,
         connector_name: String,
+    },
+
+    #[error(
+        "Sequential native type {} of {} must not have a static default value.",
+        native_type,
+        connector_name
+    )]
+    IncompatibleSequentialTypeWithStaticDefaultValue {
+        native_type: String,
+        connector_name: String,
+    },
+
+    #[error(
+        "Argument M is out of range for Native type {} of {}: {}",
+        native_type,
+        connector_name,
+        message
+    )]
+    ArgumentOutOfRangeError {
+        native_type: String,
+        connector_name: String,
+        message: String,
     },
 }

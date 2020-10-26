@@ -17,6 +17,10 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
         }
     }
 
+    fn should_drop_indexes_from_dropped_tables(&self) -> bool {
+        true
+    }
+
     fn tables_to_redefine(&self, differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
         differ
             .table_pairs()

@@ -47,14 +47,21 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             }
         }
 
+        fn render_decimal(input: Option<(u32, u32)>) -> String {
+            match input {
+                None => "".to_string(),
+                Some((precision, scale)) => format!("({}, {})", precision, scale),
+            }
+        }
+
         let data_type: String = match mysql_type {
             MySqlType::Int => "INTEGER".into(),
             MySqlType::SmallInt => "SMALLINT".into(),
             MySqlType::TinyInt => "TINYINT".into(),
             MySqlType::MediumInt => "MEDIUMINT".into(),
             MySqlType::BigInt => "BIGINT".into(),
-            MySqlType::Decimal(precision, scale) => format!("DECIMAL({}, {})", precision, scale),
-            MySqlType::Numeric(precision, scale) => format!("NUMERIC({}, {})", precision, scale),
+            MySqlType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)),
+            MySqlType::Numeric(precision) => format!("NUMERIC{}", render_decimal(precision)),
             MySqlType::Float => "FLOAT".into(),
             MySqlType::Double => "DOUBLE".into(),
             MySqlType::Bit(size) => format!("BIT({size})", size = size),

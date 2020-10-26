@@ -174,7 +174,7 @@ impl SqlMigrationConnector {
                         }
 
                         for (previous_column_index, next_column_index, changes, type_change) in
-                            redefine_table.intersection_columns()
+                            redefine_table.column_pairs.iter()
                         {
                             let previous = previous.column_at(*previous_column_index);
                             let next = next.column_at(*next_column_index);

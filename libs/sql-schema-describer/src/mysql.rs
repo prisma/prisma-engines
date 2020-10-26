@@ -3,9 +3,11 @@ use crate::getters::Getter;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint, Value};
 use serde_json::from_str;
-use std::borrow::Cow;
-use std::collections::{BTreeMap, HashMap, HashSet};
-use tracing::debug;
+use std::{
+    borrow::Cow,
+    collections::{BTreeMap, HashMap, HashSet},
+};
+use tracing::trace;
 
 fn is_mariadb(version: &str) -> bool {
     version.contains("MariaDB")
@@ -32,33 +34,33 @@ pub struct SqlSchemaDescriber {
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
-    async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        let databases = self.get_databases().await;
-        Ok(databases)
+    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
+        self.get_databases().await
     }
 
-    async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
-        let count = self.get_table_names(&schema).await.len();
-        let size = self.get_size(&schema).await;
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata> {
+        let table_count = self.get_table_names(&schema).await?.len();
+        let size_in_bytes = self.get_size(&schema).await?;
+
         Ok(SQLMetadata {
-            table_count: count,
-            size_in_bytes: size,
+            table_count,
+            size_in_bytes,
         })
     }
 
-    async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
-        debug!("describing schema '{}'", schema);
+    #[tracing::instrument(skip(self))]
+    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let version = self.conn.version().await.ok().flatten();
         let flavour = version
             .as_ref()
             .map(|s| Flavour::from_version(s))
             .unwrap_or(Flavour::Mysql);
 
-        let table_names = self.get_table_names(schema).await;
+        let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = get_all_columns(&self.conn, schema, &flavour).await;
-        let mut indexes = get_all_indexes(&self.conn, schema).await;
-        let mut fks = get_foreign_keys(&self.conn, schema).await;
+        let mut columns = get_all_columns(&self.conn, schema, &flavour).await?;
+        let mut indexes = get_all_indexes(&self.conn, schema).await?;
+        let mut fks = get_foreign_keys(&self.conn, schema).await?;
 
         let mut enums = vec![];
         for table_name in &table_names {
@@ -74,9 +76,9 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         })
     }
 
-    async fn version(&self, schema: &str) -> crate::SqlSchemaDescriberResult<Option<String>> {
-        debug!("getting db version '{}'", schema);
-        Ok(self.conn.version().await.unwrap())
+    #[tracing::instrument(skip(self))]
+    async fn version(&self, schema: &str) -> crate::DescriberResult<Option<String>> {
+        Ok(self.conn.version().await?)
     }
 }
 
@@ -86,51 +88,49 @@ impl SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
-    async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting databases");
+    #[tracing::instrument(skip(self))]
+    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
+        let rows = self.conn.query_raw(sql, &[]).await?;
         let names = rows
             .into_iter()
             .map(|row| row.get_expect_string("schema_name"))
             .collect();
 
-        debug!("Found schema names: {:?}", names);
-        names
+        trace!("Found schema names: {:?}", names);
+
+        Ok(names)
     }
 
-    async fn get_table_names(&self, schema: &str) -> Vec<String> {
-        debug!("Getting table names");
+    #[tracing::instrument(skip(self))]
+    async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
         let sql = "SELECT table_name as table_name FROM information_schema.tables
             WHERE table_schema = ?
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
             ORDER BY table_name";
-        let rows = self
-            .conn
-            .query_raw(sql, &[schema.into()])
-            .await
-            .expect("get table names ");
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let names = rows
             .into_iter()
             .map(|row| row.get_expect_string("table_name"))
             .collect();
 
-        debug!("Found table names: {:?}", names);
-        names
+        trace!("Found table names: {:?}", names);
+
+        Ok(names)
     }
 
-    async fn get_size(&self, schema: &str) -> usize {
+    #[tracing::instrument(skip(self))]
+    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
         use rust_decimal::prelude::*;
 
-        debug!("Getting db size");
         let sql = r#"
             SELECT
             SUM(data_length + index_length) as size
             FROM information_schema.TABLES
             WHERE table_schema = ?
         "#;
-        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
+        let result = self.conn.query_raw(sql, &[schema.into()]).await?;
         let size = result
             .first()
             .and_then(|row| {
@@ -140,10 +140,12 @@ impl SqlSchemaDescriber {
             })
             .unwrap_or(0);
 
-        debug!("Found db size: {:?}", size);
-        size as usize
+        trace!("Found db size: {:?}", size);
+
+        Ok(size as usize)
     }
 
+    #[tracing::instrument(skip(self, columns, indexes, foreign_keys))]
     fn get_table(
         &self,
         name: &str,
@@ -151,11 +153,11 @@ impl SqlSchemaDescriber {
         indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
         foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
     ) -> (Table, Vec<Enum>) {
-        debug!("Getting table '{}'", name);
         let (columns, enums) = columns.remove(name).expect("table columns not found");
         let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
 
         let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
+
         (
             Table {
                 name: name.to_string(),
@@ -173,7 +175,7 @@ async fn get_all_columns(
     conn: &dyn Queryable,
     schema_name: &str,
     flavour: &Flavour,
-) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
+) -> DescriberResult<HashMap<String, (Vec<Column>, Vec<Enum>)>> {
     // We alias all the columns because MySQL column names are case-insensitive in queries, but the
     // information schema column names became upper-case in MySQL 8, causing the code fetching
     // the result values by column name below to fail.
@@ -197,13 +199,10 @@ async fn get_all_columns(
 
     let mut map = HashMap::new();
 
-    let rows = conn
-        .query_raw(sql, &[schema_name.into()])
-        .await
-        .expect("querying for columns");
+    let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
     for col in rows {
-        debug!("Got column: {:?}", col);
+        trace!("Got column: {:?}", col);
         let table_name = col.get_expect_string("table_name");
         let name = col.get_expect_string("column_name");
         let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
@@ -223,14 +222,13 @@ async fn get_all_columns(
         };
 
         let character_maximum_length = col.get_u32("character_maximum_length");
+        let time_precision = col.get_u32("datetime_precision");
         let numeric_precision = col.get_u32("numeric_precision");
         let numeric_scale = col.get_u32("numeric_scale");
-        let time_precision = col.get_u32("datetime_precision");
 
         let precision = Precision {
             character_maximum_length,
             numeric_precision,
-            numeric_precision_radix: None,
             numeric_scale,
             time_precision,
         };
@@ -310,13 +308,13 @@ async fn get_all_columns(
         entry.0.push(col);
     }
 
-    map
+    Ok(map)
 }
 
 async fn get_all_indexes(
     conn: &dyn Queryable,
     schema_name: &str,
-) -> HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)> {
+) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
     let mut map = HashMap::new();
     let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
 
@@ -334,13 +332,10 @@ async fn get_all_indexes(
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
-    let rows = conn
-        .query_raw(sql, &[schema_name.into()])
-        .await
-        .expect("querying for indices");
+    let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
     for row in rows {
-        debug!("Got index row: {:#?}", row);
+        trace!("Got index row: {:#?}", row);
         let table_name = row.get_expect_string("table_name");
         let index_name = row.get_expect_string("index_name");
         match row.get_string("column_name") {
@@ -357,20 +352,20 @@ async fn get_all_indexes(
 
                 let is_pk = index_name.to_lowercase() == "primary";
                 if is_pk {
-                    debug!("Column '{}' is part of the primary key", column_name);
+                    trace!("Column '{}' is part of the primary key", column_name);
                     match primary_key {
                         Some(pk) => {
                             if pk.columns.len() < (pos + 1) as usize {
                                 pk.columns.resize((pos + 1) as usize, "".to_string());
                             }
                             pk.columns[pos as usize] = column_name;
-                            debug!(
+                            trace!(
                                 "The primary key has already been created, added column to it: {:?}",
                                 pk.columns
                             );
                         }
                         None => {
-                            debug!("Instantiating primary key");
+                            trace!("Instantiating primary key");
 
                             primary_key.replace(PrimaryKey {
                                 columns: vec![column_name],
@@ -411,10 +406,13 @@ async fn get_all_indexes(
         }
     }
 
-    map
+    Ok(map)
 }
 
-async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, Vec<ForeignKey>> {
+async fn get_foreign_keys(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
     // Foreign keys covering multiple columns will return multiple rows, which we need to
     // merge.
     let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
@@ -447,13 +445,10 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
         ORDER BY ordinal_position
     ";
 
-    let result_set = conn
-        .query_raw(sql, &[schema_name.into(), schema_name.into()])
-        .await
-        .expect("querying for foreign keys");
+    let result_set = conn.query_raw(sql, &[schema_name.into(), schema_name.into()]).await?;
 
     for row in result_set.into_iter() {
-        debug!("Got description FK row {:#?}", row);
+        trace!("Got description FK row {:#?}", row);
         let table_name = row.get_expect_string("table_name");
         let constraint_name = row.get_expect_string("constraint_name");
         let column = row.get_expect_string("column_name");
@@ -505,7 +500,8 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
         };
     }
 
-    map.into_iter()
+    let fks = map
+        .into_iter()
         .map(|(k, v)| {
             let mut fks: Vec<ForeignKey> = v.into_iter().map(|(_k, v)| v).collect();
 
@@ -513,7 +509,9 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
 
             (k, fks)
         })
-        .collect()
+        .collect();
+
+    Ok(fks)
 }
 
 fn get_column_type_and_enum(
@@ -550,28 +548,28 @@ fn get_column_type_and_enum(
         "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
         "decimal" => (
             ColumnTypeFamily::Decimal,
-            Some(MySqlType::Decimal(
-                precision.numeric_precision(),
-                precision.numeric_scale(),
-            )),
+            Some(MySqlType::Decimal(Some((
+                precision.numeric_precision.unwrap(),
+                precision.numeric_scale.unwrap(),
+            )))),
         ),
         "numeric" => (
             ColumnTypeFamily::Decimal,
-            Some(MySqlType::Numeric(
-                precision.numeric_precision(),
-                precision.numeric_scale(),
-            )),
+            Some(MySqlType::Numeric(Some((
+                precision.numeric_precision.unwrap(),
+                precision.numeric_scale.unwrap(),
+            )))),
         ),
         "float" => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
         "double" => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
 
         "char" => (
             ColumnTypeFamily::String,
-            Some(MySqlType::Char(precision.character_max_length())),
+            Some(MySqlType::Char(precision.character_maximum_length.unwrap())),
         ),
         "varchar" => (
             ColumnTypeFamily::String,
-            Some(MySqlType::VarChar(precision.character_max_length())),
+            Some(MySqlType::VarChar(precision.character_maximum_length.unwrap())),
         ),
         "text" => (ColumnTypeFamily::String, Some(MySqlType::Text)),
         "tinytext" => (ColumnTypeFamily::String, Some(MySqlType::TinyText)),
@@ -585,29 +583,29 @@ fn get_column_type_and_enum(
         "time" => (
             //Fixme this can either be a time or a duration -.-
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::Time(precision.time_precision())),
+            Some(MySqlType::Time(precision.time_precision)),
         ),
         "datetime" => (
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::DateTime(precision.time_precision())),
+            Some(MySqlType::DateTime(precision.time_precision)),
         ),
         "timestamp" => (
             ColumnTypeFamily::DateTime,
-            Some(MySqlType::Timestamp(precision.time_precision())),
+            Some(MySqlType::Timestamp(precision.time_precision)),
         ),
         "year" => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
         //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
         "bit" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::Bit(precision.numeric_precision())),
+            Some(MySqlType::Bit(precision.numeric_precision.unwrap())),
         ),
         "binary" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::Binary(precision.character_max_length())),
+            Some(MySqlType::Binary(precision.character_maximum_length.unwrap())),
         ),
         "varbinary" => (
             ColumnTypeFamily::Binary,
-            Some(MySqlType::VarBinary(precision.character_max_length())),
+            Some(MySqlType::VarBinary(precision.character_maximum_length.unwrap())),
         ),
         "blob" => (ColumnTypeFamily::Binary, Some(MySqlType::Blob)),
         "tinyblob" => (ColumnTypeFamily::Binary, Some(MySqlType::TinyBlob)),

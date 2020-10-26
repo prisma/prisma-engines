@@ -3,17 +3,12 @@
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
-use fmt::Display;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use std::{
-    error::Error,
-    fmt::{self, Debug},
-    str::FromStr,
-};
+use std::{fmt, str::FromStr};
 use tracing::debug;
 use walkers::TableWalker;
 
@@ -24,38 +19,24 @@ pub mod postgres;
 pub mod sqlite;
 pub mod walkers;
 
-/// description errors.
-#[derive(Debug)]
-pub enum SqlSchemaDescriberError {
-    /// An unknown error occurred.
-    UnknownError,
-}
+mod error;
 
-impl Display for SqlSchemaDescriberError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "unknown")
-    }
-}
-
-impl Error for SqlSchemaDescriberError {}
-
-/// The result type.
-pub type SqlSchemaDescriberResult<T> = core::result::Result<T, SqlSchemaDescriberError>;
+pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
 
 /// A database description connector.
 #[async_trait::async_trait]
 pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     /// List the database's schemas.
-    async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>>;
+    async fn list_databases(&self) -> DescriberResult<Vec<String>>;
 
     /// Get the databases metadata.
-    async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata>;
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata>;
 
     /// Describe a database schema.
-    async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema>;
+    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema>;
 
     /// Get the database version.
-    async fn version(&self, schema: &str) -> SqlSchemaDescriberResult<Option<String>>;
+    async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
 }
 
 #[derive(Serialize, Deserialize)]
@@ -550,36 +531,8 @@ pub fn unquote_string(val: &str) -> String {
 struct Precision {
     character_maximum_length: Option<u32>,
     numeric_precision: Option<u32>,
-    numeric_precision_radix: Option<u32>,
     numeric_scale: Option<u32>,
     time_precision: Option<u32>,
-}
-
-impl Precision {
-    fn numeric_precision(&self) -> u32 {
-        // Fixme
-        // Do we need to express radix?
-        // base 10 for numeric types usually
-        // base 2 for bits usually
-        // on Postgres `decimal_column decimal` will not return precision
-        // on Postgres `decimal_array_column decimal(30,5)[]` will also not return numeric precision since none is specified
-        // workaround https://stackoverflow.com/questions/57336645/how-to-get-array-elements-numeric-precision-numeric-scale-and-datetime-pr
-        self.numeric_precision.unwrap_or(65)
-    }
-
-    fn character_max_length(&self) -> u32 {
-        // on Postgres `char_array_column char(8)[]` will also not return character_max_length
-        self.character_maximum_length.unwrap_or(64000)
-    }
-
-    fn numeric_scale(&self) -> u32 {
-        // see numeric precision
-        self.numeric_scale.unwrap_or(30)
-    }
-
-    fn time_precision(&self) -> Option<u32> {
-        self.time_precision
-    }
 }
 
 #[cfg(test)]

@@ -136,7 +136,7 @@ services:
     tmpfs: /var/lib/mariadb
 
   mssql-2019:
-    image: prismagraphql/build:mssql-2019
+    image: mcr.microsoft.com/mssql/server:2019-latest
     restart: always
     environment:
       ACCEPT_EULA: Y
@@ -145,10 +145,9 @@ services:
       - "1433:1433"
     networks:
       - databases
-    tmpfs: /var/opt/mssql/data:size=1G
 
   mssql-2017:
-    image: prismagraphql/build:mssql-2017
+    image: mcr.microsoft.com/mssql/server:2017-latest
     restart: always
     environment:
       ACCEPT_EULA: Y
@@ -157,7 +156,6 @@ services:
       - "1434:1433"
     networks:
       - databases
-    tmpfs: /var/opt/mssql/data:size=1G
 
 networks:
   databases:

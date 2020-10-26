@@ -8,7 +8,7 @@ version = "0.1.0"
 datamodel-connector = {path = "../connectors/datamodel-connector"}
 dml = {path = "../connectors/dml"}
 prisma-value = {path = "../../prisma-value"}
-rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
+rust_decimal = "1.8.1"
 sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
 # Temporary until PR is accepted.
 bytecount = "0.5"

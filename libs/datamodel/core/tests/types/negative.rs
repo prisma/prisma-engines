@@ -152,17 +152,15 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
         model Blog {
             id     Int    @id
             bigInt Int    @pg.BigInt
-            foobar String @pg.VarChar()
+            foobar String @pg.VarChar(2, 3, 4)
         }
     "#;
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_argument_count_missmatch_error(
-        "VarChar",
-        1,
-        0,
-        ast::Span::new(337, 349),
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type VarChar takes 1 optional arguments, but received 3.",
+        ast::Span::new(337, 356),
     ));
 }
 
