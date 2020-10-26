@@ -604,9 +604,9 @@ dependencies = [
 
 [[package]]
 name = "connection-string"
-version = "0.1.6"
+version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d672ca0b0ad00e87bf383a2c68e76dc4408d198473fd221c44605f0e37af118"
+checksum = "4792f31bcb812a45b6776af34a2dc1d70d38fb93ab6f74548796afe43988eae9"
 
 [[package]]
 name = "const-random"
@@ -2812,6 +2812,7 @@ dependencies = [
  "async-trait",
  "base64 0.12.3",
  "chrono",
+ "connection-string",
  "datamodel",
  "datamodel-connector",
  "feature-flags",
@@ -3552,6 +3553,7 @@ dependencies = [
 name = "test-setup"
 version = "0.1.0"
 dependencies = [
+ "connection-string",
  "enumflags2",
  "once_cell",
  "quaint",

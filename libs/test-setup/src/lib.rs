@@ -18,7 +18,7 @@ use crate::connectors::Tags;
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
-use std::collections::BTreeMap;
+use std::str::FromStr;
 use url::Url;
 
 type AnyError = Box<dyn std::error::Error + Send + Sync>;
@@ -530,26 +530,27 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
     Ok(conn)
 }
 
+/// Create an MSSQL database from a JDBC connection string..
 pub async fn create_mssql_database(jdbc_string: &str) -> Result<Quaint, AnyError> {
-    let mut splitted = jdbc_string.split(';');
-    let uri = splitted.next().unwrap().to_string();
+    let mut conn = connection_string::JdbcString::from_str(jdbc_string)?;
 
-    let mut params: BTreeMap<String, String> = splitted
-        .map(|kv| kv.split('='))
-        .map(|mut kv| {
-            let key = kv.next().unwrap().to_string();
-            let value = kv.next().unwrap().to_string();
+    let server_name = conn
+        .server_name()
+        .expect("failed to get a server name from the connection string")
+        .to_owned();
 
-            (key, value)
-        })
-        .collect();
+    let host = match conn.instance_name() {
+        Some(instance_name) => format!(r#"{}\{}"#, server_name, instance_name),
+        None => server_name.to_owned(),
+    };
 
+    let params = conn.properties_mut();
     match params.remove("database") {
         Some(ref db_name) if db_name != "master" => {
             params.insert("database".into(), "master".into());
 
             let params: Vec<_> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
-            let conn_str = format!("{};{}", uri, params.join(";"));
+            let conn_str = format!("{};{}", host, params.join(";"));
 
             let conn = Quaint::new(conn_str.as_str()).await?;
 
