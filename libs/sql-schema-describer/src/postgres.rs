@@ -231,23 +231,17 @@ impl SqlSchemaDescriber {
 
                 let formatted_type = col.get_expect_string("formatted_type");
                 let fdt = col.get_expect_string("full_data_type");
-                let char_max_length = if matches!(fdt.as_str(), "_bpchar" | "_varchar" | "_bit" | "_varbit") {
-                    get_single(&formatted_type)
-                } else {
-                    None
+                let char_max_length = match fdt.as_str() {
+                    "_bpchar" | "_varchar" | "_bit" | "_varbit" => get_single(&formatted_type),
+                    _ => None,
                 };
-                let (num_precision, num_scale) = if matches!(fdt.as_str(), "_numeric") {
-                    get_dual(&formatted_type)
-                } else {
-                    (None, None)
+                let (num_precision, num_scale) = match fdt.as_str() {
+                    "_numeric" => get_dual(&formatted_type),
+                    _ => (None, None),
                 };
-                let time = if matches!(
-                    fdt.as_str(),
-                    "_timestamptz" | "_timestamp" | "_timetz" | "_time" | "_interval"
-                ) {
-                    get_single(&formatted_type)
-                } else {
-                    None
+                let time = match fdt.as_str() {
+                    "_timestamptz" | "_timestamp" | "_timetz" | "_time" | "_interval" => get_single(&formatted_type),
+                    _ => None,
                 };
 
                 (char_max_length, num_precision, num_scale, time)
@@ -674,7 +668,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     };
 
     let precision = SqlSchemaDescriber::get_precision(&row);
-    let unsupported = || (Unsupported(full_data_type.clone()), None);
+    let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_exists = |name| enums.iter().any(|e| e.name == name);
 
     let (family, native_type) = match full_data_type.as_str() {
@@ -713,7 +707,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
             )),
         ),
         "money" | "_money" => (Float, None),
-        "pg_lsn" | "_pg_lsn" => unsupported(),
+        "pg_lsn" | "_pg_lsn" => unsupported_type(),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
         "timetz" | "_timetz" => (DateTime, Some(PostgresType::TimeWithTimeZone(precision.time_precision))),
         "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision))),
@@ -722,18 +716,18 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
             DateTime,
             Some(PostgresType::TimestampWithTimeZone(precision.time_precision)),
         ),
-        "tsquery" | "_tsquery" => unsupported(),
-        "tsvector" | "_tsvector" => unsupported(),
-        "txid_snapshot" | "_txid_snapshot" => unsupported(),
+        "tsquery" | "_tsquery" => unsupported_type(),
+        "tsvector" | "_tsvector" => unsupported_type(),
+        "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
         "inet" | "_inet" => (String, None),
         //geometric
-        "box" | "_box" => unsupported(),
-        "circle" | "_circle" => unsupported(),
-        "line" | "_line" => unsupported(),
-        "lseg" | "_lseg" => unsupported(),
-        "path" | "_path" => unsupported(),
-        "polygon" | "_polygon" => unsupported(),
-        _ => unsupported(),
+        "box" | "_box" => unsupported_type(),
+        "circle" | "_circle" => unsupported_type(),
+        "line" | "_line" => unsupported_type(),
+        "lseg" | "_lseg" => unsupported_type(),
+        "path" | "_path" => unsupported_type(),
+        "polygon" | "_polygon" => unsupported_type(),
+        _ => unsupported_type(),
     };
 
     ColumnType {
