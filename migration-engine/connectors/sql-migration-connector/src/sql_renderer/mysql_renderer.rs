@@ -21,8 +21,6 @@ use sql_schema_describer::{
 };
 use std::borrow::Cow;
 
-const VARCHAR_LENGTH_PREFIX: &str = "(191)";
-
 impl SqlRenderer for MysqlFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::Backticks(name)
@@ -399,7 +397,7 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
         ColumnTypeFamily::Int => "int".into(),
         // we use varchar right now as mediumtext doesn't allow default values
         // a bigger length would not allow to use such a column as primary key
-        ColumnTypeFamily::String => format!("varchar{}", VARCHAR_LENGTH_PREFIX).into(),
+        ColumnTypeFamily::String => "longtext".into(),
         ColumnTypeFamily::Enum(enum_name) => {
             let r#enum = column
                 .schema()
