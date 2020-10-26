@@ -1,43 +1,6 @@
 use super::*;
 use prisma_models::dml::DefaultValue;
 
-/// Builds "<x>CreateOrConnectNestedInput" input object types.
-pub(crate) fn nested_connect_or_create_input_object(
-    ctx: &mut BuilderContext,
-    parent_field: &RelationFieldRef,
-) -> Option<InputObjectTypeWeakRef> {
-    let related_model = parent_field.related_model();
-
-    let where_object = filter_input_objects::where_unique_object_type(ctx, &related_model);
-    let create_object = create_input_type(ctx, &related_model, Some(parent_field));
-
-    if where_object.into_arc().is_empty() {
-        return None;
-    }
-
-    let type_name = format!(
-        "{}CreateOrConnectWithout{}Input",
-        related_model.name,
-        parent_field.model().name
-    );
-
-    match ctx.get_input_type(&type_name) {
-        None => {
-            let input_object = Arc::new(init_input_object_type(type_name.clone()));
-            ctx.cache_input_type(type_name, input_object.clone());
-
-            let fields = vec![
-                input_field("where", InputType::object(where_object), None),
-                input_field("create", InputType::object(create_object), None),
-            ];
-
-            input_object.set_fields(fields);
-            Some(Arc::downgrade(&input_object))
-        }
-        x => x,
-    }
-}
-
 /// Builds the create input type (<x>CreateInput / <x>CreateWithout<y>Input)
 pub(crate) fn create_input_type(
     ctx: &mut BuilderContext,
@@ -153,4 +116,41 @@ fn relation_input_fields_for_create(
 
 fn field_should_be_kept_for_create_input_type(field: &ScalarFieldRef) -> bool {
     !field.is_auto_generated_int_id
+}
+
+/// Builds "<x>CreateOrConnectNestedInput" input object types.
+pub(crate) fn nested_connect_or_create_input_object(
+    ctx: &mut BuilderContext,
+    parent_field: &RelationFieldRef,
+) -> Option<InputObjectTypeWeakRef> {
+    let related_model = parent_field.related_model();
+
+    let where_object = filter_input_objects::where_unique_object_type(ctx, &related_model);
+    let create_object = create_input_type(ctx, &related_model, Some(parent_field));
+
+    if where_object.into_arc().is_empty() {
+        return None;
+    }
+
+    let type_name = format!(
+        "{}CreateOrConnectWithout{}Input",
+        related_model.name,
+        parent_field.model().name
+    );
+
+    match ctx.get_input_type(&type_name) {
+        None => {
+            let input_object = Arc::new(init_input_object_type(type_name.clone()));
+            ctx.cache_input_type(type_name, input_object.clone());
+
+            let fields = vec![
+                input_field("where", InputType::object(where_object), None),
+                input_field("create", InputType::object(create_object), None),
+            ];
+
+            input_object.set_fields(fields);
+            Some(Arc::downgrade(&input_object))
+        }
+        x => x,
+    }
 }
