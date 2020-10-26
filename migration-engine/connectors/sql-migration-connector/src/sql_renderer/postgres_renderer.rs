@@ -421,7 +421,7 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
     match &t.family {
         ColumnTypeFamily::Boolean => format!("boolean {}", array),
         ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),
-        ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
+        ColumnTypeFamily::Float => format!("float {}", array),
         ColumnTypeFamily::Decimal => format!("Decimal(65,30) {}", array),
         ColumnTypeFamily::Int => format!("integer {}", array),
         ColumnTypeFamily::String => format!("text {}", array),

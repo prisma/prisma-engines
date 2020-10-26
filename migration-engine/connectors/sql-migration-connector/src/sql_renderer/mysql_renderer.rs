@@ -394,7 +394,7 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
     match &column.column_type().family {
         ColumnTypeFamily::Boolean => "boolean".into(),
         ColumnTypeFamily::DateTime => "datetime(3)".into(),
-        ColumnTypeFamily::Float => "decimal(65,30)".into(),
+        ColumnTypeFamily::Float => "float".into(),
         ColumnTypeFamily::Decimal => "decimal(65,30)".into(),
         ColumnTypeFamily::Int => "int".into(),
         // we use varchar right now as mediumtext doesn't allow default values
