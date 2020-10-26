@@ -8,7 +8,7 @@ class XmlSpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = ProjectDsl.fromString {
       """|model Model {
          | id    Int  @id
-         | field Xml? @default("<sense>none</sense>")
+         | field String? @default("<sense>none</sense>")
          |}"""
     }
 

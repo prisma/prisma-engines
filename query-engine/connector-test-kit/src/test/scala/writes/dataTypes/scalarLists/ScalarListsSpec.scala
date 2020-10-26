@@ -21,7 +21,7 @@ class ScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
       |  enums     MyEnum[]
       |  dateTimes DateTime[]
       |  bytes     Bytes[]
-      |  xmls      Xml[]
+      |  xmls      String[]
       |}
       |
       |enum MyEnum {

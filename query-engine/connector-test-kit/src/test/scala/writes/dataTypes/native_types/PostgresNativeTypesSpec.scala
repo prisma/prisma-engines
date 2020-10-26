@@ -146,7 +146,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  id    String  @id @default(cuid())
         |  bool  Boolean @test.Boolean
         |  byteA Bytes   @test.ByteA
-        |  xml   Xml     @test.Xml
+        |  xml   String  @test.Xml
         |  json  Json    @test.Json
         |  jsonb Json    @test.JsonB
         |}"""
