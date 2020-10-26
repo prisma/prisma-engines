@@ -38,7 +38,12 @@ fn should_fail_on_colliding_implicit_self_relations() {
 "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_field_validation_error("", "User", "userId", Span::new(3, 4)));
+    errors.assert_is(DatamodelError::new_field_validation_error(
+        "",
+        "User",
+        "userId",
+        Span::new(3, 4),
+    ));
 
     //errors.assert_is(DatamodelError::new_model_validation_error("", "User", Span::new(3, 4)));
 }

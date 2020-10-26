@@ -6,7 +6,7 @@ use crate::{
     diagnostics::Diagnostics,
     dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -36,17 +36,21 @@ impl Standardiser {
     /// For any relations which are missing to_fields, sets them to the @id fields
     /// of the foreign model.
     /// Also adds missing underlying scalar fields.
-    fn set_relation_to_field_to_id_if_missing(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics>  {
+    fn set_relation_to_field_to_id_if_missing(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        schema: &mut dml::Datamodel,
+    ) -> Result<(), Diagnostics> {
         let mut errors = Diagnostics::new();
         let schema_copy = schema.clone();
-
 
         // Iterate and mutate models.
         for model in schema.models_mut() {
             let cloned_model = model.clone();
-            let mut set = HashSet::new();
 
             let mut fields_to_add = vec![];
+            let mut missing_field_names_to_field_names = HashMap::new();
+            let mut underlying_field_name = "";
             for field in model.fields_mut() {
                 if let Field::RelationField(field) = field {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
@@ -91,21 +95,37 @@ impl Standardiser {
                             rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
 
                             for underlying_field in underlying_fields {
-                                let cloned_underlying_field = underlying_field.clone();
-                                if set.contains(cloned_underlying_field.name.as_str()) {
-                                    errors.push_error(field_validation_error(&format!("Automated underlying scalar field generation would cause duplicates. Please separate scalar field for {}", format!("{}id", field.name)), &cloned_model, &Field::ScalarField(cloned_underlying_field.clone()), &ast_schema));
-                                } else {
-                                    set.insert(cloned_underlying_field.name.as_str());
-                                }
+                                underlying_field_name = underlying_field.clone().name.as_str();
+                                let t = missing_field_names_to_field_names
+                                    .entry(underlying_field_name)
+                                    .or_insert(vec![field.name.as_str()]);
+                                t.push(field.name.as_str());
                                 fields_to_add.push(Field::ScalarField(underlying_field));
                             }
                         }
                     }
                 }
             }
-
             for field in fields_to_add {
-                model.add_field(field);
+                match missing_field_names_to_field_names.get(field.name()) {
+                    Some(field_names) if field_names.len() > 1 => {
+                        let model_span = ast_schema
+                            .find_model(cloned_model.name.as_str())
+                            .expect(ERROR_GEN_STATE_ERROR)
+                            .span;
+                        errors.push_error(DatamodelError::new_model_validation_error(
+                            format!(
+                                "Colliding implicit relations. Please add scalar types {}.",
+                                field_names.join(", and")
+                            )
+                            .as_str(),
+                            cloned_model.name.as_str(),
+                            model_span,
+                        ));
+                    }
+                    Some(_) => model.add_field(field),
+                    None => {}
+                }
             }
         }
 
