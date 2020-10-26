@@ -88,6 +88,7 @@ impl ConnectionInfo {
             }
             #[cfg(feature = "postgresql")]
             SqlFamily::Postgres => Ok(ConnectionInfo::Postgres(PostgresUrl::new(url)?)),
+            #[allow(unreachable_patterns)]
             _ => unreachable!(),
         }
     }
@@ -200,6 +201,7 @@ impl ConnectionInfo {
 
     /// Whether the pgbouncer mode is enabled.
     pub fn pg_bouncer(&self) -> bool {
+        #[allow(unreachable_patterns)]
         match self {
             #[cfg(feature = "postgresql")]
             ConnectionInfo::Postgres(url) => url.pg_bouncer(),
@@ -276,9 +278,19 @@ impl SqlFamily {
         matches!(self, SqlFamily::Postgres)
     }
 
+    #[cfg(not(feature = "postgresql"))]
+    pub fn is_postgres(&self) -> bool {
+        false
+    }
+
     #[cfg(feature = "mysql")]
     pub fn is_mysql(&self) -> bool {
         matches!(self, SqlFamily::Mysql)
+    }
+
+    #[cfg(not(feature = "mysql"))]
+    pub fn is_mysql(&self) -> bool {
+        false
     }
 
     #[cfg(feature = "sqlite")]
@@ -286,9 +298,19 @@ impl SqlFamily {
         matches!(self, SqlFamily::Sqlite)
     }
 
+    #[cfg(not(feature = "sqlite"))]
+    pub fn is_sqlite(&self) -> bool {
+        false
+    }
+
     #[cfg(feature = "mssql")]
     pub fn is_mssql(&self) -> bool {
         matches!(self, SqlFamily::Mssql)
+    }
+
+    #[cfg(not(feature = "mssql"))]
+    pub fn is_mssql(&self) -> bool {
+        false
     }
 }
 
@@ -308,9 +330,11 @@ mod tests {
     fn sqlite_connection_info_from_str_interprets_relative_path_correctly() {
         let conn_info = ConnectionInfo::from_url("file:dev.db").unwrap();
 
-        match conn_info {
-            ConnectionInfo::Sqlite { file_path, db_name: _ } => assert_eq!(file_path, "dev.db"),
-            _ => panic!("wrong"),
+        #[allow(irrefutable_let_patterns)]
+        if let ConnectionInfo::Sqlite { file_path, db_name: _ } = conn_info {
+            assert_eq!(file_path, "dev.db");
+        } else {
+            panic!("Wrong type of connection info, should be Sqlite");
         }
     }
 
@@ -319,14 +343,14 @@ mod tests {
     fn mysql_connection_info_from_str() {
         let conn_info = ConnectionInfo::from_url("mysql://myuser:my%23pass%23word@lclhst:5432/mydb").unwrap();
 
-        match conn_info {
-            ConnectionInfo::Mysql(url) => {
-                assert_eq!(url.password().unwrap(), "my#pass#word");
-                assert_eq!(url.host(), "lclhst");
-                assert_eq!(url.username(), "myuser");
-                assert_eq!(url.dbname(), "mydb");
-            }
-            _ => panic!("wrong"),
+        #[allow(irrefutable_let_patterns)]
+        if let ConnectionInfo::Mysql(url) = conn_info {
+            assert_eq!(url.password().unwrap(), "my#pass#word");
+            assert_eq!(url.host(), "lclhst");
+            assert_eq!(url.username(), "myuser");
+            assert_eq!(url.dbname(), "mydb");
+        } else {
+            panic!("Wrong type of connection info, should be Mysql");
         }
     }
 }

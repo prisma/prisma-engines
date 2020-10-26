@@ -3,7 +3,7 @@ use crate::{
     connector::{queryable::TakeRow, TypeIdentifier},
     error::{Error, ErrorKind},
 };
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
 use mysql_async::{
     self as my,
@@ -44,7 +44,7 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
 
                     return Err(builder.build());
                 }
-                #[cfg(feature = "json-1")]
+                #[cfg(feature = "json")]
                 Value::Json(s) => match s {
                     Some(ref s) => {
                         let json = serde_json::to_string(s)?;
@@ -54,17 +54,17 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
                     }
                     None => None,
                 },
-                #[cfg(feature = "uuid-0_8")]
+                #[cfg(feature = "uuid")]
                 Value::Uuid(u) => u.map(|u| my::Value::Bytes(u.to_hyphenated().to_string().into_bytes())),
-                #[cfg(feature = "chrono-0_4")]
+                #[cfg(feature = "chrono")]
                 Value::Date(d) => {
                     d.map(|d| my::Value::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0))
                 }
-                #[cfg(feature = "chrono-0_4")]
+                #[cfg(feature = "chrono")]
                 Value::Time(t) => {
                     t.map(|t| my::Value::Time(false, 0, t.hour() as u8, t.minute() as u8, t.second() as u8, 0))
                 }
-                #[cfg(feature = "chrono-0_4")]
+                #[cfg(feature = "chrono")]
                 Value::DateTime(dt) => dt.map(|dt| {
                     my::Value::Date(
                         dt.year() as u16,
@@ -199,7 +199,7 @@ impl TakeRow for my::Row {
 
             let res = match value {
                 // JSON is returned as bytes.
-                #[cfg(feature = "json-1")]
+                #[cfg(feature = "json")]
                 my::Value::Bytes(b) if column.is_json() => {
                     serde_json::from_slice(&b).map(Value::json).map_err(|_| {
                         let msg = "Unable to convert bytes to JSON";
@@ -243,7 +243,7 @@ impl TakeRow for my::Row {
                 })?),
                 my::Value::Float(f) => Value::from(f),
                 my::Value::Double(f) => Value::from(f),
-                #[cfg(feature = "chrono-0_4")]
+                #[cfg(feature = "chrono")]
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
                     if day == 0 || month == 0 {
                         let msg = format!(
@@ -261,7 +261,7 @@ impl TakeRow for my::Row {
 
                     Value::datetime(DateTime::<Utc>::from_utc(dt, Utc))
                 }
-                #[cfg(feature = "chrono-0_4")]
+                #[cfg(feature = "chrono")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
                     if is_neg {
                         let kind = ErrorKind::conversion("Failed to convert a negative time");
@@ -282,15 +282,15 @@ impl TakeRow for my::Row {
                     t if t.is_real() => Value::Real(None),
                     t if t.is_null() => Value::Integer(None),
                     t if t.is_integer() => Value::Integer(None),
-                    #[cfg(feature = "chrono-0_4")]
+                    #[cfg(feature = "chrono")]
                     t if t.is_datetime() => Value::DateTime(None),
-                    #[cfg(feature = "chrono-0_4")]
+                    #[cfg(feature = "chrono")]
                     t if t.is_time() => Value::Time(None),
-                    #[cfg(feature = "chrono-0_4")]
+                    #[cfg(feature = "chrono")]
                     t if t.is_date() => Value::Date(None),
                     t if t.is_text() => Value::Text(None),
                     t if t.is_bytes() => Value::Bytes(None),
-                    #[cfg(feature = "json-1")]
+                    #[cfg(feature = "json")]
                     t if t.is_json() => Value::Json(None),
                     typ => {
                         let msg = format!(
@@ -302,7 +302,7 @@ impl TakeRow for my::Row {
                         return Err(Error::builder(kind).build());
                     }
                 },
-                #[cfg(not(feature = "chrono-0_4"))]
+                #[cfg(not(feature = "chrono"))]
                 typ => {
                     let msg = format!(
                         "Value of type {:?} is not supported with the current configuration",

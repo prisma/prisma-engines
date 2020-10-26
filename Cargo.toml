@@ -19,22 +19,20 @@ repository = "https://github.com/prisma/quaint/"
 version = "0.2.0-alpha.13"
 
 [package.metadata.docs.rs]
-features = ["full", "serde-support", "json-1", "uuid-0_8", "chrono-0_4"]
+features = [
+  "chrono",
+  "json",
+  "mssql",
+  "mysql",
+  "pooled",
+  "postgresql",
+  "serde-support",
+  "sqlite",
+  "uuid",
+]
 
 [features]
 default = []
-
-full = ["pooled", "sqlite", "json-1", "postgresql", "uuid-0_8", "chrono-0_4", "mysql", "mssql"]
-full-mssql = ["pooled", "mssql", "tokio/time"]
-full-mysql = ["pooled", "mysql", "json-1", "uuid-0_8", "chrono-0_4"]
-full-postgresql = ["pooled", "postgresql", "json-1", "uuid-0_8", "chrono-0_4"]
-full-sqlite = ["pooled", "sqlite", "json-1", "uuid-0_8", "chrono-0_4"]
-
-single = ["sqlite", "json-1", "postgresql", "uuid-0_8", "chrono-0_4", "mysql", "mssql"]
-single-mssql = ["mssql", "tokio/time"]
-single-mysql = ["mysql", "json-1", "uuid-0_8", "chrono-0_4"]
-single-postgresql = ["postgresql", "json-1", "uuid-0_8", "chrono-0_4"]
-single-sqlite = ["sqlite", "json-1", "uuid-0_8", "chrono-0_4"]
 
 postgresql = [
   "native-tls",
@@ -48,19 +46,16 @@ postgresql = [
   "byteorder",
 ]
 
-chrono-0_4 = ["chrono"]
-json-1 = ["serde_json", "base64"]
-mssql = ["tiberius", "uuid-0_8", "chrono-0_4", "tokio-util"]
-mysql = ["mysql_async", "tokio"]
+json = ["serde_json", "base64"]
+mssql = ["tiberius", "uuid", "chrono", "tokio-util", "tokio/time", "tokio/net", "either"]
+mysql = ["mysql_async", "tokio/time"]
 pooled = ["mobc"]
 serde-support = ["serde", "chrono/serde"]
 sqlite = ["rusqlite", "libsqlite3-sys", "tokio/sync"]
 tracing-log = ["tracing", "tracing-core"]
-uuid-0_8 = ["uuid"]
 
 [dependencies]
 async-trait = "0.1"
-either = "1.6"
 futures = "0.3"
 hex = "0.4"
 metrics = "0.12"
@@ -71,40 +66,37 @@ rust_decimal = "1.8"
 thiserror = "1.0"
 url = "2.1"
 
+either = { version = "1.6", optional = true }
 byteorder = { default-features = false, optional = true, version = "1.3" }
-base64 = {version = "0.11.0", optional = true}
-chrono = {version = "0.4", optional = true}
-lru-cache = {version = "0.1", optional = true}
-serde_json = {version = "1.0.48", optional = true}
-uuid = {version = "0.8", optional = true}
-
-libsqlite3-sys = {version = "0.18", default-features = false, features = ["bundled"], optional = true}
-rusqlite = {version = "0.23", features = ["chrono", "bundled"], optional = true}
-
-native-tls = {version = "0.2", optional = true}
-
-mysql_async = {version = "0.24.2", optional = true}
-
-log = {version = "0.4", features = ["release_max_level_trace"]}
-tracing = {version = "0.1", optional = true}
-tracing-core = {version = "0.1", optional = true}
-
-bit-vec = {version = "0.6.1", optional = true}
-bytes = {version = "0.5", optional = true}
-mobc = {version = "0.5.7", optional = true}
-serde = {version = "1.0", optional = true}
-tokio = {version = "0.2", features = ["rt-threaded", "macros", "sync"], optional = true}
-tokio-util = {version = "0.3", features = ["compat"], optional = true}
+base64 = { version = "0.11.0", optional = true }
+chrono = { version = "0.4", optional = true }
+lru-cache = { version = "0.1", optional = true }
+serde_json = { version = "1.0.48", optional = true }
+rusqlite = { version = "0.23", features = ["chrono", "bundled"], optional = true }
+native-tls = { version = "0.2", optional = true }
+mysql_async = { version = "0.24.2", optional = true }
+log = { version = "0.4", features = ["release_max_level_trace"] }
+tracing = { version = "0.1", optional = true }
+tracing-core = { version = "0.1", optional = true }
+bit-vec = { version = "0.6.1", optional = true }
+bytes = { version = "0.5", optional = true }
+mobc = { version = "0.5.7", optional = true }
+serde = { version = "1.0", optional = true }
 connection-string = "0.1.10"
 
 [dev-dependencies]
 indoc = "0.3"
 names = "0.11"
 paste = "1.0"
-serde = {version = "1.0", features = ["derive"]}
-test-macros = {path = "test-macros"}
-test-setup = {path = "test-setup"}
-tokio = {version = "0.2", features = ["rt-threaded", "macros"]}
+serde = { version = "1.0", features = ["derive"] }
+test-macros = { path = "test-macros" }
+test-setup = { path = "test-setup" }
+uuid = { version = "0.8", features = ["v4"] }
+tokio = { version = "0.2", features = ["rt-threaded", "macros", "io-driver", "time"] }
+
+[dependencies.uuid]
+version = "0.8"
+optional = true
 
 [dependencies.tiberius]
 version = "0.4.13"
@@ -126,4 +118,20 @@ optional = true
 [dependencies.postgres-native-tls]
 branch = "pgbouncer-mode"
 git = "https://github.com/pimeys/rust-postgres"
+optional = true
+
+[dependencies.libsqlite3-sys]
+version = "0.18"
+default-features = false
+features = ["bundled"]
+optional = true
+
+[dependencies.tokio]
+version = "0.2"
+features = ["rt-threaded", "macros", "sync"]
+optional = true
+
+[dependencies.tokio-util]
+version = "0.3"
+features = ["compat"]
 optional = true

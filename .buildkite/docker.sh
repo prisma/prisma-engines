@@ -27,11 +27,12 @@ docker run --name test-mssql --network test-net \
     -d mcr.microsoft.com/mssql/server:2019-latest
 
 docker run -w /build --network test-net -v $BUILDKITE_BUILD_CHECKOUT_PATH:/build \
+    -e RUSTFLAGS="-D warnings" \
     -e TEST_MYSQL=mysql://prisma:prisma@test-mysql:3306/prisma \
     -e TEST_MYSQL8=mysql://prisma:prisma@test-mysql-8:3306/prisma \
     -e TEST_PSQL=postgres://prisma:prisma@test-postgres:5432/prisma \
     -e TEST_MSSQL="jdbc:sqlserver://test-mssql:1433;user=SA;password=$MSSQL_SA_PASSWORD;trustServerCertificate=true" \
-    prismagraphql/build:test cargo test --features full,json-1,xml,uuid-0_8,chrono-0_4,tracing-log,serde-support
+    prismagraphql/build:test $1
 
 exit_code=$?
 

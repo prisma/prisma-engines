@@ -19,16 +19,16 @@ Quaint is an abstraction over certain SQL databases. It provides:
 
 ### Feature flags
 
-- `full`: All connectors and a pooled `Quaint` manager
-- `full-postgresql`: Pooled support for PostgreSQL
-- `full-mysql`: Pooled support for MySQL
-- `full-sqlite`: Pooled support for SQLite
-- `full-mssql`: Pooled support for Microsoft SQL Server
-- `single`: All connectors, but no pooling
-- `single-postgresql`: Single connection support for PostgreSQL
-- `single-mysql`: Single connection support for MySQL
-- `single-sqlite`: Single connection support for SQLite
-- `single-mssql`: Single connection support for Microsoft SQL Server
+- `mysql`: Support for MySQL databases.
+- `postgresql`: Support for PostgreSQL databases.
+- `sqlite`: Support for SQLite databases.
+- `mssql`: Support for Microsoft SQL Server databases.
+- `pooled`: A connection pool in `pooled::Quaint`.
+- `json`: JSON type support with `serde_json` crate.
+- `uuid`: UUID type support with `uuid` crate.
+- `chrono`: DateTime type support with `chrono` crate.
+- `serde-support`: Deserialize support from result set with `serde` crate.
+- `tracing-log`: Logging with `tracing` crate.
 
 ### Goals:
 

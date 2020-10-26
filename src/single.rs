@@ -8,8 +8,6 @@ use crate::{
 };
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
-use url::Url;
 
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
@@ -141,14 +139,14 @@ impl Quaint {
             }
             #[cfg(feature = "mysql")]
             s if s.starts_with("mysql") => {
-                let url = connector::MysqlUrl::new(Url::parse(s)?)?;
+                let url = connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let mysql = connector::Mysql::new(url)?;
 
                 Arc::new(mysql) as Arc<dyn Queryable>
             }
             #[cfg(feature = "postgresql")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
-                let url = connector::PostgresUrl::new(Url::parse(s)?)?;
+                let url = connector::PostgresUrl::new(url::Url::parse(s)?)?;
                 let psql = connector::PostgreSql::new(url).await?;
                 Arc::new(psql) as Arc<dyn Queryable>
             }

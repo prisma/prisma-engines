@@ -1,6 +1,5 @@
-use super::{query::SelectQuery, CommonTableExpression, ExpressionKind, IntoCommonTableExpression, Row, Select};
+use super::ExpressionKind;
 use crate::ast::{Column, ConditionTree, Expression};
-use either::Either;
 use std::borrow::Cow;
 
 /// For modeling comparison expressions.
@@ -53,16 +52,23 @@ impl<'a> Compare<'a> {
     ///
     /// Left side means a match and the CTE should be handled, right side is a
     /// no-op.
+    #[cfg(feature = "mssql")]
     pub(crate) fn convert_tuple_select_to_cte(
         self,
         level: &mut usize,
-    ) -> Either<Self, (Self, Vec<CommonTableExpression<'a>>)> {
+    ) -> either::Either<Self, (Self, Vec<super::CommonTableExpression<'a>>)> {
+        use super::IntoCommonTableExpression;
+
         fn convert<'a>(
-            row: Row<'a>,
-            select: SelectQuery<'a>,
+            row: super::Row<'a>,
+            select: super::SelectQuery<'a>,
             mut selected_columns: Vec<String>,
             level: &mut usize,
-        ) -> (Column<'a>, Select<'a>, Vec<CommonTableExpression<'a>>) {
+        ) -> (
+            super::Column<'a>,
+            super::Select<'a>,
+            Vec<super::CommonTableExpression<'a>>,
+        ) {
             // Get the columns out from the row.
             let mut cols = row.into_columns();
 
@@ -85,7 +91,7 @@ impl<'a> Compare<'a> {
             // `SELECT`.  At this point we just select the first column from the
             // original select, changing the `SELECT` into
             // `(SELECT first_col FROM cte_n)`.
-            let base_select = Select::from_table(ident).column(selected_columns.remove(0));
+            let base_select = super::Select::from_table(ident).column(selected_columns.remove(0));
 
             // We know we have the same amount of columns on both sides,
             let column_pairs = cols.into_iter().zip(selected_columns.into_iter());
@@ -115,14 +121,14 @@ impl<'a> Compare<'a> {
                     let left = Expression::row(row);
                     let right = Expression::selection(select);
 
-                    return Either::Left(left.in_selection(right));
+                    return either::Either::Left(left.in_selection(right));
                 }
 
                 if row.is_only_columns() && row.len() > 1 {
                     let (comp_col, inner_select, ctes) = convert(row, select, selection, level);
                     let cond = comp_col.in_selection(inner_select);
 
-                    Either::Right((cond, ctes))
+                    either::Either::Right((cond, ctes))
                 } else if row.len() == 1 {
                     let left = Expression::row(row);
                     let (select, ctes) = select.convert_tuple_selects_to_ctes(level);
@@ -130,20 +136,20 @@ impl<'a> Compare<'a> {
                     let select = Expression::selection(select);
                     let cond = Self::In(Box::new(left), Box::new(select));
 
-                    Either::Right((cond, ctes))
+                    either::Either::Right((cond, ctes))
                 } else {
                     let left = Expression::row(row);
                     let select = Expression::selection(select);
                     let cond = Self::In(Box::new(left), Box::new(select));
 
-                    Either::Left(cond)
+                    either::Either::Left(cond)
                 }
             }
             Self::In(left, right) if right.is_selection() => {
                 let (selection, ctes) = right.into_selection().unwrap().convert_tuple_selects_to_ctes(level);
                 let cond = Self::In(left, Box::new(Expression::selection(selection)));
 
-                Either::Right((cond, ctes))
+                either::Either::Right((cond, ctes))
             }
             Self::NotIn(left, right) if left.is_row() && right.is_selection() => {
                 let row = left.into_row().unwrap();
@@ -154,14 +160,14 @@ impl<'a> Compare<'a> {
                     let left = Expression::row(row);
                     let right = Expression::selection(select);
 
-                    return Either::Left(left.not_in_selection(right));
+                    return either::Either::Left(left.not_in_selection(right));
                 }
 
                 if row.is_only_columns() && row.len() > 1 {
                     let (comp_col, inner_select, ctes) = convert(row, select, selection, level);
                     let cond = comp_col.not_in_selection(inner_select);
 
-                    Either::Right((cond, ctes))
+                    either::Either::Right((cond, ctes))
                 } else if row.len() == 1 {
                     let left = Expression::row(row);
                     let (select, ctes) = select.convert_tuple_selects_to_ctes(level);
@@ -169,22 +175,22 @@ impl<'a> Compare<'a> {
                     let select = Expression::selection(select);
                     let cond = Self::NotIn(Box::new(left), Box::new(select));
 
-                    Either::Right((cond, ctes))
+                    either::Either::Right((cond, ctes))
                 } else {
                     let left = Expression::row(row);
                     let select = Expression::selection(select);
                     let cond = Self::NotIn(Box::new(left), Box::new(select));
 
-                    Either::Left(cond)
+                    either::Either::Left(cond)
                 }
             }
             Self::NotIn(left, right) if right.is_selection() => {
                 let (selection, ctes) = right.into_selection().unwrap().convert_tuple_selects_to_ctes(level);
                 let cond = Self::NotIn(left, Box::new(Expression::selection(selection)));
 
-                Either::Right((cond, ctes))
+                either::Either::Right((cond, ctes))
             }
-            _ => Either::Left(self),
+            _ => either::Either::Left(self),
         }
     }
 }

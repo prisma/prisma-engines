@@ -20,6 +20,7 @@ pub enum ConditionTree<'a> {
 impl<'a> ConditionTree<'a> {
     // Finds all possible comparisons between a tuple and a select. If returning
     // a vector of CTEs, they should be handled by the calling party.
+    #[cfg(feature = "mssql")]
     pub(crate) fn convert_tuple_selects_to_ctes(self, level: &mut usize) -> (Self, Vec<CommonTableExpression<'a>>) {
         fn convert_many<'a>(
             exprs: Vec<Expression<'a>>,

@@ -379,7 +379,7 @@ test_type!(inet_array(
     Value::array(vec![Value::text("127.0.0.1"), Value::text("192.168.1.1")])
 ));
 
-#[cfg(feature = "json-1")]
+#[cfg(feature = "json")]
 test_type!(json(
     postgres,
     "json",
@@ -387,7 +387,7 @@ test_type!(json(
     Value::json(serde_json::json!({"foo": "bar"}))
 ));
 
-#[cfg(feature = "json-1")]
+#[cfg(feature = "json")]
 test_type!(json_array(
     postgres,
     "json[]",
@@ -398,7 +398,7 @@ test_type!(json_array(
     ])
 ));
 
-#[cfg(feature = "json-1")]
+#[cfg(feature = "json")]
 test_type!(jsonb(
     postgres,
     "jsonb",
@@ -406,7 +406,7 @@ test_type!(jsonb(
     Value::json(serde_json::json!({"foo": "bar"}))
 ));
 
-#[cfg(feature = "json-1")]
+#[cfg(feature = "json")]
 test_type!(jsonb_array(
     postgres,
     "jsonb[]",
@@ -426,7 +426,7 @@ test_type!(xml_array(
     Value::array(vec!["<test>1</test>", "<test>2</test>",])
 ));
 
-#[cfg(feature = "uuid-0_8")]
+#[cfg(feature = "uuid")]
 test_type!(uuid(
     postgres,
     "uuid",
@@ -434,7 +434,7 @@ test_type!(uuid(
     Value::uuid(uuid::Uuid::from_str("936DA01F-9ABD-4D9D-80C7-02AF85C822A8").unwrap())
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(date(
     postgres,
     "date",
@@ -442,7 +442,7 @@ test_type!(date(
     Value::date(chrono::NaiveDate::from_ymd(2020, 4, 20))
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(date_array(
     postgres,
     "date[]",
@@ -450,7 +450,7 @@ test_type!(date_array(
     Value::array(vec![chrono::NaiveDate::from_ymd(2020, 4, 20)])
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(time(
     postgres,
     "time",
@@ -458,7 +458,7 @@ test_type!(time(
     Value::time(chrono::NaiveTime::from_hms(16, 20, 00))
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(time_array(
     postgres,
     "time[]",
@@ -466,25 +466,25 @@ test_type!(time_array(
     Value::array(vec![chrono::NaiveTime::from_hms(16, 20, 00)])
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(timestamp(postgres, "timestamp", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(timestamp_array(postgres, "timestamp[]", Value::Array(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::array(vec![dt.with_timezone(&chrono::Utc)])
 }));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(timestamptz(postgres, "timestamptz", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(timestamptz_array(postgres, "timestamptz[]", Value::Array(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::array(vec![dt.with_timezone(&chrono::Utc)])

@@ -617,6 +617,7 @@ impl<'a> Select<'a> {
     /// - Not comparing a tuple (e.g. `x IN (SELECT ...)`)
     /// - Not using a `IN` or `NOT IN` operation
     /// - Imbalanced number of variables (e.g. `(x, y, z) IN (SELECT a, b ...)`)
+    #[cfg(feature = "mssql")]
     pub(crate) fn convert_tuple_selects_to_ctes(
         mut self,
         top_level: bool,

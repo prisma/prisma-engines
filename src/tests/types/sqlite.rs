@@ -1,8 +1,9 @@
 use crate::tests::test_api::sqlite_test_api;
+#[cfg(feature = "chrono")]
 use crate::tests::test_api::TestApi;
+#[cfg(feature = "chrono")]
 use crate::{ast::*, connector::Queryable};
 use std::str::FromStr;
-use test_macros::test_each_connector;
 
 test_type!(integer(
     sqlite,
@@ -42,7 +43,7 @@ test_type!(boolean(
     Value::boolean(false)
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(date(
     sqlite,
     "DATE",
@@ -50,7 +51,7 @@ test_type!(date(
     Value::date(chrono::NaiveDate::from_ymd(1984, 1, 1))
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(datetime(
     sqlite,
     "DATETIME",
@@ -58,8 +59,8 @@ test_type!(datetime(
     Value::datetime(chrono::DateTime::from_str("2020-07-29T09:23:44.458Z").unwrap())
 ));
 
-#[cfg(feature = "chrono-0_4")]
-#[test_each_connector(tags("sqlite"))]
+#[cfg(feature = "chrono")]
+#[test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_rfc3339(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;
     let dt = chrono::Utc::now();
@@ -79,8 +80,8 @@ async fn test_type_text_datetime_rfc3339(api: &mut dyn TestApi) -> crate::Result
     Ok(())
 }
 
-#[cfg(feature = "chrono-0_4")]
-#[test_each_connector(tags("sqlite"))]
+#[cfg(feature = "chrono")]
+#[test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_rfc2822(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;
     let dt = chrono::DateTime::parse_from_rfc2822("Tue, 1 Jul 2003 10:52:37 +0200")
@@ -102,8 +103,8 @@ async fn test_type_text_datetime_rfc2822(api: &mut dyn TestApi) -> crate::Result
     Ok(())
 }
 
-#[cfg(feature = "chrono-0_4")]
-#[test_each_connector(tags("sqlite"))]
+#[cfg(feature = "chrono")]
+#[test_macros::test_each_connector(tags("sqlite"))]
 async fn test_type_text_datetime_custom(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_type_table("DATETIME").await?;
 

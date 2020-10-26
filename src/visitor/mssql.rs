@@ -173,7 +173,7 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             Value::Bytes(b) => b.map(|b| self.write(format!("0x{}", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(if b { 1 } else { 0 })),
             Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
-            #[cfg(feature = "json-1")]
+            #[cfg(feature = "json")]
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             Value::Array(_) => {
                 let msg = "Arrays are not supported in T-SQL.";
@@ -184,22 +184,22 @@ impl<'a> Visitor<'a> for Mssql<'a> {
 
                 return Err(builder.build());
             }
-            #[cfg(feature = "uuid-0_8")]
+            #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| {
                 let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.to_hyphenated().to_string());
                 self.write(s)
             }),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| {
                 let s = format!("CONVERT(datetimeoffset, N'{}')", dt.to_rfc3339());
                 self.write(s)
             }),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| {
                 let s = format!("CONVERT(date, N'{}')", date);
                 self.write(s)
             }),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| {
                 let s = format!("CONVERT(time, N'{}')", time);
                 self.write(s)
@@ -986,7 +986,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "json-1")]
+    #[cfg(feature = "json")]
     fn test_raw_json() {
         let (sql, params) = Mssql::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
         assert_eq!("SELECT '{\"foo\":\"bar\"}'", sql);
@@ -994,7 +994,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid-0_8")]
+    #[cfg(feature = "uuid")]
     fn test_raw_uuid() {
         let uuid = uuid::Uuid::new_v4();
         let (sql, params) = Mssql::build(Select::default().value(uuid.raw())).unwrap();
@@ -1011,7 +1011,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "chrono-0_4")]
+    #[cfg(feature = "chrono")]
     fn test_raw_datetime() {
         let dt = chrono::Utc::now();
         let (sql, params) = Mssql::build(Select::default().value(dt.raw())).unwrap();

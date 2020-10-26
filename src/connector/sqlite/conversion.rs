@@ -110,7 +110,9 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_text() => Value::Text(None),
                     c if c.is_bytes() => Value::Bytes(None),
                     c if c.is_real() => Value::Real(None),
+                    #[cfg(feature = "chrono")]
                     c if c.is_datetime() => Value::DateTime(None),
+                    #[cfg(feature = "chrono")]
                     c if c.is_date() => Value::Date(None),
                     c if c.is_bool() => Value::Boolean(None),
                     c => match c.decl_type() {
@@ -131,12 +133,12 @@ impl<'a> GetRow for SqliteRow<'a> {
                             Value::boolean(true)
                         }
                     }
-                    #[cfg(feature = "chrono-0_4")]
+                    #[cfg(feature = "chrono")]
                     c if c.is_date() => {
                         let dt = chrono::NaiveDateTime::from_timestamp(i / 1000, 0);
                         Value::date(dt.date())
                     }
-                    #[cfg(feature = "chrono-0_4")]
+                    #[cfg(feature = "chrono")]
                     c if c.is_datetime() => {
                         let sec = i / 1000;
                         let ns = i % 1000 * 1_000_000;
@@ -146,7 +148,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                     _ => Value::integer(i),
                 },
                 ValueRef::Real(f) => Value::from(f),
-                #[cfg(feature = "chrono-0_4")]
+                #[cfg(feature = "chrono")]
                 ValueRef::Text(bytes) if column.is_datetime() => {
                     let parse_res = std::str::from_utf8(bytes).map_err(|_| {
                         let builder = Error::builder(ErrorKind::ConversionError(
@@ -213,7 +215,7 @@ impl<'a> ToSql for Value<'a> {
 
                 return Err(RusqlError::ToSqlConversionFailure(Box::new(builder.build())));
             }
-            #[cfg(feature = "json-1")]
+            #[cfg(feature = "json")]
             Value::Json(value) => value.as_ref().map(|value| {
                 let stringified = serde_json::to_string(value)
                     .map_err(|err| RusqlError::ToSqlConversionFailure(Box::new(err)))
@@ -222,16 +224,16 @@ impl<'a> ToSql for Value<'a> {
                 ToSqlOutput::from(stringified)
             }),
             Value::Xml(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
-            #[cfg(feature = "uuid-0_8")]
+            #[cfg(feature = "uuid")]
             Value::Uuid(value) => value.map(|value| ToSqlOutput::from(value.to_hyphenated().to_string())),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::DateTime(value) => value.map(|value| ToSqlOutput::from(value.timestamp_millis())),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| {
                 let dt = date.and_hms(0, 0, 0);
                 ToSqlOutput::from(dt.timestamp_millis())
             }),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| {
                 use chrono::{NaiveDate, Timelike};
 

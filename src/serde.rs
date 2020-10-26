@@ -122,37 +122,37 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             Value::Real(Some(real)) => visitor.visit_f64(real.to_string().parse::<f64>().unwrap()),
             Value::Real(None) => visitor.visit_none(),
 
-            #[cfg(feature = "uuid-0_8")]
+            #[cfg(feature = "uuid")]
             Value::Uuid(Some(uuid)) => visitor.visit_string(uuid.to_string()),
-            #[cfg(feature = "uuid-0_8")]
+            #[cfg(feature = "uuid")]
             Value::Uuid(None) => visitor.visit_none(),
 
-            #[cfg(feature = "json-1")]
+            #[cfg(feature = "json")]
             Value::Json(Some(value)) => {
                 let de = value.into_deserializer();
 
                 de.deserialize_any(visitor)
                     .map_err(|err| serde::de::value::Error::custom(format!("Error deserializing JSON value: {}", err)))
             }
-            #[cfg(feature = "json-1")]
+            #[cfg(feature = "json")]
             Value::Json(None) => visitor.visit_none(),
 
             Value::Xml(Some(s)) => visitor.visit_string(s.into_owned()),
             Value::Xml(None) => visitor.visit_none(),
 
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::DateTime(Some(dt)) => visitor.visit_string(dt.to_rfc3339()),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::DateTime(None) => visitor.visit_none(),
 
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Date(Some(d)) => visitor.visit_string(format!("{}", d)),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Date(None) => visitor.visit_none(),
 
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Time(Some(t)) => visitor.visit_string(format!("{}", t)),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Time(None) => visitor.visit_none(),
 
             Value::Array(Some(values)) => {

@@ -117,6 +117,7 @@ impl<'a> Union<'a> {
     /// Finds all comparisons between tuples and selects in the queries and
     /// converts them to common table expressions for making the query
     /// compatible with databases not supporting tuples.
+    #[cfg(feature = "mssql")]
     pub(crate) fn convert_tuple_selects_into_ctes(
         mut self,
         top_level: bool,

@@ -152,7 +152,7 @@ test_type!(image(
     Value::bytes(b"DEADBEEF".to_vec()),
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(date(
     mssql,
     "date",
@@ -160,7 +160,7 @@ test_type!(date(
     Value::date(chrono::NaiveDate::from_ymd(2020, 4, 20))
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(time(
     mssql,
     "time",
@@ -168,25 +168,25 @@ test_type!(time(
     Value::time(chrono::NaiveTime::from_hms(16, 20, 00))
 ));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(datetime2(mssql, "datetime2", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(datetime(mssql, "datetime", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(datetimeoffset(mssql, "datetimeoffset", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));
 
-#[cfg(feature = "chrono-0_4")]
+#[cfg(feature = "chrono")]
 test_type!(smalldatetime(mssql, "smalldatetime", Value::DateTime(None), {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:00Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))

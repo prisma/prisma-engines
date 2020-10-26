@@ -174,6 +174,7 @@ impl ErrorKind {
         Self::ConversionError(msg.into())
     }
 
+    #[allow(dead_code)]
     pub(crate) fn database_url_is_invalid(msg: impl Into<String>) -> Self {
         Self::DatabaseUrlIsInvalid(msg.into())
     }
@@ -192,7 +193,7 @@ impl From<rust_decimal::Error> for Error {
     }
 }
 
-#[cfg(feature = "json-1")]
+#[cfg(feature = "json")]
 impl From<serde_json::Error> for Error {
     fn from(_: serde_json::Error) -> Self {
         Self::builder(ErrorKind::conversion("Malformed JSON data.")).build()

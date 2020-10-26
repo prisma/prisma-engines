@@ -1,5 +1,4 @@
 use crate::ast::*;
-use either::Either;
 use query::SelectQuery;
 use std::borrow::Cow;
 
@@ -22,6 +21,7 @@ impl<'a> Expression<'a> {
         self.alias.as_ref().map(|s| s.as_ref())
     }
 
+    #[allow(dead_code)]
     pub(crate) fn row(row: Row<'a>) -> Self {
         Self {
             kind: ExpressionKind::Row(row),
@@ -33,6 +33,7 @@ impl<'a> Expression<'a> {
         Self::selection(SelectQuery::Union(Box::new(union)))
     }
 
+    #[allow(dead_code)]
     pub(crate) fn selection(selection: SelectQuery<'a>) -> Self {
         Self {
             kind: ExpressionKind::Selection(selection),
@@ -40,8 +41,9 @@ impl<'a> Expression<'a> {
         }
     }
 
-    #[cfg(feature = "json-1")]
-    pub(crate) fn is_json_value(&self) -> bool {
+    #[cfg(feature = "json")]
+    #[allow(dead_code)]
+    pub fn is_json_value(&self) -> bool {
         match &self.kind {
             ExpressionKind::Parameterized(Value::Json(_)) => true,
             ExpressionKind::Value(expr) => expr.is_json_value(),
@@ -49,18 +51,22 @@ impl<'a> Expression<'a> {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn is_xml_value(&self) -> bool {
         self.kind.is_xml_value()
     }
 
-    pub(crate) fn is_asterisk(&self) -> bool {
+    #[allow(dead_code)]
+    pub fn is_asterisk(&self) -> bool {
         matches!(self.kind, ExpressionKind::Asterisk(_))
     }
 
+    #[allow(dead_code)]
     pub(crate) fn is_row(&self) -> bool {
         matches!(self.kind, ExpressionKind::Row(_))
     }
 
+    #[allow(dead_code)]
     pub(crate) fn into_row(self) -> Option<Row<'a>> {
         match self.kind {
             ExpressionKind::Row(row) => Some(row),
@@ -68,6 +74,7 @@ impl<'a> Expression<'a> {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn into_selection(self) -> Option<SelectQuery<'a>> {
         match self.kind {
             ExpressionKind::Selection(selection) => Some(selection),
@@ -75,6 +82,7 @@ impl<'a> Expression<'a> {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn into_column(self) -> Option<Column<'a>> {
         match self.kind {
             ExpressionKind::Column(column) => Some(*column),
@@ -82,16 +90,19 @@ impl<'a> Expression<'a> {
         }
     }
 
+    #[allow(dead_code)]
     pub(crate) fn is_selection(&self) -> bool {
         matches!(self.kind, ExpressionKind::Selection(_))
     }
 
+    #[allow(dead_code)]
     pub(crate) fn is_column(&self) -> bool {
         matches!(self.kind, ExpressionKind::Column(_))
     }
 
     /// Finds all comparisons between a tuple and a selection. If returning some
     /// CTEs, they should be handled in the calling layer.
+    #[cfg(feature = "mssql")]
     pub(crate) fn convert_tuple_selects_to_ctes(self, level: &mut usize) -> (Self, Vec<CommonTableExpression<'a>>) {
         match self.kind {
             ExpressionKind::Selection(s) => {
@@ -106,7 +117,7 @@ impl<'a> Expression<'a> {
             }
             ExpressionKind::Compare(compare) => match compare.convert_tuple_select_to_cte(level) {
                 // No conversion
-                Either::Left(compare) => {
+                either::Either::Left(compare) => {
                     let expr = Expression {
                         kind: ExpressionKind::Compare(compare),
                         alias: self.alias,
@@ -115,7 +126,7 @@ impl<'a> Expression<'a> {
                     (expr, Vec::new())
                 }
                 // Conversion happened
-                Either::Right((comp, ctes)) => {
+                either::Either::Right((comp, ctes)) => {
                     let expr = Expression {
                         kind: ExpressionKind::Compare(comp),
                         alias: self.alias,

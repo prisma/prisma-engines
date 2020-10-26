@@ -3,7 +3,7 @@
 set -e
 shopt -s globstar
 
-docker run -w /build -v $(pwd):/build prismagraphql/build:test cargo rustdoc --features full,json-1,uuid-0_8,chrono-0_4,tracing-log,serde-support
+docker run -w /build -v $(pwd):/build prismagraphql/build:test cargo rustdoc --all-features
 
 rm -rf deploy_docs
 git clone --branch gh-pages "git@github.com:prisma/quaint.git" deploy_docs > /dev/null 2>&1

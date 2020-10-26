@@ -142,8 +142,6 @@ pub use manager::*;
 use crate::connector::ConnectionInfo;
 use mobc::Pool;
 use std::{sync::Arc, time::Duration};
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
-use url::Url;
 
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;
@@ -334,7 +332,7 @@ impl Quaint {
             }
             #[cfg(feature = "mysql")]
             s if s.starts_with("mysql") => {
-                let url = crate::connector::MysqlUrl::new(Url::parse(s)?)?;
+                let url = crate::connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
                 let connect_timeout = url.connect_timeout();
 
@@ -353,7 +351,7 @@ impl Quaint {
             }
             #[cfg(feature = "postgresql")]
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
-                let url = crate::connector::PostgresUrl::new(Url::parse(s)?)?;
+                let url = crate::connector::PostgresUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
                 let connect_timeout = url.connect_timeout();
 

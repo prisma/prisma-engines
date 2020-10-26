@@ -64,7 +64,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
             Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
-            #[cfg(feature = "json-1")]
+            #[cfg(feature = "json")]
             Value::Json(j) => match j {
                 Some(ref j) => {
                     let s = serde_json::to_string(&j)?;
@@ -81,13 +81,13 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
                 return Err(builder.build());
             }
-            #[cfg(feature = "uuid-0_8")]
+            #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.to_hyphenated().to_string()))),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
-            #[cfg(feature = "chrono-0_4")]
+            #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
             Value::Xml(cow) => cow.map(|cow| self.write(format!("'{}'", cow))),
         };
@@ -205,7 +205,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     }
 
     fn visit_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        #[cfg(feature = "json-1")]
+        #[cfg(feature = "json")]
         {
             if right.is_json_value() || left.is_json_value() {
                 self.write("JSON_CONTAINS")?;
@@ -228,14 +228,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             }
         }
 
-        #[cfg(not(feature = "json-1"))]
+        #[cfg(not(feature = "json"))]
         {
             self.visit_regular_equality_comparison(left, right)
         }
     }
 
     fn visit_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
-        #[cfg(feature = "json-1")]
+        #[cfg(feature = "json")]
         {
             if right.is_json_value() || left.is_json_value() {
                 self.write("NOT JSON_CONTAINS")?;
@@ -258,7 +258,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             }
         }
 
-        #[cfg(not(feature = "json-1"))]
+        #[cfg(not(feature = "json"))]
         {
             self.visit_regular_difference_comparison(left, right)
         }
@@ -373,7 +373,7 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "json-1")]
+    #[cfg(feature = "json")]
     #[test]
     fn equality_with_a_json_value() {
         let expected = expected_values(
@@ -388,7 +388,7 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "json-1")]
+    #[cfg(feature = "json")]
     #[test]
     fn difference_with_a_json_value() {
         let expected = expected_values(
@@ -493,7 +493,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "json-1")]
+    #[cfg(feature = "json")]
     fn test_raw_json() {
         let (sql, params) = Mysql::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
         assert_eq!("SELECT CONVERT('{\"foo\":\"bar\"}', JSON)", sql);
@@ -501,7 +501,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "uuid-0_8")]
+    #[cfg(feature = "uuid")]
     fn test_raw_uuid() {
         let uuid = uuid::Uuid::new_v4();
         let (sql, params) = Mysql::build(Select::default().value(uuid.raw())).unwrap();
@@ -512,7 +512,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "chrono-0_4")]
+    #[cfg(feature = "chrono")]
     fn test_raw_datetime() {
         let dt = chrono::Utc::now();
         let (sql, params) = Mysql::build(Select::default().value(dt.raw())).unwrap();

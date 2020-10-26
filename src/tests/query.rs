@@ -501,6 +501,7 @@ async fn single_default_value_insert(api: &mut dyn TestApi) -> crate::Result<()>
     Ok(())
 }
 
+#[cfg(any(feature = "mssql", feature = "postgresql"))]
 #[test_each_connector(tags("mssql", "postgres"))]
 async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_table("id int, name varchar(255)").await?;
@@ -627,6 +628,7 @@ async fn single_insert_conflict_do_nothing_single_unique_with_autogen_default(
     Ok(())
 }
 
+#[cfg(any(feature = "mssql", feature = "postgresql"))]
 #[test_each_connector(tags("postgres", "mssql"))]
 async fn single_insert_conflict_do_nothing_with_returning(api: &mut dyn TestApi) -> crate::Result<()> {
     let constraint = api.unique_constraint("id");
@@ -1051,6 +1053,7 @@ async fn unsigned_integers_are_handled(api: &mut dyn TestApi) -> crate::Result<(
     Ok(())
 }
 
+#[cfg(feature = "json")]
 #[test_each_connector(tags("mysql", "postgres"))]
 async fn json_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
     let json_type = match api.system() {
