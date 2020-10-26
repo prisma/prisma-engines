@@ -81,7 +81,7 @@ impl PostgresDatamodelConnector {
         let bit = NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, vec![ScalarType::String]);
         let varbit = NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, vec![ScalarType::String]);
         let uuid = NativeTypeConstructor::without_args(UUID_TYPE_NAME, vec![ScalarType::String]);
-        let xml = NativeTypeConstructor::without_args(XML_TYPE_NAME, vec![ScalarType::Xml]);
+        let xml = NativeTypeConstructor::without_args(XML_TYPE_NAME, vec![ScalarType::String]);
         let json = NativeTypeConstructor::without_args(JSON_TYPE_NAME, vec![ScalarType::Json]);
         let json_b = NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, vec![ScalarType::Json]);
 

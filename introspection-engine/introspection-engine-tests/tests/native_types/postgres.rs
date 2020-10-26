@@ -93,7 +93,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             bit             String   @postgres.Bit(1)
             varbit          String   @postgres.VarBit(1)
             uuid            String   @postgres.Uuid
-            xml             Xml      @postgres.Xml
+            xml             String   @postgres.Xml
             json            Json     @postgres.Json
             jsonb           Json     @postgres.JsonB
           }
@@ -237,7 +237,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             bit             String
             varbit          String
             uuid            String
-            xml             Xml
+            xml             String
             json            Json
             jsonb           Json
         }

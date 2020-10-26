@@ -196,7 +196,6 @@ impl SqlSchemaDescriber {
                                 ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(default_string)),
                                 ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                             })
