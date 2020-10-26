@@ -66,15 +66,30 @@ fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
 
 /// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-fn list_union_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
-    let object_type = InputType::object(input);
+fn list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
+    let input_type = InputType::object(input);
+    list_union_type(input_type, as_list)
+}
 
+/// Convenience function to return [input_type, list_input_type]
+/// (shorthand + full type) if the field is a list.
+fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     if as_list {
-        vec![object_type.clone(), InputType::list(object_type)]
+        vec![input_type.clone(), InputType::list(input_type)]
     } else {
-        vec![object_type]
+        vec![input_type]
     }
 }
+
+// /// Convenience function to return [input_type_1, list_input_type_1, input_type_2, list_input_type_2]
+// /// (shorthand + full type for each fiven InputType) if the field is a list.
+// fn list_union_types(input_type: Vec<InputType>, as_list: bool) -> Vec<InputType> {
+//     if as_list {
+//         vec![input_type.clone(), InputType::list(input_type)]
+//     } else {
+//         vec![input_type]
+//     }
+// }
 
 fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
     alias.map(capitalize).unwrap_or_else(|| {

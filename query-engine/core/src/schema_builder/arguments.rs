@@ -20,7 +20,7 @@ pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) 
 
 /// Builds "data" argument intended for the create field.
 pub(crate) fn create_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
-    let input_object_type = input_types::create_input_objects::create_input_type(ctx, model, None);
+    let input_object_type = input_types::create_input_objects::create_input_types(ctx, model, None);
 
     if input_object_type.into_arc().is_empty() {
         None
