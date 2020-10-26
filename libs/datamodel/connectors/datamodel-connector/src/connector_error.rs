@@ -24,6 +24,10 @@ impl ConnectorError {
         })
     }
 
+    pub fn new_scalar_type_string_used_with_id_or_index_on_mysql_error() -> ConnectorError {
+        ConnectorError::from_kind(ErrorKind::ScalarTypeStringWithIdOrIndexOnMySQLError {})
+    }
+
     pub fn new_optional_argument_count_mismatch_error(
         native_type: &str,
         optional_count: usize,
@@ -227,4 +231,9 @@ pub enum ErrorKind {
         connector_name: String,
         message: String,
     },
+
+    #[error(
+    "Scalar Type String can not be used in combination with an id or unique field attribute when no native type is used."
+    )]
+    ScalarTypeStringWithIdOrIndexOnMySQLError {},
 }

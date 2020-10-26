@@ -193,6 +193,11 @@ impl Connector for MySqlDatamodelConnector {
                 ));
             }
         }
+        if let FieldType::Base(scalar_type, _) = field.field_type() {
+            if scalar_type == ScalarType::String && (field.is_id() || field.is_unique()) {
+                return Err(ConnectorError::new_scalar_type_string_used_with_id_or_index_on_mysql_error());
+            }
+        }
         Ok(())
     }
 
@@ -216,6 +221,11 @@ impl Connector for MySqlDatamodelConnector {
                         };
                     }
                 }
+                if let FieldType::Base(scalar_field, _) = f.field_type() {
+                    if scalar_field == ScalarType::String {
+                        return Err(ConnectorError::new_scalar_type_string_used_with_id_or_index_on_mysql_error());
+                    }
+                }
             }
         }
         for id_field in model.id_fields.iter() {
@@ -227,6 +237,11 @@ impl Connector for MySqlDatamodelConnector {
                         native_type_name,
                         "MySQL",
                     ));
+                }
+            }
+            if let FieldType::Base(scalar_type, _) = field.field_type() {
+                if scalar_type == ScalarType::String {
+                    return Err(ConnectorError::new_scalar_type_string_used_with_id_or_index_on_mysql_error());
                 }
             }
         }

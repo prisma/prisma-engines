@@ -1,4 +1,5 @@
 use crate::common::*;
+use crate::types::helper::{test_block_attribute_support, test_field_attribute_support};
 use datamodel::{ast, diagnostics::DatamodelError};
 
 #[test]
@@ -212,6 +213,21 @@ fn should_fail_on_missing_native_types_feature_flag() {
         "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your datasource block: `previewFeatures = [\"nativeTypes\"]`",
         ast::Span::new(178, 196),
     ));
+}
+
+#[test]
+fn should_fail_on_scalar_type_string_with_unique_or_id_constraint() {
+    let error_msg = "Scalar Type String can not be used in combination with an id or unique field attribute when no native type is used.";
+
+    test_field_attribute_support("String", "unique", error_msg, MYSQL_SOURCE);
+    test_block_attribute_support("String", "unique", error_msg, MYSQL_SOURCE);
+    test_field_attribute_support("String", "id", error_msg, MYSQL_SOURCE);
+    test_block_attribute_support("String", "id", error_msg, MYSQL_SOURCE);
+
+    for attr in &["id", "unique"] {
+        test_field_attribute_support("String", attr, error_msg, MYSQL_SOURCE);
+        test_block_attribute_support("String", attr, error_msg, MYSQL_SOURCE);
+    }
 }
 
 #[test]
