@@ -399,39 +399,31 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         self.table_pairs()
             .filter(|tables| tables_to_redefine.contains(tables.next.name()))
             .map(|tables| {
-                let mut other_columns = Vec::new();
-                let mut columns_that_became_required_with_a_default = Vec::new();
-
-                for columns in tables.column_pairs() {
-                    let (changes, type_change) = columns.all_changes();
-                    let item = (
-                        columns.previous.column_index(),
-                        columns.next.column_index(),
-                        changes.clone(),
-                        type_change.map(|tc| match tc {
-                            ColumnTypeChange::SafeCast => sql_migration::ColumnTypeChange::SafeCast,
-                            ColumnTypeChange::RiskyCast => sql_migration::ColumnTypeChange::RiskyCast,
-                            ColumnTypeChange::NotCastable => {
-                                unreachable!("ColumnTypeChange::NotCastable in redefine_tables")
-                            }
-                        }),
-                    );
-
-                    if changes.arity_changed() && columns.next.arity().is_required() && columns.next.default().is_some()
-                    {
-                        columns_that_became_required_with_a_default.push(item);
-                    } else {
-                        other_columns.push(item);
-                    }
-                }
+                let column_pairs = tables
+                    .column_pairs()
+                    .map(|columns| {
+                        let (changes, type_change) = columns.all_changes();
+                        (
+                            columns.previous.column_index(),
+                            columns.next.column_index(),
+                            changes.clone(),
+                            type_change.map(|tc| match tc {
+                                ColumnTypeChange::SafeCast => sql_migration::ColumnTypeChange::SafeCast,
+                                ColumnTypeChange::RiskyCast => sql_migration::ColumnTypeChange::RiskyCast,
+                                ColumnTypeChange::NotCastable => {
+                                    unreachable!("ColumnTypeChange::NotCastable in redefine_tables")
+                                }
+                            }),
+                        )
+                    })
+                    .collect();
 
                 RedefineTable {
                     table_index: (tables.previous.table_index(), tables.next.table_index()),
                     dropped_primary_key: SqlSchemaDiffer::drop_primary_key(&tables).is_some(),
                     added_columns: tables.added_columns().map(|col| col.column_index()).collect(),
                     dropped_columns: tables.dropped_columns().map(|col| col.column_index()).collect(),
-                    other_columns,
-                    columns_that_became_required_with_a_default,
+                    column_pairs,
                 }
             })
             .collect()
