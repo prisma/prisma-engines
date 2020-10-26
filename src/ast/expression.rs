@@ -49,7 +49,6 @@ impl<'a> Expression<'a> {
         }
     }
 
-    #[cfg(feature = "xml")]
     pub(crate) fn is_xml_value(&self) -> bool {
         self.kind.is_xml_value()
     }
@@ -170,7 +169,6 @@ pub enum ExpressionKind<'a> {
 }
 
 impl<'a> ExpressionKind<'a> {
-    #[cfg(feature = "xml")]
     pub(crate) fn is_xml_value(&self) -> bool {
         match self {
             Self::Parameterized(Value::Xml(_)) => true,

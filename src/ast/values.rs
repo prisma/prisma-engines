@@ -59,13 +59,11 @@ pub enum Value<'a> {
     Boolean(Option<bool>),
     /// A single character.
     Char(Option<char>),
-    #[cfg(all(feature = "array", feature = "postgresql"))]
     /// An array value (PostgreSQL).
     Array(Option<Vec<Value<'a>>>),
     #[cfg(feature = "json-1")]
     /// A JSON value.
     Json(Option<serde_json::Value>),
-    #[cfg(feature = "xml")]
     /// A XML value.
     Xml(Option<Cow<'a, str>>),
     #[cfg(feature = "uuid-0_8")]
@@ -110,7 +108,6 @@ impl<'a> fmt::Display for Value<'a> {
             Value::Enum(val) => val.as_ref().map(|v| write!(f, "\"{}\"", v)),
             Value::Boolean(val) => val.map(|v| write!(f, "{}", v)),
             Value::Char(val) => val.map(|v| write!(f, "'{}'", v)),
-            #[cfg(feature = "array")]
             Value::Array(vals) => vals.as_ref().map(|vals| {
                 let len = vals.len();
 
@@ -126,7 +123,6 @@ impl<'a> fmt::Display for Value<'a> {
             }),
             #[cfg(feature = "json-1")]
             Value::Json(val) => val.as_ref().map(|v| write!(f, "{}", v)),
-            #[cfg(feature = "xml")]
             Value::Xml(val) => val.as_ref().map(|v| write!(f, "{}", v)),
             #[cfg(feature = "uuid-0_8")]
             Value::Uuid(val) => val.map(|v| write!(f, "{}", v)),
@@ -164,9 +160,7 @@ impl<'a> From<Value<'a>> for serde_json::Value {
             }),
             #[cfg(feature = "json-1")]
             Value::Json(v) => v,
-            #[cfg(feature = "xml")]
             Value::Xml(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
-            #[cfg(feature = "array")]
             Value::Array(v) => {
                 v.map(|v| serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()))
             }
@@ -242,7 +236,6 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new array value.
-    #[cfg(feature = "array")]
     pub fn array<I, V>(value: I) -> Self
     where
         I: IntoIterator<Item = V>,
@@ -282,7 +275,6 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new XML value.
-    #[cfg(feature = "xml")]
     pub fn xml<T>(value: T) -> Self
     where
         T: Into<Cow<'a, str>>,
@@ -300,7 +292,6 @@ impl<'a> Value<'a> {
             Value::Bytes(b) => b.is_none(),
             Value::Boolean(b) => b.is_none(),
             Value::Char(c) => c.is_none(),
-            #[cfg(feature = "array")]
             Value::Array(v) => v.is_none(),
             #[cfg(feature = "uuid-0_8")]
             Value::Uuid(u) => u.is_none(),
@@ -312,7 +303,6 @@ impl<'a> Value<'a> {
             Value::Time(t) => t.is_none(),
             #[cfg(feature = "json-1")]
             Value::Json(json) => json.is_none(),
-            #[cfg(feature = "xml")]
             Value::Xml(s) => s.is_none(),
         }
     }
@@ -436,7 +426,6 @@ impl<'a> Value<'a> {
     }
 
     /// `true` if the `Value` is an Array.
-    #[cfg(feature = "array")]
     pub fn is_array(&self) -> bool {
         matches!(self, Value::Array(_))
     }
@@ -526,7 +515,6 @@ impl<'a> Value<'a> {
     }
 
     /// Returns a Vec<T> if the value is an array of T, otherwise `None`.
-    #[cfg(all(feature = "array", feature = "postgresql"))]
     pub fn into_vec<T>(self) -> Option<Vec<T>>
     where
         // Implement From<Value>
@@ -719,7 +707,7 @@ impl<'a> IntoIterator for Values<'a> {
     }
 }
 
-#[cfg(all(test, feature = "array", feature = "postgresql"))]
+#[cfg(all(test, feature = "postgresql"))]
 mod tests {
     use super::*;
     #[cfg(feature = "chrono-0_4")]

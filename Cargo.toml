@@ -19,21 +19,21 @@ repository = "https://github.com/prisma/quaint/"
 version = "0.2.0-alpha.13"
 
 [package.metadata.docs.rs]
-features = ["full", "serde-support", "json-1", "uuid-0_8", "chrono-0_4", "array"]
+features = ["full", "serde-support", "json-1", "uuid-0_8", "chrono-0_4"]
 
 [features]
 default = []
 
 full = ["pooled", "sqlite", "json-1", "postgresql", "uuid-0_8", "chrono-0_4", "mysql", "mssql"]
-full-mssql = ["pooled", "mssql", "xml", "tokio/time"]
+full-mssql = ["pooled", "mssql", "tokio/time"]
 full-mysql = ["pooled", "mysql", "json-1", "uuid-0_8", "chrono-0_4"]
-full-postgresql = ["pooled", "postgresql", "json-1", "xml", "uuid-0_8", "chrono-0_4", "array"]
+full-postgresql = ["pooled", "postgresql", "json-1", "uuid-0_8", "chrono-0_4"]
 full-sqlite = ["pooled", "sqlite", "json-1", "uuid-0_8", "chrono-0_4"]
 
-single = ["sqlite", "json-1", "xml", "postgresql", "uuid-0_8", "chrono-0_4", "mysql", "mssql"]
-single-mssql = ["mssql", "xml", "tokio/time"]
+single = ["sqlite", "json-1", "postgresql", "uuid-0_8", "chrono-0_4", "mysql", "mssql"]
+single-mssql = ["mssql", "tokio/time"]
 single-mysql = ["mysql", "json-1", "uuid-0_8", "chrono-0_4"]
-single-postgresql = ["postgresql", "json-1", "xml", "uuid-0_8", "chrono-0_4", "array"]
+single-postgresql = ["postgresql", "json-1", "uuid-0_8", "chrono-0_4"]
 single-sqlite = ["sqlite", "json-1", "uuid-0_8", "chrono-0_4"]
 
 postgresql = [
@@ -41,7 +41,6 @@ postgresql = [
   "tokio-postgres",
   "postgres-types",
   "postgres-native-tls",
-  "array",
   "bytes",
   "tokio",
   "bit-vec",
@@ -49,7 +48,6 @@ postgresql = [
   "byteorder",
 ]
 
-array = []
 chrono-0_4 = ["chrono"]
 json-1 = ["serde_json", "base64"]
 mssql = ["tiberius", "uuid-0_8", "chrono-0_4", "tokio-util"]
@@ -59,7 +57,6 @@ serde-support = ["serde", "chrono/serde"]
 sqlite = ["rusqlite", "libsqlite3-sys", "tokio/sync"]
 tracing-log = ["tracing", "tracing-core"]
 uuid-0_8 = ["uuid"]
-xml = []
 
 [dependencies]
 async-trait = "0.1"

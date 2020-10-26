@@ -204,7 +204,6 @@ impl<'a> ToSql for Value<'a> {
             Value::Boolean(boo) => boo.map(ToSqlOutput::from),
             Value::Char(c) => c.map(|c| ToSqlOutput::from(c as u8)),
             Value::Bytes(bytes) => bytes.as_ref().map(|bytes| ToSqlOutput::from(bytes.as_ref())),
-            #[cfg(feature = "array")]
             Value::Array(_) => {
                 let msg = "Arrays are not supported in SQLite.";
                 let kind = ErrorKind::conversion(msg);
@@ -222,7 +221,6 @@ impl<'a> ToSql for Value<'a> {
 
                 ToSqlOutput::from(stringified)
             }),
-            #[cfg(feature = "xml")]
             Value::Xml(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             #[cfg(feature = "uuid-0_8")]
             Value::Uuid(value) => value.map(|value| ToSqlOutput::from(value.to_hyphenated().to_string())),

@@ -33,10 +33,8 @@ impl<'a> ToSql for Value<'a> {
             Value::Date(val) => val.to_sql(),
             #[cfg(feature = "chrono-0_4")]
             Value::Time(val) => val.to_sql(),
-            #[cfg(feature = "xml")]
             Value::Xml(val) => val.to_sql(),
-            #[cfg(feature = "array")]
-            p => todo!("Type {:?} is not supported", p),
+            Value::Array(_) => panic!("Arrays are not supported on SQL Server."),
         }
     }
 }
@@ -96,7 +94,6 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
 
                 Value::DateTime(DateTime::<Utc>::from_sql(&dt)?)
             }
-            #[cfg(feature = "xml")]
             ColumnData::Xml(cow) => Value::Xml(cow.map(|xml_data| Cow::Owned(xml_data.into_owned().into_string()))),
         };
 

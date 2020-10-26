@@ -78,7 +78,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
             #[cfg(feature = "json-1")]
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
-            #[cfg(all(feature = "array", feature = "postgresql"))]
+            #[cfg(feature = "postgresql")]
             Value::Array(ary) => ary.map(|ary| {
                 self.surround_with("'{", "}'", |ref mut s| {
                     let len = ary.len();
@@ -102,7 +102,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
             #[cfg(feature = "chrono-0_4")]
             Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
-            #[cfg(feature = "xml")]
             Value::Xml(cow) => cow.map(|cow| self.write(format!("'{}'", cow))),
         };
 
@@ -205,7 +204,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         let right_cast = match left {
             #[cfg(feature = "json-1")]
             _ if left.is_json_value() => "::jsonb",
-            #[cfg(feature = "xml")]
             _ if left.is_xml_value() => "::text",
             _ => "",
         };
@@ -213,7 +211,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         let left_cast = match right {
             #[cfg(feature = "json-1")]
             _ if right.is_json_value() => "::jsonb",
-            #[cfg(feature = "xml")]
             _ if right.is_xml_value() => "::text",
             _ => "",
         };
@@ -232,7 +229,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         let right_cast = match left {
             #[cfg(feature = "json-1")]
             _ if left.is_json_value() => "::jsonb",
-            #[cfg(feature = "xml")]
             _ if left.is_xml_value() => "::text",
             _ => "",
         };
@@ -240,7 +236,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         let left_cast = match right {
             #[cfg(feature = "json-1")]
             _ if right.is_json_value() => "::jsonb",
-            #[cfg(feature = "xml")]
             _ if right.is_xml_value() => "::text",
             _ => "",
         };
@@ -450,7 +445,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "xml")]
     #[test]
     fn equality_with_a_xml_value() {
         let expected = expected_values(
@@ -466,7 +460,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "xml")]
     #[test]
     fn equality_with_a_lhs_xml_value() {
         let expected = expected_values(
@@ -482,7 +475,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "xml")]
     #[test]
     fn difference_with_a_xml_value() {
         let expected = expected_values(
@@ -498,7 +490,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "xml")]
     #[test]
     fn difference_with_a_lhs_xml_value() {
         let expected = expected_values(

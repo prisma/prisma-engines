@@ -142,7 +142,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Bytes(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::BYTEA_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Vec<u8>> = val;
@@ -212,7 +211,6 @@ impl GetRow for PostgresRow {
                 },
                 #[cfg(feature = "json-1")]
                 PostgresType::JSON | PostgresType::JSONB => Value::Json(row.try_get(i)?),
-                #[cfg(feature = "array")]
                 PostgresType::INT2_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i16> = val;
@@ -221,7 +219,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::INT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i32> = val;
@@ -230,7 +227,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::INT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i64> = val;
@@ -239,7 +235,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f32> = val;
@@ -248,7 +243,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f64> = val;
@@ -257,7 +251,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::BOOL_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<bool> = val;
@@ -266,7 +259,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
+                #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<NaiveDateTime> = val;
@@ -279,7 +272,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<DecimalWrapper> = val;
@@ -290,7 +282,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::TEXT_ARRAY | PostgresType::NAME_ARRAY | PostgresType::VARCHAR_ARRAY => {
                     match row.try_get(i)? {
                         Some(val) => {
@@ -300,7 +291,6 @@ impl GetRow for PostgresRow {
                         None => Value::Array(None),
                     }
                 }
-                #[cfg(feature = "array")]
                 PostgresType::MONEY_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<NaiveMoney> = val;
@@ -309,7 +299,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::OID_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<u32> = val;
@@ -318,7 +307,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
+                #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<DateTime<Utc>> = val;
@@ -327,7 +316,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
+                #[cfg(feature = "chrono-0_4")]
                 PostgresType::DATE_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<chrono::NaiveDate> = val;
@@ -335,7 +324,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
+                #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIME_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<chrono::NaiveTime> = val;
@@ -343,7 +332,7 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(all(feature = "array", feature = "chrono-0_4"))]
+                #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIMETZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<TimeTz> = val;
@@ -354,7 +343,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::JSON_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<serde_json::Value> = val;
@@ -363,7 +351,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::JSONB_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<serde_json::Value> = val;
@@ -393,7 +380,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Text(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::INET_ARRAY | PostgresType::CIDR_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<std::net::IpAddr> = val;
@@ -409,7 +395,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Text(None),
                 },
-                #[cfg(feature = "array")]
                 PostgresType::BIT_ARRAY | PostgresType::VARBIT_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<BitVec> = val;
@@ -423,7 +408,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
-                #[cfg(feature = "xml")]
                 PostgresType::XML => match row.try_get(i)? {
                     Some(val) => {
                         let val: XmlString = val;
@@ -431,7 +415,6 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Xml(None),
                 },
-                #[cfg(all(feature = "array", feature = "xml"))]
                 PostgresType::XML_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<XmlString> = val;
@@ -447,7 +430,6 @@ impl GetRow for PostgresRow {
                         }
                         None => Value::Enum(None),
                     },
-                    #[cfg(feature = "array")]
                     Kind::Array(inner) => match inner.kind() {
                         Kind::Enum(_) => match row.try_get(i)? {
                             Some(val) => {
@@ -602,11 +584,9 @@ impl<'a> ToSql for Value<'a> {
             }),
             (Value::Boolean(boo), _) => boo.map(|boo| boo.to_sql(ty, out)),
             (Value::Char(c), _) => c.map(|c| (c as i8).to_sql(ty, out)),
-            #[cfg(feature = "array")]
             (Value::Array(vec), _) => vec.as_ref().map(|vec| vec.to_sql(ty, out)),
             #[cfg(feature = "json-1")]
             (Value::Json(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
-            #[cfg(feature = "xml")]
             (Value::Xml(value), _) => value.as_ref().map(|value| value.to_sql(ty, out)),
             #[cfg(feature = "uuid-0_8")]
             (Value::Uuid(value), _) => value.map(|value| value.to_sql(ty, out)),

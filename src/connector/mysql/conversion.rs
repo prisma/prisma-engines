@@ -31,6 +31,19 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
                 Value::Enum(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
                 Value::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
                 Value::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
+                Value::Xml(s) => match s {
+                    Some(ref s) => Some(my::Value::Bytes((s).as_bytes().to_vec())),
+                    None => None,
+                },
+                Value::Array(_) => {
+                    let msg = "Arrays are not supported in MySQL.";
+                    let kind = ErrorKind::conversion(msg);
+
+                    let mut builder = Error::builder(kind);
+                    builder.set_original_message(msg);
+
+                    return Err(builder.build());
+                }
                 #[cfg(feature = "json-1")]
                 Value::Json(s) => match s {
                     Some(ref s) => {
@@ -41,21 +54,6 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
                     }
                     None => None,
                 },
-                #[cfg(feature = "xml")]
-                Value::Xml(s) => match s {
-                    Some(ref s) => Some(my::Value::Bytes((s).as_bytes().to_vec())),
-                    None => None,
-                },
-                #[cfg(feature = "array")]
-                Value::Array(_) => {
-                    let msg = "Arrays are not supported in MySQL.";
-                    let kind = ErrorKind::conversion(msg);
-
-                    let mut builder = Error::builder(kind);
-                    builder.set_original_message(msg);
-
-                    return Err(builder.build());
-                }
                 #[cfg(feature = "uuid-0_8")]
                 Value::Uuid(u) => u.map(|u| my::Value::Bytes(u.to_hyphenated().to_string().into_bytes())),
                 #[cfg(feature = "chrono-0_4")]

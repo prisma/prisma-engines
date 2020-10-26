@@ -137,10 +137,8 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             #[cfg(feature = "json-1")]
             Value::Json(None) => visitor.visit_none(),
 
-            #[cfg(feature = "xml")]
-            Value::Xml(None) => visitor.visit_none(),
-            #[cfg(feature = "xml")]
             Value::Xml(Some(s)) => visitor.visit_string(s.into_owned()),
+            Value::Xml(None) => visitor.visit_none(),
 
             #[cfg(feature = "chrono-0_4")]
             Value::DateTime(Some(dt)) => visitor.visit_string(dt.to_rfc3339()),
@@ -157,12 +155,10 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             #[cfg(feature = "chrono-0_4")]
             Value::Time(None) => visitor.visit_none(),
 
-            #[cfg(all(feature = "array", feature = "postgresql"))]
             Value::Array(Some(values)) => {
                 let deserializer = serde::de::value::SeqDeserializer::new(values.into_iter());
                 visitor.visit_seq(deserializer)
             }
-            #[cfg(all(feature = "array", feature = "postgresql"))]
             Value::Array(None) => visitor.visit_none(),
         }
     }

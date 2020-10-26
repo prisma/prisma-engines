@@ -1,5 +1,4 @@
 use super::Visitor;
-#[cfg(all(feature = "array", feature = "postgresql"))]
 use crate::error::{Error, ErrorKind};
 use crate::prelude::Aliasable;
 use crate::prelude::Query;
@@ -91,8 +90,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             }
             (left_kind, right_kind) => {
                 let (l_alias, r_alias) = (left.alias, right.alias);
-
-                #[cfg(feature = "xml")]
                 let (left_xml, right_xml) = (left_kind.is_xml_value(), right_kind.is_xml_value());
 
                 let mut left = Expression::from(left_kind);
@@ -107,23 +104,19 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                     right = right.alias(alias);
                 }
 
-                match self {
-                    #[cfg(feature = "xml")]
-                    _ if right_xml => {
-                        self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(left))?
-                    }
-                    _ => self.visit_expression(left)?,
-                };
+                if right_xml {
+                    self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(left))?;
+                } else {
+                    self.visit_expression(left)?;
+                }
 
                 self.write(" = ")?;
 
-                match self {
-                    #[cfg(feature = "xml")]
-                    _ if left_xml => {
-                        self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(right))?
-                    }
-                    _ => self.visit_expression(right)?,
-                };
+                if left_xml {
+                    self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(right))?;
+                } else {
+                    self.visit_expression(right)?;
+                }
             }
         }
 
@@ -138,8 +131,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             }
             (left_kind, right_kind) => {
                 let (l_alias, r_alias) = (left.alias, right.alias);
-
-                #[cfg(feature = "xml")]
                 let (left_xml, right_xml) = (left_kind.is_xml_value(), right_kind.is_xml_value());
 
                 let mut left = Expression::from(left_kind);
@@ -154,23 +145,19 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                     right = right.alias(alias);
                 }
 
-                match self {
-                    #[cfg(feature = "xml")]
-                    _ if right_xml => {
-                        self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(left))?
-                    }
-                    _ => self.visit_expression(left)?,
-                };
+                if right_xml {
+                    self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(left))?;
+                } else {
+                    self.visit_expression(left)?;
+                }
 
                 self.write(" <> ")?;
 
-                match self {
-                    #[cfg(feature = "xml")]
-                    _ if left_xml => {
-                        self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(right))?
-                    }
-                    _ => self.visit_expression(right)?,
-                };
+                if left_xml {
+                    self.surround_with("CAST(", " AS NVARCHAR(MAX))", |x| x.visit_expression(right))?;
+                } else {
+                    self.visit_expression(right)?;
+                }
             }
         }
 
@@ -188,7 +175,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
             #[cfg(feature = "json-1")]
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
-            #[cfg(all(feature = "array", feature = "postgresql"))]
             Value::Array(_) => {
                 let msg = "Arrays are not supported in T-SQL.";
                 let kind = ErrorKind::conversion(msg);
@@ -218,7 +204,6 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 let s = format!("CONVERT(time, N'{}')", time);
                 self.write(s)
             }),
-            #[cfg(feature = "xml")]
             // Style 3 is keep all whitespace + internal DTD processing:
             // https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?redirectedfrom=MSDN&view=sql-server-ver15#xml-styles
             Value::Xml(cow) => cow.map(|cow| self.write(format!("CONVERT(XML, N'{}', 3)", cow))),
@@ -697,7 +682,6 @@ mod tests {
         assert_eq!(default_params(expected.1), params);
     }
 
-    #[cfg(feature = "xml")]
     #[test]
     fn equality_with_a_xml_value() {
         let expected = expected_values(
@@ -712,7 +696,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "xml")]
     #[test]
     fn equality_with_a_lhs_xml_value() {
         let expected = expected_values(
@@ -728,7 +711,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "xml")]
     #[test]
     fn difference_with_a_xml_value() {
         let expected = expected_values(
@@ -744,7 +726,6 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
-    #[cfg(feature = "xml")]
     #[test]
     fn difference_with_a_lhs_xml_value() {
         let expected = expected_values(
