@@ -215,6 +215,4 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     res.toString should be(
       """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","time":"1970-01-01T13:02:20.321+00:00","ts":"2016-09-24T14:01:30.213+00:00"}}}""")
   }
-
-  // XML
 }
