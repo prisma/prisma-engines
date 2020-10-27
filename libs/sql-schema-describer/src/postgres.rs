@@ -156,7 +156,9 @@ impl SqlSchemaDescriber {
             And att.attrelid = (
             	SELECT pg_class.oid 
             	FROM pg_class 
-            	WHERE relname = "table_name"
+            	JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
+            	WHERE relname = info.table_name
+            	AND pg_namespace.nspname = $1
             	)
             WHERE table_schema = $1	
             ORDER BY ordinal_position;
