@@ -33,6 +33,8 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
             boolean Boolean
             string String
             dateTime DateTime
+            bytes Bytes
+            decimal Decimal
         }
     "#;
 
@@ -40,7 +42,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
-            .assert_columns_count(6)?
+            .assert_columns_count(8)?
             .assert_column("int", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
@@ -57,6 +59,12 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
             })?
             .assert_column("dateTime", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
+            })?
+            .assert_column("bytes", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Binary)
+            })?
+            .assert_column("decimal", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
             })
     })?;
 

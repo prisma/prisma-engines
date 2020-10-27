@@ -6,3 +6,4 @@ mod mysql;
 mod postgres;
 mod sql;
 mod sqlite;
+mod types;
