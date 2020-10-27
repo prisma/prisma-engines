@@ -47,7 +47,9 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
             .assert_column("float", |c| match api.sql_family() {
                 //The native types work made the inferrence more correct on the describer level.
                 // But unless the feature is activated, this will be mapped to float like before in the datamodel level
-                SqlFamily::Mysql => c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Float),
+                SqlFamily::Mysql | SqlFamily::Postgres => {
+                    c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Float)
+                }
                 _ => c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal),
             })?
             .assert_column("boolean", |c| {
