@@ -59,7 +59,7 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
 
     let dm2 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String
             age Int @default(45)
         }
@@ -91,7 +91,7 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
 async fn adding_a_required_field_without_default_to_an_existing_table_without_data_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String
         }
     "#;
@@ -100,7 +100,7 @@ async fn adding_a_required_field_without_default_to_an_existing_table_without_da
 
     let dm2 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String
             age Int
         }

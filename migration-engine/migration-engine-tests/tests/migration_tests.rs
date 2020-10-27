@@ -1904,7 +1904,7 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
         }
 
         model Pet {
-            id              String @id
+            id              Int @id
             human_firstName String
             human_lastName  String
 
@@ -1953,7 +1953,7 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
         }
 
         model Cat {
-            id String @id
+            id Int @id
             humans HumanToCat[]
         }
     "#;
@@ -2006,7 +2006,7 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
         }
 
         model Cat {
-            id String @id
+            id Int @id
             humans HumanToCat[]
         }
     "#;
@@ -2038,7 +2038,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
         }
 
         model Test {
-            id String @id
+            id Int @id
             name String
         }
     "#;

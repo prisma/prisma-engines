@@ -14,7 +14,7 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
         |}
         |
         |model ModelB {
-        |  id String @id
+        |  id Int @id
         |  createdAt DateTime @default(now())
         |  a_id Int
         |  a ModelA @relation(fields: [a_id], references: [id])

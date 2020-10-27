@@ -12,7 +12,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         }
 
         model Post {
-            id String @id
+            id Int @id
             author String
             author_rel User @relation(fields: [author], references: name)
         }
@@ -43,14 +43,14 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
 
     let dm2 = r#"
         model User {
-            id String @id
+            id Int @id
             name String
 
             @@unique([name], name: "idxrenamed")
         }
 
         model Post {
-            id String @id
+            id Int @id
             author String
             author_rel User @relation(fields: [author], references: name)
         }

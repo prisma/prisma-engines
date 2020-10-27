@@ -7,7 +7,7 @@ fn strings_with_quotes_are_unescaped() {
     let input = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String @default("a \" b\"c d")
         }"#
     );
@@ -33,7 +33,7 @@ fn strings_with_newlines_are_unescpaed() {
     let input = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String @default("Jean\nClaude\nVan\nDamme")
         }"#
     );

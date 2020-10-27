@@ -8,7 +8,7 @@ fn strings_with_quotes_render_as_escaped_literals() {
     let input = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String
         }"#
     );
@@ -16,7 +16,7 @@ fn strings_with_quotes_render_as_escaped_literals() {
     let expected = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String @default("a \" b\"c d")
         }
         "#
@@ -37,7 +37,7 @@ fn strings_with_quotes_roundtrip() {
     let input = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String @default("a \" b\"c d")
         }
         "#
@@ -54,7 +54,7 @@ fn strings_with_newlines_render_as_escaped_literals() {
     let input = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String
         }"#
     );
@@ -62,7 +62,7 @@ fn strings_with_newlines_render_as_escaped_literals() {
     let expected = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String @default("Jean\nClaude\nVan\nDamme")
         }
         "#
@@ -85,7 +85,7 @@ fn strings_with_newlines_roundtrip() {
     let input = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String @default("Jean\nClaude\nVan\nDamme")
         }
         "#
@@ -102,7 +102,7 @@ fn strings_with_backslashes_roundtrip() {
     let input = indoc!(
         r#"
         model Category {
-          id   String @id
+          id   Int @id
           name String @default("xyz\\Datasource\\Model")
         }
         "#
