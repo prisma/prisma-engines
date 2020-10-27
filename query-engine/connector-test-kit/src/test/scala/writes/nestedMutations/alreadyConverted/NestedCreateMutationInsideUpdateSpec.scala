@@ -679,13 +679,13 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() {
       """model Comment{
         |   id   String @id @default(cuid())
-        |   text String @unique
+        |   text Int @unique
         |   todo Todo?  @relation(references: [id])
         |}
         |
         |model Todo{
         |   id       String @id @default(cuid())
-        |   title    String @unique
+        |   title    Int @unique
         |   comments Comment[]
         |}"""
     }

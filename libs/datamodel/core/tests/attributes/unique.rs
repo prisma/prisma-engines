@@ -244,7 +244,7 @@ fn must_error_when_using_the_same_field_multiple_times() {
     let dml = r#"
     model User {
         id    Int    @id
-        email String @unique
+        email Int @unique
 
         @@unique([email, email])
     }

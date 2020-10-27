@@ -9,7 +9,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       |model TestModel {
       |  id          Int    @id
       |  field       String
-      |  uniqueField String @unique
+      |  uniqueField Int @unique
       |}
     """.stripMargin
   }

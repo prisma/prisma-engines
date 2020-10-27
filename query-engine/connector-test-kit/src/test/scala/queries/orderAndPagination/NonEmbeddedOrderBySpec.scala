@@ -11,7 +11,7 @@ class NonEmbeddedOrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     val s1 = """
       model  List {
         id    String @id @default(cuid())
-        name  String @unique
+        name  Int @unique
 
         todos Todo[]
       }

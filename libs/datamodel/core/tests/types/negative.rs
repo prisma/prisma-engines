@@ -88,7 +88,7 @@ fn shound_fail_on_unresolvable_type() {
 fn should_fail_on_custom_related_types() {
     let dml = r#"
     type UserViaEmail = User @relation(references: email)
-    type UniqueString = String @unique
+    type UniqueString = Int @unique
 
     model User {
         id Int @id

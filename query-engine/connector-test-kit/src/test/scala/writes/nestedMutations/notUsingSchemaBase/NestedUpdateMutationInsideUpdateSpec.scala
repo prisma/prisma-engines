@@ -291,7 +291,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |
         |model Comment {
         | id    String @id @default(cuid())
-        | alias String @unique
+        | alias Int @unique
         | text  String?
         | todo  Todo
         |}
@@ -348,13 +348,13 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val project = SchemaDsl.fromStringV11() {
       s"""model List {
         | id         String @id @default(cuid())
-        | listUnique String @unique
+        | listUnique Int @unique
         | todoes     Todo[] $relationInlineAttribute
         |}
         |
         |model Todo {
         | id         String @id @default(cuid())
-        | todoUnique String @unique
+        | todoUnique Int @unique
         |}
       """
     }

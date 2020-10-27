@@ -742,7 +742,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  nameMiddle Int @unique
                                              |  tops       Top[]
                                              |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
@@ -829,7 +829,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  nameMiddle Int @unique
                                              |  tops       Top[]
                                              |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
@@ -922,7 +922,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |}""" }
     database.setup(project)
 
@@ -1007,7 +1007,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |}""" }
     database.setup(project)
 
@@ -1086,14 +1086,14 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  nameMiddle Int @unique
                                              |  tops       Top[]
                                              |  bottom     Bottom? @relation(references: [id])
                                              |}
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |  middle     Middle
                                              |}""" }
     database.setup(project)
@@ -1174,7 +1174,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |  middle     Middle?
                                              |}""" }
 
@@ -1242,13 +1242,13 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
   "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges for update" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String @id @default(cuid())
-                                             |  nameTop String @unique
+                                             |  nameTop Int @unique
                                              |  middle  Middle? @relation(references: [id])
                                              |}
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  nameMiddle Int @unique
                                              |  bottom     Bottom? @relation(references: [id])
                                              |}
                                              |
@@ -1260,7 +1260,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Below {
                                              |  id        String @id @default(cuid())
-                                             |  nameBelow String @unique
+                                             |  nameBelow Int @unique
                                              |}""" }
     database.setup(project)
 
@@ -1353,7 +1353,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Below {
                                              |  id        String @id @default(cuid())
-                                             |  nameBelow String @unique
+                                             |  nameBelow Int @unique
                                              |}""" }
     database.setup(project)
 
@@ -1517,7 +1517,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  nameMiddle Int @unique
                                              |  top        Top?
                                              |  bottom     Bottom? @relation(references: [id])
                                              |}
@@ -1597,7 +1597,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |}""" }
     database.setup(project)
 

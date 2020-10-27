@@ -6,7 +6,7 @@ fn unique_attribute() {
     let dml = r#"
         model Test {
             id Int @id
-            unique String @unique
+            unique Int @unique
         }
     "#;
 
@@ -29,7 +29,7 @@ fn duplicate_attributes_should_error() {
     let dml = r#"
         model Test {
             id Int @id
-            unique String @unique @unique
+            unique Id @unique @unique
         }
     "#;
 

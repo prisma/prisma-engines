@@ -127,7 +127,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
         |
         |model ModelB {
         |  id  String @id @default(cuid())
-        |  b_u String @unique
+        |  b_u Int @unique
         |
         |  manyA ModelA[]
         |}
@@ -288,7 +288,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
         |
         |model ModelB {
         |  id  String @id @default(cuid())
-        |  b_u String @unique
+        |  b_u Int @unique
         |
         |  manyA ModelA[]
         |}
@@ -449,7 +449,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
         |
         |model ModelB {
         |  id  String @id @default(cuid())
-        |  b_u String @unique
+        |  b_u Int @unique
         |
         |  oneA ModelA
         |}
@@ -643,7 +643,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
         |
         |model ModelB {
         |  id  String @id @default(cuid())
-        |  b_u String @unique
+        |  b_u Int @unique
         |
         |  oneA ModelA
         |}

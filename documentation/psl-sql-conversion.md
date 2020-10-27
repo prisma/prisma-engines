@@ -151,7 +151,7 @@ CREATE TABLE "test"."User_ints" (
 model Blog {
     id        String @id @default(cuid())
     title     String
-    slug      String @unique
+    slug      Int @unique
 }
 ```
 

@@ -15,7 +15,7 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
 
         model Cat {
             id Int @id
-            name String @unique
+            name Int @unique
             humans Human[]
         }
     "#;

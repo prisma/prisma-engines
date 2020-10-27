@@ -41,7 +41,7 @@ class FindOneQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = SchemaDsl.fromStringV11() {
       """model TestModel {
         |  id   Int    @id
-        |  uniq String @unique
+        |  uniq Int @unique
         |}
       """.stripMargin
     }

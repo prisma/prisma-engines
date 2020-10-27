@@ -942,13 +942,13 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  nameMiddle Int @unique
                                              |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |}""" }
     database.setup(project)
 
@@ -1024,7 +1024,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  nameMiddle Int @unique
                                              |  tops       Top[]
                                              |  bottom     Bottom? @relation(references: [id])
                                              |}
@@ -1116,7 +1116,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                                              |
                                              |model Below {
                                              |  id        String @id @default(cuid())
-                                             |  nameBelow String @unique
+                                             |  nameBelow Int @unique
                                              |}""" }
     database.setup(project)
 
@@ -1276,7 +1276,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |}""" }
     database.setup(project)
 

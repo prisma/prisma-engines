@@ -549,7 +549,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         |
         |model AUser {
         |  id    String @id @default(cuid())
-        |  name  String @unique
+        |  name  Int @unique
         |  posts Post[]
         |}"""
     }

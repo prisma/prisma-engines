@@ -59,7 +59,7 @@ fn must_succeed_on_model_with_unique_criteria() {
 
     let dml3 = r#"
     model Model {
-        unique String @unique
+        unique Int @unique
     }
     "#;
     let _ = parse(dml3);

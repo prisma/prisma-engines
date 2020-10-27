@@ -110,7 +110,7 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
     let dm = r#"
             model Blog {
                 id Int @id
-                title String @unique
+                title Int @unique
             }
         "#;
     let result = api.infer_and_apply_forcefully(&dm).await.sql_schema;

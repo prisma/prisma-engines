@@ -43,7 +43,7 @@ fn resolve_related_field() {
     let dml = r#"
     model User {
         id        Int    @id
-        firstName String @unique
+        firstName Int @unique
         posts Post[]
     }
 

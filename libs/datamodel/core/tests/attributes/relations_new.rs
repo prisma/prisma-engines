@@ -288,7 +288,7 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
     let dml = r#"
     model User {
         id Int @id
-        firstName String @unique
+        firstName Int @unique
         posts Post[]
     }
 

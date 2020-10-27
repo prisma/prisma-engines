@@ -145,7 +145,7 @@ async fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: &T
     let dm = r#"
         model User {
             id     Int    @id @default(autoincrement())
-            email  String @unique
+            email  Int @unique
             name   String
 
             @@index([email])

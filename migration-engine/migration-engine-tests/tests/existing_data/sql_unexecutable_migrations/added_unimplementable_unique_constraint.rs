@@ -28,7 +28,7 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
             id Int @id
-            name String @unique
+            name Int @unique
         }
     "#;
 
@@ -161,7 +161,7 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
     let dm2 = r#"
         model Test {
             id Int @id
-            name String @unique
+            name Int @unique
         }
     "#;
 

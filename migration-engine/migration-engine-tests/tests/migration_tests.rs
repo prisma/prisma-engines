@@ -1024,7 +1024,7 @@ async fn adding_a_new_unique_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
-            field String @unique
+            field Int @unique
         }
     "#;
 
@@ -1063,7 +1063,7 @@ async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) 
     let dm1 = r#"
         model A {
             id Int @id
-            field String @unique @map("custom_field_name")
+            field Int @unique @map("custom_field_name")
         }
     "#;
 
@@ -1104,7 +1104,7 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
     let dm1 = r#"
         model A {
             id    Int    @id
-            field String @unique
+            field Int @unique
         }
     "#;
 
@@ -1150,7 +1150,7 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResu
     let dm2 = r#"
         model A {
             id    Int    @id
-            field String @unique
+            field Int @unique
         }
     "#;
 
@@ -1176,7 +1176,7 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
     let dm1 = r#"
         model A {
             id    Int    @id
-            field String @unique
+            field Int @unique
         }
     "#;
 
@@ -1531,7 +1531,7 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
     let dm = r#"
         model User {
             id Int @id
-            email String @unique
+            email Int @unique
         }
 
         model Account {
@@ -1563,7 +1563,7 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
     let dm = r#"
         model User {
             id Int @id
-            email String @unique @map("emergency-mail")
+            email Int @unique @map("emergency-mail")
             accounts Account[]
 
             @@map("users")
@@ -1724,7 +1724,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     let dm1 = r#"
         model User {
             id Int @id
-            email String @unique
+            email Int @unique
         }
 
         model Account {
@@ -1742,7 +1742,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     let dm2 = r#"
         model User {
             id Int @id
-            email String @unique
+            email Int @unique
         }
 
         model Account {
@@ -1768,7 +1768,7 @@ async fn foreign_keys_can_be_added_on_existing_columns(api: &TestApi) -> TestRes
     let dm1 = r#"
         model User {
             id Int @id
-            email String @unique
+            email Int @unique
         }
 
         model Account {
@@ -1787,7 +1787,7 @@ async fn foreign_keys_can_be_added_on_existing_columns(api: &TestApi) -> TestRes
     let dm2 = r#"
         model User {
             id Int @id
-            email String @unique
+            email Int @unique
         }
 
         model Account {
@@ -1813,7 +1813,7 @@ async fn foreign_keys_can_be_dropped_on_existing_columns(api: &TestApi) -> TestR
     let dm1 = r#"
         model User {
             id Int @id
-            email String @unique
+            email Int @unique
         }
 
         model Account {
@@ -1834,7 +1834,7 @@ async fn foreign_keys_can_be_dropped_on_existing_columns(api: &TestApi) -> TestR
     let dm2 = r#"
         model User {
             id Int @id
-            email String @unique
+            email Int @unique
         }
 
         model Account {
@@ -2082,14 +2082,14 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
     let dm2 = r#"
         model A {
             id Int
-            name String @unique
+            name Int @unique
             b_email String
             brel B @relation("AtoB", fields: [b_email], references: [email])
         }
 
         model B {
             id Int
-            email String @unique
+            email Int @unique
             a_name String
             arel A @relation("BtoA", fields: [a_name], references: [name])
         }

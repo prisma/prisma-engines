@@ -157,7 +157,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       """
         |model Post {
         |  id      String @id @default(cuid())
-        |  title   String @unique
+        |  title   Int @unique
         |
         |  author  AUser?
         |}

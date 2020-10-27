@@ -26,7 +26,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
       model Bottom {
         id        String @id @default(cuid())
-        b         String @unique
+        b         Int @unique
         middle_id String
 
         middle Middle @relation(fields: [middle_id], references: [id])
@@ -52,7 +52,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
       model Bottom {
         id        String @id @default(cuid())
-        b         String @unique
+        b         Int @unique
         middle_id String
 
         middle Middle @relation(fields: [middle_id], references: [id])

@@ -120,7 +120,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 fn should_be_able_to_handle_multiple_types() {
     let dml = r#"
     type ID = String @id @default(cuid())
-    type UniqueString = String @unique
+    type UniqueString = Int @unique
     type Cash = Int @default(0)
 
     model User {

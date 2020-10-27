@@ -89,7 +89,7 @@ async fn a_table_with_unique_index(api: &TestApi) -> crate::TestResult {
     let dm = indoc! {r##"
         model Blog {
             id      Int @id @default(autoincrement())
-            authorId String @unique
+            authorId Int @unique
         }
     "##};
 

@@ -44,7 +44,7 @@ fn test_reformat_model_complex() {
     let expected = r#"/// model doc comment
 model User {
   id                    Int    @id // doc comment on the side
-  fieldA                String @unique // comment on the side
+  fieldA                Int @unique // comment on the side
   // comment before
   /// doc comment before
   anotherWeirdFieldName Int
@@ -211,7 +211,7 @@ fn comments_in_a_model_must_not_move() {
         model User {
           id     Int    @id
           // Comment
-          email  String @unique
+          email  Int @unique
           // Comment 2
         }
     "#;
@@ -219,7 +219,7 @@ fn comments_in_a_model_must_not_move() {
     let expected = r#"model User {
   id    Int    @id
   // Comment
-  email String @unique
+  email Int @unique
   // Comment 2
 }
 "#;

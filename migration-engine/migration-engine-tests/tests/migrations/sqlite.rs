@@ -7,7 +7,7 @@ async fn sqlite_must_recreate_indexes(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
-            field String @unique
+            field Int @unique
         }
     "#;
 
@@ -20,7 +20,7 @@ async fn sqlite_must_recreate_indexes(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model A {
             id    Int    @id
-            field String @unique
+            field Int @unique
             other String
         }
     "#;

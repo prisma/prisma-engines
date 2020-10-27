@@ -553,7 +553,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
                         model ReqOther{
                             id       String @id @default(cuid())
-                            r        String @unique
+                            r        Int @unique
                             childReq Child
                         }"""
 
@@ -628,7 +628,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
                         model OptOther{
                             id       String @id @default(cuid())
-                            o        String @unique
+                            o        Int @unique
                             childOpt Child?
                         }"""
 
@@ -758,7 +758,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     val schema = s"""model Comment{
                             id     String @id @default(cuid())
                             text   String
-                            alias  String @unique
+                            alias  Int @unique
                             todo   Todo?
                         }
 
@@ -952,7 +952,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
                         model Todo{
                             id    String @id @default(cuid())
-                            title String @unique
+                            title Int @unique
                             note  Note?  @relation(references: [id])
                         }"""
 
@@ -1077,14 +1077,14 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Middle {
                                              |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  nameMiddle Int @unique
                                              |  tops       Top[]
                                              |  bottoms    Bottom[] $relationInlineAttribute
                                              |}
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |  middles    Middle
                                              |}""" }
     database.setup(project)
@@ -1178,7 +1178,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |}""" }
     database.setup(project)
 
@@ -1260,7 +1260,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
   "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path " ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String @id @default(cuid())
-                                             |  nameTop String @unique
+                                             |  nameTop Int @unique
                                              |  middles Middle[] $relationInlineAttribute
                                              |}
                                              |
@@ -1273,7 +1273,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                             |  nameBottom Int @unique
                                              |  middle     Middle
                                              |}""" }
     database.setup(project)
@@ -1364,7 +1364,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Below {
                                              |  id        String @id @default(cuid())
-                                             |  nameBelow String @unique
+                                             |  nameBelow Int @unique
                                              |}""" }
     database.setup(project)
 

@@ -16,7 +16,7 @@ class RelationFilterOrderingSpec extends FlatSpec with Matchers with ApiSpecBase
 
                 model Label {
                   id String @id @default(cuid())
-                  text String @unique
+                  text Int @unique
 
                   blogs Blog[]
                 }"""
@@ -31,7 +31,7 @@ class RelationFilterOrderingSpec extends FlatSpec with Matchers with ApiSpecBase
 
                 model Label {
                   id String @id @default(cuid())
-                  text String @unique
+                  text Int @unique
 
                   blogs Blog[]
                 }"""

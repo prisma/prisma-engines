@@ -277,7 +277,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
         |
         |model AUser {
         |  id    String @id @default(cuid())
-        |  name  String @unique
+        |  name  Int @unique
         |  posts Post[] @relation(references: [id])
         |}"""
 
@@ -290,7 +290,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
         |
         |model AUser {
         |  id    String @id @default(cuid())
-        |  name  String @unique
+        |  name  Int @unique
         |  posts Post[] @relation(references: [id])
         |}"""
 
