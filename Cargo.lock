@@ -604,9 +604,9 @@ dependencies = [
 
 [[package]]
 name = "connection-string"
-version = "0.1.9"
+version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cf9ff4ef35828f9e55249d69d57c1727c5409f168a4434d7bb6bb2c0e08bacc"
+checksum = "479c8a899d8b4fb4abe469c53f53e472131688245b0e3327537f36392b7b84e8"
 
 [[package]]
 name = "const-random"
