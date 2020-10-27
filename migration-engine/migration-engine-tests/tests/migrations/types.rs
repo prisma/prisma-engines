@@ -183,3 +183,105 @@ async fn string_to_bytes_works(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(capabilities("scalar_lists"))]
+async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
+    let dm1 = format!(
+        r#"
+            {datasource}
+
+            model Test {{
+                id       String    @id @default(cuid())
+                decFloat Decimal
+            }}
+        "#,
+        datasource = api.datasource()
+    );
+
+    api.schema_push(&dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())
+    })?;
+
+    let dm2 = format!(
+        r#"
+            {datasource}
+
+            model Test {{
+                id       String    @id @default(cuid())
+                decFloat Decimal[]
+            }}
+        "#,
+        datasource = api.datasource()
+    );
+
+    api.schema_push(dm2)
+        .send()
+        .await?
+        .assert_green()?
+        .assert_has_executed_steps()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_list())
+    })?;
+
+    api.schema_push(&dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("scalar_lists"))]
+async fn bytes_to_bytes_array_works(api: &TestApi) -> TestResult {
+    let dm1 = format!(
+        r#"
+            {datasource}
+
+            model Test {{
+                id       String    @id @default(cuid())
+                bytesCol Bytes
+            }}
+        "#,
+        datasource = api.datasource()
+    );
+
+    api.schema_push(&dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_required())
+    })?;
+
+    let dm2 = format!(
+        r#"
+            {datasource}
+
+            model Test {{
+                id       String    @id @default(cuid())
+                bytesCol Bytes[]
+            }}
+        "#,
+        datasource = api.datasource()
+    );
+
+    api.schema_push(dm2)
+        .send()
+        .await?
+        .assert_green()?
+        .assert_has_executed_steps()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_list())
+    })?;
+
+    api.schema_push(&dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("bytesCol", |col| col.assert_type_is_bytes()?.assert_is_required())
+    })?;
+
+    Ok(())
+}
