@@ -188,6 +188,15 @@ impl<'a> TableWalker<'a> {
         })
     }
 
+    /// Same as `TableWalker::indexes()`, but takes ownership.
+    pub fn into_indexes(self) -> impl Iterator<Item = IndexWalker<'a>> {
+        self.table.indices.iter().map(move |index| IndexWalker {
+            index,
+            schema: self.schema,
+            table: self.table,
+        })
+    }
+
     /// Traverse the foreign keys on the table.
     pub fn foreign_keys(self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
         self.table.foreign_keys.iter().map(move |foreign_key| ForeignKeyWalker {
@@ -375,6 +384,14 @@ impl<'a> IndexWalker<'a> {
     /// The name of the index.
     pub fn name(&self) -> &str {
         &self.index.name
+    }
+
+    /// Traverse to the table of the index.
+    pub fn table(&self) -> TableWalker<'a> {
+        TableWalker {
+            table: self.table,
+            schema: self.schema,
+        }
     }
 }
 

@@ -8,15 +8,16 @@ const TYPES: &[(&str, &str)] = &[
     //fieldname, db datatype
     ("int", "int(11)"),
     ("smallint", "SmallInt"),
-    // ("tinyint", "TinyInt"),
+    ("tinyint", "TinyInt"),
     ("tinyint_bool", "TinyInt(1)"),
     ("mediumint", "MediumInt"),
     ("bigint", "BigInt"),
     ("decimal", "Decimal(5, 3)"),
+    ("decimal_2", "Decimal"),
     ("numeric", "Decimal(4,1)"),
     ("float", "Float"),
     ("double", "Double"),
-    ("bits", "Bit(10)"),
+    ("bits", "Bit(64)"),
     ("chars", "Char(10)"),
     ("varchars", "VarChar(500)"),
     ("binary", "Binary(230)"),
@@ -82,14 +83,16 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             id                             Int      @id @mysql.Int
             int                            Int      @mysql.Int
             smallint                       Int      @mysql.SmallInt
+            tinyint                        Int      @mysql.TinyInt
             tinyint_bool                   Boolean  @mysql.TinyInt
             mediumint                      Int      @mysql.MediumInt
             bigint                         Int      @mysql.BigInt
             decimal                        Decimal  @mysql.Decimal(5, 3)
+            decimal_2                      Decimal  @mysql.Decimal(10, 0)
             numeric                        Decimal  @mysql.Decimal(4, 1)
             float                          Float    @mysql.Float
             double                         Float    @mysql.Double
-            bits                           Bytes    @mysql.Bit(10)
+            bits                           Bytes    @mysql.Bit(64)
             chars                          String   @mysql.Char(10)
             varchars                       String   @mysql.VarChar(500)
             binary                         Bytes    @mysql.Binary(230)
@@ -165,10 +168,12 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             id                             Int            @id
             int                            Int
             smallint                       Int
+            tinyint                        Int   
             tinyint_bool                   Boolean
             mediumint                      Int
             bigint                         Int
             decimal                        Float
+            decimal_2                      Float
             numeric                        Float
             float                          Float
             double                         Float

@@ -113,7 +113,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 
     let mysql_type: MySqlType = sft.deserialize_native_type();
 
-    assert_eq!(mysql_type, MySqlType::Decimal(8, 2));
+    assert_eq!(mysql_type, MySqlType::Decimal(Some((8, 2))));
 }
 
 #[test]
@@ -193,6 +193,7 @@ fn should_handle_type_specifications_on_postgres() {
             id     Int    @id
             bigInt Int    @pg.BigInt
             foobar String @pg.VarChar(26)
+            foobaz String @pg.VarChar
         }
     "#;
 
@@ -206,9 +207,12 @@ fn should_handle_type_specifications_on_postgres() {
     assert_eq!(postgres_type, PostgresType::BigInt);
 
     let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
-
     let postgres_type: PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgres_type, PostgresType::VarChar(26));
+    assert_eq!(postgres_type, PostgresType::VarChar(Some(26)));
+
+    let sft = user_model.assert_has_scalar_field("foobaz").assert_native_type();
+    let postgres_type: PostgresType = sft.deserialize_native_type();
+    assert_eq!(postgres_type, PostgresType::VarChar(None));
 }
 
 #[test]

@@ -29,6 +29,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
         previous.name() != next.name()
     }
 
+    /// Whether the indexes of dropped tables should be dropped before the table is dropped.
+    fn should_drop_indexes_from_dropped_tables(&self) -> bool {
+        false
+    }
+
     /// Whether `AddForeignKey` steps should be generated for created tables.
     fn should_push_foreign_keys_from_created_tables(&self) -> bool {
         true

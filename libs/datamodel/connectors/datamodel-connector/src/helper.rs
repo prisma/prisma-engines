@@ -28,3 +28,14 @@ pub fn parse_u32_arguments(args: Vec<String>) -> Result<Vec<u32>, ConnectorError
         Ok(res.iter().map(|arg| *arg.as_ref().unwrap() as u32).collect_vec())
     }
 }
+
+pub fn arg_vec_from_opt(input: Option<u32>) -> Vec<u32> {
+    input.into_iter().collect()
+}
+
+pub fn args_vec_from_opt(input: Option<(u32, u32)>) -> Vec<u32> {
+    match input {
+        Some((x, y)) => vec![x, y],
+        None => vec![],
+    }
+}

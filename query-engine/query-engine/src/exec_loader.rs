@@ -1,5 +1,7 @@
 use crate::{PrismaError, PrismaResult};
+use connection_string::JdbcString;
 use connector::Connector;
+use std::str::FromStr;
 
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
@@ -102,20 +104,11 @@ async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
 
     let mssql = Mssql::from_source(source).await?;
 
-    let mut splitted = source.url().value.split(';');
-    splitted.next();
-
-    let mut params: HashMap<String, String> = splitted
-        .map(|kv| {
-            let mut splitted = kv.split('=');
-            let key = splitted.next().unwrap();
-            let value = splitted.next().unwrap();
-
-            (key.to_lowercase(), value.to_string())
-        })
-        .collect();
-
-    let db_name = params.remove("schema").unwrap_or_else(|| String::from("dbo"));
+    let mut conn = JdbcString::from_str(&format!("jdbc:{}", &source.url().value))?;
+    let db_name = conn
+        .properties_mut()
+        .remove("schema")
+        .unwrap_or_else(|| String::from("dbo"));
 
     trace!("Loaded SQL Server connector.");
     Ok((db_name, sql_executor(mssql, false)))

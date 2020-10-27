@@ -169,7 +169,7 @@ fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
         Some("file") | Some("sqlite") => "sqlite",
         Some(s) if s.starts_with("postgres") => "postgresql",
         Some("mysql") => "mysql",
-        Some("sqlserver") | Some("jdbc:sqlserver") => "sqlserver",
+        Some("sqlserver") => "sqlserver",
         _ => anyhow::bail!("Could not extract a provider from the URL"),
     };
 
