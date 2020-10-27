@@ -38,14 +38,11 @@ fn should_fail_on_colliding_implicit_self_relations() {
 "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_field_validation_error(
-        "",
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "Colliding implicit relations. Please add scalar types husbandId, and teacherId.",
         "User",
-        "userId",
-        Span::new(3, 4),
+        Span::new(5, 342),
     ));
-
-    //errors.assert_is(DatamodelError::new_model_validation_error("", "User", Span::new(3, 4)));
 }
 
 #[test]

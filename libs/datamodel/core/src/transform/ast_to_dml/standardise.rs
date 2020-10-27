@@ -7,6 +7,7 @@ use crate::{
     dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
 use std::collections::HashMap;
+use itertools::Itertools;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -50,7 +51,6 @@ impl Standardiser {
 
             let mut fields_to_add = vec![];
             let mut missing_field_names_to_field_names = HashMap::new();
-            let mut underlying_field_name = "";
             for field in model.fields_mut() {
                 if let Field::RelationField(field) = field {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
@@ -95,12 +95,14 @@ impl Standardiser {
                             rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
 
                             for underlying_field in underlying_fields {
-                                underlying_field_name = underlying_field.clone().name.as_str();
                                 let t = missing_field_names_to_field_names
-                                    .entry(underlying_field_name)
-                                    .or_insert(vec![field.name.as_str()]);
-                                t.push(field.name.as_str());
-                                fields_to_add.push(Field::ScalarField(underlying_field));
+                                    .entry(String::from(underlying_field.clone().name))
+                                    .or_insert(vec![]);
+                                t.push(field.name.clone());
+                                let scalar_field = Field::ScalarField(underlying_field);
+                                if !fields_to_add.contains(&scalar_field) {
+                                    fields_to_add.push(scalar_field);
+                                }
                             }
                         }
                     }
@@ -113,10 +115,11 @@ impl Standardiser {
                             .find_model(cloned_model.name.as_str())
                             .expect(ERROR_GEN_STATE_ERROR)
                             .span;
+                        let missing_names = field_names.iter().map(|f| format!("{}Id", f.camel_case())).collect_vec();
                         errors.push_error(DatamodelError::new_model_validation_error(
                             format!(
                                 "Colliding implicit relations. Please add scalar types {}.",
-                                field_names.join(", and")
+                                missing_names.join(", and ")
                             )
                             .as_str(),
                             cloned_model.name.as_str(),
