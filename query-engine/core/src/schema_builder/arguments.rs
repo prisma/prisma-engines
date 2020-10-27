@@ -23,7 +23,7 @@ pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) 
 pub(crate) fn create_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     let create_types = input_types::create_input_objects::create_input_types(ctx, model, None);
 
-    if create_types.into_iter().all(|typ| typ.is_empty()) {
+    if create_types.iter().all(|typ| typ.is_empty()) {
         None
     } else {
         Some(vec![input_field("data", create_types, None)])
@@ -49,14 +49,14 @@ pub(crate) fn update_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     where_unique_argument(ctx, model).and_then(|where_unique_arg| {
         let update_type = input_types::update_input_objects::update_input_type(ctx, model);
-        let create_type = input_types::create_input_objects::create_input_type(ctx, model, None);
+        let create_types = input_types::create_input_objects::create_input_types(ctx, model, None);
 
-        if update_type.into_arc().is_empty() || create_type.into_arc().is_empty() {
+        if update_type.into_arc().is_empty() || create_types.iter().all(|typ| typ.is_empty()) {
             None
         } else {
             Some(vec![
                 where_unique_arg,
-                input_field("create", InputType::object(create_type), None),
+                input_field("create", create_types, None),
                 input_field("update", InputType::object(update_type), None),
             ])
         }
