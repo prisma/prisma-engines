@@ -526,7 +526,7 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     // Decrement
     queryNumberOperation(project, 1, "optFloat", "decrement", "4.6") should be("""{"optFloat":null}""")
-    queryNumberOperation(project, 2, "optFloat", "decrement", "4.6") should be("""{"optFloat":5.5}""")
+    queryNumberOperation(project, 2, "optFloat", "decrement", "4.6") should be("""{"optFloat":5.5[00001]}""")
 
     // Multiply
     queryNumberOperation(project, 1, "optFloat", "multiply", "2") should be("""{"optFloat":null}""")
