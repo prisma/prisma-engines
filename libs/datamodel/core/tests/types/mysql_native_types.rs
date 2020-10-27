@@ -111,6 +111,21 @@ fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
 }
 
 #[test]
+fn should_fail_on_invalid_precision_for_timestamp() {
+    fn error_msg(type_name: &str) -> String {
+        format!(
+            "Argument M is out of range for Native type {} of MySQL: M can range from 0 to 6.",
+            type_name
+        )
+    }
+
+    for tpe in &["Timestamp", "Timestamp"] {
+        test_native_types_without_attributes(&format!("{}(7)", tpe), "DateTime", &error_msg(tpe), MYSQL_SOURCE);
+        test_native_types_without_attributes(&format!("{}(-1)", tpe), "DateTime", &error_msg(tpe), MYSQL_SOURCE);
+    }
+}
+
+#[test]
 fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let dml = r#"
         datasource db {

@@ -199,6 +199,18 @@ impl Connector for MySqlDatamodelConnector {
                     "MySQL",
                 ));
             }
+            if matches!(native_type_name, TIMESTAMP_TYPE_NAME) {
+                match native_type.args.as_slice() {
+                    [precision] if *precision > 6 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "M can range from 0 to 6.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    _ => {}
+                }
+            }
         }
         Ok(())
     }
