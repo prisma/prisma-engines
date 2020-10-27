@@ -126,30 +126,4 @@ class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
     result.pathAsString("data.createTodo.title") should equal("the title")
     result.pathAsLong("data.createTodo.id") should equal(1)
   }
-
-  "Creating an item with an id field of type Int with autoincrement and providing an id" should "error" in {
-    val project = ProjectDsl.fromString {
-      s"""
-         |model Todo {
-         |  id    Int @id @default(autoincrement())
-         |  title String
-         |}
-       """.stripMargin
-    }
-    database.setup(project)
-
-    server.queryThatMustFail(
-      """
-        |mutation {
-        |  createTodo(data: { title: "the title", id: 2}){
-        |    id
-        |    title
-        |  }
-        |}
-      """.stripMargin,
-      project,
-      0
-    )
-  }
-
 }
