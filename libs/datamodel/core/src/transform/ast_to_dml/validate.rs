@@ -1013,6 +1013,7 @@ impl<'a> Validator<'a> {
                         }
                     } else if rel_a.to == model.name && rel_b.to == model.name {
                         // This is a self-relation with at least two fields.
+
                         // Named self relations are ambiguous when they involve more than two fields.
                         for field_c in model.relation_fields() {
                             if field_a != field_c && field_b != field_c {
