@@ -104,7 +104,7 @@ async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
 
     let mssql = Mssql::from_source(source).await?;
 
-    let mut conn = JdbcString::from_str(&source.url().value)?;
+    let mut conn = JdbcString::from_str(&format!("jdbc:{}", &source.url().value))?;
     let db_name = conn
         .properties_mut()
         .remove("schema")

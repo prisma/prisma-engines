@@ -532,7 +532,7 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
 
 /// Create an MSSQL database from a JDBC connection string..
 pub async fn create_mssql_database(jdbc_string: &str) -> Result<Quaint, AnyError> {
-    let mut conn = connection_string::JdbcString::from_str(jdbc_string)?;
+    let mut conn = connection_string::JdbcString::from_str(&format!("jdbc:{}", jdbc_string))?;
 
     let params = conn.properties_mut();
     match params.remove("database") {
