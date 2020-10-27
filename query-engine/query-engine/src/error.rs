@@ -97,6 +97,12 @@ impl From<url::ParseError> for PrismaError {
     }
 }
 
+impl From<connection_string::Error> for PrismaError {
+    fn from(e: connection_string::Error) -> PrismaError {
+        PrismaError::ConfigurationError(format!("Error parsing connection string: {}", e))
+    }
+}
+
 impl From<serde_json::error::Error> for PrismaError {
     fn from(e: serde_json::error::Error) -> PrismaError {
         PrismaError::JsonDecodeError(e.into())
