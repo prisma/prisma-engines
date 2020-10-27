@@ -1,7 +1,7 @@
 use barrel::types;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use quaint::prelude::Queryable;
+use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
 
 #[test_each_connector]
@@ -358,7 +358,10 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
 
     let final_column = final_result.table_bang("Blog").column_bang("new_title");
 
-    assert_eq!(final_column.tpe.family, ColumnTypeFamily::Decimal);
+    match api.sql_family() {
+        SqlFamily::Mysql | SqlFamily::Postgres => assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float),
+        _ => assert_eq!(final_column.tpe.family, ColumnTypeFamily::Decimal),
+    }
     assert!(final_result.table_bang("Blog").column("title").is_none());
 
     Ok(())
