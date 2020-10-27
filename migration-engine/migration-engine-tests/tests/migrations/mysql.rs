@@ -8,13 +8,13 @@ use std::fmt::Write as _;
 async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> TestResult {
     let schema = r#"
         model Human {
-            id String @id
+            id Int @id
             catname String
             cat_rel Cat @relation(fields: [catname], references: [name])
         }
 
         model Cat {
-            id String @id
+            id Int @id
             name String @unique
             humans Human[]
         }
@@ -52,12 +52,12 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
 async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
-            id String @id
+            id Int @id
             mood Mood
         }
 
         model Human {
-            id String @id
+            id Int @id
             mood Mood
         }
 

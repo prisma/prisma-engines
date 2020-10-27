@@ -84,7 +84,7 @@ fn should_allow_string_ids_with_uuid() {
 fn should_allow_string_ids_without_default() {
     let dml = r#"
     model Model {
-        id String @id
+        id Int @id
     }
     "#;
 

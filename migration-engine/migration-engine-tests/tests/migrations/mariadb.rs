@@ -5,7 +5,7 @@ use quaint::{ast as quaint_ast, prelude::Queryable};
 async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
-            id String @id
+            id Int @id
             name String
 
             @@unique([name], name: "idxname")

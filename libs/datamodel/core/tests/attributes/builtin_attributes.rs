@@ -28,7 +28,7 @@ fn unique_attribute() {
 fn duplicate_attributes_should_error() {
     let dml = r#"
         model Test {
-            id String @id
+            id Int @id
             unique String @unique @unique
         }
     "#;

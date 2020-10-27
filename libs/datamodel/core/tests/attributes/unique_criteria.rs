@@ -43,7 +43,7 @@ fn must_error_if_only_loose_unique_criterias_are_present() {
 fn must_succeed_on_model_with_unique_criteria() {
     let dml1 = r#"
     model Model {
-        id String @id
+        id Int @id
     }
     "#;
     let _ = parse(dml1);

@@ -7,7 +7,7 @@ use std::fmt::Write;
 async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
-            id String @id
+            id Int @id
             name String
             mood CatMood
         }
@@ -26,7 +26,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
 
     let dm2 = r#"
         model Cat {
-            id String @id
+            id Int @id
             name String
         }
     "#;

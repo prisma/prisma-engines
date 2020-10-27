@@ -4,7 +4,7 @@ use migration_engine_tests::sql::*;
 async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String
         }
     "#;
@@ -27,7 +27,7 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
 
     let dm2 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String @unique
         }
     "#;
@@ -65,7 +65,7 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
 async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
-            id String @id
+            id Int @id
             name Test_name
         }
         
@@ -95,7 +95,7 @@ async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
 
     let dm2 = r#"
              model Test {
-            id String @id
+            id Int @id
             name Test_name
         }
         
@@ -139,7 +139,7 @@ async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
 async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String
         }
     "#;
@@ -160,7 +160,7 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
 
     let dm2 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String @unique
         }
     "#;

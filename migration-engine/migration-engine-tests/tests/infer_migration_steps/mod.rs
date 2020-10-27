@@ -62,7 +62,7 @@ async fn infer_migration_steps_validates_that_already_applied_migrations_are_not
 ) -> TestResult {
     let dm1 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String
         }
     "#;
@@ -80,7 +80,7 @@ async fn infer_migration_steps_validates_that_already_applied_migrations_are_not
 
     let dm2 = r#"
         model Test {
-            id String @id
+            id Int @id
             name String
             age Int
         }

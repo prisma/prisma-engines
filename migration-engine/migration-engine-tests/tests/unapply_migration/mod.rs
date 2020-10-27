@@ -44,7 +44,7 @@ async fn unapply_must_work(api: &TestApi) -> TestResult {
 async fn destructive_change_checks_run_on_unapply_migration(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
-            id String @id
+            id Int @id
             field String
         }
     "#;

@@ -47,7 +47,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
 async fn migrating_a_required_column_from_int_to_string_should_cast(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
-            id String @id
+            id Int @id
             serialNumber Int
         }
     "#;
@@ -67,7 +67,7 @@ async fn migrating_a_required_column_from_int_to_string_should_cast(api: &TestAp
 
     let dm2 = r#"
         model Test {
-            id String @id
+            id Int @id
             serialNumber String
         }
     "#;
@@ -95,7 +95,7 @@ async fn changing_a_string_array_column_to_scalar_is_fine(api: &TestApi) -> Test
         {datasource_block}
 
         model Film {{
-            id String @id
+            id Int @id
             mainProtagonist String[]
         }}
         "#,
@@ -118,7 +118,7 @@ async fn changing_a_string_array_column_to_scalar_is_fine(api: &TestApi) -> Test
             {datasource_block}
 
             model Film {{
-                id String @id
+                id Int @id
                 mainProtagonist String
             }}
             "#,
@@ -154,7 +154,7 @@ async fn changing_an_int_array_column_to_scalar_is_not_possible(api: &TestApi) -
         {datasource_block}
 
         model Film {{
-            id String @id
+            id Int @id
             mainProtagonist Int[]
         }}
         "#,
@@ -174,7 +174,7 @@ async fn changing_an_int_array_column_to_scalar_is_not_possible(api: &TestApi) -
             {datasource_block}
 
             model Film {{
-                id String @id
+                id Int @id
                 mainProtagonist Int
             }}
             "#,
@@ -214,7 +214,7 @@ async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> 
         {datasource_block}
 
         model Film {{
-            id String @id
+            id Int @id
             mainProtagonist String
         }}
         "#,
@@ -235,7 +235,7 @@ async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> 
             {datasource_block}
 
             model Film {{
-                id String @id
+                id Int @id
                 mainProtagonist String[]
             }}
             "#,

@@ -37,7 +37,7 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
         }
 
         model PairMetadata {
-            id String @id
+            id Int @id
             pairidx Int
             pairname String
             pair Pair @relation(fields: [pairidx, pairname], references: [index, name])
@@ -70,7 +70,7 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
         }
 
         model PairMetadata {
-            id String @id
+            id Int @id
             pweight Float
             pair Pair @relation(fields: [pweight], references: [weight])
         }
@@ -94,7 +94,7 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
 async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
-            id String @id
+            id Int @id
             mood CatMood
         }
 
@@ -122,7 +122,7 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
 
     let dm = r##"
         model Cat {
-            id String @id
+            id Int @id
             mood CatMood
         }
 
@@ -159,7 +159,7 @@ struct Cat<'a> {
 async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
-            id String @id
+            id Int @id
             mood CatMood @default(HUNGRY)
             previousMood CatMood @default(ANGRY)
         }
@@ -207,12 +207,12 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
 async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
-            nemesis_id String @id
+            nemesis_id Int @id
             nemesis Dog @relation(fields: [nemesis_id], references: [id])
         }
 
         model Dog {
-            id String @id
+            id Int @id
         }
     "##;
 
