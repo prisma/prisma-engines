@@ -6,8 +6,8 @@ use crate::{
     diagnostics::Diagnostics,
     dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
 };
-use std::collections::HashMap;
 use itertools::Itertools;
+use std::collections::HashMap;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -115,7 +115,10 @@ impl Standardiser {
                             .find_model(cloned_model.name.as_str())
                             .expect(ERROR_GEN_STATE_ERROR)
                             .span;
-                        let missing_names = field_names.iter().map(|f| format!("{}Id", f.camel_case())).collect_vec();
+                        let missing_names = field_names
+                            .iter()
+                            .map(|f| format!("{}Id", f.camel_case()))
+                            .collect_vec();
                         errors.push_error(DatamodelError::new_model_validation_error(
                             format!(
                                 "Colliding implicit relations. Please add scalar types {}.",
