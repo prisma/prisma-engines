@@ -9,11 +9,11 @@ use crate::{
 
 /// Traverse all the columns in the schema.
 pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWalker<'a>> + 'a {
-    schema.tables.iter().flat_map(move |table| {
+    schema.tables.iter().enumerate().flat_map(move |(table_index, table)| {
         (0..table.columns.len()).map(move |column_index| ColumnWalker {
             schema,
             column_index,
-            table,
+            table_index,
         })
     })
 }
@@ -23,15 +23,16 @@ pub fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_name: &st
     schema
         .tables
         .iter()
-        .find(move |table| table.name == table_name)
-        .and_then(move |table| {
+        .enumerate()
+        .find(move |(_, table)| table.name == table_name)
+        .and_then(move |(table_index, table)| {
             table
                 .columns
                 .iter()
                 .position(|column| column.name == column_name)
                 .map(|column_index| ColumnWalker {
                     schema,
-                    table,
+                    table_index,
                     column_index,
                 })
         })
@@ -44,8 +45,8 @@ pub struct ColumnWalker<'a> {
     schema: &'a SqlSchema,
     /// The index of the column in the table.
     column_index: usize,
-    /// The underlying table struct.
-    table: &'a Table,
+    /// The index of the table in the schema.
+    table_index: usize,
 }
 
 impl<'a> ColumnWalker<'a> {
@@ -56,7 +57,7 @@ impl<'a> ColumnWalker<'a> {
 
     /// A reference to the underlying Column struct.
     pub fn column(&self) -> &'a Column {
-        &self.table.columns[self.column_index]
+        &self.table().table().columns[self.column_index]
     }
 
     /// The index of the column in the parent table.
@@ -116,7 +117,7 @@ impl<'a> ColumnWalker<'a> {
     pub fn table(&self) -> TableWalker<'a> {
         TableWalker {
             schema: self.schema,
-            table: self.table,
+            table_index: self.table_index,
         }
     }
 
@@ -131,14 +132,14 @@ impl<'a> ColumnWalker<'a> {
 pub struct TableWalker<'a> {
     /// The schema the column is contained in.
     schema: &'a SqlSchema,
-    /// The underlying table struct.
-    table: &'a Table,
+    /// The index of the table in the schema.
+    table_index: usize,
 }
 
 impl<'a> TableWalker<'a> {
     /// Create a TableWalker from a schema and a reference to one of its tables. This should stay private.
-    pub(crate) fn new(schema: &'a SqlSchema, table: &'a Table) -> Self {
-        Self { schema, table }
+    pub(crate) fn new(schema: &'a SqlSchema, table_index: usize) -> Self {
+        Self { schema, table_index }
     }
 
     /// Get a column in the table, by name.
@@ -151,47 +152,47 @@ impl<'a> TableWalker<'a> {
         ColumnWalker {
             schema: self.schema,
             column_index: idx,
-            table: self.table,
+            table_index: self.table_index,
         }
     }
 
     /// Traverse the table's columns.
-    pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> {
+    pub fn columns(&self) -> impl Iterator<Item = ColumnWalker<'a>> {
         let schema = self.schema;
-        let table = self.table;
+        let table_index = self.table_index;
 
-        (0..self.table.columns.len()).map(move |column_index| ColumnWalker {
+        (0..self.table().columns.len()).map(move |column_index| ColumnWalker {
             schema,
             column_index,
-            table,
+            table_index,
         })
     }
 
     /// The number of foreign key constraints on the table.
     pub fn foreign_key_count(&self) -> usize {
-        self.table.foreign_keys.len()
+        self.table().foreign_keys.len()
     }
 
     /// Traverse the indexes on the table.
-    pub fn indexes<'b>(&'b self) -> impl Iterator<Item = IndexWalker<'a>> {
+    pub fn indexes(&self) -> impl Iterator<Item = IndexWalker<'a>> {
         let schema = self.schema;
-        let table = self.table;
+        let table_index = self.table_index;
 
-        (0..self.table.indices.len()).map(move |index_index| IndexWalker {
+        (0..self.table().indices.len()).map(move |index_index| IndexWalker {
             schema,
-            table,
+            table_index,
             index_index,
         })
     }
 
     /// Traverse the foreign keys on the table.
-    pub fn foreign_keys(self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
-        let table = self.table;
+    pub fn foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
+        let table_index = self.table_index;
         let schema = self.schema;
 
-        (0..self.table.foreign_keys.len()).map(move |foreign_key_index| ForeignKeyWalker {
+        (0..self.table().foreign_keys.len()).map(move |foreign_key_index| ForeignKeyWalker {
             foreign_key_index,
-            table,
+            table_index,
             schema,
         })
     }
@@ -200,57 +201,53 @@ impl<'a> TableWalker<'a> {
     pub fn foreign_key_at(&self, index: usize) -> ForeignKeyWalker<'a> {
         ForeignKeyWalker {
             schema: self.schema,
-            table: self.table,
+            table_index: self.table_index,
             foreign_key_index: index,
         }
     }
 
     /// The table name.
     pub fn name(&self) -> &'a str {
-        &self.table.name
+        &self.table().name
     }
 
     /// Try to traverse a foreign key for a single column.
     pub fn foreign_key_for_column(&self, column: &str) -> Option<&'a ForeignKey> {
-        self.table.foreign_key_for_column(column)
+        self.table().foreign_key_for_column(column)
     }
 
     /// Traverse to the primary key of the table.
     pub fn primary_key(&self) -> Option<&'a PrimaryKey> {
-        self.table.primary_key.as_ref()
+        self.table().primary_key.as_ref()
     }
 
     /// The names of the columns that are part of the primary key. `None` means
     /// there is no primary key on the table.
     pub fn primary_key_column_names(&self) -> Option<&[String]> {
-        self.table.primary_key.as_ref().map(|pk| pk.columns.as_slice())
+        self.table().primary_key.as_ref().map(|pk| pk.columns.as_slice())
     }
 
     /// Reference to the underlying `Table` struct.
-    pub fn table(&self) -> &Table {
-        &self.table
+    pub fn table(&self) -> &'a Table {
+        &self.schema.tables[self.table_index]
     }
 
-    /// Walks the parent schema to find the index of the table inside it. This
-    /// should be considered a temporary crutch. We should strive to keep track
-    /// of indexes where we need them.
+    /// The index of the table in the schema.
     pub fn table_index(&self) -> usize {
-        self.schema
-            .tables
-            .iter()
-            .position(|table| table.name == self.table.name)
-            .unwrap()
+        self.table_index
     }
 }
 
 /// Traverse a foreign key.
 pub struct ForeignKeyWalker<'schema> {
+    /// The index of the foreign key in the table.
     foreign_key_index: usize,
-    table: &'schema Table,
+    /// The index of the table in the schema.
+    table_index: usize,
     schema: &'schema SqlSchema,
 }
 
-impl<'a, 'schema> ForeignKeyWalker<'schema> {
+impl<'schema> ForeignKeyWalker<'schema> {
     /// The names of the foreign key columns on the referencing table.
     pub fn constrained_column_names(&self) -> &[String] {
         &self.foreign_key().columns
@@ -273,7 +270,7 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
 
     /// The underlying ForeignKey struct.
     pub fn foreign_key(&self) -> &'schema ForeignKey {
-        &self.table.foreign_keys[self.foreign_key_index]
+        &self.table().table().foreign_keys[self.foreign_key_index]
     }
 
     /// The index of the foreign key in the parent table.
@@ -310,18 +307,19 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
     pub fn referenced_table(&self) -> TableWalker<'schema> {
         TableWalker {
             schema: self.schema,
-            table: self
+            table_index: self
                 .schema
-                .table(&self.foreign_key().referenced_table)
-                .expect("foreign key references unknown table"),
+                .table_walker(&self.foreign_key().referenced_table)
+                .expect("foreign key references unknown table")
+                .table_index,
         }
     }
 
-    /// Traverse to the referencing table.
+    /// Traverse to the referencing/constrained table.
     pub fn table(&self) -> TableWalker<'schema> {
         TableWalker {
             schema: self.schema,
-            table: self.table,
+            table_index: self.table_index,
         }
     }
 }
@@ -329,7 +327,9 @@ impl<'a, 'schema> ForeignKeyWalker<'schema> {
 /// Traverse an index.
 pub struct IndexWalker<'a> {
     schema: &'a SqlSchema,
-    table: &'a Table,
+    /// The index of the table in the schema.
+    table_index: usize,
+    /// The index of the database index in the table.
     index_index: usize,
 }
 
@@ -350,7 +350,7 @@ impl<'a> IndexWalker<'a> {
 
     /// The underlying index struct.
     pub fn index(&self) -> &'a Index {
-        &self.table.indices[self.index_index]
+        &self.table().table().indices[self.index_index]
     }
 
     /// The IndexType
@@ -366,7 +366,7 @@ impl<'a> IndexWalker<'a> {
     /// Traverse to the table of the index.
     pub fn table(&self) -> TableWalker<'a> {
         TableWalker {
-            table: self.table,
+            table_index: self.table_index,
             schema: self.schema,
         }
     }
@@ -378,20 +378,20 @@ pub trait SqlSchemaExt {
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
 
     /// Find a table by index.
-    fn table_walker_at<'a>(&'a self, index: usize) -> TableWalker<'a>;
+    fn table_walker_at(&self, index: usize) -> TableWalker<'_>;
 }
 
 impl SqlSchemaExt for SqlSchema {
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         Some(TableWalker {
-            table: self.table(name).ok()?,
+            table_index: self.tables.iter().position(|table| table.name == name)?,
             schema: self,
         })
     }
 
-    fn table_walker_at<'a>(&'a self, index: usize) -> TableWalker<'a> {
+    fn table_walker_at(&self, index: usize) -> TableWalker<'_> {
         TableWalker {
-            table: &self.tables[index],
+            table_index: index,
             schema: self,
         }
     }
