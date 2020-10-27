@@ -8,6 +8,7 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
+use connection_string::JdbcString;
 use futures::lock::Mutex;
 use std::{convert::TryFrom, fmt, future::Future, str::FromStr, time::Duration};
 use tiberius::*;
@@ -206,6 +207,7 @@ pub struct Mssql {
 impl Mssql {
     pub async fn new(url: MssqlUrl) -> crate::Result<Self> {
         let config = Config::from_jdbc_string(&url.connection_string)?;
+
         let tcp = TcpStream::connect_named(&config).await?;
         let client = Client::connect(config, tcp.compat_write()).await?;
         let socket_timeout = url.socket_timeout();
@@ -331,7 +333,7 @@ impl Queryable for Mssql {
 impl MssqlUrl {
     pub fn new(jdbc_connection_string: &str) -> crate::Result<Self> {
         let query_params = Self::parse_query_params(jdbc_connection_string)?;
-        let connection_string = jdbc_connection_string.to_string();
+        let connection_string = Self::with_jdbc_prefix(jdbc_connection_string);
 
         Ok(Self {
             connection_string,
@@ -339,8 +341,16 @@ impl MssqlUrl {
         })
     }
 
+    fn with_jdbc_prefix(input: &str) -> String {
+        if input.starts_with("jdbc:sqlserver") {
+            input.into()
+        } else {
+            format!("jdbc:{}", input)
+        }
+    }
+
     fn parse_query_params(input: &str) -> crate::Result<MssqlQueryParams> {
-        let mut conn = connection_string::JdbcString::from_str(input)?;
+        let mut conn = JdbcString::from_str(&Self::with_jdbc_prefix(input))?;
 
         let host = conn.server_name().map(|server_name| match conn.instance_name() {
             Some(instance_name) => format!(r#"{}\{}"#, server_name, instance_name),

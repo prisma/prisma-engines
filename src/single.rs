@@ -153,7 +153,7 @@ impl Quaint {
                 Arc::new(psql) as Arc<dyn Queryable>
             }
             #[cfg(feature = "mssql")]
-            s if s.starts_with("jdbc:sqlserver") => {
+            s if s.starts_with("jdbc:sqlserver") | s.starts_with("sqlserver") => {
                 let url = connector::MssqlUrl::new(s)?;
                 let psql = connector::Mssql::new(url).await?;
 
