@@ -209,7 +209,7 @@ fn should_fail_on_missing_native_types_feature_flag() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your datasource block: `previewFeatures = [\"nativeTypes\"]`",
+        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
         ast::Span::new(178, 196),
     ));
 }
