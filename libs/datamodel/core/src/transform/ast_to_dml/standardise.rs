@@ -298,7 +298,6 @@ impl Standardiser {
                     };
 
                     let back_relation_field = dml::RelationField::new_generated(&model.name, relation_info);
-                    println!("missing field: {:?}", back_relation_field);
                     result.push(AddMissingBackRelationField {
                         model: rel_info.to.clone(),
                         field: back_relation_field,
