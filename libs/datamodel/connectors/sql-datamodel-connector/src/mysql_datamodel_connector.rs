@@ -165,13 +165,6 @@ impl Connector for MySqlDatamodelConnector {
                             "MySQL",
                         ));
                     }
-                    [precision, _] if *precision > 1000 || *precision <= 0 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Precision must be positive with the maximum value of 1000.",
-                            native_type_name,
-                            "MySQL",
-                        ));
-                    }
                     _ => {}
                 }
             }
@@ -198,18 +191,6 @@ impl Connector for MySqlDatamodelConnector {
                     native_type_name,
                     "MySQL",
                 ));
-            }
-            if matches!(native_type_name, TIMESTAMP_TYPE_NAME | TIME_TYPE_NAME) {
-                match native_type.args.as_slice() {
-                    [precision] if *precision > 6 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "M can range from 0 to 6.",
-                            native_type_name,
-                            "MySQL",
-                        ))
-                    }
-                    _ => {}
-                }
             }
         }
         Ok(())

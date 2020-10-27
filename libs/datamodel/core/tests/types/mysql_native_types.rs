@@ -97,35 +97,6 @@ fn should_fail_on_argument_out_of_range_for_bit_type() {
 }
 
 #[test]
-fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
-    fn error_msg(type_name: &str) -> String {
-        format!(
-            "Argument M is out of range for Native type {} of MySQL: Precision must be positive with the maximum value of 1000.",
-            type_name
-        )
-    }
-
-    for tpe in &["Decimal", "Numeric"] {
-        test_native_types_without_attributes(&format!("{}(1001, 3)", tpe), "Decimal", &error_msg(tpe), MYSQL_SOURCE);
-    }
-}
-
-#[test]
-fn should_fail_on_invalid_precision_for_timestamp_and_time() {
-    fn error_msg(type_name: &str) -> String {
-        format!(
-            "Argument M is out of range for Native type {} of MySQL: M can range from 0 to 6.",
-            type_name
-        )
-    }
-
-    for tpe in &["Timestamp", "Time"] {
-        test_native_types_without_attributes(&format!("{}(7)", tpe), "DateTime", &error_msg(tpe), MYSQL_SOURCE);
-        test_native_types_without_attributes(&format!("{}(-1)", tpe), "DateTime", &error_msg(tpe), MYSQL_SOURCE);
-    }
-}
-
-#[test]
 fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let dml = r#"
         datasource db {
