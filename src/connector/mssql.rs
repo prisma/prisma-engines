@@ -9,13 +9,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use futures::lock::Mutex;
-use std::{
-    convert::TryFrom,
-    fmt::{self, Write},
-    future::Future,
-    str::FromStr,
-    time::Duration,
-};
+use std::{convert::TryFrom, fmt, future::Future, str::FromStr, time::Duration};
 use tiberius::*;
 use tokio::{net::TcpStream, time::timeout};
 use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
@@ -168,10 +162,6 @@ impl MssqlUrl {
 }
 
 impl MssqlQueryParams {
-    fn encrypt(&self) -> EncryptMode {
-        self.encrypt
-    }
-
     fn port(&self) -> u16 {
         self.port.unwrap_or(1433)
     }
@@ -184,20 +174,12 @@ impl MssqlQueryParams {
         self.user.as_deref()
     }
 
-    fn password(&self) -> Option<&str> {
-        self.password.as_deref()
-    }
-
     fn database(&self) -> &str {
         &self.database
     }
 
     fn schema(&self) -> &str {
         &self.schema
-    }
-
-    fn trust_server_certificate(&self) -> bool {
-        self.trust_server_certificate
     }
 
     fn socket_timeout(&self) -> Option<Duration> {
@@ -223,7 +205,7 @@ pub struct Mssql {
 
 impl Mssql {
     pub async fn new(url: MssqlUrl) -> crate::Result<Self> {
-        let config = Config::from_ado_string(&url.connection_string)?;
+        let config = Config::from_jdbc_string(&url.connection_string)?;
         let tcp = TcpStream::connect_named(&config).await?;
         let client = Client::connect(config, tcp.compat_write()).await?;
         let socket_timeout = url.socket_timeout();
@@ -349,7 +331,7 @@ impl Queryable for Mssql {
 impl MssqlUrl {
     pub fn new(jdbc_connection_string: &str) -> crate::Result<Self> {
         let query_params = Self::parse_query_params(jdbc_connection_string)?;
-        let connection_string = Self::create_ado_net_string(&query_params)?;
+        let connection_string = jdbc_connection_string.to_string();
 
         Ok(Self {
             connection_string,
@@ -417,30 +399,6 @@ impl MssqlUrl {
             connect_timeout,
             transaction_isolation_level,
         })
-    }
-
-    fn create_ado_net_string(params: &MssqlQueryParams) -> crate::Result<String> {
-        let mut buf = String::new();
-
-        write!(&mut buf, "Server=tcp:{},{}", params.host(), params.port())?;
-        write!(&mut buf, ";Encrypt={}", params.encrypt())?;
-        write!(&mut buf, ";Database={}", params.database())?;
-
-        write!(
-            &mut buf,
-            ";TrustServerCertificate={}",
-            params.trust_server_certificate()
-        )?;
-
-        if let Some(user) = params.user() {
-            write!(&mut buf, ";User ID={}", user)?;
-        };
-
-        if let Some(password) = params.password() {
-            write!(&mut buf, ";Password={}", password)?;
-        };
-
-        Ok(buf)
     }
 }
 

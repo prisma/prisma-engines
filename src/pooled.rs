@@ -12,10 +12,14 @@
 //! - `sqlite`/`file` opens an SQLite connection.
 //! - `mysql` opens a MySQL connection.
 //! - `postgres`/`postgresql` opens a PostgreSQL connection.
-//! - `sqlserver`/`jdbc:sqlserver` opens a Microsoft SQL Server connection.
 //!
 //! All parameters should be given in the query string format:
 //! `?key1=val1&key2=val2`. All parameters are optional.
+//!
+//! As a special case, Microsoft SQL Server connections use the JDBC URI
+//! format:
+//!
+//! `jdbc:sqlserver://host\instance:port;key1=val1;key2=val2;`
 //!
 //! ## Common parameters
 //!
@@ -81,11 +85,6 @@
 //!
 //! ## Microsoft SQL Server
 //!
-//! SQL Server is a bit different due to its connection string following the
-//! JDBC standard. It's quite similar to the others: the parameters are delimited
-//! with a `;` instead of `?` or `&`, and the parameter names are camelCase instead
-//! of snake_case.
-//!
 //! - `encrypt` if set to `true` encrypts all traffic over TLS. If `false`, only
 //!   the login details are encrypted. A special value `DANGER_PLAINTEXT` will
 //!   disable TLS completely, including sending login credentials as plaintext.
@@ -106,12 +105,6 @@
 //! - `isolationLevel` the transaction isolation level. Possible values:
 //!   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
 //!   `SERIALIZABLE`.
-//!
-//! Example of a JDBC connection string:
-//!
-//! ```ignore
-//! sqlserver://host:port;database=master;user=SA;password=secret
-//! ```
 //!
 //! To create a new `Quaint` pool connecting to a PostgreSQL database:
 //!

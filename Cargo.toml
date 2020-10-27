@@ -98,7 +98,7 @@ mobc = {version = "0.5.7", optional = true}
 serde = {version = "1.0", optional = true}
 tokio = {version = "0.2", features = ["rt-threaded", "macros", "sync"], optional = true}
 tokio-util = {version = "0.3", features = ["compat"], optional = true}
-connection-string = "0.1.5"
+connection-string = "0.1.10"
 
 [dev-dependencies]
 indoc = "0.3"

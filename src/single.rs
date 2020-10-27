@@ -44,6 +44,11 @@ impl Quaint {
     /// All parameters should be given in the query string format:
     /// `?key1=val1&key2=val2`. All parameters are optional.
     ///
+    /// As a special case, Microsoft SQL Server connections use the JDBC URI
+    /// format:
+    ///
+    /// `jdbc:sqlserver://host\instance:port;key1=val1;key2=val2;`
+    ///
     /// SQLite:
     ///
     /// - `user`/`password` do not do anything and can be emitted.
@@ -148,13 +153,13 @@ impl Quaint {
                 Arc::new(psql) as Arc<dyn Queryable>
             }
             #[cfg(feature = "mssql")]
-            s if s.starts_with("jdbc:sqlserver") || s.starts_with("sqlserver") => {
+            s if s.starts_with("jdbc:sqlserver") => {
                 let url = connector::MssqlUrl::new(s)?;
                 let psql = connector::Mssql::new(url).await?;
 
                 Arc::new(psql) as Arc<dyn Queryable>
             }
-            _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgresql or sqlserver."),
+            _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgresql or jdbc:sqlserver."),
         };
 
         let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
