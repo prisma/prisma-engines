@@ -434,6 +434,15 @@ impl InputType {
     pub fn enum_type(containing: EnumTypeRef) -> InputType {
         InputType::Enum(containing)
     }
+
+    pub fn is_empty(&self) -> bool {
+        match self {
+            Self::Scalar(_) => false,
+            Self::Enum(_) => false,
+            Self::List(inner) => inner.is_empty(),
+            Self::Object(weak) => weak.into_arc().is_empty(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

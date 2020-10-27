@@ -11,7 +11,12 @@ pub(crate) fn create_input_types(
     if feature_flags::get().unsafeScalarInputs {
         let unsafe_input = InputType::object(unsafe_create_input_type(ctx, model, parent_field));
 
-        vec![safe_input, unsafe_input]
+        // If the inputs are equal, only use one.
+        if safe_input == unsafe_input {
+            vec![safe_input]
+        } else {
+            vec![safe_input, unsafe_input]
+        }
     } else {
         vec![safe_input]
     }
