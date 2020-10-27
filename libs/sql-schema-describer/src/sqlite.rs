@@ -448,7 +448,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "date" => ColumnTypeFamily::DateTime,
         "datetime" => ColumnTypeFamily::DateTime,
         "timestamp" => ColumnTypeFamily::DateTime,
-        "binary" => ColumnTypeFamily::Binary,
+        "binary" | "blob" => ColumnTypeFamily::Binary,
         "double" => ColumnTypeFamily::Float,
         "binary[]" => ColumnTypeFamily::Binary,
         "boolean[]" => ColumnTypeFamily::Boolean,
