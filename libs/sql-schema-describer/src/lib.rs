@@ -135,7 +135,7 @@ impl Table {
             .unwrap_or_else(|| panic!("Column {} not found in Table {}", name, self.name))
     }
 
-    pub fn column(&self, name: &str) -> Option<&Column> {
+    pub fn column<'a>(&'a self, name: &str) -> Option<&'a Column> {
         self.columns.iter().find(|c| c.name == name)
     }
 

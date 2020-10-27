@@ -364,7 +364,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         // because they are needed for implementing new foreign key constraints.
         if !tables_to_redefine.is_empty() && self.flavour.should_drop_indexes_from_dropped_tables() {
             drop_indexes.extend(self.dropped_tables().flat_map(|table| {
-                table.into_indexes().map(move |index| DropIndex {
+                table.indexes().map(move |index| DropIndex {
                     table: table.name().to_owned(),
                     name: index.name().to_owned(),
                 })
