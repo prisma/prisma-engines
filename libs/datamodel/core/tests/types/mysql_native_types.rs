@@ -111,7 +111,7 @@ fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
 }
 
 #[test]
-fn should_fail_on_invalid_precision_for_timestamp() {
+fn should_fail_on_invalid_precision_for_timestamp_and_time() {
     fn error_msg(type_name: &str) -> String {
         format!(
             "Argument M is out of range for Native type {} of MySQL: M can range from 0 to 6.",
@@ -119,7 +119,7 @@ fn should_fail_on_invalid_precision_for_timestamp() {
         )
     }
 
-    for tpe in &["Timestamp", "Timestamp"] {
+    for tpe in &["Timestamp", "Time"] {
         test_native_types_without_attributes(&format!("{}(7)", tpe), "DateTime", &error_msg(tpe), MYSQL_SOURCE);
         test_native_types_without_attributes(&format!("{}(-1)", tpe), "DateTime", &error_msg(tpe), MYSQL_SOURCE);
     }
