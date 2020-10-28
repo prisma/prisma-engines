@@ -6,27 +6,27 @@ pub(crate) fn create_input_types(
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<InputType> {
-    let safe_input = InputType::object(safe_create_input_type(ctx, model, parent_field));
+    let checked_input = InputType::object(checked_create_input_type(ctx, model, parent_field));
 
-    if feature_flags::get().unsafeScalarInputs {
-        let unsafe_input = InputType::object(unsafe_create_input_type(ctx, model, parent_field));
+    if feature_flags::get().uncheckedScalarInputs {
+        let unchecked_input = InputType::object(unchecked_create_input_type(ctx, model, parent_field));
 
         // If the inputs are equal, only use one.
-        if safe_input == unsafe_input {
-            vec![safe_input]
+        if checked_input == unchecked_input {
+            vec![checked_input]
         } else {
-            vec![safe_input, unsafe_input]
+            vec![checked_input, unchecked_input]
         }
     } else {
-        vec![safe_input]
+        vec![checked_input]
     }
 }
 
 /// Builds the create input type (<x>CreateInput / <x>CreateWithout<y>Input)
 /// Also valid for nested inputs. A nested input is constructed if the `parent_field` is provided.
-/// "Safe" input refers to disallowing writing relation scalars directly, as it can lead to unintended
+/// "Checked" input refers to disallowing writing relation scalars directly, as it can lead to unintended
 /// data integrity violations if used incorrectly.
-fn safe_create_input_type(
+fn checked_create_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
@@ -49,7 +49,7 @@ fn safe_create_input_type(
         .fields()
         .scalar_writable()
         .into_iter()
-        .filter(|f| field_should_be_kept_for_safe_create_input_type(&f))
+        .filter(|f| field_should_be_kept_for_checked_create_input_type(&f))
         .collect();
 
     let mut fields = input_fields::scalar_input_fields(
@@ -75,7 +75,7 @@ fn safe_create_input_type(
     );
 
     // Compute input fields for relational fields.
-    let mut relational_fields = relation_input_fields_for_safe_create(ctx, model, parent_field);
+    let mut relational_fields = relation_input_fields_for_checked_create(ctx, model, parent_field);
 
     fields.append(&mut relational_fields);
 
@@ -83,8 +83,8 @@ fn safe_create_input_type(
     Arc::downgrade(&input_object)
 }
 
-/// For safe create input types only. Compute input fields for relational fields.
-fn relation_input_fields_for_safe_create(
+/// For checked create input types only. Compute input fields for relational fields.
+fn relation_input_fields_for_checked_create(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
@@ -141,15 +141,15 @@ fn relation_input_fields_for_safe_create(
         .collect()
 }
 
-fn field_should_be_kept_for_safe_create_input_type(field: &ScalarFieldRef) -> bool {
+fn field_should_be_kept_for_checked_create_input_type(field: &ScalarFieldRef) -> bool {
     !field.is_auto_generated_int_id
 }
 
-/// Builds the create input type (<x>UnsafeCreateInput / <x>UnsafeCreateWithout<y>Input)
+/// Builds the create input type (<x>UncheckedCreateInput / <x>UncheckedCreateWithout<y>Input)
 /// Also valid for nested inputs. A nested input is constructed if the `parent_field` is provided.
-/// "Safe" input refers to disallowing writing relation scalars directly, as it can lead to unintended
-/// data integrity violations if used incorrectly.
-fn unsafe_create_input_type(
+/// "Unchecked" input refers to allowing to write _all_ scalars on a model directly, which can
+/// lead to unintended data integrity violations if used incorrectly.
+fn unchecked_create_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
@@ -158,8 +158,12 @@ fn unsafe_create_input_type(
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input ("Without<Parent>").
     let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!("{}UnsafeCreateWithout{}Input", model.name, capitalize(f.name.as_str())),
-        _ => format!("{}UnsafeCreateInput", model.name),
+        Some(ref f) => format!(
+            "{}UncheckedCreateWithout{}Input",
+            model.name,
+            capitalize(f.name.as_str())
+        ),
+        _ => format!("{}UncheckedCreateInput", model.name),
     };
 
     return_cached_input!(ctx, &name);
@@ -208,7 +212,7 @@ fn unsafe_create_input_type(
     );
 
     // Compute input fields for relational fields.
-    let mut relational_fields = relation_input_fields_for_unsafe_create(ctx, model, parent_field);
+    let mut relational_fields = relation_input_fields_for_unchecked_create(ctx, model, parent_field);
 
     fields.append(&mut relational_fields);
 
@@ -216,8 +220,8 @@ fn unsafe_create_input_type(
     Arc::downgrade(&input_object)
 }
 
-/// For safe create input types only. Compute input fields for relational fields.
-fn relation_input_fields_for_unsafe_create(
+/// For unchecked create input types only. Compute input fields for relational fields.
+fn relation_input_fields_for_unchecked_create(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
@@ -233,13 +237,13 @@ fn relation_input_fields_for_unsafe_create(
             // Compute input object name
             let arity_part = if rf.is_list { "Many" } else { "One" };
             let without_part = format!("Without{}", capitalize(&child_field.name));
-            let input_name = format!("{}UnsafeCreate{}{}Input", child_model.name, arity_part, without_part);
+            let input_name = format!("{}UncheckedCreate{}{}Input", child_model.name, arity_part, without_part);
 
             let field_is_opposite_relation_field =
                 parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
 
             // Filter out all inlined relations on `child_model`.
-            // -> Only relations that point to other models are allowed in the unsafe input.
+            // -> Only relations that point to other models are allowed in the unchecked input.
             if field_is_opposite_relation_field || !child_field.is_inlined_on_enclosing_model() {
                 None
             } else {
