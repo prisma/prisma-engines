@@ -130,7 +130,6 @@ impl SqlMigrationConnector {
                                 step_index,
                             ),
                             TableChange::DropAndRecreateColumn {
-                                column_name: _,
                                 column_index: (previous_idx, next_idx),
                                 changes,
                             } => {

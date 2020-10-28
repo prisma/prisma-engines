@@ -3,7 +3,7 @@ pub(crate) mod expanded_alter_column;
 use crate::sql_schema_differ::ColumnChanges;
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Deserialize, Serialize};
-use sql_schema_describer::{Column, ForeignKey, Index, SqlSchema, Table};
+use sql_schema_describer::{Column, Index, SqlSchema, Table};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SqlMigration {
@@ -75,6 +75,8 @@ impl SqlMigrationStep {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct CreateTable {
     pub table: Table,
+    #[serde(skip)]
+    pub table_index: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -97,7 +99,6 @@ pub enum TableChange {
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
     DropAndRecreateColumn {
-        column_name: String,
         /// The index of the column in the table in (previous schema, next schema).
         #[serde(skip)]
         column_index: (usize, usize),
@@ -115,6 +116,8 @@ pub enum TableChange {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AddColumn {
+    #[serde(skip)]
+    pub column_index: usize,
     pub column: Column,
 }
 
@@ -129,6 +132,8 @@ pub struct DropColumn {
 pub struct AlterColumn {
     pub column_name: String,
     #[serde(skip)]
+    pub column_index: (usize, usize),
+    #[serde(skip)]
     pub(crate) changes: ColumnChanges,
     #[serde(skip)]
     pub type_change: Option<ColumnTypeChange>,
@@ -142,19 +147,21 @@ pub enum ColumnTypeChange {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AddForeignKey {
-    pub table: String,
     /// The index of the table in the next schema.
     #[serde(skip)]
     pub table_index: usize,
     /// The index of the foreign key in the table.
     #[serde(skip)]
     pub foreign_key_index: usize,
-    pub foreign_key: ForeignKey,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropForeignKey {
     pub table: String,
+    #[serde(skip)]
+    pub table_index: usize,
+    #[serde(skip)]
+    pub foreign_key_index: usize,
     pub constraint_name: String,
 }
 

@@ -156,12 +156,15 @@ impl SqlRenderer for PostgresFlavour {
         let AlterTable {
             table,
             changes,
-            table_index,
+            table_index: (previous_table_index, next_table_index),
         } = alter_table;
 
         let mut lines = Vec::new();
         let mut before_statements = Vec::new();
         let mut after_statements = Vec::new();
+
+        let previous_table = differ.previous.table_walker_at(*previous_table_index);
+        let next_table = differ.next.table_walker_at(*next_table_index);
 
         for change in changes {
             match change {
@@ -177,15 +180,13 @@ impl SqlRenderer for PostgresFlavour {
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
-                TableChange::AddColumn(AddColumn { column }) => {
-                    let column = differ
-                        .next
-                        .table_walker(&table.name)
-                        .expect("Invariant violation: add column on unknown table")
-                        .columns()
-                        .find(|col| col.name() == column.name)
-                        .expect("Invariant violation: add column with unknown column");
+                TableChange::AddColumn(AddColumn {
+                    column: _,
+                    column_index,
+                }) => {
+                    let column = next_table.column_at(*column_index);
                     let col_sql = self.render_column(column);
+
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn(DropColumn { name, .. }) => {
@@ -193,20 +194,13 @@ impl SqlRenderer for PostgresFlavour {
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_name,
+                    column_name: _,
+                    column_index: (previous_column_index, next_column_index),
                     changes,
                     type_change: _,
                 }) => {
-                    let previous_column = differ
-                        .previous
-                        .table_walker_at(table_index.0)
-                        .column(&column_name)
-                        .expect("AlterColumn on unknown column");
-                    let next_column = differ
-                        .next
-                        .table_walker_at(table_index.1)
-                        .column(&column_name)
-                        .expect("AlterColumn on unknown column");
+                    let previous_column = previous_table.column_at(*previous_column_index);
+                    let next_column = next_table.column_at(*next_column_index);
 
                     render_alter_column(
                         self,
@@ -218,20 +212,16 @@ impl SqlRenderer for PostgresFlavour {
                     );
                 }
                 TableChange::DropAndRecreateColumn {
-                    column_name,
-                    column_index: (_, next_idx),
+                    column_index: (previous_index, next_idx),
                     changes: _,
                 } => {
-                    let name = self.quote(column_name);
+                    let previous_column = previous_table.column_at(*previous_index);
+                    let name = self.quote(previous_column.name());
+
                     lines.push(format!("DROP COLUMN {}", name));
 
-                    let column = differ
-                        .next
-                        .table_walker(&table.name)
-                        .expect("AlterTable on unknown table")
-                        .column_at(*next_idx);
-
-                    let col_sql = self.render_column(column);
+                    let next_column = next_table.column_at(*next_idx);
+                    let col_sql = self.render_column(next_column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
             };

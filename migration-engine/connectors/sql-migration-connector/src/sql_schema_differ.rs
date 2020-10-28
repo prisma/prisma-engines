@@ -18,7 +18,7 @@ use crate::{
 use column::ColumnTypeChange;
 use enums::EnumDiffer;
 use sql_schema_describer::{
-    walkers::{ForeignKeyWalker, SqlSchemaExt, TableWalker},
+    walkers::{ForeignKeyWalker, TableWalker},
     Enum,
 };
 use std::collections::HashSet;
@@ -100,15 +100,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         differ.diff_internal()
     }
 
-    pub(crate) fn diff_table(&self, table_name: &str) -> Option<TableDiffer<'schema>> {
-        Some(TableDiffer {
-            database_info: self.database_info,
-            flavour: self.flavour,
-            previous: self.previous.table_walker(table_name)?,
-            next: self.next.table_walker(table_name)?,
-        })
-    }
-
     fn diff_internal(&self) -> SqlSchemaDiff {
         let tables_to_redefine = self.flavour.tables_to_redefine(&self);
         let alter_indexes: Vec<_> = self.alter_indexes(&tables_to_redefine);
@@ -136,6 +127,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         self.created_tables()
             .map(|created_table| CreateTable {
                 table: created_table.table().clone(),
+                table_index: created_table.table_index(),
             })
             .collect()
     }
@@ -156,8 +148,13 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
             dropped_tables.push(drop_table);
 
-            for fk_name in dropped_table.foreign_keys().filter_map(|fk| fk.constraint_name()) {
+            for (fk, fk_name) in dropped_table
+                .foreign_keys()
+                .filter_map(|fk| fk.constraint_name().map(|name| (fk, name)))
+            {
                 let drop_foreign_key = DropForeignKey {
+                    table_index: dropped_table.table_index(),
+                    foreign_key_index: fk.foreign_key_index(),
                     table: dropped_table.name().to_owned(),
                     constraint_name: fk_name.to_owned(),
                 };
@@ -223,6 +220,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         differ.added_columns().map(move |column| {
             let change = AddColumn {
                 column: column.column().clone(),
+                column_index: column.column_index(),
             };
 
             TableChange::AddColumn(change)
@@ -238,25 +236,27 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             }
 
             let column_name = column_differ.previous.name().to_owned();
+            let column_index = (column_differ.previous.column_index(), column_differ.next.column_index());
 
             match type_change {
-                Some(ColumnTypeChange::NotCastable) => Some(TableChange::DropAndRecreateColumn {
-                    column_name,
-                    column_index: (column_differ.previous.column_index(), column_differ.next.column_index()),
-                    changes,
-                }),
+                Some(ColumnTypeChange::NotCastable) => {
+                    Some(TableChange::DropAndRecreateColumn { column_index, changes })
+                }
                 Some(ColumnTypeChange::RiskyCast) => Some(TableChange::AlterColumn(AlterColumn {
                     column_name,
+                    column_index,
                     changes,
                     type_change: Some(crate::sql_migration::ColumnTypeChange::RiskyCast),
                 })),
                 Some(ColumnTypeChange::SafeCast) => Some(TableChange::AlterColumn(AlterColumn {
                     column_name,
+                    column_index,
                     changes,
                     type_change: Some(crate::sql_migration::ColumnTypeChange::SafeCast),
                 })),
                 None => Some(TableChange::AlterColumn(AlterColumn {
                     column_name,
+                    column_index,
                     changes,
                     type_change: None,
                 })),
@@ -273,13 +273,14 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .table_pairs()
             .filter(|tables| !tables_to_redefine.contains(tables.next.name()))
         {
-            let table_name = differ.previous.name();
-            for dropped_foreign_key_name in differ
+            for (dropped_fk, dropped_foreign_key_name) in differ
                 .dropped_foreign_keys()
-                .filter_map(|foreign_key| foreign_key.constraint_name())
+                .filter_map(|foreign_key| foreign_key.constraint_name().map(|name| (foreign_key, name)))
             {
                 drop_foreign_keys.push(DropForeignKey {
-                    table: table_name.to_owned(),
+                    table_index: differ.previous.table_index(),
+                    table: differ.previous.name().to_owned(),
+                    foreign_key_index: dropped_fk.foreign_key_index(),
                     constraint_name: dropped_foreign_key_name.to_owned(),
                 })
             }
@@ -526,9 +527,7 @@ fn push_created_foreign_keys<'a, 'schema>(
 ) {
     table_pairs.for_each(|differ| {
         added_foreign_keys.extend(differ.created_foreign_keys().map(|created_fk| AddForeignKey {
-            table: differ.next.name().to_owned(),
             table_index: differ.next.table_index(),
-            foreign_key: created_fk.inner().clone(),
             foreign_key_index: created_fk.foreign_key_index(),
         }))
     })
@@ -540,9 +539,7 @@ fn push_foreign_keys_from_created_tables<'a>(
 ) {
     for table in created_tables {
         steps.extend(table.foreign_keys().map(|fk| AddForeignKey {
-            table: table.name().to_owned(),
             table_index: table.table_index(),
-            foreign_key: fk.foreign_key().clone(),
             foreign_key_index: fk.foreign_key_index(),
         }));
     }

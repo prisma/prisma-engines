@@ -163,11 +163,8 @@ fn render_raw_sql(
         SqlMigrationStep::CreateEnum(create_enum) => renderer.render_create_enum(create_enum),
         SqlMigrationStep::DropEnum(drop_enum) => renderer.render_drop_enum(drop_enum),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
-        SqlMigrationStep::CreateTable(CreateTable { table }) => {
-            let table = next_schema
-                .table_walker(&table.name)
-                .ok_or_else(|| anyhow::anyhow!("CreateTable referring to an unknown table: `{}`.", &table.name))
-                .unwrap();
+        SqlMigrationStep::CreateTable(CreateTable { table: _, table_index }) => {
+            let table = next_schema.table_walker_at(*table_index);
 
             vec![renderer.render_create_table(&table)]
         }

@@ -20,6 +20,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
     ) {
         let AlterColumn {
             column_name: _,
+            column_index: _,
             changes,
             type_change,
         } = alter_column;
