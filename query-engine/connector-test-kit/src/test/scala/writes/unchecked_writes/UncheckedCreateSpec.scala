@@ -4,15 +4,6 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
-  // CREATE
-  // 1) Test with 2 relations inlined (one opt, one req), one not inlined. Make it multi-field!
-  // -> required relations need to be written.
-  // -> Optional can be optional.
-  // -> Other relation is still there that is not inlined.
-  // 2) Auto inc ids can be provided, so id is an OPTIONAL input.
-  // 3) Test empty create input and when it's present and when it's not. Can have weird impact on existing queries.
-  // 4) Test with default on relation scalar?
-
   "Unchecked creates" should "allow writing inlined relation scalars" in {
     val project = ProjectDsl.fromString {
       """|model ModelA {
@@ -315,4 +306,78 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.toString() should be("""{"data":{"createOneModelA":{"id":1,"b":{"id":11},"c":{"id":21}}}}""")
   }
 
+  "Unchecked creates" should "honor defaults and make required relation scalars optional" in {
+    val project = ProjectDsl.fromString {
+      """|model ModelA {
+         |  id   Int    @id
+         |  b_id Int    @default(11)
+         |  b    ModelB @relation(fields: [b_id], references: [id])
+         |}
+         |
+         |model ModelB {
+         |  id Int      @id
+         |  a  ModelA[]
+         |}
+      """
+    }
+
+    database.setup(project)
+
+    server.query(
+      """
+        |mutation {
+        |  createOneModelB(data: {
+        |    id: 11
+        |  }) {
+        |    id
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+
+    val res = server.query(
+      """
+        |mutation {
+        |  createOneModelA(data: {
+        |    id: 1
+        |  }) {
+        |    b { id }
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+
+    res.toString() should be("""{"data":{"createOneModelA":{"b":{"id":11}}}}""")
+  }
+
+  "Unchecked creates" should "allow to write to autoincrement IDs directly" in {
+    val project = ProjectDsl.fromString {
+      """|model ModelA {
+         |  id   Int    @id @default(autoincrement())
+         |}
+      """
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      """
+        |mutation {
+        |  createOneModelA(data: {
+        |    id: 111
+        |  }) {
+        |    id
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+
+    res.toString() should be("""{"data":{"createOneModelA":{"id":111}}}""")
+  }
 }
