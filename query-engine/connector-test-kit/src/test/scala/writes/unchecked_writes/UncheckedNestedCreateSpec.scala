@@ -3,10 +3,9 @@ package writes.unchecked_writes
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// Important: This test covers ALL nested create inputs, like create nested, connectOrCreate, nested upsert,
+// because schema building uses the exact same types under the hood.
 class UncheckedNestedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
-  // todo:
-  // - should allow writing non-parent
-
   "Unchecked nested creates" should "allow writing non-parent inlined relation scalars" in {
     val project = ProjectDsl.fromString {
       """|model ModelA {

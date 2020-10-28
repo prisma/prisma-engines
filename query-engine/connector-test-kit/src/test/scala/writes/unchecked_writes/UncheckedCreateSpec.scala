@@ -3,6 +3,8 @@ package writes.unchecked_writes
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// Important: This test covers ALL top level create inputs, like create & upsert,
+// because schema building uses the exact same types under the hood.
 class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Unchecked creates" should "allow writing inlined relation scalars" in {
     val project = ProjectDsl.fromString {
