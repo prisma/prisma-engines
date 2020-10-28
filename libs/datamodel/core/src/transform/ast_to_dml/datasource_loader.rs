@@ -5,10 +5,8 @@ use super::{
     datasource_provider::DatasourceProvider,
 };
 use crate::ast::Span;
-use crate::common::preview_features::*;
 use crate::configuration::StringFromEnvVar;
 use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics, ValidatedDatasource, ValidatedDatasources};
-use crate::transform::ast_to_dml::common::validate_preview_features;
 use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
 
@@ -164,11 +162,7 @@ impl DatasourceLoader {
         };
 
         if !preview_features.is_empty() {
-            diagnostics.push_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block to use theses preview features.", preview_features_arg?.span()));
-            diagnostics.append(&mut result);
-            if diagnostics.has_errors() {
-                return Err(diagnostics);
-            }
+            return Err(diagnostics.merge_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block.", span)));
         }
 
         let documentation = ast_source.documentation.clone().map(|comment| comment.text);
