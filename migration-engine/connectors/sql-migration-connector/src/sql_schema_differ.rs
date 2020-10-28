@@ -197,7 +197,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 Some(changes)
                     .filter(|changes| !changes.is_empty())
                     .map(|changes| AlterTable {
-                        table: tables.next.table().clone(),
                         table_index: (tables.previous.table_index(), tables.next.table_index()),
                         changes,
                     })

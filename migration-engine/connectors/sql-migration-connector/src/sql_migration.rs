@@ -86,7 +86,6 @@ pub struct DropTable {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AlterTable {
-    pub table: Table,
     /// Index in (previous_schema, next_schema).
     #[serde(skip)]
     pub table_index: (usize, usize),

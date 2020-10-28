@@ -2274,18 +2274,18 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
     let dm2 = r#"
         model C {
             id Int @id
-            a A @relation(name: "ctoa", fields: [name], references: [name])
+            a A @relation(name: "ctoa2", fields: [name], references: [name])
             name Int @unique
         }
 
         model A {
             id Int @id
             name Int @unique
-            c C @relation(name: "atoc", fields: [name], references: [name])
+            c C @relation(name: "atoc2", fields: [name], references: [name])
         }
 
         model B {
-            c C @relation(name: "btoc", fields: [name], references: [name])
+            c C @relation(name: "btoc2", fields: [name], references: [name])
             id Int @id
             name Int @unique
         }

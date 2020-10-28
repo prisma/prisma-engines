@@ -85,7 +85,6 @@ impl SqlMigrationConnector {
         for (step_index, step) in steps.iter().enumerate() {
             match step {
                 SqlMigrationStep::AlterTable(AlterTable {
-                    table,
                     table_index: (prev_idx, next_idx),
                     changes,
                 }) => {
@@ -97,8 +96,7 @@ impl SqlMigrationConnector {
                     for change in changes {
                         match change {
                             TableChange::DropColumn(ref drop_column) => {
-                                let column = find_column(before, &table.name, &drop_column.name)
-                                    .expect("Dropping of unknown column.");
+                                let column = before_table.column_at(drop_column.index);
 
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
@@ -125,7 +123,7 @@ impl SqlMigrationConnector {
                             }
                             TableChange::DropPrimaryKey { .. } => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
-                                    table: table.name.clone(),
+                                    table: before_table.name().to_owned(),
                                 },
                                 step_index,
                             ),

@@ -154,7 +154,6 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         let AlterTable {
-            table,
             changes,
             table_index: (previous_table_index, next_table_index),
         } = alter_table;
@@ -231,7 +230,11 @@ impl SqlRenderer for PostgresFlavour {
             return Vec::new();
         }
 
-        let alter_table = format!("ALTER TABLE {} {}", self.quote(&table.name), lines.join(",\n"));
+        let alter_table = format!(
+            "ALTER TABLE {} {}",
+            self.quote(previous_table.name()),
+            lines.join(",\n")
+        );
 
         before_statements
             .into_iter()
