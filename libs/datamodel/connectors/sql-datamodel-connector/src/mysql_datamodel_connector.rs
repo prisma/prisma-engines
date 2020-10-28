@@ -163,7 +163,21 @@ impl Connector for MySqlDatamodelConnector {
                         return Err(ConnectorError::new_scale_larger_than_precision_error(
                             native_type_name,
                             "MySQL",
-                        ));
+                        ))
+                    }
+                    [precision, _] if *precision > 65 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "Precision can range from 1 to 65.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    [_, scale] if *scale > 30 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "Scale can range from 0 to 30.",
+                            native_type_name,
+                            "MySQL",
+                        ))
                     }
                     _ => {}
                 }

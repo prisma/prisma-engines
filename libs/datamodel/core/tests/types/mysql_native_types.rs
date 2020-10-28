@@ -97,6 +97,31 @@ fn should_fail_on_argument_out_of_range_for_bit_type() {
 }
 
 #[test]
+fn should_fail_on_argument_out_of_range_for_decimal_and_numeric_type() {
+    fn error_msg(type_name: &str, arg: &str, range: &str) -> String {
+        format!(
+            "Argument M is out of range for Native type {} of MySQL: {} can range from {}.",
+            type_name, arg, range
+        )
+    };
+
+    for tpe in &["Numeric", "Decimal"] {
+        test_native_types_without_attributes(
+            &format!("{}(66, 20)", tpe),
+            "Decimal",
+            &error_msg(tpe, "Precision", "1 to 65"),
+            MYSQL_SOURCE,
+        );
+        test_native_types_without_attributes(
+            &format!("{}(44, 33)", tpe),
+            "Decimal",
+            &error_msg(tpe, "Scale", "0 to 30"),
+            MYSQL_SOURCE,
+        );
+    }
+}
+
+#[test]
 fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let dml = r#"
         datasource db {
