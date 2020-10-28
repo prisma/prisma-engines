@@ -288,7 +288,6 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                         "mood" "Mood"  NOT NULL ,
                         PRIMARY KEY ("id")
                         );
-                        
                         "#
                     }
                 }

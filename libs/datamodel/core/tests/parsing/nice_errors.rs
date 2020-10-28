@@ -1,6 +1,5 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::common::preview_features::DATASOURCE_PREVIEW_FEATURES;
 use datamodel::diagnostics::DatamodelError;
 
 #[test]
