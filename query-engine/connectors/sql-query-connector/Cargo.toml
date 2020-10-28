@@ -17,8 +17,18 @@ tokio = "0.2.13"
 uuid = "0.8"
 
 [dependencies.quaint]
-features = ["full", "tracing-log"]
 git = "https://github.com/prisma/quaint"
+features = [
+    "pooled",
+    "json",
+    "uuid",
+    "chrono",
+    "sqlite",
+    "postgresql",
+    "mysql",
+    "mssql",
+    "tracing-log"
+]
 
 [dependencies.connector-interface]
 package = "query-connector"

@@ -19,8 +19,18 @@ tracing-futures = "0.2.4"
 tracing-error = "0.1.2"
 
 [dependencies.quaint]
-features = ["single-postgresql", "single-mysql", "single-sqlite", "serde-support", "tracing-log"]
 git = "https://github.com/prisma/quaint"
+features = [
+    "serde-support",
+    "json",
+    "uuid",
+    "chrono",
+    "sqlite",
+    "postgresql",
+    "mysql",
+    "mssql",
+    "tracing-log"
+]
 
 [dev-dependencies]
 anyhow = "1.0.28"

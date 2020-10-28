@@ -56,8 +56,21 @@ indoc = "0.3"
 introspection-core = {path = "../../introspection-engine/core"}
 migration-connector = {path = "../../migration-engine/connectors/migration-connector"}
 migration-core = {path = "../../migration-engine/core"}
-quaint = { git = "https://github.com/prisma/quaint", features = ["full", "tracing-log"] }
 serial_test = "*"
 sql-migration-connector = {path = "../../migration-engine/connectors/sql-migration-connector"}
 test-macros = {path = "../../libs/test-macros"}
 test-setup = {path = "../../libs/test-setup"}
+
+[dev-dependencies.quaint]
+git = "https://github.com/prisma/quaint"
+features = [
+    "pooled",
+    "json",
+    "uuid",
+    "chrono",
+    "sqlite",
+    "postgresql",
+    "mysql",
+    "mssql",
+    "tracing-log"
+]

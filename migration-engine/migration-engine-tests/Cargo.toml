@@ -27,7 +27,6 @@ barrel = { git = "https://github.com/prisma/barrel.git", features = ["sqlite3", 
 chrono = "0.4.15"
 indoc = "1.0.2"
 pretty_assertions = "0.6"
-quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["serde-support", "tracing-log"] }
 serde = "1"
 serde_json = "1.0.45"
 tempfile = "3.1.0"
@@ -35,3 +34,8 @@ tokio = { version = "0.2.13", features = ["macros"] }
 tracing = "0.1.12"
 tracing-futures = "0.2.1"
 url = "2.1.1"
+
+[dependencies.quaint]
+git = "https://github.com/prisma/quaint"
+optional = true
+features = ["serde-support", "tracing-log"]
