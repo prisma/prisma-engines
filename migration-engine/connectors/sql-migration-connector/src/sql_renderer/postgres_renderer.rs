@@ -15,15 +15,6 @@ use regex::Regex;
 use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
 
-impl PostgresFlavour {
-    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
-        QuotedWithSchema {
-            schema_name: self.schema_name(),
-            name: self.quote(name),
-        }
-    }
-}
-
 impl SqlRenderer for PostgresFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
