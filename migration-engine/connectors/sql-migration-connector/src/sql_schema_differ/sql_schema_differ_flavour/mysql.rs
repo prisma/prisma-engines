@@ -55,4 +55,8 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
             previous.name() != next.name()
         }
     }
+
+    fn should_create_indexes_from_created_tables(&self) -> bool {
+        false
+    }
 }
