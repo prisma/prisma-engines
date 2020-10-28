@@ -2246,3 +2246,53 @@ async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestAp
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model A {
+            id Int @id
+            name Int @unique
+            c C @relation(name: "atoc", fields: [name], references: [name])
+        }
+
+        model B {
+            id Int @id
+            name Int @unique
+            c C @relation(name: "btoc", fields: [name], references: [name])
+        }
+
+        model C {
+            id Int @id
+            name Int @unique
+            a A @relation(name: "ctoa", fields: [name], references: [name])
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let dm2 = r#"
+        model C {
+            id Int @id
+            a A @relation(name: "ctoa", fields: [name], references: [name])
+            name Int @unique
+        }
+
+        model A {
+            id Int @id
+            name Int @unique
+            c C @relation(name: "atoc", fields: [name], references: [name])
+        }
+
+        model B {
+            c C @relation(name: "btoc", fields: [name], references: [name])
+            id Int @id
+            name Int @unique
+        }
+
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    Ok(())
+}
