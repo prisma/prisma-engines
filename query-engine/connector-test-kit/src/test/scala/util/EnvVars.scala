@@ -7,15 +7,11 @@ object EnvVars {
     .getOrElse(sys.error("Unable to resolve cargo root path"))
     .stripSuffix("/")
 
-  // env var is for compatibility with `test_connector.sh`
-  val isDebugBuild = sys.env.get("IS_DEBUG_BUILD") match {
-    case Some(x) => x == "1"
-    case _       => PrismaRsBuild.isDebug
-  }
+  val isDebugBuild = PrismaRsBuild.buildMode != "release"
 
   val isWindows = System.getProperty("os.name") match {
     case s if s.startsWith("Windows") => true
-    case _ => false
+    case _                            => false
   }
 
   // env var is for compatibility with `test_connector.sh`

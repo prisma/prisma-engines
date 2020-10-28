@@ -14,7 +14,7 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
   // 4) Test with default on relation scalar?
   // 5)
 
-  "Uncehcked creates" should "allow writing inlined relation scalars" ignore {
+  "Uncehcked creates" should "allow writing inlined relation scalars" in {
     val project = ProjectDsl.fromString {
       // test optional relation with one field optional one field required?
       """|model ModelA {
