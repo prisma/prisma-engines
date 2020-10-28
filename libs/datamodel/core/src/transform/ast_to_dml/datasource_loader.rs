@@ -164,12 +164,7 @@ impl DatasourceLoader {
         };
 
         if !preview_features.is_empty() {
-            let mut result = validate_preview_features(
-                preview_features.clone(),
-                span,
-                Vec::from(DATASOURCE_PREVIEW_FEATURES),
-                Vec::from(DEPRECATED_DATASOURCE_PREVIEW_FEATURES),
-            );
+            diagnostics.push_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block to use theses preview features.", preview_features_arg?.span()));
             diagnostics.append(&mut result);
             if diagnostics.has_errors() {
                 return Err(diagnostics);
