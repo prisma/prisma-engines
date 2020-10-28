@@ -272,29 +272,13 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
          |
          |model ModelC {
          |  id   Int    @id
-         |  a_id
-         |  a    ModelA @relation(fields: [c_id], references: [id])
+         |  a_id Int 
+         |  a    ModelA @relation(fields: [a_id], references: [id])
          |}
       """
     }
 
     database.setup(project)
-
-    server.queryThatMustFail(
-      """
-        |mutation {
-        |  createOneModelA(data: {
-        |    id: 1
-        |  }) {
-        |    id
-        |  }
-        |}
-      """.stripMargin,
-      project,
-      errorCode = 2009,
-      errorContains = "`Mutation.createOneModelA.data.ModelAUncheckedCreateInput.b_id`: A value is required but not set.",
-      legacy = false
-    )
 
     server.query(
       """
@@ -316,6 +300,7 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  createOneModelA(data: {
         |    id: 1
         |    b_id: 11
+        |    c: { create: { id: 21 }}
         |  }) {
         |    id
         |    b { id }
@@ -327,6 +312,7 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString() should be("""{"data":{"createOneModelA":{"id":1,"b":{"id":11},"c":null}}}""")
+    res.toString() should be("""{"data":{"createOneModelA":{"id":1,"b":{"id":11},"c":{"id":21}}}}""")
   }
+
 }
