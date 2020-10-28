@@ -354,7 +354,7 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.toString() should be("""{"data":{"createOneModelA":{"b":{"id":11}}}}""")
   }
 
-  "Unchecked creates" should "allow to write to autoincrement IDs directly" in {
+  "Unchecked creates" should "allow to write to autoincrement IDs directly" taggedAs IgnoreMsSql in {
     val project = ProjectDsl.fromString {
       """|model ModelA {
          |  id   Int    @id @default(autoincrement())
