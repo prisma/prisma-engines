@@ -10,6 +10,7 @@ use std::fmt::{self, Write};
 ///
 /// The returned parameter values implement the `ToSql` trait from rusqlite and
 /// can be used directly with the database.
+#[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
 pub struct Sqlite<'a> {
     query: String,
     parameters: Vec<Value<'a>>,
@@ -202,7 +203,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     }
 }
 
-#[cfg(all(test, feature = "sqlite"))]
+#[cfg(test)]
 mod tests {
     use crate::{val, visitor::*};
 

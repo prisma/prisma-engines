@@ -126,6 +126,7 @@ impl Quaint {
     /// - `isolationLevel` the transaction isolation level. Possible values:
     ///   `READ UNCOMMITTED`, `READ COMMITTED`, `REPEATABLE READ`, `SNAPSHOT`,
     ///   `SERIALIZABLE`.
+    #[allow(unreachable_code)]
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let inner = match url_str {
             #[cfg(feature = "sqlite")]
@@ -167,6 +168,7 @@ impl Quaint {
     }
 
     #[cfg(feature = "sqlite")]
+    #[cfg_attr(feature = "docs", doc(cfg(sqlite)))]
     /// Open a new SQLite database in memory.
     pub fn new_in_memory(attached_name: Option<String>) -> crate::Result<Quaint> {
         let attached_name = attached_name.unwrap_or_else(|| DEFAULT_SQLITE_SCHEMA_NAME.into());

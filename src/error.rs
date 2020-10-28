@@ -160,6 +160,7 @@ pub enum ErrorKind {
     ValueOutOfRange { message: String },
 
     #[cfg(feature = "serde-support")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "serde-support")))]
     #[error("Deserializing a ResultRow {:?}", _0)]
     FromRowError(serde::de::value::Error),
 }
@@ -194,6 +195,7 @@ impl From<rust_decimal::Error> for Error {
 }
 
 #[cfg(feature = "json")]
+#[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
 impl From<serde_json::Error> for Error {
     fn from(_: serde_json::Error) -> Self {
         Self::builder(ErrorKind::conversion("Malformed JSON data.")).build()
@@ -223,6 +225,7 @@ impl From<connection_string::Error> for Error {
 }
 
 #[cfg(feature = "pooled")]
+#[cfg_attr(feature = "docs", doc(cfg(feature = "pooled")))]
 impl From<mobc::Error<Error>> for Error {
     fn from(e: mobc::Error<Error>) -> Self {
         match e {
@@ -241,6 +244,10 @@ impl From<mobc::Error<Error>> for Error {
 }
 
 #[cfg(any(feature = "postgresql", feature = "mysql", feature = "mssql"))]
+#[cfg_attr(
+    feature = "docs",
+    doc(cfg(feature = "postgresql", feature = "mysql", feature = "mssql"))
+)]
 impl From<tokio::time::Elapsed> for Error {
     fn from(_: tokio::time::Elapsed) -> Self {
         let kind = ErrorKind::Timeout("tokio timeout".into());

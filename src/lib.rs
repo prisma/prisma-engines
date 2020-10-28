@@ -103,33 +103,32 @@
 //! # Ok(())
 //! # }
 //! ```
+
+#![cfg_attr(feature = "docs", feature(doc_cfg))]
+
+#[cfg(not(any(feature = "sqlite", feature = "postgresql", feature = "mysql", feature = "mssql",)))]
+compile_error!("one of 'sqlite', 'postgresql', 'mysql' or 'mssql' features must be enabled");
+
 #[macro_use]
 mod macros;
 
-#[cfg(all(
-    not(feature = "tracing-log"),
-    any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql")
-))]
+#[cfg(not(feature = "tracing-log"))]
 #[macro_use]
 extern crate log;
 
 #[macro_use]
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql"))]
 extern crate metrics;
 
 pub mod ast;
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql"))]
 pub mod connector;
 pub mod error;
-#[cfg(all(
-    feature = "pooled",
-    any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql")
-))]
+#[cfg(feature = "pooled")]
+#[cfg_attr(feature = "docs", doc(cfg(pooled)))]
 pub mod pooled;
 pub mod prelude;
 #[cfg(feature = "serde-support")]
+#[cfg_attr(feature = "docs", doc(cfg(feature = "serde-support")))]
 pub mod serde;
-#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql", feature = "mssql"))]
 pub mod single;
 #[cfg(test)]
 mod tests;

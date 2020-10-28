@@ -41,11 +41,12 @@ impl<'a> Expression<'a> {
         }
     }
 
-    #[cfg(feature = "json")]
     #[allow(dead_code)]
-    pub fn is_json_value(&self) -> bool {
+    pub(crate) fn is_json_value(&self) -> bool {
         match &self.kind {
+            #[cfg(feature = "json")]
             ExpressionKind::Parameterized(Value::Json(_)) => true,
+            #[cfg(feature = "json")]
             ExpressionKind::Value(expr) => expr.is_json_value(),
             _ => false,
         }

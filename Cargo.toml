@@ -19,7 +19,13 @@ repository = "https://github.com/prisma/quaint/"
 version = "0.2.0-alpha.13"
 
 [package.metadata.docs.rs]
-features = [
+features = ["docs", "all"]
+
+[features]
+default = []
+docs = []
+
+all = [
   "chrono",
   "json",
   "mssql",
@@ -30,9 +36,6 @@ features = [
   "sqlite",
   "uuid",
 ]
-
-[features]
-default = []
 
 postgresql = [
   "native-tls",

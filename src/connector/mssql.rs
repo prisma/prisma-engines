@@ -15,7 +15,10 @@ use tiberius::*;
 use tokio::{net::TcpStream, time::timeout};
 use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
 
+/// Wraps a connection url and exposes the parsing logic used by Quaint,
+/// including default values.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
 pub struct MssqlUrl {
     connection_string: String,
     query_params: MssqlQueryParams,
@@ -23,6 +26,7 @@ pub struct MssqlUrl {
 
 /// TLS mode when connecting to SQL Server.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
 pub enum EncryptMode {
     /// All traffic is encrypted.
     On,
@@ -78,6 +82,7 @@ pub(crate) struct MssqlQueryParams {
 /// documentation].
 ///
 /// [SQL Server documentation]: https://docs.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver15
+#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
 pub enum IsolationLevel {
     ReadUncommitted,
     ReadCommitted,
@@ -125,38 +130,48 @@ impl TransactionCapable for Mssql {
 }
 
 impl MssqlUrl {
+    /// Maximum number of connections the pool can have (if used together with
+    /// pooled Quaint).
     pub fn connection_limit(&self) -> Option<usize> {
         self.query_params.connection_limit()
     }
 
+    /// A duration how long one query can take.
     pub fn socket_timeout(&self) -> Option<Duration> {
         self.query_params.socket_timeout()
     }
 
+    /// A duration how long we can try to connect to the database.
     pub fn connect_timeout(&self) -> Option<Duration> {
         self.query_params.connect_timeout()
     }
 
+    /// The isolation level of a transaction.
     pub fn transaction_isolation_level(&self) -> Option<IsolationLevel> {
         self.query_params.transaction_isolation_level
     }
 
+    /// Name of the database.
     pub fn dbname(&self) -> &str {
         self.query_params.database()
     }
 
+    /// The prefix which to use when querying database.
     pub fn schema(&self) -> &str {
         self.query_params.schema()
     }
 
+    /// Database hostname.
     pub fn host(&self) -> &str {
         self.query_params.host()
     }
 
+    /// The username to use when connecting to the database.
     pub fn username(&self) -> Option<&str> {
         self.query_params.user()
     }
 
+    /// Database port.
     pub fn port(&self) -> u16 {
         self.query_params.port()
     }
@@ -196,8 +211,9 @@ impl MssqlQueryParams {
     }
 }
 
-/// A connector interface for the PostgreSQL database.
+/// A connector interface for the SQL Server database.
 #[derive(Debug)]
+#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
 pub struct Mssql {
     client: Mutex<Client<Compat<TcpStream>>>,
     url: MssqlUrl,
@@ -205,6 +221,7 @@ pub struct Mssql {
 }
 
 impl Mssql {
+    /// Creates a new connection to SQL Server.
     pub async fn new(url: MssqlUrl) -> crate::Result<Self> {
         let config = Config::from_jdbc_string(&url.connection_string)?;
 

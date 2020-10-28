@@ -8,6 +8,7 @@ use std::fmt::{self, Write};
 /// A visitor to generate queries for the MySQL database.
 ///
 /// The returned parameter values can be used directly with the mysql crate.
+#[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
 pub struct Mysql<'a> {
     query: String,
     parameters: Vec<Value<'a>>,

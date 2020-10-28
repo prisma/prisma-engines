@@ -18,15 +18,19 @@ use std::convert::TryFrom;
 pub enum ConnectionInfo {
     /// A PostgreSQL connection URL.
     #[cfg(feature = "postgresql")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
     Postgres(PostgresUrl),
     /// A MySQL connection URL.
     #[cfg(feature = "mysql")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
     Mysql(MysqlUrl),
     /// A SQL Server connection URL.
     #[cfg(feature = "mssql")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
     Mssql(MssqlUrl),
     /// A SQLite connection URL.
     #[cfg(feature = "sqlite")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
     Sqlite {
         /// The filesystem path of the SQLite database.
         file_path: String,
@@ -34,6 +38,7 @@ pub enum ConnectionInfo {
         db_name: String,
     },
     #[cfg(feature = "sqlite")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
     InMemorySqlite { db_name: String },
 }
 
@@ -231,12 +236,16 @@ impl ConnectionInfo {
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum SqlFamily {
     #[cfg(feature = "postgresql")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "postgresql")))]
     Postgres,
     #[cfg(feature = "mysql")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
     Mysql,
     #[cfg(feature = "sqlite")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
     Sqlite,
     #[cfg(feature = "mssql")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
     Mssql,
 }
 
@@ -273,41 +282,49 @@ impl SqlFamily {
         Self::from_scheme(url_scheme).is_some()
     }
 
+    /// True, if family is PostgreSQL.
     #[cfg(feature = "postgresql")]
     pub fn is_postgres(&self) -> bool {
         matches!(self, SqlFamily::Postgres)
     }
 
+    /// True, if family is PostgreSQL.
     #[cfg(not(feature = "postgresql"))]
     pub fn is_postgres(&self) -> bool {
         false
     }
 
+    /// True, if family is MySQL.
     #[cfg(feature = "mysql")]
     pub fn is_mysql(&self) -> bool {
         matches!(self, SqlFamily::Mysql)
     }
 
+    /// True, if family is MySQL.
     #[cfg(not(feature = "mysql"))]
     pub fn is_mysql(&self) -> bool {
         false
     }
 
+    /// True, if family is SQLite.
     #[cfg(feature = "sqlite")]
     pub fn is_sqlite(&self) -> bool {
         matches!(self, SqlFamily::Sqlite)
     }
 
+    /// True, if family is SQLite.
     #[cfg(not(feature = "sqlite"))]
     pub fn is_sqlite(&self) -> bool {
         false
     }
 
+    /// True, if family is SQL Server.
     #[cfg(feature = "mssql")]
     pub fn is_mssql(&self) -> bool {
         matches!(self, SqlFamily::Mssql)
     }
 
+    /// True, if family is SQL Server.
     #[cfg(not(feature = "mssql"))]
     pub fn is_mssql(&self) -> bool {
         false

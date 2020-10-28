@@ -9,6 +9,10 @@ use crate::{
 };
 use std::{convert::TryFrom, fmt::Write, iter};
 
+/// A visitor to generate queries for the SQL Server database.
+///
+/// The returned parameter values can be used directly with the tiberius crate.
+#[cfg_attr(feature = "docs", doc(cfg(feature = "mssql")))]
 pub struct Mssql<'a> {
     query: String,
     parameters: Vec<Value<'a>>,
