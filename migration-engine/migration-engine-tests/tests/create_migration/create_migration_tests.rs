@@ -23,7 +23,7 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                     indoc! {
                         r#"
                         -- CreateTable
-                        CREATE TABLE "prisma-tests"."Cat" (
+                        CREATE TABLE "Cat" (
                         "id" integer   NOT NULL ,
                         "name" text   NOT NULL ,
                         PRIMARY KEY ("id")
@@ -105,7 +105,7 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                     indoc! {
                         r#"
                         -- CreateTable
-                        CREATE TABLE "prisma-tests"."Dog" (
+                        CREATE TABLE "Dog" (
                         "id" integer   NOT NULL ,
                         "name" text   NOT NULL ,
                         PRIMARY KEY ("id")
