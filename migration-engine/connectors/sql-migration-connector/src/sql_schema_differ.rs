@@ -304,26 +304,18 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn create_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<CreateIndex> {
         let mut steps = Vec::new();
 
-        let family = self.database_info.sql_family();
+        if self.flavour.should_create_indexes_from_created_tables() {
+            let create_indexes_from_created_tables = self
+                .created_tables()
+                .flat_map(|table| table.indexes())
+                .filter(|index| !self.flavour.should_skip_index_for_new_table(index))
+                .map(|index| CreateIndex {
+                    table: index.table().name().to_owned(),
+                    index: index.index().clone(),
+                    caused_by_create_table: true,
+                });
 
-        // TODO: move this into SqlSchemaDescriberFlavour methods, it is
-        // extremely ugly.
-        if !family.is_mysql() {
-            for table in self.created_tables() {
-                let walker = self.next.table_walker(table.name()).unwrap();
-
-                for walker in walker.indexes() {
-                    if family.is_mssql() && walker.index_type().is_unique() {
-                        continue;
-                    }
-
-                    steps.push(CreateIndex {
-                        table: table.name().to_owned(),
-                        index: walker.index().clone(),
-                        caused_by_create_table: true,
-                    });
-                }
-            }
+            steps.extend(create_indexes_from_created_tables);
         }
 
         for tables in self
