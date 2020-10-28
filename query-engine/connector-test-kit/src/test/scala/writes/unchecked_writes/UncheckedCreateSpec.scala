@@ -1,9 +1,9 @@
-package writes.dataTypes.bytes
+package writes.unchecked_writes
 
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
-class UnsafeCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
+class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
   // CREATE
   // 1) Test with 2 relations inlined (one opt, one req), one not inlined. Make it multi-field!
   // -> required relations need to be written.
@@ -14,7 +14,7 @@ class UnsafeCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
   // 4) Test with default on relation scalar?
   // 5)
 
-  "Uncehcked creates" should "allow writing inlined relation scalars" in {
+  "Uncehcked creates" should "allow writing inlined relation scalars" ignore {
     val project = ProjectDsl.fromString {
       // test optional relation with one field optional one field required?
       """|model ModelA {
