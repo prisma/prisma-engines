@@ -3,7 +3,9 @@
 MYSQL_ROOT_PASSWORD=prisma
 MSSQL_SA_PASSWORD="<YourStrong@Passw0rd>"
 
+docker pull prismagraphql/build:test
 docker network create test-net
+
 docker run --name test-postgres --network test-net \
     -e POSTGRES_PASSWORD=prisma \
     -e POSTGRES_USER=prisma \
