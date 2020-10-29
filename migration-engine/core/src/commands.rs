@@ -22,6 +22,7 @@ mod infer_migration_steps;
 mod initialize;
 #[allow(missing_docs)]
 mod list_migrations;
+mod mark_migration_applied;
 #[allow(missing_docs)]
 mod migration_progress;
 mod plan_migration;
@@ -47,6 +48,7 @@ pub use get_database_version::*;
 pub use infer_migration_steps::*;
 pub use initialize::{InitializeCommand, InitializeInput, InitializeOutput};
 pub use list_migrations::*;
+pub use mark_migration_applied::{MarkMigrationAppliedCommand, MarkMigrationAppliedInput, MarkMigrationAppliedOutput};
 pub use migration_progress::*;
 pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigrationOutput};
 pub use reset::ResetCommand;

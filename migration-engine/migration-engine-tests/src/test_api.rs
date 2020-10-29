@@ -6,6 +6,7 @@ mod diagnose_migration_history;
 mod evaluate_data_loss;
 mod infer;
 mod infer_apply;
+mod mark_migration_applied;
 mod reset;
 mod schema_push;
 mod unapply_migration;
@@ -18,6 +19,7 @@ pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
+pub use mark_migration_applied::MarkMigrationApplied;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
@@ -225,6 +227,14 @@ impl TestApi {
         prisma_schema: impl Into<String>,
     ) -> EvaluateDataLoss<'a> {
         EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
+    }
+
+    pub fn mark_migration_applied<'a>(
+        &'a self,
+        migration_name: impl Into<String>,
+        migrations_directory: &'a TempDir,
+    ) -> MarkMigrationApplied<'a> {
+        MarkMigrationApplied::new(&self.api, migration_name.into(), migrations_directory)
     }
 
     pub fn reset(&self) -> Reset<'_> {

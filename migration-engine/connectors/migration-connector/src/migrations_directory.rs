@@ -127,6 +127,12 @@ impl Error for ReadMigrationScriptError {
 }
 
 impl MigrationDirectory {
+    /// Initialize a MigrationDirectory at the provided path. This will not
+    /// validate that the path is valid and exists.
+    pub fn new(path: PathBuf) -> MigrationDirectory {
+        MigrationDirectory { path }
+    }
+
     /// The `{timestamp}_{name}` formatted migration name.
     pub fn migration_name(&self) -> &str {
         self.path
