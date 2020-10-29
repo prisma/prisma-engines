@@ -215,12 +215,9 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             // This type is currently not supported.
             // bytea        bytea
             ts              DateTime
-            tstz            DateTime
             date            DateTime
             time            DateTime
             time_2          DateTime
-            timetz          DateTime
-            interval        String
             bool            Boolean
             bit             String
             varbit          String
