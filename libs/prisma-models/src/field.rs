@@ -177,6 +177,7 @@ impl From<ScalarType> for TypeIdentifier {
         match st {
             ScalarType::String => Self::String,
             ScalarType::Int => Self::Int,
+            ScalarType::BigInt => Self::BigInt,
             ScalarType::Float => Self::Float,
             ScalarType::Boolean => Self::Boolean,
             ScalarType::DateTime => Self::DateTime,
