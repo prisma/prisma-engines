@@ -21,7 +21,7 @@ fn should_fail_on_serial_data_types_with_number_default() {
 fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of Postgres: Precision must be positive with the maximum value of 1000.",
+            "Argument M is out of range for Native type {} of Postgres: Precision must be positive with a maximum value of 1000.",
             type_name
         )
     }

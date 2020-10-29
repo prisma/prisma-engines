@@ -140,7 +140,7 @@ impl Connector for PostgresDatamodelConnector {
                     }
                     [precision, _] if *precision > 1000 || *precision <= 0 => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Precision must be positive with the maximum value of 1000.",
+                            "Precision must be positive with a maximum value of 1000.",
                             native_type_name,
                             "Postgres",
                         ));
