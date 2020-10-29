@@ -165,6 +165,40 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 }
 
 #[test]
+fn should_fail_on_decimal_scalar_type_used_without_preview_feature() {
+    let dml = r#"
+        model Blog {
+            id     Int    @id
+            foo Decimal
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
+        ast::Span::new(64, 76),
+    ));
+}
+
+#[test]
+fn should_fail_on_bytes_scalar_type_used_without_preview_feature() {
+    let dml = r#"
+        model Blog {
+            id     Int    @id
+            foo Bytes
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
+        ast::Span::new(64, 74),
+    ));
+}
+
+#[test]
 fn should_fail_on_native_type_with_unknown_type() {
     let dml = r#"
         datasource pg {
