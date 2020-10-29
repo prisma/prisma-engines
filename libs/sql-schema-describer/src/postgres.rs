@@ -695,13 +695,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "money" | "_money" => (Float, None),
         "pg_lsn" | "_pg_lsn" => unsupported_type(),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
-        "timetz" | "_timetz" => (DateTime, Some(PostgresType::TimeWithTimeZone(precision.time_precision))),
-        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision))),
         "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision))),
-        "timestamptz" | "_timestamptz" => (
-            DateTime,
-            Some(PostgresType::TimestampWithTimeZone(precision.time_precision)),
-        ),
         "tsquery" | "_tsquery" => unsupported_type(),
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
