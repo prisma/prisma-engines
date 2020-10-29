@@ -47,7 +47,10 @@ impl Clone for State {
 
 /// Create a new server and listen.
 pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
-    let config = opts.configuration(false)?.validate_that_one_datasource_is_provided()?;
+    let config = opts
+        .configuration(false)?
+        .subject
+        .validate_that_one_datasource_is_provided()?;
     let datamodel = opts.datamodel(false)?;
     let cx = PrismaContext::builder(config, datamodel)
         .legacy(opts.legacy)
