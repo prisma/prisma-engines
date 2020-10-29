@@ -53,7 +53,7 @@ pub struct SqlSchemaDiff {
 impl SqlSchemaDiff {
     /// Translate the diff into steps that should be executed in order. The general idea in the
     /// ordering of steps is to drop obsolete constraints first, alter/create tables, then add the new constraints.
-    pub fn into_steps(self) -> Vec<SqlMigrationStep> {
+    pub(crate) fn into_steps(self) -> Vec<SqlMigrationStep> {
         let redefine_tables = Some(self.redefine_tables)
             .filter(|tables| !tables.is_empty())
             .map(SqlMigrationStep::RedefineTables);
@@ -126,7 +126,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn create_tables(&self) -> Vec<CreateTable> {
         self.created_tables()
             .map(|created_table| CreateTable {
-                table: created_table.table().clone(),
                 table_index: created_table.table_index(),
             })
             .collect()

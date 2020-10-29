@@ -112,7 +112,7 @@ fn infer(
     }
 }
 
-pub fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
+pub(crate) fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
 where
     F: Fn(T) -> SqlMigrationStep,
 {

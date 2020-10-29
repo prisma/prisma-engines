@@ -12,7 +12,7 @@ use quaint::{
     connector::ConnectionInfo,
     visitor::{self, Visitor},
 };
-use sql_migration_connector::{sql_migration::SqlMigration, SqlMigrationConnector};
+use sql_migration_connector::{SqlMigration, SqlMigrationConnector};
 use std::sync::Arc;
 use test_setup::*;
 
