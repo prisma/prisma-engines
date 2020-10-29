@@ -1,6 +1,27 @@
 use super::*;
 use prisma_models::dml::DefaultValue;
 
+pub(crate) fn update_one_input_types(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    parent_field: Option<&RelationFieldRef>,
+) -> Vec<InputType> {
+    let checked_input = InputType::object(checked_update_one_input_type(ctx, model, parent_field));
+
+    if feature_flags::get().uncheckedScalarInputs {
+        let unchecked_input = InputType::object(unchecked_update_one_input_type(ctx, model, parent_field));
+
+        // If the inputs are equal, only use one.
+        if checked_input == unchecked_input {
+            vec![checked_input]
+        } else {
+            vec![checked_input, unchecked_input]
+        }
+    } else {
+        vec![checked_input]
+    }
+}
+
 /// Builds "<x>UpdateInput" input object type.
 pub(crate) fn update_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let name = format!("{}UpdateInput", model.name);
