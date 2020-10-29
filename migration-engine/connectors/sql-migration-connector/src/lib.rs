@@ -169,10 +169,6 @@ impl MigrationConnector for SqlMigrationConnector {
         self
     }
 
-    fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<SqlMigration> {
-        serde_json::from_value(json).ok()
-    }
-
     fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence {
         self
     }

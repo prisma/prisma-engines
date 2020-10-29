@@ -248,3 +248,71 @@ async fn creating_a_migration_with_a_non_existent_migrations_directory_should_wo
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql", "postgres"))]
+async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult {
+    let dm = r#"
+        datasource test {
+          provider = "mysql"
+          url = "mysql://root:prisma@127.0.0.1:3306/SelfRelationFilterBugSpec?connection_limit=1"
+        }
+    
+    
+        model Cat {
+            id      Int @id
+            mood    Mood
+        }
+        
+        enum Mood{
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("create-cats", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .assert_migration("create-cats", |migration| {
+            let expected_script = match api.sql_family() {
+                SqlFamily::Postgres => {
+                    indoc! {
+                        r#"
+                        -- CreateEnum
+                        CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                        "id" integer   NOT NULL ,
+                        "mood" "Mood"  NOT NULL ,
+                        PRIMARY KEY ("id")
+                        );
+                        "#
+                    }
+                }
+                SqlFamily::Mysql => {
+                    indoc! {
+                        r#"
+                        -- CreateTable
+                        CREATE TABLE `Cat` (
+                        `id` int  NOT NULL ,
+                        `mood` ENUM('HUNGRY', 'SLEEPY')  NOT NULL ,
+                        PRIMARY KEY (`id`)
+                        ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+                        "#
+                    }
+                }
+                SqlFamily::Sqlite => unreachable!("no enums -.-"),
+                SqlFamily::Mssql => {
+                    indoc! {
+                        r#"say hi to Musti and Nauki"#
+                    }
+                }
+            };
+
+            migration.assert_contents(expected_script)
+        })?;
+
+    Ok(())
+}
