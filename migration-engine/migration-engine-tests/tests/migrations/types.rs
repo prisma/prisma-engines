@@ -17,16 +17,15 @@ async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
         }}
     "#,
         datasource = api.datasource()
-    )
-    .as_str();
+    );
 
-    api.schema_push(dm)
+    api.schema_push(&dm)
         .send()
         .await?
         .assert_green()?
         .assert_has_executed_steps()?;
 
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }
