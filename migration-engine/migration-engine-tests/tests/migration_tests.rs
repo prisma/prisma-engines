@@ -40,7 +40,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
-            .assert_columns_count(8)?
+            .assert_columns_count(6)?
             .assert_column("int", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
