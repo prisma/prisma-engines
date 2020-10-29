@@ -1,8 +1,9 @@
-use crate::{connect, connection_wrapper::Connection, SqlFlavour};
+use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
+use connection_string::JdbcString;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::connector::MssqlUrl;
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend, SqlSchemaDescriberError};
-use std::collections::HashMap;
+use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use std::str::FromStr;
 
 #[derive(Debug)]
 pub(crate) struct MssqlFlavour(pub(crate) MssqlUrl);
@@ -12,33 +13,21 @@ impl MssqlFlavour {
         self.0.schema()
     }
 
-    fn master_url(jdbc_string: &str) -> (String, String) {
-        let mut splitted = jdbc_string.split(';');
-        let uri = splitted.next().unwrap().to_string();
-
-        let mut params: HashMap<String, String> = splitted
-            .map(|kv| kv.split('='))
-            .map(|mut kv| {
-                let key = kv.next().unwrap().to_string();
-                let value = kv.next().unwrap().to_string();
-
-                (key, value)
-            })
-            .collect();
+    /// Get the url as a JDBC string, extract the database name, and re-encode the string.
+    fn master_url(input: &str) -> ConnectorResult<(String, String)> {
+        let mut conn = JdbcString::from_str(&format!("jdbc:{}", input))
+            .map_err(|e| ConnectorError::generic(anyhow::Error::new(e)))?;
+        let params = conn.properties_mut();
 
         let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
-        let params: Vec<_> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
-
-        let master_uri = format!("{};{}", uri, params.join(";"));
-
-        (db_name, master_uri)
+        Ok((db_name, conn.to_string()))
     }
 }
 
 #[async_trait::async_trait]
 impl SqlFlavour for MssqlFlavour {
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
-        let (db_name, master_uri) = Self::master_url(jdbc_string);
+        let (db_name, master_uri) = Self::master_url(jdbc_string)?;
         let conn = connect(&master_uri.to_string()).await?;
 
         let query = format!("CREATE DATABASE [{}]", db_name);
@@ -74,15 +63,18 @@ impl SqlFlavour for MssqlFlavour {
         sql_schema_describer::mssql::SqlSchemaDescriber::new(connection.quaint().clone())
             .describe(connection.connection_info().schema_name())
             .await
-            .map_err(|err| match err {
-                SqlSchemaDescriberError::UnknownError => {
-                    ConnectorError::generic(anyhow::anyhow!("An unknown error occurred in sql-schema-describer"))
+            .map_err(|err| match err.into_kind() {
+                DescriberErrorKind::QuaintError(err) => {
+                    quaint_error_to_connector_error(err, connection.connection_info())
                 }
             })
     }
 
     async fn drop_database(&self, _database_url: &str) -> ConnectorResult<()> {
-        todo!("drop_database on MSSQL")
+        let features = vec!["microsoftSqlServer".into()];
+        return Err(ConnectorError::user_facing_error(
+            user_facing_errors::migration_engine::PreviewFeaturesBlocked { features },
+        ));
     }
 
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
@@ -128,7 +120,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
-        let (db_name, master_uri) = Self::master_url(database_str);
+        let (db_name, master_uri) = Self::master_url(database_str)?;
         let conn = connect(&master_uri).await?;
 
         // Without these, our poor connection gets deadlocks if other schemas

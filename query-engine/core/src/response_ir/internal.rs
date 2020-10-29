@@ -402,7 +402,9 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),
         (ScalarType::UUID, PrismaValue::Uuid(u)) => PrismaValue::Uuid(u),
         (ScalarType::Bytes, PrismaValue::Bytes(b)) => PrismaValue::Bytes(b),
+
         (ScalarType::Xml, PrismaValue::Xml(b)) => PrismaValue::Xml(b),
+        (ScalarType::String, PrismaValue::Xml(s)) => PrismaValue::String(s),
 
         (st, pv) => {
             return Err(CoreError::SerializationError(format!(

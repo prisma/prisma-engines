@@ -1,5 +1,6 @@
 use crate::{error::PrismaError, PrismaResult};
-use datamodel::{Configuration, Datamodel};
+use datamodel::diagnostics::ValidatedConfiguration;
+use datamodel::Datamodel;
 use serde::Deserialize;
 use std::{ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
@@ -134,7 +135,7 @@ impl PrismaOpt {
         }
     }
 
-    pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<Configuration> {
+    pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<ValidatedConfiguration> {
         let datamodel_str = self.datamodel_str()?;
 
         let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
@@ -149,9 +150,7 @@ impl PrismaOpt {
         } else {
             datamodel::parse_configuration_with_url_overrides(datamodel_str, datasource_url_overrides)
         };
-        config_result
-            .map(|config| config.subject)
-            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
+        config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }
 
     /// Extract the log format from on the RUST_LOG_FORMAT env var.

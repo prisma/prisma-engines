@@ -1,42 +1,45 @@
-//! Postgres description.
+//! Postgres schema description.
+
 use super::*;
 use crate::getters::Getter;
 use native_types::{NativeType, PostgresType};
 use quaint::connector::ResultRow;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
+use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
-use tracing::debug;
+use tracing::trace;
 
+#[derive(Debug)]
 pub struct SqlSchemaDescriber {
     conn: Quaint,
 }
 
 #[async_trait::async_trait]
 impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
-    async fn list_databases(&self) -> SqlSchemaDescriberResult<Vec<String>> {
-        let databases = self.get_databases().await;
-        Ok(databases)
+    async fn list_databases(&self) -> DescriberResult<Vec<String>> {
+        Ok(self.get_databases().await?)
     }
 
-    async fn get_metadata(&self, schema: &str) -> SqlSchemaDescriberResult<SQLMetadata> {
-        let count = self.get_table_names(&schema).await.len();
-        let size = self.get_size(&schema).await;
+    async fn get_metadata(&self, schema: &str) -> DescriberResult<SQLMetadata> {
+        let table_count = self.get_table_names(&schema).await?.len();
+        let size_in_bytes = self.get_size(&schema).await?;
+
         Ok(SQLMetadata {
-            table_count: count,
-            size_in_bytes: size,
+            table_count,
+            size_in_bytes,
         })
     }
 
-    async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
-        debug!("describing schema '{}'", schema);
+    #[tracing::instrument]
+    async fn describe(&self, schema: &str) -> DescriberResult<SqlSchema> {
         let sequences = self.get_sequences(schema).await?;
         let enums = self.get_enums(schema).await?;
-        let mut columns = self.get_columns(schema, &enums).await;
-        let mut foreign_keys = self.get_foreign_keys(schema).await;
-        let mut indexes = self.get_indices(schema, &sequences).await;
+        let mut columns = self.get_columns(schema, &enums).await?;
+        let mut foreign_keys = self.get_foreign_keys(schema).await?;
+        let mut indexes = self.get_indices(schema, &sequences).await?;
 
-        let table_names = self.get_table_names(schema).await;
+        let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
 
         for table_name in &table_names {
@@ -50,9 +53,9 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         })
     }
 
-    async fn version(&self, schema: &str) -> crate::SqlSchemaDescriberResult<Option<String>> {
-        debug!("getting db version '{}'", schema);
-        Ok(self.conn.version().await.unwrap())
+    #[tracing::instrument]
+    async fn version(&self, schema: &str) -> crate::DescriberResult<Option<String>> {
+        Ok(self.conn.version().await?)
     }
 }
 
@@ -62,58 +65,54 @@ impl SqlSchemaDescriber {
         SqlSchemaDescriber { conn }
     }
 
-    async fn get_databases(&self) -> Vec<String> {
-        debug!("Getting databases");
+    #[tracing::instrument]
+    async fn get_databases(&self) -> DescriberResult<Vec<String>> {
         let sql = "select schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
+        let rows = self.conn.query_raw(sql, &[]).await?;
         let names = rows
             .into_iter()
             .map(|row| row.get_expect_string("schema_name"))
             .collect();
 
-        debug!("Found schema names: {:?}", names);
-        names
+        trace!("Found schema names: {:?}", names);
+
+        Ok(names)
     }
 
-    async fn get_table_names(&self, schema: &str) -> Vec<String> {
-        debug!("Getting table names");
-        let sql = "SELECT table_name as table_name FROM information_schema.tables
+    #[tracing::instrument]
+    async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
+        let sql = "
+            SELECT table_name as table_name FROM information_schema.tables
             WHERE table_schema = $1
             -- Views are not supported yet
             AND table_type = 'BASE TABLE'
             ORDER BY table_name";
-        let rows = self
-            .conn
-            .query_raw(sql, &[schema.into()])
-            .await
-            .expect("get table names ");
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let names = rows
             .into_iter()
             .map(|row| row.get_expect_string("table_name"))
             .collect();
 
-        debug!("Found table names: {:?}", names);
-        names
+        trace!("Found table names: {:?}", names);
+
+        Ok(names)
     }
 
-    async fn get_size(&self, schema: &str) -> usize {
-        debug!("Getting db size");
+    #[tracing::instrument]
+    async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
         let sql =
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
              FROM pg_tables
              WHERE schemaname = $1::text";
-        let mut result_iter = self
-            .conn
-            .query_raw(sql, &[schema.into()])
-            .await
-            .expect("get db size ")
-            .into_iter();
+        let mut result_iter = self.conn.query_raw(sql, &[schema.into()]).await?.into_iter();
         let size: i64 = result_iter.next().and_then(|row| row.get_i64("size")).unwrap_or(0);
 
-        debug!("Found db size: {:?}", size);
-        size.try_into().unwrap()
+        trace!("Found db size: {:?}", size);
+
+        Ok(size.try_into().expect("size is not a valid usize"))
     }
 
+    #[tracing::instrument(skip(columns, foreign_keys, indices))]
     fn get_table(
         &self,
         name: &str,
@@ -121,7 +120,6 @@ impl SqlSchemaDescriber {
         foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
         indices: &mut HashMap<String, (Vec<Index>, Option<PrimaryKey>)>,
     ) -> Table {
-        debug!("Getting table '{}'", name);
         let (indices, primary_key) = indices.remove(name).unwrap_or_else(|| (Vec::new(), None));
         let foreign_keys = foreign_keys.remove(name).unwrap_or_else(Vec::new);
         let columns = columns.remove(name).expect("could not get columns");
@@ -134,72 +132,60 @@ impl SqlSchemaDescriber {
         }
     }
 
-    async fn get_columns(&self, schema: &str, enums: &[Enum]) -> HashMap<String, Vec<Column>> {
+    async fn get_columns(&self, schema: &str, enums: &[Enum]) -> DescriberResult<HashMap<String, Vec<Column>>> {
         let mut columns: HashMap<String, Vec<Column>> = HashMap::new();
 
         let sql = r#"
             SELECT
-                table_name,
-                column_name,
-                data_type,
-                udt_name as full_data_type,
-                column_default,
-                is_nullable,
-                is_identity,
-                character_maximum_length,
-                numeric_precision,
-                numeric_scale,
-                numeric_precision_radix,
-                datetime_precision
-            FROM information_schema.columns
-            WHERE table_schema = $1
-            ORDER BY ordinal_position
+               info.table_name,
+                info.column_name,
+                format_type(att.atttypid, att.atttypmod) as formatted_type,
+                info.numeric_precision,
+                info.numeric_scale,
+                info.numeric_precision_radix,
+                info.datetime_precision,
+                info.data_type,
+                info.udt_name as full_data_type,
+                info.column_default,
+                info.is_nullable,
+                info.is_identity,
+                info.data_type, 
+                info.character_maximum_length
+            FROM information_schema.columns info
+            JOIN pg_attribute  att on att.attname = info.column_name
+            And att.attrelid = (
+            	SELECT pg_class.oid 
+            	FROM pg_class 
+            	JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
+            	WHERE relname = info.table_name
+            	AND pg_namespace.nspname = $1
+            	)
+            WHERE table_schema = $1	
+            ORDER BY ordinal_position;
         "#;
 
-        let rows = self
-            .conn
-            .query_raw(&sql, &[schema.into()])
-            .await
-            .expect("querying for columns");
+        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
 
         for col in rows {
-            debug!("Got column: {:?}", col);
+            trace!("Got column: {:?}", col);
             let table_name = col.get_expect_string("table_name");
-            let col_name = col.get_expect_string("column_name");
-            let data_type = col.get_expect_string("data_type");
-            let full_data_type = col.get_expect_string("full_data_type");
+            let name = col.get_expect_string("column_name");
+
             let is_identity_str = col.get_expect_string("is_identity").to_lowercase();
-            let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
 
             let is_identity = match is_identity_str.as_str() {
                 "no" => false,
                 "yes" => true,
                 _ => panic!("unrecognized is_identity variant '{}'", is_identity_str),
             };
-            let is_required = match is_nullable.as_ref() {
-                "no" => true,
-                "yes" => false,
-                x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
-            };
 
-            let arity = if data_type == "ARRAY" {
-                ColumnArity::List
-            } else if is_required {
-                ColumnArity::Required
-            } else {
-                ColumnArity::Nullable
-            };
-
-            let precision = SqlSchemaDescriber::get_precision(&col);
-
-            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums, precision);
-
-            let default = get_default_value(schema, col, &table_name, &col_name, &tpe);
+            let tpe = get_column_type(&col, enums);
+            let default = get_default_value(schema, &col, &tpe);
 
             let auto_increment = is_identity || matches!(default, Some(DefaultValue::SEQUENCE(_)));
 
             let col = Column {
-                name: col_name,
+                name,
                 tpe,
                 default,
                 auto_increment,
@@ -208,29 +194,71 @@ impl SqlSchemaDescriber {
             columns.entry(table_name).or_default().push(col);
         }
 
-        debug!("Found table columns: {:?}", columns);
+        trace!("Found table columns: {:?}", columns);
 
-        columns
+        Ok(columns)
     }
 
     fn get_precision(col: &ResultRow) -> Precision {
-        let character_maximum_length = col.get_u32("character_maximum_length");
-        let numeric_precision = col.get_u32("numeric_precision");
-        let numeric_precision_radix = col.get_u32("numeric_precision_radix");
-        let numeric_scale = col.get_u32("numeric_scale");
-        let time_precision = col.get_u32("datetime_precision");
+        let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
+            if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
+                fn get_single(formatted_type: &String) -> Option<u32> {
+                    static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0-9]*)\).*\[\]$"#).unwrap());
+
+                    SINGLE_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
+                }
+
+                fn get_dual(formatted_type: &String) -> (Option<u32>, Option<u32>) {
+                    static DUAL_REGEX: Lazy<Regex> =
+                        Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
+                    let first = DUAL_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+
+                    let second = DUAL_REGEX
+                        .captures(formatted_type.as_str())
+                        .and_then(|cap| cap.get(2).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+
+                    (first, second)
+                }
+
+                let formatted_type = col.get_expect_string("formatted_type");
+                let fdt = col.get_expect_string("full_data_type");
+                let char_max_length = match fdt.as_str() {
+                    "_bpchar" | "_varchar" | "_bit" | "_varbit" => get_single(&formatted_type),
+                    _ => None,
+                };
+                let (num_precision, num_scale) = match fdt.as_str() {
+                    "_numeric" => get_dual(&formatted_type),
+                    _ => (None, None),
+                };
+                let time = match fdt.as_str() {
+                    "_timestamptz" | "_timestamp" | "_timetz" | "_time" | "_interval" => get_single(&formatted_type),
+                    _ => None,
+                };
+
+                (char_max_length, num_precision, num_scale, time)
+            } else {
+                (
+                    col.get_u32("character_maximum_length"),
+                    col.get_u32("numeric_precision"),
+                    col.get_u32("numeric_scale"),
+                    col.get_u32("datetime_precision"),
+                )
+            };
 
         Precision {
             character_maximum_length,
             numeric_precision,
-            numeric_precision_radix,
             numeric_scale,
             time_precision,
         }
     }
 
     /// Returns a map from table name to foreign keys.
-    async fn get_foreign_keys(&self, schema: &str) -> HashMap<String, Vec<ForeignKey>> {
+    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
         let sql = r#"
             SELECT
@@ -276,14 +304,10 @@ impl SqlSchemaDescriber {
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID, which we will have to combine into corresponding foreign key
         // objects.
-        let result_set = self
-            .conn
-            .query_raw(&sql, &[schema.into()])
-            .await
-            .expect("querying for foreign keys");
+        let result_set = self.conn.query_raw(&sql, &[schema.into()]).await?;
         let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
         for row in result_set.into_iter() {
-            debug!("Got description FK row {:?}", row);
+            trace!("Got description FK row {:?}", row);
             let id = row.get_expect_i64("con_id");
             let column = row.get_expect_string("child_column");
             let referenced_table = row.get_expect_string("parent_table");
@@ -333,9 +357,11 @@ impl SqlSchemaDescriber {
         for (table_name, fk) in intermediate_fks.into_iter().map(|(_k, v)| v) {
             let entry = fks.entry(table_name).or_insert_with(Vec::new);
 
-            debug!(
+            trace!(
                 "Found foreign key - column(s): {:?}, to table: '{}', to column(s): {:?}",
-                fk.columns, fk.referenced_table, fk.referenced_columns
+                fk.columns,
+                fk.referenced_table,
+                fk.referenced_columns
             );
 
             entry.push(fk);
@@ -345,7 +371,7 @@ impl SqlSchemaDescriber {
             fks.sort_unstable_by_key(|fk| fk.columns.clone());
         }
 
-        fks
+        Ok(fks)
     }
 
     /// Returns a map from table name to indexes and (optional) primary key.
@@ -353,7 +379,7 @@ impl SqlSchemaDescriber {
         &self,
         schema: &str,
         sequences: &[Sequence],
-    ) -> HashMap<String, (Vec<Index>, Option<PrimaryKey>)> {
+    ) -> DescriberResult<HashMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
         let mut indexes_map = HashMap::new();
 
         let sql = r#"
@@ -404,14 +430,11 @@ impl SqlSchemaDescriber {
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname, rawIndex.indkeyidx
         ORDER BY rawIndex.indkeyidx
         "#;
-        let rows = self
-            .conn
-            .query_raw(&sql, &[schema.into()])
-            .await
-            .expect("querying for indices");
+
+        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
 
         for index in rows {
-            debug!("Got index: {:?}", index);
+            trace!("Got index: {:?}", index);
             let IndexRow {
                 column_name,
                 is_primary_key,
@@ -434,7 +457,7 @@ impl SqlSchemaDescriber {
                             let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
                             let sequence_name = captures.get(1).expect("get capture").as_str();
                             sequences.iter().find(|s| s.name == sequence_name).map(|sequence| {
-                                debug!("Got sequence corresponding to primary key: {:#?}", sequence);
+                                trace!("Got sequence corresponding to primary key: {:#?}", sequence);
                                 sequence.clone()
                             })
                         });
@@ -464,23 +487,19 @@ impl SqlSchemaDescriber {
             }
         }
 
-        indexes_map
+        Ok(indexes_map)
     }
 
-    async fn get_sequences(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Sequence>> {
-        debug!("Getting sequences");
+    #[tracing::instrument]
+    async fn get_sequences(&self, schema: &str) -> DescriberResult<Vec<Sequence>> {
         let sql = "SELECT start_value, sequence_name
                   FROM information_schema.sequences
                   WHERE sequence_schema = $1";
-        let rows = self
-            .conn
-            .query_raw(&sql, &[schema.into()])
-            .await
-            .expect("querying for sequences");
+        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
         let sequences = rows
             .into_iter()
             .map(|seq| {
-                debug!("Got sequence: {:?}", seq);
+                trace!("Got sequence: {:?}", seq);
                 let initial_value = seq
                     .get("start_value")
                     .and_then(|x| x.to_string())
@@ -496,25 +515,25 @@ impl SqlSchemaDescriber {
             })
             .collect();
 
-        debug!("Found sequences: {:?}", sequences);
+        trace!("Found sequences: {:?}", sequences);
         Ok(sequences)
     }
 
-    async fn get_enums(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Enum>> {
-        debug!("Getting enums");
-
-        let sql = "SELECT t.typname as name, e.enumlabel as value
+    #[tracing::instrument]
+    async fn get_enums(&self, schema: &str) -> DescriberResult<Vec<Enum>> {
+        let sql = "
+            SELECT t.typname as name, e.enumlabel as value
             FROM pg_type t
             JOIN pg_enum e ON t.oid = e.enumtypid
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1
             ORDER BY e.enumsortorder";
 
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await.unwrap();
+        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
         let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
 
         for row in rows.into_iter() {
-            debug!("Got enum row: {:?}", row);
+            trace!("Got enum row: {:?}", row);
             let name = row.get_expect_string("name");
             let value = row.get_expect_string("value");
 
@@ -529,7 +548,8 @@ impl SqlSchemaDescriber {
 
         enums.sort_by(|a, b| Ord::cmp(&a.name, &b.name));
 
-        debug!("Found enums: {:?}", enums);
+        trace!("Found enums: {:?}", enums);
+
         Ok(enums)
     }
 }
@@ -544,13 +564,9 @@ struct IndexRow {
     sequence_name: Option<String>,
 }
 
-fn get_default_value(
-    schema: &str,
-    col: ResultRow,
-    table_name: &String,
-    col_name: &String,
-    tpe: &ColumnType,
-) -> Option<DefaultValue> {
+fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<DefaultValue> {
+    let table_name = col.get_expect_string("table_name");
+    let col_name = col.get_expect_string("column_name");
     match col.get("column_default") {
         None => None,
         Some(param_value) => match param_value.to_string() {
@@ -598,7 +614,6 @@ fn get_default_value(
                         .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
                         .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                     ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                    ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
                     ColumnTypeFamily::Enum(enum_name) => {
                         let enum_suffix_without_quotes = format!("::{}", enum_name);
                         let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
@@ -622,20 +637,31 @@ fn get_default_value(
     }
 }
 
-fn get_column_type<'a>(
-    data_type: &str,
-    full_data_type: &'a str,
-    arity: ColumnArity,
-    enums: &[Enum],
-    precision: Precision,
-) -> ColumnType {
+fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     use ColumnTypeFamily::*;
-    let trim = |name: &'a str| name.trim_start_matches('_');
-    let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
+    let data_type = row.get_expect_string("data_type");
+    let full_data_type = row.get_expect_string("full_data_type");
+    let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
+        "no" => true,
+        "yes" => false,
+        x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+    };
 
-    let (family, native_type) = match full_data_type {
-        x if data_type == "USER-DEFINED" && enum_exists(x) => (Enum(x.to_owned()), None),
-        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => (Enum(trim(x).to_owned()), None),
+    let arity = match matches!(data_type.as_str(), "ARRAY") {
+        true => ColumnArity::List,
+        false if is_required => ColumnArity::Required,
+        false => ColumnArity::Nullable,
+    };
+
+    let precision = SqlSchemaDescriber::get_precision(&row);
+    let unsupported_type = || (Unsupported(full_data_type.clone()), None);
+    let enum_exists = |name| enums.iter().any(|e| e.name == name);
+
+    let (family, native_type) = match full_data_type.as_str() {
+        name if data_type == "USER-DEFINED" && enum_exists(name) => (Enum(name.to_owned()), None),
+        name if data_type == "ARRAY" && name.starts_with('_') && enum_exists(name.trim_start_matches('_')) => {
+            (Enum(name.trim_start_matches('_').to_owned()), None)
+        }
         "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
         "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
         "int8" | "_int8" => (Int, Some(PostgresType::BigInt)),
@@ -645,49 +671,49 @@ fn get_column_type<'a>(
         "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
         "text" | "_text" => (String, Some(PostgresType::Text)),
         "citext" | "_citext" => (String, None),
-        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_max_length()))),
-        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_max_length()))),
+        "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_maximum_length))),
+        "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
         "bytea" | "_bytea" => (Binary, Some(PostgresType::ByteA)),
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
         "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
-        "xml" | "_xml" => (Xml, Some(PostgresType::Xml)),
+        "xml" | "_xml" => (String, Some(PostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_max_length()))),
-        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_max_length()))),
+        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_maximum_length))),
+        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_maximum_length))),
         "numeric" | "_numeric" => (
             Decimal,
             Some(PostgresType::Numeric(
-                precision.numeric_precision(),
-                precision.numeric_scale(),
+                match (precision.numeric_precision, precision.numeric_scale) {
+                    (None, None) => None,
+                    (Some(prec), Some(scale)) => Some((prec, scale)),
+                    _ => None,
+                },
             )),
         ),
         "money" | "_money" => (Float, None),
-        "pg_lsn" | "_pg_lsn" => (Unsupported(full_data_type.into()), None),
-        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision()))),
-        "timetz" | "_timetz" => (
-            DateTime,
-            Some(PostgresType::TimeWithTimeZone(precision.time_precision())),
-        ),
-        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision()))),
-        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision()))),
+        "pg_lsn" | "_pg_lsn" => unsupported_type(),
+        "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
+        "timetz" | "_timetz" => (DateTime, Some(PostgresType::TimeWithTimeZone(precision.time_precision))),
+        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision))),
+        "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision))),
         "timestamptz" | "_timestamptz" => (
             DateTime,
-            Some(PostgresType::TimestampWithTimeZone(precision.time_precision())),
+            Some(PostgresType::TimestampWithTimeZone(precision.time_precision)),
         ),
-        "tsquery" | "_tsquery" => (Unsupported(full_data_type.into()), None),
-        "tsvector" | "_tsvector" => (Unsupported(full_data_type.into()), None),
-        "txid_snapshot" | "_txid_snapshot" => (Unsupported(full_data_type.into()), None),
+        "tsquery" | "_tsquery" => unsupported_type(),
+        "tsvector" | "_tsvector" => unsupported_type(),
+        "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
         "inet" | "_inet" => (String, None),
         //geometric
-        "box" | "_box" => (Unsupported(full_data_type.into()), None),
-        "circle" | "_circle" => (Unsupported(full_data_type.into()), None),
-        "line" | "_line" => (Unsupported(full_data_type.into()), None),
-        "lseg" | "_lseg" => (Unsupported(full_data_type.into()), None),
-        "path" | "_path" => (Unsupported(full_data_type.into()), None),
-        "polygon" | "_polygon" => (Unsupported(full_data_type.into()), None),
-        _ => (Unsupported(full_data_type.into()), None),
+        "box" | "_box" => unsupported_type(),
+        "circle" | "_circle" => unsupported_type(),
+        "line" | "_line" => unsupported_type(),
+        "lseg" | "_lseg" => unsupported_type(),
+        "path" | "_path" => unsupported_type(),
+        "polygon" | "_polygon" => unsupported_type(),
+        _ => unsupported_type(),
     };
 
     ColumnType {

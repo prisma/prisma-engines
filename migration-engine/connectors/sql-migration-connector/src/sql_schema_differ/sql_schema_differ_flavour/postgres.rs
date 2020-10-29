@@ -35,11 +35,24 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+        // List to scalar
         if differ.previous.arity().is_list() && !differ.next.arity().is_list() {
             return match (differ.previous.column_type_family(), differ.next.column_type_family()) {
                 (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
                 (_, _) => Some(ColumnTypeChange::NotCastable),
             };
+        }
+
+        // Scalar to list
+        if !differ.previous.arity().is_list() && differ.next.arity().is_list() {
+            match (differ.previous.column_type_family(), differ.next.column_type_family()) {
+                (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal)
+                | (ColumnTypeFamily::Float, ColumnTypeFamily::Float)
+                | (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float)
+                | (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal)
+                | (ColumnTypeFamily::Binary, ColumnTypeFamily::Binary) => return Some(ColumnTypeChange::NotCastable),
+                _ => (),
+            }
         }
 
         if differ.previous.column_type_family() == differ.next.column_type_family() {

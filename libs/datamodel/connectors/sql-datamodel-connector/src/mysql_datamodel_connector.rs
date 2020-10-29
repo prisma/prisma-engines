@@ -1,5 +1,5 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use datamodel_connector::helper::parse_u32_arguments;
+use datamodel_connector::helper::{args_vec_from_opt, parse_u32_arguments};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
 use dml::model::{IndexType, Model};
@@ -66,6 +66,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::Json,
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::AutoIncrementAllowedOnNonId,
+            ConnectorCapability::RelationFieldsInArbitraryOrder,
         ];
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -81,8 +82,8 @@ impl MySqlDatamodelConnector {
             NativeTypeConstructor::without_args(UNSIGNED_MEDIUM_INT_TYPE_NAME, vec![ScalarType::Int]);
         let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, vec![ScalarType::Int]);
         let unsigned_big_int = NativeTypeConstructor::without_args(UNSIGNED_BIG_INT_TYPE_NAME, vec![ScalarType::Int]);
-        let decimal = NativeTypeConstructor::with_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
-        let numeric = NativeTypeConstructor::with_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]);
+        let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
+        let numeric = NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]);
         let float = NativeTypeConstructor::without_args(FLOAT_TYPE_NAME, vec![ScalarType::Float]);
         let double = NativeTypeConstructor::without_args(DOUBLE_TYPE_NAME, vec![ScalarType::Float]);
         let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, vec![ScalarType::Bytes]);
@@ -162,7 +163,21 @@ impl Connector for MySqlDatamodelConnector {
                         return Err(ConnectorError::new_scale_larger_than_precision_error(
                             native_type_name,
                             "MySQL",
-                        ));
+                        ))
+                    }
+                    [precision, _] if *precision > 65 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "Precision can range from 1 to 65.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    [_, scale] if *scale > 30 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "Scale can range from 0 to 30.",
+                            native_type_name,
+                            "MySQL",
+                        ))
                     }
                     _ => {}
                 }
@@ -171,7 +186,7 @@ impl Connector for MySqlDatamodelConnector {
                 match native_type.args.as_slice() {
                     [length] if length == &0 || length > &64 => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "M can range from 1 to 64",
+                            "M can range from 1 to 64.",
                             native_type_name,
                             "MySQL",
                         ))
@@ -190,6 +205,30 @@ impl Connector for MySqlDatamodelConnector {
                     native_type_name,
                     "MySQL",
                 ));
+            }
+            if matches!(native_type_name, CHAR_TYPE_NAME) {
+                match native_type.args.as_slice() {
+                    [length] if *length > 255 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "M can range from 0 to 255.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    _ => {}
+                }
+            }
+            if matches!(native_type_name, VAR_CHAR_TYPE_NAME) {
+                match native_type.args.as_slice() {
+                    [length] if *length > 65535 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "M can range from 0 to 65,535.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    _ => {}
+                }
             }
         }
         Ok(())
@@ -252,11 +291,13 @@ impl Connector for MySqlDatamodelConnector {
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
             UNSIGNED_BIG_INT_TYPE_NAME => MySqlType::UnsignedBigInt,
             DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
-                [scale, precision] => MySqlType::Decimal(*scale, *precision),
+                [scale, precision] => MySqlType::Decimal(Some((*scale, *precision))),
+                [] => MySqlType::Decimal(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, parsed_args.len())),
             },
             NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
-                [scale, precision] => MySqlType::Numeric(*scale, *precision),
+                [scale, precision] => MySqlType::Numeric(Some((*scale, *precision))),
+                [] => MySqlType::Numeric(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(NUMERIC_TYPE_NAME, 2, parsed_args.len())),
             },
             FLOAT_TYPE_NAME => MySqlType::Float,
@@ -293,7 +334,7 @@ impl Connector for MySqlDatamodelConnector {
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
             TIME_TYPE_NAME => match parsed_args.as_slice() {
-                [fractions] => MySqlType::Time(Option::Some(*fractions)),
+                [fractions] => MySqlType::Time(Some(*fractions)),
                 [] => MySqlType::Time(None),
                 _ => {
                     return Err(self.wrap_in_optional_argument_count_mismatch_error(
@@ -304,7 +345,7 @@ impl Connector for MySqlDatamodelConnector {
                 }
             },
             DATETIME_TYPE_NAME => match parsed_args.as_slice() {
-                [fractions] => MySqlType::DateTime(Option::Some(*fractions)),
+                [fractions] => MySqlType::DateTime(Some(*fractions)),
                 [] => MySqlType::DateTime(None),
                 _ => {
                     return Err(self.wrap_in_optional_argument_count_mismatch_error(
@@ -315,7 +356,7 @@ impl Connector for MySqlDatamodelConnector {
                 }
             },
             TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
-                [fractions] => MySqlType::Timestamp(Option::Some(*fractions)),
+                [fractions] => MySqlType::Timestamp(Some(*fractions)),
                 [] => MySqlType::Timestamp(None),
                 _ => {
                     return Err(self.wrap_in_optional_argument_count_mismatch_error(
@@ -353,8 +394,8 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::UnsignedMediumInt => (UNSIGNED_MEDIUM_INT_TYPE_NAME, vec![]),
             MySqlType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
             MySqlType::UnsignedBigInt => (UNSIGNED_BIG_INT_TYPE_NAME, vec![]),
-            MySqlType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x, y]),
-            MySqlType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x, y]),
+            MySqlType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
+            MySqlType::Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             MySqlType::Float => (FLOAT_TYPE_NAME, vec![]),
             MySqlType::Double => (DOUBLE_TYPE_NAME, vec![]),
             MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x]),

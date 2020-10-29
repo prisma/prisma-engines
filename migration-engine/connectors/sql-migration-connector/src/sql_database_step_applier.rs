@@ -73,13 +73,15 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
                 &database_migration.after,
             );
 
-            script.push_str("-- ");
-            script.push_str(step.description());
-            script.push('\n');
+            if !statements.is_empty() {
+                script.push_str("-- ");
+                script.push_str(step.description());
+                script.push('\n');
 
-            for statement in statements {
-                script.push_str(&statement);
-                script.push_str(";\n");
+                for statement in statements {
+                    script.push_str(&statement);
+                    script.push_str(";\n");
+                }
             }
         }
 

@@ -378,6 +378,30 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_type_is_bytes(self) -> AssertionResult<Self> {
+        let found = &self.0.tpe.family;
+
+        anyhow::ensure!(
+            found == &sql_schema_describer::ColumnTypeFamily::Binary,
+            "Assertion failed. Expected a bytes column, got {:?}.",
+            found
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_type_is_decimal(self) -> AssertionResult<Self> {
+        let found = &self.0.tpe.family;
+
+        anyhow::ensure!(
+            found == &sql_schema_describer::ColumnTypeFamily::Decimal,
+            "Assertion failed. Expected a decimal column, got {:?}.",
+            found
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_type_is_string(self) -> AssertionResult<Self> {
         let found = &self.0.tpe.family;
 

@@ -317,6 +317,23 @@ fn fail_to_load_sources_for_invalid_source() {
 }
 
 #[test]
+fn fail_when_preview_features_are_declared() {
+    let dml = r#"
+    datasource db {
+        provider = "mysql"
+        url = "mysql://"
+        previewFeatures = ["foo"]
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_connector_error(
+        "Preview features are only supported in the generator block. Please move this field to the generator block.",
+        Span::new(99, 106),
+    ));
+}
+
+#[test]
 #[serial]
 fn fail_when_no_source_is_declared() {
     let invalid_datamodel: &str = r#"        "#;

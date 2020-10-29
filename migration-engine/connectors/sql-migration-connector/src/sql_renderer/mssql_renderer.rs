@@ -93,7 +93,6 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::Int => "int",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
             ColumnTypeFamily::Binary => "varbinary(max)",
-            ColumnTypeFamily::Xml => "xml",
             ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
             ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
             ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
@@ -145,8 +144,7 @@ impl SqlRenderer for MssqlFlavour {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_))
-            | (DefaultValue::VALUE(PrismaValue::Xml(val)), ColumnTypeFamily::Xml) => {
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
                 format!("'{}'", escape_string_literal(&val)).into()
             }
             (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {

@@ -30,20 +30,26 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 Some(arg) => format!("({})", arg),
             }
         }
+        fn render_decimal(input: Option<(u32, u32)>) -> String {
+            match input {
+                None => "".to_string(),
+                Some((precision, scale)) => format!("({}, {})", precision, scale),
+            }
+        }
 
         let data_type = match postgres_type {
             PostgresType::SmallInt => "SMALLINT".to_owned(),
             PostgresType::Integer => "INTEGER".to_owned(),
             PostgresType::BigInt => "BIGINT".to_owned(),
-            PostgresType::Decimal(precision, scale) => format!("DECIMAL({}, {})", precision, scale),
-            PostgresType::Numeric(precision, scale) => format!("NUMERIC({}, {})", precision, scale),
+            PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)),
+            PostgresType::Numeric(precision) => format!("NUMERIC{}", render_decimal(precision)),
             PostgresType::Real => "REAL".to_owned(),
             PostgresType::DoublePrecision => "DOUBLE PRECISION".to_owned(),
             PostgresType::SmallSerial => "SMALLSERIAL".to_owned(),
             PostgresType::Serial => "SERIAL".to_owned(),
             PostgresType::BigSerial => "BIGSERIAL".to_owned(),
-            PostgresType::VarChar(size) => format!("VARCHAR({})", size),
-            PostgresType::Char(size) => format!("CHAR({})", size),
+            PostgresType::VarChar(length) => format!("VARCHAR{}", render(length)),
+            PostgresType::Char(length) => format!("CHAR{}", render(length)),
             PostgresType::Text => "TEXT".to_owned(),
             PostgresType::ByteA => "BYTEA".to_owned(),
             PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)),
@@ -53,8 +59,8 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             PostgresType::TimeWithTimeZone(precision) => format!("TIMETZ{}", render(precision)),
             PostgresType::Interval(precision) => format!("INTERVAL{}", render(precision)),
             PostgresType::Boolean => "BOOLEAN".to_owned(),
-            PostgresType::Bit(size) => format!("BIT({})", size),
-            PostgresType::VarBit(size) => format!("VARBIT({})", size),
+            PostgresType::Bit(length) => format!("BIT{}", render(length)),
+            PostgresType::VarBit(length) => format!("VARBIT{}", render(length)),
             PostgresType::UUID => "UUID".to_owned(),
             PostgresType::Xml => "XML".to_owned(),
             PostgresType::JSON => "JSON".to_owned(),

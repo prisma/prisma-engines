@@ -209,20 +209,8 @@ pub struct RedefineTable {
     #[serde(skip)]
     pub dropped_columns: Vec<usize>,
     #[serde(skip)]
-    pub columns_that_became_required_with_a_default: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
-    #[serde(skip)]
     pub dropped_primary_key: bool,
     #[serde(skip)]
-    pub other_columns: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
+    pub column_pairs: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
     pub table_index: (usize, usize),
-}
-
-impl RedefineTable {
-    pub(crate) fn intersection_columns(
-        &self,
-    ) -> impl Iterator<Item = &(usize, usize, ColumnChanges, Option<ColumnTypeChange>)> {
-        self.columns_that_became_required_with_a_default
-            .iter()
-            .chain(self.other_columns.iter())
-    }
 }
