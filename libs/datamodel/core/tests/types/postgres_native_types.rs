@@ -18,10 +18,47 @@ fn should_fail_on_serial_data_types_with_number_default() {
 }
 
 #[test]
+fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
+    fn error_msg(type_name: &str) -> String {
+        format!(
+            "Argument M is out of range for Native type {} of Postgres: Precision must be positive with a maximum value of 1000.",
+            type_name
+        )
+    }
+
+    for tpe in &["Decimal", "Numeric"] {
+        test_native_types_without_attributes(
+            &format!("{}(1001, 3)", tpe),
+            "Decimal",
+            &error_msg(tpe),
+            POSTGRES_SOURCE,
+        );
+    }
+}
+
+#[test]
+fn should_fail_on_invalid_precision_for_time_types() {
+    fn error_msg(type_name: &str) -> String {
+        format!(
+            "Argument M is out of range for Native type {} of Postgres: M can range from 0 to 6.",
+            type_name
+        )
+    }
+
+    for tpe in &["Timestamp", "Time", "TimestampWithTimeZone", "TimeWithTimeZone"] {
+        test_native_types_without_attributes(&format!("{}(7)", tpe), "DateTime", &error_msg(tpe), POSTGRES_SOURCE);
+        test_native_types_without_attributes(&format!("{}(-1)", tpe), "DateTime", &error_msg(tpe), POSTGRES_SOURCE);
+    }
+
+    test_native_types_without_attributes("Interval(7)", "Duration", &error_msg("Interval"), POSTGRES_SOURCE);
+    test_native_types_without_attributes("Interval(-1)", "Duration", &error_msg("Interval"), POSTGRES_SOURCE);
+}
+
+#[test]
 fn should_fail_on_argument_out_of_range_for_bit_data_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of MySQL: M must be a positive integer.",
+            "Argument M is out of range for Native type {} of Postgres: M must be a positive integer.",
             type_name
         )
     }
