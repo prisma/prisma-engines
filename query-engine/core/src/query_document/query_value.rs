@@ -57,6 +57,7 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::Json(s) => Self::String(s),
             PrismaValue::Xml(s) => Self::String(s),
             PrismaValue::Bytes(b) => Self::String(prisma_value::encode_bytes(&b)),
+            PrismaValue::BigInt(i) => Self::Int(i),
         }
     }
 }

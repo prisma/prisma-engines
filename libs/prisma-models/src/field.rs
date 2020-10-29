@@ -60,6 +60,7 @@ impl From<&RelationFieldRef> for FieldWeak {
 pub enum TypeIdentifier {
     String,
     Int,
+    BigInt,
     Float,
     Decimal,
     Boolean,

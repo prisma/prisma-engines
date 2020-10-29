@@ -80,6 +80,7 @@ pub(crate) fn map_scalar_output_type(field: &ScalarFieldRef) -> OutputType {
         TypeIdentifier::Int => OutputType::int(),
         TypeIdentifier::Xml => OutputType::xml(),
         TypeIdentifier::Bytes => OutputType::bytes(),
+        TypeIdentifier::BigInt => OutputType::bigint(),
     };
 
     if field.is_list {
