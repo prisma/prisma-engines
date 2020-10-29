@@ -101,12 +101,8 @@ impl SqlMigrationConnector {
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
                             TableChange::AlterColumn(ref alter_column) => {
-                                let previous_column = before_table
-                                    .column(&alter_column.column_name)
-                                    .expect("unsupported column renaming");
-                                let next_column = after_table
-                                    .column(&alter_column.column_name)
-                                    .expect("unsupported column renaming");
+                                let previous_column = before_table.column_at(alter_column.column_index.0);
+                                let next_column = after_table.column_at(alter_column.column_index.1);
 
                                 self.flavour().check_alter_column(
                                     &alter_column,

@@ -232,7 +232,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 return None;
             }
 
-            let column_name = column_differ.previous.name().to_owned();
             let column_index = (column_differ.previous.column_index(), column_differ.next.column_index());
 
             match type_change {
@@ -240,19 +239,16 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     Some(TableChange::DropAndRecreateColumn { column_index, changes })
                 }
                 Some(ColumnTypeChange::RiskyCast) => Some(TableChange::AlterColumn(AlterColumn {
-                    column_name,
                     column_index,
                     changes,
                     type_change: Some(crate::sql_migration::ColumnTypeChange::RiskyCast),
                 })),
                 Some(ColumnTypeChange::SafeCast) => Some(TableChange::AlterColumn(AlterColumn {
-                    column_name,
                     column_index,
                     changes,
                     type_change: Some(crate::sql_migration::ColumnTypeChange::SafeCast),
                 })),
                 None => Some(TableChange::AlterColumn(AlterColumn {
-                    column_name,
                     column_index,
                     changes,
                     type_change: None,

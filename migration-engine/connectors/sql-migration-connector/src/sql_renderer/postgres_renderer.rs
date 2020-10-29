@@ -190,7 +190,6 @@ impl SqlRenderer for PostgresFlavour {
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_name: _,
                     column_index: (previous_column_index, next_column_index),
                     changes,
                     type_change: _,

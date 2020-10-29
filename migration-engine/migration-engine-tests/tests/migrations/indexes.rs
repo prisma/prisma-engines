@@ -412,7 +412,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
         .filter(|i| i.columns == &["field", "id"] && i.name == "customNameA");
     assert_eq!(indexes.count(), 1);
 
-    // // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
+    // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
         let expected_steps = &["DropIndex", "CreateIndex"];
         let actual_steps = result.migration_output.describe_steps();

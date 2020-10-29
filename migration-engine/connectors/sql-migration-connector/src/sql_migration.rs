@@ -123,7 +123,6 @@ pub(crate) struct DropColumn {
 
 #[derive(Debug)]
 pub(crate) struct AlterColumn {
-    pub column_name: String,
     pub column_index: (usize, usize),
     pub(crate) changes: ColumnChanges,
     pub type_change: Option<ColumnTypeChange>,

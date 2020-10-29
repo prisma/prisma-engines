@@ -19,7 +19,6 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         step_index: usize,
     ) {
         let AlterColumn {
-            column_name: _,
             column_index: _,
             changes,
             type_change,

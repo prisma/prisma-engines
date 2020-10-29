@@ -137,7 +137,6 @@ impl SqlRenderer for MysqlFlavour {
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_name: _,
                     changes,
                     column_index: (previous_column_index, next_column_index),
                     type_change: _,
