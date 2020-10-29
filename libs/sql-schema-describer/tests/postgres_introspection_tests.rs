@@ -428,6 +428,35 @@ async fn all_postgres_column_types_must_work() {
             auto_increment: false,
         },
         Column {
+            name: "time_col".into(),
+            tpe: ColumnType {
+                data_type: "time without time zone".into(),
+                full_data_type: "time".into(),
+                character_maximum_length: None,
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(PostgresType::Time(Some(6)).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "timestamp_col".into(),
+            tpe: ColumnType {
+                data_type: "timestamp without time zone".into(),
+                full_data_type: "timestamp".into(),
+                character_maximum_length: None,
+
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(PostgresType::Timestamp(Some(6)).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
             name: "lseg_col".into(),
             tpe: ColumnType {
                 data_type: "lseg".into(),
