@@ -82,11 +82,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
     fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker<Self::DatabaseMigration>;
 
-    // TODO: figure out if this is the best way to do this or move to a better place/interface
-    // this is placed here so i can use the associated type
-    /// Deprecated
-    fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<Self::DatabaseMigration>;
-
     /// See [MigrationStepApplier](trait.MigrationStepApplier.html).
     fn migration_applier<'a>(&'a self) -> Box<dyn MigrationApplier<Self::DatabaseMigration> + Send + Sync + 'a> {
         let applier = MigrationApplierImpl {

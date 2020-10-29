@@ -18,53 +18,31 @@ impl<'a> MigrationCommand for ListMigrationsCommand {
     {
         let migration_persistence = engine.connector().migration_persistence();
 
-        let result: CoreResult<Self::Output> = migration_persistence
+        let migrations: Self::Output = migration_persistence
             .load_all()
             .await?
             .into_iter()
-            .map(|migration| convert_migration_to_list_migration_steps_output(&engine, migration))
+            .map(convert_migration_to_list_migration_steps_output)
             .collect();
 
-        if let Ok(migrations) = result.as_ref() {
-            tracing::info!(
-                "Returning {migrations_count} migrations ({pending_count} pending).",
-                migrations_count = migrations.len(),
-                pending_count = migrations.iter().filter(|mig| mig.status.is_pending()).count(),
-            );
-        }
+        tracing::info!(
+            "Returning {migrations_count} migrations ({pending_count} pending).",
+            migrations_count = migrations.len(),
+            pending_count = migrations.iter().filter(|mig| mig.status.is_pending()).count(),
+        );
 
-        result
+        Ok(migrations)
     }
 }
 
-pub fn convert_migration_to_list_migration_steps_output<C, D>(
-    engine: &MigrationEngine<C, D>,
-    migration: Migration,
-) -> CoreResult<ListMigrationsOutput>
-where
-    C: MigrationConnector<DatabaseMigration = D>,
-    D: DatabaseMigrationMarker + 'static,
-{
-    let connector = engine.connector();
-    let database_migration = migration.database_migration;
-
-    let database_steps_json = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        match connector.deserialize_database_migration(database_migration) {
-            Some(database_migration) => connector
-                .database_migration_step_applier()
-                .render_steps_pretty(&database_migration)
-                .unwrap_or_else(|_| Vec::new()),
-            None => vec![],
-        }
-    }));
-
-    Ok(ListMigrationsOutput {
+pub fn convert_migration_to_list_migration_steps_output(migration: Migration) -> ListMigrationsOutput {
+    ListMigrationsOutput {
         id: migration.name,
         datamodel_steps: migration.datamodel_steps,
-        database_steps: database_steps_json.unwrap_or_else(|_| Vec::new()),
+        database_steps: vec![],
         status: migration.status,
         datamodel: migration.datamodel_string,
-    })
+    }
 }
 
 #[derive(Debug, Serialize)]
