@@ -7,6 +7,7 @@ use crate::{
     PrismaResult,
 };
 
+use datamodel::diagnostics::ValidatedConfiguration;
 use datamodel::{Configuration, Datamodel};
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
@@ -29,7 +30,7 @@ pub struct DmmfRequest {
 }
 
 pub struct GetConfigRequest {
-    config: Configuration,
+    config: ValidatedConfiguration,
 }
 
 pub enum CliCommand {
@@ -60,7 +61,7 @@ impl CliCommand {
                         datamodel: opts.datamodel(true)?,
                         build_mode,
                         enable_raw_queries: opts.enable_raw_queries,
-                        config: opts.configuration(true)?,
+                        config: opts.configuration(true)?.subject,
                     })))
                 }
                 CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
@@ -71,7 +72,7 @@ impl CliCommand {
                     enable_raw_queries: opts.enable_raw_queries,
                     legacy: input.legacy,
                     datamodel: opts.datamodel(false)?,
-                    config: opts.configuration(false)?,
+                    config: opts.configuration(false)?.subject,
                 }))),
             },
         }
@@ -110,7 +111,7 @@ impl CliCommand {
         Ok(())
     }
 
-    fn get_config(config: Configuration) -> PrismaResult<()> {
+    fn get_config(config: ValidatedConfiguration) -> PrismaResult<()> {
         let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 
