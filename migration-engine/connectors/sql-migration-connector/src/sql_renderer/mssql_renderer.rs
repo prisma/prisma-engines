@@ -51,10 +51,7 @@ impl SqlRenderer for MssqlFlavour {
                     let columns = columns.iter().map(|colname| self.quote(colname)).join(", ");
                     lines.push(format!("ADD PRIMARY KEY ({})", columns));
                 }
-                TableChange::AddColumn(AddColumn {
-                    column: _,
-                    column_index,
-                }) => {
+                TableChange::AddColumn(AddColumn { column_index }) => {
                     let column = next_table.column_at(*column_index);
                     let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));

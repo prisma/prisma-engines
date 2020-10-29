@@ -31,7 +31,7 @@ use crate::{
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
 use sql_schema_describer::{
-    walkers::{find_column, ColumnWalker, SqlSchemaExt},
+    walkers::{ColumnWalker, SqlSchemaExt},
     ColumnArity, SqlSchema,
 };
 use unexecutable_step_check::UnexecutableStepCheck;
@@ -116,8 +116,7 @@ impl SqlMigrationConnector {
                                 )
                             }
                             TableChange::AddColumn(ref add_column) => {
-                                let column = find_column(after, after_table.name(), &add_column.column.name)
-                                    .expect("Could not find column in AddColumn");
+                                let column = after_table.column_at(add_column.column_index);
 
                                 self.check_add_column(&column, &mut plan, step_index)
                             }

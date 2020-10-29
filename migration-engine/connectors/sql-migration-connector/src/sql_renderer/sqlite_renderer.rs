@@ -130,10 +130,7 @@ impl SqlRenderer for SqliteFlavour {
 
         for change in changes {
             match change {
-                TableChange::AddColumn(AddColumn {
-                    column: _,
-                    column_index,
-                }) => {
+                TableChange::AddColumn(AddColumn { column_index }) => {
                     let column = next_table.column_at(*column_index);
                     let col_sql = self.render_column(column);
 

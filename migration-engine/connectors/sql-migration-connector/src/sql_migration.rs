@@ -3,7 +3,7 @@ pub(crate) mod expanded_alter_column;
 use crate::sql_schema_differ::ColumnChanges;
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Serialize, Serializer};
-use sql_schema_describer::{Column, Index, SqlSchema};
+use sql_schema_describer::{Index, SqlSchema};
 
 /// The database migration type for SqlMigrationConnector.
 #[derive(Debug, Serialize)]
@@ -113,7 +113,6 @@ pub(crate) enum TableChange {
 #[derive(Debug)]
 pub(crate) struct AddColumn {
     pub(crate) column_index: usize,
-    pub(crate) column: Column,
 }
 
 #[derive(Debug)]
