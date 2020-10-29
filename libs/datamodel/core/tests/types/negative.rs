@@ -197,6 +197,22 @@ fn should_fail_on_bytes_scalar_type_used_without_preview_feature() {
         ast::Span::new(64, 74),
     ));
 }
+#[test]
+fn should_fail_on_big_int_scalar_type_used_without_preview_feature() {
+    let dml = r#"
+        model Blog {
+            id     Int    @id
+            foo BigInt
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
+        ast::Span::new(64, 75),
+    ));
+}
 
 #[test]
 fn should_fail_on_native_type_with_unknown_type() {
