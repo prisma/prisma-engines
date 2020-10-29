@@ -46,18 +46,22 @@ where
     D: DatabaseMigrationMarker + 'static,
 {
     let connector = engine.connector();
+    let database_migration = migration.database_migration;
 
-    let database_steps_json = match connector.deserialize_database_migration(migration.database_migration) {
-        Some(database_migration) => connector
-            .database_migration_step_applier()
-            .render_steps_pretty(&database_migration)?,
-        None => vec![],
-    };
+    let database_steps_json = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        match connector.deserialize_database_migration(database_migration) {
+            Some(database_migration) => connector
+                .database_migration_step_applier()
+                .render_steps_pretty(&database_migration)
+                .unwrap_or_else(|_| Vec::new()),
+            None => vec![],
+        }
+    }));
 
     Ok(ListMigrationsOutput {
         id: migration.name,
         datamodel_steps: migration.datamodel_steps,
-        database_steps: database_steps_json,
+        database_steps: database_steps_json.unwrap_or_else(|_| Vec::new()),
         status: migration.status,
         datamodel: migration.datamodel_string,
     })
