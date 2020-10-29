@@ -2,12 +2,23 @@ use migration_engine_tests::sql::*;
 
 #[test_each_connector]
 async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
-    let dm = r#"
-        model Cat {
+    let dm = format!(
+        r#"
+        {datasource}
+
+        generator client {{
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
+        }}
+
+        model Cat {{
             id String @id
             chipData Bytes
-        }
-    "#;
+        }}
+    "#,
+        datasource = api.datasource()
+    )
+    .as_str();
 
     api.schema_push(dm)
         .send()
