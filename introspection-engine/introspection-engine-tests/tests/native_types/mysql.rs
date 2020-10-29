@@ -86,7 +86,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             tinyint                        Int      @mysql.TinyInt
             tinyint_bool                   Boolean  @mysql.TinyInt
             mediumint                      Int      @mysql.MediumInt
-            bigint                         Int      @mysql.BigInt
+            bigint                         BigInt   @mysql.BigInt
             decimal                        Decimal  @mysql.Decimal(5, 3)
             decimal_2                      Decimal  @mysql.Decimal(10, 0)
             numeric                        Decimal  @mysql.Decimal(4, 1)

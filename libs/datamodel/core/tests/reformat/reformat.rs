@@ -536,7 +536,7 @@ generator js {
 
 model Blog {
   id     Int    @id
-  bigInt Int    @pg.BigInt
+  bigInt Int    @pg.Integer
   foobar String @pg.VarChar(12)
 }
 "#;
