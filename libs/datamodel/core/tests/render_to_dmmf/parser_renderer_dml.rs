@@ -259,7 +259,7 @@ datasource pg {
 
 model Blog {
   id     Int    @id
-  bigInt Int    @pg.BigInt
+  bigInt BigInt @pg.BigInt
   foobar String @pg.VarChar(12)
 }
 "#;
