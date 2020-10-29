@@ -1,3 +1,4 @@
+mod apply_script_tests;
 mod enums;
 mod indexes;
 mod json;

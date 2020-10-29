@@ -43,6 +43,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn version(&self, input: &serde_json::Value) -> CoreResult<String>;
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput>;
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
+    async fn apply_script(&self, input: &ApplyScriptInput) -> CoreResult<ApplyScriptOutput>;
     async fn calculate_database_steps(
         &self,
         input: &CalculateDatabaseStepsInput,
@@ -89,6 +90,12 @@ where
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
         self.handle_command::<ApplyMigrationsCommand>(input)
             .instrument(tracing::info_span!("ApplyMigrations"))
+            .await
+    }
+
+    async fn apply_script(&self, input: &ApplyScriptInput) -> CoreResult<ApplyScriptOutput> {
+        self.handle_command::<ApplyScriptCommand>(input)
+            .instrument(tracing::info_span!("ApplyScript"))
             .await
     }
 

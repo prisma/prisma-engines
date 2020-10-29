@@ -12,67 +12,70 @@ pub struct RpcApi {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum RpcCommand {
-    GetDatabaseVersion,
+    ApplyMigration,
     ApplyMigrations,
+    ApplyScript,
+    CalculateDatabaseSteps,
+    CalculateDatamodel,
     CreateMigration,
     DebugPanic,
     DiagnoseMigrationHistory,
     EvaluateDataLoss,
+    GetDatabaseVersion,
     InferMigrationSteps,
     Initialize,
     ListMigrations,
     MigrationProgress,
     PlanMigration,
-    ApplyMigration,
-    UnapplyMigration,
     Reset,
     SchemaPush,
-    CalculateDatamodel,
-    CalculateDatabaseSteps,
+    UnapplyMigration,
 }
 
 impl RpcCommand {
     fn name(&self) -> &'static str {
         match self {
-            RpcCommand::GetDatabaseVersion => "getDatabaseVersion",
+            RpcCommand::ApplyMigration => "applyMigration",
             RpcCommand::ApplyMigrations => "applyMigrations",
+            RpcCommand::ApplyScript => "applyScript",
+            RpcCommand::CalculateDatabaseSteps => "calculateDatabaseSteps",
+            RpcCommand::CalculateDatamodel => "calculateDatamodel",
             RpcCommand::CreateMigration => "createMigration",
             RpcCommand::DebugPanic => "debugPanic",
             RpcCommand::DiagnoseMigrationHistory => "diagnoseMigrationHistory",
             RpcCommand::EvaluateDataLoss => "evaluateDataLoss",
+            RpcCommand::GetDatabaseVersion => "getDatabaseVersion",
             RpcCommand::InferMigrationSteps => "inferMigrationSteps",
+            RpcCommand::Initialize => "initialize",
             RpcCommand::ListMigrations => "listMigrations",
             RpcCommand::MigrationProgress => "migrationProgress",
-            RpcCommand::ApplyMigration => "applyMigration",
-            RpcCommand::UnapplyMigration => "unapplyMigration",
-            RpcCommand::Initialize => "initialize",
             RpcCommand::PlanMigration => "planMigration",
             RpcCommand::Reset => "reset",
             RpcCommand::SchemaPush => "schemaPush",
-            RpcCommand::CalculateDatamodel => "calculateDatamodel",
-            RpcCommand::CalculateDatabaseSteps => "calculateDatabaseSteps",
+            RpcCommand::UnapplyMigration => "unapplyMigration",
         }
     }
 }
 
 const AVAILABLE_COMMANDS: &[RpcCommand] = &[
-    RpcCommand::GetDatabaseVersion,
     RpcCommand::ApplyMigration,
     RpcCommand::ApplyMigrations,
+    RpcCommand::ApplyScript,
+    RpcCommand::CalculateDatabaseSteps,
+    RpcCommand::CalculateDatamodel,
     RpcCommand::CreateMigration,
+    RpcCommand::DebugPanic,
     RpcCommand::DiagnoseMigrationHistory,
     RpcCommand::EvaluateDataLoss,
-    RpcCommand::DebugPanic,
+    RpcCommand::GetDatabaseVersion,
     RpcCommand::InferMigrationSteps,
     RpcCommand::Initialize,
     RpcCommand::ListMigrations,
     RpcCommand::MigrationProgress,
     RpcCommand::PlanMigration,
-    RpcCommand::UnapplyMigration,
     RpcCommand::Reset,
     RpcCommand::SchemaPush,
-    RpcCommand::CalculateDatamodel,
-    RpcCommand::CalculateDatabaseSteps,
+    RpcCommand::UnapplyMigration,
 ];
 
 impl RpcApi {
@@ -123,6 +126,7 @@ impl RpcApi {
     ) -> Result<serde_json::Value, RunCommandError> {
         tracing::debug!(?cmd, "running the command");
         match cmd {
+            RpcCommand::ApplyScript => render(executor.apply_script(&params.parse()?).await?),
             RpcCommand::ApplyMigrations => render(executor.apply_migrations(&params.parse()?).await?),
             RpcCommand::CreateMigration => render(executor.create_migration(&params.parse()?).await?),
             RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),

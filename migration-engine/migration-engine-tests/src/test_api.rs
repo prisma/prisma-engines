@@ -37,7 +37,7 @@ use migration_connector::{
 };
 use migration_core::{
     api::{GenericApi, MigrationApi},
-    commands::ApplyMigrationInput,
+    commands::{ApplyMigrationInput, ApplyScriptInput},
 };
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -151,6 +151,14 @@ impl TestApi {
 
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
         ApplyMigrations::new(&self.api, migrations_directory)
+    }
+
+    pub async fn apply_script(&self, script: impl Into<String>) -> anyhow::Result<()> {
+        self.api
+            .apply_script(&ApplyScriptInput { script: script.into() })
+            .await?;
+
+        Ok(())
     }
 
     /// Convenient builder and assertions for the CreateMigration command.
