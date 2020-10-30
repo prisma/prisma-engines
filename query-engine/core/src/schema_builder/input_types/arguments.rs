@@ -22,11 +22,13 @@ pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) 
 /// The data argument is not present if no data can be created.
 pub(crate) fn create_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     let create_types = create_objects::create_input_types(ctx, model, None);
+    let any_empty = create_types.iter().any(|typ| typ.is_empty());
+    let all_empty = create_types.iter().all(|typ| typ.is_empty());
 
-    if create_types.iter().all(|typ| typ.is_empty()) {
+    if all_empty {
         None
     } else {
-        Some(vec![input_field("data", create_types, None)])
+        Some(vec![input_field("data", create_types, None).optional_if(any_empty)])
     }
 }
 

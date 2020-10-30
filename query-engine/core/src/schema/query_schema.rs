@@ -322,6 +322,15 @@ impl InputField {
         self
     }
 
+    /// Sets the field as optional if the condition is true.
+    pub fn optional_if(self, condition: bool) -> Self {
+        if condition {
+            self.optional()
+        } else {
+            self
+        }
+    }
+
     /// Sets the field as nullable (accepting null inputs).
     pub fn nullable(self) -> Self {
         self.add_type(InputType::null())
