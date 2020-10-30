@@ -45,6 +45,7 @@ impl<'a> ColumnDiffer<'a> {
 
     fn column_type_change(&self) -> Option<ColumnTypeChange> {
         match (self.previous.column_type_family(), self.next.column_type_family()) {
+            (_, _) if self.arity_changed() => self.flavour.column_type_change(self),
             (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal) => None,
             (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float) => None,
             (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal) => None,

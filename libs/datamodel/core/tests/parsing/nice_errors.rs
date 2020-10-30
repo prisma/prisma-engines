@@ -1,6 +1,5 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::common::preview_features::DATASOURCE_PREVIEW_FEATURES;
 use datamodel::diagnostics::DatamodelError;
 
 #[test]
@@ -16,29 +15,6 @@ fn nice_error_for_missing_model_keyword() {
     error.assert_is(DatamodelError::new_validation_error(
         "This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include 'model', 'enum', 'datasource' and 'generator'.",
         Span::new(5, 36),
-    ));
-}
-
-#[test]
-fn nice_error_for_unknown_datasource_preview_feature() {
-    let dml = r#"
-    datasource ds {
-        provider = "postgres"
-        url = "postgresql://"
-        previewFeatures = ["foo"]
-    }
-
-    model User {
-        id Int @id
-    }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_preview_feature_not_known_error(
-        "foo",
-        Vec::from(DATASOURCE_PREVIEW_FEATURES),
-        Span::new(107, 114),
     ));
 }
 

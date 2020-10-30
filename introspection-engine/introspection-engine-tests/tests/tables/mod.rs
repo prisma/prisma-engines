@@ -9,7 +9,7 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
-                migration.create_table("Blog", |t| {
+                migration.create_table("Blog", move |t| {
                     t.add_column("bool", types::boolean());
                     t.add_column("float", types::float());
                     t.add_column("date", types::datetime());
@@ -282,7 +282,7 @@ async fn default_values(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
-                migration.create_table("Test", |t| {
+                migration.create_table("Test", move |t| {
                     t.add_column("id", types::primary());
                     t.add_column(
                         "string_static_char",

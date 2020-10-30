@@ -163,7 +163,21 @@ impl Connector for MySqlDatamodelConnector {
                         return Err(ConnectorError::new_scale_larger_than_precision_error(
                             native_type_name,
                             "MySQL",
-                        ));
+                        ))
+                    }
+                    [precision, _] if *precision > 65 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "Precision can range from 1 to 65.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    [_, scale] if *scale > 30 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "Scale can range from 0 to 30.",
+                            native_type_name,
+                            "MySQL",
+                        ))
                     }
                     _ => {}
                 }
@@ -172,7 +186,7 @@ impl Connector for MySqlDatamodelConnector {
                 match native_type.args.as_slice() {
                     [length] if length == &0 || length > &64 => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "M can range from 1 to 64",
+                            "M can range from 1 to 64.",
                             native_type_name,
                             "MySQL",
                         ))
@@ -191,6 +205,30 @@ impl Connector for MySqlDatamodelConnector {
                     native_type_name,
                     "MySQL",
                 ));
+            }
+            if matches!(native_type_name, CHAR_TYPE_NAME) {
+                match native_type.args.as_slice() {
+                    [length] if *length > 255 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "M can range from 0 to 255.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    _ => {}
+                }
+            }
+            if matches!(native_type_name, VAR_CHAR_TYPE_NAME) {
+                match native_type.args.as_slice() {
+                    [length] if *length > 65535 => {
+                        return Err(ConnectorError::new_argument_m_out_of_range_error(
+                            "M can range from 0 to 65,535.",
+                            native_type_name,
+                            "MySQL",
+                        ))
+                    }
+                    _ => {}
+                }
             }
         }
         Ok(())

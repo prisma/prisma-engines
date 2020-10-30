@@ -28,8 +28,16 @@ tracing-futures = "0.2.0"
 user-facing-errors = {path = "../../../libs/user-facing-errors", features = ["sql"]}
 
 [dependencies.quaint]
-features = ["single"]
 git = "https://github.com/prisma/quaint"
+features = [
+    "postgresql",
+    "mysql",
+    "mssql",
+    "sqlite",
+    "json",
+    "uuid",
+    "chrono",
+]
 
 [dev-dependencies]
 barrel = {git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], branch = "mssql-support"}

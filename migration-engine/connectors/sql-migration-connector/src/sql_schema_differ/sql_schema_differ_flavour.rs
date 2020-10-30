@@ -29,12 +29,30 @@ pub(crate) trait SqlSchemaDifferFlavour {
         previous.name() != next.name()
     }
 
+    /// Whether the differ should produce CreateIndex steps for the indexes of
+    /// new tables.
+    fn should_create_indexes_from_created_tables(&self) -> bool {
+        true
+    }
+
+    /// Whether the indexes of dropped tables should be dropped before the table
+    /// is dropped.
+    fn should_drop_indexes_from_dropped_tables(&self) -> bool {
+        false
+    }
+
     /// Whether `AddForeignKey` steps should be generated for created tables.
     fn should_push_foreign_keys_from_created_tables(&self) -> bool {
         true
     }
 
-    /// Return the tables that cannot be migrated without being redefined. This is currently useful only on SQLite.
+    /// Whether a specific index should *not* be produced.
+    fn should_skip_index_for_new_table(&self, _index: &IndexWalker<'_>) -> bool {
+        false
+    }
+
+    /// Return the tables that cannot be migrated without being redefined. This
+    /// is currently useful only on SQLite.
     fn tables_to_redefine(&self, _differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
         HashSet::new()
     }

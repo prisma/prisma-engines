@@ -116,11 +116,11 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         let AlterTable {
-            table,
             changes,
-            table_index: (_, next_idx),
+            table_index: (previous_idx, next_idx),
         } = alter_table;
 
+        let previous_table = differ.previous.table_walker_at(*previous_idx);
         let next_table = differ.next.table_walker_at(*next_idx);
 
         let mut statements = Vec::new();
@@ -130,16 +130,13 @@ impl SqlRenderer for SqliteFlavour {
 
         for change in changes {
             match change {
-                TableChange::AddColumn(AddColumn { column }) => {
-                    let column = next_table
-                        .column(&column.name)
-                        .expect("Invariant violation: add column with unknown column");
-
+                TableChange::AddColumn(AddColumn { column_index }) => {
+                    let column = next_table.column_at(*column_index);
                     let col_sql = self.render_column(column);
 
                     statements.push(format!(
                         "ALTER TABLE {table_name} ADD COLUMN {column_definition}",
-                        table_name = self.quote(&table.name),
+                        table_name = self.quote(previous_table.name()),
                         column_definition = col_sql,
                     ));
                 }
@@ -167,8 +164,12 @@ impl SqlRenderer for SqliteFlavour {
         let primary_columns = table.primary_key_column_names().unwrap_or(&[]);
 
         let primary_key = if !primary_columns.is_empty() && !primary_key_is_already_set {
-            let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-            format!(",\nPRIMARY KEY ({})", column_names)
+            let column_names = primary_columns.iter().map(Quoted::sqlite_ident).join(",");
+            format!(
+                ",\n{indentation}PRIMARY KEY ({column_names})",
+                indentation = SQL_INDENTATION,
+                column_names = column_names
+            )
         } else {
             String::new()
         };
@@ -180,7 +181,11 @@ impl SqlRenderer for SqliteFlavour {
             while let Some(fk) = fks.next() {
                 write!(
                     rendered_fks,
-                    "{indentation}FOREIGN KEY ({constrained_columns}) {references}{comma}",
+                    "{indentation}{constraint_clause}FOREIGN KEY ({constrained_columns}) {references}{comma}",
+                    constraint_clause = fk
+                        .constraint_name()
+                        .map(|name| format!("CONSTRAINT {} ", name))
+                        .unwrap_or_default(),
                     indentation = SQL_INDENTATION,
                     constrained_columns = fk
                         .constrained_column_names()
@@ -260,14 +265,13 @@ impl SqlRenderer for SqliteFlavour {
                 new_name = next_table.name(),
             ));
 
-            // Recreate the indices
-            result.extend(next_table.indexes().map(|index| {
-                self.render_create_index(&CreateIndex {
+            for index in next_table.indexes() {
+                result.push(self.render_create_index(&CreateIndex {
                     table: next_table.name().to_owned(),
                     index: index.index().clone(),
                     caused_by_create_table: false,
-                })
-            }));
+                }))
+            }
         }
 
         result.push("PRAGMA foreign_key_check".to_string());
@@ -294,7 +298,6 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Enum(_) => unreachable!("ColumnTypeFamily::Enum on SQLite"),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("ColumnTypeFamily::Uuid on SQLite"),
-        ColumnTypeFamily::Xml => unimplemented!("Xml not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
 }
@@ -318,21 +321,21 @@ fn copy_current_table_into_new_table(
     flavour: &SqliteFlavour,
 ) {
     let destination_columns = redefine_table
-        .other_columns
+        .column_pairs
         .iter()
-        .chain(redefine_table.columns_that_became_required_with_a_default.iter())
         .map(|(_, next_colidx, _, _)| next_table.column_at(*next_colidx).name());
 
     let source_columns = redefine_table
-        .other_columns
+        .column_pairs
         .iter()
-        .map(|(previous_colidx, _, _, _)| previous_table.column_at(*previous_colidx))
-        .map(|col| format!("{}", Quoted::sqlite_ident(col.name())))
-        .chain(redefine_table.columns_that_became_required_with_a_default.iter().map(
-            |(previous_colidx, next_colidx, _, _)| {
-                let previous_column = previous_table.column_at(*previous_colidx);
-                let next_column = next_table.column_at(*next_colidx);
+        .map(|(previous_colidx, next_colidx, changes, _)| {
+            let previous_column = previous_table.column_at(*previous_colidx);
+            let next_column = next_table.column_at(*next_colidx);
 
+            let col_became_required_with_a_default =
+                changes.arity_changed() && next_column.arity().is_required() && next_column.default().is_some();
+
+            if col_became_required_with_a_default {
                 format!(
                     "coalesce({column_name}, {default_value}) AS {column_name}",
                     column_name = Quoted::sqlite_ident(previous_column.name()),
@@ -341,8 +344,10 @@ fn copy_current_table_into_new_table(
                         &next_column.column_type_family()
                     )
                 )
-            },
-        ));
+            } else {
+                Quoted::sqlite_ident(previous_column.name()).to_string()
+            }
+        });
 
     let query = format!(
         r#"INSERT INTO "{temporary_table_name}" ({destination_columns}) SELECT {source_columns} FROM "{previous_table_name}""#,

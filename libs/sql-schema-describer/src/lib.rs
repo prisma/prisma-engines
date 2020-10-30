@@ -108,8 +108,8 @@ impl SqlSchema {
         }
     }
 
-    pub fn table_walkers<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> + 'a {
-        self.tables.iter().map(move |table| TableWalker::new(self, table))
+    pub fn table_walkers<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> {
+        (0..self.tables.len()).map(move |table_index| TableWalker::new(self, table_index))
     }
 }
 
@@ -135,7 +135,7 @@ impl Table {
             .unwrap_or_else(|| panic!("Column {} not found in Table {}", name, self.name))
     }
 
-    pub fn column(&self, name: &str) -> Option<&Column> {
+    pub fn column<'a>(&'a self, name: &str) -> Option<&'a Column> {
         self.columns.iter().find(|c| c.name == name)
     }
 
@@ -319,8 +319,6 @@ pub enum ColumnTypeFamily {
     Binary,
     /// JSON types.
     Json,
-    /// Xml types.
-    Xml,
     /// UUID types.
     Uuid,
     ///Enum
@@ -358,7 +356,6 @@ impl fmt::Display for ColumnTypeFamily {
             Self::Duration => "duration".to_string(),
             Self::Binary => "binary".to_string(),
             Self::Json => "json".to_string(),
-            Self::Xml => "xml".to_string(),
             Self::Uuid => "uuid".to_string(),
             Self::Enum(x) => format!("Enum({})", &x),
             Self::Unsupported(x) => x.to_string(),

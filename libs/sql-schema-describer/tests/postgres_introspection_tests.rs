@@ -36,7 +36,6 @@ async fn all_postgres_column_types_must_work() {
         t.add_column("double_col", types::double());
         t.add_column("float_col", types::float());
         t.add_column("int_col", types::integer());
-        t.add_column("interval_col", types::custom("INTERVAL"));
         t.add_column("line_col", types::custom("LINE"));
         t.add_column("lseg_col", types::custom("LSEG"));
         t.add_column("numeric_col", types::custom("NUMERIC"));
@@ -51,9 +50,7 @@ async fn all_postgres_column_types_must_work() {
         t.add_column("string1_col", types::text());
         t.add_column("string2_col", types::varchar(1));
         t.add_column("time_col", types::custom("TIME"));
-        t.add_column("time_with_zone_col", types::custom("TIME WITH TIME ZONE"));
         t.add_column("timestamp_col", types::custom("TIMESTAMP"));
-        t.add_column("timestamp_with_zone_col", types::custom("TIMESTAMP WITH TIME ZONE"));
         t.add_column("tsquery_col", types::custom("TSQUERY"));
         t.add_column("tsvector_col", types::custom("TSVECTOR"));
         t.add_column("txid_col", types::custom("TXID_SNAPSHOT"));
@@ -417,20 +414,6 @@ async fn all_postgres_column_types_must_work() {
             auto_increment: false,
         },
         Column {
-            name: "interval_col".into(),
-            tpe: ColumnType {
-                data_type: "interval".into(),
-                full_data_type: "interval".into(),
-                character_maximum_length: None,
-                family: ColumnTypeFamily::Duration,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Interval(Some(6)).to_json()),
-            },
-
-            default: None,
-            auto_increment: false,
-        },
-        Column {
             name: "line_col".into(),
             tpe: ColumnType {
                 data_type: "line".into(),
@@ -439,6 +422,35 @@ async fn all_postgres_column_types_must_work() {
                 family: ColumnTypeFamily::Unsupported("line".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "time_col".into(),
+            tpe: ColumnType {
+                data_type: "time without time zone".into(),
+                full_data_type: "time".into(),
+                character_maximum_length: None,
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(PostgresType::Time(Some(6)).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "timestamp_col".into(),
+            tpe: ColumnType {
+                data_type: "timestamp without time zone".into(),
+                full_data_type: "timestamp".into(),
+                character_maximum_length: None,
+
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(PostgresType::Timestamp(Some(6)).to_json()),
             },
 
             default: None,
@@ -561,65 +573,6 @@ async fn all_postgres_column_types_must_work() {
                 SCHEMA
             ))),
             auto_increment: true,
-        },
-        Column {
-            name: "time_col".into(),
-            tpe: ColumnType {
-                data_type: "time without time zone".into(),
-                full_data_type: "time".into(),
-                character_maximum_length: None,
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Time(Some(6)).to_json()),
-            },
-
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "time_with_zone_col".into(),
-            tpe: ColumnType {
-                data_type: "time with time zone".into(),
-                full_data_type: "timetz".into(),
-                character_maximum_length: None,
-
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::TimeWithTimeZone(Some(6)).to_json()),
-            },
-
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "timestamp_col".into(),
-            tpe: ColumnType {
-                data_type: "timestamp without time zone".into(),
-                full_data_type: "timestamp".into(),
-                character_maximum_length: None,
-
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Timestamp(Some(6)).to_json()),
-            },
-
-            default: None,
-            auto_increment: false,
-        },
-        Column {
-            name: "timestamp_with_zone_col".into(),
-            tpe: ColumnType {
-                data_type: "timestamp with time zone".into(),
-                full_data_type: "timestamptz".into(),
-                character_maximum_length: None,
-
-                family: ColumnTypeFamily::DateTime,
-                arity: ColumnArity::Required,
-                native_type: Some(PostgresType::TimestampWithTimeZone(Some(6)).to_json()),
-            },
-
-            default: None,
-            auto_increment: false,
         },
         Column {
             name: "tsquery_col".into(),

@@ -1,6 +1,5 @@
 use migration_engine_tests::sql::*;
-use sql_migration_connector::sql_migration::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
-use sql_schema_describer::{Index, IndexType};
+use sql_schema_describer::IndexType;
 
 #[test_each_connector]
 async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
@@ -224,16 +223,17 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResul
 #[test_each_connector]
 async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "customName")
-                @@index([secondField, field], name: "customNameNonUnique")
-            }
-        "#;
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+            @@unique([field, secondField], name: "customName")
+            @@index([secondField, field], name: "customNameNonUnique")
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
@@ -246,17 +246,18 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
     })?;
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "customNameA")
-                @@index([secondField, field], name: "customNameNonUniqueA")
-            }
-        "#;
+            @@unique([field, secondField], name: "customNameA")
+            @@index([secondField, field], name: "customNameNonUniqueA")
+        }
+    "#;
 
     let result = api.infer_apply(&dm2).send().await?.into_inner();
+
     api.assert_schema().await?.assert_table("A", |table| {
         table
             .assert_indexes_count(2)?
@@ -270,19 +271,8 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = &[
-            SqlMigrationStep::AlterIndex(AlterIndex {
-                table: "A".into(),
-                index_new_name: "customNameA".into(),
-                index_name: "customName".into(),
-            }),
-            SqlMigrationStep::AlterIndex(AlterIndex {
-                table: "A".into(),
-                index_new_name: "customNameNonUniqueA".into(),
-                index_name: "customNameNonUnique".into(),
-            }),
-        ];
-        let actual_steps = result.sql_migration();
+        let expected_steps = &["AlterIndex", "AlterIndex"];
+        let actual_steps = result.describe_steps();
         assert_eq!(actual_steps, expected_steps);
     }
 
@@ -330,12 +320,8 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
-            table: "A".into(),
-            index_new_name: "A.field_secondField_unique".into(),
-            index_name: "customName".into(),
-        })];
-        let actual_steps = result.sql_migration();
+        let expected_steps = &["AlterIndex"];
+        let actual_steps = result.migration_output.describe_steps();
         assert_eq!(actual_steps, expected_steps);
     }
 }
@@ -380,12 +366,8 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = &[SqlMigrationStep::AlterIndex(AlterIndex {
-            table: "A".into(),
-            index_name: "A.field_secondField_unique".into(),
-            index_new_name: "somethingCustom".into(),
-        })];
-        let actual_steps = result.sql_migration();
+        let expected_steps = &["AlterIndex"];
+        let actual_steps = result.describe_steps();
         assert_eq!(actual_steps, expected_steps);
     }
 
@@ -432,22 +414,8 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = vec![
-            SqlMigrationStep::DropIndex(DropIndex {
-                table: "A".into(),
-                name: "customName".into(),
-            }),
-            SqlMigrationStep::CreateIndex(CreateIndex {
-                table: "A".into(),
-                index: Index {
-                    name: "customNameA".into(),
-                    columns: vec!["field".into(), "id".into()],
-                    tpe: IndexType::Unique,
-                },
-                caused_by_create_table: false,
-            }),
-        ];
-        let actual_steps = result.sql_migration();
+        let expected_steps = &["DropIndex", "CreateIndex"];
+        let actual_steps = result.migration_output.describe_steps();
         assert_eq!(actual_steps, expected_steps);
     }
 }
@@ -455,14 +423,14 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
 #[test_each_connector]
 async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "customName")
-            }
-        "#;
+            @@unique([field, secondField], name: "customName")
+        }
+    "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")
@@ -478,7 +446,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector(tags("postgres", "mysql"), log = "sql-schema-describer=info,debug")]
+#[test_each_connector(tags("postgres", "mysql"))]
 async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestApi) -> TestResult {
     let dm = r#"
         model TestModelWithALongName {
@@ -515,6 +483,58 @@ async fn indexes_with_an_automatically_truncated_name_are_idempotent(api: &TestA
         })?;
 
     api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn new_index_with_same_name_as_index_from_dropped_table_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id Int @id
+            ownerid String
+            owner Owner @relation(fields: [ownerid])
+
+            @@index([ownerid])
+        }
+
+        model Other {
+            id Int @id
+            ownerid String
+
+            @@index([ownerid], name: "ownerid")
+        }
+
+        model Owner {
+            id String @id
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table.assert_column("ownerid", |col| col.assert_is_required())
+    })?;
+
+    let dm2 = r#"
+        model Owner {
+            id Int @id
+            ownerid String
+            owner Cat @relation(fields: [ownerid])
+
+            @@index([ownerid], name: "ownerid")
+        }
+
+        model Cat {
+            id String @id
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Owner", |table| {
+        table.assert_column("ownerid", |col| col.assert_is_required())
+    })?;
 
     Ok(())
 }

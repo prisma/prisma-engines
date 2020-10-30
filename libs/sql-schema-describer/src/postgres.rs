@@ -156,7 +156,9 @@ impl SqlSchemaDescriber {
             And att.attrelid = (
             	SELECT pg_class.oid 
             	FROM pg_class 
-            	WHERE relname = "table_name"
+            	JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
+            	WHERE relname = info.table_name
+            	AND pg_namespace.nspname = $1
             	)
             WHERE table_schema = $1	
             ORDER BY ordinal_position;
@@ -612,7 +614,6 @@ fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<
                         .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
                         .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                     ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                    ColumnTypeFamily::Xml => DefaultValue::DBGENERATED(default_string),
                     ColumnTypeFamily::Enum(enum_name) => {
                         let enum_suffix_without_quotes = format!("::{}", enum_name);
                         let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
@@ -677,7 +678,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "json" | "_json" => (Json, Some(PostgresType::JSON)),
         "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
-        "xml" | "_xml" => (Xml, Some(PostgresType::Xml)),
+        "xml" | "_xml" => (String, Some(PostgresType::Xml)),
         // bit and varbit should be binary, but are currently mapped to strings.
         "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_maximum_length))),
         "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_maximum_length))),
@@ -694,13 +695,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "money" | "_money" => (Float, None),
         "pg_lsn" | "_pg_lsn" => unsupported_type(),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
-        "timetz" | "_timetz" => (DateTime, Some(PostgresType::TimeWithTimeZone(precision.time_precision))),
-        "interval" | "_interval" => (Duration, Some(PostgresType::Interval(precision.time_precision))),
         "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision))),
-        "timestamptz" | "_timestamptz" => (
-            DateTime,
-            Some(PostgresType::TimestampWithTimeZone(precision.time_precision)),
-        ),
         "tsquery" | "_tsquery" => unsupported_type(),
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
