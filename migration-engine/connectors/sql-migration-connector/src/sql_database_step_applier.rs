@@ -1,7 +1,7 @@
 use crate::{
     database_info::DatabaseInfo,
+    pair::Pair,
     sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
-    sql_schema_differ::SqlSchemaDiffer,
     SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{
@@ -69,8 +69,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
                 step,
                 self.flavour(),
                 self.database_info(),
-                &database_migration.before,
-                &database_migration.after,
+                &Pair::new(&database_migration.before, &database_migration.after),
             );
 
             if !statements.is_empty() {
@@ -111,7 +110,12 @@ impl SqlMigrationConnector {
         let step = &steps[index];
         tracing::debug!(?step);
 
-        for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema, next_schema) {
+        for sql_string in render_raw_sql(
+            &step,
+            renderer,
+            self.database_info(),
+            &Pair::new(current_schema, next_schema),
+        ) {
             tracing::debug!(index, %sql_string);
 
             self.conn().raw_cmd(&sql_string).await?;
@@ -131,7 +135,7 @@ fn render_steps_pretty(
     let mut steps = Vec::with_capacity(database_migration.steps.len());
 
     for step in &database_migration.steps {
-        let sql = render_raw_sql(&step, renderer, database_info, current_schema, next_schema).join(";\n");
+        let sql = render_raw_sql(&step, renderer, database_info, &Pair::new(current_schema, next_schema)).join(";\n");
 
         if !sql.is_empty() {
             steps.push(PrettyDatabaseMigrationStep {
@@ -148,39 +152,32 @@ fn render_raw_sql(
     step: &SqlMigrationStep,
     renderer: &(dyn SqlFlavour + Send + Sync),
     database_info: &DatabaseInfo,
-    previous_schema: &SqlSchema,
-    next_schema: &SqlSchema,
+    schemas: &Pair<&SqlSchema>,
 ) -> Vec<String> {
-    let differ = SqlSchemaDiffer {
-        previous: previous_schema,
-        next: next_schema,
-        database_info,
-        flavour: renderer,
-    };
-
     match step {
-        SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, differ),
+        SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, schemas),
+        SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, schemas),
         SqlMigrationStep::CreateEnum(create_enum) => renderer.render_create_enum(create_enum),
         SqlMigrationStep::DropEnum(drop_enum) => renderer.render_drop_enum(drop_enum),
-        SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
         SqlMigrationStep::CreateTable(CreateTable { table_index }) => {
-            let table = next_schema.table_walker_at(*table_index);
+            let table = schemas.next().table_walker_at(*table_index);
 
             vec![renderer.render_create_table(&table)]
         }
         SqlMigrationStep::DropTable(DropTable { name }) => renderer.render_drop_table(name),
         SqlMigrationStep::AddForeignKey(add_foreign_key) => {
-            let foreign_key = next_schema
+            let foreign_key = schemas
+                .next()
                 .table_walker_at(add_foreign_key.table_index)
                 .foreign_key_at(add_foreign_key.foreign_key_index);
             vec![renderer.render_add_foreign_key(&foreign_key)]
         }
         SqlMigrationStep::DropForeignKey(drop_foreign_key) => vec![renderer.render_drop_foreign_key(drop_foreign_key)],
-        SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &differ),
+        SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, schemas),
         SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(create_index)],
         SqlMigrationStep::DropIndex(drop_index) => vec![renderer.render_drop_index(drop_index)],
         SqlMigrationStep::AlterIndex(alter_index) => {
-            renderer.render_alter_index(alter_index, database_info, previous_schema)
+            renderer.render_alter_index(alter_index, database_info, schemas.previous())
         }
     }
 }

@@ -7,6 +7,7 @@ mod connection_wrapper;
 mod database_info;
 mod error;
 mod flavour;
+mod pair;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
 mod sql_destructive_change_checker;
