@@ -6,19 +6,13 @@ use test_macros::test_each_connector_mssql as test_each_connector;
 
 #[test_each_connector]
 async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
-    let sql_family = api.sql_family();
-
     api.barrel()
         .execute_with_schema(
             |migration| {
                 migration.create_table("Blog", move |t| {
                     t.add_column("bool", types::boolean());
                     t.add_column("float", types::float());
-                    if sql_family.is_postgres() {
-                        t.add_column("date", types::time().nullable(false));
-                    } else {
-                        t.add_column("date", types::datetime());
-                    }
+                    t.add_column("date", types::datetime());
                     t.add_column("id", types::primary());
                     t.add_column("int", types::integer());
                     t.add_column("string", types::text());
@@ -285,8 +279,6 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> crate::TestResult {
 
 #[test_each_connector]
 async fn default_values(api: &TestApi) -> crate::TestResult {
-    let sql_family = api.sql_family();
-
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -307,18 +299,10 @@ async fn default_values(api: &TestApi) -> crate::TestResult {
                     t.add_column("int_static", types::integer().default(2).nullable(true));
                     t.add_column("float_static", types::float().default(1.43).nullable(true));
                     t.add_column("boolean_static", types::boolean().default(true).nullable(true));
-
-                    if sql_family.is_postgres() {
-                        t.add_column(
-                            "datetime_now",
-                            types::time().default(functions::current_timestamp()).nullable(true),
-                        );
-                    } else {
-                        t.add_column(
-                            "datetime_now",
-                            types::datetime().default(functions::current_timestamp()).nullable(true),
-                        );
-                    };
+                    t.add_column(
+                        "datetime_now",
+                        types::datetime().default(functions::current_timestamp()).nullable(true),
+                    );
                 });
             },
             api.schema_name(),

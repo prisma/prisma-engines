@@ -1281,16 +1281,11 @@ async fn comments(api: &TestApi) -> crate::TestResult {
 
 #[test_each_connector]
 async fn updated_at(api: &TestApi) -> crate::TestResult {
-    let sql_family = api.sql_family();
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
                 t.add_column("id", types::varchar(30).primary(true));
-                if sql_family.is_postgres() {
-                    t.inject_custom("lastupdated Timestamp");
-                } else {
-                    t.add_column("lastupdated", types::datetime().nullable(true));
-                }
+                t.add_column("lastupdated", types::datetime().nullable(true));
             });
 
             migration.create_table("Unrelated", |t| {
