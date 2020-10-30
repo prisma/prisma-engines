@@ -76,19 +76,19 @@ impl SqlMigrationStep {
 
 #[derive(Debug)]
 pub(crate) struct CreateTable {
-    pub(crate) table_index: usize,
+    pub table_index: usize,
 }
 
 #[derive(Debug)]
 pub(crate) struct DropTable {
-    pub(crate) name: String,
+    pub name: String,
 }
 
 #[derive(Debug)]
 pub(crate) struct AlterTable {
     /// Index in (previous_schema, next_schema).
-    pub(crate) table_index: (usize, usize),
-    pub(crate) changes: Vec<TableChange>,
+    pub table_index: (usize, usize),
+    pub changes: Vec<TableChange>,
 }
 
 #[derive(Debug)]
@@ -112,19 +112,19 @@ pub(crate) enum TableChange {
 
 #[derive(Debug)]
 pub(crate) struct AddColumn {
-    pub(crate) column_index: usize,
+    pub column_index: usize,
 }
 
 #[derive(Debug)]
 pub(crate) struct DropColumn {
     pub name: String,
-    pub(crate) index: usize,
+    pub index: usize,
 }
 
 #[derive(Debug)]
 pub(crate) struct AlterColumn {
     pub column_index: (usize, usize),
-    pub(crate) changes: ColumnChanges,
+    pub changes: ColumnChanges,
     pub type_change: Option<ColumnTypeChange>,
 }
 
@@ -144,48 +144,48 @@ pub(crate) struct AddForeignKey {
 
 #[derive(Debug)]
 pub struct DropForeignKey {
-    pub(crate) table: String,
-    pub(crate) table_index: usize,
-    pub(crate) foreign_key_index: usize,
-    pub(crate) constraint_name: String,
+    pub table: String,
+    pub table_index: usize,
+    pub foreign_key_index: usize,
+    pub constraint_name: String,
 }
 
 #[derive(Debug)]
 pub struct CreateIndex {
-    pub(crate) table: String,
-    pub(crate) index: Index,
-    pub(crate) caused_by_create_table: bool,
+    pub table: String,
+    pub index: Index,
+    pub caused_by_create_table: bool,
 }
 
 #[derive(Debug)]
 pub struct DropIndex {
-    pub(crate) table: String,
-    pub(crate) name: String,
+    pub table: String,
+    pub name: String,
 }
 
 #[derive(Debug)]
 pub struct AlterIndex {
-    pub(crate) table: String,
-    pub(crate) index_name: String,
-    pub(crate) index_new_name: String,
+    pub table: String,
+    pub index_name: String,
+    pub index_new_name: String,
 }
 
 #[derive(Debug)]
 pub struct CreateEnum {
-    pub(crate) name: String,
-    pub(crate) variants: Vec<String>,
+    pub name: String,
+    pub variants: Vec<String>,
 }
 
 #[derive(Debug)]
 pub struct DropEnum {
-    pub(crate) name: String,
+    pub name: String,
 }
 
 #[derive(Debug)]
 pub(crate) struct AlterEnum {
-    pub(crate) name: String,
-    pub(crate) created_variants: Vec<String>,
-    pub(crate) dropped_variants: Vec<String>,
+    pub name: String,
+    pub created_variants: Vec<String>,
+    pub dropped_variants: Vec<String>,
 }
 
 impl AlterEnum {
@@ -196,11 +196,11 @@ impl AlterEnum {
 
 #[derive(Debug)]
 pub(crate) struct RedefineTable {
-    pub(crate) added_columns: Vec<usize>,
-    pub(crate) dropped_columns: Vec<usize>,
-    pub(crate) dropped_primary_key: bool,
-    pub(crate) column_pairs: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
-    pub(crate) table_index: (usize, usize),
+    pub added_columns: Vec<usize>,
+    pub dropped_columns: Vec<usize>,
+    pub dropped_primary_key: bool,
+    pub column_pairs: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
+    pub table_index: (usize, usize),
 }
 
 #[cfg(test)]
