@@ -200,7 +200,8 @@ fn relation_input_fields_for_checked_update_one(
 }
 
 /// Builds "<x>UpdateWithWhereUniqueNestedInput" / "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
-pub(crate) fn input_object_type_nested_update(
+/// Simple combination object of "where" and "data".
+pub(crate) fn update_one_where_combination_object(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
@@ -260,7 +261,7 @@ pub(super) fn nested_checked_update_one_data(
 
 fn field_should_be_kept_for_update_input_type(field: &ScalarFieldRef) -> bool {
     // We forbid updating auto-increment integer unique fields as this can create problems with the
-    // underlying sequences.
+    // underlying sequences (checked inputs only).
     !field.is_auto_generated_int_id
         && !matches!(
             (&field.type_identifier, field.unique(), field.is_autoincrement),

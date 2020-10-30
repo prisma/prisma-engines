@@ -17,7 +17,7 @@ pub(crate) fn nested_create_input_field(ctx: &mut BuilderContext, field: &Relati
 }
 
 pub(crate) fn nested_connect_or_create_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
-    create_objects::nested_connect_or_create_input_object(ctx, field).map(|input_object_type| {
+    connect_or_create_objects::nested_connect_or_create_input_object(ctx, field).map(|input_object_type| {
         input_field(
             "connectOrCreate",
             list_union_object_type(input_object_type, field.is_list),
@@ -105,7 +105,7 @@ pub(crate) fn nested_connect_input_field(ctx: &mut BuilderContext, field: &Relat
 }
 
 pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
-    let input_object_type = update_one_objects::input_object_type_nested_update(ctx, field);
+    let input_object_type = update_one_objects::update_one_where_combination_object(ctx, field);
     input_field("update", list_union_object_type(input_object_type, field.is_list), None).optional()
 }
 
