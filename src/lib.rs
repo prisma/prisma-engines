@@ -106,7 +106,7 @@
 
 #![cfg_attr(feature = "docs", feature(doc_cfg))]
 
-#[cfg(not(any(feature = "sqlite", feature = "postgresql", feature = "mysql", feature = "mssql",)))]
+#[cfg(not(any(feature = "sqlite", feature = "postgresql", feature = "mysql", feature = "mssql")))]
 compile_error!("one of 'sqlite', 'postgresql', 'mysql' or 'mssql' features must be enabled");
 
 #[macro_use]
@@ -118,6 +118,12 @@ extern crate log;
 
 #[macro_use]
 extern crate metrics;
+
+#[cfg(feature = "bigdecimal")]
+extern crate bigdecimal_ as bigdecimal;
+
+#[cfg(feature = "chrono")]
+extern crate chrono_ as chrono;
 
 pub mod ast;
 pub mod connector;

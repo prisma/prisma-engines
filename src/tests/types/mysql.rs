@@ -81,25 +81,28 @@ test_type!(bigint(
     Value::integer(i64::MAX)
 ));
 
+#[cfg(feature = "bigdecimal")]
 test_type!(decimal(
     mysql,
     "decimal(10,2)",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::new(314, 2))
+    Value::Numeric(None),
+    Value::numeric(bigdecimal::BigDecimal::from_str("3.14").unwrap())
 ));
 
+#[cfg(feature = "bigdecimal")]
 test_type!(float(
     mysql,
     "float",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::from_str("1.1234").unwrap())
+    Value::Numeric(None),
+    Value::numeric(bigdecimal::BigDecimal::from_str("1.1234").unwrap())
 ));
 
+#[cfg(feature = "bigdecimal")]
 test_type!(double(
     mysql,
     "double",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::from_str("1.12345").unwrap())
+    Value::Numeric(None),
+    Value::numeric(bigdecimal::BigDecimal::from_str("1.12345").unwrap())
 ));
 
 test_type!(bit64(

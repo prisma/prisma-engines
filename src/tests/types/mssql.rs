@@ -1,5 +1,7 @@
+#[cfg(feature = "bigdecimal")]
+mod bigdecimal;
+
 use crate::tests::test_api::*;
-use std::str::FromStr;
 
 test_type!(nvarchar_limited(
     mssql,
@@ -72,55 +74,6 @@ test_type!(bigint(
     Value::Integer(None),
     Value::integer(i64::MIN),
     Value::integer(i64::MAX),
-));
-
-test_type!(decimal(
-    mssql,
-    "decimal(10,2)",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::new(314, 2))
-));
-
-test_type!(numeric(
-    mssql,
-    "numeric(10,2)",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::new(314, 2))
-));
-
-test_type!(money(
-    mssql,
-    "money",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::new(314, 2))
-));
-
-test_type!(smallmoney(
-    mssql,
-    "smallmoney",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::new(314, 2))
-));
-
-test_type!(float_24(
-    mssql,
-    "float(24)",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::from_str("1.1234567").unwrap())
-));
-
-test_type!(real(
-    mssql,
-    "real",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::from_str("1.1234567").unwrap())
-));
-
-test_type!(float_53(
-    mssql,
-    "float(53)",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::from_str("1.123456789012345").unwrap())
 ));
 
 test_type!(boolean(

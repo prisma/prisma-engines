@@ -119,8 +119,10 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             Value::Boolean(None) => visitor.visit_none(),
             Value::Char(Some(c)) => visitor.visit_char(c),
             Value::Char(None) => visitor.visit_none(),
-            Value::Real(Some(real)) => visitor.visit_f64(real.to_string().parse::<f64>().unwrap()),
-            Value::Real(None) => visitor.visit_none(),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(Some(num)) => visitor.visit_f64(num.to_string().parse::<f64>().unwrap()),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(None) => visitor.visit_none(),
 
             #[cfg(feature = "uuid")]
             Value::Uuid(Some(uuid)) => visitor.visit_string(uuid.to_string()),
@@ -290,7 +292,7 @@ mod tests {
     #[test]
     fn deserialize_cat() {
         let row = make_row(vec![
-            ("age", Value::real("18.800001".parse().unwrap())),
+            ("age", Value::numeric("18.800001".parse().unwrap())),
             ("birthday", Value::datetime("2019-08-01T20:00:00Z".parse().unwrap())),
             (
                 "human",

@@ -22,7 +22,8 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
         for pv in params {
             let res = match pv {
                 Value::Integer(i) => i.map(my::Value::Int),
-                Value::Real(f) => match f {
+                #[cfg(feature = "bigdecimal")]
+                Value::Numeric(f) => match f {
                     Some(f) => Some(my::Value::Bytes(f.to_string().as_bytes().to_vec())),
                     None => None,
                 },
@@ -213,6 +214,7 @@ impl TakeRow for my::Row {
                     Value::enum_variant(s)
                 }
                 // NEWDECIMAL returned as bytes. See https://mariadb.com/kb/en/resultset-row/#decimal-binary-encoding
+                #[cfg(feature = "bigdecimal")]
                 my::Value::Bytes(b) if column.is_real() => {
                     let s = String::from_utf8(b).map_err(|_| {
                         let msg = "Could not convert NEWDECIMAL from bytes to String.";
@@ -222,13 +224,13 @@ impl TakeRow for my::Row {
                     })?;
 
                     let dec = s.parse().map_err(|_| {
-                        let msg = "Could not convert NEWDECIMAL string to a Decimal.";
+                        let msg = "Could not convert NEWDECIMAL string to a BigDecimal.";
                         let kind = ErrorKind::conversion(msg);
 
                         Error::builder(kind).build()
                     })?;
 
-                    Value::real(dec)
+                    Value::numeric(dec)
                 }
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
@@ -279,7 +281,8 @@ impl TakeRow for my::Row {
                 my::Value::NULL => match column {
                     t if t.is_bool() => Value::Boolean(None),
                     t if t.is_enum() => Value::Enum(None),
-                    t if t.is_real() => Value::Real(None),
+                    #[cfg(feature = "bigdecimal")]
+                    t if t.is_real() => Value::Numeric(None),
                     t if t.is_null() => Value::Integer(None),
                     t if t.is_integer() => Value::Integer(None),
                     #[cfg(feature = "chrono")]

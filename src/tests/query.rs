@@ -1016,12 +1016,13 @@ async fn float_columns_cast_to_f32(api: &mut dyn TestApi) -> crate::Result<()> {
 }
 
 #[test_each_connector(tags("mysql"))]
+#[cfg(feature = "bigdecimal")]
 async fn newdecimal_conversion_is_handled_correctly(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::default().value(sum(Value::integer(1)).alias("theone"));
     let result = api.conn().select(select).await?;
 
     assert_eq!(
-        Value::Real(Some("1.0".parse().unwrap())),
+        Value::Numeric(Some("1.0".parse().unwrap())),
         result.into_single().unwrap()[0]
     );
 

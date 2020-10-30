@@ -43,7 +43,8 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
         let res = match value {
             Value::Integer(i) => i.map(|i| self.write(i)),
-            Value::Real(r) => r.map(|r| self.write(r)),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(r) => r.map(|r| self.write(r)),
             Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
             Value::Enum(e) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),

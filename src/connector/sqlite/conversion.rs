@@ -109,7 +109,8 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_integer() | c.is_null() => Value::Integer(None),
                     c if c.is_text() => Value::Text(None),
                     c if c.is_bytes() => Value::Bytes(None),
-                    c if c.is_real() => Value::Real(None),
+                    #[cfg(feature = "bigdecimal")]
+                    c if c.is_real() => Value::Numeric(None),
                     #[cfg(feature = "chrono")]
                     c if c.is_datetime() => Value::DateTime(None),
                     #[cfg(feature = "chrono")]
@@ -198,9 +199,10 @@ impl<'a> ToSql for Value<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match self {
             Value::Integer(integer) => integer.map(ToSqlOutput::from),
-            Value::Real(d) => {
-                d.map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("Decimal is not a f64.")))
-            }
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(d) => d
+                .as_ref()
+                .map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("BigDecimal is not a f64."))),
             Value::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             Value::Enum(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             Value::Boolean(boo) => boo.map(ToSqlOutput::from),

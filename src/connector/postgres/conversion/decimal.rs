@@ -1,29 +1,19 @@
-//! We implement the postgres conversions here to fix a disastrous dependency hell.
-
+use bigdecimal::{BigDecimal, ToPrimitive, Zero};
 use byteorder::{BigEndian, ReadBytesExt};
 use bytes::{BufMut, BytesMut};
+use num_bigint::{BigInt, Sign};
 use postgres_types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
-use rust_decimal::{prelude::Zero, Decimal};
-use std::convert::TryInto;
-use std::{error, fmt, io::Cursor};
-
-const MAX_PRECISION: u32 = 28;
+use std::{cmp, convert::TryInto, error, fmt, io::Cursor};
 
 #[derive(Debug, Clone)]
-pub struct DecimalWrapper(pub Decimal);
+pub struct DecimalWrapper(pub BigDecimal);
 
 #[derive(Debug, Clone)]
-pub struct InvalidDecimal {
-    inner: Option<String>,
-}
+pub struct InvalidDecimal(&'static str);
 
 impl fmt::Display for InvalidDecimal {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        if let Some(ref msg) = self.inner {
-            fmt.write_fmt(format_args!("Invalid Decimal: {}", msg))
-        } else {
-            fmt.write_str("Invalid Decimal")
-        }
+        fmt.write_fmt(format_args!("Invalid Decimal: {}", self.0))
     }
 }
 
@@ -36,89 +26,57 @@ struct PostgresDecimal<D> {
     digits: D,
 }
 
-fn from_postgres<D: ExactSizeIterator<Item = u16>>(dec: PostgresDecimal<D>) -> Result<Decimal, InvalidDecimal> {
+fn from_postgres<D: ExactSizeIterator<Item = u16>>(dec: PostgresDecimal<D>) -> Result<BigDecimal, InvalidDecimal> {
     let PostgresDecimal {
-        neg,
-        scale,
-        digits,
-        weight,
+        neg, digits, weight, ..
     } = dec;
 
-    let mut digits = digits.into_iter().collect::<Vec<_>>();
-
-    let fractionals_part_count = digits.len() as i32 + (-weight as i32) - 1;
-    let integers_part_count = weight as i32 + 1;
-
-    let mut result = Decimal::zero();
-
-    // adding integer part
-    if integers_part_count > 0 {
-        let (start_integers, last) = if integers_part_count > digits.len() as i32 {
-            (integers_part_count - digits.len() as i32, digits.len() as i32)
-        } else {
-            (0, integers_part_count)
-        };
-
-        let integers: Vec<_> = digits.drain(..last as usize).collect();
-
-        for digit in integers {
-            result *= Decimal::from_i128_with_scale(10i128.pow(4), 0);
-            result += Decimal::new(digit as i64, 0);
-        }
-
-        result *= Decimal::from_i128_with_scale(10i128.pow(4 * start_integers as u32), 0);
+    if digits.len() == 0 {
+        return Ok(0u64.into());
     }
 
-    // adding fractional part
-    if fractionals_part_count > 0 {
-        let dec: Vec<_> = digits.into_iter().collect();
-        let start_fractionals = if weight < 0 { (-weight as u32) - 1 } else { 0 };
+    let sign = match neg {
+        false => Sign::Plus,
+        true => Sign::Minus,
+    };
 
-        for (i, digit) in dec.into_iter().enumerate() {
-            let fract_pow = 4 * (i as u32 + 1 + start_fractionals);
+    // weight is 0 if the decimal point falls after the first base-10000 digit
+    let scale = (digits.len() as i64 - weight as i64 - 1) * 4;
 
-            if fract_pow <= MAX_PRECISION {
-                result += Decimal::new(digit as i64, 0) / Decimal::from_i128_with_scale(10i128.pow(fract_pow), 0);
-            } else if fract_pow == MAX_PRECISION + 4 {
-                // rounding last digit
-                if digit >= 5000 {
-                    result += Decimal::new(1 as i64, 0) / Decimal::from_i128_with_scale(10i128.pow(MAX_PRECISION), 0);
-                }
-            }
-        }
+    // no optimized algorithm for base-10 so use base-100 for faster processing
+    let mut cents = Vec::with_capacity(digits.len() * 2);
+
+    for digit in digits {
+        cents.push((digit / 100) as u8);
+        cents.push((digit % 100) as u8);
     }
 
-    result.set_sign_negative(neg);
+    let bigint = BigInt::from_radix_be(sign, &cents, 100)
+        .ok_or(InvalidDecimal("PostgresDecimal contained an out-of-range digit"))?;
 
-    // Rescale to the postgres value, automatically rounding as needed.
-    result.rescale(scale as u32);
-
-    Ok(result)
+    Ok(BigDecimal::new(bigint, scale))
 }
 
-fn to_postgres(decimal: Decimal) -> PostgresDecimal<Vec<i16>> {
+fn to_postgres(decimal: &BigDecimal) -> crate::Result<PostgresDecimal<Vec<i16>>> {
     if decimal.is_zero() {
-        return PostgresDecimal {
+        return Ok(PostgresDecimal {
             neg: false,
             weight: 0,
             scale: 0,
-            digits: vec![0],
-        };
+            digits: vec![],
+        });
     }
 
-    let scale = decimal.scale() as u16;
+    // NOTE: this unfortunately copies the BigInt internally
+    let (integer, exp) = decimal.as_bigint_and_exponent();
 
-    // A serialized version of the decimal number. The resulting byte array
-    // will have the following representation:
-    //
-    // Bytes 1-4: flags
-    // Bytes 5-8: lo portion of m
-    // Bytes 9-12: mid portion of m
-    // Bytes 13-16: high portion of m
-    let mut mantissa = u128::from_le_bytes(decimal.serialize());
+    // scale is only nonzero when we have fractional digits
+    // since `exp` is the _negative_ decimal exponent, it tells us
+    // exactly what our scale should be
+    let scale: u16 = cmp::max(0, exp).try_into()?;
 
-    // chop off the flags
-    mantissa >>= 32;
+    let (sign, uint) = integer.into_parts();
+    let mut mantissa = uint.to_u128().unwrap();
 
     // If our scale is not a multiple of 4, we need to go to the next
     // multiple.
@@ -151,12 +109,17 @@ fn to_postgres(decimal: Decimal) -> PostgresDecimal<Vec<i16>> {
         digits.pop();
     }
 
-    PostgresDecimal {
-        neg: decimal.is_sign_negative(),
+    let neg = match sign {
+        Sign::Plus | Sign::NoSign => false,
+        Sign::Minus => true,
+    };
+
+    Ok(PostgresDecimal {
+        neg,
         scale,
         weight,
         digits,
-    }
+    })
 }
 
 impl<'a> FromSql<'a> for DecimalWrapper {
@@ -255,7 +218,7 @@ impl ToSql for DecimalWrapper {
             weight,
             scale,
             digits,
-        } = to_postgres(self.0);
+        } = to_postgres(&self.0)?;
 
         let num_digits = digits.len();
 

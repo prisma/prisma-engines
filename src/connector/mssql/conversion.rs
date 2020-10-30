@@ -1,5 +1,6 @@
 use crate::ast::Value;
-use rust_decimal::{prelude::FromPrimitive, Decimal};
+#[cfg(feature = "bigdecimal")]
+use bigdecimal::{BigDecimal, FromPrimitive};
 use std::{borrow::Cow, convert::TryFrom};
 use tiberius::{ColumnData, FromSql, IntoSql, ToSql};
 
@@ -17,7 +18,8 @@ impl<'a> ToSql for Value<'a> {
     fn to_sql(&self) -> ColumnData<'_> {
         match self {
             Value::Integer(val) => val.to_sql(),
-            Value::Real(val) => val.to_sql(),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(val) => (*val).to_sql(),
             Value::Text(val) => val.to_sql(),
             Value::Bytes(val) => val.to_sql(),
             Value::Enum(val) => val.to_sql(),
@@ -48,13 +50,16 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
             ColumnData::I16(num) => Value::Integer(num.map(i64::from)),
             ColumnData::I32(num) => Value::Integer(num.map(i64::from)),
             ColumnData::I64(num) => Value::Integer(num.map(i64::from)),
-            ColumnData::F32(num) => Value::Real(num.and_then(Decimal::from_f32)),
-            ColumnData::F64(num) => Value::Real(num.and_then(Decimal::from_f64)),
+            #[cfg(feature = "bigdecimal")]
+            ColumnData::F32(num) => Value::Numeric(num.and_then(BigDecimal::from_f32)),
+            #[cfg(feature = "bigdecimal")]
+            ColumnData::F64(num) => Value::Numeric(num.and_then(BigDecimal::from_f64)),
             ColumnData::Bit(b) => Value::Boolean(b),
             ColumnData::String(s) => Value::Text(s),
             ColumnData::Guid(uuid) => Value::Uuid(uuid),
             ColumnData::Binary(bytes) => Value::Bytes(bytes),
-            numeric @ ColumnData::Numeric(_) => Value::Real(Decimal::from_sql(&numeric)?),
+            #[cfg(feature = "bigdecimal")]
+            numeric @ ColumnData::Numeric(_) => Value::Numeric(BigDecimal::from_sql(&numeric)?),
             #[cfg(feature = "chrono")]
             dt @ ColumnData::DateTime(_) => {
                 use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};

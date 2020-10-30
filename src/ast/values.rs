@@ -1,24 +1,20 @@
 use crate::ast::*;
 use crate::error::{Error, ErrorKind};
-use rust_decimal::{
-    prelude::{FromPrimitive, ToPrimitive},
-    Decimal,
-};
+
+#[cfg(feature = "bigdecimal")]
+use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
+#[cfg(feature = "chrono")]
+use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
+#[cfg(feature = "json")]
+use serde_json::{Number, Value as JsonValue};
 use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
     fmt,
     str::FromStr,
 };
-
-#[cfg(feature = "json")]
-use serde_json::{Number, Value as JsonValue};
-
 #[cfg(feature = "uuid")]
 use uuid::Uuid;
-
-#[cfg(feature = "chrono")]
-use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 
 /// A value written to the query as-is without parameterization.
 #[derive(Debug, Clone, PartialEq)]
@@ -47,8 +43,10 @@ where
 pub enum Value<'a> {
     /// 64-bit signed integer.
     Integer(Option<i64>),
-    /// A decimal value.
-    Real(Option<Decimal>),
+    /// A numeric value.
+    #[cfg(feature = "bigdecimal")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
+    Numeric(Option<BigDecimal>),
     /// String value.
     Text(Option<Cow<'a, str>>),
     /// Database enum value.
@@ -107,7 +105,8 @@ impl<'a> fmt::Display for Value<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let res = match self {
             Value::Integer(val) => val.map(|v| write!(f, "{}", v)),
-            Value::Real(val) => val.map(|v| write!(f, "{}", v)),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(val) => val.as_ref().map(|v| write!(f, "{}", v)),
             Value::Text(val) => val.as_ref().map(|v| write!(f, "\"{}\"", v)),
             Value::Bytes(val) => val.as_ref().map(|v| write!(f, "<{} bytes blob>", v.len())),
             Value::Enum(val) => val.as_ref().map(|v| write!(f, "\"{}\"", v)),
@@ -152,7 +151,8 @@ impl<'a> From<Value<'a>> for serde_json::Value {
     fn from(pv: Value<'a>) -> Self {
         let res = match pv {
             Value::Integer(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
-            Value::Real(d) => d.map(|d| serde_json::to_value(d).unwrap()),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(d) => d.map(|d| serde_json::to_value(d.to_f64().unwrap()).unwrap()),
             Value::Text(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
             Value::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(&bytes))),
             Value::Enum(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
@@ -197,8 +197,10 @@ impl<'a> Value<'a> {
     }
 
     /// Creates a new decimal value.
-    pub fn real(value: Decimal) -> Self {
-        Value::Real(Some(value))
+    #[cfg(feature = "bigdecimal")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
+    pub fn numeric(value: BigDecimal) -> Self {
+        Value::Numeric(Some(value))
     }
 
     /// Creates a new string value.
@@ -297,7 +299,8 @@ impl<'a> Value<'a> {
     pub fn is_null(&self) -> bool {
         match self {
             Value::Integer(i) => i.is_none(),
-            Value::Real(r) => r.is_none(),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(r) => r.is_none(),
             Value::Text(t) => t.is_none(),
             Value::Enum(e) => e.is_none(),
             Value::Bytes(b) => b.is_none(),
@@ -395,23 +398,39 @@ impl<'a> Value<'a> {
         }
     }
 
-    /// `true` if the `Value` is a real value.
-    pub fn is_real(&self) -> bool {
-        matches!(self, Value::Real(_))
+    /// `true` if the `Value` is a numeric value.
+    #[cfg(feature = "bigdecimal")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
+    pub fn is_numeric(&self) -> bool {
+        matches!(self, Value::Numeric(_))
     }
 
-    /// Returns a f64 if the value is a real value and the underlying decimal can be converted, otherwise `None`.
+    /// Returns a f64 if the value is a numeric value and the underlying decimal can be converted, otherwise `None`.
     pub fn as_f64(&self) -> Option<f64> {
         match self {
-            Value::Real(Some(d)) => d.to_f64(),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(Some(d)) => d.to_f64(),
             _ => None,
         }
     }
 
-    /// Returns a decimal if the value is a real value, otherwise `None`.
-    pub fn as_decimal(&self) -> Option<Decimal> {
+    /// Returns a bigdecimal, if the value is a numeric value, otherwise `None`.
+    #[cfg(feature = "bigdecimal")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
+    pub fn into_decimal(self) -> Option<BigDecimal> {
         match self {
-            Value::Real(d) => *d,
+            Value::Numeric(d) => d,
+            _ => None,
+        }
+    }
+
+    /// Returns a reference of bigdecimal if the value is a numeric value,
+    /// otherwise `None`.
+    #[cfg(feature = "bigdecimal")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "bigdecimal")))]
+    pub fn as_decimal(&self) -> Option<&BigDecimal> {
+        match self {
+            Value::Numeric(d) => d.as_ref(),
             _ => None,
         }
     }
@@ -557,7 +576,8 @@ impl<'a> Value<'a> {
 
 value!(val: i64, Integer, val);
 value!(val: bool, Boolean, val);
-value!(val: Decimal, Real, val);
+#[cfg(feature = "bigdecimal")]
+value!(val: BigDecimal, Numeric, val);
 #[cfg(feature = "json")]
 #[cfg_attr(feature = "docs", doc(cfg(feature = "json")))]
 value!(val: JsonValue, Json, val);
@@ -579,13 +599,19 @@ value!(val: chrono::NaiveTime, Time, val);
 #[cfg_attr(feature = "docs", doc(cfg(feature = "chrono")))]
 value!(val: chrono::NaiveDate, Date, val);
 
+#[cfg(feature = "bigdecimal")]
 value!(
     val: f64,
-    Real,
-    Decimal::from_str(&val.to_string()).expect("f64 is not a Decimal")
+    Numeric,
+    BigDecimal::from_str(&val.to_string()).expect("f64 is not a BigDecimal")
 );
 
-value!(val: f32, Real, Decimal::from_f32(val).expect("f32 is not a Decimal"));
+#[cfg(feature = "bigdecimal")]
+value!(
+    val: f32,
+    Numeric,
+    BigDecimal::from_f32(val).expect("f32 is not a BigDecimal")
+);
 
 impl<'a> TryFrom<Value<'a>> for i64 {
     type Error = Error;
@@ -597,12 +623,13 @@ impl<'a> TryFrom<Value<'a>> for i64 {
     }
 }
 
-impl<'a> TryFrom<Value<'a>> for Decimal {
+#[cfg(feature = "bigdecimal")]
+impl<'a> TryFrom<Value<'a>> for BigDecimal {
     type Error = Error;
 
-    fn try_from(value: Value<'a>) -> Result<Decimal, Self::Error> {
+    fn try_from(value: Value<'a>) -> Result<BigDecimal, Self::Error> {
         value
-            .as_decimal()
+            .into_decimal()
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a decimal")).build())
     }
 }
@@ -612,7 +639,7 @@ impl<'a> TryFrom<Value<'a>> for f64 {
 
     fn try_from(value: Value<'a>) -> Result<f64, Self::Error> {
         value
-            .as_decimal()
+            .into_decimal()
             .and_then(|d| d.to_f64())
             .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a f64")).build())
     }

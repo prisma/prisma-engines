@@ -19,11 +19,12 @@ test_type!(integer(
     Value::integer(i64::MAX)
 ));
 
+#[cfg(feature = "bigdecimal")]
 test_type!(real(
     sqlite,
     "REAL",
-    Value::Real(None),
-    Value::real(rust_decimal::Decimal::from_str("1.12345").unwrap())
+    Value::Numeric(None),
+    Value::numeric(bigdecimal::BigDecimal::from_str("1.12345").unwrap())
 ));
 
 test_type!(text(sqlite, "TEXT", Value::Text(None), Value::text("foobar huhuu")));
