@@ -2,7 +2,7 @@ use std::path::Path;
 
 use super::MigrationCommand;
 use crate::{migration_engine::MigrationEngine, CoreResult};
-use migration_connector::{MigrationDirectory, MigrationRecord};
+use migration_connector::{MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
 use serde::{Deserialize, Serialize};
 
 /// The input to the `DiagnoseMigrationHistory` command.
@@ -30,6 +30,8 @@ pub struct DiagnoseMigrationHistoryOutput {
     /// migration directory does not match the checksum of the applied migration
     /// in the database.
     pub edited_migration_names: Vec<String>,
+    /// Is the migrations table initialized in the database.
+    pub has_migrations_table: bool,
 }
 
 impl DiagnoseMigrationHistoryOutput {
@@ -67,7 +69,10 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
         // Load the migrations.
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
-        let migrations_from_database = migration_persistence.list_migrations().await?.unwrap_or_default();
+        let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
+            Ok(migrations) => (migrations, true),
+            Err(PersistenceNotInitializedError {}) => (vec![], false),
+        };
 
         let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
 
@@ -118,6 +123,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             history: diagnostics.history(),
             failed_migration_names: diagnostics.failed_migration_names(),
             edited_migration_names: diagnostics.edited_migration_names(),
+            has_migrations_table,
         })
     }
 }

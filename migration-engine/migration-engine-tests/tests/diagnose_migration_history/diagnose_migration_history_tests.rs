@@ -83,12 +83,14 @@ async fn diagnose_migration_history_detects_drift(api: &TestApi) -> TestResult {
         history,
         failed_migration_names,
         edited_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert_eq!(drift, Some(DriftDiagnostic::DriftDetected));
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -132,6 +134,7 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
         history,
         failed_migration_names,
         edited_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -143,6 +146,7 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
             unapplied_migration_names: vec![name],
         })
     );
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -189,6 +193,7 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
         history,
         failed_migration_names,
         edited_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(failed_migration_names.is_empty());
@@ -200,6 +205,7 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
             unpersisted_migration_names: vec![name],
         })
     );
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -270,6 +276,7 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
         drift,
         failed_migration_names,
         edited_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(failed_migration_names.is_empty());
@@ -283,6 +290,7 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
             last_common_migration_name: Some(first_migration_name),
         })
     );
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -328,12 +336,14 @@ async fn diagnose_migrations_history_can_detect_edited_migrations(api: &TestApi)
         history,
         edited_migration_names,
         failed_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
     assert_eq!(edited_migration_names, &[initial_migration_name]);
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -420,12 +430,14 @@ async fn diagnose_migrations_history_with_a_nonexistent_migrations_directory_wor
         history,
         edited_migration_names,
         failed_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
+    assert!(!has_migrations_table);
 
     Ok(())
 }
