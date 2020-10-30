@@ -9,7 +9,7 @@ pub(crate) fn update_one_input_types(
     let checked_input = InputType::object(checked_update_one_input_type(ctx, model, parent_field));
 
     if feature_flags::get().uncheckedScalarInputs {
-        let unchecked_input = InputType::object(unchecked_update_one_input_type(ctx, model));
+        let unchecked_input = InputType::object(unchecked_update_one_input_type(ctx, model, parent_field));
 
         // If the inputs are equal, only use one.
         if checked_input == unchecked_input {
@@ -54,18 +54,30 @@ fn checked_update_one_input_type(
 }
 
 /// Builds "<x>UncheckedUpdateInput" input object type.
-fn unchecked_update_one_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UncheckedUpdateInput", model.name);
+fn unchecked_update_one_input_type(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    parent_field: Option<&RelationFieldRef>,
+) -> InputObjectTypeWeakRef {
+    let name = match parent_field.map(|pf| pf.related_field()) {
+        Some(ref f) => format!(
+            "{}UncheckedUpdateWithout{}Input",
+            model.name,
+            capitalize(f.related_field().name.as_str())
+        ),
+        _ => format!("{}UncheckedUpdateInput", model.name),
+    };
+
     return_cached_input!(ctx, &name);
 
     let input_object = Arc::new(init_input_object_type(name.clone()));
     ctx.cache_input_type(name, input_object.clone());
 
     // Compute input fields for scalar fields.
-    let mut fields = scalar_input_fields_for_unchecked_update(ctx, model);
+    let mut fields = scalar_input_fields_for_unchecked_update(ctx, model, parent_field);
 
     // Compute input fields for relational fields.
-    let mut relational_fields = relation_input_fields_for_checked_update_one(ctx, model, None);
+    let mut relational_fields = relation_input_fields_for_unchecked_update_one(ctx, model, parent_field);
     fields.append(&mut relational_fields);
 
     input_object.set_fields(fields);
@@ -87,12 +99,34 @@ pub(super) fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, m
     )
 }
 
-fn scalar_input_fields_for_unchecked_update(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
+fn scalar_input_fields_for_unchecked_update(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    parent_field: Option<&RelationFieldRef>,
+) -> Vec<InputField> {
+    let linking_fields = if let Some(parent_field) = parent_field {
+        let child_field = parent_field.related_field();
+        if child_field.is_inlined_on_enclosing_model() {
+            child_field.linking_fields().scalar_fields().collect()
+        } else {
+            vec![]
+        }
+    } else {
+        vec![]
+    };
+
+    let scalar_fields: Vec<ScalarFieldRef> = model
+        .fields()
+        .scalar()
+        .into_iter()
+        .filter(|sf| !linking_fields.contains(sf))
+        .collect();
+
     input_fields::scalar_input_fields(
         ctx,
         model.name.clone(),
         "Update",
-        model.fields().scalar(),
+        scalar_fields,
         |ctx, f: ScalarFieldRef, default| non_list_scalar_update_field_mapper(ctx, &f, default),
         false,
     )
@@ -190,6 +224,63 @@ fn relation_input_fields_for_checked_update_one(
                 parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
 
             if field_is_opposite_relation_field {
+                None
+            } else {
+                let input_object = match ctx.get_input_type(&input_name) {
+                    Some(t) => t,
+                    None => {
+                        let input_object = Arc::new(init_input_object_type(input_name.clone()));
+                        ctx.cache_input_type(input_name, input_object.clone());
+
+                        // Enqueue the nested update input for its fields to be
+                        // created at a later point, to avoid recursing too deep
+                        // (that has caused stack overflows on large schemas in
+                        // the past).
+                        ctx.nested_update_inputs_queue
+                            .push((Arc::clone(&input_object), Arc::clone(&rf)));
+
+                        Arc::downgrade(&input_object)
+                    }
+                };
+
+                Some(input_field(rf.name.clone(), InputType::object(input_object), None).optional())
+            }
+        })
+        .collect()
+}
+
+/// For unchecked update input types only. Compute input fields for checked relational fields.
+fn relation_input_fields_for_unchecked_update_one(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    parent_field: Option<&RelationFieldRef>,
+) -> Vec<InputField> {
+    model
+        .fields()
+        .relation()
+        .into_iter()
+        .filter_map(|rf| {
+            let related_model = rf.related_model();
+            let related_field = rf.related_field();
+
+            // Compute input object name
+            let arity_part = match (rf.is_list, rf.is_required) {
+                (true, _) => "Many",
+                (false, true) => "OneRequired",
+                (false, false) => "One",
+            };
+
+            let without_part = format!("Without{}", capitalize(&related_field.name));
+            let input_name = format!(
+                "{}UncheckedUpdate{}{}Input",
+                related_model.name, arity_part, without_part
+            );
+            let field_is_opposite_relation_field =
+                parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
+
+            // Filter out all inlined relations on `related_model`.
+            // -> Only relations that point to other models are allowed in the unchecked input.
+            if field_is_opposite_relation_field || !related_field.is_inlined_on_enclosing_model() {
                 None
             } else {
                 let input_object = match ctx.get_input_type(&input_name) {
