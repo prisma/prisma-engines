@@ -1283,7 +1283,7 @@ async fn comments(api: &TestApi) -> crate::TestResult {
 async fn updated_at(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("User", |t| {
+            migration.create_table("User", move |t| {
                 t.add_column("id", types::varchar(30).primary(true));
                 t.add_column("lastupdated", types::datetime().nullable(true));
             });

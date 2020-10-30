@@ -45,13 +45,10 @@ fn should_fail_on_invalid_precision_for_time_types() {
         )
     }
 
-    for tpe in &["Timestamp", "Time", "TimestampWithTimeZone", "TimeWithTimeZone"] {
+    for tpe in &["Timestamp", "Time"] {
         test_native_types_without_attributes(&format!("{}(7)", tpe), "DateTime", &error_msg(tpe), POSTGRES_SOURCE);
         test_native_types_without_attributes(&format!("{}(-1)", tpe), "DateTime", &error_msg(tpe), POSTGRES_SOURCE);
     }
-
-    test_native_types_without_attributes("Interval(7)", "Duration", &error_msg("Interval"), POSTGRES_SOURCE);
-    test_native_types_without_attributes("Interval(-1)", "Duration", &error_msg("Interval"), POSTGRES_SOURCE);
 }
 
 #[test]

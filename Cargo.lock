@@ -355,7 +355,7 @@ dependencies = [
 [[package]]
 name = "barrel"
 version = "0.6.6-alpha.0"
-source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#7822943706feaf3b8f6059ccc172324b620bab6e"
+source = "git+https://github.com/prisma/barrel.git?branch=mssql-support#5d6a731665acdab0d459be23843c2c54112ff099"
 
 [[package]]
 name = "base-x"

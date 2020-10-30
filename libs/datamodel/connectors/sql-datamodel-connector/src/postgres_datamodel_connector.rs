@@ -24,11 +24,8 @@ const CHAR_TYPE_NAME: &str = "Char";
 const TEXT_TYPE_NAME: &str = "Text";
 const BYTE_A_TYPE_NAME: &str = "ByteA";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
-const TIMESTAMP_WITH_TIMEZONE_TYPE_NAME: &str = "TimestampWithTimeZone";
 const DATE_TYPE_NAME: &str = "Date";
 const TIME_TYPE_NAME: &str = "Time";
-const TIME_WITH_TIMEZONE_TYPE_NAME: &str = "TimeWithTimeZone";
-const INTERVAL_TYPE_NAME: &str = "Interval";
 const BOOLEAN_TYPE_NAME: &str = "Boolean";
 const BIT_TYPE_NAME: &str = "Bit";
 const VAR_BIT_TYPE_NAME: &str = "VarBit";
@@ -70,13 +67,8 @@ impl PostgresDatamodelConnector {
         let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]);
         let byte_a = NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, vec![ScalarType::Bytes]);
         let timestamp = NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, vec![ScalarType::DateTime]);
-        let timestamp_with_timezone =
-            NativeTypeConstructor::with_optional_args(TIMESTAMP_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, vec![ScalarType::DateTime]);
         let time = NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, vec![ScalarType::DateTime]);
-        let time_with_timezone =
-            NativeTypeConstructor::with_optional_args(TIME_WITH_TIMEZONE_TYPE_NAME, 1, vec![ScalarType::DateTime]);
-        let interval = NativeTypeConstructor::with_optional_args(INTERVAL_TYPE_NAME, 1, vec![ScalarType::Duration]);
         let boolean = NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, vec![ScalarType::Boolean]);
         let bit = NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, vec![ScalarType::String]);
         let varbit = NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, vec![ScalarType::String]);
@@ -101,11 +93,8 @@ impl PostgresDatamodelConnector {
             text,
             byte_a,
             timestamp,
-            timestamp_with_timezone,
             date,
             time,
-            time_with_timezone,
-            interval,
             boolean,
             bit,
             varbit,
@@ -173,14 +162,7 @@ impl Connector for PostgresDatamodelConnector {
                     );
                 }
             }
-            if matches!(
-                native_type_name,
-                TIMESTAMP_TYPE_NAME
-                    | TIME_TYPE_NAME
-                    | INTERVAL_TYPE_NAME
-                    | TIME_WITH_TIMEZONE_TYPE_NAME
-                    | TIMESTAMP_WITH_TIMEZONE_TYPE_NAME
-            ) {
+            if matches!(native_type_name, TIMESTAMP_TYPE_NAME | TIME_TYPE_NAME) {
                 match native_type.args.as_slice() {
                     [precision] if *precision > 6 => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
@@ -250,18 +232,7 @@ impl Connector for PostgresDatamodelConnector {
                     ))
                 }
             },
-            TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => PostgresType::TimestampWithTimeZone(parsed_args.first().cloned()),
-            INTERVAL_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Interval(Option::Some(*arg)),
-                [] => PostgresType::Interval(None),
-                _ => {
-                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
-                        INTERVAL_TYPE_NAME,
-                        1,
-                        parsed_args.len(),
-                    ))
-                }
-            },
+
             DATE_TYPE_NAME => PostgresType::Date,
             TIME_TYPE_NAME => match parsed_args.as_slice() {
                 [arg] => PostgresType::Time(Option::Some(*arg)),
@@ -269,17 +240,6 @@ impl Connector for PostgresDatamodelConnector {
                 _ => {
                     return Err(self.wrap_in_optional_argument_count_mismatch_error(
                         TIME_TYPE_NAME,
-                        1,
-                        parsed_args.len(),
-                    ))
-                }
-            },
-            TIME_WITH_TIMEZONE_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::TimeWithTimeZone(Option::Some(*arg)),
-                [] => PostgresType::TimeWithTimeZone(None),
-                _ => {
-                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
-                        TIME_WITH_TIMEZONE_TYPE_NAME,
                         1,
                         parsed_args.len(),
                     ))
@@ -328,11 +288,8 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::Text => (TEXT_TYPE_NAME, vec![]),
             PostgresType::ByteA => (BYTE_A_TYPE_NAME, vec![]),
             PostgresType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
-            PostgresType::TimestampWithTimeZone(x) => (TIMESTAMP_WITH_TIMEZONE_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Date => (DATE_TYPE_NAME, vec![]),
             PostgresType::Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
-            PostgresType::TimeWithTimeZone(x) => (TIME_WITH_TIMEZONE_TYPE_NAME, arg_vec_from_opt(x)),
-            PostgresType::Interval(x) => (INTERVAL_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Boolean => (BOOLEAN_TYPE_NAME, vec![]),
             PostgresType::Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
