@@ -86,9 +86,13 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
                 )))
             }
             (_, true) => {
-                persistence
-                    .mark_migration_rolled_back(migration_directory.migration_name())
-                    .await?;
+                let migrations_to_mark_rolled_back = relevant_migrations
+                    .iter()
+                    .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none());
+
+                for migration in migrations_to_mark_rolled_back {
+                    persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
+                }
 
                 persistence
                     .mark_migration_applied(migration_directory.migration_name(), &script)

@@ -4,6 +4,7 @@ mod indexes;
 mod json;
 mod mariadb;
 mod mark_migration_applied_tests;
+mod mark_migration_rolled_back_tests;
 mod mysql;
 mod postgres;
 mod sql;

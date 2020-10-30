@@ -7,6 +7,7 @@ mod evaluate_data_loss;
 mod infer;
 mod infer_apply;
 mod mark_migration_applied;
+mod mark_migration_rolled_back;
 mod reset;
 mod schema_push;
 mod unapply_migration;
@@ -25,6 +26,8 @@ pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
 
 use crate::AssertionResult;
+
+use self::mark_migration_rolled_back::MarkMigrationRolledBack;
 
 use super::assertions::SchemaAssertion;
 use super::{
@@ -235,6 +238,10 @@ impl TestApi {
         migrations_directory: &'a TempDir,
     ) -> MarkMigrationApplied<'a> {
         MarkMigrationApplied::new(&self.api, migration_name.into(), migrations_directory)
+    }
+
+    pub fn mark_migration_rolled_back<'a>(&'a self, migration_name: impl Into<String>) -> MarkMigrationRolledBack<'a> {
+        MarkMigrationRolledBack::new(&self.api, migration_name.into())
     }
 
     pub fn reset(&self) -> Reset<'_> {

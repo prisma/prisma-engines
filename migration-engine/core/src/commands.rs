@@ -23,6 +23,7 @@ mod initialize;
 #[allow(missing_docs)]
 mod list_migrations;
 mod mark_migration_applied;
+mod mark_migration_rolled_back;
 #[allow(missing_docs)]
 mod migration_progress;
 mod plan_migration;
@@ -49,6 +50,9 @@ pub use infer_migration_steps::*;
 pub use initialize::{InitializeCommand, InitializeInput, InitializeOutput};
 pub use list_migrations::*;
 pub use mark_migration_applied::{MarkMigrationAppliedCommand, MarkMigrationAppliedInput, MarkMigrationAppliedOutput};
+pub use mark_migration_rolled_back::{
+    MarkMigrationRolledBackCommand, MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput,
+};
 pub use migration_progress::*;
 pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigrationOutput};
 pub use reset::ResetCommand;
