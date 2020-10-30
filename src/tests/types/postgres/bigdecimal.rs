@@ -173,34 +173,6 @@ test_type!(decimal_array(
     Value::array(vec![BigDecimal::from_str("3.14")?, BigDecimal::from_str("5.12")?])
 ));
 
-test_type!(float4(
-    postgres,
-    "float4",
-    Value::Numeric(None),
-    Value::numeric(BigDecimal::from_str("1.1234")?)
-));
-
-test_type!(float4_array(
-    postgres,
-    "float4[]",
-    Value::Array(None),
-    Value::array(vec![BigDecimal::from_str("1.1234")?, BigDecimal::from_str("4.3210")?,])
-));
-
-test_type!(float8(
-    postgres,
-    "float8",
-    Value::Numeric(None),
-    Value::numeric(BigDecimal::from_str("1.12345")?)
-));
-
-test_type!(float8_array(
-    postgres,
-    "float8[]",
-    Value::Array(None),
-    Value::array(vec![BigDecimal::from_str("1.1234")?, BigDecimal::from_str("4.3210")?,])
-));
-
 test_type!(money(
     postgres,
     "money",
@@ -213,4 +185,24 @@ test_type!(money_array(
     "money[]",
     Value::Array(None),
     Value::array(vec![BigDecimal::from_str("1.12")?, BigDecimal::from_str("1.12")?])
+));
+
+test_type!(float4(
+    postgres,
+    "float4",
+    (Value::Numeric(None), Value::Float(None)),
+    (
+        Value::numeric(BigDecimal::from_str("1.123456")?),
+        Value::float(1.123456)
+    )
+));
+
+test_type!(float8(
+    postgres,
+    "float8",
+    (Value::Numeric(None), Value::Double(None)),
+    (
+        Value::numeric(BigDecimal::from_str("1.123456")?),
+        Value::double(1.123456)
+    )
 ));

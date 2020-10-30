@@ -22,11 +22,8 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
         for pv in params {
             let res = match pv {
                 Value::Integer(i) => i.map(my::Value::Int),
-                #[cfg(feature = "bigdecimal")]
-                Value::Numeric(f) => match f {
-                    Some(f) => Some(my::Value::Bytes(f.to_string().as_bytes().to_vec())),
-                    None => None,
-                },
+                Value::Float(f) => f.map(my::Value::Float),
+                Value::Double(f) => f.map(my::Value::Double),
                 Value::Text(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
                 Value::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
                 Value::Enum(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
@@ -45,6 +42,11 @@ pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
 
                     return Err(builder.build());
                 }
+                #[cfg(feature = "bigdecimal")]
+                Value::Numeric(f) => match f {
+                    Some(f) => Some(my::Value::Bytes(f.to_string().as_bytes().to_vec())),
+                    None => None,
+                },
                 #[cfg(feature = "json")]
                 Value::Json(s) => match s {
                     Some(ref s) => {
@@ -93,10 +95,19 @@ impl TypeIdentifier for my::Column {
     fn is_real(&self) -> bool {
         use ColumnType::*;
 
-        matches!(
-            self.column_type(),
-            MYSQL_TYPE_DECIMAL | MYSQL_TYPE_FLOAT | MYSQL_TYPE_DOUBLE | MYSQL_TYPE_NEWDECIMAL
-        )
+        matches!(self.column_type(), MYSQL_TYPE_DECIMAL | MYSQL_TYPE_NEWDECIMAL)
+    }
+
+    fn is_float(&self) -> bool {
+        use ColumnType::*;
+
+        matches!(self.column_type(), MYSQL_TYPE_FLOAT)
+    }
+
+    fn is_double(&self) -> bool {
+        use ColumnType::*;
+
+        matches!(self.column_type(), MYSQL_TYPE_DOUBLE)
     }
 
     fn is_integer(&self) -> bool {
@@ -281,18 +292,20 @@ impl TakeRow for my::Row {
                 my::Value::NULL => match column {
                     t if t.is_bool() => Value::Boolean(None),
                     t if t.is_enum() => Value::Enum(None),
-                    #[cfg(feature = "bigdecimal")]
-                    t if t.is_real() => Value::Numeric(None),
                     t if t.is_null() => Value::Integer(None),
                     t if t.is_integer() => Value::Integer(None),
+                    t if t.is_float() => Value::Float(None),
+                    t if t.is_double() => Value::Double(None),
+                    t if t.is_text() => Value::Text(None),
+                    t if t.is_bytes() => Value::Bytes(None),
+                    #[cfg(feature = "bigdecimal")]
+                    t if t.is_real() => Value::Numeric(None),
                     #[cfg(feature = "chrono")]
                     t if t.is_datetime() => Value::DateTime(None),
                     #[cfg(feature = "chrono")]
                     t if t.is_time() => Value::Time(None),
                     #[cfg(feature = "chrono")]
                     t if t.is_date() => Value::Date(None),
-                    t if t.is_text() => Value::Text(None),
-                    t if t.is_bytes() => Value::Bytes(None),
                     #[cfg(feature = "json")]
                     t if t.is_json() => Value::Json(None),
                     typ => {

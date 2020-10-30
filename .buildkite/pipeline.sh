@@ -11,25 +11,25 @@ steps:
       command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=sqlite\"
 
     - label: \":sqlite: Sqlite full\"
-      command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=sqlite,chrono,json,uuid,pooled,serde-support\"
+      command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=sqlite,chrono,json,uuid,pooled,serde-support,bigdecimal\"
 
     - label: \":postgres: PostgreSQL minimal\"
       command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=postgresql\"
 
     - label: \":postgres: PostgreSQL full\"
-      command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=postgresql,chrono,json,uuid,pooled,serde-support\"
+      command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=postgresql,chrono,json,uuid,pooled,serde-support,bigdecimal\"
 
     - label: \":mysql: MySQL minimal\"
       command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=mysql\"
 
     - label: \":mysql: MySQL full\"
-      command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=mysql,chrono,json,uuid,pooled,serde-support\"
+      command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=mysql,chrono,json,uuid,pooled,serde-support,bigdecimal\"
 
     - label: \":windows: SQL Server minimal\"
       command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=mssql\"
 
     - label: \":windows: SQL Server full\"
-      command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=mssql,chrono,json,uuid,pooled,serde-support\"
+      command: ./.buildkite/docker.sh \"cargo test --lib --no-default-features --features=mssql,chrono,json,uuid,pooled,serde-support,bigdecimal\"
 
     - wait
 

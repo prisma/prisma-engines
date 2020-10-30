@@ -1,4 +1,5 @@
 use crate::tests::test_api::*;
+#[cfg(feature = "bigdecimal")]
 use std::str::FromStr;
 
 test_type!(tinyint(
@@ -90,19 +91,25 @@ test_type!(decimal(
 ));
 
 #[cfg(feature = "bigdecimal")]
-test_type!(float(
+test_type!(float_decimal(
     mysql,
     "float",
-    Value::Numeric(None),
-    Value::numeric(bigdecimal::BigDecimal::from_str("1.1234").unwrap())
+    (Value::Numeric(None), Value::Float(None)),
+    (
+        Value::numeric(bigdecimal::BigDecimal::from_str("3.14").unwrap()),
+        Value::float(3.14)
+    )
 ));
 
 #[cfg(feature = "bigdecimal")]
-test_type!(double(
+test_type!(double_decimal(
     mysql,
     "double",
-    Value::Numeric(None),
-    Value::numeric(bigdecimal::BigDecimal::from_str("1.12345").unwrap())
+    (Value::Numeric(None), Value::Double(None)),
+    (
+        Value::numeric(bigdecimal::BigDecimal::from_str("3.14").unwrap()),
+        Value::double(3.14)
+    )
 ));
 
 test_type!(bit64(
@@ -121,7 +128,8 @@ test_type!(boolean(
 ));
 
 test_type!(char(mysql, "char(255)", Value::Text(None), Value::text("foobar")));
-
+test_type!(float(mysql, "float", Value::Float(None), Value::float(1.12345),));
+test_type!(double(mysql, "double", Value::Double(None), Value::double(1.12314124)));
 test_type!(varchar(mysql, "varchar(255)", Value::Text(None), Value::text("foobar")));
 test_type!(tinytext(mysql, "tinytext", Value::Text(None), Value::text("foobar")));
 test_type!(text(mysql, "text", Value::Text(None), Value::text("foobar")));

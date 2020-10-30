@@ -20,7 +20,7 @@ test_type!(numeric_10_2(
 ));
 
 test_type!(numeric_35_6(
-    postgres,
+    mssql,
     "numeric(35, 6)",
     (
         Value::numeric(BigDecimal::from_str("3950")?),
@@ -101,7 +101,7 @@ test_type!(numeric_35_6(
 ));
 
 test_type!(numeric_35_2(
-    postgres,
+    mssql,
     "numeric(35, 2)",
     (
         Value::numeric(BigDecimal::from_str("3950.123456")?),
@@ -114,49 +114,19 @@ test_type!(numeric_35_2(
 ));
 
 test_type!(numeric_4_0(
-    postgres,
+    mssql,
     "numeric(4, 0)",
     Value::numeric(BigDecimal::from_str("3950")?)
 ));
 
-test_type!(numeric_65_30(
-    postgres,
-    "numeric(65, 30)",
-    (
-        Value::numeric(BigDecimal::from_str("1.2")?),
-        Value::numeric(BigDecimal::from_str("1.2000000000000000000000000000")?)
-    ),
-    (
-        Value::numeric(BigDecimal::from_str("3.141592653589793238462643383279")?),
-        Value::numeric(BigDecimal::from_str("3.141592653589793238462643383279")?)
-    )
-));
-
-test_type!(numeric_65_34(
-    postgres,
-    "numeric(65, 34)",
-    (
-        Value::numeric(BigDecimal::from_str("3.1415926535897932384626433832795028")?),
-        Value::numeric(BigDecimal::from_str("3.1415926535897932384626433832795028")?)
-    ),
-    (
-        Value::numeric(BigDecimal::from_str("1.23456789012345678901234567895")?),
-        Value::numeric(BigDecimal::from_str("1.23456789012345678901234567895")?)
-    ),
-    (
-        Value::numeric(BigDecimal::from_str("1.234567890123456789012345678949999")?),
-        Value::numeric(BigDecimal::from_str("1.234567890123456789012345678949999")?)
-    ),
-));
-
 test_type!(numeric_35_0(
-    postgres,
+    mssql,
     "numeric(35, 0)",
     Value::numeric(BigDecimal::from_str("79228162514264337593543950335")?),
 ));
 
 test_type!(numeric_35_1(
-    postgres,
+    mssql,
     "numeric(35, 1)",
     (
         Value::numeric(BigDecimal::from_str("79228162514264337593543950335")?),
@@ -171,34 +141,43 @@ test_type!(numeric_35_1(
 test_type!(money(
     mssql,
     "money",
-    Value::Numeric(None),
-    Value::numeric(BigDecimal::from_str("3.14")?)
+    (Value::Numeric(None), Value::Double(None)),
+    (Value::numeric(BigDecimal::from_str("3.14")?), Value::double(3.14))
 ));
 
 test_type!(smallmoney(
     mssql,
     "smallmoney",
-    Value::Numeric(None),
-    Value::numeric(BigDecimal::from_str("3.14")?)
+    (Value::Numeric(None), Value::Double(None)),
+    (Value::numeric(BigDecimal::from_str("3.14")?), Value::double(3.14))
 ));
 
 test_type!(float_24(
     mssql,
     "float(24)",
-    Value::Numeric(None),
-    Value::numeric(BigDecimal::from_str("1.123456")?)
+    (Value::Numeric(None), Value::Float(None)),
+    (
+        Value::numeric(BigDecimal::from_str("1.123456")?),
+        Value::float(1.123456)
+    )
 ));
 
 test_type!(real(
     mssql,
     "real",
-    Value::Numeric(None),
-    Value::numeric(BigDecimal::from_str("1.123456")?)
+    (Value::Numeric(None), Value::Float(None)),
+    (
+        Value::numeric(BigDecimal::from_str("1.123456")?),
+        Value::float(1.123456)
+    )
 ));
 
 test_type!(float_53(
     mssql,
     "float(53)",
-    Value::Numeric(None),
-    Value::numeric(BigDecimal::from_str("1.123456789012345")?)
+    (Value::Numeric(None), Value::Float(None)),
+    (
+        Value::numeric(BigDecimal::from_str("1.123456789012345")?),
+        Value::double(1.123456789012345)
+    )
 ));

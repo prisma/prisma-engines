@@ -71,15 +71,24 @@ impl<'a> Visitor<'a> for Postgres<'a> {
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
         let res = match value {
             Value::Integer(i) => i.map(|i| self.write(i)),
-            Value::Numeric(r) => r.map(|r| self.write(r)),
             Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
             Value::Enum(e) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("E'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
+            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{}'", cow))),
             Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
-            #[cfg(feature = "json")]
-            Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
-            #[cfg(feature = "postgresql")]
+            Value::Float(d) => d.map(|f| match f {
+                f if f.is_nan() => self.write("'NaN'"),
+                f if f == f32::INFINITY => self.write("'Infinity'"),
+                f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
+                v => self.write(format!("{:?}", v)),
+            }),
+            Value::Double(d) => d.map(|f| match f {
+                f if f.is_nan() => self.write("'NaN'"),
+                f if f == f64::INFINITY => self.write("'Infinity'"),
+                f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
+                v => self.write(format!("{:?}", v)),
+            }),
             Value::Array(ary) => ary.map(|ary| {
                 self.surround_with("'{", "}'", |ref mut s| {
                     let len = ary.len();
@@ -95,6 +104,10 @@ impl<'a> Visitor<'a> for Postgres<'a> {
                     Ok(())
                 })
             }),
+            #[cfg(feature = "json")]
+            Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(r) => r.map(|r| self.write(r)),
             #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.to_hyphenated().to_string()))),
             #[cfg(feature = "chrono")]
@@ -103,7 +116,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
             Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
             #[cfg(feature = "chrono")]
             Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
-            Value::Xml(cow) => cow.map(|cow| self.write(format!("'{}'", cow))),
         };
 
         match res {

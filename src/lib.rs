@@ -122,9 +122,6 @@ extern crate metrics;
 #[cfg(feature = "bigdecimal")]
 extern crate bigdecimal_ as bigdecimal;
 
-#[cfg(feature = "chrono")]
-extern crate chrono_ as chrono;
-
 pub mod ast;
 pub mod connector;
 pub mod error;

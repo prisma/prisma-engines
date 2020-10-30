@@ -59,20 +59,23 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
         let res = match value {
             Value::Integer(i) => i.map(|i| self.write(i)),
-            Value::Numeric(r) => r.map(|r| self.write(r)),
+            Value::Float(d) => d.map(|f| match f {
+                f if f.is_nan() => self.write("'NaN'"),
+                f if f == f32::INFINITY => self.write("'Infinity'"),
+                f if f == f32::NEG_INFINITY => self.write("'-Infinity"),
+                v => self.write(format!("{:?}", v)),
+            }),
+            Value::Double(d) => d.map(|f| match f {
+                f if f.is_nan() => self.write("'NaN'"),
+                f if f == f64::INFINITY => self.write("'Infinity'"),
+                f if f == f64::NEG_INFINITY => self.write("'-Infinity"),
+                v => self.write(format!("{:?}", v)),
+            }),
             Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
             Value::Enum(e) => e.map(|e| self.write(e)),
             Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
             Value::Boolean(b) => b.map(|b| self.write(b)),
             Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
-            #[cfg(feature = "json")]
-            Value::Json(j) => match j {
-                Some(ref j) => {
-                    let s = serde_json::to_string(&j)?;
-                    Some(self.write(format!("CONVERT('{}', JSON)", s)))
-                }
-                None => None,
-            },
             Value::Array(_) => {
                 let msg = "Arrays are not supported in MySQL.";
                 let kind = ErrorKind::conversion(msg);
@@ -82,6 +85,16 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 
                 return Err(builder.build());
             }
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(r) => r.map(|r| self.write(r)),
+            #[cfg(feature = "json")]
+            Value::Json(j) => match j {
+                Some(ref j) => {
+                    let s = serde_json::to_string(&j)?;
+                    Some(self.write(format!("CONVERT('{}', JSON)", s)))
+                }
+                None => None,
+            },
             #[cfg(feature = "uuid")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.to_hyphenated().to_string()))),
             #[cfg(feature = "chrono")]

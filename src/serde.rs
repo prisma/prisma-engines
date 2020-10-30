@@ -119,8 +119,16 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
             Value::Boolean(None) => visitor.visit_none(),
             Value::Char(Some(c)) => visitor.visit_char(c),
             Value::Char(None) => visitor.visit_none(),
+            Value::Float(Some(num)) => visitor.visit_f64(num as f64),
+            Value::Float(None) => visitor.visit_none(),
+            Value::Double(Some(num)) => visitor.visit_f64(num),
+            Value::Double(None) => visitor.visit_none(),
+
             #[cfg(feature = "bigdecimal")]
-            Value::Numeric(Some(num)) => visitor.visit_f64(num.to_string().parse::<f64>().unwrap()),
+            Value::Numeric(Some(num)) => {
+                use crate::bigdecimal::ToPrimitive;
+                visitor.visit_f64(num.to_f64().unwrap())
+            }
             #[cfg(feature = "bigdecimal")]
             Value::Numeric(None) => visitor.visit_none(),
 

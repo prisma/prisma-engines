@@ -81,6 +81,7 @@ impl<'a> FromSql<'a> for TimeTz {
 #[cfg(feature = "bigdecimal")]
 struct NaiveMoney(BigDecimal);
 
+#[cfg(feature = "bigdecimal")]
 impl<'a> FromSql<'a> for NaiveMoney {
     fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<NaiveMoney, Box<dyn std::error::Error + Sync + Send>> {
         let cents = i64::from_sql(&PostgresType::INT8, raw)?;
@@ -119,27 +120,19 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Integer(None),
                 },
-                #[cfg(feature = "bigdecimal")]
-                PostgresType::NUMERIC => {
-                    let dw: Option<DecimalWrapper> = row.try_get(i)?;
-
-                    Value::Numeric(dw.map(|dw| dw.0))
-                }
-                #[cfg(feature = "bigdecimal")]
                 PostgresType::FLOAT4 => match row.try_get(i)? {
                     Some(val) => {
-                        let val = BigDecimal::from_f32(val).expect("f32 is not a Decimal");
-                        Value::numeric(val)
+                        let val: f32 = val;
+                        Value::float(val)
                     }
-                    None => Value::Numeric(None),
+                    None => Value::Float(None),
                 },
-                #[cfg(feature = "bigdecimal")]
                 PostgresType::FLOAT8 => match row.try_get(i)? {
                     Some(val) => {
-                        let val = BigDecimal::from_f64(val).expect("f64 is not a Decimal");
-                        Value::numeric(val)
+                        let val: f64 = val;
+                        Value::double(val)
                     }
-                    None => Value::Numeric(None),
+                    None => Value::Double(None),
                 },
                 PostgresType::BYTEA => match row.try_get(i)? {
                     Some(val) => {
@@ -156,6 +149,12 @@ impl GetRow for PostgresRow {
                     }
                     None => Value::Array(None),
                 },
+                #[cfg(feature = "bigdecimal")]
+                PostgresType::NUMERIC => {
+                    let dw: Option<DecimalWrapper> = row.try_get(i)?;
+
+                    Value::Numeric(dw.map(|dw| dw.0))
+                }
                 #[cfg(feature = "bigdecimal")]
                 PostgresType::MONEY => match row.try_get(i)? {
                     Some(val) => {
@@ -245,7 +244,7 @@ impl GetRow for PostgresRow {
                 PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f32> = val;
-                        let floats = val.into_iter().map(Value::from);
+                        let floats = val.into_iter().map(Value::float);
                         Value::array(floats)
                     }
                     None => Value::Array(None),
@@ -253,7 +252,7 @@ impl GetRow for PostgresRow {
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f64> = val;
-                        let floats = val.into_iter().map(Value::from);
+                        let floats = val.into_iter().map(Value::double);
                         Value::array(floats)
                     }
                     None => Value::Array(None),
@@ -505,6 +504,8 @@ impl<'a> ToSql for Value<'a> {
             }
             (Value::Integer(integer), &PostgresType::OID) => integer.map(|integer| (integer as u32).to_sql(ty, out)),
             (Value::Integer(integer), _) => integer.map(|integer| (integer as i64).to_sql(ty, out)),
+            (Value::Float(float), _) => float.map(|float| float.to_sql(ty, out)),
+            (Value::Double(double), _) => double.map(|double| double.to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
             (Value::Numeric(decimal), &PostgresType::FLOAT4) => decimal.as_ref().map(|decimal| {
                 let f = decimal.to_f32().expect("decimal to f32 conversion");
@@ -512,27 +513,56 @@ impl<'a> ToSql for Value<'a> {
             }),
             #[cfg(feature = "bigdecimal")]
             (Value::Numeric(decimal), &PostgresType::FLOAT8) => decimal.as_ref().map(|decimal| {
-                let f = decimal.to_string().parse::<f64>().expect("decimal to f64 conversion");
+                let f = decimal.to_f64().expect("decimal to f64 conversion");
                 f.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
-            (Value::Array(decimals), &PostgresType::FLOAT4_ARRAY) => decimals.as_ref().map(|decimals| {
-                let f: Vec<f32> = decimals
-                    .iter()
-                    .filter_map(|v| v.as_decimal().and_then(|decimal| decimal.to_f32()))
-                    .collect();
-                f.to_sql(ty, out)
+            (Value::Array(values), &PostgresType::FLOAT4_ARRAY) => values.as_ref().map(|values| {
+                let mut floats = Vec::with_capacity(values.len());
+
+                for value in values.iter() {
+                    let float = match value {
+                        Value::Numeric(n) => n.as_ref().and_then(|n| n.to_f32()),
+                        Value::Float(f) => *f,
+                        Value::Double(d) => d.map(|d| d as f32),
+                        v => {
+                            let kind = ErrorKind::conversion(format!(
+                                "Couldn't add value of type `{:?}` into a float array.",
+                                v
+                            ));
+
+                            Err(Error::builder(kind).build())?
+                        }
+                    };
+
+                    floats.push(float);
+                }
+
+                floats.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
-            (Value::Array(decimals), &PostgresType::FLOAT8_ARRAY) => decimals.as_ref().map(|decimals| {
-                let f: Vec<f64> = decimals
-                    .iter()
-                    .filter_map(|v| {
-                        v.as_decimal()
-                            .and_then(|decimal| decimal.to_string().parse::<f64>().ok())
-                    })
-                    .collect();
-                f.to_sql(ty, out)
+            (Value::Array(values), &PostgresType::FLOAT8_ARRAY) => values.as_ref().map(|values| {
+                let mut floats = Vec::with_capacity(values.len());
+
+                for value in values.iter() {
+                    let float = match value {
+                        Value::Numeric(n) => n.as_ref().and_then(|n| n.to_f64()),
+                        Value::Float(f) => f.map(|f| f as f64),
+                        Value::Double(d) => *d,
+                        v => {
+                            let kind = ErrorKind::conversion(format!(
+                                "Couldn't add value of type `{:?}` into a double array.",
+                                v
+                            ));
+
+                            Err(Error::builder(kind).build())?
+                        }
+                    };
+
+                    floats.push(float);
+                }
+
+                floats.to_sql(ty, out)
             }),
             #[cfg(feature = "bigdecimal")]
             (Value::Numeric(decimal), &PostgresType::MONEY) => decimal.as_ref().map(|decimal| {

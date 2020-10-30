@@ -1,5 +1,7 @@
 pub(crate) trait TypeIdentifier {
     fn is_real(&self) -> bool;
+    fn is_float(&self) -> bool;
+    fn is_double(&self) -> bool;
     fn is_integer(&self) -> bool;
     fn is_datetime(&self) -> bool;
     fn is_time(&self) -> bool;

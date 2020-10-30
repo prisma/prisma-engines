@@ -16,10 +16,21 @@ impl TypeIdentifier for Column<'_> {
         match self.decl_type() {
             Some(n) if n.starts_with("DECIMAL") => true,
             Some(n) if n.starts_with("decimal") => true,
-            Some("NUMERIC") | Some("REAL") | Some("DOUBLE") | Some("DOUBLE PRECISION") | Some("FLOAT") => true,
-            Some("numeric") | Some("real") | Some("double") | Some("double precision") | Some("float") => true,
+            Some("NUMERIC") | Some("REAL") => true,
+            Some("numeric") | Some("real") => true,
             _ => false,
         }
+    }
+
+    fn is_float(&self) -> bool {
+        matches!(self.decl_type(), Some("float") | Some("FLOAT"))
+    }
+
+    fn is_double(&self) -> bool {
+        matches!(
+            self.decl_type(),
+            Some("double") | Some("DOUBLE") | Some("DOUBLE PRECISION") | Some("double precision")
+        )
     }
 
     fn is_integer(&self) -> bool {
@@ -109,6 +120,8 @@ impl<'a> GetRow for SqliteRow<'a> {
                     c if c.is_integer() | c.is_null() => Value::Integer(None),
                     c if c.is_text() => Value::Text(None),
                     c if c.is_bytes() => Value::Bytes(None),
+                    c if c.is_float() => Value::Float(None),
+                    c if c.is_double() => Value::Double(None),
                     #[cfg(feature = "bigdecimal")]
                     c if c.is_real() => Value::Numeric(None),
                     #[cfg(feature = "chrono")]
@@ -148,7 +161,13 @@ impl<'a> GetRow for SqliteRow<'a> {
                     }
                     _ => Value::integer(i),
                 },
-                ValueRef::Real(f) => Value::from(f),
+                #[cfg(feature = "bigdecimal")]
+                ValueRef::Real(f) if column.is_real() => {
+                    use bigdecimal::{BigDecimal, FromPrimitive};
+
+                    Value::numeric(BigDecimal::from_f64(f).unwrap())
+                }
+                ValueRef::Real(f) => Value::double(f),
                 #[cfg(feature = "chrono")]
                 ValueRef::Text(bytes) if column.is_datetime() => {
                     let parse_res = std::str::from_utf8(bytes).map_err(|_| {
@@ -199,10 +218,8 @@ impl<'a> ToSql for Value<'a> {
     fn to_sql(&self) -> Result<ToSqlOutput, RusqlError> {
         let value = match self {
             Value::Integer(integer) => integer.map(ToSqlOutput::from),
-            #[cfg(feature = "bigdecimal")]
-            Value::Numeric(d) => d
-                .as_ref()
-                .map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("BigDecimal is not a f64."))),
+            Value::Float(float) => float.map(|f| f as f64).map(ToSqlOutput::from),
+            Value::Double(double) => double.map(ToSqlOutput::from),
             Value::Text(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             Value::Enum(cow) => cow.as_ref().map(|cow| ToSqlOutput::from(cow.as_ref())),
             Value::Boolean(boo) => boo.map(ToSqlOutput::from),
@@ -217,6 +234,10 @@ impl<'a> ToSql for Value<'a> {
 
                 return Err(RusqlError::ToSqlConversionFailure(Box::new(builder.build())));
             }
+            #[cfg(feature = "bigdecimal")]
+            Value::Numeric(d) => d
+                .as_ref()
+                .map(|d| ToSqlOutput::from(d.to_string().parse::<f64>().expect("BigDecimal is not a f64."))),
             #[cfg(feature = "json")]
             Value::Json(value) => value.as_ref().map(|value| {
                 let stringified = serde_json::to_string(value)

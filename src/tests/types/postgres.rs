@@ -2,6 +2,7 @@
 mod bigdecimal;
 
 use crate::tests::test_api::*;
+#[cfg(feature = "bigdecimal")]
 use std::str::FromStr;
 
 test_type!(boolean(
@@ -62,6 +63,29 @@ test_type!(int8_array(
     "int8[]",
     Value::Array(None),
     Value::array(vec![1, 2, 3]),
+));
+
+test_type!(float4(postgres, "float4", Value::Float(None), Value::float(1.234)));
+
+test_type!(float4_array(
+    postgres,
+    "float4[]",
+    Value::Array(None),
+    Value::array(vec![1.1234_f32, 4.321_f32])
+));
+
+test_type!(float8(
+    postgres,
+    "float8",
+    Value::Double(None),
+    Value::double(1.12345764),
+));
+
+test_type!(float8_array(
+    postgres,
+    "float8[]",
+    Value::Array(None),
+    Value::array(vec![1.1234_f64, 4.321_f64])
 ));
 
 test_type!(oid(postgres, "oid", Value::Integer(None), Value::integer(10000)));

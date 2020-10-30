@@ -76,6 +76,26 @@ test_type!(bigint(
     Value::integer(i64::MAX),
 ));
 
+test_type!(float_24(mssql, "float(24)", Value::Float(None), Value::float(1.23456),));
+
+test_type!(real(mssql, "real", Value::Float(None), Value::float(1.123456)));
+
+test_type!(float_53(
+    mssql,
+    "float(53)",
+    Value::Float(None),
+    Value::double(1.1234567891)
+));
+
+test_type!(money(mssql, "money", Value::Double(None), Value::double(3.14)));
+
+test_type!(smallmoney(
+    mssql,
+    "smallmoney",
+    Value::Double(None),
+    Value::double(3.14)
+));
+
 test_type!(boolean(
     mssql,
     "bit",
