@@ -110,11 +110,11 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         let AlterTable {
-            table,
-            table_index: (_, next_idx),
+            table_index: (previous_idx, next_idx),
             changes,
         } = alter_table;
 
+        let previous_table = differ.previous.table_walker_at(*previous_idx);
         let next_table = differ.next.table_walker_at(*next_idx);
 
         let mut lines = Vec::new();
@@ -126,12 +126,10 @@ impl SqlRenderer for MysqlFlavour {
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
-                TableChange::AddColumn(AddColumn { column }) => {
-                    let column = next_table
-                        .column(&column.name)
-                        .expect("Invariant violation: add column with unknown column");
-
+                TableChange::AddColumn(AddColumn { column_index }) => {
+                    let column = next_table.column_at(*column_index);
                     let col_sql = self.render_column(column);
+
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn(DropColumn { name, .. }) => {
@@ -139,25 +137,22 @@ impl SqlRenderer for MysqlFlavour {
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_name,
                     changes,
+                    column_index: (previous_column_index, next_column_index),
                     type_change: _,
                 }) => {
-                    let columns = differ
-                        .diff_table(&table.name)
-                        .expect("AlterTable on unknown table.")
-                        .diff_column(column_name)
-                        .expect("AlterColumn on unknown column.");
+                    let previous_column = previous_table.column_at(*previous_column_index);
+                    let next_column = next_table.column_at(*next_column_index);
 
-                    let expanded = expand_mysql_alter_column((&columns.previous, &columns.next), &changes);
+                    let expanded = expand_mysql_alter_column((&previous_column, &next_column), &changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
                             "ALTER COLUMN {column} DROP DEFAULT",
-                            column = Quoted::mysql_ident(columns.previous.name())
+                            column = Quoted::mysql_ident(previous_column.name())
                         )),
                         MysqlAlterColumn::Modify { new_default, changes } => {
-                            lines.push(render_mysql_modify(&changes, new_default.as_ref(), columns.next, self))
+                            lines.push(render_mysql_modify(&changes, new_default.as_ref(), next_column, self))
                         }
                     };
                 }
@@ -171,7 +166,7 @@ impl SqlRenderer for MysqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote(&table.name),
+            self.quote(previous_table.name()),
             lines.join(",\n    ")
         )]
     }

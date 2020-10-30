@@ -31,7 +31,7 @@ use crate::{
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
 use sql_schema_describer::{
-    walkers::{find_column, ColumnWalker, SqlSchemaExt},
+    walkers::{ColumnWalker, SqlSchemaExt},
     ColumnArity, SqlSchema,
 };
 use unexecutable_step_check::UnexecutableStepCheck;
@@ -85,7 +85,6 @@ impl SqlMigrationConnector {
         for (step_index, step) in steps.iter().enumerate() {
             match step {
                 SqlMigrationStep::AlterTable(AlterTable {
-                    table,
                     table_index: (prev_idx, next_idx),
                     changes,
                 }) => {
@@ -97,18 +96,13 @@ impl SqlMigrationConnector {
                     for change in changes {
                         match change {
                             TableChange::DropColumn(ref drop_column) => {
-                                let column = find_column(before, &table.name, &drop_column.name)
-                                    .expect("Dropping of unknown column.");
+                                let column = before_table.column_at(drop_column.index);
 
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
                             TableChange::AlterColumn(ref alter_column) => {
-                                let previous_column = before_table
-                                    .column(&alter_column.column_name)
-                                    .expect("unsupported column renaming");
-                                let next_column = after_table
-                                    .column(&alter_column.column_name)
-                                    .expect("unsupported column renaming");
+                                let previous_column = before_table.column_at(alter_column.column_index.0);
+                                let next_column = after_table.column_at(alter_column.column_index.1);
 
                                 self.flavour().check_alter_column(
                                     &alter_column,
@@ -118,19 +112,17 @@ impl SqlMigrationConnector {
                                 )
                             }
                             TableChange::AddColumn(ref add_column) => {
-                                let column = find_column(after, after_table.name(), &add_column.column.name)
-                                    .expect("Could not find column in AddColumn");
+                                let column = after_table.column_at(add_column.column_index);
 
                                 self.check_add_column(&column, &mut plan, step_index)
                             }
                             TableChange::DropPrimaryKey { .. } => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
-                                    table: table.name.clone(),
+                                    table: before_table.name().to_owned(),
                                 },
                                 step_index,
                             ),
                             TableChange::DropAndRecreateColumn {
-                                column_name: _,
                                 column_index: (previous_idx, next_idx),
                                 changes,
                             } => {
