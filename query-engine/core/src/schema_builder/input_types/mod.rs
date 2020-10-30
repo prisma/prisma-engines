@@ -1,11 +1,12 @@
-pub(crate) mod create_input_objects;
+pub(crate) mod arguments;
 pub(crate) mod field_filter_types;
-pub(crate) mod filter_input_objects;
 pub(crate) mod input_fields;
-pub(crate) mod update_input_objects;
+
+mod objects;
 
 use super::*;
 use crate::schema::*;
+use objects::*;
 use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
 /// Builds "<Model>OrderByInput" object types.
@@ -80,16 +81,6 @@ fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
         vec![input_type]
     }
 }
-
-// /// Convenience function to return [input_type_1, list_input_type_1, input_type_2, list_input_type_2]
-// /// (shorthand + full type for each fiven InputType) if the field is a list.
-// fn list_union_types(input_type: Vec<InputType>, as_list: bool) -> Vec<InputType> {
-//     if as_list {
-//         vec![input_type.clone(), InputType::list(input_type)]
-//     } else {
-//         vec![input_type]
-//     }
-// }
 
 fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
     alias.map(capitalize).unwrap_or_else(|| {

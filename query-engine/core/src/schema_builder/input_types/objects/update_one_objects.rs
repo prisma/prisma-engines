@@ -30,7 +30,7 @@ fn checked_update_one_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> 
     let mut fields = scalar_input_fields_for_checked_update(ctx, model);
 
     // Compute input fields for relational fields.
-    let mut relational_fields = relation_input_fields_for_checked_update(ctx, model, None);
+    let mut relational_fields = relation_input_fields_for_checked_update_one(ctx, model, None);
     fields.append(&mut relational_fields);
 
     input_object.set_fields(fields);
@@ -56,19 +56,7 @@ fn unchecked_update_one_input_type(ctx: &mut BuilderContext, model: &ModelRef) -
     Arc::downgrade(&input_object)
 }
 
-/// Builds "<x>UpdateManyMutationInput" input object type.
-pub(crate) fn update_many_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let object_name = format!("{}UpdateManyMutationInput", model.name);
-    return_cached_input!(ctx, &object_name);
-
-    let input_fields = scalar_input_fields_for_checked_update(ctx, model);
-    let input_object = Arc::new(input_object_type(object_name.clone(), input_fields));
-
-    ctx.cache_input_type(object_name, input_object.clone());
-    Arc::downgrade(&input_object)
-}
-
-fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
+pub(super) fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
     input_fields::scalar_input_fields(
         ctx,
         model.name.clone(),
@@ -211,134 +199,16 @@ fn relation_input_fields_for_checked_update_one(
         .collect()
 }
 
-pub(crate) fn nested_upsert_input_object(
-    ctx: &mut BuilderContext,
-    parent_field: &RelationFieldRef,
-) -> Option<InputObjectTypeWeakRef> {
-    let nested_update_data_object = nested_update_data(ctx, parent_field);
-
-    if parent_field.is_list {
-        nested_upsert_list_input_object(ctx, parent_field, nested_update_data_object)
-    } else {
-        nested_upsert_nonlist_input_object(ctx, parent_field, nested_update_data_object)
-    }
-}
-
-/// Builds "<x>UpsertWithWhereUniqueNestedInput" / "<x>UpsertWithWhereUniqueWithout<y>Input" input object types.
-fn nested_upsert_list_input_object(
-    ctx: &mut BuilderContext,
-    parent_field: &RelationFieldRef,
-    update_object: InputObjectTypeWeakRef,
-) -> Option<InputObjectTypeWeakRef> {
-    let related_model = parent_field.related_model();
-    let where_object = filter_input_objects::where_unique_object_type(ctx, &related_model);
-    let create_types = create_input_objects::create_input_types(ctx, &related_model, Some(parent_field));
-
-    if where_object.into_arc().is_empty() || create_types.iter().all(|typ| typ.is_empty()) {
-        return None;
-    }
-
-    let type_name = format!(
-        "{}UpsertWithWhereUniqueWithout{}Input",
-        related_model.name,
-        capitalize(&parent_field.related_field().name)
-    );
-
-    match ctx.get_input_type(&type_name) {
-        None => {
-            let input_object = Arc::new(init_input_object_type(type_name.clone()));
-            ctx.cache_input_type(type_name, input_object.clone());
-
-            let fields = vec![
-                input_field("where", InputType::object(where_object), None),
-                input_field("update", InputType::object(update_object), None),
-                input_field("create", create_types, None),
-            ];
-
-            input_object.set_fields(fields);
-            Some(Arc::downgrade(&input_object))
-        }
-        x => x,
-    }
-}
-
-/// Builds "<x>UpsertNestedInput" / "<x>UpsertWithout<y>Input" input object types.
-fn nested_upsert_nonlist_input_object(
-    ctx: &mut BuilderContext,
-    parent_field: &RelationFieldRef,
-    update_object: InputObjectTypeWeakRef,
-) -> Option<InputObjectTypeWeakRef> {
-    let related_model = parent_field.related_model();
-    let create_types = create_input_objects::create_input_types(ctx, &related_model, Some(parent_field));
-
-    if create_types.iter().all(|typ| typ.is_empty()) {
-        return None;
-    }
-
-    let type_name = format!(
-        "{}UpsertWithout{}Input",
-        related_model.name,
-        capitalize(&parent_field.related_field().name)
-    );
-
-    match ctx.get_input_type(&type_name) {
-        None => {
-            let input_object = Arc::new(init_input_object_type(type_name.clone()));
-            ctx.cache_input_type(type_name, input_object.clone());
-
-            let fields = vec![
-                input_field("update", InputType::object(update_object), None),
-                input_field("create", create_types, None),
-            ];
-
-            input_object.set_fields(fields);
-            Some(Arc::downgrade(&input_object))
-        }
-        x => x,
-    }
-}
-
-/// Builds "<x>UpdateManyWithWhereNestedInput" input object type.
-pub(crate) fn nested_update_many_input_object(
-    ctx: &mut BuilderContext,
-    field: &RelationFieldRef,
-) -> Option<InputObjectTypeWeakRef> {
-    if field.is_list {
-        let related_model = field.related_model();
-        let type_name = format!("{}UpdateManyWithWhereNestedInput", related_model.name);
-
-        match ctx.get_input_type(&type_name) {
-            None => {
-                let data_input_object = nested_update_many_data(ctx, field);
-                let input_object = Arc::new(init_input_object_type(type_name.clone()));
-                ctx.cache_input_type(type_name, input_object.clone());
-
-                let where_input_object = filter_input_objects::scalar_filter_object_type(ctx, &related_model);
-
-                input_object.set_fields(vec![
-                    input_field("where", InputType::object(where_input_object), None),
-                    input_field("data", InputType::object(data_input_object), None),
-                ]);
-
-                Some(Arc::downgrade(&input_object))
-            }
-            x => x,
-        }
-    } else {
-        None
-    }
-}
-
 /// Builds "<x>UpdateWithWhereUniqueNestedInput" / "<x>UpdateWithWhereUniqueWithout<y>Input" input object types.
 pub(crate) fn input_object_type_nested_update(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
     let related_model = parent_field.related_model();
-    let nested_input_object = nested_update_data(ctx, parent_field);
+    let nested_input_object = nested_checked_update_one_data(ctx, parent_field);
 
     if parent_field.is_list {
-        let where_input_object = filter_input_objects::where_unique_object_type(ctx, &related_model);
+        let where_input_object = filter_objects::where_unique_object_type(ctx, &related_model);
         let type_name = format!(
             "{}UpdateWithWhereUniqueWithout{}Input",
             related_model.name,
@@ -361,8 +231,11 @@ pub(crate) fn input_object_type_nested_update(
     }
 }
 
-/// Builds "<x>UpdateDataInput" / "<x>UpdateWithout<y>DataInput" ubout input object types.
-fn nested_checked_update_one_data(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputObjectTypeWeakRef {
+/// Builds "<x>UpdateDataInput" / "<x>UpdateWithout<y>DataInput" input object types.
+pub(super) fn nested_checked_update_one_data(
+    ctx: &mut BuilderContext,
+    parent_field: &RelationFieldRef,
+) -> InputObjectTypeWeakRef {
     let related_model = parent_field.related_model();
     let type_name = format!(
         "{}UpdateWithout{}DataInput",
@@ -382,22 +255,6 @@ fn nested_checked_update_one_data(ctx: &mut BuilderContext, parent_field: &Relat
     fields.append(&mut relational_input_fields);
     input_object.set_fields(fields);
 
-    Arc::downgrade(&input_object)
-}
-
-/// Builds "<x>UpdateManyDataInput" input object type.
-fn nested_update_many_data(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputObjectTypeWeakRef {
-    let related_model = parent_field.related_model();
-    let type_name = format!("{}UpdateManyDataInput", related_model.name);
-
-    return_cached_input!(ctx, &type_name);
-
-    let input_object = Arc::new(init_input_object_type(type_name.clone()));
-    ctx.cache_input_type(type_name, input_object.clone());
-
-    let fields = scalar_input_fields_for_checked_update(ctx, &related_model);
-
-    input_object.set_fields(fields);
     Arc::downgrade(&input_object)
 }
 

@@ -287,7 +287,7 @@ pub(crate) fn nested_connect_or_create_input_object(
     parent_field: &RelationFieldRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();
-    let where_object = filter_input_objects::where_unique_object_type(ctx, &related_model);
+    let where_object = filter_objects::where_unique_object_type(ctx, &related_model);
 
     if where_object.into_arc().is_empty() {
         return None;
