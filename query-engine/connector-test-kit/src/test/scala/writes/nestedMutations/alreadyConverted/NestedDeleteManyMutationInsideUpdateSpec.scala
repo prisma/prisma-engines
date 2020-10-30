@@ -33,10 +33,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  where: $parentIdentifier
          |  data:{
          |    p: { set: "p2" }
-         |    childOpt: {deleteMany: {
-         |        where:{c: "c"}
-         |    }}
-         |  }){
+         |    childOpt: { deleteMany: { where: { c: "c" }}}
+         |  }) {
          |    childOpt {
          |      c
          |    }
@@ -46,7 +44,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project,
         errorCode = 2009,
         errorContains =
-          """`Field does not exist on enclosing type.` at `Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.deleteMany`"""
+          """`Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.deleteMany`: Field does not exist on enclosing type."""
       )
     }
   }
