@@ -4,12 +4,10 @@ pub(crate) fn nested_upsert_input_object(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
 ) -> Option<InputObjectTypeWeakRef> {
-    let nested_update_data_object = update_one_objects::nested_checked_update_one_data(ctx, parent_field);
-
     if parent_field.is_list {
-        nested_upsert_list_input_object(ctx, parent_field, nested_update_data_object)
+        nested_upsert_list_input_object(ctx, parent_field)
     } else {
-        nested_upsert_nonlist_input_object(ctx, parent_field, nested_update_data_object)
+        nested_upsert_nonlist_input_object(ctx, parent_field)
     }
 }
 
@@ -17,11 +15,11 @@ pub(crate) fn nested_upsert_input_object(
 fn nested_upsert_list_input_object(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
-    update_object: InputObjectTypeWeakRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();
     let where_object = filter_objects::where_unique_object_type(ctx, &related_model);
     let create_types = create_objects::create_input_types(ctx, &related_model, Some(parent_field));
+    let update_types = update_one_objects::update_one_input_types(ctx, &related_model, Some(parent_field));
 
     if where_object.into_arc().is_empty() || create_types.iter().all(|typ| typ.is_empty()) {
         return None;
@@ -40,7 +38,7 @@ fn nested_upsert_list_input_object(
 
             let fields = vec![
                 input_field("where", InputType::object(where_object), None),
-                input_field("update", InputType::object(update_object), None),
+                input_field("update", update_types, None),
                 input_field("create", create_types, None),
             ];
 
@@ -55,10 +53,10 @@ fn nested_upsert_list_input_object(
 fn nested_upsert_nonlist_input_object(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
-    update_object: InputObjectTypeWeakRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();
     let create_types = create_objects::create_input_types(ctx, &related_model, Some(parent_field));
+    let update_types = update_one_objects::update_one_input_types(ctx, &related_model, Some(parent_field));
 
     if create_types.iter().all(|typ| typ.is_empty()) {
         return None;
@@ -76,7 +74,7 @@ fn nested_upsert_nonlist_input_object(
             ctx.cache_input_type(type_name, input_object.clone());
 
             let fields = vec![
-                input_field("update", InputType::object(update_object), None),
+                input_field("update", update_types, None),
                 input_field("create", create_types, None),
             ];
 

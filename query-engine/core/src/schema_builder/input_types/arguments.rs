@@ -38,7 +38,7 @@ pub(crate) fn delete_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 /// Builds "where" (unique) and "data" arguments intended for the update field.
 pub(crate) fn update_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     where_unique_argument(ctx, model).map(|unique_arg| {
-        let update_types = update_one_objects::update_one_input_types(ctx, model);
+        let update_types = update_one_objects::update_one_input_types(ctx, model, None);
 
         vec![input_field("data", update_types, None), unique_arg]
     })
@@ -47,7 +47,7 @@ pub(crate) fn update_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 /// Builds "where" (unique), "create", and "update" arguments intended for the upsert field.
 pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     where_unique_argument(ctx, model).and_then(|where_unique_arg| {
-        let update_types = update_one_objects::update_one_input_types(ctx, model);
+        let update_types = update_one_objects::update_one_input_types(ctx, model, None);
         let create_types = create_objects::create_input_types(ctx, model, None);
 
         if update_types.iter().all(|typ| typ.is_empty()) || create_types.iter().all(|typ| typ.is_empty()) {

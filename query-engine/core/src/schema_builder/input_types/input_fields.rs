@@ -105,8 +105,16 @@ pub(crate) fn nested_connect_input_field(ctx: &mut BuilderContext, field: &Relat
 }
 
 pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
-    let input_object_type = update_one_objects::update_one_where_combination_object(ctx, field);
-    input_field("update", list_union_object_type(input_object_type, field.is_list), None).optional()
+    let update_one_types = update_one_objects::update_one_input_types(ctx, &field.related_model(), Some(field));
+
+    let update_types = if field.is_list {
+        let list_object_type = update_one_objects::update_one_where_combination_object(ctx, update_one_types, field);
+        list_union_object_type(list_object_type, true)
+    } else {
+        update_one_types
+    };
+
+    input_field("update", update_types, None).optional()
 }
 
 /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
