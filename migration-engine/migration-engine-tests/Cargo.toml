@@ -25,7 +25,7 @@ enumflags2 = "0.6.0"
 anyhow = "1.0"
 barrel = { git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], optional = true, branch = "mssql-support" }
 chrono = "0.4.15"
-indoc = "1.0.2"
+indoc = "1.0.3"
 pretty_assertions = "0.6"
 serde = "1"
 serde_json = "1.0.45"

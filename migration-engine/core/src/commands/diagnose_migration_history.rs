@@ -109,14 +109,15 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
         let applied_migrations: Vec<_> = migrations_from_filesystem
             .iter()
             .filter(|fs_migration| {
-                migrations_from_database.iter().any(|db_migration| {
-                    db_migration.migration_name == fs_migration.migration_name() && !db_migration.is_failed()
-                })
+                migrations_from_database
+                    .iter()
+                    .filter(|db_migration| db_migration.finished_at.is_some() && db_migration.rolled_back_at.is_none())
+                    .any(|db_migration| db_migration.migration_name == fs_migration.migration_name())
             })
             .cloned()
             .collect();
 
-        diagnostics.drift_detected = migration_inferrer.detect_drift(&applied_migrations).await?;
+        diagnostics.drift = migration_inferrer.calculate_drift(&applied_migrations).await?;
 
         Ok(DiagnoseMigrationHistoryOutput {
             drift: diagnostics.drift(),
@@ -134,7 +135,8 @@ struct Diagnostics<'a> {
     db_migrations_not_in_fs: Vec<(usize, &'a MigrationRecord)>,
     edited_migrations: Vec<&'a MigrationRecord>,
     failed_migrations: Vec<&'a MigrationRecord>,
-    drift_detected: bool,
+    /// A rollback script, in case we detected drift.
+    drift: Option<String>,
     /// Name and error.
     migration_failed_to_apply: Option<(String, String)>,
     fs_migrations: &'a [MigrationDirectory],
@@ -147,7 +149,7 @@ impl<'a> Diagnostics<'a> {
             db_migrations_not_in_fs: Vec::new(),
             edited_migrations: Vec::new(),
             failed_migrations: Vec::new(),
-            drift_detected: false,
+            drift: None,
             migration_failed_to_apply: None,
             fs_migrations,
         }
@@ -205,8 +207,10 @@ impl<'a> Diagnostics<'a> {
     }
 
     fn drift(&self) -> Option<DriftDiagnostic> {
-        if self.drift_detected {
-            return Some(DriftDiagnostic::DriftDetected);
+        if let Some(rollback) = &self.drift {
+            return Some(DriftDiagnostic::DriftDetected {
+                rollback: rollback.clone(),
+            });
         }
 
         if let Some((migration_name, error)) = &self.migration_failed_to_apply {
@@ -263,7 +267,10 @@ pub enum HistoryDiagnostic {
 pub enum DriftDiagnostic {
     /// The database schema of the current database does not match what would be
     /// expected at its stage in the migration history.
-    DriftDetected,
+    DriftDetected {
+        /// A database script to correct the drift by reverting to the expected schema.
+        rollback: String,
+    },
     /// When a migration fails to apply cleanly to a temporary database.
     #[serde(rename_all = "camelCase")]
     MigrationFailedToApply {
@@ -272,4 +279,14 @@ pub enum DriftDiagnostic {
         /// The full error.
         error: String,
     },
+}
+
+impl DriftDiagnostic {
+    /// For tests.
+    pub fn unwrap_drift_detected(self) -> String {
+        match self {
+            DriftDiagnostic::DriftDetected { rollback } => rollback,
+            other => panic!("unwrap_drift_detected on {:?}", other),
+        }
+    }
 }
