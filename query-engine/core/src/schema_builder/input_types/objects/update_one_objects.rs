@@ -99,7 +99,7 @@ pub(super) fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, m
     )
 }
 
-fn scalar_input_fields_for_unchecked_update(
+pub(super) fn scalar_input_fields_for_unchecked_update(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,

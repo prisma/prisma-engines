@@ -55,16 +55,20 @@ pub(crate) fn nested_delete_many_field(ctx: &mut BuilderContext, field: &Relatio
 
 /// Builds "updateMany" field for nested updates (on relation fields).
 pub(crate) fn nested_update_many_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
-    update_many_objects::nested_update_many_input_object(ctx, field).map(|input_object| {
-        let input_type = InputType::object(input_object);
+    if field.is_list {
+        let input_type = update_many_objects::update_many_where_combination_object(ctx, field);
 
-        input_field(
-            "updateMany",
-            vec![input_type.clone(), InputType::list(input_type)],
-            None,
+        Some(
+            input_field(
+                "updateMany",
+                list_union_object_type(input_type, true), //vec![input_type.clone(), InputType::list(input_type)],
+                None,
+            )
+            .optional(),
         )
-        .optional()
-    })
+    } else {
+        None
+    }
 }
 
 /// Builds "set" field for nested updates (on relation fields).

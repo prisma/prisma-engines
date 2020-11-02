@@ -66,10 +66,10 @@ pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 
 /// Builds "where" and "data" arguments intended for the update many field.
 pub(crate) fn update_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
-    let update_object = update_many_objects::update_many_input_type(ctx, model);
+    let update_many_types = update_many_objects::update_many_input_types(ctx, model, None);
     let where_arg = where_argument(ctx, model);
 
-    vec![input_field("data", InputType::object(update_object), None), where_arg]
+    vec![input_field("data", update_many_types, None), where_arg]
 }
 
 /// Builds "where" argument intended for the delete many field.
