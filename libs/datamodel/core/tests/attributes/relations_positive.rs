@@ -59,7 +59,7 @@ fn allow_complicated_self_relations() {
         wifeId Int?
         
         son     User? @relation(name: "offspring", fields: sonId, references: id)
-        father  User  @relation(name: "offspring")
+        father  User? @relation(name: "offspring")
         
         husband User? @relation(name: "spouse")
         wife    User? @relation(name: "spouse", fields: wifeId, references: id)
