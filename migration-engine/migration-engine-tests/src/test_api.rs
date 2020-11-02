@@ -43,7 +43,7 @@ use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
-use sql_migration_connector::{sql_migration::SqlMigration, SqlMigrationConnector, MIGRATION_TABLE_NAME};
+use sql_migration_connector::{SqlMigration, SqlMigrationConnector, MIGRATION_TABLE_NAME};
 use sql_schema_describer::*;
 use tempfile::TempDir;
 use test_setup::*;

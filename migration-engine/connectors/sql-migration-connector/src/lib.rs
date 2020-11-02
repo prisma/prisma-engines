@@ -3,10 +3,6 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::trivial_regex)] // these will grow
 
-// This is public for test purposes.
-#[allow(missing_docs)]
-pub mod sql_migration;
-
 mod connection_wrapper;
 mod database_info;
 mod error;
@@ -15,22 +11,23 @@ mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
 mod sql_destructive_change_checker;
 mod sql_imperative_migration_persistence;
+mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
 
-use connection_wrapper::Connection;
-use datamodel::Datamodel;
-use error::quaint_error_to_connector_error;
+pub use sql_migration::SqlMigration;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
+use connection_wrapper::Connection;
 use database_info::DatabaseInfo;
+use datamodel::Datamodel;
+use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
 use quaint::{prelude::ConnectionInfo, prelude::SqlFamily, single::Quaint};
 use sql_database_migration_inferrer::*;
-use sql_migration::SqlMigration;
 use sql_schema_describer::SqlSchema;
 
 /// The top-level SQL migration connector.

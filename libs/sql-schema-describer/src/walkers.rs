@@ -18,26 +18,6 @@ pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWal
     })
 }
 
-/// Find a column by table and column name in the schema.
-pub fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_name: &str) -> Option<ColumnWalker<'a>> {
-    schema
-        .tables
-        .iter()
-        .enumerate()
-        .find(move |(_, table)| table.name == table_name)
-        .and_then(move |(table_index, table)| {
-            table
-                .columns
-                .iter()
-                .position(|column| column.name == column_name)
-                .map(|column_index| ColumnWalker {
-                    schema,
-                    table_index,
-                    column_index,
-                })
-        })
-}
-
 /// Traverse a table column.
 #[derive(Debug, Clone, Copy)]
 pub struct ColumnWalker<'a> {

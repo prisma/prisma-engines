@@ -116,11 +116,11 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
         let AlterTable {
-            table,
             changes,
-            table_index: (_, next_idx),
+            table_index: (previous_idx, next_idx),
         } = alter_table;
 
+        let previous_table = differ.previous.table_walker_at(*previous_idx);
         let next_table = differ.next.table_walker_at(*next_idx);
 
         let mut statements = Vec::new();
@@ -130,16 +130,13 @@ impl SqlRenderer for SqliteFlavour {
 
         for change in changes {
             match change {
-                TableChange::AddColumn(AddColumn { column }) => {
-                    let column = next_table
-                        .column(&column.name)
-                        .expect("Invariant violation: add column with unknown column");
-
+                TableChange::AddColumn(AddColumn { column_index }) => {
+                    let column = next_table.column_at(*column_index);
                     let col_sql = self.render_column(column);
 
                     statements.push(format!(
                         "ALTER TABLE {table_name} ADD COLUMN {column_definition}",
-                        table_name = self.quote(&table.name),
+                        table_name = self.quote(previous_table.name()),
                         column_definition = col_sql,
                     ));
                 }

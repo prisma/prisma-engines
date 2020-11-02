@@ -19,12 +19,9 @@ const TYPES: &[(&str, &str)] = &[
     ("text", "Text"),
     ("bytea", "ByteA"),
     ("ts", "Timestamp(0)"),
-    ("tstz", "Timestamptz(0)"),
     ("date", "Date"),
     ("time", "Time(2)"),
     ("time_2", "Time"),
-    ("timetz", "Timetz(2)"),
-    ("interval", "Interval(2)"),
     ("bool", "Boolean"),
     ("bit", "Bit(1)"),
     ("varbit", "VarBit(1)"),
@@ -83,12 +80,9 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             text            String   @postgres.Text
             bytea           Bytes    @postgres.ByteA
             ts              DateTime @postgres.Timestamp(0)
-            tstz            DateTime @postgres.TimestampWithTimeZone(0)
             date            DateTime @postgres.Date
             time            DateTime @postgres.Time(2)
             time_2          DateTime @postgres.Time(6)
-            timetz          DateTime @postgres.TimeWithTimeZone(2)
-            interval        Duration @postgres.Interval(2)
             bool            Boolean  @postgres.Boolean
             bit             String   @postgres.Bit(1)
             varbit          String   @postgres.VarBit(1)
@@ -130,10 +124,7 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
                 t.inject_custom("varbit_array Varbit(2)[] ");
                 t.inject_custom("varbit_array_2 Varbit[] ");
                 t.inject_custom("timestamp_array Timestamp(4)[] ");
-                t.inject_custom("timestamptz_array Timestamptz(4)[] ");
                 t.inject_custom("time_array Time(4)[] ");
-                t.inject_custom("timetz_array Timetz[] ");
-                t.inject_custom("interval_array Interval(1)[] ");
             });
         })
         .await?;
@@ -164,10 +155,7 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
           varbit_array      String[]   @postgres.VarBit(2)
           varbit_array_2    String[]   @postgres.VarBit
           timestamp_array   DateTime[] @postgres.Timestamp(4)
-          timestamptz_array DateTime[] @postgres.TimestampWithTimeZone(4)
           time_array        DateTime[] @postgres.Time(4)
-          timetz_array      DateTime[] @postgres.TimeWithTimeZone
-          interval_array    Duration[] @postgres.Interval(1)
         }
     "#}
     .to_string();
@@ -227,12 +215,9 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             // This type is currently not supported.
             // bytea        bytea
             ts              DateTime
-            tstz            DateTime
             date            DateTime
             time            DateTime
             time_2          DateTime
-            timetz          DateTime
-            interval        String
             bool            Boolean
             bit             String
             varbit          String
