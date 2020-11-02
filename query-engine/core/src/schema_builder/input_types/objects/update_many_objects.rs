@@ -33,30 +33,42 @@ pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &M
     Arc::downgrade(&input_object)
 }
 
-/// Builds "<x>UncheckedUpdateManyMutationInput" input object type.
+/// Builds "<x>UncheckedUpdateManyWithout<y>MutationInput" input object type.
 pub(crate) fn unchecked_update_many_input_type(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let object_name = format!("{}UncheckedUpdateManyMutationInput", model.name);
-    return_cached_input!(ctx, &object_name);
+    let name = match parent_field.map(|pf| pf.related_field()) {
+        Some(ref f) => format!(
+            "{}UncheckedUpdateManyWithout{}Input",
+            model.name,
+            capitalize(f.related_field().name.as_str())
+        ),
+        _ => format!("{}UncheckedUpdateManyInput", model.name),
+    };
+
+    return_cached_input!(ctx, &name);
 
     let input_fields = update_one_objects::scalar_input_fields_for_unchecked_update(ctx, model, parent_field);
-    let input_object = Arc::new(input_object_type(object_name.clone(), input_fields));
+    let input_object = Arc::new(input_object_type(name.clone(), input_fields));
 
-    ctx.cache_input_type(object_name, input_object.clone());
+    ctx.cache_input_type(name, input_object.clone());
     Arc::downgrade(&input_object)
 }
 
-/// Builds "<x>UpdateManyWithWhereNestedInput" input object type.
+/// Builds "<x>UpdateManyWithWhereWithout<y>Input" input object type.
 /// Simple combination object of "where" and "data".
 pub(crate) fn update_many_where_combination_object(
     ctx: &mut BuilderContext,
-    field: &RelationFieldRef,
+    parent_field: &RelationFieldRef,
 ) -> InputObjectTypeWeakRef {
-    let related_model = field.related_model();
-    let name = format!("{}UpdateManyWithWhereNestedInput", related_model.name);
+    let related_model = parent_field.related_model();
+    let name = format!(
+        "{}UpdateManyWithWhereWithout{}Input",
+        related_model.name,
+        capitalize(&parent_field.related_field().name)
+    );
 
     return_cached_input!(ctx, &name);
 
@@ -64,7 +76,7 @@ pub(crate) fn update_many_where_combination_object(
     ctx.cache_input_type(name, input_object.clone());
 
     let where_input_object = filter_objects::scalar_filter_object_type(ctx, &related_model);
-    let update_types = update_many_input_types(ctx, &related_model, Some(field));
+    let update_types = update_many_input_types(ctx, &related_model, Some(parent_field));
 
     input_object.set_fields(vec![
         input_field("where", InputType::object(where_input_object), None),

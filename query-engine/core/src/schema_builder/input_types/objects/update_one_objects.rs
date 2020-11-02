@@ -122,6 +122,9 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
         .filter(|sf| !linking_fields.contains(sf))
         .collect();
 
+    dbg!(parent_field);
+    dbg!(&scalar_fields);
+
     input_fields::scalar_input_fields(
         ctx,
         model.name.clone(),
