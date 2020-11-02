@@ -52,10 +52,8 @@ macro_rules! flags {
     };
 }
 
-// `transaction`: Transactional batches support in the QE.
-// `connectOrCreate`: `connectOrCreate` nested query in the QE.
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases
-flags!(transaction, connectOrCreate, microsoftSqlServer);
+flags!(microsoftSqlServer);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.
