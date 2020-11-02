@@ -72,23 +72,6 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(id)
     }
 
-    async fn mark_migration_rolled_back(&self, migration_name: &str) -> ConnectorResult<()> {
-        let conn = self.conn();
-
-        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
-            .so_that(
-                Column::from("migration_name")
-                    .equals(migration_name)
-                    .and(Column::from("finished_at").is_null())
-                    .and(Column::from("rolled_back_at").is_null()),
-            )
-            .set("rolled_back_at", chrono::Utc::now()); // TODO maybe use the database `NOW`.
-
-        conn.execute(update).await?;
-
-        Ok(())
-    }
-
     async fn mark_migration_rolled_back_by_id(&self, migration_id: &str) -> ConnectorResult<()> {
         let conn = self.conn();
 

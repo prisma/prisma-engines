@@ -38,10 +38,6 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
 
     /// Mark the failed instances of the migration in the persistence as rolled
     /// back, so they will be ignored by the engine in the future.
-    async fn mark_migration_rolled_back(&self, migration_name: &str) -> ConnectorResult<()>;
-
-    /// Mark the failed instances of the migration in the persistence as rolled
-    /// back, so they will be ignored by the engine in the future.
     async fn mark_migration_rolled_back_by_id(&self, migration_id: &str) -> ConnectorResult<()>;
 
     /// Record that a migration is about to be applied. Returns the unique
