@@ -321,7 +321,7 @@ async fn all_postgres_column_types_must_work() {
                 full_data_type: "int8".into(),
                 character_maximum_length: None,
 
-                family: ColumnTypeFamily::Int,
+                family: ColumnTypeFamily::BigInt,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::BigInt.to_json()),
             },
