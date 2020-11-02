@@ -1,6 +1,6 @@
 use super::{PrismaValue, TypeIdentifier};
 use crate::DomainError;
-use rust_decimal::prelude::ToPrimitive;
+use bigdecimal::ToPrimitive;
 
 // use std::convert::TryFrom;
 
@@ -39,7 +39,7 @@ impl PrismaValueExtensions for PrismaValue {
                     ))
                 }
             },
-            (PrismaValue::Float(f), TypeIdentifier::Int) => PrismaValue::Int(f.trunc().to_i64().unwrap()),
+            (PrismaValue::Float(f), TypeIdentifier::Int) => PrismaValue::Int(f.to_i64().unwrap()),
 
             // Todo other coercions here
 

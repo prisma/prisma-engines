@@ -2,10 +2,10 @@ use super::env_function::EnvFunction;
 use crate::diagnostics::DatamodelError;
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
+use bigdecimal::BigDecimal;
 use chrono::{DateTime, FixedOffset};
 use dml::scalars::ScalarType;
 use prisma_value::PrismaValue;
-use rust_decimal::Decimal;
 use std::error;
 
 /// Wraps a value and provides convenience methods for
@@ -119,11 +119,15 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
-    pub fn as_float(&self) -> Result<Decimal, DatamodelError> {
+    pub fn as_float(&self) -> Result<BigDecimal, DatamodelError> {
         match &self.value {
-            ast::Expression::StringValue(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
+            ast::Expression::StringValue(value, _) => {
+                self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
+            }
+            ast::Expression::NumericValue(value, _) => {
+                self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric")
+            }
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<BigDecimal>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }

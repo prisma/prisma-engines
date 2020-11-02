@@ -3,10 +3,10 @@
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
+use bigdecimal::BigDecimal;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
 use tracing::debug;
@@ -508,7 +508,8 @@ pub fn parse_bool(value: &str) -> Option<PrismaValue> {
 pub fn parse_float(value: &str) -> Option<PrismaValue> {
     let captures = RE_FLOAT.captures(value)?;
     let num_str = captures.get(1).expect("get capture").as_str();
-    match Decimal::from_str(num_str) {
+
+    match BigDecimal::from_str(num_str) {
         Ok(num) => Some(PrismaValue::Float(num)),
         Err(_) => {
             debug!("Couldn't parse float '{}'", value);

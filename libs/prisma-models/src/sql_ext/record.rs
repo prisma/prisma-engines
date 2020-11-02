@@ -1,6 +1,6 @@
 use crate::{error::DomainError, ModelProjection, RecordProjection, ScalarFieldExt};
 use quaint::{connector::ResultSet, Value};
-use std::convert::TryFrom;
+use std::convert::{TryFrom, TryInto};
 
 impl TryFrom<(&ModelProjection, ResultSet)> for RecordProjection {
     type Error = DomainError;
@@ -15,7 +15,7 @@ impl TryFrom<(&ModelProjection, ResultSet)> for RecordProjection {
             for (i, val) in row.into_iter().enumerate() {
                 match model_projection.map_db_name(columns[i].as_str()) {
                     Some(field) => {
-                        record_projection.add((field, val.into()));
+                        record_projection.add((field, val.try_into()?));
                     }
                     None => {
                         return Err(DomainError::ScalarFieldNotFound {

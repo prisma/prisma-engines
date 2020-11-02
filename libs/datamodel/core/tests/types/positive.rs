@@ -1,9 +1,8 @@
 use crate::common::*;
+use bigdecimal::{BigDecimal, FromPrimitive};
 use datamodel::{dml::ScalarType, DefaultValue, ValueGenerator};
 use native_types::{MySqlType, PostgresType};
 use prisma_value::PrismaValue;
-use rust_decimal::prelude::FromPrimitive;
-use rust_decimal::Decimal;
 
 #[test]
 fn should_apply_a_custom_type() {
@@ -106,7 +105,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
     user_model
         .assert_has_scalar_field("test")
         .assert_default_value(DefaultValue::Single(PrismaValue::Float(
-            Decimal::from_f64(1.00).unwrap(),
+            BigDecimal::from_f64(1.00).unwrap(),
         )));
 
     let sft = user_model.assert_has_scalar_field("test").assert_native_type();

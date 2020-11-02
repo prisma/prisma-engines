@@ -1,12 +1,12 @@
+use bigdecimal::BigDecimal;
 use indexmap::IndexMap;
 use prisma_value::{stringify_date, PrismaValue};
-use rust_decimal::Decimal;
 use std::hash::Hash;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum QueryValue {
     Int(i64),
-    Float(Decimal),
+    Float(BigDecimal),
     String(String),
     Boolean(bool),
     Null,

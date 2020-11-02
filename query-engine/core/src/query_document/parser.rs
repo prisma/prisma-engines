@@ -1,9 +1,9 @@
 use super::*;
 use crate::schema::*;
+use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use indexmap::IndexMap;
 use prisma_value::PrismaValue;
-use rust_decimal::{prelude::ToPrimitive, Decimal};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
@@ -237,8 +237,8 @@ impl QueryDocumentParser {
             (QueryValue::String(s), ScalarType::Bytes) => Self::parse_bytes(parent_path, s),
             (QueryValue::String(s), ScalarType::Decimal) => Self::parse_decimal(parent_path, s),
             (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
-            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(Decimal::from(i))),
-            (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(Decimal::from(i))),
+            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
+            (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
             (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().unwrap())),
@@ -278,7 +278,7 @@ impl QueryDocumentParser {
     }
 
     pub fn parse_decimal(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
-        Decimal::from_str(&s)
+        BigDecimal::from_str(&s)
             .map(PrismaValue::Float)
             .map_err(|_| QueryParserError {
                 path: path.clone(),
