@@ -109,11 +109,13 @@ class UncheckedUpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
     res.toString() should be("""{"data":{"updateManyModelA":{"count":2}}}""")
   }
 
-  "Unchecked updates" should "allow to write to autoincrement IDs directly" taggedAs IgnoreMsSql in {
+  "Unchecked updates" should "allow to write to autoincrement IDs directly" taggedAs (IgnoreMsSql, IgnoreSQLite) in {
     val project = ProjectDsl.fromString {
       """|model ModelA {
          |  id  Int @id
          |  int Int @default(autoincrement())
+         |
+         |  @@index([int])
          |}
       """
     }
