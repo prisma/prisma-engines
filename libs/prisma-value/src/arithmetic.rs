@@ -18,7 +18,7 @@ macro_rules! number_operation {
           }
 
           (PrismaValue::Float(l), PrismaValue::Int(r)) => PrismaValue::Float(
-              l $op (Decimal::from_i64(r).expect("Invalid i64 to decimal conversion.")),
+              l $op (BigDecimal::from_i64(r).expect("Invalid i64 to decimal conversion.")),
           ),
 
           (PrismaValue::Float(l), PrismaValue::Float(r)) => PrismaValue::Float(l $op r),

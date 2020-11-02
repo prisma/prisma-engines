@@ -184,6 +184,12 @@ impl SqlError {
     }
 }
 
+impl From<prisma_models::ConversionFailure> for SqlError {
+    fn from(e: prisma_models::ConversionFailure) -> Self {
+        Self::ConversionError(e.into())
+    }
+}
+
 impl From<quaint::error::Error> for SqlError {
     fn from(e: quaint::error::Error) -> Self {
         match QuaintKind::from(e) {

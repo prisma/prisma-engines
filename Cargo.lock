@@ -387,10 +387,21 @@ version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1374191e2dd25f9ae02e3aa95041ed5d747fc77b3c102b49fe2dd9a8117a6244"
 dependencies = [
- "num-bigint",
+ "num-bigint 0.2.6",
  "num-integer",
  "num-traits",
  "serde",
+]
+
+[[package]]
+name = "bigdecimal"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc403c26e6b03005522e6e8053384c4e881dfe5b2bf041c0c2c49be33d64a539"
+dependencies = [
+ "num-bigint 0.3.0",
+ "num-integer",
+ "num-traits",
 ]
 
 [[package]]
@@ -830,6 +841,7 @@ checksum = "d4d0e2d24e5ee3b23a01de38eefdcd978907890701f08ffffd4cb457ca4ee8d6"
 name = "datamodel"
 version = "0.1.0"
 dependencies = [
+ "bigdecimal 0.2.0",
  "bytecount",
  "chrono",
  "clap",
@@ -846,7 +858,6 @@ dependencies = [
  "pretty_assertions",
  "prisma-value",
  "regex",
- "rust_decimal",
  "serde",
  "serde_json",
  "serial_test",
@@ -1999,6 +2010,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "barrel",
+ "bigdecimal 0.2.0",
  "chrono",
  "datamodel",
  "enumflags2",
@@ -2144,7 +2156,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c529a525c62e4788cff3a4557b652e2efd04eb3171da4ae2792031499f96442f"
 dependencies = [
  "base64 0.12.3",
- "bigdecimal",
+ "bigdecimal 0.1.2",
  "bitflags",
  "byteorder",
  "bytes",
@@ -2153,7 +2165,7 @@ dependencies = [
  "flate2",
  "lazy_static",
  "lexical",
- "num-bigint",
+ "num-bigint 0.2.6",
  "num-traits",
  "rand",
  "regex",
@@ -2219,6 +2231,17 @@ name = "num-bigint"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "090c7f9998ee0ff65aa5b723e4009f7b217707f1fb5ea551329cc4d6231fb304"
+dependencies = [
+ "autocfg 1.0.1",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-bigint"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b7f3fc75e3697059fb1bc465e3d8cca6cf92f56854f201158b3f9c77d5a3cfa0"
 dependencies = [
  "autocfg 1.0.1",
  "num-integer",
@@ -2618,6 +2641,7 @@ dependencies = [
 name = "prisma-models"
 version = "0.0.0"
 dependencies = [
+ "bigdecimal 0.2.0",
  "chrono",
  "cuid",
  "datamodel",
@@ -2626,7 +2650,6 @@ dependencies = [
  "prisma-value",
  "quaint",
  "rand",
- "rust_decimal",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2639,11 +2662,11 @@ name = "prisma-value"
 version = "0.1.0"
 dependencies = [
  "base64 0.12.3",
+ "bigdecimal 0.2.0",
  "chrono",
  "once_cell",
  "quaint",
  "regex",
- "rust_decimal",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2716,10 +2739,11 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#4382be1ae081978deacce635b56fbf1bde3a1613"
+source = "git+https://github.com/prisma/quaint#894ddef84748429f780a05373f08fd60239d481d"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
+ "bigdecimal 0.2.0",
  "bit-vec",
  "byteorder",
  "bytes",
@@ -2735,13 +2759,13 @@ dependencies = [
  "mobc",
  "mysql_async",
  "native-tls",
+ "num-bigint 0.3.0",
  "num_cpus",
  "once_cell",
  "percent-encoding 2.1.0",
  "postgres-native-tls",
  "postgres-types",
  "rusqlite",
- "rust_decimal",
  "serde",
  "serde_json",
  "thiserror",
@@ -2780,6 +2804,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
+ "bigdecimal 0.2.0",
  "chrono",
  "crossbeam-queue",
  "datamodel-connector",
@@ -2794,7 +2819,6 @@ dependencies = [
  "prisma-models",
  "prisma-value",
  "query-connector",
- "rust_decimal",
  "serde",
  "serde_json",
  "thiserror",
@@ -2812,6 +2836,7 @@ dependencies = [
  "async-std",
  "async-trait",
  "base64 0.12.3",
+ "bigdecimal 0.2.0",
  "chrono",
  "connection-string",
  "datamodel",
@@ -2831,7 +2856,6 @@ dependencies = [
  "quaint",
  "query-connector",
  "query-core",
- "rust_decimal",
  "rustc_version",
  "serde",
  "serde_json",
@@ -3249,6 +3273,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "barrel",
+ "bigdecimal 0.2.0",
  "datamodel",
  "datamodel-connector",
  "introspection-connector",
@@ -3258,7 +3283,6 @@ dependencies = [
  "prisma-value",
  "quaint",
  "regex",
- "rust_decimal",
  "serde",
  "serde_json",
  "sql-datamodel-connector",
@@ -3307,6 +3331,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "bigdecimal 0.2.0",
  "chrono",
  "cuid",
  "datamodel",
@@ -3317,7 +3342,6 @@ dependencies = [
  "quaint",
  "query-connector",
  "rand",
- "rust_decimal",
  "serde",
  "serde_json",
  "thiserror",
@@ -3333,6 +3357,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "barrel",
+ "bigdecimal 0.2.0",
  "enumflags2",
  "native-types",
  "once_cell",
@@ -3340,7 +3365,6 @@ dependencies = [
  "prisma-value",
  "quaint",
  "regex",
- "rust_decimal",
  "serde",
  "serde_json",
  "test-macros",
@@ -3604,13 +3628,14 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.4.13"
+version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee74df3b10e3d5dac0b3edad0cbc8ca6788e869ef32d18cc224888cb089c66e8"
+checksum = "2c8a2492671391fc34198ed782b6a9a6bb14aa7cc709044eed4eb6c2d9c517c2"
 dependencies = [
  "async-native-tls",
  "async-stream",
  "async-trait",
+ "bigdecimal 0.2.0",
  "bitflags",
  "byteorder",
  "bytes",
@@ -3621,10 +3646,11 @@ dependencies = [
  "futures-sink",
  "futures-util",
  "futures_codec",
+ "num-bigint 0.3.0",
+ "num-traits",
  "once_cell",
  "pin-project-lite",
  "pretty-hex",
- "rust_decimal",
  "thiserror",
  "tokio",
  "tokio-util",

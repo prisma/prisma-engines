@@ -3,10 +3,10 @@ use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
     CoreError, EnumType, OutputFieldRef, QueryResult, RecordAggregation, RecordSelection,
 };
+use bigdecimal::ToPrimitive;
 use connector::AggregationResult;
 use indexmap::IndexMap;
 use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
-use rust_decimal::prelude::ToPrimitive;
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
@@ -392,7 +392,7 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
         (ScalarType::Float, PrismaValue::Int(i)) => {
-            PrismaValue::Int(i.to_i64().expect("Unable to convert Decimal to i64."))
+            PrismaValue::Int(i.to_i64().expect("Unable to convert BigDecimal to i64."))
         }
 
         (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),

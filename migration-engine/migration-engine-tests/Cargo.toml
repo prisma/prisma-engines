@@ -22,6 +22,7 @@ test-setup = { path = "../../libs/test-setup" }
 prisma-value = { path = "../../libs/prisma-value" }
 enumflags2 = "0.6.0"
 
+bigdecimal = "0.2"
 anyhow = "1.0"
 barrel = { git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "mysql", "pg", "mssql"], optional = true, branch = "mssql-support" }
 chrono = "0.4.15"
