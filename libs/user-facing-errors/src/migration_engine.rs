@@ -94,6 +94,16 @@ impl crate::UserFacingError for PreviewFeaturesBlocked {
     }
 }
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3008",
+    message = "The migration `{migration_name}` is already recorded as applied in the database."
+)]
+pub struct MigrationAlreadyApplied {
+    /// The name of the migration.
+    pub migration_name: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

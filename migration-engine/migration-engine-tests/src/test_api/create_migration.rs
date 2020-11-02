@@ -118,6 +118,10 @@ impl<'a> CreateMigrationAssertion<'a> {
         Ok(self)
     }
 
+    pub fn output(&self) -> &CreateMigrationOutput {
+        &self.output
+    }
+
     pub fn modify_migration<F>(self, modify: F) -> AssertionResult<Self>
     where
         F: FnOnce(&mut String),

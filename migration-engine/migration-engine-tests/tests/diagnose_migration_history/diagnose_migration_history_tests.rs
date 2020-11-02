@@ -51,7 +51,7 @@ async fn diagnose_migrations_history_after_two_migrations_happy_path(api: &TestA
 }
 
 #[test_each_connector]
-async fn diagnose_migration_history_detects_drift(api: &TestApi) -> TestResult {
+async fn diagnose_migration_history_calculates_drift(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
     let dm1 = r#"
@@ -83,12 +83,89 @@ async fn diagnose_migration_history_detects_drift(api: &TestApi) -> TestResult {
         history,
         failed_migration_names,
         edited_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
-    assert_eq!(drift, Some(DriftDiagnostic::DriftDetected));
+    let expected_rollback_warnings =
+         "/*\n  Warnings:\n\n  - You are about to drop the column `fluffiness` on the `Cat` table. All the data in the column will be lost.\n\n*/";
+
+    let rollback = drift.unwrap().unwrap_drift_detected();
+
+    assert!(rollback.starts_with(expected_rollback_warnings), rollback);
+
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
+    assert!(has_migrations_table);
+
+    Ok(())
+}
+
+#[test_each_connector(ignore("postgres"))]
+async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migrations(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id      Int @id
+            name    String
+        }
+    "#;
+
+    api.create_migration("01_initial", dm1, &directory).send().await?;
+
+    let dm2 = r#"
+        model Cat {
+            id      Int @id
+            name    String
+        }
+
+        model Dog {
+            id Int @id
+            fluffiness Float
+        }
+    "#;
+
+    let migration_two = api
+        .create_migration("02_add_dogs", dm2, &directory)
+        .send()
+        .await?
+        .modify_migration(|migration| {
+            dbg!(&migration);
+            migration.push_str("\nSELECT YOLO;");
+        })?;
+
+    api.apply_migrations(&directory).send().await.ok();
+
+    migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()))?;
+
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        failed_migration_names,
+        edited_migration_names,
+        has_migrations_table,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+
+    let rollback = drift.unwrap().unwrap_drift_detected();
+
+    let expected_rollback_warnings = indoc::indoc!(
+        "
+        /*
+          Warnings:
+
+          - You are about to drop the `Dog` table. If the table is not empty, all the data it contains will be lost.
+
+        */
+        "
+    );
+
+    assert!(rollback.starts_with(expected_rollback_warnings), rollback);
+
+    assert!(history.is_none());
+    assert!(failed_migration_names.is_empty());
+    assert_eq!(edited_migration_names.len(), 1);
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -132,6 +209,7 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
         history,
         failed_migration_names,
         edited_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -143,6 +221,7 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
             unapplied_migration_names: vec![name],
         })
     );
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -189,17 +268,19 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
         history,
         failed_migration_names,
         edited_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
-    assert_eq!(drift, Some(DriftDiagnostic::DriftDetected));
+    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { rollback: _ })));
     assert_eq!(
         history,
         Some(HistoryDiagnostic::MigrationsDirectoryIsBehind {
             unpersisted_migration_names: vec![name],
         })
     );
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -270,11 +351,12 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
         drift,
         failed_migration_names,
         edited_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
-    assert_eq!(drift, Some(DriftDiagnostic::DriftDetected));
+    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { rollback: _ })));
     assert_eq!(
         history,
         Some(HistoryDiagnostic::HistoriesDiverge {
@@ -283,6 +365,7 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
             last_common_migration_name: Some(first_migration_name),
         })
     );
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -328,12 +411,14 @@ async fn diagnose_migrations_history_can_detect_edited_migrations(api: &TestApi)
         history,
         edited_migration_names,
         failed_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
     assert_eq!(edited_migration_names, &[initial_migration_name]);
+    assert!(has_migrations_table);
 
     Ok(())
 }
@@ -420,12 +505,14 @@ async fn diagnose_migrations_history_with_a_nonexistent_migrations_directory_wor
         history,
         edited_migration_names,
         failed_migration_names,
+        has_migrations_table,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
+    assert!(!has_migrations_table);
 
     Ok(())
 }

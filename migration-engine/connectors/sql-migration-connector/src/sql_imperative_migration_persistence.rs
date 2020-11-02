@@ -48,6 +48,42 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(())
     }
 
+    async fn mark_migration_applied_impl(
+        &self,
+        migration_name: &str,
+        script: &str,
+        checksum: &str,
+    ) -> ConnectorResult<String> {
+        let conn = self.conn();
+        let id = Uuid::new_v4().to_string();
+        let now = chrono::Utc::now();
+
+        let insert = Insert::single_into(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+            .value("id", id.as_str())
+            .value("checksum", checksum)
+            .value("logs", "")
+            .value("started_at", now)
+            .value("finished_at", now)
+            .value("migration_name", migration_name)
+            .value("script", script);
+
+        conn.execute(insert).await?;
+
+        Ok(id)
+    }
+
+    async fn mark_migration_rolled_back_by_id(&self, migration_id: &str) -> ConnectorResult<()> {
+        let conn = self.conn();
+
+        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
+            .so_that(Column::from("id").equals(migration_id))
+            .set("rolled_back_at", chrono::Utc::now());
+
+        conn.execute(update).await?;
+
+        Ok(())
+    }
+
     async fn record_migration_started_impl(
         &self,
         migration_name: &str,
@@ -56,10 +92,12 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     ) -> ConnectorResult<String> {
         let conn = self.conn();
         let id = Uuid::new_v4().to_string();
+        let now = chrono::Utc::now();
 
         let insert = Insert::single_into((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
             .value("id", id.as_str())
             .value("checksum", checksum)
+            .value("started_at", now)
             // We need this line because MySQL can't default a text field to an empty string
             .value("logs", "")
             .value("migration_name", migration_name)
