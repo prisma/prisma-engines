@@ -9,61 +9,6 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
   //todo which tests to keep and which ones to delete???? Some do not really test the compound unique functionality
 
-  "a P1! to C1! relation" should "error since old required parent relation would be broken" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      val res = server
-        .query(
-          s"""mutation {
-          |  createParent(data: {
-          |    p: "p1", p_1: "p", p_2: "1"
-          |    childReq: {
-          |      create: {
-          |        c: "c1"
-          |        c_1: "c_1"
-          |        c_2: "c_2"
-          |      }
-          |    }
-          |  }){
-          |    ${t.parent.selection}
-          |    childReq {
-          |      ${t.child.selection}
-          |    }
-          |  }
-          |}""",
-          project
-        )
-
-      val parentIdentifier = t.parent.where(res, "data.createParent")
-
-      server.queryThatMustFail(
-        s"""
-         |mutation {
-         |  updateParent(
-         |  where: $parentIdentifier
-         |  data:{
-         |    p: {set: "p2"}
-         |    childReq: {create: {c: "SomeC", c_1: "Some1", c_2: "Some2"}}
-         |  }){
-         |  p
-         |  childReq {
-         |      c
-         |    }
-         |  }
-         |}
-      """,
-        project,
-        errorCode = 2014,
-        errorContains =
-          """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" })"""
-      )
-    }
-  }
-
   "a P1! to C1 relation" should "work" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {

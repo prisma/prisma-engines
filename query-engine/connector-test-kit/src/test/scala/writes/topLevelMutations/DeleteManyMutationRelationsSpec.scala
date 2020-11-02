@@ -107,58 +107,6 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
 
   }
 
-  "a P1! to C1! relation " should "error when deleting the parent" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      val res = server
-        .query(
-          s"""mutation {
-          |  createParent(data: {
-          |    p: "p1"
-          |    p_1: "p_1"
-          |    p_2: "p_2"
-          |    childReq: {
-          |      create: {
-          |        c: "c1"
-          |        c_1: "c_1"
-          |        c_2: "c_2"
-          |      }
-          |    }
-          |  }){
-          |    ${t.parent.selection}
-          |    childReq{
-          |       ${t.child.selection}
-          |    }
-          |  }
-          |}""".stripMargin,
-          project
-        )
-      val childId  = t.child.where(res, "data.createParent.childReq")
-      val parentId = t.parent.where(res, "data.createParent")
-
-      server.queryThatMustFail(
-        s"""
-         |mutation {
-         |  deleteManyParents(
-         |    where: $parentId
-         |  ) {
-         |    count
-         |  }
-         |}
-      """.stripMargin,
-        project,
-        // TODO: errors are different depending on the relation setup
-        errorCode = 0, // should be 2014,
-        // errorContains =  """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models.""",
-      )
-
-    }
-  }
-
   "a P1! to C1 relation" should "succeed when trying to delete the parent" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt, withoutParams = true).test { t =>
       val project = SchemaDsl.fromStringV11() {
