@@ -1,6 +1,5 @@
-use migration_core::commands::{DiagnoseMigrationHistoryOutput, HistoryDiagnostic};
-
 use crate::*;
+use migration_core::commands::{DiagnoseMigrationHistoryOutput, HistoryDiagnostic};
 use std::io::Write;
 
 #[test_each_connector]

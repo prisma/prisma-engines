@@ -283,9 +283,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn drop_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
-        differ.dropped_primary_key().map(|pk| TableChange::DropPrimaryKey {
-            constraint_name: pk.constraint_name.clone(),
-        })
+        differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey)
     }
 
     fn create_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<CreateIndex> {

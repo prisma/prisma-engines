@@ -119,7 +119,7 @@ impl SqlRenderer for MysqlFlavour {
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name: _ } => lines.push("DROP PRIMARY KEY".to_owned()),
+                TableChange::DropPrimaryKey => lines.push("DROP PRIMARY KEY".to_owned()),
                 TableChange::AddPrimaryKey { columns } => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")

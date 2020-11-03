@@ -38,8 +38,12 @@ impl SqlRenderer for MssqlFlavour {
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name } => {
-                    let constraint = constraint_name.as_ref().unwrap();
+                TableChange::DropPrimaryKey => {
+                    let constraint = tables
+                        .previous()
+                        .primary_key()
+                        .and_then(|pk| pk.constraint_name.as_ref())
+                        .expect("Missing constraint name in DropPrimaryKey on MSSQL");
                     lines.push(format!("DROP CONSTRAINT {}", self.quote(constraint)));
                 }
                 TableChange::AddPrimaryKey { columns } => {

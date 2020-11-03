@@ -108,9 +108,7 @@ pub(crate) enum TableChange {
         /// The change mask for the column.
         changes: ColumnChanges,
     },
-    DropPrimaryKey {
-        constraint_name: Option<String>,
-    },
+    DropPrimaryKey,
     AddPrimaryKey {
         columns: Vec<String>,
     },

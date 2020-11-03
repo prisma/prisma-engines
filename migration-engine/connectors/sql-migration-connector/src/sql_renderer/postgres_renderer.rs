@@ -157,11 +157,13 @@ impl SqlRenderer for PostgresFlavour {
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name } => lines.push(format!(
+                TableChange::DropPrimaryKey => lines.push(format!(
                     "DROP CONSTRAINT {}",
                     Quoted::postgres_ident(
-                        constraint_name
-                            .as_ref()
+                        tables
+                            .previous()
+                            .primary_key()
+                            .and_then(|pk| pk.constraint_name.as_ref())
                             .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
                     )
                 )),
