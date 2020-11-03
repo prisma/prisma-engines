@@ -17,11 +17,6 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
                     t.add_column("int", types::integer());
                     t.add_column("string", types::text());
                 });
-
-                migration.create_table("_RelayId", |t| {
-                    t.add_column("id", types::primary());
-                    t.inject_custom("stableModelIdentifier   int");
-                });
             },
             api.schema_name(),
         )
@@ -35,6 +30,61 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
             id      Int @id @default(autoincrement())
             int     Int
             string  String
+        }
+    "##};
+
+    assert_eq_datamodels!(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                });
+
+                migration.create_table("_RelayId", move |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("stablemodelidentifier", types::text());
+                });
+
+                migration.create_table("_Migration", move |t| {
+                    t.add_column("revision", types::text());
+                    t.add_column("name", types::text());
+                    t.add_column("datamodel", types::text());
+                    t.add_column("status", types::text());
+                    t.add_column("applied", types::text());
+                    t.add_column("rolled_back", types::text());
+                    t.add_column("datamodel_steps", types::text());
+                    t.add_column("database_migrations", types::text());
+                    t.add_column("errors", types::text());
+                    t.add_column("started_at", types::text());
+                    t.add_column("finished_at", types::text());
+                });
+
+                migration.create_table("_prisma_migrations", move |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("checksum", types::text());
+                    t.add_column("finished_at", types::text());
+                    t.add_column("migration_name", types::text());
+                    t.add_column("logs", types::text());
+                    t.add_column("rolled_back_at", types::text());
+                    t.add_column("started_at", types::text());
+                    t.add_column("applied_steps_count", types::text());
+                    t.add_column("script", types::text());
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {      
+            id      Int @id @default(autoincrement())
         }
     "##};
 
