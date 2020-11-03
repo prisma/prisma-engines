@@ -1,6 +1,7 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
     flavour::MysqlFlavour,
+    pair::Pair,
     sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
@@ -14,7 +15,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        (previous, next): (&ColumnWalker<'_>, &ColumnWalker<'_>),
+        columns: &Pair<ColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -32,11 +33,11 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
         // Otherwise, case by case.
         // Column went from optional to required. This is unexecutable unless the table is
         // empty or the column has no existing NULLs.
-        if changes.arity_changed() && next.arity().is_required() {
+        if changes.arity_changed() && columns.next().arity().is_required() {
             plan.push_unexecutable(
                 UnexecutableStepCheck::MadeOptionalFieldRequired {
-                    column: previous.name().to_owned(),
-                    table: previous.table().name().to_owned(),
+                    column: columns.previous().name().to_owned(),
+                    table: columns.previous().table().name().to_owned(),
                 },
                 step_index,
             );
@@ -44,7 +45,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             return;
         }
 
-        if changes.only_type_changed() && is_safe_enum_change((previous, next), plan, step_index) {
+        if changes.only_type_changed() && is_safe_enum_change(columns, plan, step_index) {
             return;
         }
 
@@ -53,10 +54,10 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             Some(ColumnTypeChange::RiskyCast) => {
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {
-                        table: previous.table().name().to_owned(),
-                        column: previous.name().to_owned(),
-                        previous_type: format!("{:?}", previous.column_type_family()),
-                        next_type: format!("{:?}", next.column_type_family()),
+                        table: columns.previous().table().name().to_owned(),
+                        column: columns.previous().name().to_owned(),
+                        previous_type: format!("{:?}", columns.previous().column_type_family()),
+                        next_type: format!("{:?}", columns.next().column_type_family()),
                     },
                     step_index,
                 );
@@ -66,7 +67,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        _columns: (&ColumnWalker<'_>, &ColumnWalker<'_>),
+        _columns: &Pair<ColumnWalker<'_>>,
         _changes: &ColumnChanges,
         _plan: &mut DestructiveCheckPlan,
         _step_index: usize,
@@ -76,14 +77,11 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 }
 
 /// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.
-fn is_safe_enum_change(
-    (previous, next): (&ColumnWalker<'_>, &ColumnWalker<'_>),
-    plan: &mut DestructiveCheckPlan,
-    step_index: usize,
-) -> bool {
-    if let (Some(previous_enum), Some(next_enum)) =
-        (previous.column_type_family_as_enum(), next.column_type_family_as_enum())
-    {
+fn is_safe_enum_change(columns: &Pair<ColumnWalker<'_>>, plan: &mut DestructiveCheckPlan, step_index: usize) -> bool {
+    if let (Some(previous_enum), Some(next_enum)) = (
+        columns.previous().column_type_family_as_enum(),
+        columns.next().column_type_family_as_enum(),
+    ) {
         let removed_values: Vec<String> = previous_enum
             .values
             .iter()

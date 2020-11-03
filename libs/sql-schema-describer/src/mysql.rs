@@ -1,5 +1,6 @@
 use super::*;
 use crate::getters::Getter;
+use bigdecimal::ToPrimitive;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint, Value};
 use serde_json::from_str;
@@ -122,21 +123,20 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument(skip(self))]
     async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        use rust_decimal::prelude::*;
-
         let sql = r#"
             SELECT
             SUM(data_length + index_length) as size
             FROM information_schema.TABLES
             WHERE table_schema = ?
         "#;
+
         let result = self.conn.query_raw(sql, &[schema.into()]).await?;
         let size = result
             .first()
             .and_then(|row| {
                 row.get("size")
-                    .and_then(|x| x.as_decimal())
-                    .and_then(|decimal| decimal.round().to_usize())
+                    .and_then(|x| x.as_numeric())
+                    .and_then(|decimal| decimal.round(0).to_usize())
             })
             .unwrap_or(0);
 

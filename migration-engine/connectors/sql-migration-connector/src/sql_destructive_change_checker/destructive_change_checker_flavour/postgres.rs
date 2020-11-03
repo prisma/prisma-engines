@@ -1,6 +1,7 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
     flavour::PostgresFlavour,
+    pair::Pair,
     sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
@@ -17,7 +18,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        (previous, next): (&ColumnWalker<'_>, &ColumnWalker<'_>),
+        columns: &Pair<ColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
@@ -27,24 +28,26 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             type_change,
         } = alter_column;
 
-        let steps = expand_postgres_alter_column((previous, next), changes);
+        let steps = expand_postgres_alter_column(columns, changes);
 
         for step in steps {
             // We keep the match here to keep the exhaustiveness checking for when we add variants.
             match step {
                 PostgresAlterColumn::SetNotNull => plan.push_unexecutable(
                     UnexecutableStepCheck::MadeOptionalFieldRequired {
-                        column: previous.name().to_owned(),
-                        table: previous.table().name().to_owned(),
+                        column: columns.previous().name().to_owned(),
+                        table: columns.previous().table().name().to_owned(),
                     },
                     step_index,
                 ),
                 PostgresAlterColumn::SetType(_) => {
-                    if !matches!(previous.arity(), ColumnArity::List) && matches!(next.arity(), ColumnArity::List) {
+                    if !matches!(columns.previous().arity(), ColumnArity::List)
+                        && matches!(columns.next().arity(), ColumnArity::List)
+                    {
                         plan.push_unexecutable(
                             UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-                                table: previous.table().name().to_owned(),
-                                column: previous.name().to_owned(),
+                                table: columns.previous().table().name().to_owned(),
+                                column: columns.previous().name().to_owned(),
                             },
                             step_index,
                         )
@@ -55,10 +58,10 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                             Some(ColumnTypeChange::RiskyCast) => {
                                 plan.push_warning(
                                     SqlMigrationWarningCheck::RiskyCast {
-                                        table: previous.table().name().to_owned(),
-                                        column: previous.name().to_owned(),
-                                        previous_type: format!("{:?}", previous.column_type_family()),
-                                        next_type: format!("{:?}", next.column_type_family()),
+                                        table: columns.previous().table().name().to_owned(),
+                                        column: columns.previous().name().to_owned(),
+                                        previous_type: format!("{:?}", columns.previous().column_type_family()),
+                                        next_type: format!("{:?}", columns.next().column_type_family()),
                                     },
                                     step_index,
                                 );
@@ -76,38 +79,38 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
 
     fn check_drop_and_recreate_column(
         &self,
-        (previous_column, next_column): (&ColumnWalker<'_>, &ColumnWalker<'_>),
+        columns: &Pair<ColumnWalker<'_>>,
         changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     ) {
         // Unexecutable drop and recreate.
         if changes.arity_changed()
-            && previous_column.arity().is_nullable()
-            && next_column.arity().is_required()
-            && !default_can_be_rendered(next_column.default())
+            && columns.previous().arity().is_nullable()
+            && columns.next().arity().is_required()
+            && !default_can_be_rendered(columns.next().default())
         {
             plan.push_unexecutable(
                 UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: previous_column.name().to_owned(),
-                    table: previous_column.table().name().to_owned(),
+                    column: columns.previous().name().to_owned(),
+                    table: columns.previous().table().name().to_owned(),
                 },
                 step_index,
             )
         } else {
-            if next_column.arity().is_required() && next_column.default().is_none() {
+            if columns.next().arity().is_required() && columns.next().default().is_none() {
                 plan.push_unexecutable(
                     UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                        column: previous_column.name().to_owned(),
-                        table: previous_column.table().name().to_owned(),
+                        column: columns.previous().name().to_owned(),
+                        table: columns.previous().table().name().to_owned(),
                     },
                     step_index,
                 )
             } else {
                 plan.push_warning(
                     SqlMigrationWarningCheck::DropAndRecreateColumn {
-                        column: previous_column.name().to_owned(),
-                        table: previous_column.table().name().to_owned(),
+                        column: columns.previous().name().to_owned(),
+                        table: columns.previous().table().name().to_owned(),
                     },
                     step_index,
                 )

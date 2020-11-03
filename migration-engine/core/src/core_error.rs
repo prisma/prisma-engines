@@ -25,6 +25,9 @@ pub enum CoreError {
     /// Errors from the connector.
     ConnectorError(ConnectorError),
 
+    /// User facing errors
+    UserFacing(user_facing_errors::KnownError),
+
     /// Using gated preview features.
     GatedPreviewFeatures(Vec<String>),
 
@@ -56,6 +59,7 @@ impl Display for CoreError {
             }
             CoreError::Generic(src) => write!(f, "Generic error: {}", src),
             CoreError::Input(src) => write!(f, "Error in command input: {}", src),
+            CoreError::UserFacing(src) => src.message.fmt(f),
         }
     }
 }
@@ -68,6 +72,7 @@ impl StdError for CoreError {
             CoreError::InvalidPersistedDatamodel(_) => None,
             CoreError::DatamodelRenderingError(_) => None,
             CoreError::GatedPreviewFeatures(_) => None,
+            CoreError::UserFacing(_) => None,
             CoreError::ConnectorError(err) => Some(err),
             CoreError::Generic(err) => Some(err.as_ref()),
             CoreError::Input(err) => Some(err.as_ref()),

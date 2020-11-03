@@ -1,6 +1,6 @@
 pub(crate) mod expanded_alter_column;
 
-use crate::sql_schema_differ::ColumnChanges;
+use crate::{pair::Pair, sql_schema_differ::ColumnChanges};
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Serialize, Serializer};
 use sql_schema_describer::{Index, SqlSchema};
@@ -11,6 +11,12 @@ pub struct SqlMigration {
     pub(crate) before: SqlSchema,
     pub(crate) after: SqlSchema,
     pub(crate) steps: Vec<SqlMigrationStep>,
+}
+
+impl SqlMigration {
+    pub(crate) fn schemas(&self) -> Pair<&SqlSchema> {
+        Pair::new(&self.before, &self.after)
+    }
 }
 
 impl DatabaseMigrationMarker for SqlMigration {
@@ -87,7 +93,7 @@ pub(crate) struct DropTable {
 #[derive(Debug)]
 pub(crate) struct AlterTable {
     /// Index in (previous_schema, next_schema).
-    pub table_index: (usize, usize),
+    pub table_index: Pair<usize>,
     pub changes: Vec<TableChange>,
 }
 
@@ -97,8 +103,8 @@ pub(crate) enum TableChange {
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
     DropAndRecreateColumn {
-        /// The index of the column in the table in (previous schema, next schema).
-        column_index: (usize, usize),
+        /// The index of the column in the table.
+        column_index: Pair<usize>,
         /// The change mask for the column.
         changes: ColumnChanges,
     },
@@ -123,7 +129,7 @@ pub(crate) struct DropColumn {
 
 #[derive(Debug)]
 pub(crate) struct AlterColumn {
-    pub column_index: (usize, usize),
+    pub column_index: Pair<usize>,
     pub changes: ColumnChanges,
     pub type_change: Option<ColumnTypeChange>,
 }
@@ -199,8 +205,8 @@ pub(crate) struct RedefineTable {
     pub added_columns: Vec<usize>,
     pub dropped_columns: Vec<usize>,
     pub dropped_primary_key: bool,
-    pub column_pairs: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
-    pub table_index: (usize, usize),
+    pub column_pairs: Vec<(Pair<usize>, ColumnChanges, Option<ColumnTypeChange>)>,
+    pub table_index: Pair<usize>,
 }
 
 #[cfg(test)]

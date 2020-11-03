@@ -1,11 +1,10 @@
 use crate::{error::PrismaError, PrismaResult};
+use bigdecimal::{BigDecimal, FromPrimitive};
 use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };
 use indexmap::IndexMap;
 use query_core::query_document::*;
-use rust_decimal::Decimal;
-use std::str::FromStr;
 
 /// Protocol adapter for GraphQL -> Query Document.
 ///
@@ -140,9 +139,7 @@ impl GraphQLProtocolAdapter {
                     i
                 ))),
             },
-            // We can't use Decimal::from_f64 here due to a bug in rust_decimal.
-            // Issue: https://github.com/paupino/rust-decimal/issues/228<Paste>
-            Value::Float(f) => match Decimal::from_str(&f.to_string()).ok() {
+            Value::Float(f) => match BigDecimal::from_f64(f) {
                 Some(dec) => Ok(QueryValue::Float(dec)),
                 None => Err(PrismaError::QueryConversionError(format!(
                     "invalid 64-bit float: {:?}",

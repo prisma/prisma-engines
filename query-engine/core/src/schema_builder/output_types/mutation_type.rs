@@ -46,10 +46,8 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
             let nested_connect = input_fields::nested_connect_input_field(ctx, &rf);
             append_opt(&mut fields, nested_connect);
 
-            if feature_flags::get().connectOrCreate {
-                let nested_connect_or_create = input_fields::nested_connect_or_create_field(ctx, &rf);
-                append_opt(&mut fields, nested_connect_or_create);
-            }
+            let nested_connect_or_create = input_fields::nested_connect_or_create_field(ctx, &rf);
+            append_opt(&mut fields, nested_connect_or_create);
 
             input_object.set_fields(fields);
         }
@@ -66,10 +64,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
             append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_upsert_field(ctx, &rf));
-
-            if feature_flags::get().connectOrCreate {
-                append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
-            }
+            append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
 
             input_object.set_fields(fields);
         }

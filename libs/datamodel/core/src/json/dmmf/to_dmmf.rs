@@ -1,7 +1,7 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
 use crate::{dml, IndexType, ScalarType};
+use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
-use rust_decimal::prelude::ToPrimitive;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);

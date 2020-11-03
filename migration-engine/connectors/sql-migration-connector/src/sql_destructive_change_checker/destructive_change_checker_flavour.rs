@@ -6,7 +6,7 @@ mod sqlite;
 use sql_schema_describer::walkers::ColumnWalker;
 
 use super::DestructiveCheckPlan;
-use crate::{sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
+use crate::{pair::Pair, sql_migration::AlterColumn, sql_schema_differ::ColumnChanges};
 
 /// Flavour-specific destructive change checks.
 pub(crate) trait DestructiveChangeCheckerFlavour {
@@ -14,7 +14,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        columns: (&ColumnWalker<'_>, &ColumnWalker<'_>),
+        columns: &Pair<ColumnWalker<'_>>,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
     );
@@ -22,7 +22,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     /// Check a DropAndRecreateColumn step.
     fn check_drop_and_recreate_column(
         &self,
-        columns: (&ColumnWalker<'_>, &ColumnWalker<'_>),
+        columns: &Pair<ColumnWalker<'_>>,
         changes: &ColumnChanges,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,

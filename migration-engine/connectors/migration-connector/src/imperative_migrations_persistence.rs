@@ -15,6 +15,31 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// migration persistence. If not, return a DatabaseSchemaNotEmpty error.
     async fn initialize(&self) -> ConnectorResult<()>;
 
+    /// Implementation in the connector for the core's MarkMigrationApplied
+    /// command. See the docs there. Note that the started_at and finished_at
+    /// for the migration should be the same.
+    ///
+    /// Connectors should implement mark_migration_applied_impl to avoid doing
+    /// the checksuming themselves.
+    async fn mark_migration_applied(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
+        self.mark_migration_applied_impl(migration_name, script, &checksum(script))
+            .await
+    }
+
+    /// Implementation in the connector for the core's MarkMigrationApplied
+    /// command. See the docs there. Note that the started_at and finished_at
+    /// for the migration should be the same.
+    async fn mark_migration_applied_impl(
+        &self,
+        migration_name: &str,
+        script: &str,
+        checksum: &str,
+    ) -> ConnectorResult<String>;
+
+    /// Mark the failed instances of the migration in the persistence as rolled
+    /// back, so they will be ignored by the engine in the future.
+    async fn mark_migration_rolled_back_by_id(&self, migration_id: &str) -> ConnectorResult<()>;
+
     /// Record that a migration is about to be applied. Returns the unique
     /// identifier for the migration.
     ///
@@ -67,7 +92,7 @@ impl PersistenceNotInitializedError {
 }
 
 /// An applied migration, as returned by list_migrations.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize)]
 pub struct MigrationRecord {
     /// A unique, randomly generated identifier.
     pub id: String,
@@ -99,6 +124,6 @@ pub struct MigrationRecord {
 impl MigrationRecord {
     /// Is the migration in a failed state?
     pub fn is_failed(&self) -> bool {
-        self.finished_at.is_none()
+        self.finished_at.is_none() && self.rolled_back_at.is_none()
     }
 }

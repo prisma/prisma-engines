@@ -8,10 +8,10 @@ pub(crate) use common::IteratorJoin;
 
 use crate::{
     database_info::DatabaseInfo,
+    pair::Pair,
     sql_migration::{
         AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex, RedefineTable,
     },
-    sql_schema_differ::SqlSchemaDiffer,
 };
 use common::{Quoted, QuotedWithSchema};
 use sql_schema_describer::{
@@ -26,9 +26,9 @@ pub(crate) trait SqlRenderer {
 
     fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String;
 
-    fn render_alter_enum(&self, alter_enum: &AlterEnum, differ: &SqlSchemaDiffer<'_>) -> Vec<String>;
+    fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String>;
 
-    fn render_column(&self, column: ColumnWalker<'_>) -> String;
+    fn render_column(&self, column: &ColumnWalker<'_>) -> String;
 
     fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String;
 
@@ -42,7 +42,7 @@ pub(crate) trait SqlRenderer {
         current_schema: &SqlSchema,
     ) -> Vec<String>;
 
-    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String>;
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String>;
 
     /// Render a `CreateEnum` step.
     fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String>;
@@ -73,7 +73,7 @@ pub(crate) trait SqlRenderer {
     }
 
     /// Render a `RedefineTables` step.
-    fn render_redefine_tables(&self, tables: &[RedefineTable], differ: SqlSchemaDiffer<'_>) -> Vec<String>;
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String>;
 
     /// Render a table renaming step.
     fn render_rename_table(&self, name: &str, new_name: &str) -> String;

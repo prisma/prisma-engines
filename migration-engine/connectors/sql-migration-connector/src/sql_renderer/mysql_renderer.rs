@@ -5,18 +5,19 @@ use super::{
 use crate::{
     database_info::DatabaseInfo,
     flavour::{MysqlFlavour, SqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
+    pair::Pair,
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
         AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
         DropForeignKey, DropIndex, RedefineTable, TableChange,
     },
-    sql_schema_differ::{ColumnChanges, SqlSchemaDiffer},
+    sql_schema_differ::ColumnChanges,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, ForeignKeyWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, Index, IndexType, SqlSchema,
 };
 use std::borrow::Cow;
@@ -49,7 +50,7 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on MySQL")
     }
 
@@ -108,14 +109,10 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable {
-            table_index: (previous_idx, next_idx),
-            changes,
-        } = alter_table;
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        let AlterTable { table_index, changes } = alter_table;
 
-        let previous_table = differ.previous.table_walker_at(*previous_idx);
-        let next_table = differ.next.table_walker_at(*next_idx);
+        let tables = schemas.tables(table_index);
 
         let mut lines = Vec::new();
 
@@ -127,8 +124,8 @@ impl SqlRenderer for MysqlFlavour {
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
                 TableChange::AddColumn(AddColumn { column_index }) => {
-                    let column = next_table.column_at(*column_index);
-                    let col_sql = self.render_column(column);
+                    let column = tables.next().column_at(*column_index);
+                    let col_sql = self.render_column(&column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
@@ -138,22 +135,23 @@ impl SqlRenderer for MysqlFlavour {
                 }
                 TableChange::AlterColumn(AlterColumn {
                     changes,
-                    column_index: (previous_column_index, next_column_index),
+                    column_index,
                     type_change: _,
                 }) => {
-                    let previous_column = previous_table.column_at(*previous_column_index);
-                    let next_column = next_table.column_at(*next_column_index);
-
-                    let expanded = expand_mysql_alter_column((&previous_column, &next_column), &changes);
+                    let columns = tables.columns(column_index);
+                    let expanded = expand_mysql_alter_column(&columns, &changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
                             "ALTER COLUMN {column} DROP DEFAULT",
-                            column = Quoted::mysql_ident(previous_column.name())
+                            column = Quoted::mysql_ident(columns.previous().name())
                         )),
-                        MysqlAlterColumn::Modify { new_default, changes } => {
-                            lines.push(render_mysql_modify(&changes, new_default.as_ref(), next_column, self))
-                        }
+                        MysqlAlterColumn::Modify { new_default, changes } => lines.push(render_mysql_modify(
+                            &changes,
+                            new_default.as_ref(),
+                            columns.next(),
+                            self,
+                        )),
                     };
                 }
                 TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on MySQL"),
@@ -166,12 +164,12 @@ impl SqlRenderer for MysqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote(previous_table.name()),
+            self.quote(tables.previous().name()),
             lines.join(",\n    ")
         )]
     }
 
-    fn render_column(&self, column: ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(&column);
         let nullability_str = render_nullability(&column);
@@ -262,7 +260,7 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
+        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
 
         let primary_columns = table.primary_key_column_names();
 
@@ -327,7 +325,7 @@ impl SqlRenderer for MysqlFlavour {
         vec![format!("DROP TABLE {}", self.quote(&table_name))]
     }
 
-    fn render_redefine_tables(&self, _names: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_redefine_table on MySQL")
     }
 
@@ -343,7 +341,7 @@ impl SqlRenderer for MysqlFlavour {
 fn render_mysql_modify(
     changes: &ColumnChanges,
     new_default: Option<&sql_schema_describer::DefaultValue>,
-    next_column: ColumnWalker<'_>,
+    next_column: &ColumnWalker<'_>,
     renderer: &dyn SqlFlavour,
 ) -> String {
     let column_type: Option<String> = if changes.type_changed() {

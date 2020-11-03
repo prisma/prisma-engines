@@ -1,15 +1,47 @@
 use crate::PrismaValue;
+use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use quaint::ast::Value;
+use std::convert::TryFrom;
 
-impl<'a> From<Value<'a>> for PrismaValue {
-    fn from(pv: Value<'a>) -> Self {
-        match pv {
+impl<'a> TryFrom<Value<'a>> for PrismaValue {
+    type Error = crate::ConversionFailure;
+
+    fn try_from(pv: Value<'a>) -> crate::PrismaValueResult<Self> {
+        let val = match pv {
             Value::Integer(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
 
-            Value::Real(d) => d
+            Value::Float(Some(f)) => match f {
+                f if f.is_nan() => Err(crate::ConversionFailure {
+                    from: "NaN",
+                    to: "BigDecimal",
+                })?,
+                f if f.is_infinite() => Err(crate::ConversionFailure {
+                    from: "Infinity",
+                    to: "BigDecimal",
+                })?,
+                _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
+            },
+
+            Value::Float(None) => PrismaValue::Null,
+
+            Value::Double(Some(f)) => match f {
+                f if f.is_nan() => Err(crate::ConversionFailure {
+                    from: "NaN",
+                    to: "BigDecimal",
+                })?,
+                f if f.is_infinite() => Err(crate::ConversionFailure {
+                    from: "Infinity",
+                    to: "BigDecimal",
+                })?,
+                _ => PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
+            },
+
+            Value::Double(None) => PrismaValue::Null,
+
+            Value::Numeric(d) => d
                 // chop the trailing zeroes off so javascript doesn't start rounding things wrong
-                .map(|d| PrismaValue::Float(d.normalize()))
+                .map(|d| PrismaValue::Float(d.normalized()))
                 .unwrap_or(PrismaValue::Null),
 
             Value::Text(s) => s
@@ -22,9 +54,17 @@ impl<'a> From<Value<'a>> for PrismaValue {
 
             Value::Boolean(b) => b.map(PrismaValue::Boolean).unwrap_or(PrismaValue::Null),
 
-            Value::Array(v) => v
-                .map(|v| PrismaValue::List(v.into_iter().map(PrismaValue::from).collect()))
-                .unwrap_or(PrismaValue::Null),
+            Value::Array(Some(v)) => {
+                let mut res = Vec::with_capacity(v.len());
+
+                for v in v.into_iter() {
+                    res.push(PrismaValue::try_from(v)?);
+                }
+
+                PrismaValue::List(res)
+            }
+
+            Value::Array(None) => PrismaValue::Null,
 
             Value::Json(val) => val
                 .map(|val| PrismaValue::Json(val.to_string()))
@@ -63,6 +103,8 @@ impl<'a> From<Value<'a>> for PrismaValue {
                 .unwrap_or(PrismaValue::Null),
 
             Value::Xml(s) => s.map(|s| PrismaValue::Xml(s.into_owned())).unwrap_or(PrismaValue::Null),
-        }
+        };
+
+        Ok(val)
     }
 }

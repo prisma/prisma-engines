@@ -1,4 +1,5 @@
 use crate::error::SqlError;
+use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{AggregationResult, Aggregator};
 use datamodel::FieldArity;
@@ -7,8 +8,7 @@ use quaint::{
     ast::{Expression, Value},
     connector::ResultRow,
 };
-use rust_decimal::Decimal;
-use std::{borrow::Borrow, io, str::FromStr};
+use std::{borrow::Borrow, convert::TryFrom, io, str::FromStr};
 use uuid::Uuid;
 
 /// An allocated representation of a `Row` returned from the database.
@@ -197,24 +197,51 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
         },
         TypeIdentifier::Float | TypeIdentifier::Decimal => match p_value {
             value if value.is_null() => PrismaValue::Null,
-            Value::Real(Some(f)) => PrismaValue::Float(f.normalize()),
+            Value::Numeric(Some(f)) => PrismaValue::Float(f.normalized()),
+            Value::Double(Some(f)) => match f {
+                f if f.is_nan() => {
+                    let error = io::Error::new(io::ErrorKind::InvalidData, "Double value of `NaN` is not supported.");
+                    return Err(SqlError::ConversionError(error.into()));
+                }
+                f if f.is_infinite() => {
+                    let error = io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "Double value of `Infinity` is not supported.",
+                    );
+                    return Err(SqlError::ConversionError(error.into()));
+                }
+                _ => PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
+            },
+            Value::Float(Some(f)) => match f {
+                f if f.is_nan() => {
+                    let error = io::Error::new(io::ErrorKind::InvalidData, "Float value of `NaN` is not supported.");
+                    return Err(SqlError::ConversionError(error.into()));
+                }
+                f if f.is_infinite() => {
+                    let error = io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "Float value of `Infinity` is not supported.",
+                    );
+                    return Err(SqlError::ConversionError(error.into()));
+                }
+                _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
+            },
             Value::Integer(Some(i)) => {
-                // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
-                PrismaValue::Float(Decimal::from_str(&(i as f64).to_string()).expect("f64 was not a Decimal."))
+                PrismaValue::Float(BigDecimal::from_f64(i as f64).expect("f64 was not a BigDecimal."))
             }
             Value::Text(_) | Value::Bytes(_) => {
-                let dec: Decimal = p_value
+                let dec: BigDecimal = p_value
                     .as_str()
                     .expect("text/bytes as str")
                     .parse()
-                    .map_err(|err: rust_decimal::Error| SqlError::ColumnReadFailure(err.into()))?;
+                    .map_err(|err: bigdecimal::ParseBigDecimalError| SqlError::ColumnReadFailure(err.into()))?;
 
-                PrismaValue::Float(dec.normalize())
+                PrismaValue::Float(dec.normalized())
             }
             _ => {
                 let error = io::Error::new(
                     io::ErrorKind::InvalidData,
-                    "Float/Decimal value not stored as float, int or text",
+                    "Float/BigDecimal value not stored as float, double, number, decimal, int or text",
                 );
                 return Err(SqlError::ConversionError(error.into()));
             }
@@ -225,7 +252,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             Value::Text(Some(txt)) => PrismaValue::Int(
                 i64::from_str(txt.trim_start_matches('\0')).map_err(|err| SqlError::ConversionError(err.into()))?,
             ),
-            other => PrismaValue::from(other),
+            other => PrismaValue::try_from(other)?,
         },
         TypeIdentifier::String => match p_value {
             value if value.is_null() => PrismaValue::Null,
@@ -233,7 +260,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             Value::Json(Some(json_value)) => {
                 PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))
             }
-            other => PrismaValue::from(other),
+            other => PrismaValue::try_from(other)?,
         },
         TypeIdentifier::Bytes => match p_value {
             value if value.is_null() => PrismaValue::Null,

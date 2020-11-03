@@ -34,7 +34,7 @@ fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationF
 
     if !rf.is_list {
         let related_model = rf.related_model();
-        let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
+        let related_input_type = filter_objects::where_object_type(ctx, &related_model);
         types.push(InputType::object(related_input_type));
 
         if !rf.is_required {
@@ -47,7 +47,7 @@ fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationF
 
 fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
-    let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
+    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
     let list = if rf.is_list { "List" } else { "" };
     let filter_name = format!("{}{}RelationFilter", capitalize(&related_model.name), list);
 

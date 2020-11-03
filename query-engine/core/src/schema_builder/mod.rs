@@ -32,7 +32,6 @@
 
 #[macro_use]
 mod cache;
-mod arguments;
 mod input_types;
 mod output_types;
 mod utils;
