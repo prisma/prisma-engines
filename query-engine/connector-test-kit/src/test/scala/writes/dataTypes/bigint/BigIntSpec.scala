@@ -37,7 +37,7 @@ class BigIntSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  updateOneModel(
          |    where: { id: 1 }
          |    data: {
-         |      field: "123456789012341234123456789012341234"
+         |      field: "9223372036854775807"
          |    }
          |  ) {
          |    field
@@ -47,7 +47,7 @@ class BigIntSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    res.toString should be("""{"data":{"updateOneModel":{"field":"123456789012341234123456789012341234"}}}""")
+    res.toString should be("""{"data":{"updateOneModel":{"field":"9223372036854775807"}}}""")
 
     res = server.query(
       s"""
