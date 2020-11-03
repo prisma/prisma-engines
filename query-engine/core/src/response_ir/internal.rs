@@ -379,7 +379,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
 }
 
 fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
-    let item_value = match (st, value) {
+    let item_value = match (dbg!(st), dbg!(value)) {
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
 
         (ScalarType::Json, PrismaValue::String(s)) => PrismaValue::Json(s),
@@ -398,6 +398,7 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
 
         (ScalarType::BigInt, PrismaValue::BigInt(i)) => PrismaValue::BigInt(i),
         (ScalarType::BigInt, PrismaValue::Int(i)) => PrismaValue::BigInt(i),
+        (ScalarType::BigInt, PrismaValue::Float(f)) => PrismaValue::BigInt(f.to_i64().unwrap()),
 
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),

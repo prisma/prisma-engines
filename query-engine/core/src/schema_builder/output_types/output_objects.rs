@@ -235,7 +235,7 @@ fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
         .filter(|f| {
             matches!(
                 f.type_identifier,
-                TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::Decimal
+                TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
             )
         })
         .collect()
