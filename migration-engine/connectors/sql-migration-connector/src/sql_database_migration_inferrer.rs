@@ -76,6 +76,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         ))
     }
 
+    #[tracing::instrument(skip(self, applied_migrations))]
     async fn calculate_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<Option<String>> {
         let expected_schema = self
             .flavour()

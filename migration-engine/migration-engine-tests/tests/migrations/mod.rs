@@ -9,4 +9,5 @@ mod mysql;
 mod postgres;
 mod sql;
 mod sqlite;
+mod squashing_tests;
 mod types;
