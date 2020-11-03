@@ -1,11 +1,12 @@
-pub(crate) mod create_input_objects;
+pub(crate) mod arguments;
 pub(crate) mod field_filter_types;
-pub(crate) mod filter_input_objects;
 pub(crate) mod input_fields;
-pub(crate) mod update_input_objects;
+
+mod objects;
 
 use super::*;
 use crate::schema::*;
+use objects::*;
 use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
 /// Builds "<Model>OrderByInput" object types.
@@ -66,13 +67,18 @@ fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
 
 /// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-fn list_union_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
-    let object_type = InputType::object(input);
+fn list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
+    let input_type = InputType::object(input);
+    list_union_type(input_type, as_list)
+}
 
+/// Convenience function to return [input_type, list_input_type]
+/// (shorthand + full type) if the field is a list.
+fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     if as_list {
-        vec![object_type.clone(), InputType::list(object_type)]
+        vec![input_type.clone(), InputType::list(input_type)]
     } else {
-        vec![object_type]
+        vec![input_type]
     }
 }
 

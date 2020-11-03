@@ -53,7 +53,8 @@ macro_rules! flags {
 }
 
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases
-flags!(microsoftSqlServer);
+// `uncheckedScalarInputs`: Unchecked scalar inputs for relation fields support in the QE.
+flags!(microsoftSqlServer, uncheckedScalarInputs);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.

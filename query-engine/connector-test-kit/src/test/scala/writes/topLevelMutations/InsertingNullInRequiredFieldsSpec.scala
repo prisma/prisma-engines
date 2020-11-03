@@ -67,8 +67,8 @@ class InsertingNullInRequiredFieldsSpec extends FlatSpec with Matchers with ApiS
         |  }
         |}""",
       project,
-      errorCode = 2012,
-      errorContains = """Missing a required value at `Mutation.createA.data.ACreateInput.key"""
+      errorCode = 2009,
+      errorContains = """Mutation.createA.data.ACreateInput.key`: A value is required but not set."""
     )
   }
 

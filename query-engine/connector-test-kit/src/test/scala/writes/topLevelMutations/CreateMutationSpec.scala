@@ -169,8 +169,8 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
         |    optRel: null
         |  }){ relId }}""".stripMargin,
       project = project,
-      errorCode = 2012,
-      errorContains = "Missing a required value at `Mutation.createScalarModel.data.ScalarModelCreateInput.optRel`"
+      errorCode = 2009,
+      errorContains = "`Mutation.createScalarModel.data.ScalarModelCreateInput.optRel`: A value is required but not set"
     )
   }
 
