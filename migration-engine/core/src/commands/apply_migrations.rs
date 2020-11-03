@@ -66,6 +66,12 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
         let mut applied_migration_names: Vec<String> = Vec::with_capacity(unapplied_migrations.len());
 
         for unapplied_migration in unapplied_migrations {
+            let span = tracing::info_span!(
+                "Applying migration",
+                migration_name = unapplied_migration.migration_name(),
+            );
+            let _span = span.enter();
+
             let script = unapplied_migration
                 .read_migration_script()
                 .map_err(ConnectorError::from)?;
