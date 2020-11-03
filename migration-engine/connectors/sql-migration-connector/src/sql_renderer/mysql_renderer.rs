@@ -8,8 +8,8 @@ use crate::{
     pair::Pair,
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropColumn, DropForeignKey, DropIndex,
+        RedefineTable, TableChange,
     },
     sql_schema_differ::ColumnChanges,
 };
@@ -17,6 +17,7 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::{
+    walkers::EnumWalker,
     walkers::{ColumnWalker, ForeignKeyWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, Index, IndexType, SqlSchema,
 };
@@ -129,8 +130,8 @@ impl SqlRenderer for MysqlFlavour {
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name, .. }) => {
-                    let name = self.quote(&name);
+                TableChange::DropColumn(DropColumn { index }) => {
+                    let name = self.quote(tables.previous().column_at(*index).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
@@ -230,7 +231,7 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_create_enum(&self, _create_enum: &CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _create_enum: &EnumWalker<'_>) -> Vec<String> {
         Vec::new() // enums are defined on each column that uses them on MySQL
     }
 
@@ -305,7 +306,7 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         Vec::new()
     }
 

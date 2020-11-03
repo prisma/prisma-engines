@@ -31,7 +31,10 @@ use crate::{
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
-use sql_schema_describer::{walkers::ColumnWalker, ColumnArity, SqlSchema};
+use sql_schema_describer::{
+    walkers::{ColumnWalker, SqlSchemaExt},
+    ColumnArity, SqlSchema,
+};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
@@ -193,8 +196,12 @@ impl SqlMigrationConnector {
                         }
                     }
                 }
-                SqlMigrationStep::DropTable(DropTable { name }) => {
-                    self.check_table_drop(name, &mut plan, step_index);
+                SqlMigrationStep::DropTable(DropTable { table_index }) => {
+                    self.check_table_drop(
+                        schemas.previous().table_walker_at(*table_index).name(),
+                        &mut plan,
+                        step_index,
+                    );
                 }
                 SqlMigrationStep::CreateIndex(CreateIndex {
                     table,
@@ -208,12 +215,12 @@ impl SqlMigrationConnector {
                     step_index,
                 ),
                 SqlMigrationStep::AlterEnum(AlterEnum {
-                    name,
+                    index,
                     created_variants: _,
                     dropped_variants,
                 }) if !dropped_variants.is_empty() => plan.push_warning(
                     SqlMigrationWarningCheck::EnumValueRemoval {
-                        enm: name.clone(),
+                        enm: schemas.next().enum_walker_at(*index.next()).name().to_owned(),
                         values: dropped_variants.clone(),
                     },
                     step_index,

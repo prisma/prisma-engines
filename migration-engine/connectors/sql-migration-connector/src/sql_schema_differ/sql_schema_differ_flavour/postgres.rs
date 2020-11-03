@@ -20,9 +20,9 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .enum_pairs()
             .filter_map(|differ| {
                 let step = AlterEnum {
+                    index: differ.enums.as_ref().map(|e| e.enum_index()),
                     created_variants: differ.created_values().map(String::from).collect(),
                     dropped_variants: differ.dropped_values().map(String::from).collect(),
-                    name: differ.previous.name.clone(),
                 };
 
                 if step.is_empty() {

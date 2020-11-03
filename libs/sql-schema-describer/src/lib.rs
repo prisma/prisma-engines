@@ -10,7 +10,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
 use tracing::debug;
-use walkers::TableWalker;
+use walkers::{EnumWalker, TableWalker};
 
 pub mod getters;
 pub mod mssql;
@@ -110,6 +110,13 @@ impl SqlSchema {
 
     pub fn table_walkers<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> {
         (0..self.tables.len()).map(move |table_index| TableWalker::new(self, table_index))
+    }
+
+    pub fn enum_walkers<'a>(&'a self) -> impl Iterator<Item = EnumWalker<'a>> {
+        (0..self.enums.len()).map(move |enum_index| EnumWalker {
+            schema: self,
+            enum_index,
+        })
     }
 }
 

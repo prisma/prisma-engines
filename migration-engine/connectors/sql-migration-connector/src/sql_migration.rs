@@ -87,7 +87,7 @@ pub(crate) struct CreateTable {
 
 #[derive(Debug)]
 pub(crate) struct DropTable {
-    pub name: String,
+    pub table_index: usize,
 }
 
 #[derive(Debug)]
@@ -123,7 +123,6 @@ pub(crate) struct AddColumn {
 
 #[derive(Debug)]
 pub(crate) struct DropColumn {
-    pub name: String,
     pub index: usize,
 }
 
@@ -149,7 +148,7 @@ pub(crate) struct AddForeignKey {
 }
 
 #[derive(Debug)]
-pub struct DropForeignKey {
+pub(crate) struct DropForeignKey {
     pub table: String,
     pub table_index: usize,
     pub foreign_key_index: usize,
@@ -157,39 +156,38 @@ pub struct DropForeignKey {
 }
 
 #[derive(Debug)]
-pub struct CreateIndex {
+pub(crate) struct CreateIndex {
     pub table: String,
     pub index: Index,
     pub caused_by_create_table: bool,
 }
 
 #[derive(Debug)]
-pub struct DropIndex {
+pub(crate) struct DropIndex {
     pub table: String,
     pub name: String,
 }
 
 #[derive(Debug)]
-pub struct AlterIndex {
+pub(crate) struct AlterIndex {
     pub table: String,
     pub index_name: String,
     pub index_new_name: String,
 }
 
 #[derive(Debug)]
-pub struct CreateEnum {
-    pub name: String,
-    pub variants: Vec<String>,
+pub(crate) struct CreateEnum {
+    pub enum_index: usize,
 }
 
 #[derive(Debug)]
-pub struct DropEnum {
-    pub name: String,
+pub(crate) struct DropEnum {
+    pub enum_index: usize,
 }
 
 #[derive(Debug)]
 pub(crate) struct AlterEnum {
-    pub name: String,
+    pub index: Pair<usize>,
     pub created_variants: Vec<String>,
     pub dropped_variants: Vec<String>,
 }
@@ -224,7 +222,7 @@ mod tests {
                     foreign_key_index: 0,
                 }),
                 SqlMigrationStep::RedefineTables(vec![]),
-                SqlMigrationStep::DropTable(DropTable { name: "myTable".into() }),
+                SqlMigrationStep::DropTable(DropTable { table_index: 9 }),
             ],
         };
 

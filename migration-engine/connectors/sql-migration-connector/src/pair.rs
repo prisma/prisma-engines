@@ -1,5 +1,5 @@
 use sql_schema_describer::{
-    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, SqlSchemaExt, TableWalker},
     SqlSchema,
 };
 
@@ -14,6 +14,24 @@ impl<T> Pair<T> {
         Pair { previous, next }
     }
 
+    pub(crate) fn as_ref(&self) -> Pair<&T> {
+        Pair {
+            previous: &self.previous,
+            next: &self.next,
+        }
+    }
+
+    pub(crate) fn as_tuple(&self) -> (&T, &T) {
+        (&self.previous, &self.next)
+    }
+
+    pub(crate) fn map<U>(self, f: impl Fn(T) -> U) -> Pair<U> {
+        Pair {
+            previous: f(self.previous),
+            next: f(self.next),
+        }
+    }
+
     pub(crate) fn previous(&self) -> &T {
         &self.previous
     }
@@ -24,6 +42,13 @@ impl<T> Pair<T> {
 }
 
 impl<'a> Pair<&'a SqlSchema> {
+    pub(crate) fn enums(&self, enum_indexes: &Pair<usize>) -> Pair<EnumWalker<'a>> {
+        Pair::new(
+            self.previous().enum_walker_at(enum_indexes.previous),
+            self.next.enum_walker_at(enum_indexes.next),
+        )
+    }
+
     pub(crate) fn tables(&self, table_indexes: &Pair<usize>) -> Pair<TableWalker<'a>> {
         Pair::new(
             self.previous().table_walker_at(*table_indexes.previous()),
