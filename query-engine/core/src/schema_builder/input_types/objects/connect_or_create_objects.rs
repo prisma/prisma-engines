@@ -15,7 +15,7 @@ pub(crate) fn nested_connect_or_create_input_object(
     let type_name = format!(
         "{}CreateOrConnectWithout{}Input",
         related_model.name,
-        parent_field.model().name
+        parent_field.related_field().name
     );
 
     let create_types = create_objects::create_input_types(ctx, &related_model, Some(parent_field));
