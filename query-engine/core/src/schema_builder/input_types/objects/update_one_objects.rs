@@ -29,11 +29,7 @@ fn checked_update_one_input_type(
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!(
-            "{}UpdateWithout{}Input",
-            model.name,
-            capitalize(f.related_field().name.as_str())
-        ),
+        Some(ref f) => format!("{}UpdateWithout{}Input", model.name, capitalize(f.name.as_str())),
         _ => format!("{}UpdateInput", model.name),
     };
 
@@ -63,7 +59,7 @@ fn unchecked_update_one_input_type(
         Some(ref f) => format!(
             "{}UncheckedUpdateWithout{}Input",
             model.name,
-            capitalize(f.related_field().name.as_str())
+            capitalize(f.name.as_str())
         ),
         _ => format!("{}UncheckedUpdateInput", model.name),
     };

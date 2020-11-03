@@ -35,11 +35,7 @@ fn checked_create_input_type(
     // if we would allow to create the parent from a child create that is already a nested create.
     // To solve it, we remove the parent relation from the input ("Without<Parent>").
     let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!(
-            "{}CreateWithout{}Input",
-            model.name,
-            capitalize(f.related_field().name.as_str())
-        ),
+        Some(ref f) => format!("{}CreateWithout{}Input", model.name, capitalize(f.name.as_str())),
         _ => format!("{}CreateInput", model.name),
     };
 
