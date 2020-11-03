@@ -6,6 +6,8 @@ mod diagnose_migration_history;
 mod evaluate_data_loss;
 mod infer;
 mod infer_apply;
+mod mark_migration_applied;
+mod mark_migration_rolled_back;
 mod reset;
 mod schema_push;
 mod unapply_migration;
@@ -18,11 +20,14 @@ pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
+pub use mark_migration_applied::MarkMigrationApplied;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
 
 use crate::AssertionResult;
+
+use self::mark_migration_rolled_back::MarkMigrationRolledBack;
 
 use super::assertions::SchemaAssertion;
 use super::{
@@ -37,7 +42,7 @@ use migration_connector::{
 };
 use migration_core::{
     api::{GenericApi, MigrationApi},
-    commands::ApplyMigrationInput,
+    commands::{ApplyMigrationInput, ApplyScriptInput},
 };
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -153,6 +158,14 @@ impl TestApi {
         ApplyMigrations::new(&self.api, migrations_directory)
     }
 
+    pub async fn apply_script(&self, script: impl Into<String>) -> anyhow::Result<()> {
+        self.api
+            .apply_script(&ApplyScriptInput { script: script.into() })
+            .await?;
+
+        Ok(())
+    }
+
     /// Convenient builder and assertions for the CreateMigration command.
     pub fn create_migration<'a>(
         &'a self,
@@ -217,6 +230,18 @@ impl TestApi {
         prisma_schema: impl Into<String>,
     ) -> EvaluateDataLoss<'a> {
         EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
+    }
+
+    pub fn mark_migration_applied<'a>(
+        &'a self,
+        migration_name: impl Into<String>,
+        migrations_directory: &'a TempDir,
+    ) -> MarkMigrationApplied<'a> {
+        MarkMigrationApplied::new(&self.api, migration_name.into(), migrations_directory)
+    }
+
+    pub fn mark_migration_rolled_back<'a>(&'a self, migration_name: impl Into<String>) -> MarkMigrationRolledBack<'a> {
+        MarkMigrationRolledBack::new(&self.api, migration_name.into())
     }
 
     pub fn reset(&self) -> Reset<'_> {

@@ -24,16 +24,14 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
+    pair::Pair,
     sql_migration::ColumnTypeChange,
     sql_migration::{AlterEnum, AlterTable, CreateIndex, DropTable, SqlMigrationStep, TableChange},
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
-use sql_schema_describer::{
-    walkers::{ColumnWalker, SqlSchemaExt},
-    ColumnArity, SqlSchema,
-};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnArity, SqlSchema};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
@@ -79,62 +77,45 @@ impl SqlMigrationConnector {
         plan.push_unexecutable(typed_unexecutable, step_index);
     }
 
-    fn plan(&self, steps: &[SqlMigrationStep], before: &SqlSchema, after: &SqlSchema) -> DestructiveCheckPlan {
+    fn plan(&self, steps: &[SqlMigrationStep], schemas: &Pair<&SqlSchema>) -> DestructiveCheckPlan {
         let mut plan = DestructiveCheckPlan::new();
 
         for (step_index, step) in steps.iter().enumerate() {
             match step {
-                SqlMigrationStep::AlterTable(AlterTable {
-                    table_index: (prev_idx, next_idx),
-                    changes,
-                }) => {
+                SqlMigrationStep::AlterTable(AlterTable { table_index, changes }) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = before.table_walker_at(*prev_idx);
-                    let after_table = after.table_walker_at(*next_idx);
+                    let tables = schemas.tables(table_index);
 
                     for change in changes {
                         match change {
                             TableChange::DropColumn(ref drop_column) => {
-                                let column = before_table.column_at(drop_column.index);
+                                let column = tables.previous().column_at(drop_column.index);
 
                                 self.check_column_drop(&column, &mut plan, step_index);
                             }
-                            TableChange::AlterColumn(ref alter_column) => {
-                                let previous_column = before_table.column_at(alter_column.column_index.0);
-                                let next_column = after_table.column_at(alter_column.column_index.1);
+                            TableChange::AlterColumn(alter_column) => {
+                                let columns = tables.columns(&alter_column.column_index);
 
-                                self.flavour().check_alter_column(
-                                    &alter_column,
-                                    (&previous_column, &next_column),
-                                    &mut plan,
-                                    step_index,
-                                )
+                                self.flavour()
+                                    .check_alter_column(&alter_column, &columns, &mut plan, step_index)
                             }
                             TableChange::AddColumn(ref add_column) => {
-                                let column = after_table.column_at(add_column.column_index);
+                                let column = tables.next().column_at(add_column.column_index);
 
                                 self.check_add_column(&column, &mut plan, step_index)
                             }
                             TableChange::DropPrimaryKey { .. } => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
-                                    table: before_table.name().to_owned(),
+                                    table: tables.previous().name().to_owned(),
                                 },
                                 step_index,
                             ),
-                            TableChange::DropAndRecreateColumn {
-                                column_index: (previous_idx, next_idx),
-                                changes,
-                            } => {
-                                let previous_column = before_table.column_at(*previous_idx);
-                                let next_column = after_table.column_at(*next_idx);
+                            TableChange::DropAndRecreateColumn { column_index, changes } => {
+                                let columns = tables.columns(column_index);
 
-                                self.flavour.check_drop_and_recreate_column(
-                                    (&previous_column, &next_column),
-                                    changes,
-                                    &mut plan,
-                                    step_index,
-                                )
+                                self.flavour
+                                    .check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
                             }
                             TableChange::AddPrimaryKey { .. } => (),
                         }
@@ -142,36 +123,31 @@ impl SqlMigrationConnector {
                 }
                 SqlMigrationStep::RedefineTables(redefine_tables) => {
                     for redefine_table in redefine_tables {
-                        let (previous_table_idx, next_table_idx) = redefine_table.table_index;
-                        let previous = before.table_walker_at(previous_table_idx);
-                        let next = after.table_walker_at(next_table_idx);
+                        let tables = schemas.tables(&redefine_table.table_index);
 
                         if redefine_table.dropped_primary_key {
                             plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
-                                    table: previous.name().to_owned(),
+                                    table: tables.previous().name().to_owned(),
                                 },
                                 step_index,
                             )
                         }
 
                         for added_column_idx in &redefine_table.added_columns {
-                            let column = next.column_at(*added_column_idx);
+                            let column = tables.next().column_at(*added_column_idx);
                             self.check_add_column(&column, &mut plan, step_index);
                         }
 
                         for dropped_column_idx in &redefine_table.dropped_columns {
-                            let column = previous.column_at(*dropped_column_idx);
+                            let column = tables.previous().column_at(*dropped_column_idx);
                             self.check_column_drop(&column, &mut plan, step_index);
                         }
 
-                        for (previous_column_index, next_column_index, changes, type_change) in
-                            redefine_table.column_pairs.iter()
-                        {
-                            let previous = previous.column_at(*previous_column_index);
-                            let next = next.column_at(*next_column_index);
+                        for (column_indexes, changes, type_change) in redefine_table.column_pairs.iter() {
+                            let columns = tables.columns(column_indexes);
 
-                            let arity_change_is_safe = match (&previous.arity(), &next.arity()) {
+                            let arity_change_is_safe = match (&columns.previous().arity(), &columns.next().arity()) {
                                 // column became required
                                 (ColumnArity::Nullable, ColumnArity::Required) => false,
                                 // column became nullable
@@ -187,11 +163,14 @@ impl SqlMigrationConnector {
                                 continue;
                             }
 
-                            if changes.arity_changed() && next.arity().is_required() && next.default().is_none() {
+                            if changes.arity_changed()
+                                && columns.next().arity().is_required()
+                                && columns.next().default().is_none()
+                            {
                                 plan.push_unexecutable(
                                     UnexecutableStepCheck::MadeOptionalFieldRequired {
-                                        table: previous.table().name().to_owned(),
-                                        column: previous.name().to_owned(),
+                                        table: columns.previous().table().name().to_owned(),
+                                        column: columns.previous().name().to_owned(),
                                     },
                                     step_index,
                                 );
@@ -202,10 +181,10 @@ impl SqlMigrationConnector {
                                 Some(ColumnTypeChange::RiskyCast) => {
                                     plan.push_warning(
                                         SqlMigrationWarningCheck::RiskyCast {
-                                            table: previous.table().name().to_owned(),
-                                            column: previous.name().to_owned(),
-                                            previous_type: format!("{:?}", previous.column_type_family()),
-                                            next_type: format!("{:?}", next.column_type_family()),
+                                            table: columns.previous().table().name().to_owned(),
+                                            column: columns.previous().name().to_owned(),
+                                            previous_type: format!("{:?}", columns.previous().column_type_family()),
+                                            next_type: format!("{:?}", columns.next().column_type_family()),
                                         },
                                         step_index,
                                     );
@@ -246,14 +225,13 @@ impl SqlMigrationConnector {
         plan
     }
 
-    #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]
+    #[tracing::instrument(skip(self, steps, schemas), target = "SqlDestructiveChangeChecker::check")]
     async fn check_impl(
         &self,
         steps: &[SqlMigrationStep],
-        before: &SqlSchema,
-        after: &SqlSchema,
+        schemas: &Pair<&SqlSchema>,
     ) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        let plan = self.plan(steps, before, after);
+        let plan = self.plan(steps, schemas);
 
         plan.execute(self.conn()).await
     }
@@ -262,21 +240,13 @@ impl SqlMigrationConnector {
 #[async_trait::async_trait]
 impl DestructiveChangeChecker<SqlMigration> for SqlMigrationConnector {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        let plan = self.plan(
-            &database_migration.steps,
-            &database_migration.before,
-            &database_migration.after,
-        );
+        let plan = self.plan(&database_migration.steps, &database_migration.schemas());
 
         plan.execute(self.conn()).await
     }
 
     fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {
-        let plan = self.plan(
-            &database_migration.steps,
-            &database_migration.before,
-            &database_migration.after,
-        );
+        let plan = self.plan(&database_migration.steps, &database_migration.schemas());
 
         plan.pure_check()
     }

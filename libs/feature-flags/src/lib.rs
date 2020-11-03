@@ -52,11 +52,9 @@ macro_rules! flags {
     };
 }
 
-// `transaction`: Transactional batches support in the QE.
-// `connectOrCreate`: `connectOrCreate` nested query in the QE.
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases
 // `uncheckedScalarInputs`: Unchecked scalar inputs for relation fields support in the QE.
-flags!(transaction, connectOrCreate, microsoftSqlServer, uncheckedScalarInputs);
+flags!(microsoftSqlServer, uncheckedScalarInputs);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.

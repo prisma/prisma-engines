@@ -2,16 +2,16 @@ use super::{common, IteratorJoin, Quoted, QuotedWithSchema, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
     flavour::MssqlFlavour,
+    pair::Pair,
     sql_migration::{
         AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
         DropForeignKey, DropIndex, RedefineTable, TableChange,
     },
-    sql_schema_differ::SqlSchemaDiffer,
 };
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
     walkers::ForeignKeyWalker,
-    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write};
@@ -30,14 +30,10 @@ impl SqlRenderer for MssqlFlavour {
         Quoted::mssql_ident(name)
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable {
-            table_index: (previous_idx, next_idx),
-            changes,
-        } = alter_table;
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        let AlterTable { table_index, changes } = alter_table;
 
-        let previous_table = differ.previous.table_walker_at(*previous_idx);
-        let next_table = differ.next.table_walker_at(*next_idx);
+        let tables = schemas.tables(table_index);
 
         let mut lines = Vec::new();
 
@@ -52,8 +48,9 @@ impl SqlRenderer for MssqlFlavour {
                     lines.push(format!("ADD PRIMARY KEY ({})", columns));
                 }
                 TableChange::AddColumn(AddColumn { column_index }) => {
-                    let column = next_table.column_at(*column_index);
-                    let col_sql = self.render_column(column);
+                    let column = tables.next().column_at(*column_index);
+                    let col_sql = self.render_column(&column);
+
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
                 TableChange::DropColumn(DropColumn { name, .. }) => {
@@ -71,16 +68,16 @@ impl SqlRenderer for MssqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote_with_schema(previous_table.name()),
+            self.quote_with_schema(tables.previous().name()),
             lines.join(",\n")
         )]
     }
 
-    fn render_alter_enum(&self, _: &AlterEnum, _: &SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
-    fn render_column(&self, column: ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
 
         let r#type = match &column.column_type().family {
@@ -213,7 +210,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
+        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
 
         let primary_columns = table.primary_key_column_names();
 
@@ -276,7 +273,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_redefine_tables(&self, _tables: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _tables: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_redefine_table on MSSQL")
     }
 
