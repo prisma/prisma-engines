@@ -221,7 +221,7 @@ where
 
 fn field_avg_output_type(field: &ScalarFieldRef) -> OutputType {
     match field.type_identifier {
-        TypeIdentifier::Int | TypeIdentifier::Float => OutputType::float(),
+        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         _ => map_scalar_output_type(field),
     }
