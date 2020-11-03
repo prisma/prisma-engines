@@ -1,11 +1,11 @@
-use crate::sql_schema_differ::{ColumnChange, ColumnChanges};
+use crate::{
+    pair::Pair,
+    sql_schema_differ::{ColumnChange, ColumnChanges},
+};
 use sql_schema_describer::{walkers::ColumnWalker, ColumnArity, ColumnType, DefaultValue};
 
-pub(crate) fn expand_mysql_alter_column(
-    (previous, next): (&ColumnWalker<'_>, &ColumnWalker<'_>),
-    changes: &ColumnChanges,
-) -> MysqlAlterColumn {
-    if changes.only_default_changed() && next.default().is_none() {
+pub(crate) fn expand_mysql_alter_column(columns: &Pair<ColumnWalker<'_>>, changes: &ColumnChanges) -> MysqlAlterColumn {
+    if changes.only_default_changed() && columns.next().default().is_none() {
         return MysqlAlterColumn::DropDefault;
     }
 
@@ -15,13 +15,13 @@ pub(crate) fn expand_mysql_alter_column(
 
     // @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
     // transfer it from the introspected current state of the database.
-    let new_default = match (&previous.default(), &next.default()) {
+    let new_default = match (columns.previous().default(), columns.next().default()) {
         (Some(DefaultValue::DBGENERATED(previous)), Some(DefaultValue::DBGENERATED(next)))
             if next.is_empty() && !previous.is_empty() =>
         {
             Some(DefaultValue::DBGENERATED(previous.clone()))
         }
-        _ => next.default().cloned(),
+        _ => columns.next().default().cloned(),
     };
 
     MysqlAlterColumn::Modify {
@@ -31,7 +31,7 @@ pub(crate) fn expand_mysql_alter_column(
 }
 
 pub(crate) fn expand_postgres_alter_column(
-    (previous, next): (&ColumnWalker<'_>, &ColumnWalker<'_>),
+    columns: &Pair<ColumnWalker<'_>>,
     column_changes: &ColumnChanges,
 ) -> Vec<PostgresAlterColumn> {
     let mut changes = Vec::new();
@@ -39,11 +39,11 @@ pub(crate) fn expand_postgres_alter_column(
 
     for change in column_changes.iter() {
         match change {
-            ColumnChange::Default => match (&previous.default(), &next.default()) {
-                (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault((**next_default).clone())),
+            ColumnChange::Default => match (columns.previous().default(), columns.next().default()) {
+                (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault((*next_default).clone())),
                 (_, None) => changes.push(PostgresAlterColumn::DropDefault),
             },
-            ColumnChange::Arity => match (&previous.arity(), &next.arity()) {
+            ColumnChange::Arity => match (columns.previous().arity(), columns.next().arity()) {
                 (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
                 (ColumnArity::Nullable, ColumnArity::Required) => changes.push(PostgresAlterColumn::SetNotNull),
                 (ColumnArity::List, ColumnArity::Nullable) => {
@@ -63,7 +63,7 @@ pub(crate) fn expand_postgres_alter_column(
             },
             ColumnChange::TypeChanged => set_type = true,
             ColumnChange::Sequence => {
-                if previous.is_autoincrement() {
+                if columns.previous().is_autoincrement() {
                     // The sequence should be dropped.
                     changes.push(PostgresAlterColumn::DropDefault)
                 } else {
@@ -77,7 +77,7 @@ pub(crate) fn expand_postgres_alter_column(
 
     // This is a flag so we don't push multiple SetTypes from arity and type changes.
     if set_type {
-        changes.push(PostgresAlterColumn::SetType(next.column_type().clone()));
+        changes.push(PostgresAlterColumn::SetType(columns.next().column_type().clone()));
     }
 
     changes
