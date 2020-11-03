@@ -63,17 +63,10 @@ fn checked_create_input_type(
         scalar_fields,
         |_, f: ScalarFieldRef, default: Option<DefaultValue>| {
             let typ = map_scalar_input_type(&f);
-            if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) {
-                input_field(f.name.clone(), typ, default)
-                    .optional()
-                    .nullable_if(!f.is_required)
-            } else if f.is_required && f.default_value.is_none() {
-                input_field(f.name.clone(), typ, default)
-            } else {
-                input_field(f.name.clone(), typ, default)
-                    .optional()
-                    .nullable_if(!f.is_required)
-            }
+
+            input_field(f.name.clone(), typ, default)
+                .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
+                .nullable_if(!f.is_required)
         },
         true,
     );
@@ -200,17 +193,10 @@ fn unchecked_create_input_type(
         scalar_fields,
         |_, f: ScalarFieldRef, default: Option<DefaultValue>| {
             let typ = map_scalar_input_type(&f);
-            if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) {
-                input_field(f.name.clone(), typ, default)
-                    .optional()
-                    .nullable_if(!f.is_required)
-            } else if f.is_required && f.default_value.is_none() {
-                input_field(f.name.clone(), typ, default)
-            } else {
-                input_field(f.name.clone(), typ, default)
-                    .optional()
-                    .nullable_if(!f.is_required)
-            }
+
+            input_field(f.name.clone(), typ, default)
+                .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
+                .nullable_if(!f.is_required)
         },
         true,
     );
