@@ -205,6 +205,7 @@ pub fn insert_existing_1to1_related_model_checks(
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
 
+    // Note: Also creates the edge between `parent` and the new node.
     let read_existing_children =
         insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, Filter::empty())?;
 
