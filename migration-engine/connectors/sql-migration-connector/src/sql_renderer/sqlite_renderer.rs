@@ -268,7 +268,6 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Binary => "BLOB",
         ColumnTypeFamily::Json => unreachable!("ColumnTypeFamily::Json on SQLite"),
         ColumnTypeFamily::Enum(_) => unreachable!("ColumnTypeFamily::Enum on SQLite"),
-        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("ColumnTypeFamily::Uuid on SQLite"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }

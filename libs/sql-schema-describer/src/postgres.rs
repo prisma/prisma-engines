@@ -636,7 +636,6 @@ fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<
                             DefaultValue::DBGENERATED(default_string)
                         }
                     }
-                    ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                     ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                 })
             }

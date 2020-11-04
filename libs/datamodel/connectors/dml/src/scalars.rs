@@ -14,7 +14,6 @@ pub enum ScalarType {
     Json,
     Bytes,
     Decimal,
-    Duration,
 }
 
 impl FromStr for ScalarType {
@@ -30,7 +29,6 @@ impl FromStr for ScalarType {
             "Json" => Ok(ScalarType::Json),
             "Bytes" => Ok(ScalarType::Bytes),
             "Decimal" => Ok(ScalarType::Decimal),
-            "Duration" => Ok(ScalarType::Duration),
             _ => Err(format!("type {} is not a known scalar type.", s)),
         }
     }
@@ -48,7 +46,6 @@ impl ToString for ScalarType {
             ScalarType::Json => String::from("Json"),
             ScalarType::Bytes => String::from("Bytes"),
             ScalarType::Decimal => String::from("Decimal"),
-            ScalarType::Duration => String::from("Duration"),
         }
     }
 }

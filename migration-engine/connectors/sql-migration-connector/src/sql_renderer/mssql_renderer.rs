@@ -91,7 +91,6 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::BigInt => "bigint",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
             ColumnTypeFamily::Binary => "varbinary(max)",
-            ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
             ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
             ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
             ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),

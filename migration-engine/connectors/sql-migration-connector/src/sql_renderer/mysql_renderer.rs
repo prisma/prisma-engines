@@ -376,7 +376,6 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
         }
         ColumnTypeFamily::Json => "JSON".into(),
         ColumnTypeFamily::Binary => "LONGBLOB".into(),
-        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
