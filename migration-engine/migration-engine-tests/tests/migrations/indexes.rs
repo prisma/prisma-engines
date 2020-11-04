@@ -1,6 +1,5 @@
 use migration_engine_tests::sql::*;
-use sql_migration_connector::sql_migration::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
-use sql_schema_describer::{Index, IndexType};
+use sql_schema_describer::IndexType;
 
 #[test_each_connector]
 async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
@@ -272,19 +271,8 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = &[
-            SqlMigrationStep::AlterIndex(AlterIndex {
-                table: "A".into(),
-                index_new_name: "customNameA".into(),
-                index_name: "customName".into(),
-            }),
-            SqlMigrationStep::AlterIndex(AlterIndex {
-                table: "A".into(),
-                index_new_name: "customNameNonUniqueA".into(),
-                index_name: "customNameNonUnique".into(),
-            }),
-        ];
-        let actual_steps = result.sql_migration();
+        let expected_steps = &["AlterIndex", "AlterIndex"];
+        let actual_steps = result.describe_steps();
         assert_eq!(actual_steps, expected_steps);
     }
 
@@ -332,12 +320,8 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
-            table: "A".into(),
-            index_new_name: "A.field_secondField_unique".into(),
-            index_name: "customName".into(),
-        })];
-        let actual_steps = result.sql_migration();
+        let expected_steps = &["AlterIndex"];
+        let actual_steps = result.migration_output.describe_steps();
         assert_eq!(actual_steps, expected_steps);
     }
 }
@@ -382,12 +366,8 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = &[SqlMigrationStep::AlterIndex(AlterIndex {
-            table: "A".into(),
-            index_name: "A.field_secondField_unique".into(),
-            index_new_name: "somethingCustom".into(),
-        })];
-        let actual_steps = result.sql_migration();
+        let expected_steps = &["AlterIndex"];
+        let actual_steps = result.describe_steps();
         assert_eq!(actual_steps, expected_steps);
     }
 
@@ -434,22 +414,8 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
-        let expected_steps = vec![
-            SqlMigrationStep::DropIndex(DropIndex {
-                table: "A".into(),
-                name: "customName".into(),
-            }),
-            SqlMigrationStep::CreateIndex(CreateIndex {
-                table: "A".into(),
-                index: Index {
-                    name: "customNameA".into(),
-                    columns: vec!["field".into(), "id".into()],
-                    tpe: IndexType::Unique,
-                },
-                caused_by_create_table: false,
-            }),
-        ];
-        let actual_steps = result.sql_migration();
+        let expected_steps = &["DropIndex", "CreateIndex"];
+        let actual_steps = result.migration_output.describe_steps();
         assert_eq!(actual_steps, expected_steps);
     }
 }
@@ -457,14 +423,14 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
 #[test_each_connector]
 async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "customName")
-            }
-        "#;
+            @@unique([field, secondField], name: "customName")
+        }
+    "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let index = result
         .table_bang("A")

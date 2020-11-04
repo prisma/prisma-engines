@@ -58,6 +58,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
             .filter(|fs_migration| {
                 !migrations_from_database
                     .iter()
+                    .filter(|db_migration| db_migration.rolled_back_at.is_none())
                     .any(|db_migration| fs_migration.migration_name() == db_migration.migration_name)
             })
             .collect();
@@ -65,6 +66,12 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
         let mut applied_migration_names: Vec<String> = Vec::with_capacity(unapplied_migrations.len());
 
         for unapplied_migration in unapplied_migrations {
+            let span = tracing::info_span!(
+                "Applying migration",
+                migration_name = unapplied_migration.migration_name(),
+            );
+            let _span = span.enter();
+
             let script = unapplied_migration
                 .read_migration_script()
                 .map_err(ConnectorError::from)?;
@@ -134,13 +141,16 @@ fn diagnose_migration_history(
 
     let mut edited_migrations = migrations_from_database
         .iter()
+        .filter(|db_migration| db_migration.rolled_back_at.is_none())
         .filter(|db_migration| {
-            migrations_from_filesystem.iter().any(|fs_migration| {
-                fs_migration.migration_name() == db_migration.migration_name
-                    && !fs_migration
+            migrations_from_filesystem
+                .iter()
+                .filter(|fs_migration| fs_migration.migration_name() == db_migration.migration_name)
+                .any(|fs_migration| {
+                    !fs_migration
                         .matches_checksum(&db_migration.checksum)
                         .expect("Failed to read migration script to match checksum.")
-            })
+                })
         })
         .peekable();
 

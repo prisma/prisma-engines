@@ -5,18 +5,20 @@ use super::{
 use crate::{
     database_info::DatabaseInfo,
     flavour::{MysqlFlavour, SqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
+    pair::Pair,
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropColumn, DropForeignKey, DropIndex,
+        RedefineTable, TableChange,
     },
-    sql_schema_differ::{ColumnChanges, SqlSchemaDiffer},
+    sql_schema_differ::ColumnChanges,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, ForeignKeyWalker, SqlSchemaExt, TableWalker},
+    walkers::EnumWalker,
+    walkers::{ColumnWalker, ForeignKeyWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, Index, IndexType, SqlSchema,
 };
 use std::borrow::Cow;
@@ -49,7 +51,7 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on MySQL")
     }
 
@@ -108,57 +110,49 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable {
-            table,
-            table_index: (_, next_idx),
-            changes,
-        } = alter_table;
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        let AlterTable { table_index, changes } = alter_table;
 
-        let next_table = differ.next.table_walker_at(*next_idx);
+        let tables = schemas.tables(table_index);
 
         let mut lines = Vec::new();
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name: _ } => lines.push("DROP PRIMARY KEY".to_owned()),
+                TableChange::DropPrimaryKey => lines.push("DROP PRIMARY KEY".to_owned()),
                 TableChange::AddPrimaryKey { columns } => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
                 )),
-                TableChange::AddColumn(AddColumn { column }) => {
-                    let column = next_table
-                        .column(&column.name)
-                        .expect("Invariant violation: add column with unknown column");
+                TableChange::AddColumn(AddColumn { column_index }) => {
+                    let column = tables.next().column_at(*column_index);
+                    let col_sql = self.render_column(&column);
 
-                    let col_sql = self.render_column(column);
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name, .. }) => {
-                    let name = self.quote(&name);
+                TableChange::DropColumn(DropColumn { index }) => {
+                    let name = self.quote(tables.previous().column_at(*index).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
-                    column_name,
                     changes,
+                    column_index,
                     type_change: _,
                 }) => {
-                    let columns = differ
-                        .diff_table(&table.name)
-                        .expect("AlterTable on unknown table.")
-                        .diff_column(column_name)
-                        .expect("AlterColumn on unknown column.");
-
-                    let expanded = expand_mysql_alter_column((&columns.previous, &columns.next), &changes);
+                    let columns = tables.columns(column_index);
+                    let expanded = expand_mysql_alter_column(&columns, &changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
                             "ALTER COLUMN {column} DROP DEFAULT",
-                            column = Quoted::mysql_ident(columns.previous.name())
+                            column = Quoted::mysql_ident(columns.previous().name())
                         )),
-                        MysqlAlterColumn::Modify { new_default, changes } => {
-                            lines.push(render_mysql_modify(&changes, new_default.as_ref(), columns.next, self))
-                        }
+                        MysqlAlterColumn::Modify { new_default, changes } => lines.push(render_mysql_modify(
+                            &changes,
+                            new_default.as_ref(),
+                            columns.next(),
+                            self,
+                        )),
                     };
                 }
                 TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on MySQL"),
@@ -171,12 +165,12 @@ impl SqlRenderer for MysqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote(&table.name),
+            self.quote(tables.previous().name()),
             lines.join(",\n    ")
         )]
     }
 
-    fn render_column(&self, column: ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(&column);
         let nullability_str = render_nullability(&column);
@@ -237,7 +231,7 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_create_enum(&self, _create_enum: &CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _create_enum: &EnumWalker<'_>) -> Vec<String> {
         Vec::new() // enums are defined on each column that uses them on MySQL
     }
 
@@ -267,7 +261,7 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
+        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
 
         let primary_columns = table.primary_key_column_names();
 
@@ -312,7 +306,7 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         Vec::new()
     }
 
@@ -332,7 +326,7 @@ impl SqlRenderer for MysqlFlavour {
         vec![format!("DROP TABLE {}", self.quote(&table_name))]
     }
 
-    fn render_redefine_tables(&self, _names: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_redefine_table on MySQL")
     }
 
@@ -348,7 +342,7 @@ impl SqlRenderer for MysqlFlavour {
 fn render_mysql_modify(
     changes: &ColumnChanges,
     new_default: Option<&sql_schema_describer::DefaultValue>,
-    next_column: ColumnWalker<'_>,
+    next_column: &ColumnWalker<'_>,
     renderer: &dyn SqlFlavour,
 ) -> String {
     let column_type: Option<String> = if changes.type_changed() {
@@ -397,6 +391,7 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
         ColumnTypeFamily::Float => "decimal(65,30)".into(),
         ColumnTypeFamily::Decimal => "decimal(65,30)".into(),
         ColumnTypeFamily::Int => "int".into(),
+        ColumnTypeFamily::BigInt => "bigint".into(),
         // we use varchar right now as mediumtext doesn't allow default values
         // a bigger length would not allow to use such a column as primary key
         ColumnTypeFamily::String => format!("varchar{}", VARCHAR_LENGTH_PREFIX).into(),

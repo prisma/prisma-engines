@@ -322,6 +322,15 @@ impl InputField {
         self
     }
 
+    /// Sets the field as optional if the condition is true.
+    pub fn optional_if(self, condition: bool) -> Self {
+        if condition {
+            self.optional()
+        } else {
+            self
+        }
+    }
+
     /// Sets the field as nullable (accepting null inputs).
     pub fn nullable(self) -> Self {
         self.add_type(InputType::null())
@@ -391,6 +400,10 @@ impl InputType {
         InputType::Scalar(ScalarType::Int)
     }
 
+    pub fn bigint() -> InputType {
+        InputType::Scalar(ScalarType::BigInt)
+    }
+
     pub fn float() -> InputType {
         InputType::Scalar(ScalarType::Float)
     }
@@ -434,6 +447,15 @@ impl InputType {
     pub fn enum_type(containing: EnumTypeRef) -> InputType {
         InputType::Enum(containing)
     }
+
+    pub fn is_empty(&self) -> bool {
+        match self {
+            Self::Scalar(_) => false,
+            Self::Enum(_) => false,
+            Self::List(inner) => inner.is_empty(),
+            Self::Object(weak) => weak.into_arc().is_empty(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -459,6 +481,10 @@ impl OutputType {
 
     pub fn int() -> OutputType {
         OutputType::Scalar(ScalarType::Int)
+    }
+
+    pub fn bigint() -> OutputType {
+        OutputType::Scalar(ScalarType::BigInt)
     }
 
     pub fn float() -> OutputType {
@@ -518,6 +544,7 @@ pub enum ScalarType {
     Null,
     String,
     Int,
+    BigInt,
     Float,
     Decimal,
     Boolean,

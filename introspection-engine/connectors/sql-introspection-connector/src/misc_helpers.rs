@@ -12,7 +12,7 @@ use sql_schema_describer::{
 use tracing::debug;
 
 //checks
-pub fn is_migration_table(table: &Table) -> bool {
+pub fn is_old_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
         && table.columns.iter().any(|c| c.name == "revision")
         && table.columns.iter().any(|c| c.name == "name")
@@ -25,6 +25,19 @@ pub fn is_migration_table(table: &Table) -> bool {
         && table.columns.iter().any(|c| c.name == "errors")
         && table.columns.iter().any(|c| c.name == "started_at")
         && table.columns.iter().any(|c| c.name == "finished_at")
+}
+
+pub fn is_new_migration_table(table: &Table) -> bool {
+    table.name == "_prisma_migrations"
+        && table.columns.iter().any(|c| c.name == "id")
+        && table.columns.iter().any(|c| c.name == "checksum")
+        && table.columns.iter().any(|c| c.name == "finished_at")
+        && table.columns.iter().any(|c| c.name == "migration_name")
+        && table.columns.iter().any(|c| c.name == "logs")
+        && table.columns.iter().any(|c| c.name == "rolled_back_at")
+        && table.columns.iter().any(|c| c.name == "started_at")
+        && table.columns.iter().any(|c| c.name == "applied_steps_count")
+        && table.columns.iter().any(|c| c.name == "script")
 }
 
 pub(crate) fn is_relay_table(table: &Table) -> bool {
@@ -245,7 +258,11 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
         (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
+            Some(DMLDef::Expression(VG::new_autoincrement()))
+        }
         (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
         (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
@@ -344,6 +361,7 @@ pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -
         _ if is_mysql_bit => FieldType::Base(ScalarType::Int, None),
         _ if is_postgres_interval => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
@@ -363,6 +381,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
 
     match &column.tpe.family {
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::BigInt, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Decimal, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),

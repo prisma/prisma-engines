@@ -1,7 +1,7 @@
 use crate::misc_helpers::{
     calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
-    calculate_scalar_field, is_migration_table, is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table,
-    is_relay_table,
+    calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
+    is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::version_checker::VersionChecker;
 use crate::SqlError;
@@ -20,7 +20,8 @@ pub fn introspect(
     for table in schema
         .tables
         .iter()
-        .filter(|table| !is_migration_table(&table))
+        .filter(|table| !is_old_migration_table(&table))
+        .filter(|table| !is_new_migration_table(&table))
         .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table))
         .filter(|table| !is_prisma_1_point_0_join_table(&table))
         .filter(|table| !is_relay_table(&table))

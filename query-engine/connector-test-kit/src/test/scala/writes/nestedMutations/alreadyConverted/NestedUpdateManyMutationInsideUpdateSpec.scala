@@ -50,7 +50,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project,
         errorCode = 2009,
         errorContains =
-          """`Field does not exist on enclosing type.` at `Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.updateMany`"""
+          """`Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.updateMany`: Field does not exist on enclosing type."""
       )
     }
   }

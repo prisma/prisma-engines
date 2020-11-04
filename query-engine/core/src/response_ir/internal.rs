@@ -3,10 +3,10 @@ use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
     CoreError, EnumType, OutputFieldRef, QueryResult, RecordAggregation, RecordSelection,
 };
+use bigdecimal::ToPrimitive;
 use connector::AggregationResult;
 use indexmap::IndexMap;
 use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
-use rust_decimal::prelude::ToPrimitive;
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
@@ -63,8 +63,6 @@ fn serialize_aggregation(
     output_field: &OutputFieldRef,
     record_aggregation: RecordAggregation,
 ) -> crate::Result<CheckedItemsWithParents> {
-    dbg!(&output_field.name);
-
     let ordering = record_aggregation.selection_order;
     let results = record_aggregation.results;
 
@@ -392,11 +390,15 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
 
         (ScalarType::Float, PrismaValue::Float(f)) => PrismaValue::Float(f),
         (ScalarType::Float, PrismaValue::Int(i)) => {
-            PrismaValue::Int(i.to_i64().expect("Unable to convert Decimal to i64."))
+            PrismaValue::Int(i.to_i64().expect("Unable to convert BigDecimal to i64."))
         }
 
         (ScalarType::Decimal, PrismaValue::Int(i)) => PrismaValue::String(i.to_string()),
         (ScalarType::Decimal, PrismaValue::Float(f)) => PrismaValue::String(f.to_string()),
+
+        (ScalarType::BigInt, PrismaValue::BigInt(i)) => PrismaValue::BigInt(i),
+        (ScalarType::BigInt, PrismaValue::Int(i)) => PrismaValue::BigInt(i),
+        (ScalarType::BigInt, PrismaValue::Float(f)) => PrismaValue::BigInt(f.to_i64().unwrap()),
 
         (ScalarType::Boolean, PrismaValue::Boolean(b)) => PrismaValue::Boolean(b),
         (ScalarType::DateTime, PrismaValue::DateTime(dt)) => PrismaValue::DateTime(dt),

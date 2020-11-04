@@ -76,7 +76,8 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         ))
     }
 
-    async fn detect_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<bool> {
+    #[tracing::instrument(skip(self, applied_migrations))]
+    async fn calculate_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<Option<String>> {
         let expected_schema = self
             .flavour()
             .sql_schema_from_migration_history(applied_migrations, self.conn())
@@ -87,7 +88,23 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         let diff =
             SqlSchemaDiffer::diff(&actual_schema, &expected_schema, self.flavour(), self.database_info()).into_steps();
 
-        Ok(!diff.is_empty())
+        if diff.is_empty() {
+            return Ok(None);
+        }
+
+        let migration = SqlMigration {
+            before: actual_schema,
+            after: expected_schema,
+            steps: diff,
+        };
+
+        let diagnostics = self.destructive_change_checker().pure_check(&migration);
+
+        let rollback = self
+            .database_migration_step_applier()
+            .render_script(&migration, &diagnostics);
+
+        Ok(Some(rollback))
     }
 }
 
@@ -112,7 +129,7 @@ fn infer(
     }
 }
 
-pub fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
+pub(crate) fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
 where
     F: Fn(T) -> SqlMigrationStep,
 {

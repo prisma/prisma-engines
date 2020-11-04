@@ -1,5 +1,5 @@
 use crate::misc_helpers::{
-    is_migration_table, is_prisma_1_or_11_list_table, is_prisma_1_point_0_join_table,
+    is_old_migration_table, is_prisma_1_or_11_list_table, is_prisma_1_point_0_join_table,
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use datamodel::{Datamodel, Model};
@@ -70,7 +70,7 @@ impl VersionChecker {
     pub fn new(sql_family: SqlFamily, schema: &SqlSchema) -> VersionChecker {
         VersionChecker {
             sql_family,
-            has_migration_table: schema.tables.iter().any(|table| is_migration_table(&table)),
+            has_migration_table: schema.tables.iter().any(|table| is_old_migration_table(&table)),
             has_relay_table: schema.tables.iter().any(|table| is_relay_table(&table)),
             has_prisma_1_join_table: schema.tables.iter().any(|table| is_prisma_1_point_0_join_table(&table)),
             has_prisma_1_1_or_2_join_table: schema

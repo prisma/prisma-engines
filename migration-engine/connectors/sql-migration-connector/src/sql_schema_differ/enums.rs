@@ -1,19 +1,22 @@
-use sql_schema_describer::Enum;
+use sql_schema_describer::walkers::EnumWalker;
+
+use crate::pair::Pair;
 
 pub(crate) struct EnumDiffer<'a> {
-    pub(crate) previous: &'a Enum,
-    pub(crate) next: &'a Enum,
+    pub(crate) enums: Pair<EnumWalker<'a>>,
 }
 
 impl<'a> EnumDiffer<'a> {
     pub(crate) fn created_values<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
-        self.next
-            .values
+        self.enums
+            .next()
+            .values()
             .iter()
             .filter(move |next_value| {
                 !self
-                    .previous
-                    .values
+                    .enums
+                    .previous()
+                    .values()
                     .iter()
                     .any(|previous_value| values_match(previous_value, next_value))
             })
@@ -21,13 +24,15 @@ impl<'a> EnumDiffer<'a> {
     }
 
     pub(crate) fn dropped_values<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
-        self.previous
-            .values
+        self.enums
+            .previous()
+            .values()
             .iter()
             .filter(move |previous_value| {
                 !self
-                    .next
-                    .values
+                    .enums
+                    .next()
+                    .values()
                     .iter()
                     .any(|next_value| values_match(previous_value, next_value))
             })

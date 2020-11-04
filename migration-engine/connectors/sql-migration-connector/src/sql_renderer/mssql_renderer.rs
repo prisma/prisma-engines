@@ -2,16 +2,15 @@ use super::{common, IteratorJoin, Quoted, QuotedWithSchema, SqlRenderer};
 use crate::{
     database_info::DatabaseInfo,
     flavour::MssqlFlavour,
+    pair::Pair,
     sql_migration::{
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropColumn, DropForeignKey, DropIndex,
+        RedefineTable, TableChange,
     },
-    sql_schema_differ::SqlSchemaDiffer,
 };
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
-    walkers::ForeignKeyWalker,
-    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write};
@@ -30,36 +29,35 @@ impl SqlRenderer for MssqlFlavour {
         Quoted::mssql_ident(name)
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable {
-            table,
-            table_index: (_, next_idx),
-            changes,
-        } = alter_table;
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        let AlterTable { table_index, changes } = alter_table;
 
-        let next_table = differ.next.table_walker_at(*next_idx);
+        let tables = schemas.tables(table_index);
 
         let mut lines = Vec::new();
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name } => {
-                    let constraint = constraint_name.as_ref().unwrap();
+                TableChange::DropPrimaryKey => {
+                    let constraint = tables
+                        .previous()
+                        .primary_key()
+                        .and_then(|pk| pk.constraint_name.as_ref())
+                        .expect("Missing constraint name in DropPrimaryKey on MSSQL");
                     lines.push(format!("DROP CONSTRAINT {}", self.quote(constraint)));
                 }
                 TableChange::AddPrimaryKey { columns } => {
                     let columns = columns.iter().map(|colname| self.quote(colname)).join(", ");
                     lines.push(format!("ADD PRIMARY KEY ({})", columns));
                 }
-                TableChange::AddColumn(AddColumn { column }) => {
-                    let column = next_table
-                        .column(&column.name)
-                        .expect("Invariant violation: add column with unknown column");
-                    let col_sql = self.render_column(column);
+                TableChange::AddColumn(AddColumn { column_index }) => {
+                    let column = tables.next().column_at(*column_index);
+                    let col_sql = self.render_column(&column);
+
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name, .. }) => {
-                    let name = self.quote(&name);
+                TableChange::DropColumn(DropColumn { index }) => {
+                    let name = self.quote(tables.previous().column_at(*index).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::DropAndRecreateColumn { .. } => todo!("DropAndRecreateColumn on MSSQL"),
@@ -73,16 +71,16 @@ impl SqlRenderer for MssqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote_with_schema(&table.name),
+            self.quote_with_schema(tables.previous().name()),
             lines.join(",\n")
         )]
     }
 
-    fn render_alter_enum(&self, _: &AlterEnum, _: &SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
-    fn render_column(&self, column: ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
 
         let r#type = match &column.column_type().family {
@@ -91,6 +89,7 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::Float => "decimal(32,16)",
             ColumnTypeFamily::Decimal => "decimal(32,16)",
             ColumnTypeFamily::Int => "int",
+            ColumnTypeFamily::BigInt => "bigint",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
             ColumnTypeFamily::Binary => "varbinary(max)",
             ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
@@ -182,7 +181,7 @@ impl SqlRenderer for MssqlFlavour {
         )]
     }
 
-    fn render_create_enum(&self, _: &CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_create_enum on Microsoft SQL Server")
     }
 
@@ -214,7 +213,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
+        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
 
         let primary_columns = table.primary_key_column_names();
 
@@ -257,7 +256,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_drop_enum on MSSQL")
     }
 
@@ -277,7 +276,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_redefine_tables(&self, _tables: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _tables: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_redefine_table on MSSQL")
     }
 

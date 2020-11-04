@@ -2,14 +2,14 @@ use super::*;
 
 /// Builds "where" argument.
 pub(crate) fn where_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
-    let where_object = input_types::filter_input_objects::where_object_type(ctx, model);
+    let where_object = filter_objects::where_object_type(ctx, model);
 
     input_field("where", InputType::object(where_object), None).optional()
 }
 
 /// Builds "where" argument which input type is the where unique type of the input builder.
 pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) -> Option<InputField> {
-    let input_object_type = input_types::filter_input_objects::where_unique_object_type(ctx, &model);
+    let input_object_type = filter_objects::where_unique_object_type(ctx, &model);
 
     if input_object_type.into_arc().is_empty() {
         None
@@ -19,13 +19,16 @@ pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) 
 }
 
 /// Builds "data" argument intended for the create field.
+/// The data argument is not present if no data can be created.
 pub(crate) fn create_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
-    let input_object_type = input_types::create_input_objects::create_input_type(ctx, model, None);
+    let create_types = create_objects::create_input_types(ctx, model, None);
+    let any_empty = create_types.iter().any(|typ| typ.is_empty());
+    let all_empty = create_types.iter().all(|typ| typ.is_empty());
 
-    if input_object_type.into_arc().is_empty() {
+    if all_empty {
         None
     } else {
-        Some(vec![input_field("data", InputType::object(input_object_type), None)])
+        Some(vec![input_field("data", create_types, None).optional_if(any_empty)])
     }
 }
 
@@ -37,26 +40,25 @@ pub(crate) fn delete_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 /// Builds "where" (unique) and "data" arguments intended for the update field.
 pub(crate) fn update_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     where_unique_argument(ctx, model).map(|unique_arg| {
-        let input_object = input_types::update_input_objects::update_input_type(ctx, model);
-        let input_object_type = InputType::object(input_object);
+        let update_types = update_one_objects::update_one_input_types(ctx, model, None);
 
-        vec![input_field("data", input_object_type, None), unique_arg]
+        vec![input_field("data", update_types, None), unique_arg]
     })
 }
 
 /// Builds "where" (unique), "create", and "update" arguments intended for the upsert field.
 pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     where_unique_argument(ctx, model).and_then(|where_unique_arg| {
-        let update_type = input_types::update_input_objects::update_input_type(ctx, model);
-        let create_type = input_types::create_input_objects::create_input_type(ctx, model, None);
+        let update_types = update_one_objects::update_one_input_types(ctx, model, None);
+        let create_types = create_objects::create_input_types(ctx, model, None);
 
-        if update_type.into_arc().is_empty() || create_type.into_arc().is_empty() {
+        if update_types.iter().all(|typ| typ.is_empty()) || create_types.iter().all(|typ| typ.is_empty()) {
             None
         } else {
             Some(vec![
                 where_unique_arg,
-                input_field("create", InputType::object(create_type), None),
-                input_field("update", InputType::object(update_type), None),
+                input_field("create", create_types, None),
+                input_field("update", update_types, None),
             ])
         }
     })
@@ -64,10 +66,10 @@ pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 
 /// Builds "where" and "data" arguments intended for the update many field.
 pub(crate) fn update_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
-    let update_object = input_types::update_input_objects::update_many_input_type(ctx, model);
+    let update_many_types = update_many_objects::update_many_input_types(ctx, model, None);
     let where_arg = where_argument(ctx, model);
 
-    vec![input_field("data", InputType::object(update_object), None), where_arg]
+    vec![input_field("data", update_many_types, None), where_arg]
 }
 
 /// Builds "where" argument intended for the delete many field.
@@ -92,7 +94,7 @@ pub(crate) fn many_records_field_arguments(ctx: &mut BuilderContext, field: &Mod
 
 /// Builds "many records where" arguments solely based on the given model.
 pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
-    let unique_input_type = InputType::object(input_types::filter_input_objects::where_unique_object_type(ctx, model));
+    let unique_input_type = InputType::object(filter_objects::where_unique_object_type(ctx, model));
 
     let mut args = vec![
         where_argument(ctx, &model),
@@ -118,7 +120,7 @@ pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef)
 
 // Builds "orderBy" argument.
 pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
-    let order_object_type = InputType::object(input_types::order_by_object_type(ctx, model));
+    let order_object_type = InputType::object(order_by_object_type(ctx, model));
 
     input_field(
         "orderBy",

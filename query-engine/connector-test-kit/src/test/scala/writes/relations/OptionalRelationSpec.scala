@@ -61,8 +61,8 @@ class OptionalRelationSpec extends FlatSpec with Matchers with ApiSpecBase {
         | }
       """,
       project,
-      errorCode = 2012,
-      errorContains = "Missing a required value at `Mutation.updateList.data.ListUpdateInput.todo"
+      errorCode = 2009,
+      errorContains = "`Mutation.updateList.data.ListUpdateInput.todo`: A value is required but not set."
     )
   }
 

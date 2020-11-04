@@ -223,7 +223,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ),
         (
             "bigint",
-            "Int",
+            "BigInt",
             "BigInt",
             if api.is_mysql_8() { "bigint" } else { "bigint(20)" },
         ),

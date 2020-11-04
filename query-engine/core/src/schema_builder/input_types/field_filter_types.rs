@@ -34,7 +34,7 @@ fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationF
 
     if !rf.is_list {
         let related_model = rf.related_model();
-        let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
+        let related_input_type = filter_objects::where_object_type(ctx, &related_model);
         types.push(InputType::object(related_input_type));
 
         if !rf.is_required {
@@ -47,7 +47,7 @@ fn mto1_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationF
 
 fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
-    let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
+    let related_input_type = filter_objects::where_object_type(ctx, &related_model);
     let list = if rf.is_list { "List" } else { "" };
     let filter_name = format!("{}{}RelationFilter", capitalize(&related_model.name), list);
 
@@ -104,12 +104,14 @@ fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested
             .chain(query_mode_field(ctx, nested))
             .collect(),
 
-        TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::DateTime | TypeIdentifier::Decimal => {
-            equality_filters(sf)
-                .chain(inclusion_filters(sf))
-                .chain(alphanumeric_filters(sf))
-                .collect()
-        }
+        TypeIdentifier::Int
+        | TypeIdentifier::BigInt
+        | TypeIdentifier::Float
+        | TypeIdentifier::DateTime
+        | TypeIdentifier::Decimal => equality_filters(sf)
+            .chain(inclusion_filters(sf))
+            .chain(alphanumeric_filters(sf))
+            .collect(),
 
         TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
             equality_filters(sf).collect()
@@ -213,6 +215,7 @@ fn scalar_filter_name(sf: &ScalarFieldRef, nested: bool) -> String {
         TypeIdentifier::UUID => format!("{}Uuid{}{}Filter", nested, nullable, list),
         TypeIdentifier::String => format!("{}String{}{}Filter", nested, nullable, list),
         TypeIdentifier::Int => format!("{}Int{}{}Filter", nested, nullable, list),
+        TypeIdentifier::BigInt => format!("{}BigInt{}{}Filter", nested, nullable, list),
         TypeIdentifier::Float => format!("{}Float{}{}Filter", nested, nullable, list),
         TypeIdentifier::Decimal => format!("{}Decimal{}{}Filter", nested, nullable, list),
         TypeIdentifier::Boolean => format!("{}Bool{}{}Filter", nested, nullable, list),

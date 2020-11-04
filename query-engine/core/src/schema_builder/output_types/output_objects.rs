@@ -80,6 +80,7 @@ pub(crate) fn map_scalar_output_type(field: &ScalarFieldRef) -> OutputType {
         TypeIdentifier::Int => OutputType::int(),
         TypeIdentifier::Xml => OutputType::xml(),
         TypeIdentifier::Bytes => OutputType::bytes(),
+        TypeIdentifier::BigInt => OutputType::bigint(),
     };
 
     if field.is_list {
@@ -220,7 +221,7 @@ where
 
 fn field_avg_output_type(field: &ScalarFieldRef) -> OutputType {
     match field.type_identifier {
-        TypeIdentifier::Int | TypeIdentifier::Float => OutputType::float(),
+        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         _ => map_scalar_output_type(field),
     }
@@ -234,7 +235,7 @@ fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
         .filter(|f| {
             matches!(
                 f.type_identifier,
-                TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::Decimal
+                TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
             )
         })
         .collect()

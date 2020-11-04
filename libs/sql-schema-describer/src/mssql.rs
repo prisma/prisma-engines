@@ -255,6 +255,10 @@ impl SqlSchemaDescriber {
                                 Some(int_value) => DefaultValue::VALUE(int_value),
                                 None => DefaultValue::DBGENERATED(default_string),
                             },
+                            ColumnTypeFamily::BigInt => match parse_big_int(&default_string) {
+                                Some(int_value) => DefaultValue::VALUE(int_value),
+                                None => DefaultValue::DBGENERATED(default_string),
+                            },
                             ColumnTypeFamily::Float => match parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::VALUE(float_value),
                                 None => DefaultValue::DBGENERATED(default_string),
