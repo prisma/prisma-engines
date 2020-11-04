@@ -69,7 +69,7 @@ pub struct PrismaOpt {
     pub datamodel: Option<String>,
 
     /// Base64 encoded datasource urls, overwriting the ones in the schema
-    #[structopt(long, env, parse(try_from_str = parse_base64_string))]
+    #[structopt(long, env = "OVERWRITE_DATASOURCES", parse(try_from_str = parse_base64_string))]
     pub overwrite_datasources: Option<String>,
 
     /// Switches query schema generation to Prisma 1 compatible mode.
