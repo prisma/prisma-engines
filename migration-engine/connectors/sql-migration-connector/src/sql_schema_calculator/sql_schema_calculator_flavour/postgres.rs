@@ -78,4 +78,10 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             native_type: Some(native_type_instance.serialized_native_type.clone()),
         }
     }
+
+    fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, db_name: &str) -> sql::ColumnType {
+        let arity = super::super::column_arity(field.arity());
+
+        sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity)
+    }
 }

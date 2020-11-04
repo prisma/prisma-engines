@@ -112,7 +112,11 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
 
     assert!(result.is_err());
 
-    let mut migrations = api.imperative_migration_persistence().list_migrations().await?.unwrap();
+    let mut migrations = api
+        .imperative_migration_persistence()
+        .list_migrations(&api.default_connection_token())
+        .await?
+        .unwrap();
 
     assert_eq!(migrations.len(), 2);
 
@@ -176,7 +180,11 @@ async fn migrations_should_fail_to_apply_if_modified(api: &TestApi) -> TestResul
         err
     );
 
-    let mut migrations = api.imperative_migration_persistence().list_migrations().await?.unwrap();
+    let mut migrations = api
+        .imperative_migration_persistence()
+        .list_migrations(&api.default_connection_token())
+        .await?
+        .unwrap();
 
     assert_eq!(migrations.len(), 1);
     let migration = migrations.pop().unwrap();

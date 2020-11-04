@@ -17,33 +17,40 @@ mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
 
+// These will become private.
 pub use sql_migration::SqlMigration;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use connection_wrapper::Connection;
 use datamodel::Datamodel;
-use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use sql_database_migration_inferrer::*;
 use sql_schema_describer::SqlSchema;
+use tokio::sync::Mutex;
 
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
-    connection: Connection,
-    flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
+    exclusive_connection: Mutex<Option<(ConnectionToken, Connection)>>,
+    connection_string: String,
+    default_connection: Connection,
+    default_connection_token: ConnectionToken,
 }
 
 impl SqlMigrationConnector {
-    /// Construct and initialize the SQL migration connector.
-    pub async fn new(database_str: &str) -> ConnectorResult<Self> {
-        let connection = connect(database_str).await?;
-        let flavour = flavour::from_connection_info(connection.connection_info());
+    /// Construct the SQL migration connector and establish the default connection.
+    pub async fn new(connection_string: &str) -> ConnectorResult<Self> {
+        let default_connection = Connection::connect(connection_string).await?;
+        let flavour = flavour::from_connection_info(default_connection.connection_info());
+        flavour.ensure_connection_validity(&default_connection).await?;
 
-        flavour.ensure_connection_validity(&connection).await?;
-
-        Ok(Self { flavour, connection })
+        Ok(Self {
+            exclusive_connection: Default::default(),
+            connection_string: connection_string.to_owned(),
+            default_connection,
+            default_connection_token: ConnectionToken::new(),
+        })
     }
 
     /// Create the database corresponding to the connection string, without initializing the connector.
@@ -73,22 +80,36 @@ impl SqlMigrationConnector {
         flavour.qe_setup(database_str).await
     }
 
-    fn conn(&self) -> &Connection {
-        &self.connection
+    async fn conn(&self, connection_token: &ConnectionToken) -> ConnectorResult<Connection> {
+        if connection_token == &self.default_connection_token {
+            return Ok(self.default_connection.clone());
+        }
+
+        let connection = self.exclusive_connection.lock().await;
+
+        match connection.as_ref() {
+            None => Err(ConnectorError::generic(anyhow::anyhow!(
+                "Invariant violation: tried to acquire closed connection."
+            ))),
+            Some((token, _)) if token != connection_token => Err(ConnectorError::generic(anyhow::anyhow!(
+                "Invariant violation: the database is already locked by another request"
+            ))),
+            Some((_, connection)) => Ok(connection.clone()),
+        }
     }
 
     fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync) {
-        self.flavour.as_ref()
+        self.default_connection.flavour()
     }
 
     /// For tests.
     pub fn quaint(&self) -> &Quaint {
-        self.connection.quaint()
+        self.default_connection.quaint()
     }
 
-    /// Made public for tests.
-    pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
-        self.flavour.describe_schema(&self.connection).await
+    /// Describes the schema with the given connection. Made public for tests.
+    pub async fn describe_schema(&self, connection_token: &ConnectionToken) -> ConnectorResult<SqlSchema> {
+        self.conn(connection_token).await?.describe_schema().await
     }
 }
 
@@ -97,23 +118,42 @@ impl MigrationConnector for SqlMigrationConnector {
     type DatabaseMigration = SqlMigration;
 
     fn connector_type(&self) -> &'static str {
-        self.connection.connection_info().sql_family().as_str()
-    }
-
-    async fn version(&self) -> ConnectorResult<String> {
-        Ok(self
-            .connection
-            .version()
-            .await?
-            .unwrap_or_else(|| "Database version information not available.".into()))
+        self.default_connection.connection_info().sql_family().as_str()
     }
 
     async fn create_database(database_str: &str) -> ConnectorResult<String> {
         Self::create_database(database_str).await
     }
 
+    fn default_connection_token(&self) -> ConnectionToken {
+        self.default_connection_token.clone()
+    }
+
+    async fn open_exclusive_connection(&self) -> ConnectorResult<ConnectionToken> {
+        let mut conn = self.exclusive_connection.lock().await;
+
+        if let Some((token, _)) = conn.as_mut() {
+            if token.is_detached() {
+                *conn = None;
+            } else {
+                return Err(ConnectorError::generic(anyhow::anyhow!(
+                    "Invariant violation: Tried opening an exclusive connection, but another is already open."
+                )));
+            }
+        }
+
+        let token = ConnectionToken::new();
+        let connection = Connection::connect(&self.connection_string).await?;
+
+        connection.acquire_advisory_lock().await?;
+
+        *conn = Some((token.clone(), connection));
+
+        Ok(token)
+    }
+
     async fn reset(&self) -> ConnectorResult<()> {
-        self.flavour.reset(self.conn()).await
+        self.default_connection.flavour().reset(&self.default_connection).await
     }
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
@@ -122,7 +162,7 @@ impl MigrationConnector for SqlMigrationConnector {
         &self,
         datamodel: &Datamodel,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
-        self.flavour.check_database_version_compatibility(datamodel)
+        self.flavour().check_database_version_compatibility(datamodel)
     }
 
     fn migration_persistence(&self) -> &dyn MigrationPersistence {
@@ -144,15 +184,13 @@ impl MigrationConnector for SqlMigrationConnector {
     fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence {
         self
     }
-}
 
-async fn connect(database_str: &str) -> ConnectorResult<Connection> {
-    let connection_info =
-        ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-
-    let connection = Quaint::new(database_str)
-        .await
-        .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
-
-    Ok(Connection::new(connection))
+    async fn version(&self) -> ConnectorResult<String> {
+        Ok(self
+            .conn(&self.default_connection_token)
+            .await?
+            .version()
+            .await?
+            .unwrap_or_else(|| "Database version information not available.".into()))
+    }
 }

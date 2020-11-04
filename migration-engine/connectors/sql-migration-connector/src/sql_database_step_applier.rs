@@ -22,11 +22,21 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
         .await
     }
 
-    fn render_steps_pretty(
-        &self,
-        database_migration: &SqlMigration,
-    ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-        render_steps_pretty(&database_migration, self.flavour(), database_migration.schemas())
+    fn render_steps_pretty(&self, migration: &SqlMigration) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
+        let mut steps = Vec::with_capacity(migration.steps.len());
+
+        for step in &migration.steps {
+            let sql = render_raw_sql(&step, self.flavour(), migration.schemas()).join(";\n");
+
+            if !sql.is_empty() {
+                steps.push(PrettyDatabaseMigrationStep {
+                    step: serde_json::to_value(&step).unwrap_or_else(|_| serde_json::json!({})),
+                    raw: sql,
+                });
+            }
+        }
+
+        Ok(steps)
     }
 
     fn render_script(&self, database_migration: &SqlMigration, diagnostics: &DestructiveChangeDiagnostics) -> String {
@@ -79,7 +89,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
     }
 
     async fn apply_script(&self, script: &str) -> ConnectorResult<()> {
-        Ok(self.conn().raw_cmd(script).await?)
+        Ok(self.default_connection.raw_cmd(script).await?)
     }
 }
 
@@ -103,32 +113,11 @@ impl SqlMigrationConnector {
         for sql_string in render_raw_sql(&step, renderer, schemas) {
             tracing::debug!(index, %sql_string);
 
-            self.conn().raw_cmd(&sql_string).await?;
+            self.default_connection.raw_cmd(&sql_string).await?;
         }
 
         Ok(true)
     }
-}
-
-fn render_steps_pretty(
-    database_migration: &SqlMigration,
-    renderer: &(dyn SqlFlavour + Send + Sync),
-    schemas: Pair<&SqlSchema>,
-) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-    let mut steps = Vec::with_capacity(database_migration.steps.len());
-
-    for step in &database_migration.steps {
-        let sql = render_raw_sql(&step, renderer, schemas).join(";\n");
-
-        if !sql.is_empty() {
-            steps.push(PrettyDatabaseMigrationStep {
-                step: serde_json::to_value(&step).unwrap_or_else(|_| serde_json::json!({})),
-                raw: sql,
-            });
-        }
-    }
-
-    Ok(steps)
 }
 
 fn render_raw_sql(

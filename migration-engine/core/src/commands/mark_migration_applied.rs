@@ -35,9 +35,9 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
         C: migration_connector::MigrationConnector<DatabaseMigration = D>,
         D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
     {
-        // We should take a lock on the migrations table.
-
-        let persistence = engine.connector().new_migration_persistence();
+        let connector = engine.connector();
+        let persistence = connector.new_migration_persistence();
+        let connection_token = connector.open_exclusive_connection().await?;
 
         let migration_directory =
             MigrationDirectory::new(Path::new(&input.migrations_directory_path).join(&input.migration_name));
@@ -45,14 +45,14 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
             .read_migration_script()
             .map_err(|err| CoreError::Generic(err.into()))?;
 
-        let relevant_migrations = match persistence.list_migrations().await? {
+        let relevant_migrations = match persistence.list_migrations(&connection_token).await? {
             Ok(migrations) => migrations
                 .into_iter()
                 .filter(|migration| migration.migration_name == input.migration_name)
                 .collect(),
             Err(_) => {
                 if !input.expect_failed {
-                    persistence.initialize(true).await?;
+                    persistence.initialize(true, &connection_token).await?;
                 }
 
                 vec![]
@@ -62,7 +62,7 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
         match (relevant_migrations.len(), input.expect_failed) {
             (0, false) => {
                 persistence
-                    .mark_migration_applied(migration_directory.migration_name(), &script)
+                    .mark_migration_applied(migration_directory.migration_name(), &script, &connection_token)
                     .await?;
             }
             (0, true) => {
@@ -92,11 +92,13 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
                     .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none());
 
                 for migration in migrations_to_mark_rolled_back {
-                    persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
+                    persistence
+                        .mark_migration_rolled_back_by_id(&migration.id, &connection_token)
+                        .await?;
                 }
 
                 persistence
-                    .mark_migration_applied(migration_directory.migration_name(), &script)
+                    .mark_migration_applied(migration_directory.migration_name(), &script, &connection_token)
                     .await?;
             }
         }

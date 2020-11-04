@@ -1,4 +1,4 @@
-use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
+use crate::{connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind, prelude::SqlFamily};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
@@ -17,6 +17,13 @@ impl PostgresFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
+    async fn acquire_advisory_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        // See https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS
+        connection.raw_cmd("SELECT pg_advisory_lock(652)").await?;
+
+        Ok(())
+    }
+
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         let db_name = self.0.dbname();
@@ -43,7 +50,7 @@ impl SqlFlavour for PostgresFlavour {
         // Now create the schema
         url.set_path(&format!("/{}", db_name));
 
-        let conn = connect(&url.to_string()).await?;
+        let conn = Connection::connect(&url.to_string()).await?;
 
         let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", &self.schema_name());
 
@@ -140,7 +147,7 @@ impl SqlFlavour for PostgresFlavour {
         // Now create the schema
         url.set_path(&format!("/{}", db_name));
 
-        let conn = connect(&url.to_string()).await?;
+        let conn = Connection::connect(&url.to_string()).await?;
 
         let drop_and_recreate_schema = format!(
             "DROP SCHEMA IF EXISTS \"{schema}\" CASCADE;\nCREATE SCHEMA \"{schema}\";",
@@ -190,7 +197,7 @@ impl SqlFlavour for PostgresFlavour {
         tracing::debug!("Connecting to temporary database at {}", temporary_database_url);
 
         let sql_schema = {
-            let temporary_database = crate::connect(&temporary_database_url).await?;
+            let temporary_database = Connection::connect(&temporary_database_url).await?;
 
             temporary_database.raw_cmd(&create_schema).await?;
 
@@ -239,7 +246,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
 
     for database_name in candidate_default_databases {
         url.set_path(&format!("/{}", database_name));
-        match connect(url.as_str()).await {
+        match Connection::connect(url.as_str()).await {
             // If the database does not exist, try the next one.
             Err(err) => match &err.error_code() {
                 Some(DatabaseDoesNotExist::ERROR_CODE) => (),

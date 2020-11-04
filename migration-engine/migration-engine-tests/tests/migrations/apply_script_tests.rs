@@ -3,6 +3,7 @@ use pretty_assertions::assert_eq;
 
 #[test_each_connector]
 async fn apply_script_applies_the_script_without_touching_migrations_persistence(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let dir = api.create_migrations_directory()?;
 
     let dm = r#"
@@ -29,7 +30,11 @@ async fn apply_script_applies_the_script_without_touching_migrations_persistence
     out.assert_migration_directories_count(1)?;
 
     // There is no new migration in the table.
-    let migrations = api.imperative_migration_persistence().list_migrations().await?.unwrap();
+    let migrations = api
+        .imperative_migration_persistence()
+        .list_migrations(&connection)
+        .await?
+        .unwrap();
     assert_eq!(migrations.len(), 1);
 
     // The script was applied

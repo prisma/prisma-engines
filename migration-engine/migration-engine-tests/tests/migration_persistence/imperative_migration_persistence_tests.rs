@@ -6,15 +6,18 @@ use pretty_assertions::assert_eq;
 async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 
-    persistence.initialize(false).await?;
+    persistence.initialize(false, &api.default_connection_token()).await?;
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
     let id = persistence
-        .record_migration_started("initial_migration", script)
+        .record_migration_started("initial_migration", script, &api.default_connection_token())
         .await?;
 
-    let migrations = persistence.list_migrations().await?.unwrap();
+    let migrations = persistence
+        .list_migrations(&api.default_connection_token())
+        .await?
+        .unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -40,20 +43,21 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let persistence = api.imperative_migration_persistence();
 
-    persistence.initialize(false).await?;
+    persistence.initialize(false, &connection).await?;
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
     let id = persistence
-        .record_migration_started("initial_migration", script)
+        .record_migration_started("initial_migration", script, &connection)
         .await?;
-    persistence.record_migration_finished(&id).await?;
+    persistence.record_migration_finished(&id, &connection).await?;
 
-    let migrations = persistence.list_migrations().await?.unwrap();
+    let migrations = persistence.list_migrations(&connection).await?.unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -84,19 +88,20 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
 
 #[test_each_connector]
 async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let persistence = api.imperative_migration_persistence();
 
-    persistence.initialize(false).await?;
+    persistence.initialize(false, &connection).await?;
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
     let id = persistence
-        .record_migration_started("initial_migration", script)
+        .record_migration_started("initial_migration", script, &connection)
         .await?;
-    persistence.record_successful_step(&id, "oï").await?;
-    persistence.record_migration_finished(&id).await?;
+    persistence.record_successful_step(&id, "oï", &connection).await?;
+    persistence.record_migration_finished(&id, &connection).await?;
 
-    let migrations = persistence.list_migrations().await?.unwrap();
+    let migrations = persistence.list_migrations(&connection).await?.unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -127,29 +132,30 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
 
 #[test_each_connector]
 async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let persistence = api.imperative_migration_persistence();
 
-    persistence.initialize(false).await?;
+    persistence.initialize(false, &connection).await?;
 
     let script_1 = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
     let id_1 = persistence
-        .record_migration_started("initial_migration", script_1)
+        .record_migration_started("initial_migration", script_1, &connection)
         .await?;
-    persistence.record_successful_step(&id_1, "oï").await?;
-    persistence.record_migration_finished(&id_1).await?;
+    persistence.record_successful_step(&id_1, "oï", &connection).await?;
+    persistence.record_migration_finished(&id_1, &connection).await?;
 
     std::thread::sleep(std::time::Duration::from_millis(10));
 
     let script_2 = "DROP ENUM MyBoolean";
     let id_2 = persistence
-        .record_migration_started("second_migration", script_2)
+        .record_migration_started("second_migration", script_2, &connection)
         .await?;
     persistence
-        .record_successful_step(&id_2, "logs for the second migration")
+        .record_successful_step(&id_2, "logs for the second migration", &connection)
         .await?;
 
-    let migrations = persistence.list_migrations().await?.unwrap();
+    let migrations = persistence.list_migrations(&connection).await?.unwrap();
 
     assert_eq!(migrations.len(), 2);
 

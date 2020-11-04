@@ -1,6 +1,5 @@
 use super::SqlFlavour;
 use crate::{
-    connect,
     connection_wrapper::Connection,
     error::{quaint_error_to_connector_error, SystemDatabase},
 };
@@ -43,41 +42,78 @@ impl MysqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
+    // fn check_database_version_compatibility(
+    //     &self,
+    //     datamodel: &Datamodel,
+    // ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
+    //     if self.is_mysql_5_6() {
+    //         let mut errors = Vec::new();
+
+    //         check_datamodel_for_mysql_5_6(datamodel, &mut errors);
+    //     }
+    // }
+
+    async fn acquire_advisory_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("SELECT GET_LOCK('prisma-migrate', 10)").await?;
+
+        Ok(())
+    }
+
     fn check_database_version_compatibility(
         &self,
         datamodel: &Datamodel,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
-        if self.is_mysql_5_6() {
-            let mut errors = Vec::new();
-
-            check_datamodel_for_mysql_5_6(datamodel, &mut errors);
-
-            if errors.is_empty() {
-                return None;
-            }
-
-            let mut errors_string = String::with_capacity(errors.iter().map(|err| err.len() + 3).sum());
-
-            for error in &errors {
-                errors_string.push_str("- ");
-                errors_string.push_str(error);
-                errors_string.push_str("\n");
-            }
-
-            Some(user_facing_errors::common::DatabaseVersionIncompatibility {
-                errors: errors_string,
-                database_version: "MySQL 5.6".into(),
-            })
-        } else {
-            None
+        if !self.is_mysql_5_6() {
+            return None;
         }
+
+        let mut errors = Vec::new();
+
+        check_datamodel_for_mysql_5_6(datamodel, &mut errors);
+
+        if errors.is_empty() {
+            return None;
+        }
+
+        let mut errors_string = String::with_capacity(errors.iter().map(|err| err.len() + 3).sum());
+
+        for error in &errors {
+            errors_string.push_str("- ");
+            errors_string.push_str(error);
+            errors_string.push_str("\n");
+        }
+
+        Some(user_facing_errors::common::DatabaseVersionIncompatibility {
+            errors: errors_string,
+            database_version: "MySQL 5.6".into(),
+        })
+    }
+
+    fn check_self(&self) -> Result<(), SystemDatabase> {
+        static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
+            RegexSet::new(&[
+                "(?i)^mysql$",
+                "(?i)^information_schema$",
+                "(?i)^performance_schema$",
+                "(?i)^sys$",
+            ])
+            .unwrap()
+        });
+
+        let db_name = self.url.dbname();
+
+        if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
+            return Err(SystemDatabase(db_name.to_owned()).into());
+        }
+
+        Ok(())
     }
 
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
 
-        let conn = connect(&url.to_string()).await?;
+        let conn = Connection::connect(&url.to_string()).await?;
         let db_name = self.url.dbname();
 
         let query = format!(
@@ -120,7 +156,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
-        let connection = connect(database_url).await?;
+        let connection = Connection::connect(database_url).await?;
         let db_name = connection.connection_info().dbname().unwrap();
 
         connection.raw_cmd(&format!("DROP DATABASE `{}`", db_name)).await?;
@@ -129,22 +165,6 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
-        static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
-            RegexSet::new(&[
-                "(?i)^mysql$",
-                "(?i)^information_schema$",
-                "(?i)^performance_schema$",
-                "(?i)^sys$",
-            ])
-            .unwrap()
-        });
-
-        let db_name = connection.connection_info().schema_name();
-
-        if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
-            return Err(SystemDatabase(db_name.to_owned()).into());
-        }
-
         let version = connection.version().await?;
         let mut circumstances = BitFlags::<Circumstances>::default();
 
@@ -184,7 +204,7 @@ impl SqlFlavour for MysqlFlavour {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         url.set_path("/mysql");
 
-        let conn = connect(&url.to_string()).await?;
+        let conn = Connection::connect(&url.to_string()).await?;
         let db_name = self.url.dbname();
 
         let query = format!("DROP DATABASE IF EXISTS `{}`", db_name);
@@ -232,7 +252,7 @@ impl SqlFlavour for MysqlFlavour {
 
         tracing::debug!("Connecting to temporary database at {:?}", temporary_database_url);
 
-        let temp_database = crate::connect(&temporary_database_url).await?;
+        let temp_database = Connection::connect(&temporary_database_url).await?;
 
         for migration in migrations {
             let script = migration.read_migration_script()?;

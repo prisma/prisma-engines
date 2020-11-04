@@ -40,7 +40,8 @@ use crate::connectors::Tags;
 use crate::test_api::list_migration_directories::ListMigrationDirectories;
 use enumflags2::BitFlags;
 use migration_connector::{
-    ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord, MigrationStep,
+    ConnectionToken, ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord,
+    MigrationStep,
 };
 use migration_core::{
     api::{GenericApi, MigrationApi},
@@ -64,6 +65,10 @@ pub struct TestApi {
 }
 
 impl TestApi {
+    pub fn default_connection_token(&self) -> ConnectionToken {
+        self.api.connector().default_connection_token()
+    }
+
     pub fn schema_name(&self) -> &str {
         self.connection_info().schema_name()
     }
@@ -269,7 +274,8 @@ impl TestApi {
     }
 
     pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
-        let mut result = self.api.connector().describe_schema().await?;
+        let connection_token = self.api.connector().default_connection_token();
+        let mut result = self.api.connector().describe_schema(&connection_token).await?;
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
         result.tables = result
@@ -365,7 +371,7 @@ impl<'a> TestApiSelect<'a> {
     }
 }
 
-pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn mysql_8_test_api(args: TestApiArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_8_url(db_name);
     let connector = mysql_migration_connector(&url).await;
@@ -377,7 +383,7 @@ pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn mysql_5_6_test_api(args: TestApiArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_5_6_url(db_name);
     let connector = mysql_migration_connector(&url).await;
@@ -389,7 +395,7 @@ pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn mysql_test_api(args: TestApiArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_url(db_name);
     let connector = mysql_migration_connector(&url).await;
@@ -401,7 +407,7 @@ pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn mysql_mariadb_test_api(args: TestApiArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mariadb_url(db_name);
     let connector = mysql_migration_connector(&url).await;
@@ -413,7 +419,7 @@ pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn postgres9_test_api(args: TestApiArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_9_url(db_name);
     let connector = postgres_migration_connector(&url).await;
@@ -425,7 +431,7 @@ pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn postgres_test_api(args: TestApiArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_10_url(db_name);
     let connector = postgres_migration_connector(&url).await;
@@ -437,7 +443,7 @@ pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn postgres11_test_api(args: TestApiArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_11_url(db_name);
     let connector = postgres_migration_connector(&url).await;
@@ -449,7 +455,7 @@ pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn postgres12_test_api(args: TestApiArgs) -> TestApi {
     let url = postgres_12_url(args.test_function_name);
     let connector = postgres_migration_connector(&url).await;
 
@@ -460,7 +466,7 @@ pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn postgres13_test_api(args: TestApiArgs) -> TestApi {
     let url = postgres_13_url(args.test_function_name);
     let connector = postgres_migration_connector(&url).await;
 
@@ -471,7 +477,7 @@ pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
+pub async fn sqlite_test_api(args: TestApiArgs) -> TestApi {
     let db_name = args.test_function_name;
     let connector = sqlite_migration_connector(db_name).await;
 

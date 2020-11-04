@@ -27,11 +27,12 @@ impl MigrationCommand for MarkMigrationRolledBackCommand {
         C: migration_connector::MigrationConnector<DatabaseMigration = D>,
         D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
     {
-        // We should take a lock on the migrations table.
+        let connector = engine.connector();
 
-        let persistence = engine.connector().new_migration_persistence();
+        let persistence = connector.new_migration_persistence();
+        let connection_token = connector.open_exclusive_connection().await?;
 
-        let all_migrations = persistence.list_migrations().await?.map_err(|_err| {
+        let all_migrations = persistence.list_migrations(&connection_token).await?.map_err(|_err| {
             CoreError::Generic(anyhow::anyhow!(
                 "Invariant violation: called markMigrationRolledBack on a database without migrations table."
             ))
@@ -69,7 +70,9 @@ impl MigrationCommand for MarkMigrationRolledBackCommand {
                 migration_name = migration.migration_name.as_str(),
                 "Marking migration as rolled back."
             );
-            persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
+            persistence
+                .mark_migration_rolled_back_by_id(&migration.id, &connection_token)
+                .await?;
         }
 
         Ok(Default::default())

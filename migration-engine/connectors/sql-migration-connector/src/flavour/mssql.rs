@@ -1,4 +1,4 @@
-use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
+use crate::{connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
 use connection_string::JdbcString;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::MssqlUrl, prelude::SqlFamily};
@@ -26,14 +26,18 @@ impl MssqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MssqlFlavour {
+    async fn acquire_advisory_lock(&self, _connection: &Connection) -> ConnectorResult<()> {
+        todo!("acquire_advisory_lock on MSSQL")
+    }
+
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
         let (db_name, master_uri) = Self::master_url(jdbc_string)?;
-        let conn = connect(&master_uri.to_string()).await?;
+        let conn = Connection::connect(&master_uri.to_string()).await?;
 
         let query = format!("CREATE DATABASE [{}]", db_name);
         conn.raw_cmd(&query).await?;
 
-        let conn = connect(jdbc_string).await?;
+        let conn = Connection::connect(jdbc_string).await?;
 
         let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name());
         conn.raw_cmd(&query).await?;
@@ -121,7 +125,7 @@ impl SqlFlavour for MssqlFlavour {
 
     async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
         let (db_name, master_uri) = Self::master_url(database_str)?;
-        let conn = connect(&master_uri).await?;
+        let conn = Connection::connect(&master_uri).await?;
 
         // Without these, our poor connection gets deadlocks if other schemas
         // are modified while we introspect.

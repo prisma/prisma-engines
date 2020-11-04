@@ -117,7 +117,7 @@ impl SqlMigrationConnector {
                             TableChange::DropAndRecreateColumn { column_index, changes } => {
                                 let columns = tables.columns(column_index);
 
-                                self.flavour
+                                self.flavour()
                                     .check_drop_and_recreate_column(&columns, changes, &mut plan, step_index)
                             }
                             TableChange::AddPrimaryKey { .. } => (),
@@ -246,7 +246,7 @@ impl SqlMigrationConnector {
     ) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(steps, schemas);
 
-        plan.execute(self.conn()).await
+        plan.execute(&self.default_connection).await
     }
 }
 
@@ -255,7 +255,7 @@ impl DestructiveChangeChecker<SqlMigration> for SqlMigrationConnector {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(&database_migration.steps, &database_migration.schemas());
 
-        plan.execute(self.conn()).await
+        plan.execute(&self.default_connection).await
     }
 
     fn pure_check(&self, database_migration: &SqlMigration) -> DestructiveChangeDiagnostics {

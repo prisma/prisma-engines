@@ -3,6 +3,7 @@ use pretty_assertions::assert_eq;
 
 #[test_each_connector]
 async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
 
@@ -23,7 +24,7 @@ async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> Tes
     api.assert_schema().await?.assert_tables_count(0)?;
 
     assert!(
-        persistence.list_migrations().await?.is_err(),
+        persistence.list_migrations(&connection).await?.is_err(),
         "The migrations table should not be there yet."
     );
 
@@ -32,7 +33,7 @@ async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> Tes
         .send()
         .await?;
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = persistence.list_migrations(&connection).await?.unwrap();
 
     assert_eq!(applied_migrations.len(), 1);
     assert_eq!(&applied_migrations[0].migration_name, &migration_name);
@@ -52,6 +53,7 @@ async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> Tes
 
 #[test_each_connector]
 async fn mark_migration_applied_on_an_empty_database_with_expect_failed_errors(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
 
@@ -72,7 +74,7 @@ async fn mark_migration_applied_on_an_empty_database_with_expect_failed_errors(a
     api.assert_schema().await?.assert_tables_count(0)?;
 
     assert!(
-        persistence.list_migrations().await?.is_err(),
+        persistence.list_migrations(&connection).await?.is_err(),
         "The migrations table should not be there yet."
     );
 
@@ -88,7 +90,7 @@ async fn mark_migration_applied_on_an_empty_database_with_expect_failed_errors(a
         "Invariant violation: expect_failed was passed but no failed migration was found in the database."
     );
 
-    assert!(persistence.list_migrations().await?.is_err());
+    assert!(persistence.list_migrations(&connection).await?.is_err());
 
     api.assert_schema().await?.assert_tables_count(0)?;
 
@@ -97,6 +99,7 @@ async fn mark_migration_applied_on_an_empty_database_with_expect_failed_errors(a
 
 #[test_each_connector]
 async fn mark_migration_applied_on_a_non_empty_database_without_failed_works(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
 
@@ -148,7 +151,7 @@ async fn mark_migration_applied_on_a_non_empty_database_without_failed_works(api
         .send()
         .await?;
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = persistence.list_migrations(&connection).await?.unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -171,6 +174,7 @@ async fn mark_migration_applied_on_a_non_empty_database_without_failed_works(api
 
 #[test_each_connector]
 async fn mark_migration_applied_on_a_non_empty_database_with_wrong_expect_failed(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
 
@@ -229,7 +233,7 @@ async fn mark_migration_applied_on_a_non_empty_database_with_wrong_expect_failed
         "Invariant violation: expect_failed was passed but no failed migration was found in the database."
     );
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = persistence.list_migrations(&connection).await?.unwrap();
 
     assert_eq!(applied_migrations.len(), 1);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -246,6 +250,7 @@ async fn mark_migration_applied_on_a_non_empty_database_with_wrong_expect_failed
 
 #[test_each_connector]
 async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
 
@@ -307,7 +312,7 @@ async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api
         )
     );
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = persistence.list_migrations(&connection).await?.unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -327,6 +332,7 @@ async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api
 
 #[test_each_connector]
 async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> TestResult {
+    let connection = api.default_connection_token();
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
 
@@ -377,7 +383,7 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
 
     // Check that the second migration failed.
     {
-        let applied_migrations = persistence.list_migrations().await?.unwrap();
+        let applied_migrations = persistence.list_migrations(&connection).await?.unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(
@@ -393,7 +399,7 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
         .send()
         .await?;
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = persistence.list_migrations(&connection).await?.unwrap();
 
     assert_eq!(applied_migrations.len(), 3);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -420,6 +426,7 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
 async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_false(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
+    let connection_token = api.default_connection_token();
 
     // Create and apply a first migration
     let initial_migration_name = {
@@ -468,7 +475,7 @@ async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_f
 
     // Check that the second migration failed.
     {
-        let applied_migrations = persistence.list_migrations().await?.unwrap();
+        let applied_migrations = persistence.list_migrations(&connection_token).await?.unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(
@@ -491,7 +498,7 @@ async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_f
         "Invariant violation: there are failed migrations in the database, but expect_failed was not passed."
     );
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = persistence.list_migrations(&connection_token).await?.unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -514,6 +521,7 @@ async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_f
 async fn baselining_should_work(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
+    let token = api.default_connection_token();
 
     api.apply_script("Create Table test(id Integer Primary Key);")
         .await
@@ -543,7 +551,7 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
         .send()
         .await;
 
-    let applied_migrations = persistence.list_migrations().await?.unwrap();
+    let applied_migrations = persistence.list_migrations(&token).await?.unwrap();
 
     assert_eq!(applied_migrations.len(), 1);
     assert_eq!(&applied_migrations[0].migration_name, &baseline_migration_name);

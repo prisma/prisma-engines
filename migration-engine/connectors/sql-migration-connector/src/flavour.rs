@@ -7,17 +7,17 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
+use datamodel::Datamodel;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
 
 use crate::{
-    connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
-    sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
-    sql_schema_differ::SqlSchemaDifferFlavour,
+    connection_wrapper::Connection, error::SystemDatabase,
+    sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
+    sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
 };
-use datamodel::Datamodel;
 use migration_connector::{ConnectorResult, MigrationDirectory};
 use quaint::{connector::ConnectionInfo, prelude::SqlFamily};
 use sql_schema_describer::SqlSchema;
@@ -48,11 +48,19 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
 pub(crate) trait SqlFlavour:
     DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
 {
+    async fn acquire_advisory_lock(&self, connection: &Connection) -> ConnectorResult<()>;
+
     fn check_database_version_compatibility(
         &self,
         _datamodel: &Datamodel,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         None
+    }
+
+    /// Validate the data contained in the flavour. This can be used for example
+    /// to check that we do not try to migrate a system database.
+    fn check_self(&self) -> Result<(), SystemDatabase> {
+        Ok(())
     }
 
     /// Create a database for the given URL on the server, if applicable.
@@ -78,7 +86,7 @@ pub(crate) trait SqlFlavour:
     /// Drop the database and recreate it empty.
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;
 
-    /// This should be considered deprecated.
+    /// This is deprecated, it will be removed as part of an upcoming refactoring. Use trait methods instead of matching on SqlFamily.
     fn sql_family(&self) -> SqlFamily;
 
     /// Apply the given migration history to a temporary database, and return

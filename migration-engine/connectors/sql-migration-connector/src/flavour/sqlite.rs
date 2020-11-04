@@ -1,4 +1,4 @@
-use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour};
+use crate::{connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::prelude::{ConnectionInfo, SqlFamily};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
@@ -6,12 +6,20 @@ use std::path::Path;
 
 #[derive(Debug)]
 pub(crate) struct SqliteFlavour {
-    pub(super) file_path: String,
-    pub(super) attached_name: String,
+    pub(crate) file_path: String,
+    pub(crate) attached_name: String,
 }
 
 #[async_trait::async_trait]
 impl SqlFlavour for SqliteFlavour {
+    async fn acquire_advisory_lock(&self, _connection: &Connection) -> ConnectorResult<()> {
+        // This is a no-op on SQLite because there can only be one writer at a
+        // time. No locking mechanism is necessary to enforce no concurrent
+        // migrations.
+
+        Ok(())
+    }
+
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         use anyhow::Context;
 
@@ -28,7 +36,7 @@ impl SqlFlavour for SqliteFlavour {
                 .map_err(|io_err| ConnectorError::generic(io_err))?;
         }
 
-        connect(database_str).await?;
+        Connection::connect(database_str).await?;
 
         Ok(self.file_path.clone())
     }
@@ -107,15 +115,7 @@ impl SqlFlavour for SqliteFlavour {
         _connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-        let quaint = quaint::single::Quaint::new_in_memory(Some(self.attached_name.clone())).map_err(|err| {
-            quaint_error_to_connector_error(
-                err,
-                &ConnectionInfo::InMemorySqlite {
-                    db_name: self.attached_name.clone(),
-                },
-            )
-        })?;
-        let conn = Connection::new(quaint);
+        let conn = Connection::new_in_memory_sqlite(&self.attached_name).await?;
 
         for migration in migrations {
             let script = migration.read_migration_script()?;

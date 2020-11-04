@@ -40,12 +40,14 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
         let applier = connector.database_migration_step_applier();
         let migration_persistence = connector.new_migration_persistence();
 
-        migration_persistence.initialize(false).await?;
+        let connection_token = connector.open_exclusive_connection().await?;
+
+        migration_persistence.initialize(false, &connection_token).await?;
 
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
         let migrations_from_database = migration_persistence
-            .list_migrations()
+            .list_migrations(&connection_token)
             .await?
             .map_err(PersistenceNotInitializedError::into_connector_error)?;
 
@@ -53,6 +55,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
 
         // We are now on the Happy Path™.
         tracing::debug!("Migration history is OK, applying unapplied migrations.");
+
         let unapplied_migrations: Vec<&MigrationDirectory> = migrations_from_filesystem
             .iter()
             .filter(|fs_migration| {
@@ -83,16 +86,18 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
             );
 
             let migration_id = migration_persistence
-                .record_migration_started(unapplied_migration.migration_name(), &script)
+                .record_migration_started(unapplied_migration.migration_name(), &script, &connection_token)
                 .await?;
 
             match applier.apply_script(&script).await {
                 Ok(()) => {
                     tracing::debug!("Successfully applied the script.");
                     migration_persistence
-                        .record_successful_step(&migration_id, &script)
+                        .record_successful_step(&migration_id, &script, &connection_token)
                         .await?;
-                    migration_persistence.record_migration_finished(&migration_id).await?;
+                    migration_persistence
+                        .record_migration_finished(&migration_id, &connection_token)
+                        .await?;
                     applied_migration_names.push(unapplied_migration.migration_name().to_owned());
                 }
                 Err(err) => {
@@ -100,7 +105,9 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
 
                     let logs = format!("script:\n{}\n\nerror:\n{}", script, err);
 
-                    migration_persistence.record_failed_step(&migration_id, &logs).await?;
+                    migration_persistence
+                        .record_failed_step(&migration_id, &logs, &connection_token)
+                        .await?;
 
                     return Err(err.into()); // todo: give more context
                 }

@@ -16,6 +16,7 @@ impl MigrationCommand for VersionCommand {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
+
         Ok(connector.version().await?)
     }
 }

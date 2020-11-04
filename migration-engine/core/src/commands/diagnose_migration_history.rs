@@ -74,16 +74,18 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
         let connector = engine.connector();
         let migration_persistence = connector.new_migration_persistence();
         let migration_inferrer = connector.database_migration_inferrer();
+        let connection_token = connector.default_connection_token();
 
         tracing::debug!("Diagnosing migration history");
 
         // Load the migrations.
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
-        let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
-            Ok(migrations) => (migrations, true),
-            Err(PersistenceNotInitializedError {}) => (vec![], false),
-        };
+        let (migrations_from_database, has_migrations_table) =
+            match migration_persistence.list_migrations(&connection_token).await? {
+                Ok(migrations) => (migrations, true),
+                Err(PersistenceNotInitializedError {}) => (vec![], false),
+            };
 
         let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
 
