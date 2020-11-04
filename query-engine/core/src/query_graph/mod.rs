@@ -12,7 +12,7 @@ use crate::{
 };
 use connector::{IdFilter, QueryArguments};
 use guard::*;
-use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
+use petgraph::{graph::*, stable_graph::StableGraph, visit::EdgeRef as PEdgeRef, *};
 use prisma_models::{ModelProjection, ModelRef, RecordProjection};
 use std::{borrow::Borrow, collections::HashSet};
 
@@ -183,7 +183,7 @@ pub struct QueryGraph {
 }
 
 /// Implementation detail of the QueryGraph.
-type InnerGraph = Graph<Guard<Node>, Guard<QueryGraphDependency>>;
+type InnerGraph = StableGraph<Guard<Node>, Guard<QueryGraphDependency>>;
 
 impl QueryGraph {
     pub fn new() -> Self {
@@ -591,7 +591,9 @@ impl QueryGraph {
     ///        └─────Ordering────┘
     /// ```
     fn normalize_if_nodes(&mut self) -> QueryGraphResult<()> {
-        for node_ix in self.graph.node_indices() {
+        let node_indices: Vec<_> = self.graph.node_indices().into_iter().collect();
+
+        for node_ix in node_indices {
             let node = NodeRef { node_ix };
 
             if let Node::Flow(Flow::If(_)) = self.node_content(&node).unwrap() {
