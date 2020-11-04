@@ -14,7 +14,7 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 base64 = "0.13"
 futures = "0.3"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
-serde_json = "1.0"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 structopt = "0.3.8"
 tokio = { version = "0.2.13", features = ["macros"] }
 tracing = "0.1"

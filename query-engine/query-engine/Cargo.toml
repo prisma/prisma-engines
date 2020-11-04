@@ -30,7 +30,7 @@ prisma-models = {path = "../../libs/prisma-models"}
 query-core = {path = "../core"}
 bigdecimal = "0.2"
 serde = {version = "1.0", features = ["derive"]}
-serde_json = {version = "1.0", features = ["preserve_order"]}
+serde_json = {version = "1.0", features = ["preserve_order", "float_roundtrip"]}
 sql-connector = {path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector"}
 structopt = "0.3"
 thiserror = "1.0"
