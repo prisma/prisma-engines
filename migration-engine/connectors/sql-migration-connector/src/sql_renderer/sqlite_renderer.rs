@@ -4,8 +4,8 @@ use crate::{
     flavour::SqliteFlavour,
     pair::Pair,
     sql_migration::{
-        AddColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex,
-        RedefineTable, TableChange,
+        AddColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropForeignKey, DropIndex, RedefineTable,
+        TableChange,
     },
 };
 use once_cell::sync::Lazy;
@@ -147,7 +147,7 @@ impl SqlRenderer for SqliteFlavour {
         statements
     }
 
-    fn render_create_enum(&self, _create_enum: &CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         Vec::new()
     }
 
@@ -208,7 +208,7 @@ impl SqlRenderer for SqliteFlavour {
         )
     }
 
-    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         Vec::new()
     }
 

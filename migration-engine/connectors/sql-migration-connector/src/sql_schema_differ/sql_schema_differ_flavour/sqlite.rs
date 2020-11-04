@@ -35,7 +35,7 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
                     || differ.created_foreign_keys().next().is_some()
                     || differ.dropped_foreign_keys().next().is_some()
             })
-            .map(|table| table.next.name().to_owned())
+            .map(|table| table.next().name().to_owned())
             .collect()
     }
 

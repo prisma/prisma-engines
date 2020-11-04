@@ -157,14 +157,20 @@ fn render_raw_sql(
     match step {
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, schemas),
         SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, schemas),
-        SqlMigrationStep::CreateEnum(create_enum) => renderer.render_create_enum(create_enum),
-        SqlMigrationStep::DropEnum(drop_enum) => renderer.render_drop_enum(drop_enum),
+        SqlMigrationStep::CreateEnum(create_enum) => {
+            renderer.render_create_enum(&schemas.next().enum_walker_at(create_enum.enum_index))
+        }
+        SqlMigrationStep::DropEnum(drop_enum) => {
+            renderer.render_drop_enum(&schemas.previous().enum_walker_at(drop_enum.enum_index))
+        }
         SqlMigrationStep::CreateTable(CreateTable { table_index }) => {
             let table = schemas.next().table_walker_at(*table_index);
 
             vec![renderer.render_create_table(&table)]
         }
-        SqlMigrationStep::DropTable(DropTable { name }) => renderer.render_drop_table(name),
+        SqlMigrationStep::DropTable(DropTable { table_index }) => {
+            renderer.render_drop_table(schemas.previous().table_walker_at(*table_index).name())
+        }
         SqlMigrationStep::AddForeignKey(add_foreign_key) => {
             let foreign_key = schemas
                 .next()

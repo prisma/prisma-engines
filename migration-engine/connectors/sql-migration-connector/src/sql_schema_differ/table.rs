@@ -1,5 +1,5 @@
 use super::column::ColumnDiffer;
-use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
+use crate::{database_info::DatabaseInfo, flavour::SqlFlavour, pair::Pair};
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     PrimaryKey,
@@ -8,8 +8,7 @@ use sql_schema_describer::{
 pub(crate) struct TableDiffer<'a> {
     pub(crate) database_info: &'a DatabaseInfo,
     pub(crate) flavour: &'a dyn SqlFlavour,
-    pub(crate) previous: TableWalker<'a>,
-    pub(crate) next: TableWalker<'a>,
+    pub(crate) tables: Pair<TableWalker<'a>>,
 }
 
 impl<'schema> TableDiffer<'schema> {
@@ -86,7 +85,7 @@ impl<'schema> TableDiffer<'schema> {
 
     /// The primary key present in `next` but not `previous`, if applicable.
     pub(crate) fn created_primary_key(&self) -> Option<&'schema PrimaryKey> {
-        match (self.previous.primary_key(), self.next.primary_key()) {
+        match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
             (None, Some(pk)) => Some(pk),
             (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(next_pk),
             (Some(previous_pk), Some(next_pk)) => {
@@ -102,7 +101,7 @@ impl<'schema> TableDiffer<'schema> {
 
     /// The primary key present in `previous` but not `next`, if applicable.
     pub(crate) fn dropped_primary_key(&self) -> Option<&'schema PrimaryKey> {
-        match (self.previous.primary_key(), self.next.primary_key()) {
+        match self.tables.as_ref().map(|t| t.primary_key()).as_tuple() {
             (Some(pk), None) => Some(pk),
             (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(previous_pk),
             (Some(previous_pk), Some(_next_pk)) => {
@@ -129,27 +128,35 @@ impl<'schema> TableDiffer<'schema> {
     }
 
     fn previous_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
-        self.previous.columns()
+        self.previous().columns()
     }
 
     fn next_columns<'a>(&'a self) -> impl Iterator<Item = ColumnWalker<'schema>> + 'a {
-        self.next.columns()
+        self.next().columns()
     }
 
     fn previous_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
-        self.previous.foreign_keys()
+        self.previous().foreign_keys()
     }
 
     fn next_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyWalker<'schema>> + 'a {
-        self.next.foreign_keys()
+        self.next().foreign_keys()
     }
 
     fn previous_indexes<'a>(&'a self) -> impl Iterator<Item = IndexWalker<'schema>> + 'a {
-        self.previous.indexes()
+        self.previous().indexes()
     }
 
     fn next_indexes<'a>(&'a self) -> impl Iterator<Item = IndexWalker<'schema>> + 'a {
-        self.next.indexes()
+        self.next().indexes()
+    }
+
+    pub(super) fn previous(&self) -> &TableWalker<'schema> {
+        self.tables.previous()
+    }
+
+    pub(super) fn next(&self) -> &TableWalker<'schema> {
+        self.tables.next()
     }
 }
 

@@ -4,14 +4,13 @@ use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
     sql_migration::{
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropColumn, DropForeignKey, DropIndex,
+        RedefineTable, TableChange,
     },
 };
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
-    walkers::ForeignKeyWalker,
-    walkers::{ColumnWalker, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write};
@@ -39,8 +38,12 @@ impl SqlRenderer for MssqlFlavour {
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name } => {
-                    let constraint = constraint_name.as_ref().unwrap();
+                TableChange::DropPrimaryKey => {
+                    let constraint = tables
+                        .previous()
+                        .primary_key()
+                        .and_then(|pk| pk.constraint_name.as_ref())
+                        .expect("Missing constraint name in DropPrimaryKey on MSSQL");
                     lines.push(format!("DROP CONSTRAINT {}", self.quote(constraint)));
                 }
                 TableChange::AddPrimaryKey { columns } => {
@@ -53,8 +56,8 @@ impl SqlRenderer for MssqlFlavour {
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name, .. }) => {
-                    let name = self.quote(&name);
+                TableChange::DropColumn(DropColumn { index }) => {
+                    let name = self.quote(tables.previous().column_at(*index).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::DropAndRecreateColumn { .. } => todo!("DropAndRecreateColumn on MSSQL"),
@@ -179,7 +182,7 @@ impl SqlRenderer for MssqlFlavour {
         )]
     }
 
-    fn render_create_enum(&self, _: &CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_create_enum on Microsoft SQL Server")
     }
 
@@ -254,7 +257,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_drop_enum on MSSQL")
     }
 

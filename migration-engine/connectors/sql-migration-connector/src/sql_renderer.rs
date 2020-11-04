@@ -9,12 +9,11 @@ pub(crate) use common::IteratorJoin;
 use crate::{
     database_info::DatabaseInfo,
     pair::Pair,
-    sql_migration::{
-        AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropEnum, DropForeignKey, DropIndex, RedefineTable,
-    },
+    sql_migration::{AlterEnum, AlterIndex, AlterTable, CreateIndex, DropForeignKey, DropIndex, RedefineTable},
 };
 use common::{Quoted, QuotedWithSchema};
 use sql_schema_describer::{
+    walkers::EnumWalker,
     walkers::ForeignKeyWalker,
     walkers::{ColumnWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, SqlSchema,
@@ -45,7 +44,7 @@ pub(crate) trait SqlRenderer {
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String>;
 
     /// Render a `CreateEnum` step.
-    fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String>;
+    fn render_create_enum(&self, create_enum: &EnumWalker<'_>) -> Vec<String>;
 
     /// Render a `CreateIndex` step.
     fn render_create_index(&self, create_index: &CreateIndex) -> String;
@@ -59,7 +58,7 @@ pub(crate) trait SqlRenderer {
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String;
 
     /// Render a `DropEnum` step.
-    fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
+    fn render_drop_enum(&self, dropped_enum: &EnumWalker<'_>) -> Vec<String>;
 
     /// Render a `DropForeignKey` step.
     fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String;
