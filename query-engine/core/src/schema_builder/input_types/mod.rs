@@ -46,6 +46,7 @@ fn map_scalar_input_type(field: &ScalarFieldRef) -> InputType {
         TypeIdentifier::Enum(_) => map_enum_input_type(&field),
         TypeIdentifier::Xml => InputType::xml(),
         TypeIdentifier::Bytes => InputType::bytes(),
+        TypeIdentifier::BigInt => InputType::bigint(),
     };
 
     if field.is_list {

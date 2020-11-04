@@ -1,6 +1,6 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, sql_schema_differ::column::ColumnDiffer,
+    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, pair::Pair, sql_schema_differ::column::ColumnDiffer,
     sql_schema_differ::ColumnTypeChange,
 };
 use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
@@ -47,12 +47,14 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         None
     }
 
-    fn index_should_be_renamed(&self, previous: &IndexWalker<'_>, next: &IndexWalker<'_>) -> bool {
+    fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
-        if previous.name().len() == MYSQL_IDENTIFIER_SIZE_LIMIT && next.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-            previous.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT] != next.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
+        let (previous_name, next_name) = indexes.as_ref().map(|idx| idx.name()).into_tuple();
+
+        if previous_name.len() == MYSQL_IDENTIFIER_SIZE_LIMIT && next_name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
+            previous_name[0..MYSQL_IDENTIFIER_SIZE_LIMIT] != next_name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
         } else {
-            previous.name() != next.name()
+            previous_name != next_name
         }
     }
 

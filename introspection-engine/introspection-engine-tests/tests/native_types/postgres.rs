@@ -67,14 +67,14 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             id              Int      @id @postgres.Integer
             smallint        Int      @postgres.SmallInt
             int             Int      @postgres.Integer
-            bigint          Int      @postgres.BigInt
+            bigint          BigInt   @postgres.BigInt
             decimal         Decimal  @postgres.Numeric(4, 2)
             numeric         Decimal  @postgres.Numeric(4, 2)
             real            Float    @postgres.Real
             doublePrecision Float    @postgres.DoublePrecision
             smallSerial     Int      @default(autoincrement()) @postgres.SmallInt
             serial          Int      @default(autoincrement()) @postgres.Integer
-            bigSerial       Int      @default(autoincrement()) @postgres.BigInt
+            bigSerial       BigInt   @default(autoincrement()) @postgres.BigInt
             varChar         String   @postgres.VarChar(200)
             char            String   @postgres.Char(200)
             text            String   @postgres.Text
@@ -91,6 +91,77 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             json            Json     @postgres.Json
             jsonb           Json     @postgres.JsonB
           }
+    "#};
+
+    let result = api.re_introspect(&dm).await?;
+
+    dm.push_str(types);
+
+    println!("EXPECTATION: \n {:#}", dm);
+    println!("RESULT: \n {:#}", result);
+
+    assert!(result.replace(" ", "").contains(&types.replace(" ", "")));
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+
+async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
+    let columns: Vec<String> = TYPES
+        .iter()
+        .map(|(name, data_type)| format!("\"{}\" {} Not Null", name, data_type))
+        .collect();
+
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
+                t.inject_custom("id Integer Primary Key");
+                for column in &columns {
+                    t.inject_custom(column);
+                }
+            });
+        })
+        .await?;
+
+    let mut dm = indoc! {r#"
+        datasource postgres {
+            provider        = "postgres"
+            url             = "postgres://localhost/test"
+        }
+    "#}
+    .to_string();
+
+    let types = indoc! {r#"
+        model Blog {
+            id              Int      @id
+            smallint        Int
+            int             Int
+            bigint          Int
+            decimal         Float
+            numeric         Float
+            real            Float
+            doublePrecision Float
+            smallSerial     Int      @default(autoincrement())
+            serial          Int      @default(autoincrement())
+            bigSerial       Int      @default(autoincrement())
+            varChar         String
+            char            String
+            text            String
+            // This type is currently not supported.
+            // bytea        bytea
+            ts              DateTime
+            date            DateTime
+            time            DateTime
+            time_2          DateTime
+            bool            Boolean
+            bit             String
+            varbit          String
+            uuid            String
+            xml             String
+            json            Json
+            jsonb           Json
+        }
     "#};
 
     let result = api.re_introspect(&dm).await?;
@@ -166,76 +237,6 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
     println!("RESULT: \n {:#}", result);
 
     assert!(result.replace(" ", "").contains(&dm.replace(" ", "")));
-
-    Ok(())
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
-    let columns: Vec<String> = TYPES
-        .iter()
-        .map(|(name, data_type)| format!("\"{}\" {} Not Null", name, data_type))
-        .collect();
-
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("Blog", move |t| {
-                t.inject_custom("id Integer Primary Key");
-                for column in &columns {
-                    t.inject_custom(column);
-                }
-            });
-        })
-        .await?;
-
-    let mut dm = indoc! {r#"
-        datasource postgres {
-            provider        = "postgres"
-            url             = "postgres://localhost/test"
-        }
-    "#}
-    .to_string();
-
-    let types = indoc! {r#"
-        model Blog {
-            id              Int      @id
-            smallint        Int
-            int             Int
-            bigint          Int
-            decimal         Float
-            numeric         Float
-            real            Float
-            doublePrecision Float
-            smallSerial     Int      @default(autoincrement())
-            serial          Int      @default(autoincrement())
-            bigSerial       Int      @default(autoincrement())
-            varChar         String
-            char            String
-            text            String
-            // This type is currently not supported.
-            // bytea        bytea
-            ts              DateTime
-            date            DateTime
-            time            DateTime
-            time_2          DateTime
-            bool            Boolean
-            bit             String
-            varbit          String
-            uuid            String
-            xml             String
-            json            Json
-            jsonb           Json
-        }
-    "#};
-
-    let result = api.re_introspect(&dm).await?;
-
-    dm.push_str(types);
-
-    println!("EXPECTATION: \n {:#}", dm);
-    println!("RESULT: \n {:#}", result);
-
-    assert!(result.replace(" ", "").contains(&types.replace(" ", "")));
 
     Ok(())
 }

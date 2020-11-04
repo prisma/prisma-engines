@@ -124,15 +124,15 @@ fn should_fail_on_native_type_with_invalid_datasource_name() {
 
         model Blog {
             id     Int    @id
-            bigInt Int    @pg.BigInt
+            bigInt Int    @pg.Integer
         }
     "#;
 
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.BigInt?",
-        ast::Span::new(300, 309),
+        "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.Integer?",
+        ast::Span::new(300, 310),
     ));
 }
 
@@ -151,7 +151,7 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 
         model Blog {
             id     Int    @id
-            bigInt Int    @pg.BigInt
+            bigInt Int    @pg.Integer
             foobar String @pg.VarChar(2, 3, 4)
         }
     "#;
@@ -160,7 +160,7 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Native type VarChar takes 1 optional arguments, but received 3.",
-        ast::Span::new(337, 356),
+        ast::Span::new(338, 357),
     ));
 }
 
@@ -195,6 +195,22 @@ fn should_fail_on_bytes_scalar_type_used_without_preview_feature() {
     error.assert_is(DatamodelError::new_connector_error(
         "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
         ast::Span::new(64, 74),
+    ));
+}
+#[test]
+fn should_fail_on_big_int_scalar_type_used_without_preview_feature() {
+    let dml = r#"
+        model Blog {
+            id     Int    @id
+            foo BigInt
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
+        ast::Span::new(64, 75),
     ));
 }
 
@@ -263,17 +279,30 @@ fn should_fail_on_native_type_with_incompatible_type() {
 
         model Blog {
             id     Int    @id
-            bigInt Int    @pg.BigInt
             foobar Boolean @pg.VarChar(5)
+            foo Int @pg.BigInt
         }
     "#;
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type VarChar is not compatible with declared field type Boolean, expected field type String.",
-        ast::Span::new(338, 351),
-    ));
+    error.assert_length(2);
+
+    error.assert_is_at(
+        0,
+        DatamodelError::new_connector_error(
+            "Native type VarChar is not compatible with declared field type Boolean, expected field type String.",
+            ast::Span::new(301, 314),
+        ),
+    );
+
+    error.assert_is_at(
+        1,
+        DatamodelError::new_connector_error(
+            "Native type BigInt is not compatible with declared field type Int, expected field type BigInt.",
+            ast::Span::new(336, 345),
+        ),
+    );
 }
 
 #[test]
@@ -291,7 +320,6 @@ fn should_fail_on_native_type_with_invalid_arguments() {
 
         model Blog {
             id     Int    @id
-            bigInt Int    @pg.BigInt
             foobar String @pg.VarChar(a)
         }
     "#;
@@ -300,6 +328,6 @@ fn should_fail_on_native_type_with_invalid_arguments() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "Expected a numeric value, but failed while parsing \"a\": invalid digit found in string.",
-        ast::Span::new(337, 350),
+        ast::Span::new(300, 313),
     ));
 }

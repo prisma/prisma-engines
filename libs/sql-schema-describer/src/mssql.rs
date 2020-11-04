@@ -255,6 +255,10 @@ impl SqlSchemaDescriber {
                                 Some(int_value) => DefaultValue::VALUE(int_value),
                                 None => DefaultValue::DBGENERATED(default_string),
                             },
+                            ColumnTypeFamily::BigInt => match parse_big_int(&default_string) {
+                                Some(int_value) => DefaultValue::VALUE(int_value),
+                                None => DefaultValue::DBGENERATED(default_string),
+                            },
                             ColumnTypeFamily::Float => match parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::VALUE(float_value),
                                 None => DefaultValue::DBGENERATED(default_string),
@@ -277,7 +281,6 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                         })

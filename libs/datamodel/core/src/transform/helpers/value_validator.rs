@@ -66,7 +66,7 @@ impl ValueValidator {
             }),
 
             ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
-            _ => todo!(),
+            ScalarType::BigInt => self.as_int().map(PrismaValue::BigInt),
         }
     }
 
@@ -182,6 +182,11 @@ impl ValueValidator {
                 value: self.value.clone(),
             }],
         }
+    }
+
+    /// Checks if the wrapped value is an array
+    pub fn is_array(&self) -> bool {
+        return self.value.is_array();
     }
 
     pub fn as_default_value_for_scalar_type(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {

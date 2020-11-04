@@ -256,7 +256,7 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    let result = api.infer_apply(&dm2).send().await?.into_inner();
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
@@ -268,13 +268,6 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
                 idx.assert_is_not_unique()?.assert_name("customNameNonUniqueA")
             })
     })?;
-
-    // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
-    if !api.is_sqlite() {
-        let expected_steps = &["AlterIndex", "AlterIndex"];
-        let actual_steps = result.describe_steps();
-        assert_eq!(actual_steps, expected_steps);
-    }
 
     Ok(())
 }
@@ -301,14 +294,14 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField])
-            }
-        "#;
+            @@unique([field, secondField])
+        }
+    "#;
     let result = api.infer_and_apply(&dm2).await;
     let indexes = result
         .sql_schema
@@ -317,13 +310,6 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
         .iter()
         .filter(|i| i.columns == &["field", "secondField"] && i.name == "A.field_secondField_unique");
     assert_eq!(indexes.count(), 1);
-
-    // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
-    if !api.is_sqlite() {
-        let expected_steps = &["AlterIndex"];
-        let actual_steps = result.migration_output.describe_steps();
-        assert_eq!(actual_steps, expected_steps);
-    }
 }
 
 #[test_each_connector]
@@ -355,7 +341,8 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
         }
     "#;
 
-    let result = api.infer_apply(&dm2).send().await?.assert_green()?.into_inner();
+    api.schema_push(dm2).send().await?.assert_green()?;
+
     api.assert_schema().await?.assert_table("A", |table| {
         table
             .assert_indexes_count(1)?
@@ -363,13 +350,6 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
                 idx.assert_name("somethingCustom")?.assert_is_unique()
             })
     })?;
-
-    // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
-    if !api.is_sqlite() {
-        let expected_steps = &["AlterIndex"];
-        let actual_steps = result.describe_steps();
-        assert_eq!(actual_steps, expected_steps);
-    }
 
     Ok(())
 }

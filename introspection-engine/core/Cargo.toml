@@ -18,7 +18,7 @@ thiserror = "1.0.9"
 futures = { version = "0.3", features = ["compat"] }
 futures01 = { package = "futures", version = "0.1" }
 
-serde_json = "1.0"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 serde_derive = "1.0"
 async-trait = "0.1.17"
 jsonrpc-core = "14.0"

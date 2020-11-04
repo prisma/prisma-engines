@@ -153,7 +153,7 @@ async fn all_mysql_column_types_must_work() {
                 data_type: "bigint".to_string(),
                 full_data_type: "bigint(20)".to_string(),
                 character_maximum_length: None,
-                family: ColumnTypeFamily::Int,
+                family: ColumnTypeFamily::BigInt,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::BigInt.to_json()),
             },

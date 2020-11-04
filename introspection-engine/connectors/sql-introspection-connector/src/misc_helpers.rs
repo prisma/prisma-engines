@@ -258,7 +258,11 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
         (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
+            Some(DMLDef::Expression(VG::new_autoincrement()))
+        }
         (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
         (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
@@ -357,12 +361,12 @@ pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -
         _ if is_mysql_bit => FieldType::Base(ScalarType::Int, None),
         _ if is_postgres_interval => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-        ColumnTypeFamily::Duration => FieldType::Base(ScalarType::DateTime, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
@@ -377,12 +381,12 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
 
     match &column.tpe.family {
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::BigInt, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Decimal, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-        ColumnTypeFamily::Duration => FieldType::Base(ScalarType::Duration, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),

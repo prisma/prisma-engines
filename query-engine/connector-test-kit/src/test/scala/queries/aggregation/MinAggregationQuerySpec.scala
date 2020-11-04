@@ -11,6 +11,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       |  float Float
       |  int   Int
       |  dec   Decimal
+      |  bInt  BigInt
       |}
     """.stripMargin
   }
@@ -20,7 +21,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
-  def createItem(float: Double, int: Int, dec: String, id: Option[String] = None) = {
+  def createItem(float: Double, int: Int, dec: String, bInt: String, id: Option[String] = None) = {
     val idString = id match {
       case Some(i) => s"""id: "$i","""
       case None    => ""
@@ -28,7 +29,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     server.query(
       s"""mutation {
-         |  createItem(data: { $idString float: $float, int: $int, dec: $dec }) {
+         |  createItem(data: { $idString float: $float, int: $int, dec: $dec, bInt: $bInt }) {
          |    id
          |  }
          |}""".stripMargin,
@@ -44,6 +45,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |      float
          |      int
          |      dec
+         |      bInt
          |    }
          |  }
          |}""".stripMargin,
@@ -56,8 +58,8 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Calculating min with some records in the database" should "return the correct minima" in {
-    createItem(5.5, 5, "5.5")
-    createItem(4.5, 10, "4.5")
+    createItem(5.5, 5, "5.5", "5")
+    createItem(4.5, 10, "4.5", "10")
 
     val result = server.query(
       s"""{
@@ -66,6 +68,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |      float
          |      int
          |      dec
+         |      bInt
          |    }
          |  }
          |}""".stripMargin,
@@ -73,15 +76,17 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.min.float") should be(4.5)
-    result.pathAsInt("data.aggregateItem.min.int") should be(5)
     result.pathAsString("data.aggregateItem.min.dec") should be("4.5")
+
+    result.pathAsInt("data.aggregateItem.min.int") should be(5)
+    result.pathAsString("data.aggregateItem.min.bInt") should be("5")
   }
 
   "Calculating min with all sorts of query arguments" should "work" in {
-    createItem(5.5, 5, "5.5", Some("1"))
-    createItem(4.5, 10, "4.5", Some("2"))
-    createItem(1.5, 2, "1.5", Some("3"))
-    createItem(0.0, 1, "0.0", Some("4"))
+    createItem(5.5, 5, "5.5", "5", Some("1"))
+    createItem(4.5, 10, "4.5", "10", Some("2"))
+    createItem(1.5, 2, "1.5", "2", Some("3"))
+    createItem(0.0, 1, "0.0", "1", Some("4"))
 
     var result = server.query(
       """{
@@ -90,6 +95,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |      float
         |      int
         |      dec
+        |      bInt
         |    }
         |  }
         |}
@@ -98,8 +104,10 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.min.float") should be(4.5)
-    result.pathAsInt("data.aggregateItem.min.int") should be(5)
     result.pathAsString("data.aggregateItem.min.dec") should be("4.5")
+
+    result.pathAsInt("data.aggregateItem.min.int") should be(5)
+    result.pathAsString("data.aggregateItem.min.bInt") should be("5")
 
     result = server.query(
       """{
@@ -108,6 +116,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |      float
         |      int
         |      dec
+        |      bInt
         |    }
         |  }
         |}
@@ -116,8 +125,10 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
-    result.pathAsInt("data.aggregateItem.min.int") should be(1)
     result.pathAsString("data.aggregateItem.min.dec") should be("0")
+
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
+    result.pathAsString("data.aggregateItem.min.bInt") should be("1")
 
     result = server.query(
       """{
@@ -126,6 +137,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |      float
         |      int
         |      dec
+        |      bInt
         |    }
         |  }
         |}
@@ -134,8 +146,10 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
-    result.pathAsInt("data.aggregateItem.min.int") should be(1)
     result.pathAsString("data.aggregateItem.min.dec") should be("0")
+
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
+    result.pathAsString("data.aggregateItem.min.bInt") should be("1")
 
     result = server.query(
       """{
@@ -144,6 +158,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |      float
         |      int
         |      dec
+        |      bInt
         |    }
         |  }
         |}
@@ -152,8 +167,10 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
-    result.pathAsInt("data.aggregateItem.min.int") should be(1)
     result.pathAsString("data.aggregateItem.min.dec") should be("0")
+
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
+    result.pathAsString("data.aggregateItem.min.bInt") should be("1")
 
     result = server.query(
       """{
@@ -162,6 +179,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |      float
         |      int
         |      dec
+        |      bInt
         |    }
         |  }
         |}
@@ -170,8 +188,10 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
-    result.pathAsInt("data.aggregateItem.min.int") should be(1)
     result.pathAsString("data.aggregateItem.min.dec") should be("0")
+
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
+    result.pathAsString("data.aggregateItem.min.bInt") should be("1")
 
     result = server.query(
       s"""{
@@ -180,6 +200,7 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         |      float
         |      int
         |      dec
+        |      bInt
         |    }
         |  }
         |}
@@ -188,7 +209,9 @@ class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
-    result.pathAsInt("data.aggregateItem.min.int") should be(1)
     result.pathAsString("data.aggregateItem.min.dec") should be("0")
+
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
+    result.pathAsString("data.aggregateItem.min.bInt") should be("1")
   }
 }

@@ -29,11 +29,7 @@ fn checked_update_one_input_type(
     parent_field: Option<&RelationFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let name = match parent_field.map(|pf| pf.related_field()) {
-        Some(ref f) => format!(
-            "{}UpdateWithout{}Input",
-            model.name,
-            capitalize(f.related_field().name.as_str())
-        ),
+        Some(ref f) => format!("{}UpdateWithout{}Input", model.name, capitalize(f.name.as_str())),
         _ => format!("{}UpdateInput", model.name),
     };
 
@@ -63,7 +59,7 @@ fn unchecked_update_one_input_type(
         Some(ref f) => format!(
             "{}UncheckedUpdateWithout{}Input",
             model.name,
-            capitalize(f.related_field().name.as_str())
+            capitalize(f.name.as_str())
         ),
         _ => format!("{}UncheckedUpdateInput", model.name),
     };
@@ -141,6 +137,7 @@ fn non_list_scalar_update_field_mapper(
         TypeIdentifier::Float => InputType::object(operations_object_type(ctx, "Float", field, true)),
         TypeIdentifier::Decimal => InputType::object(operations_object_type(ctx, "Decimal", field, true)),
         TypeIdentifier::Int => InputType::object(operations_object_type(ctx, "Int", field, true)),
+        TypeIdentifier::BigInt => InputType::object(operations_object_type(ctx, "BigInt", field, true)),
         TypeIdentifier::String => InputType::object(operations_object_type(ctx, "String", field, false)),
         TypeIdentifier::Boolean => InputType::object(operations_object_type(ctx, "Bool", field, false)),
         TypeIdentifier::Enum(e) => InputType::object(operations_object_type(ctx, &format!("Enum{}", e), field, false)),

@@ -1,12 +1,11 @@
 use super::{common::*, SqlRenderer};
 use crate::{
-    database_info::DatabaseInfo,
     flavour::PostgresFlavour,
     pair::Pair,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
+        TableChange,
     },
     sql_schema_differ::ColumnChanges,
 };
@@ -48,7 +47,7 @@ impl SqlRenderer for PostgresFlavour {
                 .map(|created_value| {
                     format!(
                         "ALTER TYPE {enum_name} ADD VALUE {value}",
-                        enum_name = Quoted::postgres_ident(&alter_enum.name),
+                        enum_name = Quoted::postgres_ident(schemas.enums(&alter_enum.index).previous().name()),
                         value = Quoted::postgres_string(created_value)
                     )
                 })
@@ -57,28 +56,21 @@ impl SqlRenderer for PostgresFlavour {
             return stmts;
         }
 
-        let new_enum = schemas
-            .next()
-            .get_enum(&alter_enum.name)
-            .ok_or_else(|| anyhow::anyhow!("Enum `{}` not found in target schema.", alter_enum.name))
-            .unwrap();
+        let enums = schemas.enums(&alter_enum.index);
 
         let mut stmts = Vec::with_capacity(10);
 
-        let tmp_name = format!("{}_new", &new_enum.name);
-        let tmp_old_name = format!("{}_old", &alter_enum.name);
+        let tmp_name = format!("{}_new", &enums.next().name());
+        let tmp_old_name = format!("{}_old", &enums.previous().name());
 
-        stmts.push("Begin".to_string());
+        stmts.push("BEGIN".to_string());
 
         // create the new enum with tmp name
         {
             let create_new_enum = format!(
                 "CREATE TYPE {enum_name} AS ENUM ({variants})",
-                enum_name = QuotedWithSchema {
-                    schema_name: self.schema_name(),
-                    name: Quoted::postgres_ident(&tmp_name),
-                },
-                variants = new_enum.values.iter().map(Quoted::postgres_string).join(", ")
+                enum_name = Quoted::postgres_ident(&tmp_name),
+                variants = enums.next().values().iter().map(Quoted::postgres_string).join(", ")
             );
 
             stmts.push(create_new_enum);
@@ -86,7 +78,7 @@ impl SqlRenderer for PostgresFlavour {
 
         // alter type of the current columns to new, with a cast
         {
-            let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str()));
+            let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
 
             for column in affected_columns {
                 let sql = format!(
@@ -107,7 +99,7 @@ impl SqlRenderer for PostgresFlavour {
         {
             let sql = format!(
                 "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
-                enum_name = Quoted::postgres_ident(&alter_enum.name),
+                enum_name = Quoted::postgres_ident(enums.previous().name()),
                 tmp_old_name = Quoted::postgres_ident(&tmp_old_name)
             );
 
@@ -119,7 +111,7 @@ impl SqlRenderer for PostgresFlavour {
             let sql = format!(
                 "ALTER TYPE {tmp_name} RENAME TO {enum_name}",
                 tmp_name = Quoted::postgres_ident(&tmp_name),
-                enum_name = Quoted::postgres_ident(&new_enum.name)
+                enum_name = Quoted::postgres_ident(enums.next().name())
             );
 
             stmts.push(sql)
@@ -135,21 +127,16 @@ impl SqlRenderer for PostgresFlavour {
             stmts.push(sql)
         }
 
-        stmts.push("Commit".to_string());
+        stmts.push("COMMIT".to_string());
 
         stmts
     }
 
-    fn render_alter_index(
-        &self,
-        alter_index: &AlterIndex,
-        _database_info: &DatabaseInfo,
-        _current_schema: &SqlSchema,
-    ) -> Vec<String> {
+    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![format!(
             "ALTER INDEX {} RENAME TO {}",
-            self.quote(&alter_index.index_name),
-            self.quote(&alter_index.index_new_name)
+            self.quote(indexes.previous().name()),
+            self.quote(indexes.next().name())
         )]
     }
 
@@ -164,11 +151,13 @@ impl SqlRenderer for PostgresFlavour {
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name } => lines.push(format!(
+                TableChange::DropPrimaryKey => lines.push(format!(
                     "DROP CONSTRAINT {}",
                     Quoted::postgres_ident(
-                        constraint_name
-                            .as_ref()
+                        tables
+                            .previous()
+                            .primary_key()
+                            .and_then(|pk| pk.constraint_name.as_ref())
                             .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
                     )
                 )),
@@ -182,8 +171,8 @@ impl SqlRenderer for PostgresFlavour {
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name, .. }) => {
-                    let name = self.quote(&name);
+                TableChange::DropColumn(DropColumn { index }) => {
+                    let name = self.quote(tables.previous().column_at(*index).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
@@ -241,14 +230,17 @@ impl SqlRenderer for PostgresFlavour {
         let default_str = column
             .default()
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
-            .map(|default| format!("DEFAULT {}", self.render_default(default, column.column_type_family())))
+            .map(|default| format!(" DEFAULT {}", self.render_default(default, column.column_type_family())))
             .unwrap_or_else(String::new);
         let is_serial = column.is_autoincrement();
 
         if is_serial {
             format!("{} SERIAL", column_name)
         } else {
-            format!("{} {} {} {}", column_name, tpe_str, nullability_str, default_str)
+            format!(
+                "{}{} {}{}{}",
+                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
+            )
         }
     }
 
@@ -286,28 +278,28 @@ impl SqlRenderer for PostgresFlavour {
         }
     }
 
-    fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
         let sql = format!(
             r#"CREATE TYPE {enum_name} AS ENUM ({variants})"#,
             enum_name = QuotedWithSchema {
                 schema_name: &self.0.schema(),
-                name: Quoted::postgres_ident(&create_enum.name)
+                name: Quoted::postgres_ident(enm.name())
             },
-            variants = create_enum.variants.iter().map(Quoted::postgres_string).join(", "),
+            variants = enm.values().iter().map(Quoted::postgres_string).join(", "),
         );
 
         vec![sql]
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let Index { name, columns, tpe } = &create_index.index;
-        let index_type = match tpe {
+    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
         };
-        let index_name = self.quote(&name).to_string();
-        let table_reference = self.quote(&create_index.table).to_string();
-        let columns = columns.iter().map(|c| self.quote(c));
+
+        let index_name = self.quote(index.name());
+        let table_reference = self.quote(index.table().name());
+        let columns = index.columns().map(|c| self.quote(c.name()));
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -328,7 +320,7 @@ impl SqlRenderer for PostgresFlavour {
             .map(|col| self.quote(col))
             .join(",");
         let pk = if !pk_column_names.is_empty() {
-            format!(",\nPRIMARY KEY ({})", pk_column_names)
+            format!(",\n\n{}PRIMARY KEY ({})", SQL_INDENTATION, pk_column_names)
         } else {
             String::new()
         };
@@ -341,10 +333,10 @@ impl SqlRenderer for PostgresFlavour {
         )
     }
 
-    fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, dropped_enum: &EnumWalker<'_>) -> Vec<String> {
         let sql = format!(
             "DROP TYPE {enum_name}",
-            enum_name = Quoted::postgres_ident(&drop_enum.name),
+            enum_name = Quoted::postgres_ident(dropped_enum.name()),
         );
 
         vec![sql]
@@ -390,16 +382,16 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
     }
 
     match &t.family {
-        ColumnTypeFamily::Boolean => format!("boolean {}", array),
-        ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),
-        ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
-        ColumnTypeFamily::Decimal => format!("Decimal(65,30) {}", array),
-        ColumnTypeFamily::Int => format!("integer {}", array),
-        ColumnTypeFamily::String => format!("text {}", array),
+        ColumnTypeFamily::Boolean => format!("BOOLEAN{}", array),
+        ColumnTypeFamily::DateTime => format!("TIMESTAMP(3){}", array),
+        ColumnTypeFamily::Float => format!("DECIMAL(65,30){}", array),
+        ColumnTypeFamily::Decimal => format!("DECIMAL(65,30){}", array),
+        ColumnTypeFamily::Int => format!("INTEGER{}", array),
+        ColumnTypeFamily::BigInt => format!("BIGINT{}", array),
+        ColumnTypeFamily::String => format!("TEXT{}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
-        ColumnTypeFamily::Json => format!("jsonb {}", array),
-        ColumnTypeFamily::Binary => format!("bytea {}", array),
-        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+        ColumnTypeFamily::Json => format!("JSONB{}", array),
+        ColumnTypeFamily::Binary => format!("BYTEA{}", array),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }

@@ -400,6 +400,10 @@ impl InputType {
         InputType::Scalar(ScalarType::Int)
     }
 
+    pub fn bigint() -> InputType {
+        InputType::Scalar(ScalarType::BigInt)
+    }
+
     pub fn float() -> InputType {
         InputType::Scalar(ScalarType::Float)
     }
@@ -479,6 +483,10 @@ impl OutputType {
         OutputType::Scalar(ScalarType::Int)
     }
 
+    pub fn bigint() -> OutputType {
+        OutputType::Scalar(ScalarType::BigInt)
+    }
+
     pub fn float() -> OutputType {
         OutputType::Scalar(ScalarType::Float)
     }
@@ -536,6 +544,7 @@ pub enum ScalarType {
     Null,
     String,
     Int,
+    BigInt,
     Float,
     Decimal,
     Boolean,

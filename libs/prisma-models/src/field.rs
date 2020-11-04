@@ -60,6 +60,7 @@ impl From<&RelationFieldRef> for FieldWeak {
 pub enum TypeIdentifier {
     String,
     Int,
+    BigInt,
     Float,
     Decimal,
     Boolean,
@@ -176,13 +177,13 @@ impl From<ScalarType> for TypeIdentifier {
         match st {
             ScalarType::String => Self::String,
             ScalarType::Int => Self::Int,
+            ScalarType::BigInt => Self::BigInt,
             ScalarType::Float => Self::Float,
             ScalarType::Boolean => Self::Boolean,
             ScalarType::DateTime => Self::DateTime,
             ScalarType::Json => Self::Json,
             ScalarType::Decimal => Self::Decimal,
             ScalarType::Bytes => Self::Bytes,
-            ScalarType::Duration => todo!("No idea what this is supposed to be"),
         }
     }
 }

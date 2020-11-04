@@ -1,15 +1,15 @@
 use super::{
+    common::SQL_INDENTATION,
     common::{render_nullability, render_on_delete, Quoted},
     IteratorJoin, SqlRenderer,
 };
 use crate::{
-    database_info::DatabaseInfo,
     flavour::{MysqlFlavour, SqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
     pair::Pair,
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
+        TableChange,
     },
     sql_schema_differ::ColumnChanges,
 };
@@ -17,8 +17,8 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, ForeignKeyWalker, TableWalker},
-    ColumnTypeFamily, DefaultValue, Index, IndexType, SqlSchema,
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -54,59 +54,13 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_alter_enum on MySQL")
     }
 
-    fn render_alter_index(
-        &self,
-        alter_index: &AlterIndex,
-        database_info: &DatabaseInfo,
-        current_schema: &SqlSchema,
-    ) -> Vec<String> {
-        let AlterIndex {
-            table,
-            index_name,
-            index_new_name,
-        } = alter_index;
-        // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
-        if database_info.is_mariadb() || database_info.is_mysql_5_6() {
-            let old_index = current_schema
-                .table(table)
-                .map_err(|_| {
-                    anyhow::anyhow!(
-                        "Invariant violation: could not find table `{}` in current schema.",
-                        table
-                    )
-                })
-                .unwrap()
-                .indices
-                .iter()
-                .find(|idx| idx.name.as_str() == index_name)
-                .ok_or_else(|| {
-                    anyhow::anyhow!(
-                        "Invariant violation: could not find index `{}` on table `{}` in current schema.",
-                        index_name,
-                        table
-                    )
-                })
-                .unwrap();
-            let mut new_index = old_index.clone();
-            new_index.name = index_new_name.to_owned();
-
-            // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
-            vec![
-                self.render_create_index(&CreateIndex {
-                    table: table.clone(),
-                    index: new_index,
-                    caused_by_create_table: false,
-                }),
-                mysql_drop_index(self, table, index_name),
-            ]
-        } else {
-            vec![format!(
-                "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
-                table_name = self.quote(&table),
-                index_name = self.quote(index_name),
-                index_new_name = self.quote(index_new_name)
-            )]
-        }
+    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        vec![format!(
+            "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
+            table_name = self.quote(indexes.previous().table().name()),
+            index_name = self.quote(indexes.previous().name()),
+            index_new_name = self.quote(indexes.next().name())
+        )]
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -118,7 +72,7 @@ impl SqlRenderer for MysqlFlavour {
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name: _ } => lines.push("DROP PRIMARY KEY".to_owned()),
+                TableChange::DropPrimaryKey => lines.push("DROP PRIMARY KEY".to_owned()),
                 TableChange::AddPrimaryKey { columns } => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
@@ -129,8 +83,8 @@ impl SqlRenderer for MysqlFlavour {
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name, .. }) => {
-                    let name = self.quote(&name);
+                TableChange::DropColumn(DropColumn { index }) => {
+                    let name = self.quote(tables.previous().column_at(*index).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::AlterColumn(AlterColumn {
@@ -182,7 +136,12 @@ impl SqlRenderer for MysqlFlavour {
                     // We do not want to render binary defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Binary)
             })
-            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column_type_family())))
+            .map(|default| {
+                format!(
+                    " DEFAULT {}",
+                    self.render_default(default, &column.column_type_family())
+                )
+            })
             .unwrap_or_else(String::new);
         let foreign_key = column.table().foreign_key_for_column(column.name());
         let auto_increment_str = if column.is_autoincrement() {
@@ -192,10 +151,13 @@ impl SqlRenderer for MysqlFlavour {
         };
 
         match foreign_key {
-            Some(_) => format!("{} {} {} {}", column_name, tpe_str, nullability_str, default_str),
+            Some(_) => format!(
+                "{}{} {}{}{}",
+                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
+            ),
             None => format!(
-                "{} {} {} {}{}",
-                column_name, tpe_str, nullability_str, default_str, auto_increment_str
+                "{}{} {}{}{}{}",
+                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str, auto_increment_str
             ),
         }
     }
@@ -230,25 +192,25 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_create_enum(&self, _create_enum: &CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _create_enum: &EnumWalker<'_>) -> Vec<String> {
         Vec::new() // enums are defined on each column that uses them on MySQL
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let Index { name, columns, tpe } = &create_index.index;
+    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let name = index.name();
         let name = if name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
             &name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
         } else {
             &name
         };
-        let index_type = match tpe {
+        let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
         };
         let index_name = self.quote(&name);
-        let table_reference = self.quote(&create_index.table);
+        let table_reference = self.quote(&index.table().name());
 
-        let columns = columns.iter().map(|c| self.quote(c));
+        let columns = index.columns().map(|c| self.quote(c.name()));
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -266,7 +228,7 @@ impl SqlRenderer for MysqlFlavour {
 
         let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-            format!(",\nPRIMARY KEY ({})", column_names)
+            format!(",\n\n{}PRIMARY KEY ({})", SQL_INDENTATION, column_names)
         } else {
             String::new()
         };
@@ -305,7 +267,15 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
-    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
+    fn render_drop_and_recreate_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
+        vec![
+            self.render_create_index(indexes.next()),
+            mysql_drop_index(indexes.previous().table().name(), indexes.previous().name()),
+        ]
+    }
+
+    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         Vec::new()
     }
 
@@ -318,7 +288,7 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_drop_index(&self, drop_index: &DropIndex) -> String {
-        mysql_drop_index(self, &drop_index.table, &drop_index.name)
+        mysql_drop_index(&drop_index.table, &drop_index.name)
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
@@ -385,14 +355,15 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
     }
 
     match &column.column_type().family {
-        ColumnTypeFamily::Boolean => "boolean".into(),
-        ColumnTypeFamily::DateTime => "datetime(3)".into(),
-        ColumnTypeFamily::Float => "decimal(65,30)".into(),
-        ColumnTypeFamily::Decimal => "decimal(65,30)".into(),
-        ColumnTypeFamily::Int => "int".into(),
+        ColumnTypeFamily::Boolean => "BOOLEAN".into(),
+        ColumnTypeFamily::DateTime => "DATETIME(3)".into(),
+        ColumnTypeFamily::Float => "DECIMAL(65,30)".into(),
+        ColumnTypeFamily::Decimal => "DECIMAL(65,30)".into(),
+        ColumnTypeFamily::Int => "INT".into(),
+        ColumnTypeFamily::BigInt => "BIGINT".into(),
         // we use varchar right now as mediumtext doesn't allow default values
         // a bigger length would not allow to use such a column as primary key
-        ColumnTypeFamily::String => format!("varchar{}", VARCHAR_LENGTH_PREFIX).into(),
+        ColumnTypeFamily::String => format!("VARCHAR{}", VARCHAR_LENGTH_PREFIX).into(),
         ColumnTypeFamily::Enum(enum_name) => {
             let r#enum = column
                 .schema()
@@ -403,9 +374,8 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
 
             format!("ENUM({})", variants).into()
         }
-        ColumnTypeFamily::Json => "json".into(),
-        ColumnTypeFamily::Binary => "longblob".into(),
-        ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
+        ColumnTypeFamily::Json => "JSON".into(),
+        ColumnTypeFamily::Binary => "LONGBLOB".into(),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
     }
@@ -417,10 +387,6 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }
 
-fn mysql_drop_index(renderer: &dyn SqlFlavour, table_name: &str, index_name: &str) -> String {
-    format!(
-        "DROP INDEX {} ON {}",
-        renderer.quote(index_name),
-        renderer.quote(table_name)
-    )
+fn mysql_drop_index(table_name: &str, index_name: &str) -> String {
+    format!("DROP INDEX `{}` ON `{}`", index_name, table_name)
 }

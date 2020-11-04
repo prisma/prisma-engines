@@ -76,6 +76,13 @@ impl Expression {
             Expression::Any(_, _) => "any",
         }
     }
+
+    pub fn is_array(&self) -> bool {
+        match self {
+            Expression::Array(_, _) => true,
+            _ => false,
+        }
+    }
 }
 
 impl ToString for Expression {
