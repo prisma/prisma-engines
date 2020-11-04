@@ -68,7 +68,7 @@ impl SqlRenderer for PostgresFlavour {
         let tmp_name = format!("{}_new", &new_enum.name);
         let tmp_old_name = format!("{}_old", &alter_enum.name);
 
-        stmts.push("Begin".to_string());
+        stmts.push("BEGIN".to_string());
 
         // create the new enum with tmp name
         {
@@ -135,7 +135,7 @@ impl SqlRenderer for PostgresFlavour {
             stmts.push(sql)
         }
 
-        stmts.push("Commit".to_string());
+        stmts.push("COMMIT".to_string());
 
         stmts
     }
@@ -241,14 +241,17 @@ impl SqlRenderer for PostgresFlavour {
         let default_str = column
             .default()
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
-            .map(|default| format!("DEFAULT {}", self.render_default(default, column.column_type_family())))
+            .map(|default| format!(" DEFAULT {}", self.render_default(default, column.column_type_family())))
             .unwrap_or_else(String::new);
         let is_serial = column.is_autoincrement();
 
         if is_serial {
             format!("{} SERIAL", column_name)
         } else {
-            format!("{} {} {} {}", column_name, tpe_str, nullability_str, default_str)
+            format!(
+                "{}{} {}{}{}",
+                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
+            )
         }
     }
 
@@ -328,7 +331,7 @@ impl SqlRenderer for PostgresFlavour {
             .map(|col| self.quote(col))
             .join(",");
         let pk = if !pk_column_names.is_empty() {
-            format!(",\nPRIMARY KEY ({})", pk_column_names)
+            format!(",\n\n{}PRIMARY KEY ({})", SQL_INDENTATION, pk_column_names)
         } else {
             String::new()
         };
@@ -390,16 +393,16 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
     }
 
     match &t.family {
-        ColumnTypeFamily::Boolean => format!("boolean {}", array),
-        ColumnTypeFamily::DateTime => format!("timestamp(3) {}", array),
-        ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
-        ColumnTypeFamily::Decimal => format!("Decimal(65,30) {}", array),
-        ColumnTypeFamily::Int => format!("integer {}", array),
-        ColumnTypeFamily::BigInt => format!("bigint {}", array),
-        ColumnTypeFamily::String => format!("text {}", array),
+        ColumnTypeFamily::Boolean => format!("BOOLEAN{}", array),
+        ColumnTypeFamily::DateTime => format!("TIMESTAMP(3){}", array),
+        ColumnTypeFamily::Float => format!("DECIMAL(65,30){}", array),
+        ColumnTypeFamily::Decimal => format!("DECIMAL(65,30){}", array),
+        ColumnTypeFamily::Int => format!("INTEGER{}", array),
+        ColumnTypeFamily::BigInt => format!("BIGINT{}", array),
+        ColumnTypeFamily::String => format!("TEXT{}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
-        ColumnTypeFamily::Json => format!("jsonb {}", array),
-        ColumnTypeFamily::Binary => format!("bytea {}", array),
+        ColumnTypeFamily::Json => format!("JSONB{}", array),
+        ColumnTypeFamily::Binary => format!("BYTEA{}", array),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),

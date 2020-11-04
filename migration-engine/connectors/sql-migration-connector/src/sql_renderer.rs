@@ -1,3 +1,13 @@
+//! Render SQL DDL statements.
+//!
+//! Conventions:
+//!
+//! - Use 4 spaces for indentation (see common::SQL_INDENTATION)
+//! - SQL types and keywords, like CREATE TABLE and VARCHAR, should be upper
+//!   case, for consistency.
+//! - SqlRenderer implementations do not add semicolons at the end of
+//!   statements, this is done later.
+
 mod common;
 mod mssql_renderer;
 mod mysql_renderer;
@@ -50,12 +60,12 @@ pub(crate) trait SqlRenderer {
     /// Render a `CreateIndex` step.
     fn render_create_index(&self, create_index: &CreateIndex) -> String;
 
-    /// Render a `CreateTable` step.
+    /// Render a table creation step.
     fn render_create_table(&self, table: &TableWalker<'_>) -> String {
         self.render_create_table_as(table, table.name())
     }
 
-    /// Render a `CreateTable` step with the provided table name.
+    /// Render a table creation with the provided table name.
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String;
 
     /// Render a `DropEnum` step.
