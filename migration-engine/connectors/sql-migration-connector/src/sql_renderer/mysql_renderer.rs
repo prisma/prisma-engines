@@ -1,4 +1,5 @@
 use super::{
+    common::SQL_INDENTATION,
     common::{render_nullability, render_on_delete, Quoted},
     IteratorJoin, SqlRenderer,
 };
@@ -183,7 +184,12 @@ impl SqlRenderer for MysqlFlavour {
                     // We do not want to render binary defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Binary)
             })
-            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column_type_family())))
+            .map(|default| {
+                format!(
+                    " DEFAULT {}",
+                    self.render_default(default, &column.column_type_family())
+                )
+            })
             .unwrap_or_else(String::new);
         let foreign_key = column.table().foreign_key_for_column(column.name());
         let auto_increment_str = if column.is_autoincrement() {
@@ -193,10 +199,13 @@ impl SqlRenderer for MysqlFlavour {
         };
 
         match foreign_key {
-            Some(_) => format!("{} {} {} {}", column_name, tpe_str, nullability_str, default_str),
+            Some(_) => format!(
+                "{}{} {}{}{}",
+                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
+            ),
             None => format!(
-                "{} {} {} {}{}",
-                column_name, tpe_str, nullability_str, default_str, auto_increment_str
+                "{}{} {}{}{}{}",
+                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str, auto_increment_str
             ),
         }
     }
@@ -267,7 +276,7 @@ impl SqlRenderer for MysqlFlavour {
 
         let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
-            format!(",\nPRIMARY KEY ({})", column_names)
+            format!(",\n\n{}PRIMARY KEY ({})", SQL_INDENTATION, column_names)
         } else {
             String::new()
         };
@@ -386,15 +395,15 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
     }
 
     match &column.column_type().family {
-        ColumnTypeFamily::Boolean => "boolean".into(),
-        ColumnTypeFamily::DateTime => "datetime(3)".into(),
-        ColumnTypeFamily::Float => "decimal(65,30)".into(),
-        ColumnTypeFamily::Decimal => "decimal(65,30)".into(),
-        ColumnTypeFamily::Int => "int".into(),
-        ColumnTypeFamily::BigInt => "bigint".into(),
+        ColumnTypeFamily::Boolean => "BOOLEAN".into(),
+        ColumnTypeFamily::DateTime => "DATETIME(3)".into(),
+        ColumnTypeFamily::Float => "DECIMAL(65,30)".into(),
+        ColumnTypeFamily::Decimal => "DECIMAL(65,30)".into(),
+        ColumnTypeFamily::Int => "INT".into(),
+        ColumnTypeFamily::BigInt => "BIGINT".into(),
         // we use varchar right now as mediumtext doesn't allow default values
         // a bigger length would not allow to use such a column as primary key
-        ColumnTypeFamily::String => format!("varchar{}", VARCHAR_LENGTH_PREFIX).into(),
+        ColumnTypeFamily::String => format!("VARCHAR{}", VARCHAR_LENGTH_PREFIX).into(),
         ColumnTypeFamily::Enum(enum_name) => {
             let r#enum = column
                 .schema()
@@ -405,8 +414,8 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
 
             format!("ENUM({})", variants).into()
         }
-        ColumnTypeFamily::Json => "json".into(),
-        ColumnTypeFamily::Binary => "longblob".into(),
+        ColumnTypeFamily::Json => "JSON".into(),
+        ColumnTypeFamily::Binary => "LONGBLOB".into(),
         ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),

@@ -24,9 +24,10 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                         r#"
                         -- CreateTable
                         CREATE TABLE "Cat" (
-                        "id" integer   NOT NULL ,
-                        "name" text   NOT NULL ,
-                        PRIMARY KEY ("id")
+                            "id" INTEGER NOT NULL,
+                            "name" TEXT NOT NULL,
+
+                            PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -36,9 +37,10 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                         r#"
                         -- CreateTable
                         CREATE TABLE `Cat` (
-                        `id` int  NOT NULL ,
-                        `name` varchar(191)  NOT NULL ,
-                        PRIMARY KEY (`id`)
+                            `id` INT NOT NULL,
+                            `name` VARCHAR(191) NOT NULL,
+
+                            PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                         "#
                     }
@@ -67,7 +69,7 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "sql-schema-describer=info,debug")]
+#[test_each_connector]
 async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -106,9 +108,10 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                         r#"
                         -- CreateTable
                         CREATE TABLE "Dog" (
-                        "id" integer   NOT NULL ,
-                        "name" text   NOT NULL ,
-                        PRIMARY KEY ("id")
+                            "id" INTEGER NOT NULL,
+                            "name" TEXT NOT NULL,
+
+                            PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -118,9 +121,10 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                         r#"
                         -- CreateTable
                         CREATE TABLE `Dog` (
-                        `id` int  NOT NULL ,
-                        `name` varchar(191)  NOT NULL ,
-                        PRIMARY KEY (`id`)
+                            `id` INT NOT NULL,
+                            `name` VARCHAR(191) NOT NULL,
+
+                            PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                         "#
                     }
@@ -256,13 +260,13 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
           provider = "mysql"
           url = "mysql://root:prisma@127.0.0.1:3306/SelfRelationFilterBugSpec?connection_limit=1"
         }
-    
-    
+
+
         model Cat {
             id      Int @id
             mood    Mood
         }
-        
+
         enum Mood{
             HUNGRY
             SLEEPY
@@ -284,9 +288,10 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                         CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
                         -- CreateTable
                         CREATE TABLE "Cat" (
-                        "id" integer   NOT NULL ,
-                        "mood" "Mood"  NOT NULL ,
-                        PRIMARY KEY ("id")
+                            "id" INTEGER NOT NULL,
+                            "mood" "Mood" NOT NULL,
+
+                            PRIMARY KEY ("id")
                         );
                         "#
                     }
@@ -296,9 +301,10 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                         r#"
                         -- CreateTable
                         CREATE TABLE `Cat` (
-                        `id` int  NOT NULL ,
-                        `mood` ENUM('HUNGRY', 'SLEEPY')  NOT NULL ,
-                        PRIMARY KEY (`id`)
+                            `id` INT NOT NULL,
+                            `mood` ENUM('HUNGRY', 'SLEEPY') NOT NULL,
+
+                            PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                         "#
                     }
