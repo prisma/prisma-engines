@@ -12,6 +12,7 @@ const TYPES: &[(&str, &str)] = &[
     ("tinyint_bool", "TinyInt(1)"),
     ("mediumint", "MediumInt"),
     ("bigint", "BigInt"),
+    ("bigint_autoincrement", "BigInt Auto_Increment Primary Key"),
     ("decimal", "Decimal(5, 3)"),
     ("decimal_2", "Decimal"),
     ("numeric", "Decimal(4,1)"),
@@ -50,7 +51,6 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         .execute_with_schema(
             move |migration| {
                 migration.create_table("Blog", move |t| {
-                    t.inject_custom("id Integer Primary Key");
                     for column in &columns {
                         t.inject_custom(column);
                     }
@@ -80,13 +80,13 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 
     let types = formatdoc! {r#"
         model Blog {{
-            id                             Int      @id @mysql.Int
             int                            Int      @mysql.Int
             smallint                       Int      @mysql.SmallInt
             tinyint                        Int      @mysql.TinyInt
             tinyint_bool                   Boolean  @mysql.TinyInt
             mediumint                      Int      @mysql.MediumInt
             bigint                         BigInt   @mysql.BigInt
+            bigint_autoincrement           BigInt   @id  @default(autoincrement()) @mysql.BigInt
             decimal                        Decimal  @mysql.Decimal(5, 3)
             decimal_2                      Decimal  @mysql.Decimal(10, 0)
             numeric                        Decimal  @mysql.Decimal(4, 1)
@@ -141,7 +141,6 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
         .execute_with_schema(
             move |migration| {
                 migration.create_table("Blog", move |t| {
-                    t.inject_custom("id Integer Primary Key");
                     for column in &columns {
                         t.inject_custom(column);
                     }
@@ -165,13 +164,13 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
 
 
         model Blog {{
-            id                             Int            @id
             int                            Int
             smallint                       Int
             tinyint                        Int   
             tinyint_bool                   Boolean
             mediumint                      Int
             bigint                         Int
+            bigint_autoincrement           Int       @id  @default(autoincrement())
             decimal                        Float
             decimal_2                      Float
             numeric                        Float

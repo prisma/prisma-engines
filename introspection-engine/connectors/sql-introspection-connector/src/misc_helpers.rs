@@ -258,7 +258,11 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
         (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
+            Some(DMLDef::Expression(VG::new_autoincrement()))
+        }
         (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
         (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),

@@ -106,71 +106,6 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResult {
-    api.barrel()
-        .execute(move |migration| {
-            migration.create_table("Blog", move |t| {
-                t.inject_custom("id Integer Primary Key");
-                t.inject_custom("decimal_array Decimal(42,0)[] ");
-                t.inject_custom("decimal_array_2 Decimal[] ");
-                t.inject_custom("numeric_array Numeric(4, 2)[] ");
-                t.inject_custom("numeric_array_2 Numeric[] ");
-                t.inject_custom("varchar_array Varchar(42)[] ");
-                t.inject_custom("varchar_array_2 Varchar[] ");
-                t.inject_custom("char_array Char(200)[] ");
-                t.inject_custom("char_array_2 Char[] ");
-                t.inject_custom("bit_array Bit(20)[] ");
-                t.inject_custom("bit_array_2 Bit[] ");
-                t.inject_custom("varbit_array Varbit(2)[] ");
-                t.inject_custom("varbit_array_2 Varbit[] ");
-                t.inject_custom("timestamp_array Timestamp(4)[] ");
-                t.inject_custom("time_array Time(4)[] ");
-            });
-        })
-        .await?;
-
-    let dm = indoc! {r#"
-         generator client {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-         }
-
-         datasource postgres {
-            provider        = "postgresql"
-            url             = "postgres://localhost/test"
-         }
-
-         model Blog {
-          id                Int        @id @postgres.Integer
-          decimal_array     Decimal[]  @postgres.Numeric(42, 0)
-          decimal_array_2   Decimal[]  @postgres.Numeric
-          numeric_array     Decimal[]  @postgres.Numeric(4, 2)
-          numeric_array_2   Decimal[]  @postgres.Numeric
-          varchar_array     String[]   @postgres.VarChar(42)
-          varchar_array_2   String[]   @postgres.VarChar
-          char_array        String[]   @postgres.Char(200)
-          char_array_2      String[]   @postgres.Char(1)
-          bit_array         String[]   @postgres.Bit(20)
-          bit_array_2       String[]   @postgres.Bit(1)
-          varbit_array      String[]   @postgres.VarBit(2)
-          varbit_array_2    String[]   @postgres.VarBit
-          timestamp_array   DateTime[] @postgres.Timestamp(4)
-          time_array        DateTime[] @postgres.Time(4)
-        }
-    "#}
-    .to_string();
-
-    let result = api.re_introspect(&dm).await?;
-
-    println!("EXPECTATION: \n {:#}", dm);
-    println!("RESULT: \n {:#}", result);
-
-    assert!(result.replace(" ", "").contains(&dm.replace(" ", "")));
-
-    Ok(())
-}
-
-#[test_each_connector(tags("postgres"))]
 async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
     let columns: Vec<String> = TYPES
         .iter()
@@ -236,6 +171,71 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
     println!("RESULT: \n {:#}", result);
 
     assert!(result.replace(" ", "").contains(&types.replace(" ", "")));
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(move |migration| {
+            migration.create_table("Blog", move |t| {
+                t.inject_custom("id Integer Primary Key");
+                t.inject_custom("decimal_array Decimal(42,0)[] ");
+                t.inject_custom("decimal_array_2 Decimal[] ");
+                t.inject_custom("numeric_array Numeric(4, 2)[] ");
+                t.inject_custom("numeric_array_2 Numeric[] ");
+                t.inject_custom("varchar_array Varchar(42)[] ");
+                t.inject_custom("varchar_array_2 Varchar[] ");
+                t.inject_custom("char_array Char(200)[] ");
+                t.inject_custom("char_array_2 Char[] ");
+                t.inject_custom("bit_array Bit(20)[] ");
+                t.inject_custom("bit_array_2 Bit[] ");
+                t.inject_custom("varbit_array Varbit(2)[] ");
+                t.inject_custom("varbit_array_2 Varbit[] ");
+                t.inject_custom("timestamp_array Timestamp(4)[] ");
+                t.inject_custom("time_array Time(4)[] ");
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+         generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
+         }
+
+         datasource postgres {
+            provider        = "postgresql"
+            url             = "postgres://localhost/test"
+         }
+
+         model Blog {
+          id                Int        @id @postgres.Integer
+          decimal_array     Decimal[]  @postgres.Numeric(42, 0)
+          decimal_array_2   Decimal[]  @postgres.Numeric
+          numeric_array     Decimal[]  @postgres.Numeric(4, 2)
+          numeric_array_2   Decimal[]  @postgres.Numeric
+          varchar_array     String[]   @postgres.VarChar(42)
+          varchar_array_2   String[]   @postgres.VarChar
+          char_array        String[]   @postgres.Char(200)
+          char_array_2      String[]   @postgres.Char(1)
+          bit_array         String[]   @postgres.Bit(20)
+          bit_array_2       String[]   @postgres.Bit(1)
+          varbit_array      String[]   @postgres.VarBit(2)
+          varbit_array_2    String[]   @postgres.VarBit
+          timestamp_array   DateTime[] @postgres.Timestamp(4)
+          time_array        DateTime[] @postgres.Time(4)
+        }
+    "#}
+    .to_string();
+
+    let result = api.re_introspect(&dm).await?;
+
+    println!("EXPECTATION: \n {:#}", dm);
+    println!("RESULT: \n {:#}", result);
+
+    assert!(result.replace(" ", "").contains(&dm.replace(" ", "")));
 
     Ok(())
 }
