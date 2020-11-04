@@ -8,4 +8,4 @@ edition = "2018"
 datamodel = { path = "../libs/datamodel/core" }
 structopt = "0.3"
 serde = { version = "1.0.90", features = ["derive"] }
-serde_json = "1.0"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }

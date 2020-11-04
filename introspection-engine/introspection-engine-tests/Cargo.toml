@@ -18,7 +18,7 @@ enumflags2 = "0.6.0"
 serde = { version = "1", features = ["derive"] }
 pretty_assertions = "0.6.1"
 tracing-futures = "0.2"
-serde_json = "1.0"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 tracing = "0.1.10"
 eyre = "0.6.1"
 indoc = "1"
