@@ -1,5 +1,5 @@
 use super::env_function::EnvFunction;
-use crate::diagnostics::DatamodelError;
+use crate::diagnostics::{DatamodelError};
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
 use chrono::{DateTime, FixedOffset};
@@ -177,6 +177,14 @@ impl ValueValidator {
             _ => vec![ValueValidator {
                 value: self.value.clone(),
             }],
+        }
+    }
+
+    /// Checks if the wrapped value is an array
+    pub fn is_array(&self) -> bool {
+        match self.value {
+            ast::Expression::Array(_, _) => true,
+            _ => false
         }
     }
 
