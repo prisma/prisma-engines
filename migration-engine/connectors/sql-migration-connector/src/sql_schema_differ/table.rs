@@ -75,11 +75,11 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = (IndexWalker<'schema>, IndexWalker<'schema>)> + 'a {
+    pub(crate) fn index_pairs<'a>(&'a self) -> impl Iterator<Item = Pair<IndexWalker<'schema>>> + 'a {
         self.previous_indexes().filter_map(move |previous_index| {
             self.next_indexes()
                 .find(|next_index| indexes_match(&previous_index, next_index))
-                .map(|renamed_index| (previous_index, renamed_index))
+                .map(|renamed_index| Pair::new(previous_index, renamed_index))
         })
     }
 
@@ -143,11 +143,11 @@ impl<'schema> TableDiffer<'schema> {
         self.next().foreign_keys()
     }
 
-    fn previous_indexes<'a>(&'a self) -> impl Iterator<Item = IndexWalker<'schema>> + 'a {
+    fn previous_indexes(&self) -> impl Iterator<Item = IndexWalker<'schema>> {
         self.previous().indexes()
     }
 
-    fn next_indexes<'a>(&'a self) -> impl Iterator<Item = IndexWalker<'schema>> + 'a {
+    fn next_indexes(&self) -> impl Iterator<Item = IndexWalker<'schema>> {
         self.next().indexes()
     }
 

@@ -1,12 +1,11 @@
 use super::{common::*, SqlRenderer};
 use crate::{
-    database_info::DatabaseInfo,
     flavour::PostgresFlavour,
     pair::Pair,
     sql_migration::{
         expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropColumn, DropForeignKey, DropIndex,
-        RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
+        TableChange,
     },
     sql_schema_differ::ColumnChanges,
 };
@@ -133,16 +132,11 @@ impl SqlRenderer for PostgresFlavour {
         stmts
     }
 
-    fn render_alter_index(
-        &self,
-        alter_index: &AlterIndex,
-        _database_info: &DatabaseInfo,
-        _current_schema: &SqlSchema,
-    ) -> Vec<String> {
+    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![format!(
             "ALTER INDEX {} RENAME TO {}",
-            self.quote(&alter_index.index_name),
-            self.quote(&alter_index.index_new_name)
+            self.quote(indexes.previous().name()),
+            self.quote(indexes.next().name())
         )]
     }
 
@@ -297,15 +291,15 @@ impl SqlRenderer for PostgresFlavour {
         vec![sql]
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let Index { name, columns, tpe } = &create_index.index;
-        let index_type = match tpe {
+    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
         };
-        let index_name = self.quote(&name).to_string();
-        let table_reference = self.quote(&create_index.table).to_string();
-        let columns = columns.iter().map(|c| self.quote(c));
+
+        let index_name = self.quote(index.name());
+        let table_reference = self.quote(index.table().name());
+        let columns = index.columns().map(|c| self.quote(c.name()));
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",

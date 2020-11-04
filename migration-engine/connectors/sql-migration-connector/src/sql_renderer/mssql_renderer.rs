@@ -1,16 +1,15 @@
 use super::{common, IteratorJoin, Quoted, QuotedWithSchema, SqlRenderer};
 use crate::{
-    database_info::DatabaseInfo,
     flavour::MssqlFlavour,
     pair::Pair,
     sql_migration::{
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropColumn, DropForeignKey, DropIndex,
-        RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
+        TableChange,
     },
 };
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write};
@@ -161,24 +160,18 @@ impl SqlRenderer for MssqlFlavour {
         }
     }
 
-    fn render_alter_index(
-        &self,
-        alter_index: &AlterIndex,
-        _database_info: &DatabaseInfo,
-        _current_schema: &SqlSchema,
-    ) -> Vec<String> {
-        let AlterIndex {
-            table,
-            index_name,
-            index_new_name,
-        } = alter_index;
-
-        let index_with_table = Quoted::Single(format!("{}.{}.{}", self.schema_name(), table, index_name));
+    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        let index_with_table = Quoted::Single(format!(
+            "{}.{}.{}",
+            self.schema_name(),
+            indexes.previous().table().name(),
+            indexes.previous().name()
+        ));
 
         vec![format!(
             "EXEC SP_RENAME N{index_with_table}, N{index_new_name}, N'INDEX'",
             index_with_table = Quoted::Single(index_with_table),
-            index_new_name = Quoted::Single(index_new_name),
+            index_new_name = Quoted::Single(indexes.next().name()),
         )]
     }
 
@@ -186,23 +179,17 @@ impl SqlRenderer for MssqlFlavour {
         unreachable!("render_create_enum on Microsoft SQL Server")
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let CreateIndex {
-            table,
-            index,
-            caused_by_create_table: _,
-        } = create_index;
-
-        let index_type = match index.tpe {
+    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
         };
 
-        let index_name = index.name.replace('.', "_");
+        let index_name = index.name().replace('.', "_");
         let index_name = self.quote(&index_name);
-        let table_reference = self.quote_with_schema(&table).to_string();
+        let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
-        let columns = index.columns.iter().map(|c| self.quote(c));
+        let columns = index.columns().map(|c| self.quote(c.name()));
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",

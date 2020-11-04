@@ -1,9 +1,9 @@
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, IndexWalker, SqlSchemaExt, TableWalker},
     SqlSchema,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct Pair<T> {
     previous: T,
     next: T,
@@ -25,11 +25,19 @@ impl<T> Pair<T> {
         (&self.previous, &self.next)
     }
 
+    pub(crate) fn into_tuple(self) -> (T, T) {
+        (self.previous, self.next)
+    }
+
     pub(crate) fn map<U>(self, f: impl Fn(T) -> U) -> Pair<U> {
         Pair {
             previous: f(self.previous),
             next: f(self.next),
         }
+    }
+
+    pub(crate) fn zip<U>(self, other: Pair<U>) -> Pair<(T, U)> {
+        Pair::new((self.previous, other.previous), (self.next, other.next))
     }
 
     pub(crate) fn previous(&self) -> &T {
@@ -63,5 +71,9 @@ impl<'a> Pair<TableWalker<'a>> {
             self.previous().column_at(*column_indexes.previous()),
             self.next().column_at(*column_indexes.next()),
         )
+    }
+
+    pub(crate) fn indexes(&self, index_indexes: &Pair<usize>) -> Pair<IndexWalker<'a>> {
+        self.as_ref().zip(index_indexes.as_ref()).map(|(t, i)| t.index_at(*i))
     }
 }

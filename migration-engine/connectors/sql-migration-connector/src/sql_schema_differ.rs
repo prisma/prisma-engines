@@ -10,9 +10,8 @@ pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 use crate::{
     pair::Pair,
     sql_migration::{
-        self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex,
-        CreateTable, DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep,
-        TableChange,
+        self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterTable, CreateEnum, CreateIndex, CreateTable,
+        DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep, TableChange,
     },
     wrap_as_step, DatabaseInfo, SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
 };
@@ -38,7 +37,8 @@ pub struct SqlSchemaDiff {
     alter_tables: Vec<AlterTable>,
     create_indexes: Vec<CreateIndex>,
     drop_indexes: Vec<DropIndex>,
-    alter_indexes: Vec<AlterIndex>,
+    alter_indexes: Vec<Pair<(usize, usize)>>,
+    redefine_indexes: Vec<Pair<(usize, usize)>>,
     create_enums: Vec<CreateEnum>,
     drop_enums: Vec<DropEnum>,
     alter_enums: Vec<AlterEnum>,
@@ -76,7 +76,18 @@ impl SqlSchemaDiff {
             // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
             // indexes created there.
             .chain(wrap_as_step(self.add_foreign_keys, SqlMigrationStep::AddForeignKey))
-            .chain(wrap_as_step(self.alter_indexes, SqlMigrationStep::AlterIndex))
+            .chain(self.alter_indexes.into_iter().map(|idxs| SqlMigrationStep::AlterIndex {
+                table: idxs.as_ref().map(|(table, _)| *table),
+                index: idxs.as_ref().map(|(_, idx)| *idx),
+            }))
+            .chain(
+                self.redefine_indexes
+                    .into_iter()
+                    .map(|idxs| SqlMigrationStep::RedefineIndex {
+                        table: idxs.as_ref().map(|(table, _)| *table),
+                        index: idxs.as_ref().map(|(_, idx)| *idx),
+                    }),
+            )
             .collect()
     }
 }
@@ -98,7 +109,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn diff_internal(&self) -> SqlSchemaDiff {
         let tables_to_redefine = self.flavour.tables_to_redefine(&self);
-        let alter_indexes: Vec<_> = self.alter_indexes(&tables_to_redefine);
+        let mut alter_indexes = self.alter_indexes(&tables_to_redefine);
+        let redefine_indexes = if self.flavour.can_alter_index(&self.database_info) {
+            Vec::new()
+        } else {
+            std::mem::replace(&mut alter_indexes, Vec::new())
+        };
         let (drop_tables, mut drop_foreign_keys) = self.drop_tables();
         self.drop_foreign_keys(&mut drop_foreign_keys, &tables_to_redefine);
 
@@ -111,6 +127,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             create_indexes: self.create_indexes(&tables_to_redefine),
             drop_indexes: self.drop_indexes(&tables_to_redefine),
             alter_indexes,
+            redefine_indexes,
             create_enums: self.create_enums(),
             drop_enums: self.drop_enums(),
             alter_enums: self.alter_enums(),
@@ -295,8 +312,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 .flat_map(|table| table.indexes())
                 .filter(|index| !self.flavour.should_skip_index_for_new_table(index))
                 .map(|index| CreateIndex {
-                    table: index.table().name().to_owned(),
-                    index: index.index().clone(),
+                    table_index: index.table().table_index(),
+                    index_index: index.index(),
                     caused_by_create_table: true,
                 });
 
@@ -309,8 +326,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         {
             for index in tables.created_indexes() {
                 steps.push(CreateIndex {
-                    table: tables.next().name().to_owned(),
-                    index: index.index().clone(),
+                    table_index: index.table().table_index(),
+                    index_index: index.index(),
                     caused_by_create_table: false,
                 })
             }
@@ -425,27 +442,22 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             })
     }
 
-    fn alter_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<AlterIndex> {
-        let mut alter_indexes = Vec::new();
+    fn alter_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<Pair<(usize, usize)>> {
+        let mut steps = Vec::new();
 
-        self.table_pairs()
+        for differ in self
+            .table_pairs()
             .filter(|tables| !tables_to_redefine.contains(tables.next().name()))
-            .for_each(|differ| {
-                differ
-                    .index_pairs()
-                    .filter(|(previous_index, next_index)| {
-                        self.flavour.index_should_be_renamed(&previous_index, &next_index)
-                    })
-                    .for_each(|(previous_index, renamed_index)| {
-                        alter_indexes.push(AlterIndex {
-                            index_name: previous_index.name().to_owned(),
-                            index_new_name: renamed_index.name().to_owned(),
-                            table: differ.next().name().to_owned(),
-                        })
-                    })
-            });
+        {
+            for pair in differ
+                .index_pairs()
+                .filter(|pair| self.flavour.index_should_be_renamed(&pair))
+            {
+                steps.push(pair.as_ref().map(|i| (i.table().table_index(), i.index())));
+            }
+        }
 
-        alter_indexes
+        steps
     }
 
     fn created_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> + 'a {

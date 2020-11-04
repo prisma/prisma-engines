@@ -1,12 +1,8 @@
 use super::{common::*, SqlRenderer};
 use crate::{
-    database_info::DatabaseInfo,
     flavour::SqliteFlavour,
     pair::Pair,
-    sql_migration::{
-        AddColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropForeignKey, DropIndex, RedefineTable,
-        TableChange,
-    },
+    sql_migration::{AddColumn, AlterEnum, AlterTable, DropForeignKey, DropIndex, RedefineTable, TableChange},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -23,24 +19,14 @@ impl SqlRenderer for SqliteFlavour {
         unreachable!("render_alter_enum on sqlite")
     }
 
-    fn render_alter_index(
-        &self,
-        _alter_index: &AlterIndex,
-        _database_info: &DatabaseInfo,
-        _current_schema: &SqlSchema,
-    ) -> Vec<String> {
-        unreachable!("render_alter_index on sqlite")
-    }
-
-    fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let Index { name, columns, tpe } = &create_index.index;
-        let index_type = match tpe {
+    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
         };
-        let index_name = self.quote(&name).to_string();
-        let table_reference = self.quote(&create_index.table).to_string();
-        let columns = columns.iter().map(|c| self.quote(c));
+        let index_name = self.quote(index.name());
+        let table_reference = self.quote(index.table().name());
+        let columns = index.columns().map(|c| self.quote(c.name()));
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -255,11 +241,7 @@ impl SqlRenderer for SqliteFlavour {
             ));
 
             for index in tables.next().indexes() {
-                result.push(self.render_create_index(&CreateIndex {
-                    table: tables.next().name().to_owned(),
-                    index: index.index().clone(),
-                    caused_by_create_table: false,
-                }))
+                result.push(self.render_create_index(&index));
             }
         }
 

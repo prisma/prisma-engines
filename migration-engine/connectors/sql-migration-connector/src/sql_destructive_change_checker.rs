@@ -204,16 +204,22 @@ impl SqlMigrationConnector {
                     );
                 }
                 SqlMigrationStep::CreateIndex(CreateIndex {
-                    table,
-                    index,
+                    table_index,
+                    index_index,
                     caused_by_create_table: false,
-                }) if index.is_unique() => plan.push_warning(
-                    SqlMigrationWarningCheck::UniqueConstraintAddition {
-                        table: table.clone(),
-                        columns: index.columns.clone(),
-                    },
-                    step_index,
-                ),
+                }) => {
+                    let index = schemas.next().table_walker_at(*table_index).index_at(*index_index);
+
+                    if index.index_type().is_unique() {
+                        plan.push_warning(
+                            SqlMigrationWarningCheck::UniqueConstraintAddition {
+                                table: index.table().name().to_owned(),
+                                columns: index.columns().map(|col| col.name().to_owned()).collect(),
+                            },
+                            step_index,
+                        )
+                    }
+                }
                 SqlMigrationStep::AlterEnum(AlterEnum {
                     index,
                     created_variants: _,
