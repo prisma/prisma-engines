@@ -593,9 +593,7 @@ impl QueryGraph {
     ///        └─────Ordering────┘
     /// ```
     fn normalize_if_nodes(&mut self) -> QueryGraphResult<()> {
-        let node_indices: Vec<_> = self.graph.node_indices().into_iter().collect();
-
-        for node_ix in node_indices {
+        for node_ix in self.graph.node_indices() {
             let node = NodeRef { node_ix };
 
             if let Node::Flow(Flow::If(_)) = self.node_content(&node).unwrap() {
