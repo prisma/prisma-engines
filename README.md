@@ -29,6 +29,7 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - `chrono`: DateTime type support with `chrono` crate.
 - `serde-support`: Deserialize support from result set with `serde` crate.
 - `tracing-log`: Logging with `tracing` crate.
+- `bigdecimal`: Numeric values can be read as `BigDecimal`.
 
 ### Goals:
 
