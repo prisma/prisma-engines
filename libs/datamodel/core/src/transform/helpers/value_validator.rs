@@ -1,5 +1,5 @@
 use super::env_function::EnvFunction;
-use crate::diagnostics::{DatamodelError};
+use crate::diagnostics::DatamodelError;
 use crate::ValueGenerator;
 use crate::{ast, DefaultValue};
 use chrono::{DateTime, FixedOffset};
@@ -184,7 +184,7 @@ impl ValueValidator {
     pub fn is_array(&self) -> bool {
         match self.value {
             ast::Expression::Array(_, _) => true,
-            _ => false
+            _ => false,
         }
     }
 

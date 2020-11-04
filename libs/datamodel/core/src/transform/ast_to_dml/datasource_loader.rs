@@ -102,7 +102,6 @@ impl DatasourceLoader {
         }
 
         let providers = provider_arg.as_array().to_str_vec()?;
-
         if provider_arg.is_array() {
             diagnostics.push_warning(DatamodelWarning::new_deprecated_provider_array_warning(
                 provider_arg.span(),
