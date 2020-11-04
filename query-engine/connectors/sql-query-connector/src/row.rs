@@ -246,7 +246,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
-        TypeIdentifier::Int => match p_value {
+        TypeIdentifier::Int | TypeIdentifier::BigInt => match p_value {
             Value::Integer(Some(i)) => PrismaValue::Int(i),
             Value::Bytes(Some(bytes)) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
             Value::Text(Some(txt)) => PrismaValue::Int(

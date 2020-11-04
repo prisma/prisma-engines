@@ -66,6 +66,7 @@ impl ValueValidator {
             }),
 
             ScalarType::Decimal => self.as_float().map(PrismaValue::Float),
+            ScalarType::BigInt => self.as_int().map(PrismaValue::BigInt),
             _ => todo!(),
         }
     }

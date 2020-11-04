@@ -190,7 +190,6 @@ fn should_handle_type_specifications_on_postgres() {
 
         model Blog {
             id     Int    @id
-            bigInt Int    @pg.BigInt
             foobar String @pg.VarChar(26)
             foobaz String @pg.VarChar
         }
@@ -199,11 +198,6 @@ fn should_handle_type_specifications_on_postgres() {
     let datamodel = parse(dml);
 
     let user_model = datamodel.assert_has_model("Blog");
-
-    let sft = user_model.assert_has_scalar_field("bigInt").assert_native_type();
-
-    let postgres_type: PostgresType = sft.deserialize_native_type();
-    assert_eq!(postgres_type, PostgresType::BigInt);
 
     let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
     let postgres_type: PostgresType = sft.deserialize_native_type();

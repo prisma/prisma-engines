@@ -390,6 +390,7 @@ pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str>
         ColumnTypeFamily::Float => "decimal(65,30)".into(),
         ColumnTypeFamily::Decimal => "decimal(65,30)".into(),
         ColumnTypeFamily::Int => "int".into(),
+        ColumnTypeFamily::BigInt => "bigint".into(),
         // we use varchar right now as mediumtext doesn't allow default values
         // a bigger length would not allow to use such a column as primary key
         ColumnTypeFamily::String => format!("varchar{}", VARCHAR_LENGTH_PREFIX).into(),

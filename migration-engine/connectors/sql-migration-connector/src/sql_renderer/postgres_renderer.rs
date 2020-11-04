@@ -395,6 +395,7 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
         ColumnTypeFamily::Decimal => format!("Decimal(65,30) {}", array),
         ColumnTypeFamily::Int => format!("integer {}", array),
+        ColumnTypeFamily::BigInt => format!("bigint {}", array),
         ColumnTypeFamily::String => format!("text {}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
         ColumnTypeFamily::Json => format!("jsonb {}", array),

@@ -581,6 +581,13 @@ fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<
                             false => DefaultValue::DBGENERATED(default_string),
                         },
                     },
+                    ColumnTypeFamily::BigInt => match parse_big_int(&default_string) {
+                        Some(int_value) => DefaultValue::VALUE(int_value),
+                        None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
+                            true => DefaultValue::SEQUENCE(default_string),
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                    },
                     ColumnTypeFamily::Float => match parse_float(&default_string) {
                         Some(float_value) => DefaultValue::VALUE(float_value),
                         None => DefaultValue::DBGENERATED(default_string),
@@ -664,7 +671,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         }
         "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
         "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
-        "int8" | "_int8" => (Int, Some(PostgresType::BigInt)),
+        "int8" | "_int8" => (BigInt, Some(PostgresType::BigInt)),
         "oid" | "_oid" => (Int, None),
         "float4" | "_float4" => (Float, Some(PostgresType::Real)),
         "float8" | "_float8" => (Float, Some(PostgresType::DoublePrecision)),

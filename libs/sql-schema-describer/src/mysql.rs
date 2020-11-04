@@ -264,6 +264,10 @@ async fn get_all_columns(
                             Some(int_value) => DefaultValue::VALUE(int_value),
                             None => DefaultValue::DBGENERATED(default_string),
                         },
+                        ColumnTypeFamily::BigInt => match parse_big_int(&default_string) {
+                            Some(int_value) => DefaultValue::VALUE(int_value),
+                            None => DefaultValue::DBGENERATED(default_string),
+                        },
                         ColumnTypeFamily::Float => match parse_float(&default_string) {
                             Some(float_value) => DefaultValue::VALUE(float_value),
                             None => DefaultValue::DBGENERATED(default_string),
@@ -545,7 +549,7 @@ fn get_column_type_and_enum(
         "tinyint" if is_tinyint1() && !invalid_bool_default() => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
         "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
         "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
-        "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
+        "bigint" => (ColumnTypeFamily::BigInt, Some(MySqlType::BigInt)),
         "decimal" => (
             ColumnTypeFamily::Decimal,
             Some(MySqlType::Decimal(Some((

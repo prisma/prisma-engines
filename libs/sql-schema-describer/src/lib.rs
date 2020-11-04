@@ -303,6 +303,8 @@ impl ColumnType {
 pub enum ColumnTypeFamily {
     /// Integer types.
     Int,
+    /// BigInt types.
+    BigInt,
     /// Floating point types.
     Float,
     /// Decimal Types.
@@ -348,6 +350,7 @@ impl fmt::Display for ColumnTypeFamily {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let str = match self {
             Self::Int => "int".to_string(),
+            Self::BigInt => "bigint".to_string(),
             Self::Float => "float".to_string(),
             Self::Decimal => "decimal".to_string(),
             Self::Boolean => "boolean".to_string(),
@@ -494,6 +497,16 @@ pub fn parse_int(value: &str) -> Option<PrismaValue> {
     let num_rslt = num_str.parse::<i64>();
     match num_rslt {
         Ok(num) => Some(PrismaValue::Int(num)),
+        Err(_) => None,
+    }
+}
+
+pub fn parse_big_int(value: &str) -> Option<PrismaValue> {
+    let captures = RE_NUM.captures(value)?;
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<i64>();
+    match num_rslt {
+        Ok(num) => Some(PrismaValue::BigInt(num)),
         Err(_) => None,
     }
 }

@@ -338,6 +338,7 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
         ScalarType::Json => sql::ColumnType::pure(sql::ColumnTypeFamily::Json, column_arity),
         ScalarType::Bytes => sql::ColumnType::pure(sql::ColumnTypeFamily::Binary, column_arity),
         ScalarType::Decimal => sql::ColumnType::pure(sql::ColumnTypeFamily::Decimal, column_arity),
+        ScalarType::BigInt => sql::ColumnType::pure(sql::ColumnTypeFamily::BigInt, column_arity),
         ScalarType::Duration => unreachable!("Duration type rendering"),
     }
 }

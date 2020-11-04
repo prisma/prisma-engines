@@ -67,14 +67,14 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             id              Int      @id @postgres.Integer
             smallint        Int      @postgres.SmallInt
             int             Int      @postgres.Integer
-            bigint          Int      @postgres.BigInt
+            bigint          BigInt   @postgres.BigInt
             decimal         Decimal  @postgres.Numeric(4, 2)
             numeric         Decimal  @postgres.Numeric(4, 2)
             real            Float    @postgres.Real
             doublePrecision Float    @postgres.DoublePrecision
             smallSerial     Int      @default(autoincrement()) @postgres.SmallInt
             serial          Int      @default(autoincrement()) @postgres.Integer
-            bigSerial       Int      @default(autoincrement()) @postgres.BigInt
+            bigSerial       BigInt   @default(autoincrement()) @postgres.BigInt
             varChar         String   @postgres.VarChar(200)
             char            String   @postgres.Char(200)
             text            String   @postgres.Text

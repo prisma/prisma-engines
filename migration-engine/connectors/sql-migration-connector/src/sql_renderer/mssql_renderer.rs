@@ -86,6 +86,7 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::Float => "decimal(32,16)",
             ColumnTypeFamily::Decimal => "decimal(32,16)",
             ColumnTypeFamily::Int => "int",
+            ColumnTypeFamily::BigInt => "bigint",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
             ColumnTypeFamily::Binary => "varbinary(max)",
             ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),

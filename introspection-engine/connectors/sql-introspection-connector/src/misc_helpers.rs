@@ -357,6 +357,7 @@ pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -
         _ if is_mysql_bit => FieldType::Base(ScalarType::Int, None),
         _ if is_postgres_interval => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
@@ -377,6 +378,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
 
     match &column.tpe.family {
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::BigInt, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Decimal, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),

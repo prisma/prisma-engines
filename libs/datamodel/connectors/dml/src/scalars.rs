@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize, Eq, Hash)]
 pub enum ScalarType {
     Int,
+    BigInt,
     Float,
     Boolean,
     String,
@@ -21,6 +22,7 @@ impl FromStr for ScalarType {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "Int" => Ok(ScalarType::Int),
+            "BigInt" => Ok(ScalarType::BigInt),
             "Float" => Ok(ScalarType::Float),
             "Boolean" => Ok(ScalarType::Boolean),
             "String" => Ok(ScalarType::String),
@@ -38,6 +40,7 @@ impl ToString for ScalarType {
     fn to_string(&self) -> String {
         match self {
             ScalarType::Int => String::from("Int"),
+            ScalarType::BigInt => String::from("BigInt"),
             ScalarType::Float => String::from("Float"),
             ScalarType::Boolean => String::from("Boolean"),
             ScalarType::String => String::from("String"),

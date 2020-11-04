@@ -35,6 +35,9 @@ pub enum PrismaValue {
     #[serde(serialize_with = "serialize_decimal", deserialize_with = "deserialize_decimal")]
     Float(BigDecimal),
 
+    #[serde(serialize_with = "serialize_bigint")]
+    BigInt(i64),
+
     #[serde(serialize_with = "serialize_bytes")]
     Bytes(Vec<u8>),
 }
@@ -110,6 +113,13 @@ where
     S: Serializer,
 {
     Option::<u8>::None.serialize(serializer)
+}
+
+fn serialize_bigint<S>(int: &i64, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    int.to_string().serialize(serializer)
 }
 
 fn serialize_decimal<S>(decimal: &BigDecimal, serializer: S) -> Result<S::Ok, S::Error>
@@ -211,6 +221,7 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Uuid(x) => x.fmt(f),
             PrismaValue::Json(x) => x.fmt(f),
             PrismaValue::Xml(x) => x.fmt(f),
+            PrismaValue::BigInt(x) => x.fmt(f),
             PrismaValue::List(x) => {
                 let as_string = format!("{:?}", x);
                 as_string.fmt(f)

@@ -124,6 +124,7 @@ impl ValueGeneratorFn {
             (Self::CUID, ScalarType::String) => true,
             (Self::Now, ScalarType::DateTime) => true,
             (Self::Autoincrement, ScalarType::Int) => true,
+            (Self::Autoincrement, ScalarType::BigInt) => true,
             (Self::DbGenerated, _) => true,
             _ => false,
         }
