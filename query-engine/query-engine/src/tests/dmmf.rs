@@ -39,6 +39,23 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
 
 #[test]
 #[serial]
+fn must_succeed_if_env_var_is_missing_and_override_was_provided() {
+    let schema = r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env("DATABASE_URL")
+        }
+    "#;
+
+    let url = "postgres://hostbar";
+
+    let overrides = serde_json::to_string(&vec![("ds".to_string(), url.to_string())]);
+
+    test_dmmf_cli_command(schema, Option::from(overrides.unwrap())).unwrap();
+}
+
+#[test]
+#[serial]
 fn list_of_reserved_model_names_must_be_up_to_date() {
     let dm = r#"
         datasource mydb {
@@ -108,7 +125,7 @@ fn must_not_fail_if_no_datasource_is_defined() {
         }
     "#;
 
-    test_dmmf_cli_command(schema).unwrap();
+    test_dmmf_cli_command(schema, None).unwrap();
 }
 
 #[test]
@@ -125,7 +142,7 @@ fn must_not_fail_if_an_invalid_datasource_url_is_provided() {
         }
     "#;
 
-    test_dmmf_cli_command(schema).unwrap();
+    test_dmmf_cli_command(schema, None).unwrap();
 }
 
 #[test]
@@ -138,10 +155,10 @@ fn must_fail_if_the_schema_is_invalid() {
         }
     "#;
 
-    assert!(test_dmmf_cli_command(schema).is_err());
+    assert!(test_dmmf_cli_command(schema, None).is_err());
 }
 
-fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
+fn test_dmmf_cli_command(schema: &str, overwrite_datasource: Option<String>) -> PrismaResult<()> {
     feature_flags::initialize(&[String::from("all")]).unwrap();
 
     let prisma_opt = PrismaOpt {
@@ -153,7 +170,7 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
         enable_playground: false,
         legacy: false,
         log_format: None,
-        overwrite_datasources: None,
+        overwrite_datasources: overwrite_datasource,
         port: 123,
         raw_feature_flags: vec![],
         unix_path: None,
