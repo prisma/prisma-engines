@@ -31,7 +31,7 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
                     || differ.added_columns().any(|col| col.arity().is_required())
                     || differ.column_pairs().any(|columns| columns.all_changes().0.differs_in_something())
                     // ALTER INDEX does not exist on SQLite
-                    || differ.index_pairs().any(|(previous, next)| self.index_should_be_renamed(&previous, &next))
+                    || differ.index_pairs().any(|pair| self.index_should_be_renamed(&pair))
                     || differ.created_foreign_keys().next().is_some()
                     || differ.dropped_foreign_keys().next().is_some()
             })

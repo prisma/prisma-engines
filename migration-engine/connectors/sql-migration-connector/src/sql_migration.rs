@@ -3,7 +3,7 @@ pub(crate) mod expanded_alter_column;
 use crate::{pair::Pair, sql_schema_differ::ColumnChanges};
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Serialize, Serializer};
-use sql_schema_describer::{Index, SqlSchema};
+use sql_schema_describer::SqlSchema;
 
 /// The database migration type for SqlMigrationConnector.
 #[derive(Debug, Serialize)]
@@ -38,10 +38,11 @@ pub(crate) enum SqlMigrationStep {
     AlterTable(AlterTable),
     DropForeignKey(DropForeignKey),
     DropTable(DropTable),
+    RedefineIndex { table: Pair<usize>, index: Pair<usize> },
     RedefineTables(Vec<RedefineTable>),
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
-    AlterIndex(AlterIndex),
+    AlterIndex { table: Pair<usize>, index: Pair<usize> },
     CreateEnum(CreateEnum),
     DropEnum(DropEnum),
     AlterEnum(AlterEnum),
@@ -67,12 +68,13 @@ impl SqlMigrationStep {
             SqlMigrationStep::AddForeignKey(_) => "AddForeignKey",
             SqlMigrationStep::CreateTable(_) => "CreateTable",
             SqlMigrationStep::AlterTable(_) => "AlterTable",
+            SqlMigrationStep::RedefineIndex { .. } => "RedefineIndex",
             SqlMigrationStep::DropForeignKey(_) => "DropForeignKey",
             SqlMigrationStep::DropTable(_) => "DropTable",
             SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
             SqlMigrationStep::CreateIndex(_) => "CreateIndex",
             SqlMigrationStep::DropIndex(_) => "DropIndex",
-            SqlMigrationStep::AlterIndex(_) => "AlterIndex",
+            SqlMigrationStep::AlterIndex { .. } => "AlterIndex",
             SqlMigrationStep::CreateEnum(_) => "CreateEnum",
             SqlMigrationStep::DropEnum(_) => "DropEnum",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
@@ -155,8 +157,8 @@ pub(crate) struct DropForeignKey {
 
 #[derive(Debug)]
 pub(crate) struct CreateIndex {
-    pub table: String,
-    pub index: Index,
+    pub table_index: usize,
+    pub index_index: usize,
     pub caused_by_create_table: bool,
 }
 
@@ -164,13 +166,6 @@ pub(crate) struct CreateIndex {
 pub(crate) struct DropIndex {
     pub table: String,
     pub name: String,
-}
-
-#[derive(Debug)]
-pub(crate) struct AlterIndex {
-    pub table: String,
-    pub index_name: String,
-    pub index_new_name: String,
 }
 
 #[derive(Debug)]

@@ -3,13 +3,12 @@ use super::{
     IteratorJoin, SqlRenderer,
 };
 use crate::{
-    database_info::DatabaseInfo,
     flavour::{MysqlFlavour, SqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
     pair::Pair,
     sql_migration::{
         expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateIndex, DropColumn, DropForeignKey, DropIndex,
-        RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
+        TableChange,
     },
     sql_schema_differ::ColumnChanges,
 };
@@ -17,9 +16,8 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::{
-    walkers::EnumWalker,
-    walkers::{ColumnWalker, ForeignKeyWalker, TableWalker},
-    ColumnTypeFamily, DefaultValue, Index, IndexType, SqlSchema,
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -55,59 +53,13 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_alter_enum on MySQL")
     }
 
-    fn render_alter_index(
-        &self,
-        alter_index: &AlterIndex,
-        database_info: &DatabaseInfo,
-        current_schema: &SqlSchema,
-    ) -> Vec<String> {
-        let AlterIndex {
-            table,
-            index_name,
-            index_new_name,
-        } = alter_index;
-        // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
-        if database_info.is_mariadb() || database_info.is_mysql_5_6() {
-            let old_index = current_schema
-                .table(table)
-                .map_err(|_| {
-                    anyhow::anyhow!(
-                        "Invariant violation: could not find table `{}` in current schema.",
-                        table
-                    )
-                })
-                .unwrap()
-                .indices
-                .iter()
-                .find(|idx| idx.name.as_str() == index_name)
-                .ok_or_else(|| {
-                    anyhow::anyhow!(
-                        "Invariant violation: could not find index `{}` on table `{}` in current schema.",
-                        index_name,
-                        table
-                    )
-                })
-                .unwrap();
-            let mut new_index = old_index.clone();
-            new_index.name = index_new_name.to_owned();
-
-            // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
-            vec![
-                self.render_create_index(&CreateIndex {
-                    table: table.clone(),
-                    index: new_index,
-                    caused_by_create_table: false,
-                }),
-                mysql_drop_index(self, table, index_name),
-            ]
-        } else {
-            vec![format!(
-                "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
-                table_name = self.quote(&table),
-                index_name = self.quote(index_name),
-                index_new_name = self.quote(index_new_name)
-            )]
-        }
+    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        vec![format!(
+            "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
+            table_name = self.quote(indexes.previous().table().name()),
+            index_name = self.quote(indexes.previous().name()),
+            index_new_name = self.quote(indexes.next().name())
+        )]
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -235,21 +187,21 @@ impl SqlRenderer for MysqlFlavour {
         Vec::new() // enums are defined on each column that uses them on MySQL
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let Index { name, columns, tpe } = &create_index.index;
+    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let name = index.name();
         let name = if name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
             &name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
         } else {
             &name
         };
-        let index_type = match tpe {
+        let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
         };
         let index_name = self.quote(&name);
-        let table_reference = self.quote(&create_index.table);
+        let table_reference = self.quote(&index.table().name());
 
-        let columns = columns.iter().map(|c| self.quote(c));
+        let columns = index.columns().map(|c| self.quote(c.name()));
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -306,6 +258,14 @@ impl SqlRenderer for MysqlFlavour {
         )
     }
 
+    fn render_drop_and_recreate_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
+        vec![
+            self.render_create_index(indexes.next()),
+            mysql_drop_index(indexes.previous().table().name(), indexes.previous().name()),
+        ]
+    }
+
     fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         Vec::new()
     }
@@ -319,7 +279,7 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_drop_index(&self, drop_index: &DropIndex) -> String {
-        mysql_drop_index(self, &drop_index.table, &drop_index.name)
+        mysql_drop_index(&drop_index.table, &drop_index.name)
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
@@ -419,10 +379,6 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }
 
-fn mysql_drop_index(renderer: &dyn SqlFlavour, table_name: &str, index_name: &str) -> String {
-    format!(
-        "DROP INDEX {} ON {}",
-        renderer.quote(index_name),
-        renderer.quote(table_name)
-    )
+fn mysql_drop_index(table_name: &str, index_name: &str) -> String {
+    format!("DROP INDEX `{}` ON `{}`", index_name, table_name)
 }

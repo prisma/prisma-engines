@@ -1,5 +1,5 @@
 use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
-use crate::sql_migration::AlterEnum;
+use crate::{database_info::DatabaseInfo, pair::Pair, sql_migration::AlterEnum};
 use sql_schema_describer::walkers::IndexWalker;
 use std::collections::HashSet;
 
@@ -15,6 +15,14 @@ pub(crate) trait SqlSchemaDifferFlavour {
         Vec::new()
     }
 
+    /// If this returns `true`, the differ will generate
+    /// SqlMigrationStep::RedefineIndex steps instead of
+    /// SqlMigrationStep::AlterIndex.
+    fn can_alter_index(&self, database_info: &DatabaseInfo) -> bool {
+        // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
+        !database_info.is_mariadb() && !database_info.is_mysql_5_6()
+    }
+
     /// Return whether a column's type needs to be migrated, and how.
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
         if differ.previous.column_type_family() != differ.next.column_type_family() {
@@ -25,8 +33,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
     }
 
     /// Return whether an index should be renamed by the migration.
-    fn index_should_be_renamed(&self, previous: &IndexWalker<'_>, next: &IndexWalker<'_>) -> bool {
-        previous.name() != next.name()
+    fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
+        indexes.previous().name() != indexes.next().name()
     }
 
     /// Whether the differ should produce CreateIndex steps for the indexes of
