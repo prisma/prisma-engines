@@ -120,10 +120,10 @@ impl PrismaOpt {
         Ok(res)
     }
 
-    pub fn datamodel(&self, ignore_env_errors: bool) -> PrismaResult<Datamodel> {
+    pub fn datamodel(&self, ignore_data_sources: bool) -> PrismaResult<Datamodel> {
         let datamodel_str = self.datamodel_str()?;
 
-        let datamodel = if ignore_env_errors {
+        let datamodel = if ignore_data_sources {
             datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_str)
         } else {
             datamodel::parse_datamodel(datamodel_str)

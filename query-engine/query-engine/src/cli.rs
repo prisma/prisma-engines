@@ -71,7 +71,7 @@ impl CliCommand {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
                     legacy: input.legacy,
-                    datamodel: opts.datamodel(false)?,
+                    datamodel: opts.datamodel(true)?,
                     config: opts.configuration(false)?.subject,
                 }))),
             },
