@@ -39,23 +39,6 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
 
 #[test]
 #[serial]
-fn must_succeed_if_env_var_is_missing_and_override_was_provided() {
-    let schema = r#"
-        datasource ds {
-          provider = "postgresql"
-          url = env("DATABASE_URL")
-        }
-    "#;
-
-    let url = "postgres://hostbar";
-
-    let overrides = serde_json::to_string(&vec![("ds".to_string(), url.to_string())]);
-
-    test_dmmf_cli_command(schema, Option::from(overrides.unwrap())).unwrap();
-}
-
-#[test]
-#[serial]
 fn list_of_reserved_model_names_must_be_up_to_date() {
     let dm = r#"
         datasource mydb {
