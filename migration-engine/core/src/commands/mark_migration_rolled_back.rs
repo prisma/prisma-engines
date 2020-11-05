@@ -5,6 +5,7 @@ use std::collections::HashMap;
 
 /// The input to the `markMigrationRolledBack` command.
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MarkMigrationRolledBackInput {
     /// The name of the migration to mark rolled back.
     pub migration_name: String,

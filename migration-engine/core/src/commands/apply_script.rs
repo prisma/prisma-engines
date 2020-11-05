@@ -5,6 +5,7 @@ use std::collections::HashMap;
 
 /// The input to the `applyScript` command.
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ApplyScriptInput {
     /// The script as a string. This will become more interesting when we
     /// implement migration DSLs.
