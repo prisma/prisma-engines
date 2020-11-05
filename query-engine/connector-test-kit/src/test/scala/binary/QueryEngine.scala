@@ -9,7 +9,7 @@ class QueryEngine extends FlatSpec with Matchers with ApiSpecBase {
 
     val header = s"""
         |datasource test {
-        |  provider = "${config.provider}"
+        |  provider = "${config.provider.stripSuffix("56")}"
         |  url = env("NON_EXISTENT_KEY")
         |}
         |
