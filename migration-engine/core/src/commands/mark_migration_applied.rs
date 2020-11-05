@@ -7,6 +7,7 @@ use user_facing_errors::migration_engine::MigrationAlreadyApplied;
 
 /// The input to the `markMigrationApplied` command.
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MarkMigrationAppliedInput {
     /// The name of the migration to mark applied.
     pub migration_name: String,
