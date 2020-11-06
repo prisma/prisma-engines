@@ -9,9 +9,9 @@ class NestedAtomicNumberOperationsSpec extends FlatSpec with Matchers with ApiSp
     // Inline on the child
     val project = ProjectDsl.fromString {
       """model TestModel {
-        |  id   Int          @id
-        |  uniq Int          @unique
-        |  rel  RelatedModel
+        |  id   Int           @id
+        |  uniq Int           @unique
+        |  rel  RelatedModel?
         |}
         |
         |model RelatedModel {
@@ -189,12 +189,12 @@ class NestedAtomicNumberOperationsSpec extends FlatSpec with Matchers with ApiSp
   "A nested updateOne mutation" should "correctly apply all number operations for Int" in {
     val project = ProjectDsl.fromString {
       """model TestModel {
-        |  id  Int @id
-        |  rel RelatedModel
+        |  id  Int           @id
+        |  rel RelatedModel?
         |}
         |
         |model RelatedModel {
-        | id       Int    @id
+        | id       Int       @id
         | optInt   Int?
         | optFloat Float?
         | tm_id    Int
@@ -235,8 +235,8 @@ class NestedAtomicNumberOperationsSpec extends FlatSpec with Matchers with ApiSp
   "A nested updateOne mutation" should "correctly apply all number operations for Float" in {
     val project = ProjectDsl.fromString {
       """model TestModel {
-        |  id  Int @id
-        |  rel RelatedModel
+        |  id  Int           @id
+        |  rel RelatedModel?
         |}
         |
         |model RelatedModel {
