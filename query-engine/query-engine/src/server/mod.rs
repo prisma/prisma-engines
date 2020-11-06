@@ -51,7 +51,8 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
         .configuration(false)?
         .subject
         .validate_that_one_datasource_is_provided()?;
-    let datamodel = opts.datamodel(false)?;
+
+    let datamodel = opts.datamodel(true)?;
     let cx = PrismaContext::builder(config, datamodel)
         .legacy(opts.legacy)
         .enable_raw_queries(opts.enable_raw_queries)
