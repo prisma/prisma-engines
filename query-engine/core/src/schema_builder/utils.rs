@@ -6,34 +6,25 @@ use prisma_models::{dml, ModelRef};
 use std::sync::Arc;
 
 /// Object type convenience wrapper function.
-pub fn object_type<T>(name: T, fields: Vec<OutputField>, model: Option<ModelRef>) -> ObjectType
-where
-    T: Into<String>,
-{
-    let object_type = ObjectType::new(name, model);
+pub fn object_type(ident: Identifier, fields: Vec<OutputField>, model: Option<ModelRef>) -> ObjectType {
+    let object_type = ObjectType::new(ident, model);
 
     object_type.set_fields(fields);
     object_type
 }
 
 /// Input object type convenience wrapper function.
-pub fn input_object_type<T>(name: T, fields: Vec<InputField>) -> InputObjectType
-where
-    T: Into<String>,
-{
-    let object_type = init_input_object_type(name.into());
+pub fn input_object_type(ident: Identifier, fields: Vec<InputField>) -> InputObjectType {
+    let object_type = init_input_object_type(ident);
 
     object_type.set_fields(fields);
     object_type
 }
 
 /// Input object type initializer for cases where only the name is known, and fields are computed later.
-pub fn init_input_object_type<T>(name: T) -> InputObjectType
-where
-    T: Into<String>,
-{
+pub fn init_input_object_type(ident: Identifier) -> InputObjectType {
     InputObjectType {
-        name: name.into(),
+        identifier: ident,
         constraints: InputObjectTypeConstraints::default(),
         fields: OnceCell::new(),
     }

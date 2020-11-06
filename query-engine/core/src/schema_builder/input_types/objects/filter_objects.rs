@@ -2,11 +2,11 @@ use super::*;
 use std::sync::Arc;
 
 pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let object_name = format!("{}ScalarWhereInput", model.name);
-    return_cached_input!(ctx, &object_name);
+    let ident = Identifier::new(format!("{}ScalarWhereInput", model.name), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(object_name.clone()));
-    ctx.cache_input_type(object_name, input_object.clone());
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
     let object_type = InputType::object(weak_ref.clone());
@@ -37,11 +37,11 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
 }
 
 pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}WhereInput", model.name);
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(format!("{}WhereInput", model.name), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, input_object.clone());
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     let weak_ref = Arc::downgrade(&input_object);
     let object_type = InputType::object(weak_ref.clone());
@@ -75,14 +75,14 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
 }
 
 pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}WhereUniqueInput", model.name);
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(format!("{}WhereUniqueInput", model.name), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let mut x = init_input_object_type(name.clone());
+    let mut x = init_input_object_type(ident.clone());
     x.require_exactly_one_field();
 
     let input_object = Arc::new(x);
-    ctx.cache_input_type(name, input_object.clone());
+    ctx.cache_input_type(ident, input_object.clone());
 
     // Single unique or ID fields.
     let unique_fields: Vec<ScalarFieldRef> = model.fields().scalar().into_iter().filter(|f| f.unique()).collect();
@@ -136,11 +136,14 @@ fn compound_field_unique_object_type(
     alias: Option<&String>,
     from_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
-    let name = format!("{}CompoundUniqueInput", compound_object_name(alias, &from_fields));
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(
+        format!("{}CompoundUniqueInput", compound_object_name(alias, &from_fields)),
+        PRISMA_NAMESPACE,
+    );
+    return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, input_object.clone());
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     let object_fields = from_fields
         .into_iter()

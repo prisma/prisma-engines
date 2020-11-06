@@ -19,7 +19,7 @@ use std::{collections::HashMap, fmt::Debug, sync::Weak};
 /// to uphold schema building consistency guarantees.
 #[derive(Debug, Default)]
 pub struct TypeRefCache<T> {
-    cache: HashMap<String, Arc<T>>,
+    cache: HashMap<Identifier, Arc<T>>,
 }
 
 impl<T: Debug> TypeRefCache<T> {
@@ -28,21 +28,21 @@ impl<T: Debug> TypeRefCache<T> {
     }
 
     // Retrieves a cached Arc if present, and hands out a weak reference to the contents.
-    pub fn get(&self, key: &str) -> Option<Weak<T>> {
-        self.cache.get(key).map(|v| Arc::downgrade(v))
+    pub fn get(&self, ident: &Identifier) -> Option<Weak<T>> {
+        self.cache.get(ident).map(|v| Arc::downgrade(v))
     }
 
-    /// Caches given value with given key. Panics if the cache key already exists.
+    /// Caches given value with given identifier. Panics if the cache key already exists.
     /// The reason is that for the query schema to work, we need weak references to be valid,
     /// which might be violated if we insert a new arc into the cache that replaces the old one,
     /// as it invalidates all weak refs pointing to the replaced arc, assuming that the contents
     /// changed as well. While this restriction could be lifted by comparing the contents, it is
     /// not required in the context of the schema builders.
-    pub fn insert(&mut self, key: String, value: Arc<T>) {
-        if let Some(old) = self.cache.insert(key.clone(), value) {
+    pub fn insert(&mut self, ident: Identifier, value: Arc<T>) {
+        if let Some(old) = self.cache.insert(ident.clone(), value) {
             panic!(format!(
-                "Invariant violation: Inserted key {} twice, this is a bug and invalidates weak arc references. {:?}",
-                key, old
+                "Invariant violation: Inserted identifier {:?} twice, this is a bug and invalidates weak arc references. {:?}",
+                ident, old
             ))
         }
     }
@@ -59,8 +59,8 @@ impl<T> Into<Vec<Arc<T>>> for TypeRefCache<T> {
 }
 
 /// Builds a cache over T from a vector of tuples of shape (String, Arc<T>).
-impl<T> From<Vec<(String, Arc<T>)>> for TypeRefCache<T> {
-    fn from(tuples: Vec<(String, Arc<T>)>) -> TypeRefCache<T> {
+impl<T> From<Vec<(Identifier, Arc<T>)>> for TypeRefCache<T> {
+    fn from(tuples: Vec<(Identifier, Arc<T>)>) -> TypeRefCache<T> {
         TypeRefCache {
             cache: tuples.into_iter().collect(),
         }
@@ -69,8 +69,8 @@ impl<T> From<Vec<(String, Arc<T>)>> for TypeRefCache<T> {
 
 /// Convenience cache utility to load and return immediately if an input object type is already cached.
 macro_rules! return_cached_input {
-    ($ctx:expr, $name:expr) => {
-        let existing_type = $ctx.get_input_type($name);
+    ($ctx:expr, $ident:expr) => {
+        let existing_type = $ctx.get_input_type($ident);
         if existing_type.is_some() {
             return existing_type.unwrap();
         }

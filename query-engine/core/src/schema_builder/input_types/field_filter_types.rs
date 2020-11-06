@@ -49,11 +49,14 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
     let related_model = rf.related_model();
     let related_input_type = filter_objects::where_object_type(ctx, &related_model);
     let list = if rf.is_list { "List" } else { "" };
-    let filter_name = format!("{}{}RelationFilter", capitalize(&related_model.name), list);
+    let ident = Identifier::new(
+        format!("{}{}RelationFilter", capitalize(&related_model.name), list),
+        PRISMA_NAMESPACE,
+    );
 
-    return_cached_input!(ctx, &filter_name);
-    let object = Arc::new(init_input_object_type(filter_name.clone()));
-    ctx.cache_input_type(filter_name, object.clone());
+    return_cached_input!(ctx, &ident);
+    let object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, object.clone());
 
     let fields = if rf.is_list {
         vec![
@@ -77,11 +80,11 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
 }
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
-    let name = scalar_filter_name(sf, false);
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(scalar_filter_name(sf, false), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, object.clone());
+    let object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, object.clone());
 
     let fields = equality_filters(sf).collect();
     object.set_fields(fields);
@@ -90,11 +93,11 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
 }
 
 fn full_scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: bool) -> InputObjectTypeWeakRef {
-    let name = scalar_filter_name(sf, nested);
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(scalar_filter_name(sf, nested), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, object.clone());
+    let object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, object.clone());
 
     let mut fields: Vec<_> = match sf.type_identifier {
         TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(sf)
