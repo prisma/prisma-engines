@@ -83,8 +83,8 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
             }
             (_, false) => {
                 return Err(CoreError::Generic(anyhow::anyhow!(
-                    "Invariant violation: expect_failed was passed but no failed migration was found in the database."
-                )))
+                "Invariant violation: there are failed migrations in the database, but expect_failed was not passed."
+            )))
             }
             (_, true) => {
                 let migrations_to_mark_rolled_back = relevant_migrations
