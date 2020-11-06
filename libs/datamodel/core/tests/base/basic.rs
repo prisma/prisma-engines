@@ -82,7 +82,7 @@ fn must_error_for_invalid_model_names() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "The model name `PrismaClient` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
         "PrismaClient",
-        Span::new(5, 52),
+        Span::new(5, 50),
     ));
 }
 
