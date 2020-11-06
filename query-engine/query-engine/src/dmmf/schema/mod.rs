@@ -79,34 +79,37 @@ impl RenderContext {
 
     pub fn add_enum(&mut self, identifier: Identifier, dmmf_enum: DmmfEnum) {
         // Enums from the namespace
-        let enums = match self.schema.enums.entry(identifier.namespace().to_owned()) {
-            Entry::Occupied(v) => todo!(),
-            Entry::Vacant(v) => v.insert(vec![]),
+        match self.schema.enums.entry(identifier.namespace().to_owned()) {
+            Entry::Occupied(mut v) => v.get_mut().push(dmmf_enum),
+            Entry::Vacant(v) => {
+                v.insert(vec![dmmf_enum]);
+            }
         };
 
-        enums.push(dmmf_enum);
         self.mark_as_rendered(identifier);
     }
 
     pub fn add_input_type(&mut self, identifier: Identifier, input_type: DmmfInputType) {
         // Input types from the namespace
-        let input_types = match self.schema.input_types.entry(identifier.namespace().to_owned()) {
-            Entry::Occupied(v) => todo!(),
-            Entry::Vacant(v) => v.insert(vec![]),
+        match self.schema.input_types.entry(identifier.namespace().to_owned()) {
+            Entry::Occupied(mut v) => v.get_mut().push(input_type),
+            Entry::Vacant(v) => {
+                v.insert(vec![input_type]);
+            }
         };
 
-        input_types.push(input_type);
         self.mark_as_rendered(identifier);
     }
 
     pub fn add_output_type(&mut self, identifier: Identifier, output_type: DmmfOutputType) {
         // Output types from the namespace
-        let output_types = match self.schema.output_types.entry(identifier.namespace().to_owned()) {
-            Entry::Occupied(v) => todo!(),
-            Entry::Vacant(v) => v.insert(vec![]),
+        match self.schema.output_types.entry(identifier.namespace().to_owned()) {
+            Entry::Occupied(mut v) => v.get_mut().push(output_type),
+            Entry::Vacant(v) => {
+                v.insert(vec![output_type]);
+            }
         };
 
-        output_types.push(output_type);
         self.mark_as_rendered(identifier);
     }
 
