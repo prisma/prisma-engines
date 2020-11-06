@@ -581,3 +581,43 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> crate:
 
     Ok(())
 }
+
+#[test_each_connector(tags("mariadb"))]
+async fn different_default_values_should_work(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.inject_custom("text Text Default \"one\"");
+                    t.inject_custom(
+                        "`tinytext_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"twelve\"",
+                    );
+                    t.inject_custom(
+                        "`tinytext_number_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"1\"",
+                    );
+                    t.inject_custom("`tinytext_number` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 10");
+                    t.inject_custom("`tinytext_float` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1.0");
+                    t.inject_custom("`tinytext_short` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                     Int     @id @default(autoincrement())
+          text                   String? @default("one")
+          tinytext_string        String  @default("twelve")
+          tinytext_number_string String  @default("1")
+          tinytext_number        String  @default("10")
+          tinytext_float         String  @default("1.0")
+          tinytext_short         String  @default("1")
+        }
+    "##};
+
+    assert_eq_datamodels!(dm, &api.introspect().await?);
+
+    Ok(())
+}
