@@ -666,16 +666,20 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
 fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
     static MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\('|\\[^\\])|'(')"#).unwrap());
     static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
+    static MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(.*)'"#).unwrap());
 
     let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
-        let unquoted: &str = &default[1..(default.len() - 1)];
+        let unquoted = MARIADB_DEFAULT_QUOTE_UNESCAPE_RE
+            .captures(&default)
+            .and_then(|cap| cap.get(1).map(|x| x.as_str()))
+            .unwrap_or(&default);
 
         MARIADB_NEWLINE_RE.replace_all(unquoted, "\n")
     } else {
         default.into()
     };
 
-    MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into()
+    MYSQL_ESCAPING_RE.replace_all(&maybe_unquoted, "$1$2").into()
 }
 
 /// Tests whether an introspected default value should be categorized as current_timestamp.
