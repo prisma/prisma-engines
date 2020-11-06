@@ -66,12 +66,7 @@ impl RenderContext {
     }
 
     pub fn finalize(self) -> (DmmfSchema, DmmfOperationMappings) {
-        let mut schema = self.schema;
-
-        schema.root_query_type = "Query".into();
-        schema.root_mutation_type = "Mutation".into();
-
-        (schema, self.mappings)
+        (self.schema, self.mappings)
     }
 
     pub fn already_rendered(&self, cache_key: &str) -> bool {

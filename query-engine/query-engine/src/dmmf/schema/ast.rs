@@ -3,8 +3,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DmmfSchema {
-    pub root_query_type: String,
-    pub root_mutation_type: String,
     pub input_types: Vec<DmmfInputType>,
     pub output_types: Vec<DmmfOutputType>,
     pub enums: Vec<DmmfEnum>,
