@@ -83,7 +83,10 @@ async fn mark_migration_applied_on_an_empty_database_with_expect_failed_errors(a
         .await
         .unwrap_err();
 
-    assert_eq!(err.to_string(), "Generic error: Invariant violation: expect_failed was passed but no failed migration was found in the database.");
+    assert_eq!(
+        err.to_string(),
+        "Invariant violation: expect_failed was passed but no failed migration was found in the database."
+    );
 
     assert!(persistence.list_migrations().await?.is_err());
 
@@ -225,7 +228,10 @@ async fn mark_migration_applied_on_a_non_empty_database_with_wrong_expect_failed
         .await
         .unwrap_err();
 
-    assert_eq!(error.to_string(), "Generic error: Invariant violation: expect_failed was passed but no failed migration was found in the database.");
+    assert_eq!(
+        error.to_string(),
+        "Invariant violation: expect_failed was passed but no failed migration was found in the database."
+    );
 
     let applied_migrations = persistence.list_migrations().await?.unwrap();
 
@@ -500,7 +506,10 @@ async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_f
         .await
         .unwrap_err();
 
-    assert_eq!(error.to_string(), "Generic error: Invariant violation: there are failed migrations in the database, but expect_failed was not passed.");
+    assert_eq!(
+        error.to_string(),
+        "Invariant violation: there are failed migrations in the database, but expect_failed was not passed."
+    );
 
     let applied_migrations = persistence.list_migrations().await?.unwrap();
 

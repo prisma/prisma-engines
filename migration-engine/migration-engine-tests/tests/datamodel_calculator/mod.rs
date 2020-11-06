@@ -422,7 +422,7 @@ fn calculate(schema: &SchemaAst, steps: impl AsRef<[MigrationStep]>) -> SchemaAs
 }
 
 fn calculate_error(schema: &SchemaAst, steps: impl AsRef<[MigrationStep]>) -> String {
-    format!("{}", calculate_impl(schema, steps).unwrap_err())
+    calculate_impl(schema, steps).unwrap_err().0.to_string()
 }
 
 fn calculate_impl(schema: &SchemaAst, steps: impl AsRef<[MigrationStep]>) -> Result<SchemaAst, CalculatorError> {

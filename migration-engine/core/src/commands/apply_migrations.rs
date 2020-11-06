@@ -204,6 +204,6 @@ impl HistoryProblems {
             error.push_str(edited_migrations)
         }
 
-        Err(CoreError::Generic(anyhow::anyhow!("{}", error)))
+        Err(CoreError::Generic(anyhow::Error::msg(error)))
     }
 }

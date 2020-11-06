@@ -10,11 +10,11 @@ pub trait DataModelCalculator: Send + Sync + 'static {
 }
 
 #[derive(Debug)]
-pub struct CalculatorError(anyhow::Error);
+pub struct CalculatorError(pub anyhow::Error);
 
 impl Display for CalculatorError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
+        write!(f, "Datamodel diffing failed (steps.json): {:#}", self.0)
     }
 }
 
