@@ -21,7 +21,7 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
       |   bottom       String
       |   veryBottomId String?
       |
-      |   top        Top
+      |   top        Top?
       |   veryBottom VeryBottom? @relation(fields: [veryBottomId], references: [id])
       |}
       |
