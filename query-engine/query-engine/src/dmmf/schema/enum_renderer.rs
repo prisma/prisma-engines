@@ -6,7 +6,8 @@ pub struct DmmfEnumRenderer {
 
 impl Renderer for DmmfEnumRenderer {
     fn render(&self, ctx: &mut RenderContext) {
-        if ctx.already_rendered(self.enum_type.name()) {
+        let ident = self.enum_type.identifier();
+        if ctx.already_rendered(&ident) {
             return;
         }
 
@@ -17,7 +18,7 @@ impl Renderer for DmmfEnumRenderer {
             values,
         };
 
-        ctx.add_enum(self.enum_type.name().to_owned(), rendered);
+        ctx.add_enum(ident, rendered);
     }
 }
 

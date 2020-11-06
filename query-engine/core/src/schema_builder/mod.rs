@@ -44,9 +44,6 @@ use std::sync::Arc;
 
 pub use utils::*;
 
-static PRISMA_NAMESPACE: &str = "prisma";
-static MODEL_NAMESPACE: &str = "model";
-
 // [DTODO] Remove
 /// Build mode for schema generation.
 #[derive(Debug, Copy, Clone)]

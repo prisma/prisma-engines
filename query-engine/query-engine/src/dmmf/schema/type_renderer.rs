@@ -1,23 +1,28 @@
 use super::{DmmfTypeReference, RenderContext, TypeKind};
-use query_core::{InputType, IntoArc, OutputType, ScalarType};
+use query_core::{InputType, IntoArc, OutputType, ScalarType, PRISMA_NAMESPACE};
 
 // WIP dedup code
 pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderContext) -> DmmfTypeReference {
     match output_type {
         OutputType::Object(ref obj) => {
             ctx.mark_to_be_rendered(obj);
+
+            let obj = obj.into_arc();
             let type_reference = DmmfTypeReference {
-                typ: obj.into_arc().name().to_string(),
+                typ: obj.identifier.name().to_string(),
+                namespace: obj.identifier.namespace().to_string(),
                 kind: TypeKind::Object,
                 is_list: false,
             };
 
             type_reference
         }
+
         OutputType::Enum(et) => {
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
+                namespace: et.namespace(),
                 kind: TypeKind::Enum,
                 is_list: false,
             };
@@ -36,6 +41,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
+                namespace: et.namespace(),
                 kind: TypeKind::Scalar,
                 is_list: false,
             };
@@ -63,6 +69,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
 
             let type_reference = DmmfTypeReference {
                 typ: stringified.into(),
+                namespace: PRISMA_NAMESPACE.to_owned(),
                 kind: TypeKind::Scalar,
                 is_list: false,
             };
@@ -83,8 +90,11 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
     match input_type {
         InputType::Object(ref obj) => {
             ctx.mark_to_be_rendered(obj);
+
+            let obj = obj.into_arc();
             let type_reference = DmmfTypeReference {
-                typ: obj.into_arc().name.clone(),
+                typ: obj.identifier.name().to_owned(),
+                namespace: obj.identifier.namespace().to_owned(),
                 kind: TypeKind::Object,
                 is_list: false,
             };
@@ -96,6 +106,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
+                namespace: et.namespace(),
                 kind: TypeKind::Enum,
                 is_list: false,
             };
@@ -114,6 +125,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
+                namespace: et.namespace(),
                 kind: TypeKind::Scalar,
                 is_list: false,
             };
@@ -141,6 +153,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
 
             let type_reference = DmmfTypeReference {
                 typ: stringified.into(),
+                namespace: PRISMA_NAMESPACE.to_owned(),
                 kind: TypeKind::Scalar,
                 is_list: false,
             };

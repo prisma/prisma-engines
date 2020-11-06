@@ -1,3 +1,4 @@
+use super::*;
 use prisma_models::{InternalEnum, ScalarFieldRef};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -20,6 +21,20 @@ impl EnumType {
             Self::Internal(i) => &i.name,
             Self::FieldRef(f) => &f.name,
         }
+    }
+
+    // Used as cache keys, for example.
+    pub fn identifier(&self) -> Identifier {
+        Identifier::new(self.name().to_owned(), self.namespace())
+    }
+
+    pub fn namespace(&self) -> String {
+        match self {
+            Self::String(_) => PRISMA_NAMESPACE,
+            Self::Internal(_) => MODEL_NAMESPACE,
+            Self::FieldRef(_) => PRISMA_NAMESPACE,
+        }
+        .to_string()
     }
 }
 

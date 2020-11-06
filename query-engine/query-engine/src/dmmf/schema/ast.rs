@@ -1,11 +1,13 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DmmfSchema {
-    pub input_types: Vec<DmmfInputType>,
-    pub output_types: Vec<DmmfOutputType>,
-    pub enums: Vec<DmmfEnum>,
+    pub input_types: HashMap<String, Vec<DmmfInputType>>,
+    pub output_types: HashMap<String, Vec<DmmfOutputType>>,
+    pub enums: HashMap<String, Vec<DmmfEnum>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -54,6 +56,7 @@ pub struct DmmfInputField {
 pub struct DmmfTypeReference {
     #[serde(rename = "type")]
     pub typ: String,
+    pub namespace: String,
     pub kind: TypeKind,
     pub is_list: bool,
 }

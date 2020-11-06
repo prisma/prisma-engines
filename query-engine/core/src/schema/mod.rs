@@ -10,6 +10,9 @@ pub use renderer::*;
 
 use std::sync::{Arc, Weak};
 
+pub static PRISMA_NAMESPACE: &str = "prisma";
+pub static MODEL_NAMESPACE: &str = "model";
+
 /// Since we have the invariant that the weak refs that are used throughout the query
 /// schema have to be always valid, we use this simple trait to keep the code clutter low.
 pub trait IntoArc<T> {

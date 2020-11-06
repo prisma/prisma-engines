@@ -13,7 +13,7 @@ use object_renderer::*;
 use query_core::schema::*;
 use schema_renderer::*;
 use std::{
-    collections::HashSet,
+    collections::{hash_map::Entry, HashSet},
     sync::{Arc, Weak},
 };
 use type_renderer::*;
@@ -47,8 +47,8 @@ pub struct RenderContext {
     mappings: DmmfOperationMappings,
 
     /// Prevents double rendering of elements that are referenced multiple times.
-    /// Names of input / output types / enums / models are globally unique.
-    rendered: HashSet<String>,
+    /// Names of input / output types / enums / models are unique by namespace.
+    rendered: HashSet<Identifier>,
 
     /// The child objects to render next. Rendering is considered complete when
     /// this is empty.
@@ -69,27 +69,45 @@ impl RenderContext {
         (self.schema, self.mappings)
     }
 
-    pub fn already_rendered(&self, cache_key: &str) -> bool {
+    pub fn already_rendered(&self, cache_key: &Identifier) -> bool {
         self.rendered.contains(cache_key)
     }
 
-    pub fn mark_as_rendered(&mut self, cache_key: String) {
+    pub fn mark_as_rendered(&mut self, cache_key: Identifier) {
         self.rendered.insert(cache_key);
     }
 
-    pub fn add_enum(&mut self, name: String, dmmf_enum: DmmfEnum) {
-        self.schema.enums.push(dmmf_enum);
-        self.mark_as_rendered(name);
+    pub fn add_enum(&mut self, identifier: Identifier, dmmf_enum: DmmfEnum) {
+        // Enums from the namespace
+        let enums = match self.schema.enums.entry(identifier.namespace().to_owned()) {
+            Entry::Occupied(v) => todo!(),
+            Entry::Vacant(v) => v.insert(vec![]),
+        };
+
+        enums.push(dmmf_enum);
+        self.mark_as_rendered(identifier);
     }
 
-    pub fn add_input_type(&mut self, input_type: DmmfInputType) {
-        self.mark_as_rendered(input_type.name.clone());
-        self.schema.input_types.push(input_type);
+    pub fn add_input_type(&mut self, identifier: Identifier, input_type: DmmfInputType) {
+        // Input types from the namespace
+        let input_types = match self.schema.input_types.entry(identifier.namespace().to_owned()) {
+            Entry::Occupied(v) => todo!(),
+            Entry::Vacant(v) => v.insert(vec![]),
+        };
+
+        input_types.push(input_type);
+        self.mark_as_rendered(identifier);
     }
 
-    pub fn add_output_type(&mut self, output_type: DmmfOutputType) {
-        self.mark_as_rendered(output_type.name.clone());
-        self.schema.output_types.push(output_type);
+    pub fn add_output_type(&mut self, identifier: Identifier, output_type: DmmfOutputType) {
+        // Output types from the namespace
+        let output_types = match self.schema.output_types.entry(identifier.namespace().to_owned()) {
+            Entry::Occupied(v) => todo!(),
+            Entry::Vacant(v) => v.insert(vec![]),
+        };
+
+        output_types.push(output_type);
+        self.mark_as_rendered(identifier);
     }
 
     pub fn add_mapping(&mut self, name: String, operation: Option<&QueryInfo>) {
@@ -158,7 +176,7 @@ impl<'a> IntoRenderer for &'a EnumType {
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(self.name())
+        ctx.already_rendered(&self.identifier())
     }
 }
 
@@ -168,7 +186,7 @@ impl IntoRenderer for InputObjectTypeWeakRef {
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(&self.into_arc().name)
+        ctx.already_rendered(&self.into_arc().identifier)
     }
 }
 
@@ -178,6 +196,6 @@ impl IntoRenderer for ObjectTypeWeakRef {
     }
 
     fn is_already_rendered(&self, ctx: &RenderContext) -> bool {
-        ctx.already_rendered(self.into_arc().name())
+        ctx.already_rendered(&self.into_arc().identifier)
     }
 }
