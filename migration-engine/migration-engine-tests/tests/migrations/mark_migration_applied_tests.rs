@@ -429,3 +429,98 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_false(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+    let persistence = api.imperative_migration_persistence();
+
+    // Create and apply a first migration
+    let initial_migration_name = {
+        let dm1 = r#"
+            model Test {
+                id Int @id
+            }
+        "#;
+
+        let output_initial_migration = api
+            .create_migration("01init", dm1, &migrations_directory)
+            .send()
+            .await?
+            .into_output();
+
+        output_initial_migration.generated_migration_name.unwrap()
+    };
+
+    // Create a second migration
+    let second_migration_name = {
+        let dm2 = r#"
+            model Test {
+                id Int @id
+            }
+
+            model Cat {
+                id Int @id
+                name String
+            }
+        "#;
+
+        let output_second_migration = api
+            .create_migration("02migration", dm2, &migrations_directory)
+            .send()
+            .await?
+            .modify_migration(|migration| {
+                migration.clear();
+                migration.push_str("\nSELECT YOLO;");
+            })?
+            .into_output();
+
+        output_second_migration.generated_migration_name.unwrap()
+    };
+
+    api.apply_migrations(&migrations_directory).send().await.ok();
+
+    // Check that the second migration failed.
+    {
+        let applied_migrations = persistence.list_migrations().await?.unwrap();
+
+        assert_eq!(applied_migrations.len(), 2);
+        assert!(
+            applied_migrations[1].finished_at.is_none(),
+            "The second migration should fail."
+        );
+    }
+
+    // Mark the second migration as applied again
+
+    let error = api
+        .mark_migration_applied(&second_migration_name, &migrations_directory)
+        .expect_failed(false)
+        .send()
+        .await
+        .unwrap_err();
+
+    assert_eq!(error.to_string(), "Generic error: Invariant violation: there are failed migrations in the database, but expect_failed was not passed.");
+
+    let applied_migrations = persistence.list_migrations().await?.unwrap();
+
+    assert_eq!(applied_migrations.len(), 2);
+    assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
+    assert!(&applied_migrations[0].finished_at.is_some());
+    assert_ne!(
+        &applied_migrations[0].started_at,
+        applied_migrations[0].finished_at.as_ref().unwrap()
+    );
+
+    assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
+    assert!(&applied_migrations[1].finished_at.is_none());
+    assert!(&applied_migrations[1].rolled_back_at.is_none());
+
+    api.assert_schema()
+        .await?
+        .assert_tables_count(2)?
+        .assert_has_table("_prisma_migrations")?
+        .assert_has_table("Test")?;
+
+    Ok(())
+}
