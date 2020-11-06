@@ -22,7 +22,7 @@ impl QueryDocumentParser {
         selections: &[Selection],
         schema_object: &ObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedObject> {
-        let path = parent_path.add(schema_object.identifier.to_string());
+        let path = parent_path.add(schema_object.identifier.name().to_owned());
 
         // Basic invariant not (yet) encoded in the schema: Output objects can't be empty.
         if selections.is_empty() {
@@ -395,7 +395,7 @@ impl QueryDocumentParser {
         object: IndexMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
-        let path = parent_path.add(schema_object.identifier.to_string());
+        let path = parent_path.add(schema_object.identifier.name().to_owned());
         let left: HashSet<&str> = schema_object
             .get_fields()
             .iter()
