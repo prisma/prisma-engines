@@ -27,6 +27,7 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
     let (query_schema, datamodel) = get_query_schema(dm);
     let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
     let inputs = &dmmf.schema.input_types;
+
     assert!(!inputs.is_empty());
 }
 
