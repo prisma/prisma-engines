@@ -1,5 +1,5 @@
-use super::{DmmfTypeReference, RenderContext, TypeKind};
-use query_core::{InputType, IntoArc, OutputType, ScalarType, PRISMA_NAMESPACE};
+use super::{DmmfTypeReference, RenderContext, TypeLocation};
+use query_core::{InputType, IntoArc, OutputType, ScalarType};
 
 // WIP dedup code
 pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderContext) -> DmmfTypeReference {
@@ -10,8 +10,8 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             let obj = obj.into_arc();
             let type_reference = DmmfTypeReference {
                 typ: obj.identifier.name().to_string(),
-                namespace: obj.identifier.namespace().to_string(),
-                kind: TypeKind::Object,
+                namespace: Some(obj.identifier.namespace().to_string()),
+                location: TypeLocation::OutputObjectTypes,
                 is_list: false,
             };
 
@@ -22,8 +22,8 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
-                namespace: et.namespace(),
-                kind: TypeKind::Enum,
+                namespace: Some(et.namespace()),
+                location: TypeLocation::EnumTypes,
                 is_list: false,
             };
 
@@ -41,8 +41,8 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
-                namespace: et.namespace(),
-                kind: TypeKind::Scalar,
+                namespace: Some(et.namespace()),
+                location: TypeLocation::Scalar,
                 is_list: false,
             };
 
@@ -69,8 +69,8 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
 
             let type_reference = DmmfTypeReference {
                 typ: stringified.into(),
-                namespace: PRISMA_NAMESPACE.to_owned(),
-                kind: TypeKind::Scalar,
+                namespace: None,
+                location: TypeLocation::Scalar,
                 is_list: false,
             };
 
@@ -94,8 +94,8 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             let obj = obj.into_arc();
             let type_reference = DmmfTypeReference {
                 typ: obj.identifier.name().to_owned(),
-                namespace: obj.identifier.namespace().to_owned(),
-                kind: TypeKind::Object,
+                namespace: Some(obj.identifier.namespace().to_owned()),
+                location: TypeLocation::InputObjectTypes,
                 is_list: false,
             };
 
@@ -106,8 +106,8 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
-                namespace: et.namespace(),
-                kind: TypeKind::Enum,
+                namespace: Some(et.namespace()),
+                location: TypeLocation::EnumTypes,
                 is_list: false,
             };
 
@@ -125,8 +125,8 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
             ctx.mark_to_be_rendered(&et.as_ref());
             let type_reference = DmmfTypeReference {
                 typ: et.name().to_owned(),
-                namespace: et.namespace(),
-                kind: TypeKind::Scalar,
+                namespace: Some(et.namespace()),
+                location: TypeLocation::Scalar,
                 is_list: false,
             };
 
@@ -153,8 +153,8 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
 
             let type_reference = DmmfTypeReference {
                 typ: stringified.into(),
-                namespace: PRISMA_NAMESPACE.to_owned(),
-                kind: TypeKind::Scalar,
+                namespace: None,
+                location: TypeLocation::Scalar,
                 is_list: false,
             };
 

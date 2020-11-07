@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DmmfSchema {
-    pub input_types: HashMap<String, Vec<DmmfInputType>>,
-    pub output_types: HashMap<String, Vec<DmmfOutputType>>,
-    pub enums: HashMap<String, Vec<DmmfEnum>>,
+    pub input_object_types: HashMap<String, Vec<DmmfInputType>>,
+    pub output_object_types: HashMap<String, Vec<DmmfOutputType>>,
+    pub enum_types: HashMap<String, Vec<DmmfEnum>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -56,17 +56,20 @@ pub struct DmmfInputField {
 pub struct DmmfTypeReference {
     #[serde(rename = "type")]
     pub typ: String,
-    pub namespace: String,
-    pub kind: TypeKind,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub namespace: Option<String>,
+    pub location: TypeLocation,
     pub is_list: bool,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum TypeKind {
+#[serde(rename_all = "camelCase")]
+pub enum TypeLocation {
     Scalar,
-    Object,
-    Enum,
+    InputObjectTypes,
+    OutputObjectTypes,
+    EnumTypes,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
