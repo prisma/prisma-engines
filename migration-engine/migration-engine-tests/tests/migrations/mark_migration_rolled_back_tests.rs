@@ -7,7 +7,7 @@ async fn mark_migration_rolled_back_on_an_empty_database_errors(api: &TestApi) -
 
     assert_eq!(
         err.to_string(),
-        "Generic error: Invariant violation: called markMigrationRolledBack on a database without migrations table."
+        "Invariant violation: called markMigrationRolledBack on a database without migrations table."
     );
 
     Ok(())
@@ -21,7 +21,7 @@ async fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(a
 
     assert_eq!(
         err.to_string(),
-        "Generic error: Migration `anything` cannot be rolled back because it was never applied to the database."
+        "Migration `anything` cannot be rolled back because it was never applied to the database."
     );
 
     Ok(())
@@ -179,7 +179,7 @@ async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &Tes
     assert_eq!(
         err.to_string(),
         format!(
-            "Generic error: Migration `{}` cannot be rolled back because it is not in a failed state.",
+            "Migration `{}` cannot be rolled back because it is not in a failed state.",
             second_migration_name
         )
     );

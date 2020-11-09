@@ -13,7 +13,7 @@ pub enum CoreError {
     /// When there was a bad datamodel as part of the input.
     ReceivedBadDatamodel(String),
 
-    /// When a datamodel from a generated AST is wrong. This is basically an internal error.
+    /// When a datamodel from a generated AST is wrong. This is an internal error.
     ProducedBadDatamodel(datamodel::diagnostics::Diagnostics),
 
     /// When a saved datamodel from a migration in the migrations table is no longer valid.
@@ -34,7 +34,7 @@ pub enum CoreError {
     /// Generic unspecified errors.
     Generic(anyhow::Error),
 
-    /// Error in command input.
+    /// Error in command input. Deprecated.
     Input(anyhow::Error),
 }
 
@@ -51,15 +51,15 @@ impl Display for CoreError {
                 write!(f, "The migration contains an invalid schema.\n{}", err)
             }
             CoreError::DatamodelRenderingError(err) => write!(f, "Failed to render the schema to a string ({:?})", err),
-            CoreError::ConnectorError(err) => write!(f, "Connector error: {}", err),
+            CoreError::ConnectorError(err) => write!(f, "Connector error: {:#}", err),
             CoreError::GatedPreviewFeatures(features) => {
                 let feats: Vec<_> = features.iter().map(|f| format!("`{}`", f)).collect();
 
                 write!(f, "Blocked preview features: {}", feats.join(", "))
             }
-            CoreError::Generic(src) => write!(f, "Generic error: {}", src),
+            CoreError::Generic(src) => write!(f, "{}", src),
             CoreError::Input(src) => write!(f, "Error in command input: {}", src),
-            CoreError::UserFacing(src) => src.message.fmt(f),
+            CoreError::UserFacing(src) => write!(f, "{}", src.message),
         }
     }
 }
