@@ -11,6 +11,7 @@ mod existing_data;
 mod existing_databases;
 mod infer_migration_steps;
 mod initialization;
+mod list_migration_directories;
 mod migration_persistence;
 mod migrations;
 mod reset;

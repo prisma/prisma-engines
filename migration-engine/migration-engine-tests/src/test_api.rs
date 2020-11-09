@@ -6,6 +6,7 @@ mod diagnose_migration_history;
 mod evaluate_data_loss;
 mod infer;
 mod infer_apply;
+mod list_migration_directories;
 mod mark_migration_applied;
 mod mark_migration_rolled_back;
 mod reset;
@@ -36,6 +37,7 @@ use super::{
     InferAndApplyOutput,
 };
 use crate::connectors::Tags;
+use crate::test_api::list_migration_directories::ListMigrationDirectories;
 use enumflags2::BitFlags;
 use migration_connector::{
     ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord, MigrationStep,
@@ -156,6 +158,10 @@ impl TestApi {
 
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
         ApplyMigrations::new(&self.api, migrations_directory)
+    }
+
+    pub fn list_migration_directories<'a>(&'a self, migrations_directory: &'a TempDir) -> ListMigrationDirectories<'a> {
+        ListMigrationDirectories::new(&self.api, migrations_directory)
     }
 
     pub async fn apply_script(&self, script: impl Into<String>) -> anyhow::Result<()> {
