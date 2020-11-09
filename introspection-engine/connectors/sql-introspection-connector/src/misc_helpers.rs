@@ -1,3 +1,4 @@
+use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
@@ -293,11 +294,14 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
     let model_with_fk = &table.name;
     let fk_column_name = fk.columns.join("_");
 
-    let fk_to_same_model: Vec<&ForeignKey> = table
+    let mut fk_to_same_model: Vec<ForeignKey> = table
         .foreign_keys
-        .iter()
+        .clone()
+        .into_iter()
         .filter(|fk| &fk.referenced_table == referenced_model)
         .collect();
+
+    fk_to_same_model.clear_duplicates();
 
     match schema.table(referenced_model) {
         Err(table_name) => Err(SqlError::SchemaInconsistent {

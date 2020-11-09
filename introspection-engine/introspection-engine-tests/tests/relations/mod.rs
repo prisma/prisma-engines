@@ -566,13 +566,13 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> crate::TestRe
                 model Post {
                     id      Int   @id @default(autoincrement())
                     user_id Int?
-                    User    User? @relation("Post_user_idToUser", fields: [user_id], references: [id])
+                    User    User? @relation(fields: [user_id], references: [id])
                     @@index([user_id], name: "user_id")
                 }
 
                 model User {
                     id   Int    @id @default(autoincrement())
-                    Post Post[] @relation("Post_user_idToUser")
+                    Post Post[] 
                 }
             "##}
         }
@@ -581,12 +581,12 @@ async fn duplicate_fks_should_ignore_one_of_them(api: &TestApi) -> crate::TestRe
                 model Post {
                     id      Int   @id @default(autoincrement())
                     user_id Int?
-                    User    User? @relation("Post_user_idToUser", fields: [user_id], references: [id])
+                    User    User? @relation(fields: [user_id], references: [id])
                 }
 
                 model User {
                     id   Int    @id @default(autoincrement())
-                    Post Post[] @relation("Post_user_idToUser")
+                    Post Post[] 
                 }
             "##}
         }
