@@ -20,6 +20,7 @@ mod get_database_version;
 #[allow(missing_docs)]
 mod infer_migration_steps;
 mod initialize;
+mod list_migration_directories;
 #[allow(missing_docs)]
 mod list_migrations;
 mod mark_migration_applied;
@@ -48,6 +49,7 @@ pub use evaluate_data_loss::*;
 pub use get_database_version::*;
 pub use infer_migration_steps::*;
 pub use initialize::{InitializeCommand, InitializeInput, InitializeOutput};
+pub use list_migration_directories::*;
 pub use list_migrations::*;
 pub use mark_migration_applied::{MarkMigrationAppliedCommand, MarkMigrationAppliedInput, MarkMigrationAppliedOutput};
 pub use mark_migration_rolled_back::{

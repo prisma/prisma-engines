@@ -59,6 +59,10 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> CoreResult<MigrationStepsResultOutput>;
     async fn initialize(&self, input: &InitializeInput) -> CoreResult<InitializeOutput>;
     async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>>;
+    async fn list_migration_directories(
+        &self,
+        input: &ListMigrationDirectoriesInput,
+    ) -> CoreResult<ListMigrationDirectoriesOutput>;
     async fn mark_migration_applied(&self, input: &MarkMigrationAppliedInput)
         -> CoreResult<MarkMigrationAppliedOutput>;
     async fn mark_migration_rolled_back(
@@ -172,6 +176,15 @@ where
     async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>> {
         self.handle_command::<ListMigrationsCommand>(input)
             .instrument(tracing::info_span!("ListMigrations"))
+            .await
+    }
+
+    async fn list_migration_directories(
+        &self,
+        input: &ListMigrationDirectoriesInput,
+    ) -> CoreResult<ListMigrationDirectoriesOutput> {
+        self.handle_command::<ListMigrationDirectoriesCommand>(input)
+            .instrument(tracing::info_span!("ListMigrationDirectories"))
             .await
     }
 
