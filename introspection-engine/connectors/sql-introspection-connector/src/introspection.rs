@@ -4,6 +4,7 @@ use crate::misc_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::version_checker::VersionChecker;
+use crate::Dedup;
 use crate::SqlError;
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, FieldType, Model, RelationField};
 use quaint::connector::SqlFamily;
@@ -146,22 +147,5 @@ fn calculate_fields_for_prisma_join_table(
 
             fields_to_be_added.push((referenced_model.name().to_owned(), field));
         }
-    }
-}
-
-trait Dedup<T: PartialEq + Clone> {
-    fn clear_duplicates(&mut self);
-}
-
-impl<T: PartialEq + Clone> Dedup<T> for Vec<T> {
-    fn clear_duplicates(&mut self) {
-        let mut already_seen = vec![];
-        self.retain(|item| match already_seen.contains(item) {
-            true => false,
-            _ => {
-                already_seen.push(item.clone());
-                true
-            }
-        })
     }
 }
