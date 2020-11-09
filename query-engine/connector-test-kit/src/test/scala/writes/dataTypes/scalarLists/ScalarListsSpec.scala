@@ -1,7 +1,6 @@
 package writes.dataTypes.scalarLists
 
 import org.scalatest.{FlatSpec, Matchers}
-import play.api.libs.json.JsValue
 import util.ConnectorCapability.ScalarListsCapability
 import util._
 
