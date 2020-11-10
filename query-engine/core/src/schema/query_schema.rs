@@ -362,26 +362,57 @@ pub enum InputType {
 
 impl PartialEq for InputType {
     fn eq(&self, other: &Self) -> bool {
-        dbg!(self);
-        dbg!(other);
-
-        match (self, other) {
-            (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
-            (InputType::Enum(_), InputType::Enum(_)) => true,
-            (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
-            (InputType::Object(obj), InputType::Object(oobj)) => obj.into_arc().name == oobj.into_arc().name,
-            _ => dbg!(false),
+        match dbg!(self) {
+            InputType::Scalar(st) => match dbg!(other) {
+                InputType::Scalar(ost) => dbg!(st.eq(ost)),
+                InputType::Enum(_) => false,
+                InputType::List(_) => false,
+                InputType::Object(_) => false,
+            },
+            InputType::Enum(_) => match dbg!(other) {
+                InputType::Scalar(_) => false,
+                InputType::Enum(_) => false,
+                InputType::List(_) => false,
+                InputType::Object(_) => false,
+            },
+            InputType::List(lt) => match dbg!(other) {
+                InputType::Scalar(_) => false,
+                InputType::Enum(_) => false,
+                InputType::List(olt) => dbg!(lt.eq(olt)),
+                InputType::Object(_) => false,
+            },
+            InputType::Object(obj) => match dbg!(other) {
+                InputType::Scalar(_) => false,
+                InputType::Enum(_) => false,
+                InputType::List(_) => false,
+                InputType::Object(oobj) => dbg!(obj.into_arc().name == oobj.into_arc().name),
+            },
         }
     }
 }
 
+// impl PartialEq for InputType {
+//     fn eq(&self, other: &Self) -> bool {
+//         dbg!(self);
+//         dbg!(other);
+
+//         match (self, other) {
+//             (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
+//             (InputType::Enum(_), InputType::Enum(_)) => true,
+//             (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
+//             (InputType::Object(obj), InputType::Object(oobj)) => obj.into_arc().name == oobj.into_arc().name,
+//             _ => dbg!(false),
+//         }
+//     }
+// }
+
 impl Debug for InputType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            InputType::Object(obj) => write!(f, "Object({})", obj.into_arc().name),
+            InputType::Object(obj) => write!(f, "InputType::Object({})", obj.into_arc().name),
             InputType::Scalar(s) => write!(f, "InputType::Scalar({:?})", s),
-            InputType::Enum(e) => write!(f, "{:?}", e),
-            InputType::List(l) => write!(f, "{:?}", l),
+            InputType::Enum(e) => write!(f, "InputType::Enum({:?})", e),
+            InputType::List(l) => write!(f, "InputType::List({:?})", l),
         }
     }
 }
