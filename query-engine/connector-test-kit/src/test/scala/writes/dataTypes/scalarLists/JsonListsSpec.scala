@@ -79,4 +79,22 @@ class JsonListsSpec extends FlatSpec with Matchers with ApiSpecBase with Connect
     res.toString() should be("""{"data":{"createOneScalarModel":{"json":[],"jsonB":[]}}}""")
   }
 
+  "Setting Json lists to wirst" should "be wurst" in {
+    val res = server.query(
+      s"""mutation {
+         |  createOneScalarModel(data: {
+         |    id: 1,
+         |    json: "[{\\"a\\":\\"b\\"}]"
+         |    jsonB: "[{\\"a\\":\\"b\\"}]"
+         |  }) {
+         |    json
+         |    jsonB
+         |  }
+         |}""",
+      project = project,
+      legacy = false
+    )
+
+//    res.toString() should be("""{"data":{"createOneScalarModel":{"json":[],"jsonB":[]}}}""")
+  }
 }

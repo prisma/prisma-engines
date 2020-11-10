@@ -145,11 +145,20 @@ impl QueryDocumentParser {
         value: QueryValue,
         possible_input_types: &[InputType],
     ) -> QueryParserResult<ParsedInputValue> {
+        dbg!("Parsing input:");
+        dbg!(&value);
+        dbg!(&possible_input_types);
+
         let mut parse_results = vec![];
 
         for input_type in possible_input_types {
             let value = value.clone();
+            dbg!("CHECKING");
+            dbg!(&input_type);
+            dbg!(input_type == &InputType::Scalar(ScalarType::Json));
             let result = match (&value, input_type) {
+                (QueryValue::String(s), InputType::Scalar(ScalarType::Json)) => todo!("WTF"),
+
                 // Null handling
                 (QueryValue::Null, InputType::Scalar(ScalarType::Null)) => {
                     Ok(ParsedInputValue::Single(PrismaValue::Null))
@@ -160,7 +169,9 @@ impl QueryDocumentParser {
                 }),
 
                 // Scalar handling
-                (_, InputType::Scalar(scalar)) => {
+                (q, InputType::Scalar(scalar)) => {
+                    dbg!(&q);
+                    dbg!("SCALAR");
                     Self::parse_scalar(&parent_path, value, &scalar).map(ParsedInputValue::Single)
                 }
 
@@ -171,6 +182,7 @@ impl QueryDocumentParser {
 
                 // List handling.
                 (QueryValue::List(values), InputType::List(l)) => {
+                    dbg!("LIST");
                     Self::parse_list(&parent_path, values.clone(), &l).map(ParsedInputValue::List)
                 }
 
@@ -188,6 +200,8 @@ impl QueryDocumentParser {
                     },
                 }),
             };
+
+            dbg!(&result);
 
             parse_results.push(result);
         }
@@ -221,6 +235,9 @@ impl QueryDocumentParser {
         value: QueryValue,
         scalar_type: &ScalarType,
     ) -> QueryParserResult<PrismaValue> {
+        dbg!("Parsing now:");
+        dbg!(&value);
+        dbg!(scalar_type);
         match (value, scalar_type.clone()) {
             (QueryValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
             (QueryValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
@@ -232,6 +249,8 @@ impl QueryDocumentParser {
                 Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
             }
             (QueryValue::String(s), ScalarType::Json) => {
+                dbg!("Parsing json value");
+                dbg!(&s);
                 Ok(PrismaValue::Json(Self::parse_json(parent_path, &s).map(|_| s)?))
             }
             (QueryValue::String(s), ScalarType::DateTime) => {
@@ -340,6 +359,10 @@ impl QueryDocumentParser {
         values: Vec<QueryValue>,
         value_type: &InputType,
     ) -> QueryParserResult<Vec<ParsedInputValue>> {
+        dbg!("PARSING LIST OF");
+        dbg!(value_type);
+        dbg!(&values);
+
         values
             .into_iter()
             .map(|val| Self::parse_input_value(path.clone(), val, &[value_type.clone()]))
