@@ -1,4 +1,5 @@
 use super::scalars::ScalarType;
+use native_types::MsSqlKind;
 
 /// represents an available native type
 #[derive(serde::Serialize)]
@@ -42,6 +43,45 @@ impl NativeTypeConstructor {
             _number_of_args: 0,
             _number_of_optional_args: number_of_optional_args,
             prisma_types,
+        }
+    }
+}
+
+impl From<MsSqlKind> for NativeTypeConstructor {
+    fn from(kind: MsSqlKind) -> Self {
+        let matching_types = match kind {
+            MsSqlKind::TinyInt => vec![ScalarType::Int],
+            MsSqlKind::SmallInt => vec![ScalarType::Int],
+            MsSqlKind::Int => vec![ScalarType::Int],
+            MsSqlKind::BigInt => vec![ScalarType::Int],
+            MsSqlKind::Decimal => vec![ScalarType::Decimal],
+            MsSqlKind::Numeric => vec![ScalarType::Decimal],
+            MsSqlKind::Money => vec![ScalarType::Decimal],
+            MsSqlKind::SmallMoney => vec![ScalarType::Decimal],
+            MsSqlKind::Bit => vec![ScalarType::Boolean, ScalarType::Int],
+            MsSqlKind::Float => vec![ScalarType::Float],
+            MsSqlKind::Real => vec![ScalarType::Float],
+            MsSqlKind::Date => vec![ScalarType::DateTime],
+            MsSqlKind::Time => vec![ScalarType::DateTime],
+            MsSqlKind::DateTime => vec![ScalarType::DateTime],
+            MsSqlKind::DateTime2 => vec![ScalarType::DateTime],
+            MsSqlKind::DateTimeOffset => vec![ScalarType::DateTime],
+            MsSqlKind::SmallDateTime => vec![ScalarType::DateTime],
+            MsSqlKind::Char => vec![ScalarType::String],
+            MsSqlKind::NChar => vec![ScalarType::String],
+            MsSqlKind::VarChar => vec![ScalarType::String],
+            MsSqlKind::Text => vec![ScalarType::String],
+            MsSqlKind::NVarChar => vec![ScalarType::String],
+            MsSqlKind::NText => vec![ScalarType::String],
+            MsSqlKind::Binary => vec![ScalarType::Bytes],
+            MsSqlKind::VarBinary => vec![ScalarType::Bytes],
+            MsSqlKind::Image => vec![ScalarType::Bytes],
+            MsSqlKind::Xml => vec![ScalarType::String],
+        };
+
+        match kind.maximum_parameters() {
+            0 => Self::without_args(kind.as_ref(), matching_types),
+            n => Self::with_optional_args(kind.as_ref(), n, matching_types),
         }
     }
 }

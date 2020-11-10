@@ -5,8 +5,7 @@ mod mysql;
 mod native_type;
 mod postgres;
 
-pub use mssql::TypeParameter;
-pub use mssql::MsSqlType;
+pub use mssql::{MsSqlKind, MsSqlType, TypeParameter};
 pub use mysql::MySqlType;
 pub use native_type::NativeType;
 pub use postgres::PostgresType;

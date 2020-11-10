@@ -58,6 +58,13 @@ impl FieldType {
             _ => None,
         }
     }
+
+    pub fn native_type(&self) -> Option<&NativeTypeInstance> {
+        match self {
+            FieldType::NativeType(_, nt) => Some(nt),
+            _ => None,
+        }
+    }
 }
 
 /// Represents a Field in a Model.

@@ -8,17 +8,17 @@ use std::{convert::TryFrom, fmt, io, str::FromStr};
 /// A parameter given to the SQL Server type. In many cases a number, but for
 /// some variants could also be `max`, allowing the value to be taken from the
 /// row to a larger heap.
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord)]
 pub enum TypeParameter {
     /// Number of bytes or characters the type can use.
-    Number(u16),
+    Number(u64),
     /// Stores the data outside of the row, allowing maximum of two gigabytes of
     /// storage.
     Max,
 }
 
 impl TypeParameter {
-    pub fn is_max(s: &str) -> bool {
+    pub(crate) fn is_max(s: &str) -> bool {
         s.split(",")
             .map(|s| s.trim())
             .any(|s| matches!(s, "max" | "MAX" | "Max" | "MaX" | "maX" | "mAx"))
@@ -34,7 +34,7 @@ impl FromStr for TypeParameter {
         } else {
             s.parse().map(TypeParameter::Number).map_err(|_| {
                 let kind = io::ErrorKind::InvalidInput;
-                io::Error::new(kind, "Allowed inputs: `u16` or `max`")
+                io::Error::new(kind, "Allowed inputs: `u64` or `max`")
             })
         }
     }
@@ -46,7 +46,7 @@ impl Serialize for TypeParameter {
         S: Serializer,
     {
         match self {
-            Self::Number(num) => serializer.serialize_u16(*num),
+            Self::Number(num) => serializer.serialize_u64(*num),
             Self::Max => serializer.serialize_str("Max"),
         }
     }
@@ -74,39 +74,35 @@ impl<'de> Visitor<'de> for TypeParameterVisitor {
     where
         E: de::Error,
     {
-        Ok(TypeParameter::Number(value as u16))
+        Ok(TypeParameter::Number(value as u64))
     }
 
     fn visit_u16<E>(self, value: u16) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        Ok(TypeParameter::Number(value))
+        Ok(TypeParameter::Number(value as u64))
     }
 
     fn visit_u32<E>(self, value: u32) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        u16::try_from(value)
-            .map(TypeParameter::Number)
-            .map_err(|_| E::invalid_value(Unexpected::Unsigned(value as u64), &self))
+        Ok(TypeParameter::Number(value as u64))
     }
 
     fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        u16::try_from(value)
-            .map(TypeParameter::Number)
-            .map_err(|_| E::invalid_value(Unexpected::Unsigned(value), &self))
+        Ok(TypeParameter::Number(value))
     }
 
     fn visit_i8<E>(self, value: i8) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        u16::try_from(value)
+        u64::try_from(value)
             .map(TypeParameter::Number)
             .map_err(|_| E::invalid_value(Unexpected::Signed(value as i64), &self))
     }
@@ -115,7 +111,7 @@ impl<'de> Visitor<'de> for TypeParameterVisitor {
     where
         E: de::Error,
     {
-        u16::try_from(value)
+        u64::try_from(value)
             .map(TypeParameter::Number)
             .map_err(|_| E::invalid_value(Unexpected::Signed(value as i64), &self))
     }
@@ -124,7 +120,7 @@ impl<'de> Visitor<'de> for TypeParameterVisitor {
     where
         E: de::Error,
     {
-        u16::try_from(value)
+        u64::try_from(value)
             .map(TypeParameter::Number)
             .map_err(|_| E::invalid_value(Unexpected::Signed(value as i64), &self))
     }
@@ -133,7 +129,7 @@ impl<'de> Visitor<'de> for TypeParameterVisitor {
     where
         E: de::Error,
     {
-        u16::try_from(value)
+        u64::try_from(value)
             .map(TypeParameter::Number)
             .map_err(|_| E::invalid_value(Unexpected::Signed(value), &self))
     }
@@ -150,7 +146,7 @@ impl<'de> Visitor<'de> for TypeParameterVisitor {
 
 impl<T> From<T> for TypeParameter
 where
-    T: Into<u16>,
+    T: Into<u64>,
 {
     fn from(t: T) -> Self {
         Self::Number(t.into())
@@ -161,7 +157,7 @@ impl fmt::Display for TypeParameter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Number(num) => write!(f, "{}", num),
-            Self::Max => write!(f, "max"),
+            Self::Max => write!(f, "Max"),
         }
     }
 }

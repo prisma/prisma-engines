@@ -2,6 +2,7 @@ extern crate datamodel;
 
 use self::datamodel::{IndexDefinition, StringFromEnvVar};
 use datamodel::{diagnostics::*, dml, dml::ScalarType, Configuration, Datamodel, NativeTypeInstance};
+use indoc::indoc;
 use pretty_assertions::assert_eq;
 
 pub trait DatasourceAsserts {
@@ -412,23 +413,38 @@ pub fn parse_error_and_ignore_datasource_urls(datamodel_string: &str) -> Diagnos
     }
 }
 
-pub const SQLITE_SOURCE: &str = r#"
+pub const SQLITE_SOURCE: &str = indoc!(
+    r#"
     datasource db {
         provider = "sqlite"
         url      = "file:dev.db"
     }
-"#;
+"#
+);
 
-pub const POSTGRES_SOURCE: &str = r#"
+pub const POSTGRES_SOURCE: &str = indoc!(
+    r#"
     datasource db {
         provider = "postgres"
         url      = "postgresql://localhost:5432"
     }
-"#;
+"#
+);
 
-pub const MYSQL_SOURCE: &str = r#"
+pub const MYSQL_SOURCE: &str = indoc!(
+    r#"
     datasource db {
         provider = "mysql"
         url      = "mysql://localhost:3306"
     }
-"#;
+"#
+);
+
+pub const MSSQL_SOURCE: &str = indoc!(
+    r#"
+    datasource db {
+        provider = "sqlserver"
+        url      = "sqlserver://localhost:1433"
+    }
+"#
+);

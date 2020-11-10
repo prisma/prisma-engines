@@ -57,6 +57,11 @@ impl MsSqlType {
         &*HEAP_ALLOCATED
     }
 
+    /// Break the type into kind and parameters.
+    pub fn into_parts(self) -> (MsSqlKind, Vec<TypeParameter>) {
+        (self.kind, self.parameters)
+    }
+
     /// The type kind without parameters.
     pub fn kind(&self) -> MsSqlKind {
         self.kind
@@ -269,7 +274,7 @@ impl MsSqlType {
     /// A fixed size string. Before SQL Server 2019 supported only ASCII
     /// characters, and from that version on supports also UTF-8 when using the
     /// right collation.
-    pub fn r#char(length: Option<u16>) -> Self {
+    pub fn r#char(length: Option<u64>) -> Self {
         let parameters = length.map(TypeParameter::Number).map(|l| vec![l]).unwrap_or(Vec::new());
 
         Self {
@@ -279,7 +284,7 @@ impl MsSqlType {
     }
 
     /// A fixed size UTF-16 string.
-    pub fn nchar(length: Option<u16>) -> Self {
+    pub fn nchar(length: Option<u64>) -> Self {
         let parameters = length.map(TypeParameter::Number).map(|l| vec![l]).unwrap_or(Vec::new());
 
         Self {
@@ -289,7 +294,7 @@ impl MsSqlType {
     }
 
     /// A fixed size binary blob.
-    pub fn binary(length: Option<u16>) -> Self {
+    pub fn binary(length: Option<u64>) -> Self {
         let parameters = length.map(TypeParameter::Number).map(|l| vec![l]).unwrap_or(Vec::new());
 
         Self {
@@ -366,8 +371,6 @@ impl FromStr for MsSqlType {
                         let ek = io::ErrorKind::InvalidInput;
                         io::Error::new(ek, format!("Could not parse `{}` as a MsSqlType.", s))
                     })?;
-
-                dbg!(captures.name("params").map(|s| s.as_str()));
 
                 match captures.name("params") {
                     // The `max` variant.
@@ -454,7 +457,7 @@ impl<'de> Visitor<'de> for MsSqlTypeVisitor {
                 let uses_max = parameters.iter().any(|v| *v == TypeParameter::Max);
 
                 if uses_max && !kind.allows_max_variant() {
-                    return Err(A::Error::invalid_value(Unexpected::Str("Max"), &self))
+                    return Err(A::Error::invalid_value(Unexpected::Str("Max"), &self));
                 }
 
                 match (kind.maximum_parameters(), parameters.len()) {
@@ -514,12 +517,12 @@ mod tests {
         types.push((json!({"SmallDateTime": []}), MsSqlType::smalldatetime()));
         types.push((json!({"Char": []}), MsSqlType::r#char(None)));
         types.push((json!({"NChar": []}), MsSqlType::nchar(None)));
-        types.push((json!({"VarChar": []}), MsSqlType::varchar(Option::<u16>::None)));
+        types.push((json!({"VarChar": []}), MsSqlType::varchar(Option::<u64>::None)));
         types.push((json!({"Text": []}), MsSqlType::text()));
-        types.push((json!({"NVarChar": []}), MsSqlType::nvarchar(Option::<u16>::None)));
+        types.push((json!({"NVarChar": []}), MsSqlType::nvarchar(Option::<u64>::None)));
         types.push((json!({"NText": []}), MsSqlType::ntext()));
         types.push((json!({"Binary": []}), MsSqlType::binary(None)));
-        types.push((json!({"VarBinary": []}), MsSqlType::varbinary(Option::<u16>::None)));
+        types.push((json!({"VarBinary": []}), MsSqlType::varbinary(Option::<u64>::None)));
         types.push((json!({"Image": []}), MsSqlType::image()));
         types.push((json!({"Xml": []}), MsSqlType::xml()));
 
@@ -540,10 +543,10 @@ mod tests {
         types.push((json!({"Float": [24]}), MsSqlType::float(Some(24))));
         types.push((json!({"Char": [123]}), MsSqlType::r#char(Some(123))));
         types.push((json!({"NChar": [456]}), MsSqlType::nchar(Some(456))));
-        types.push((json!({"VarChar": [4000]}), MsSqlType::varchar(Some(4000u16))));
-        types.push((json!({"NVarChar": [2000]}), MsSqlType::nvarchar(Some(2000u16))));
+        types.push((json!({"VarChar": [4000]}), MsSqlType::varchar(Some(4000u64))));
+        types.push((json!({"NVarChar": [2000]}), MsSqlType::nvarchar(Some(2000u64))));
         types.push((json!({"Binary": [1024]}), MsSqlType::binary(Some(1024))));
-        types.push((json!({"VarBinary": [2048]}), MsSqlType::varbinary(Some(2048u16))));
+        types.push((json!({"VarBinary": [2048]}), MsSqlType::varbinary(Some(2048u64))));
 
         for (expected, typ) in types.into_iter() {
             assert_eq!(expected, typ.to_json());
@@ -673,12 +676,12 @@ mod tests {
         types.insert("smalldatetime", MsSqlType::smalldatetime());
         types.insert("char", MsSqlType::r#char(None));
         types.insert("nchar", MsSqlType::nchar(None));
-        types.insert("varchar", MsSqlType::varchar(Option::<u16>::None));
+        types.insert("varchar", MsSqlType::varchar(Option::<u64>::None));
         types.insert("text", MsSqlType::text());
-        types.insert("nvarchar", MsSqlType::nvarchar(Option::<u16>::None));
+        types.insert("nvarchar", MsSqlType::nvarchar(Option::<u64>::None));
         types.insert("ntext", MsSqlType::ntext());
         types.insert("binary", MsSqlType::binary(None));
-        types.insert("varbinary", MsSqlType::varbinary(Option::<u16>::None));
+        types.insert("varbinary", MsSqlType::varbinary(Option::<u64>::None));
         types.insert("image", MsSqlType::image());
         types.insert("xml", MsSqlType::xml());
 
@@ -765,10 +768,10 @@ mod tests {
         types.insert("float(24)", MsSqlType::float(Some(24)));
         types.insert("char(123)", MsSqlType::r#char(Some(123)));
         types.insert("nchar(456)", MsSqlType::nchar(Some(456)));
-        types.insert("varchar(1000)", MsSqlType::varchar(Some(1000u16)));
-        types.insert("nvarchar(2000)", MsSqlType::nvarchar(Some(2000u16)));
+        types.insert("varchar(1000)", MsSqlType::varchar(Some(1000u64)));
+        types.insert("nvarchar(2000)", MsSqlType::nvarchar(Some(2000u64)));
         types.insert("binary(1024)", MsSqlType::binary(Some(1024)));
-        types.insert("varbinary(2048)", MsSqlType::varbinary(Some(2048u16)));
+        types.insert("varbinary(2048)", MsSqlType::varbinary(Some(2048u64)));
 
         for (s, expected) in types.into_iter() {
             let typ: MsSqlType = s.parse()?;

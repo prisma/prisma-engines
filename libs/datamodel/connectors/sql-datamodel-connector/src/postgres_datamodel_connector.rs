@@ -1,13 +1,17 @@
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_u32_arguments};
-use datamodel_connector::{Connector, ConnectorCapability};
-use dml::default_value::DefaultValue;
-use dml::field::{Field, FieldType};
-use dml::model::Model;
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
-use dml::scalars::ScalarType;
-use native_types::PostgresType;
+use datamodel_connector::{
+    connector_error::{ConnectorError, ErrorKind},
+    helper::{arg_vec_from_opt, args_vec_from_opt, parse_u32_arguments},
+    Connector, ConnectorCapability,
+};
+use dml::{
+    default_value::DefaultValue,
+    field::{Field, FieldType},
+    model::Model,
+    native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance,
+    scalars::ScalarType,
+};
+use native_types::{PostgresType, TypeParameter};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -127,7 +131,9 @@ impl Connector for PostgresDatamodelConnector {
                             "Postgres",
                         ));
                     }
-                    [precision, _] if *precision > 1000 || *precision <= 0 => {
+                    [precision, _]
+                        if *precision > TypeParameter::Number(1000) || *precision <= TypeParameter::Number(0) =>
+                    {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "Precision must be positive with a maximum value of 1000.",
                             native_type_name,
@@ -139,7 +145,7 @@ impl Connector for PostgresDatamodelConnector {
             }
             if matches!(native_type_name, BIT_TYPE_NAME | VAR_BIT_TYPE_NAME) {
                 match native_type.args.as_slice() {
-                    [length] if length == &0 => {
+                    [length] if *length == TypeParameter::Number(0) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "M must be a positive integer.",
                             native_type_name,
@@ -164,7 +170,7 @@ impl Connector for PostgresDatamodelConnector {
             }
             if matches!(native_type_name, TIMESTAMP_TYPE_NAME | TIME_TYPE_NAME) {
                 match native_type.args.as_slice() {
-                    [precision] if *precision > 6 => {
+                    [precision] if *precision > TypeParameter::Number(6) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "M can range from 0 to 6.",
                             native_type_name,
