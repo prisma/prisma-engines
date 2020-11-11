@@ -6,7 +6,7 @@ use dml::model::{IndexType, Model};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
-use native_types::{MySqlType, TypeParameter};
+use native_types::{MySqlType, TypeParameter::*};
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -166,14 +166,14 @@ impl Connector for MySqlDatamodelConnector {
                             "MySQL",
                         ))
                     }
-                    [precision, _] if *precision > TypeParameter::Number(65) => {
+                    [precision, _] if *precision > Number(65) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "Precision can range from 1 to 65.",
                             native_type_name,
                             "MySQL",
                         ))
                     }
-                    [_, scale] if *scale > TypeParameter::Number(30) => {
+                    [_, scale] if *scale > Number(30) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "Scale can range from 0 to 30.",
                             native_type_name,
@@ -185,7 +185,7 @@ impl Connector for MySqlDatamodelConnector {
             }
             if matches!(native_type_name, BIT_TYPE_NAME) {
                 match native_type.args.as_slice() {
-                    [length] if *length == TypeParameter::Number(0) || *length > TypeParameter::Number(64) => {
+                    [length] if *length == Number(0) || *length > Number(64) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "M can range from 1 to 64.",
                             native_type_name,
@@ -209,7 +209,7 @@ impl Connector for MySqlDatamodelConnector {
             }
             if matches!(native_type_name, CHAR_TYPE_NAME) {
                 match native_type.args.as_slice() {
-                    [length] if *length > TypeParameter::Number(255) => {
+                    [length] if *length > Number(255) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "M can range from 0 to 255.",
                             native_type_name,
@@ -221,7 +221,7 @@ impl Connector for MySqlDatamodelConnector {
             }
             if matches!(native_type_name, VAR_CHAR_TYPE_NAME) {
                 match native_type.args.as_slice() {
-                    [length] if *length > TypeParameter::Number(65535) => {
+                    [length] if *length > Number(65535) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "M can range from 0 to 65,535.",
                             native_type_name,

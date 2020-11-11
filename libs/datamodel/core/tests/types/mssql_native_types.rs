@@ -1,14 +1,15 @@
 use std::convert::TryFrom;
 
-use crate::common::*;
-use crate::types::helper::{
-    test_native_types_compatibility, test_native_types_with_field_attribute_support,
-    test_native_types_without_attributes,
+use crate::{
+    common::*,
+    types::helper::{
+        test_native_types_compatibility, test_native_types_with_field_attribute_support,
+        test_native_types_without_attributes,
+    },
 };
 use datamodel::{ast, diagnostics::DatamodelError};
 use indoc::indoc;
-use native_types::MsSqlType;
-use native_types::TypeParameter;
+use native_types::{MsSqlType, TypeParameter::*};
 
 const BLOB_TYPES: &[&'static str] = &["VarBinary(Max)", "Image"];
 const TEXT_TYPES: &[&'static str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)"];
@@ -109,7 +110,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
         model Blog {
             id  Int     @id
-            dec Decimal @db.Decimal(2, 4)
+            dec Decimal @db.Decimal(2,4)
         }
     "#
     );
@@ -117,8 +118,8 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Decimal native type in SQL Server.",
-        ast::Span::new(203, 233),
+        "The scale must not be larger than the precision for the Decimal(2,4) native type in SQL Server.",
+        ast::Span::new(203, 232),
     ));
 }
 
@@ -146,49 +147,52 @@ fn should_fail_on_native_type_numeric_when_scale_is_bigger_than_precision() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Numeric native type in SQL Server.",
+        "The scale must not be larger than the precision for the Numeric(2,4) native type in SQL Server.",
         ast::Span::new(203, 233),
     ));
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_char_type() {
-    let error_msg = "Argument M is out of range for Native type Char of SQL Server: Length can range from 1 to 4000.";
+    let error_msg =
+        "Argument M is out of range for Native type Char(4001) of SQL Server: Length can range from 1 to 4000.";
 
     test_native_types_without_attributes("Char(4001)", "String", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_nchar_type() {
-    let error_msg = "Argument M is out of range for Native type NChar of SQL Server: Length can range from 1 to 2000.";
+    let error_msg =
+        "Argument M is out of range for Native type NChar(2001) of SQL Server: Length can range from 1 to 2000.";
 
     test_native_types_without_attributes("NChar(2001)", "String", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_varchar_type() {
-    let error_msg = "Argument M is out of range for Native type VarChar of SQL Server: Length can range from 1 to 4000. For larger sizes, use the `Max` variant.";
+    let error_msg = "Argument M is out of range for Native type VarChar(4001) of SQL Server: Length can range from 1 to 4000. For larger sizes, use the `Max` variant.";
 
     test_native_types_without_attributes("VarChar(4001)", "String", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_nvarchar_type() {
-    let error_msg = "Argument M is out of range for Native type NVarChar of SQL Server: Length can range from 1 to 2000. For larger sizes, use the `Max` variant.";
+    let error_msg = "Argument M is out of range for Native type NVarChar(2001) of SQL Server: Length can range from 1 to 2000. For larger sizes, use the `Max` variant.";
 
     test_native_types_without_attributes("NVarChar(2001)", "String", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_varbinary_type() {
-    let error_msg = "Argument M is out of range for Native type VarBinary of SQL Server: Length can range from 1 to 4000. For larger sizes, use the `Max` variant.";
+    let error_msg = "Argument M is out of range for Native type VarBinary(4001) of SQL Server: Length can range from 1 to 4000. For larger sizes, use the `Max` variant.";
 
     test_native_types_without_attributes("VarBinary(4001)", "Bytes", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_binary_type() {
-    let error_msg = "Argument M is out of range for Native type Binary of SQL Server: Length can range from 1 to 4000.";
+    let error_msg =
+        "Argument M is out of range for Native type Binary(4001) of SQL Server: Length can range from 1 to 4000.";
 
     test_native_types_without_attributes("Binary(4001)", "Bytes", error_msg, MSSQL_SOURCE);
 }
@@ -260,87 +264,93 @@ macro_rules! test_type {
     };
 }
 
-test_type!(tinyint(("Int @db.TinyInt", MsSqlType::tinyint())));
-test_type!(smallint(("Int @db.SmallInt", MsSqlType::smallint())));
-test_type!(int(("Int @db.Int", MsSqlType::int())));
-test_type!(money(("Decimal @db.Money", MsSqlType::money())));
-test_type!(smallmoney(("Decimal @db.SmallMoney", MsSqlType::smallmoney())));
-test_type!(real(("Float @db.Real", MsSqlType::real())));
-test_type!(date(("DateTime @db.Date", MsSqlType::date())));
-test_type!(time(("DateTime @db.Time", MsSqlType::time())));
-test_type!(datetime(("DateTime @db.DateTime", MsSqlType::datetime())));
-test_type!(datetime2(("DateTime @db.DateTime2", MsSqlType::datetime2())));
-test_type!(text(("String @db.Text", MsSqlType::text())));
-test_type!(ntext(("String @db.NText", MsSqlType::ntext())));
-test_type!(image(("Bytes @db.Image", MsSqlType::image())));
-test_type!(xml(("String @db.Xml", MsSqlType::xml())));
+test_type!(tinyint(("Int @db.TinyInt", MsSqlType::TinyInt)));
+test_type!(smallint(("Int @db.SmallInt", MsSqlType::SmallInt)));
+test_type!(int(("Int @db.Int", MsSqlType::Int)));
+test_type!(money(("Decimal @db.Money", MsSqlType::Money)));
+test_type!(smallmoney(("Decimal @db.SmallMoney", MsSqlType::SmallMoney)));
+test_type!(real(("Float @db.Real", MsSqlType::Real)));
+test_type!(date(("DateTime @db.Date", MsSqlType::Date)));
+test_type!(time(("DateTime @db.Time", MsSqlType::Time)));
+test_type!(datetime(("DateTime @db.DateTime", MsSqlType::DateTime)));
+test_type!(datetime2(("DateTime @db.DateTime2", MsSqlType::DateTime2)));
+test_type!(text(("String @db.Text", MsSqlType::Text)));
+test_type!(ntext(("String @db.NText", MsSqlType::NText)));
+test_type!(image(("Bytes @db.Image", MsSqlType::Image)));
+test_type!(xml(("String @db.Xml", MsSqlType::Xml)));
 
 test_type!(datetimeoffset((
     "DateTime @db.DateTimeOffset",
-    MsSqlType::datetimeoffset()
+    MsSqlType::DateTimeOffset
 )));
 
-test_type!(smalldatetime((
-    "DateTime @db.SmallDateTime",
-    MsSqlType::smalldatetime()
-)));
+test_type!(smalldatetime(("DateTime @db.SmallDateTime", MsSqlType::SmallDateTime)));
 
 test_type!(binary(
-    ("Bytes @db.Binary", MsSqlType::binary(None)),
-    ("Bytes @db.Binary(4000)", MsSqlType::binary(Some(4000)))
+    ("Bytes @db.Binary", MsSqlType::Binary(None)),
+    ("Bytes @db.Binary(4000)", MsSqlType::Binary(Some(4000)))
 ));
 
 test_type!(varbinary(
-    ("Bytes @db.VarBinary", MsSqlType::varbinary(Option::<u64>::None)),
-    ("Bytes @db.VarBinary(4000)", MsSqlType::varbinary(Some(4000u64))),
+    ("Bytes @db.VarBinary", MsSqlType::VarBinary(None)),
+    (
+        "Bytes @db.VarBinary(4000)",
+        MsSqlType::VarBinary(Some(Number(4000)))
+    ),
     (
         "Bytes @db.VarBinary(Max)",
-        MsSqlType::varbinary(Some(TypeParameter::Max))
+        MsSqlType::VarBinary(Some(Max))
     ),
 ));
 
 test_type!(char(
-    ("String @db.Char", MsSqlType::r#char(None)),
-    ("String @db.Char(4000)", MsSqlType::r#char(Some(4000)))
+    ("String @db.Char", MsSqlType::Char(None)),
+    ("String @db.Char(4000)", MsSqlType::Char(Some(4000)))
 ));
 
 test_type!(nchar(
-    ("String @db.NChar", MsSqlType::nchar(None)),
-    ("String @db.NChar(2000)", MsSqlType::nchar(Some(2000)))
+    ("String @db.NChar", MsSqlType::NChar(None)),
+    ("String @db.NChar(2000)", MsSqlType::NChar(Some(2000)))
 ));
 
 test_type!(varchar(
-    ("String @db.VarChar", MsSqlType::varchar(Option::<u64>::None)),
-    ("String @db.VarChar(4000)", MsSqlType::varchar(Some(4000u64))),
-    ("String @db.VarChar(Max)", MsSqlType::varchar(Some(TypeParameter::Max))),
+    ("String @db.VarChar", MsSqlType::VarChar(None)),
+    (
+        "String @db.VarChar(4000)",
+        MsSqlType::VarChar(Some(Number(4000)))
+    ),
+    ("String @db.VarChar(Max)", MsSqlType::VarChar(Some(Max))),
 ));
 
 test_type!(nvarchar(
-    ("String @db.NVarChar", MsSqlType::nvarchar(Option::<u64>::None)),
-    ("String @db.NVarChar(2000)", MsSqlType::nvarchar(Some(2000u64))),
+    ("String @db.NVarChar", MsSqlType::NVarChar(None)),
+    (
+        "String @db.NVarChar(2000)",
+        MsSqlType::NVarChar(Some(Number(2000)))
+    ),
     (
         "String @db.NVarChar(Max)",
-        MsSqlType::nvarchar(Some(TypeParameter::Max))
+        MsSqlType::NVarChar(Some(Max))
     ),
 ));
 
 test_type!(boolean(
-    ("Boolean @db.Bit", MsSqlType::bit()),
-    ("Int @db.Bit", MsSqlType::bit()),
+    ("Boolean @db.Bit", MsSqlType::Bit),
+    ("Int @db.Bit", MsSqlType::Bit),
 ));
 
 test_type!(decimal(
-    ("Decimal @db.Decimal", MsSqlType::decimal(None)),
-    ("Decimal @db.Decimal(32,16)", MsSqlType::decimal(Some((32, 16)))),
+    ("Decimal @db.Decimal", MsSqlType::Decimal(None)),
+    ("Decimal @db.Decimal(32,16)", MsSqlType::Decimal(Some((32, 16)))),
 ));
 
 test_type!(number(
-    ("Decimal @db.Numeric", MsSqlType::numeric(None)),
-    ("Decimal @db.Numeric(32,16)", MsSqlType::numeric(Some((32, 16)))),
+    ("Decimal @db.Numeric", MsSqlType::Numeric(None)),
+    ("Decimal @db.Numeric(32,16)", MsSqlType::Numeric(Some((32, 16)))),
 ));
 
 test_type!(float(
-    ("Float @db.Float", MsSqlType::float(None)),
-    ("Float @db.Float(24)", MsSqlType::float(Some(24))),
-    ("Float @db.Float(53)", MsSqlType::float(Some(53))),
+    ("Float @db.Float", MsSqlType::Float(None)),
+    ("Float @db.Float(24)", MsSqlType::Float(Some(24))),
+    ("Float @db.Float(53)", MsSqlType::Float(Some(53))),
 ));

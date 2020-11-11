@@ -1,8 +1,8 @@
 use super::scalars::ScalarType;
-use native_types::MsSqlKind;
+use native_types::MsSqlType;
 
 /// represents an available native type
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug)]
 pub struct NativeTypeConstructor {
     /// the name that is used in the Prisma schema when declaring the native type
     pub name: String,
@@ -47,41 +47,41 @@ impl NativeTypeConstructor {
     }
 }
 
-impl From<MsSqlKind> for NativeTypeConstructor {
-    fn from(kind: MsSqlKind) -> Self {
-        let matching_types = match kind {
-            MsSqlKind::TinyInt => vec![ScalarType::Int],
-            MsSqlKind::SmallInt => vec![ScalarType::Int],
-            MsSqlKind::Int => vec![ScalarType::Int],
-            MsSqlKind::BigInt => vec![ScalarType::Int],
-            MsSqlKind::Decimal => vec![ScalarType::Decimal],
-            MsSqlKind::Numeric => vec![ScalarType::Decimal],
-            MsSqlKind::Money => vec![ScalarType::Decimal],
-            MsSqlKind::SmallMoney => vec![ScalarType::Decimal],
-            MsSqlKind::Bit => vec![ScalarType::Boolean, ScalarType::Int],
-            MsSqlKind::Float => vec![ScalarType::Float],
-            MsSqlKind::Real => vec![ScalarType::Float],
-            MsSqlKind::Date => vec![ScalarType::DateTime],
-            MsSqlKind::Time => vec![ScalarType::DateTime],
-            MsSqlKind::DateTime => vec![ScalarType::DateTime],
-            MsSqlKind::DateTime2 => vec![ScalarType::DateTime],
-            MsSqlKind::DateTimeOffset => vec![ScalarType::DateTime],
-            MsSqlKind::SmallDateTime => vec![ScalarType::DateTime],
-            MsSqlKind::Char => vec![ScalarType::String],
-            MsSqlKind::NChar => vec![ScalarType::String],
-            MsSqlKind::VarChar => vec![ScalarType::String],
-            MsSqlKind::Text => vec![ScalarType::String],
-            MsSqlKind::NVarChar => vec![ScalarType::String],
-            MsSqlKind::NText => vec![ScalarType::String],
-            MsSqlKind::Binary => vec![ScalarType::Bytes],
-            MsSqlKind::VarBinary => vec![ScalarType::Bytes],
-            MsSqlKind::Image => vec![ScalarType::Bytes],
-            MsSqlKind::Xml => vec![ScalarType::String],
+impl From<MsSqlType> for NativeTypeConstructor {
+    fn from(r#type: MsSqlType) -> Self {
+        let matching_types = match r#type {
+            MsSqlType::TinyInt => vec![ScalarType::Int],
+            MsSqlType::SmallInt => vec![ScalarType::Int],
+            MsSqlType::Int => vec![ScalarType::Int],
+            MsSqlType::BigInt => vec![ScalarType::Int],
+            MsSqlType::Decimal(_) => vec![ScalarType::Decimal],
+            MsSqlType::Numeric(_) => vec![ScalarType::Decimal],
+            MsSqlType::Money => vec![ScalarType::Decimal],
+            MsSqlType::SmallMoney => vec![ScalarType::Decimal],
+            MsSqlType::Bit => vec![ScalarType::Boolean, ScalarType::Int],
+            MsSqlType::Float(_) => vec![ScalarType::Float],
+            MsSqlType::Real => vec![ScalarType::Float],
+            MsSqlType::Date => vec![ScalarType::DateTime],
+            MsSqlType::Time => vec![ScalarType::DateTime],
+            MsSqlType::DateTime => vec![ScalarType::DateTime],
+            MsSqlType::DateTime2 => vec![ScalarType::DateTime],
+            MsSqlType::DateTimeOffset => vec![ScalarType::DateTime],
+            MsSqlType::SmallDateTime => vec![ScalarType::DateTime],
+            MsSqlType::Char(_) => vec![ScalarType::String],
+            MsSqlType::NChar(_) => vec![ScalarType::String],
+            MsSqlType::VarChar(_) => vec![ScalarType::String],
+            MsSqlType::Text => vec![ScalarType::String],
+            MsSqlType::NVarChar(_) => vec![ScalarType::String],
+            MsSqlType::NText => vec![ScalarType::String],
+            MsSqlType::Binary(_) => vec![ScalarType::Bytes],
+            MsSqlType::VarBinary(_) => vec![ScalarType::Bytes],
+            MsSqlType::Image => vec![ScalarType::Bytes],
+            MsSqlType::Xml => vec![ScalarType::String],
         };
 
-        match kind.maximum_parameters() {
-            0 => Self::without_args(kind.as_ref(), matching_types),
-            n => Self::with_optional_args(kind.as_ref(), n, matching_types),
+        match r#type.maximum_parameters() {
+            0 => Self::without_args(r#type.kind(), matching_types),
+            n => Self::with_optional_args(r#type.kind(), n, matching_types),
         }
     }
 }

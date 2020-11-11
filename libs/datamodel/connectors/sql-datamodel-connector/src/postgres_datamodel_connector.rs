@@ -11,7 +11,7 @@ use dml::{
     native_type_instance::NativeTypeInstance,
     scalars::ScalarType,
 };
-use native_types::{PostgresType, TypeParameter};
+use native_types::{PostgresType, TypeParameter::*};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -131,9 +131,7 @@ impl Connector for PostgresDatamodelConnector {
                             "Postgres",
                         ));
                     }
-                    [precision, _]
-                        if *precision > TypeParameter::Number(1000) || *precision <= TypeParameter::Number(0) =>
-                    {
+                    [precision, _] if *precision > Number(1000) || *precision <= Number(0) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "Precision must be positive with a maximum value of 1000.",
                             native_type_name,
@@ -145,7 +143,7 @@ impl Connector for PostgresDatamodelConnector {
             }
             if matches!(native_type_name, BIT_TYPE_NAME | VAR_BIT_TYPE_NAME) {
                 match native_type.args.as_slice() {
-                    [length] if *length == TypeParameter::Number(0) => {
+                    [length] if *length == Number(0) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "M must be a positive integer.",
                             native_type_name,
@@ -170,7 +168,7 @@ impl Connector for PostgresDatamodelConnector {
             }
             if matches!(native_type_name, TIMESTAMP_TYPE_NAME | TIME_TYPE_NAME) {
                 match native_type.args.as_slice() {
-                    [precision] if *precision > TypeParameter::Number(6) => {
+                    [precision] if *precision > Number(6) => {
                         return Err(ConnectorError::new_argument_m_out_of_range_error(
                             "M can range from 0 to 6.",
                             native_type_name,

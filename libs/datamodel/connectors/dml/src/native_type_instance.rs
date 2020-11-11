@@ -1,9 +1,6 @@
-use std::convert::TryFrom;
-use std::io;
-
-use native_types::MsSqlType;
-use native_types::{NativeType, TypeParameter};
+use native_types::{MsSqlType, NativeType, TypeParameter};
 use serde::de::DeserializeOwned;
+use std::convert::TryFrom;
 
 /// represents an instance of a native type declared in the Prisma schema
 #[derive(Debug, Clone, PartialEq)]
@@ -43,7 +40,7 @@ impl NativeTypeInstance {
 }
 
 impl TryFrom<NativeTypeInstance> for MsSqlType {
-    type Error = io::Error;
+    type Error = native_types::Error;
 
     fn try_from(value: NativeTypeInstance) -> Result<Self, Self::Error> {
         let args = value

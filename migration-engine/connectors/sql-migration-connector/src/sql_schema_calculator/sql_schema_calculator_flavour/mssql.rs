@@ -13,7 +13,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         native_type_instance: &NativeTypeInstance,
     ) -> ColumnType {
         let mssql_type: MsSqlType = native_type_instance.deserialize_native_type();
-        let data_type = mssql_type.kind().as_ref().to_string();
+        let data_type = mssql_type.kind().to_string();
         let full_data_type = format!("{}", mssql_type);
 
         ColumnType {

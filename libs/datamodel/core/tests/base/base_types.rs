@@ -174,7 +174,7 @@ fn json_type_must_work_for_some_connectors() {
         "Field `json` in model `User` can\'t be of type Json. The current connector does not support the Json type.",
         "User",
         "json",
-        Span::new(139, 149),
+        Span::new(121, 131),
     ));
 
     // Postgres does support it
