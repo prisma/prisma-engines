@@ -293,14 +293,8 @@ test_type!(binary(
 
 test_type!(varbinary(
     ("Bytes @db.VarBinary", MsSqlType::VarBinary(None)),
-    (
-        "Bytes @db.VarBinary(4000)",
-        MsSqlType::VarBinary(Some(Number(4000)))
-    ),
-    (
-        "Bytes @db.VarBinary(Max)",
-        MsSqlType::VarBinary(Some(Max))
-    ),
+    ("Bytes @db.VarBinary(4000)", MsSqlType::VarBinary(Some(Number(4000)))),
+    ("Bytes @db.VarBinary(Max)", MsSqlType::VarBinary(Some(Max))),
 ));
 
 test_type!(char(
@@ -315,23 +309,14 @@ test_type!(nchar(
 
 test_type!(varchar(
     ("String @db.VarChar", MsSqlType::VarChar(None)),
-    (
-        "String @db.VarChar(4000)",
-        MsSqlType::VarChar(Some(Number(4000)))
-    ),
+    ("String @db.VarChar(4000)", MsSqlType::VarChar(Some(Number(4000)))),
     ("String @db.VarChar(Max)", MsSqlType::VarChar(Some(Max))),
 ));
 
 test_type!(nvarchar(
     ("String @db.NVarChar", MsSqlType::NVarChar(None)),
-    (
-        "String @db.NVarChar(2000)",
-        MsSqlType::NVarChar(Some(Number(2000)))
-    ),
-    (
-        "String @db.NVarChar(Max)",
-        MsSqlType::NVarChar(Some(Max))
-    ),
+    ("String @db.NVarChar(2000)", MsSqlType::NVarChar(Some(Number(2000)))),
+    ("String @db.NVarChar(Max)", MsSqlType::NVarChar(Some(Max))),
 ));
 
 test_type!(boolean(

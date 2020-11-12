@@ -53,7 +53,7 @@ impl From<MsSqlType> for NativeTypeConstructor {
             MsSqlType::TinyInt => vec![ScalarType::Int],
             MsSqlType::SmallInt => vec![ScalarType::Int],
             MsSqlType::Int => vec![ScalarType::Int],
-            MsSqlType::BigInt => vec![ScalarType::Int],
+            MsSqlType::BigInt => vec![ScalarType::BigInt],
             MsSqlType::Decimal(_) => vec![ScalarType::Decimal],
             MsSqlType::Numeric(_) => vec![ScalarType::Decimal],
             MsSqlType::Money => vec![ScalarType::Decimal],

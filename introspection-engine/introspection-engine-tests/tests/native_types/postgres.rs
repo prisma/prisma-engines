@@ -106,7 +106,6 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_each_connector(tags("postgres"))]
-
 async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
     let columns: Vec<String> = TYPES
         .iter()

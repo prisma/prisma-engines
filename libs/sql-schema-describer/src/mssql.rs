@@ -1,8 +1,11 @@
 use super::*;
 use crate::getters::Getter;
+use native_types::MsSqlType;
+use native_types::NativeType;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
+use std::borrow::Cow;
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
@@ -196,7 +199,9 @@ impl SqlSchemaDescriber {
                 column_default,
                 is_nullable,
                 columnproperty(object_id(@P1 + '.' + table_name), column_name, 'IsIdentity') is_identity,
-                table_name
+                table_name,
+                numeric_precision,
+                numeric_scale
             FROM information_schema.columns c
             INNER JOIN sys.tables t
             ON c.TABLE_NAME = t.name AND SCHEMA_ID(c.TABLE_SCHEMA) = t.schema_id
@@ -213,9 +218,13 @@ impl SqlSchemaDescriber {
             debug!("Got column: {:?}", col);
 
             let table_name = col.get_expect_string("table_name");
+
             let name = col.get_expect_string("column_name");
             let data_type = col.get_expect_string("data_type");
-            let character_maximum_length = col.get_u32("character_maximum_length");
+            let character_maximum_length = col.get_i64("character_maximum_length");
+
+            let numeric_precision = col.get_u32("numeric_precision");
+            let numeric_scale = col.get_u32("numeric_scale");
             let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
 
             let is_required = match is_nullable.as_ref() {
@@ -230,10 +239,15 @@ impl SqlSchemaDescriber {
                 ColumnArity::Nullable
             };
 
-            let tpe = self.get_column_type(&data_type, character_maximum_length, arity);
+            let tpe = self.get_column_type(
+                &data_type,
+                character_maximum_length,
+                numeric_precision,
+                numeric_scale,
+                arity,
+            );
 
             let auto_increment = col.get_expect_bool("is_identity");
-
             let entry = map.entry(table_name).or_insert_with(Vec::new);
 
             let default = match col.get("column_default") {
@@ -533,29 +547,58 @@ impl SqlSchemaDescriber {
     fn get_column_type(
         &self,
         data_type: &str,
-        character_maximum_length: Option<u32>,
+        character_maximum_length: Option<i64>,
+        numeric_precision: Option<u32>,
+        numeric_scale: Option<u32>,
         arity: ColumnArity,
     ) -> ColumnType {
         use ColumnTypeFamily::*;
 
         let family = match data_type {
             "date" | "time" | "datetime" | "datetime2" | "smalldatetime" | "datetimeoffset" => DateTime,
+            "char" | "nchar" | "varchar" | "nvarchar" | "text" | "ntext" | "xml" => String,
             "numeric" | "decimal" | "float" | "real" | "smallmoney" | "money" => Float,
-            "char" | "nchar" | "varchar" | "nvarchar" | "text" | "ntext" => String,
-            "tinyint" | "smallint" | "int" | "bigint" => Int,
             "binary" | "varbinary" | "image" => Binary,
+            "tinyint" | "smallint" | "int" => Int,
             "uniqueidentifier" => Uuid,
+            "bigint" => BigInt,
             "bit" => Boolean,
             r#type => Unsupported(r#type.into()),
         };
 
+        let params = match data_type {
+            "numeric" | "decimal" => match (numeric_precision, numeric_scale) {
+                (Some(p), Some(s)) => Cow::from(format!("({},{})", p, s)),
+                (None, None) => Cow::from(""),
+                _ => unreachable!("Unexpected params for a decimal field."),
+            },
+            "float" => match numeric_precision {
+                Some(p) => Cow::from(format!("({})", p)),
+                None => Cow::from(""),
+            },
+            "varchar" | "nvarchar" | "varbinary" => match character_maximum_length {
+                Some(-1) => Cow::from("(max)"),
+                Some(length) => Cow::from(format!("({})", length)),
+                None => Cow::from(""),
+            },
+            "char" | "nchar" | "binary" => match character_maximum_length {
+                Some(-1) => unreachable!("Cannot have a `max` variant for type `{}`", data_type),
+                Some(length) => Cow::from(format!("({})", length)),
+                None => Cow::from(""),
+            },
+            _ => Cow::from(""),
+        };
+
+        let full_data_type = format!("{}{}", data_type, params);
+        let native_type: MsSqlType = full_data_type.parse().unwrap();
+
         ColumnType {
             data_type: data_type.into(),
-            full_data_type: data_type.into(),
+            full_data_type,
             character_maximum_length,
             family,
             arity,
-            native_type: Default::default(),
+            native_type: Some(native_type.to_json()),
         }
     }
 }
