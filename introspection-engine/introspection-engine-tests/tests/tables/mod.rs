@@ -386,7 +386,7 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
         .execute(|migration| {
             migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("string_function text Default 'Concatenated'||E'\n'");
+                t.inject_custom("string_function text Default E'  ' || '>' || ' '");
                 t.inject_custom("int_serial Serial4");
                 t.inject_custom("int_function Integer DEFAULT EXTRACT(year from TIMESTAMP '2001-02-16 20:38:40')");
                 t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')"); // todo this is not recognized as autoincrement
@@ -398,14 +398,17 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
 
     let dm = indoc! {r#"
         model Test {
-            id                      Int       @id @default(autoincrement())
-            string_function         String?   @default(dbgenerated())
-            int_serial              Int       @default(autoincrement())
-            int_function            Int?      @default(dbgenerated())
-            int_sequence            Int?      @default(dbgenerated())
-            datetime_now            DateTime? @default(now())
-            datetime_now_lc         DateTime? @default(now())
-        }
+          id              Int       @id @default(autoincrement())
+          /// This field's default value can currently not be parsed: `(('  '::text || '>'::text) || ' '::text)`.
+          string_function String?   @default(dbgenerated())
+          int_serial      Int       @default(autoincrement())
+          /// This field's default value can currently not be parsed: `date_part('year'::text, '2001-02-16 20:38:40'::timestamp without time zone)`.
+          int_function    Int?      @default(dbgenerated())
+          /// This field's default value can currently not be parsed: `nextval('test_seq'::regclass)`.
+          int_sequence    Int?      @default(dbgenerated())
+          datetime_now    DateTime? @default(now())
+          datetime_now_lc DateTime? @default(now())
+          }
     "#};
 
     assert_eq_datamodels!(dm, &api.introspect().await?);
