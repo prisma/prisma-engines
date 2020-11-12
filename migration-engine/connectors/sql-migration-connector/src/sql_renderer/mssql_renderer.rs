@@ -82,18 +82,22 @@ impl SqlRenderer for MssqlFlavour {
     fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
 
-        let r#type = match &column.column_type().family {
-            ColumnTypeFamily::Boolean => "bit",
-            ColumnTypeFamily::DateTime => "datetime2",
-            ColumnTypeFamily::Float => "decimal(32,16)",
-            ColumnTypeFamily::Decimal => "decimal(32,16)",
-            ColumnTypeFamily::Int => "int",
-            ColumnTypeFamily::BigInt => "bigint",
-            ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
-            ColumnTypeFamily::Binary => "varbinary(max)",
-            ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
-            ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
-            ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
+        let r#type = if !column.column_type().full_data_type.is_empty() {
+            column.column_type().full_data_type.as_str()
+        } else {
+            match &column.column_type().family {
+                ColumnTypeFamily::Boolean => "bit",
+                ColumnTypeFamily::DateTime => "datetime2",
+                ColumnTypeFamily::Float => "decimal(32,16)",
+                ColumnTypeFamily::Decimal => "decimal(32,16)",
+                ColumnTypeFamily::Int => "int",
+                ColumnTypeFamily::BigInt => "bigint",
+                ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
+                ColumnTypeFamily::Binary => "varbinary(max)",
+                ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
+                ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
+                ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
+            }
         };
 
         let nullability = common::render_nullability(&column);

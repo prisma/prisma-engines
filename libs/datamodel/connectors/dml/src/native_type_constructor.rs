@@ -56,8 +56,8 @@ impl From<MsSqlType> for NativeTypeConstructor {
             MsSqlType::BigInt => vec![ScalarType::BigInt],
             MsSqlType::Decimal(_) => vec![ScalarType::Decimal],
             MsSqlType::Numeric(_) => vec![ScalarType::Decimal],
-            MsSqlType::Money => vec![ScalarType::Decimal],
-            MsSqlType::SmallMoney => vec![ScalarType::Decimal],
+            MsSqlType::Money => vec![ScalarType::Float],
+            MsSqlType::SmallMoney => vec![ScalarType::Float],
             MsSqlType::Bit => vec![ScalarType::Boolean, ScalarType::Int],
             MsSqlType::Float(_) => vec![ScalarType::Float],
             MsSqlType::Real => vec![ScalarType::Float],
@@ -77,6 +77,7 @@ impl From<MsSqlType> for NativeTypeConstructor {
             MsSqlType::VarBinary(_) => vec![ScalarType::Bytes],
             MsSqlType::Image => vec![ScalarType::Bytes],
             MsSqlType::Xml => vec![ScalarType::String],
+            MsSqlType::UniqueIdentifier => vec![ScalarType::String],
         };
 
         match r#type.maximum_parameters() {

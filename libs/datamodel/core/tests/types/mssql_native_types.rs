@@ -267,8 +267,8 @@ macro_rules! test_type {
 test_type!(tinyint(("Int @db.TinyInt", MsSqlType::TinyInt)));
 test_type!(smallint(("Int @db.SmallInt", MsSqlType::SmallInt)));
 test_type!(int(("Int @db.Int", MsSqlType::Int)));
-test_type!(money(("Decimal @db.Money", MsSqlType::Money)));
-test_type!(smallmoney(("Decimal @db.SmallMoney", MsSqlType::SmallMoney)));
+test_type!(money(("Float @db.Money", MsSqlType::Money)));
+test_type!(smallmoney(("Float @db.SmallMoney", MsSqlType::SmallMoney)));
 test_type!(real(("Float @db.Real", MsSqlType::Real)));
 test_type!(date(("DateTime @db.Date", MsSqlType::Date)));
 test_type!(time(("DateTime @db.Time", MsSqlType::Time)));

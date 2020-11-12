@@ -1,8 +1,10 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
-use datamodel::walkers::ModelWalker;
-use datamodel::{walkers::ScalarFieldWalker, FieldArity, NativeTypeInstance, ScalarType};
-use native_types::MsSqlType;
+use datamodel::{
+    walkers::{ModelWalker, ScalarFieldWalker},
+    FieldArity, NativeTypeInstance, ScalarType,
+};
+use native_types::{MsSqlType, NativeType};
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, ForeignKeyAction};
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {
@@ -26,7 +28,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
                 FieldArity::Optional => ColumnArity::Nullable,
                 FieldArity::List => ColumnArity::List,
             },
-            native_type: None,
+            native_type: Some(mssql_type.to_json()),
         }
     }
 

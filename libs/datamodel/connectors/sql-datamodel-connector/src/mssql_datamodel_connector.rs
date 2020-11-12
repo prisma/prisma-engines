@@ -42,6 +42,7 @@ static ENABLED_NATIVE_TYPES: &[MsSqlType] = &[
     VarBinary(None),
     Image,
     Xml,
+    UniqueIdentifier,
 ];
 
 pub struct MsSqlDatamodelConnector {
@@ -107,22 +108,7 @@ impl Connector for MsSqlDatamodelConnector {
                         )),
                         _ => Ok(()),
                     },
-                    Text | NText | Image | Xml => {
-                        if field.is_unique() {
-                            Err(ConnectorError::new_incompatible_native_type_with_unique(
-                                &format!("{}", r#type),
-                                "SQL Server",
-                            ))
-                        } else if field.is_id() {
-                            Err(ConnectorError::new_incompatible_native_type_with_id(
-                                &format!("{}", r#type),
-                                "SQL Server",
-                            ))
-                        } else {
-                            Ok(())
-                        }
-                    }
-                    VarChar(Some(Max)) | NVarChar(Some(Max)) | VarBinary(Some(Max)) => {
+                    typ if MsSqlType::heap_allocated().contains(&typ) => {
                         if field.is_unique() {
                             Err(ConnectorError::new_incompatible_native_type_with_unique(
                                 &format!("{}", r#type),
@@ -172,31 +158,23 @@ impl Connector for MsSqlDatamodelConnector {
         for index_definition in model.indices.iter() {
             let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
 
-            let incompatible_index_type = |kind: &str| {
-                if index_definition.tpe == IndexType::Unique {
-                    Err(ConnectorError::new_incompatible_native_type_with_unique(
-                        kind,
-                        "SQL Server",
-                    ))
-                } else {
-                    Err(ConnectorError::new_incompatible_native_type_with_index(
-                        kind,
-                        "SQL Server",
-                    ))
-                }
-            };
-
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
                     // We've validated the type earlier (hopefully).
                     let r#type = MsSqlType::try_from(native_type).unwrap();
 
-                    match r#type {
-                        Text | NText | Image | Xml => incompatible_index_type(&format!("{}", r#type))?,
-                        VarChar(Some(Max)) | NVarChar(Some(Max)) | VarBinary(Some(Max)) => {
-                            incompatible_index_type(&format!("{}", r#type))?
+                    if MsSqlType::heap_allocated().contains(&r#type) {
+                        if index_definition.tpe == IndexType::Unique {
+                            return Err(ConnectorError::new_incompatible_native_type_with_unique(
+                                &format!("{}", r#type),
+                                "SQL Server",
+                            ));
+                        } else {
+                            return Err(ConnectorError::new_incompatible_native_type_with_index(
+                                &format!("{}", r#type),
+                                "SQL Server",
+                            ));
                         }
-                        _ => {}
                     }
                 }
             }
@@ -209,20 +187,11 @@ impl Connector for MsSqlDatamodelConnector {
                 // We've validated the type earlier (hopefully).
                 let r#type = MsSqlType::try_from(native_type).unwrap();
 
-                match r#type {
-                    Text | NText | Image | Xml => {
-                        return Err(ConnectorError::new_incompatible_native_type_with_id(
-                            &format!("{}", r#type),
-                            "SQL Server",
-                        ));
-                    }
-                    VarChar(Some(Max)) | NVarChar(Some(Max)) | VarBinary(Some(Max)) => {
-                        return Err(ConnectorError::new_incompatible_native_type_with_id(
-                            &format!("{}", r#type),
-                            "SQL Server",
-                        ));
-                    }
-                    _ => {}
+                if MsSqlType::heap_allocated().contains(&r#type) {
+                    return Err(ConnectorError::new_incompatible_native_type_with_id(
+                        &format!("{}", r#type),
+                        "SQL Server",
+                    ));
                 }
             }
         }

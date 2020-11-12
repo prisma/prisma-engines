@@ -118,6 +118,9 @@ pub enum MsSqlType {
     Image,
     /// XML text.
     Xml,
+    /// GUID, which is UUID but Microsoft invented them so they have their own
+    /// term for it.
+    UniqueIdentifier,
 }
 
 impl MsSqlType {
@@ -157,6 +160,7 @@ impl MsSqlType {
             MsSqlType::VarBinary(_) => 1,
             MsSqlType::Image => 0,
             MsSqlType::Xml => 0,
+            MsSqlType::UniqueIdentifier => 0,
         }
     }
 
@@ -190,6 +194,7 @@ impl MsSqlType {
             MsSqlType::VarBinary(_) => "VarBinary",
             MsSqlType::Image => "Image",
             MsSqlType::Xml => "Xml",
+            MsSqlType::UniqueIdentifier => "UniqueIdentifier",
         }
     }
 
@@ -357,6 +362,7 @@ impl FromStr for MsSqlType {
                             "ntext" => Ok(MsSqlType::NText),
                             "image" => Ok(MsSqlType::Image),
                             "xml" => Ok(MsSqlType::Xml),
+                            "uniqueidentifier" => Ok(MsSqlType::UniqueIdentifier),
                             k => {
                                 let kind = io::ErrorKind::InvalidInput;
                                 Err(io::Error::new(kind, format!("Invalid SQL Server type: `{}`", k)))?
@@ -417,6 +423,7 @@ mod tests {
         types.insert("varbinary", MsSqlType::VarBinary(None));
         types.insert("image", MsSqlType::Image);
         types.insert("xml", MsSqlType::Xml);
+        types.insert("uniqueidentifier", MsSqlType::UniqueIdentifier);
 
         for (s, expected) in types.into_iter() {
             let typ: MsSqlType = s.parse()?;
@@ -448,6 +455,7 @@ mod tests {
         types.push("ntext(1)");
         types.push("image(1)");
         types.push("xml(1)");
+        types.push("uniqueidentifier(1)");
 
         for s in types.into_iter() {
             let res: crate::Result<MsSqlType> = s.parse();

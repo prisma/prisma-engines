@@ -4,9 +4,9 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("{}", _0)]
-    Io(io::Error),
+    Io(#[source] io::Error),
     #[error("{}", _0)]
-    ParseInt(num::ParseIntError),
+    ParseInt(#[source] num::ParseIntError),
 }
 
 impl From<io::Error> for Error {

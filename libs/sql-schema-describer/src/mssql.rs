@@ -264,7 +264,7 @@ impl SqlSchemaDescriber {
                             .map(|cap| cap[1].to_string())
                             .expect("Couldn't parse default value");
 
-                        Some(match &tpe.family {
+                        Some(match tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string) {
                                 Some(int_value) => DefaultValue::VALUE(int_value),
                                 None => DefaultValue::DBGENERATED(default_string),
