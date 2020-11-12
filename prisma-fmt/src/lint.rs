@@ -46,7 +46,7 @@ pub fn run(opts: LintOpts) {
             let mini_warnings: Vec<MiniError> = validated_datamodel
                 .warnings
                 .into_iter()
-                .map(|warn: &DatamodelWarning| MiniError {
+                .map(|warn: DatamodelWarning| MiniError {
                     start: warn.span().start,
                     end: warn.span().end,
                     text: format!("{}", warn),
