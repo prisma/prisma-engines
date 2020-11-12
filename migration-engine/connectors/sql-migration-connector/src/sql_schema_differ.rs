@@ -549,31 +549,29 @@ fn push_foreign_keys_from_created_tables<'a>(
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
 fn foreign_keys_match(previous: &ForeignKeyWalker<'_>, next: &ForeignKeyWalker<'_>) -> bool {
-    // Foreign keys point to different tables.
-    if previous.referenced_table().name() != next.referenced_table().name() {
-        return false;
-    }
+    let references_same_table = previous.referenced_table().name() == next.referenced_table().name();
+    let references_same_column_count = previous.referenced_columns_count() == next.referenced_columns_count();
+    let constrains_same_column_count = previous.constrained_columns().count() == next.constrained_columns().count();
+    let constrains_same_columns =
+        previous
+            .constrained_columns()
+            .zip(next.constrained_columns())
+            .all(|(previous, next)| {
+                previous.name() == next.name() && previous.column_type_family() == next.column_type_family()
+            });
 
-    // Foreign keys point to different columns.
-    if previous.referenced_columns_count() != next.referenced_columns_count() {
-        return false;
-    }
+    // Foreign key references different columns or the same columns in a different order.
+    let references_same_columns = previous
+        .referenced_column_names()
+        .iter()
+        .zip(next.referenced_column_names())
+        .all(|(previous, next)| previous == next);
 
-    // Foreign keys constrain different columns.
-    if previous.constrained_columns().count() != next.constrained_columns().count() {
-        return false;
-    }
-
-    // Foreign keys constrain the same columns in a different order, or their types changed.
-    for (previous_column, next_column) in previous.constrained_columns().zip(next.constrained_columns()) {
-        if previous_column.name() != next_column.name()
-            || previous_column.column_type_family() != next_column.column_type_family()
-        {
-            return false;
-        }
-    }
-
-    true
+    references_same_table
+        && references_same_column_count
+        && constrains_same_column_count
+        && constrains_same_columns
+        && references_same_columns
 }
 
 fn tables_match(previous: &TableWalker<'_>, next: &TableWalker<'_>) -> bool {
