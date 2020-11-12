@@ -29,7 +29,8 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         fields.push(create_query_raw_field());
     }
 
-    let strong_ref = Arc::new(object_type("Mutation", fields, None));
+    let ident = Identifier::new("Mutation".to_owned(), PRISMA_NAMESPACE);
+    let strong_ref = Arc::new(object_type(ident, fields, None));
 
     (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)
 }

@@ -1,4 +1,5 @@
-use prisma_models::{InternalEnum, ScalarFieldRef};
+use super::*;
+use prisma_models::{InternalEnum, PrismaValue, ScalarFieldRef};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum EnumType {
@@ -7,7 +8,7 @@ pub enum EnumType {
     String(StringEnumType),
 
     /// Enum from the internal data model, representing an enum on the database level.
-    Internal(InternalEnum),
+    Database(DatabaseEnumType),
 
     /// Enum referencing fields on a model.
     FieldRef(FieldRefEnumType),
@@ -17,9 +18,23 @@ impl EnumType {
     pub fn name(&self) -> &str {
         match self {
             Self::String(s) => &s.name,
-            Self::Internal(i) => &i.name,
+            Self::Database(db) => &db.name,
             Self::FieldRef(f) => &f.name,
         }
+    }
+
+    // Used as cache keys, for example.
+    pub fn identifier(&self) -> Identifier {
+        Identifier::new(self.name().to_owned(), self.namespace())
+    }
+
+    pub fn namespace(&self) -> String {
+        match self {
+            Self::String(_) => PRISMA_NAMESPACE,
+            Self::Database(_) => MODEL_NAMESPACE,
+            Self::FieldRef(_) => PRISMA_NAMESPACE,
+        }
+        .to_string()
     }
 }
 
@@ -44,7 +59,48 @@ impl StringEnumType {
 
 impl From<InternalEnum> for EnumType {
     fn from(internal_enum: InternalEnum) -> EnumType {
-        EnumType::Internal(internal_enum)
+        EnumType::Database(DatabaseEnumType {
+            name: internal_enum.name.clone(),
+            internal_enum,
+        })
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DatabaseEnumType {
+    pub name: String,
+    pub internal_enum: InternalEnum,
+}
+
+impl DatabaseEnumType {
+    pub fn map_input_value(&self, val: &String) -> Option<PrismaValue> {
+        Some(PrismaValue::Enum(
+            self.internal_enum
+                .values
+                .iter()
+                .find(|ev| &ev.name == val)?
+                .db_name()
+                .clone(),
+        ))
+    }
+
+    pub fn map_output_value(&self, val: &String) -> Option<PrismaValue> {
+        Some(PrismaValue::Enum(
+            self.internal_enum
+                .values
+                .iter()
+                .find(|ev| ev.db_name() == val)?
+                .name
+                .clone(),
+        ))
+    }
+
+    pub fn external_values(&self) -> Vec<String> {
+        self.internal_enum
+            .values
+            .iter()
+            .map(|v| v.name.to_string())
+            .collect::<Vec<String>>()
     }
 }
 

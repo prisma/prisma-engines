@@ -39,10 +39,11 @@ fn checked_create_input_type(
         _ => format!("{}CreateInput", model.name),
     };
 
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, input_object.clone());
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     // Compute input fields for scalar fields.
     let scalar_fields: Vec<ScalarFieldRef> = model
@@ -93,18 +94,22 @@ fn relation_input_fields_for_checked_create(
             // Compute input object name
             let arity_part = if rf.is_list { "Many" } else { "One" };
             let without_part = format!("Without{}", capitalize(&related_field.name));
-            let input_name = format!("{}Create{}{}Input", related_model.name, arity_part, without_part);
+            let ident = Identifier::new(
+                format!("{}Create{}{}Input", related_model.name, arity_part, without_part),
+                PRISMA_NAMESPACE,
+            );
+
             let field_is_opposite_relation_field =
                 parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
 
             if field_is_opposite_relation_field {
                 None
             } else {
-                let input_object = match ctx.get_input_type(&input_name) {
+                let input_object = match ctx.get_input_type(&ident) {
                     Some(t) => t,
                     None => {
-                        let input_object = Arc::new(init_input_object_type(input_name.clone()));
-                        ctx.cache_input_type(input_name, input_object.clone());
+                        let input_object = Arc::new(init_input_object_type(ident.clone()));
+                        ctx.cache_input_type(ident, input_object.clone());
 
                         // Enqueue the nested create input for its fields to be
                         // created at a later point, to avoid recursing too deep
@@ -159,10 +164,11 @@ fn unchecked_create_input_type(
         _ => format!("{}UncheckedCreateInput", model.name),
     };
 
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, input_object.clone());
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
@@ -223,7 +229,10 @@ fn relation_input_fields_for_unchecked_create(
             // Compute input object name
             let arity_part = if rf.is_list { "Many" } else { "One" };
             let without_part = format!("Without{}", capitalize(&child_field.name));
-            let input_name = format!("{}UncheckedCreate{}{}Input", child_model.name, arity_part, without_part);
+            let ident = Identifier::new(
+                format!("{}UncheckedCreate{}{}Input", child_model.name, arity_part, without_part),
+                PRISMA_NAMESPACE,
+            );
 
             let field_is_opposite_relation_field =
                 parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
@@ -233,11 +242,11 @@ fn relation_input_fields_for_unchecked_create(
             if field_is_opposite_relation_field || !child_field.is_inlined_on_enclosing_model() {
                 None
             } else {
-                let input_object = match ctx.get_input_type(&input_name) {
+                let input_object = match ctx.get_input_type(&ident) {
                     Some(t) => t,
                     None => {
-                        let input_object = Arc::new(init_input_object_type(input_name.clone()));
-                        ctx.cache_input_type(input_name, input_object.clone());
+                        let input_object = Arc::new(init_input_object_type(ident.clone()));
+                        ctx.cache_input_type(ident, input_object.clone());
 
                         // Enqueue the nested create input for its fields to be
                         // created at a later point, to avoid recursing too deep

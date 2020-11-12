@@ -12,18 +12,21 @@ pub(crate) fn nested_connect_or_create_input_object(
         return None;
     }
 
-    let type_name = format!(
-        "{}CreateOrConnectWithout{}Input",
-        related_model.name,
-        parent_field.related_field().name
+    let ident = Identifier::new(
+        format!(
+            "{}CreateOrConnectWithout{}Input",
+            related_model.name,
+            parent_field.related_field().name
+        ),
+        PRISMA_NAMESPACE,
     );
 
     let create_types = create_objects::create_input_types(ctx, &related_model, Some(parent_field));
 
-    match ctx.get_input_type(&type_name) {
+    match ctx.get_input_type(&ident) {
         None => {
-            let input_object = Arc::new(init_input_object_type(type_name.clone()));
-            ctx.cache_input_type(type_name, input_object.clone());
+            let input_object = Arc::new(init_input_object_type(ident.clone()));
+            ctx.cache_input_type(ident, input_object.clone());
 
             let fields = vec![
                 input_field("where", InputType::object(where_object), None),

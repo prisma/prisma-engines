@@ -22,7 +22,7 @@ impl QueryDocumentParser {
         selections: &[Selection],
         schema_object: &ObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedObject> {
-        let path = parent_path.add(schema_object.name().to_string());
+        let path = parent_path.add(schema_object.identifier.name().to_owned());
 
         // Basic invariant not (yet) encoded in the schema: Output objects can't be empty.
         if selections.is_empty() {
@@ -374,9 +374,9 @@ impl QueryDocumentParser {
         };
 
         match typ.borrow() {
-            EnumType::Internal(i) => match i.map_input_value(&raw) {
+            EnumType::Database(db) => match db.map_input_value(&raw) {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
-                None => err(&i.name),
+                None => err(&db.name),
             },
             EnumType::String(s) => match s.value_for(raw.as_str()) {
                 Some(val) => Ok(ParsedInputValue::Single(PrismaValue::String(val.to_owned()))),
@@ -395,7 +395,7 @@ impl QueryDocumentParser {
         object: IndexMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
-        let path = parent_path.add(schema_object.name.clone());
+        let path = parent_path.add(schema_object.identifier.name().to_owned());
         let left: HashSet<&str> = schema_object
             .get_fields()
             .iter()

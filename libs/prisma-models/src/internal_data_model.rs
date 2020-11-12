@@ -48,22 +48,6 @@ impl InternalEnum {
             values: values.into_iter().map(|v| v.into()).collect(),
         }
     }
-
-    pub fn map_input_value(&self, val: &String) -> Option<PrismaValue> {
-        Some(PrismaValue::Enum(
-            self.values.iter().find(|ev| &ev.name == val)?.final_db_name().clone(),
-        ))
-    }
-
-    pub fn map_output_value(&self, val: &String) -> Option<PrismaValue> {
-        Some(PrismaValue::Enum(
-            self.values.iter().find(|ev| ev.final_db_name() == val)?.name.clone(),
-        ))
-    }
-
-    pub fn external_values(&self) -> Vec<String> {
-        self.values.iter().map(|v| v.name.to_string()).collect::<Vec<String>>()
-    }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -85,7 +69,7 @@ impl InternalEnumValue {
         }
     }
 
-    pub fn final_db_name(&self) -> &String {
+    pub fn db_name(&self) -> &String {
         self.database_name.as_ref().unwrap_or(&self.name)
     }
 }

@@ -23,13 +23,13 @@ pub(crate) fn update_many_input_types(
 
 /// Builds "<x>UpdateManyMutationInput" input object type.
 pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let object_name = format!("{}UpdateManyMutationInput", model.name);
-    return_cached_input!(ctx, &object_name);
+    let ident = Identifier::new(format!("{}UpdateManyMutationInput", model.name), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
     let input_fields = update_one_objects::scalar_input_fields_for_checked_update(ctx, model);
-    let input_object = Arc::new(input_object_type(object_name.clone(), input_fields));
+    let input_object = Arc::new(input_object_type(ident.clone(), input_fields));
 
-    ctx.cache_input_type(object_name, input_object.clone());
+    ctx.cache_input_type(ident, input_object.clone());
     Arc::downgrade(&input_object)
 }
 
@@ -48,12 +48,13 @@ pub(crate) fn unchecked_update_many_input_type(
         _ => format!("{}UncheckedUpdateManyInput", model.name),
     };
 
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
     let input_fields = update_one_objects::scalar_input_fields_for_unchecked_update(ctx, model, parent_field);
-    let input_object = Arc::new(input_object_type(name.clone(), input_fields));
+    let input_object = Arc::new(input_object_type(ident.clone(), input_fields));
 
-    ctx.cache_input_type(name, input_object.clone());
+    ctx.cache_input_type(ident, input_object.clone());
     Arc::downgrade(&input_object)
 }
 
@@ -70,10 +71,11 @@ pub(crate) fn update_many_where_combination_object(
         capitalize(&parent_field.related_field().name)
     );
 
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, input_object.clone());
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     let where_input_object = filter_objects::scalar_filter_object_type(ctx, &related_model);
     let update_types = update_many_input_types(ctx, &related_model, Some(parent_field));

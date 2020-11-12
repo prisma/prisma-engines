@@ -8,18 +8,18 @@ use test_macros::test_each_connector_mssql as test_each_connector;
 async fn a_table_with_reserved_name(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("StringFilter", |t| {
+            migration.create_table("PrismaClient", |t| {
                 t.add_column("id", types::primary());
             });
         })
         .await?;
 
     let dm = indoc! {r#"
-        /// This model has been renamed to 'RenamedStringFilter' during introspection, because the original name 'StringFilter' is reserved.
-        model RenamedStringFilter {
+        /// This model has been renamed to 'RenamedPrismaClient' during introspection, because the original name 'PrismaClient' is reserved.
+        model RenamedPrismaClient {
           id Int @id @default(autoincrement())
 
-          @@map("StringFilter")
+          @@map("PrismaClient")
         }
     "#};
 
@@ -32,14 +32,14 @@ async fn a_table_with_reserved_name(api: &TestApi) -> crate::TestResult {
 async fn reserved_names_case_sensitivity(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("query", |t| {
+            migration.create_table("prismaclient", |t| {
                 t.add_column("id", types::primary());
             });
         })
         .await?;
 
     let dm = indoc! {r#"
-        model query {
+        model prismaclient {
           id Int @id @default(autoincrement())
         }
     "#};

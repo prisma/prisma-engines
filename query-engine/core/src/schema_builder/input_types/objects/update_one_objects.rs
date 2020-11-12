@@ -33,10 +33,11 @@ fn checked_update_one_input_type(
         _ => format!("{}UpdateInput", model.name),
     };
 
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, input_object.clone());
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     // Compute input fields for scalar fields.
     let mut fields = scalar_input_fields_for_checked_update(ctx, model);
@@ -64,10 +65,11 @@ fn unchecked_update_one_input_type(
         _ => format!("{}UncheckedUpdateInput", model.name),
     };
 
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(name.clone()));
-    ctx.cache_input_type(name, input_object.clone());
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     // Compute input fields for scalar fields.
     let mut fields = scalar_input_fields_for_unchecked_update(ctx, model, parent_field);
@@ -167,14 +169,17 @@ fn operations_object_type(
     // Nullability is important for the `set` operation, so we need to
     // construct and cache different objects to reflect that.
     let nullable = if field.is_required { "" } else { "Nullable" };
-    let name = format!("{}{}FieldUpdateOperationsInput", nullable, prefix);
-    return_cached_input!(ctx, &name);
+    let ident = Identifier::new(
+        format!("{}{}FieldUpdateOperationsInput", nullable, prefix),
+        PRISMA_NAMESPACE,
+    );
+    return_cached_input!(ctx, &ident);
 
-    let mut obj = init_input_object_type(&name);
+    let mut obj = init_input_object_type(ident.clone());
     obj.require_exactly_one_field();
 
     let obj = Arc::new(obj);
-    ctx.cache_input_type(name, obj.clone());
+    ctx.cache_input_type(ident, obj.clone());
 
     let typ = map_scalar_input_type(field);
     let mut fields = vec![input_field("set", typ.clone(), None)
@@ -215,19 +220,22 @@ fn relation_input_fields_for_checked_update_one(
             };
 
             let without_part = format!("Without{}", capitalize(&related_field.name));
+            let ident = Identifier::new(
+                format!("{}Update{}{}Input", related_model.name, arity_part, without_part),
+                PRISMA_NAMESPACE,
+            );
 
-            let input_name = format!("{}Update{}{}Input", related_model.name, arity_part, without_part);
             let field_is_opposite_relation_field =
                 parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
 
             if field_is_opposite_relation_field {
                 None
             } else {
-                let input_object = match ctx.get_input_type(&input_name) {
+                let input_object = match ctx.get_input_type(&ident) {
                     Some(t) => t,
                     None => {
-                        let input_object = Arc::new(init_input_object_type(input_name.clone()));
-                        ctx.cache_input_type(input_name, input_object.clone());
+                        let input_object = Arc::new(init_input_object_type(ident.clone()));
+                        ctx.cache_input_type(ident, input_object.clone());
 
                         // Enqueue the nested update input for its fields to be
                         // created at a later point, to avoid recursing too deep
@@ -268,10 +276,14 @@ fn relation_input_fields_for_unchecked_update_one(
             };
 
             let without_part = format!("Without{}", capitalize(&related_field.name));
-            let input_name = format!(
-                "{}UncheckedUpdate{}{}Input",
-                related_model.name, arity_part, without_part
+            let ident = Identifier::new(
+                format!(
+                    "{}UncheckedUpdate{}{}Input",
+                    related_model.name, arity_part, without_part
+                ),
+                PRISMA_NAMESPACE,
             );
+
             let field_is_opposite_relation_field =
                 parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
 
@@ -280,11 +292,11 @@ fn relation_input_fields_for_unchecked_update_one(
             if field_is_opposite_relation_field || !related_field.is_inlined_on_enclosing_model() {
                 None
             } else {
-                let input_object = match ctx.get_input_type(&input_name) {
+                let input_object = match ctx.get_input_type(&ident) {
                     Some(t) => t,
                     None => {
-                        let input_object = Arc::new(init_input_object_type(input_name.clone()));
-                        ctx.cache_input_type(input_name, input_object.clone());
+                        let input_object = Arc::new(init_input_object_type(ident.clone()));
+                        ctx.cache_input_type(ident, input_object.clone());
 
                         // Enqueue the nested update input for its fields to be
                         // created at a later point, to avoid recursing too deep
@@ -312,15 +324,19 @@ pub(crate) fn update_one_where_combination_object(
 ) -> InputObjectTypeWeakRef {
     let related_model = parent_field.related_model();
     let where_input_object = filter_objects::where_unique_object_type(ctx, &related_model);
-    let type_name = format!(
-        "{}UpdateWithWhereUniqueWithout{}Input",
-        related_model.name,
-        capitalize(&parent_field.related_field().name)
+    let ident = Identifier::new(
+        format!(
+            "{}UpdateWithWhereUniqueWithout{}Input",
+            related_model.name,
+            capitalize(&parent_field.related_field().name)
+        ),
+        PRISMA_NAMESPACE,
     );
 
-    return_cached_input!(ctx, &type_name);
-    let input_object = Arc::new(init_input_object_type(type_name.clone()));
-    ctx.cache_input_type(type_name, input_object.clone());
+    return_cached_input!(ctx, &ident);
+
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
     let fields = vec![
         input_field("where", InputType::object(where_input_object), None),
