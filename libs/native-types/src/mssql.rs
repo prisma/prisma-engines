@@ -165,7 +165,7 @@ impl MsSqlType {
     }
 
     /// The name of the type without parameters.
-    pub fn kind(&self) -> &'static str {
+    pub const fn kind(&self) -> &'static str {
         match self {
             MsSqlType::TinyInt => "TinyInt",
             MsSqlType::SmallInt => "SmallInt",
@@ -238,6 +238,10 @@ impl fmt::Display for MsSqlType {
     }
 }
 
+/// Parsing native types from PSL and from the database qualified types.
+///
+/// Handles cases, such as `NVarChar(Max)`, `nvarchar(max)`, `decimal(2,1)` and
+/// `int` just the same.
 impl FromStr for MsSqlType {
     type Err = crate::Error;
 
