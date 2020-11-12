@@ -11,6 +11,7 @@ migration-connector = {path = "../migration-connector"}
 native-types = {path = "../../../libs/native-types"}
 prisma-value = {path = "../../../libs/prisma-value"}
 sql-schema-describer = {path = "../../../libs/sql-schema-describer"}
+sql-ddl = { path = "../../../libs/sql-ddl" }
 user-facing-errors = {path = "../../../libs/user-facing-errors", features = ["sql"]}
 
 anyhow = "1.0.26"
