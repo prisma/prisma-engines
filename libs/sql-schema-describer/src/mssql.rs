@@ -248,7 +248,7 @@ impl SqlSchemaDescriber {
                             .or_else(|| DEFAULT_STRING.captures_iter(&default_string).next())
                             .or_else(|| DEFAULT_DB_GEN.captures_iter(&default_string).next())
                             .map(|cap| cap[1].to_string())
-                            .expect("Couldn't parse default value");
+                            .expect(&format!("Couldn't parse default value: `{}`", default_string));
 
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string) {
