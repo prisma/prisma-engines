@@ -46,7 +46,7 @@ impl Connector for CombinedConnector {
         unimplemented!("A combined connector must not be used for native types")
     }
 
-    fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, _name: &str, _args: &[String]) -> Result<NativeTypeInstance, ConnectorError> {
         unimplemented!("A combined connector must not be used for native types")
     }
 

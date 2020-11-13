@@ -1,3 +1,4 @@
+use native_types::NativeTypeError;
 use thiserror::Error;
 
 #[derive(Debug, Error, Clone)]
@@ -87,6 +88,13 @@ impl ConnectorError {
             native_type: String::from(native_type),
             connector_name: String::from(connector_name),
             message: String::from(message),
+        })
+    }
+
+    pub fn new_name_unknown_error(native_type: impl ToString, connector_name: impl ToString) -> Self {
+        Self::from_kind(ErrorKind::NativeTypeNameUnknown {
+            native_type: native_type.to_string(),
+            connector_name: connector_name.to_string(),
         })
     }
 }
@@ -227,4 +235,22 @@ pub enum ErrorKind {
         connector_name: String,
         message: String,
     },
+}
+
+impl From<NativeTypeError> for ConnectorError {
+    fn from(e: NativeTypeError) -> Self {
+        match e {
+            NativeTypeError::OptionalArgumentCountMismatch {
+                r#type,
+                required,
+                given,
+            } => Self::new_optional_argument_count_mismatch_error(&r#type, required, given),
+            NativeTypeError::InvalidType { given, database } => Self::new_name_unknown_error(given, database),
+            NativeTypeError::InvalidParameter {
+                expected,
+                given,
+                database,
+            } => Self::new_value_parser_error(&expected, &format!("Unsupported {} type parameter.", database), &given),
+        }
+    }
 }

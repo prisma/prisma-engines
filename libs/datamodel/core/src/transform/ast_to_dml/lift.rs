@@ -322,7 +322,8 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
                         ));
                     }
 
-                    let parse_native_type_result = connector.parse_native_type(x, args);
+                    let parse_native_type_result = connector.parse_native_type(x, &args);
+
                     match parse_native_type_result {
                         Err(connector_error) => Err(DatamodelError::new_connector_error(
                             &connector_error.to_string(),

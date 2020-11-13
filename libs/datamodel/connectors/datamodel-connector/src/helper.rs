@@ -17,7 +17,7 @@ pub fn wrap_error_from_result<T, E: error::Error>(
     }
 }
 
-pub fn parse_u32_arguments(args: Vec<String>) -> Result<Vec<u32>, ConnectorError> {
+pub fn parse_u32_arguments(args: &[String]) -> Result<Vec<u32>, ConnectorError> {
     let res = args
         .iter()
         .map(|arg| wrap_error_from_result(arg.parse::<i64>(), "numeric", arg))

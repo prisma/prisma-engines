@@ -6,12 +6,14 @@ mod mysql;
 mod native_type;
 mod postgres;
 mod type_parameter;
+mod parse;
 
-pub use error::Error;
-pub use mssql::MsSqlType;
+pub use error::NativeTypeError;
+pub use mssql::{MsSqlType, MsSqlTypeParameter};
 pub use mysql::MySqlType;
 pub use native_type::NativeType;
 pub use postgres::PostgresType;
-pub use type_parameter::TypeParameter;
+pub use type_parameter::NativeTypeParameter;
+pub use parse::ParseTypeParameter;
 
-pub(crate) type Result<T> = std::result::Result<T, error::Error>;
+pub(crate) type Result<T> = std::result::Result<T, NativeTypeError>;

@@ -1,55 +1,69 @@
 use serde::{Deserialize, Serialize};
-use std::{fmt, io, str::FromStr};
+use std::borrow::Cow;
+use std::fmt;
 
-/// A parameter given to the SQL Server type. In many cases a number, but for
-/// some variants could also be `max`, allowing the value to be taken from the
-/// row to a larger heap.
-#[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub enum TypeParameter {
+/// The type of a parameter given to a database type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum NativeTypeParameter {
     /// Number of bytes or characters the type can use.
     Number(u64),
-    /// Stores the data outside of the row, allowing maximum of two gigabytes of
-    /// storage.
-    Max,
+    /// A string literal.
+    Literal(Cow<'static, str>),
 }
 
-impl TypeParameter {
-    pub(crate) fn is_max(s: &str) -> bool {
-        s.split(",")
-            .map(|s| s.trim())
-            .any(|s| matches!(s, "max" | "MAX" | "Max" | "MaX" | "maX" | "mAx"))
+impl NativeTypeParameter {
+    /// Creates a new number type parameter.
+    pub fn number(value: impl Into<u64>) -> Self {
+        Self::Number(value.into())
+    }
+
+    /// Creates a new string literal type parameter.
+    pub fn literal(value: impl Into<Cow<'static, str>>) -> Self {
+        Self::Literal(value.into())
     }
 }
 
-impl FromStr for TypeParameter {
-    type Err = io::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if TypeParameter::is_max(s) {
-            Ok(TypeParameter::Max)
-        } else {
-            s.parse().map(TypeParameter::Number).map_err(|_| {
-                let kind = io::ErrorKind::InvalidInput;
-                io::Error::new(kind, "Allowed inputs: `u64` or `max`")
-            })
-        }
-    }
-}
-
-impl<T> From<T> for TypeParameter
-where
-    T: Into<u64>,
-{
-    fn from(t: T) -> Self {
-        Self::Number(t.into())
-    }
-}
-
-impl fmt::Display for TypeParameter {
+impl fmt::Display for NativeTypeParameter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Number(num) => write!(f, "{}", num),
-            Self::Max => write!(f, "Max"),
+            Self::Number(n) => write!(f, "{}", n),
+            Self::Literal(l) => write!(f, "{}", l),
         }
+    }
+}
+
+impl From<u8> for NativeTypeParameter {
+    fn from(p: u8) -> Self {
+        Self::Number(p.into())
+    }
+}
+
+impl From<u16> for NativeTypeParameter {
+    fn from(p: u16) -> Self {
+        Self::Number(p.into())
+    }
+}
+
+impl From<u32> for NativeTypeParameter {
+    fn from(p: u32) -> Self {
+        Self::Number(p.into())
+    }
+}
+
+impl From<u64> for NativeTypeParameter {
+    fn from(p: u64) -> Self {
+        Self::Number(p)
+    }
+}
+
+impl From<&'static str> for NativeTypeParameter {
+    fn from(p: &'static str) -> Self {
+        Self::Literal(p.into())
+    }
+}
+
+impl From<String> for NativeTypeParameter {
+    fn from(p: String) -> Self {
+        Self::Literal(p.into())
     }
 }

@@ -1,9 +1,15 @@
-use super::TypeParameter;
+mod type_parameter;
+
+use crate::ParseTypeParameter;
+use crate::{NativeTypeError, NativeTypeParameter};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{fmt, io, str::FromStr};
+use std::{fmt, str::FromStr};
+pub use type_parameter::MsSqlTypeParameter::{self, *};
+
+static DATABASE_NAME: &str = "SQL Server";
 
 static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
     vec![
@@ -11,9 +17,9 @@ static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
         MsSqlType::NText,
         MsSqlType::Image,
         MsSqlType::Xml,
-        MsSqlType::VarBinary(Some(TypeParameter::Max)),
-        MsSqlType::VarChar(Some(TypeParameter::Max)),
-        MsSqlType::NVarChar(Some(TypeParameter::Max)),
+        MsSqlType::VarBinary(Some(Max)),
+        MsSqlType::VarChar(Some(Max)),
+        MsSqlType::NVarChar(Some(Max)),
     ]
 });
 
@@ -101,19 +107,19 @@ pub enum MsSqlType {
     /// A variable size string. Before SQL Server 2019 supported only ASCII
     /// characters, and from that version on supports also UTF-8 when using the
     /// right collation.
-    VarChar(Option<TypeParameter>),
+    VarChar(Option<MsSqlTypeParameter>),
     /// A heap-stored ASCII string. Deprecated in favour of `varchar(max)`.
     Text,
     /// A variable size string, supporting the full range of unicode character
     /// data. Stores in UTF-16.
-    NVarChar(Option<TypeParameter>),
+    NVarChar(Option<MsSqlTypeParameter>),
     /// A heap-stored Unicode (UTF-16) string. Deprecated in favour of
     /// `nvarchar(max)`.
     NText,
     /// A fixed size binary blob.
     Binary(Option<u16>),
     /// A variable size binary blob.
-    VarBinary(Option<TypeParameter>),
+    VarBinary(Option<MsSqlTypeParameter>),
     /// A heap-stored binary blob. Deprecated in favlour of `varbinary(max)`.
     Image,
     /// XML text.
@@ -199,19 +205,21 @@ impl MsSqlType {
     }
 
     /// The type parameters, if any.
-    pub fn parameters(self) -> Vec<TypeParameter> {
-        match self {
-            MsSqlType::Decimal(Some((p, s))) => vec![TypeParameter::from(p), TypeParameter::from(s)],
-            MsSqlType::Numeric(Some((p, s))) => vec![TypeParameter::from(p), TypeParameter::from(s)],
-            MsSqlType::Float(Some(l)) => vec![TypeParameter::from(l)],
-            MsSqlType::Char(Some(l)) => vec![TypeParameter::from(l)],
-            MsSqlType::NChar(Some(l)) => vec![TypeParameter::from(l)],
+    pub fn parameters(self) -> Vec<NativeTypeParameter> {
+        let params = match self {
+            MsSqlType::Decimal(Some((p, s))) => vec![MsSqlTypeParameter::from(p), MsSqlTypeParameter::from(s)],
+            MsSqlType::Numeric(Some((p, s))) => vec![MsSqlTypeParameter::from(p), MsSqlTypeParameter::from(s)],
+            MsSqlType::Float(Some(l)) => vec![MsSqlTypeParameter::from(l)],
+            MsSqlType::Char(Some(l)) => vec![MsSqlTypeParameter::from(l)],
+            MsSqlType::NChar(Some(l)) => vec![MsSqlTypeParameter::from(l)],
             MsSqlType::VarChar(Some(l)) => vec![l],
             MsSqlType::NVarChar(Some(l)) => vec![l],
             MsSqlType::VarBinary(Some(l)) => vec![l],
-            MsSqlType::Binary(Some(l)) => vec![TypeParameter::from(l)],
+            MsSqlType::Binary(Some(l)) => vec![MsSqlTypeParameter::from(l)],
             _ => vec![],
-        }
+        };
+
+        params.into_iter().map(NativeTypeParameter::from).collect()
     }
 }
 
@@ -243,7 +251,7 @@ impl fmt::Display for MsSqlType {
 /// Handles cases, such as `NVarChar(Max)`, `nvarchar(max)`, `decimal(2,1)` and
 /// `int` just the same.
 impl FromStr for MsSqlType {
-    type Err = crate::Error;
+    type Err = NativeTypeError;
 
     fn from_str(s: &str) -> crate::Result<Self> {
         let captures = TYPE_NO_PARAMS
@@ -257,10 +265,7 @@ impl FromStr for MsSqlType {
                     .name("kind")
                     .map(|cap| cap.as_str())
                     .map(|kind| kind.trim().to_lowercase())
-                    .ok_or_else(|| {
-                        let ek = io::ErrorKind::InvalidInput;
-                        io::Error::new(ek, format!("Could not parse `{}` as a MsSqlType.", s))
-                    })?;
+                    .ok_or_else(|| NativeTypeError::invalid_type(s, DATABASE_NAME))?;
 
                 let p0 = captures.name("p0").map(|cap| cap.as_str());
                 let p1 = captures.name("p1").map(|cap| cap.as_str());
@@ -268,83 +273,63 @@ impl FromStr for MsSqlType {
                 match kind.as_str() {
                     "decimal" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::Decimal(None)),
-                        (Some(p0), Some(p1)) => Ok(MsSqlType::Decimal(Some((p0.parse()?, p1.parse()?)))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `decimal`."))?
-                        }
+
+                        (Some(p0), Some(p1)) => Ok(MsSqlType::Decimal(Some((
+                            p0.as_param(DATABASE_NAME)?,
+                            p1.as_param(DATABASE_NAME)?,
+                        )))),
+
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 2, 1)),
                     },
                     "numeric" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::Numeric(None)),
-                        (Some(p0), Some(p1)) => Ok(MsSqlType::Numeric(Some((p0.parse()?, p1.parse()?)))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `numeric`."))?
-                        }
+
+                        (Some(p0), Some(p1)) => Ok(MsSqlType::Numeric(Some((
+                            p0.as_param(DATABASE_NAME)?,
+                            p1.as_param(DATABASE_NAME)?,
+                        )))),
+
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 2, 1)),
                     },
                     "float" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::Float(None)),
-                        (Some(p0), None) => Ok(MsSqlType::Float(Some(p0.parse()?))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `float`."))?
-                        }
+                        (Some(p0), None) => Ok(MsSqlType::Float(Some(p0.as_param(DATABASE_NAME)?))),
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 1, 2)),
                     },
                     "char" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::Char(None)),
-                        (Some(p0), None) => Ok(MsSqlType::Char(Some(p0.parse()?))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `char`."))?
-                        }
+                        (Some(p0), None) => Ok(MsSqlType::Char(Some(p0.as_param(DATABASE_NAME)?))),
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 1, 2)),
                     },
                     "nchar" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::NChar(None)),
-                        (Some(p0), None) => Ok(MsSqlType::NChar(Some(p0.parse()?))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `nchar`."))?
-                        }
+                        (Some(p0), None) => Ok(MsSqlType::NChar(Some(p0.as_param(DATABASE_NAME)?))),
+
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 1, 2)),
                     },
                     "varchar" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::VarChar(None)),
-                        (Some(p0), None) => Ok(MsSqlType::VarChar(Some(p0.parse()?))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `varchar`."))?
-                        }
+                        (Some(p0), None) => Ok(MsSqlType::VarChar(Some(p0.as_param(DATABASE_NAME)?))),
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 1, 2)),
                     },
                     "nvarchar" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::NVarChar(None)),
-                        (Some(p0), None) => Ok(MsSqlType::NVarChar(Some(p0.parse()?))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `nvarchar`."))?
-                        }
+                        (Some(p0), None) => Ok(MsSqlType::NVarChar(Some(p0.as_param(DATABASE_NAME)?))),
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 1, 2)),
                     },
                     "binary" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::Binary(None)),
-                        (Some(p0), None) => Ok(MsSqlType::Binary(Some(p0.parse()?))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `binary`."))?
-                        }
+                        (Some(p0), None) => Ok(MsSqlType::Binary(Some(p0.as_param(DATABASE_NAME)?))),
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 1, 2)),
                     },
                     "varbinary" => match (p0, p1) {
                         (None, None) => Ok(MsSqlType::VarBinary(None)),
-                        (Some(p0), None) => Ok(MsSqlType::VarBinary(Some(p0.parse()?))),
-                        _ => {
-                            let kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(kind, "Invalid number of types for `varbinary`."))?
-                        }
+                        (Some(p0), None) => Ok(MsSqlType::VarBinary(Some(p0.as_param(DATABASE_NAME)?))),
+                        _ => return Err(NativeTypeError::optional_argument_count(kind.as_str(), 1, 2)),
                     },
                     kind => {
                         if p0.is_some() || p1.is_some() {
-                            let err_kind = io::ErrorKind::InvalidInput;
-                            Err(io::Error::new(
-                                err_kind,
-                                format!("Invalid number of types for `{}`.", kind),
-                            ))?
+                            return Err(NativeTypeError::optional_argument_count(kind, 0, 2));
                         }
 
                         match kind {
@@ -367,19 +352,12 @@ impl FromStr for MsSqlType {
                             "image" => Ok(MsSqlType::Image),
                             "xml" => Ok(MsSqlType::Xml),
                             "uniqueidentifier" => Ok(MsSqlType::UniqueIdentifier),
-                            k => {
-                                let kind = io::ErrorKind::InvalidInput;
-                                Err(io::Error::new(kind, format!("Invalid SQL Server type: `{}`", k)))?
-                            }
+                            k => Err(NativeTypeError::invalid_type(k, DATABASE_NAME)),
                         }
                     }
                 }
             }
-            None => {
-                let ek = io::ErrorKind::InvalidInput;
-
-                Err(io::Error::new(ek, format!("Could not parse `{}` as a MsSqlType", s)))?
-            }
+            None => Err(NativeTypeError::invalid_type(s, DATABASE_NAME)),
         }
     }
 }
@@ -495,9 +473,9 @@ mod tests {
     fn parse_correct_type_max_param() -> anyhow::Result<()> {
         let mut types = BTreeMap::new();
 
-        types.insert("varchar(max)", MsSqlType::VarChar(Some(TypeParameter::Max)));
-        types.insert("varbinary(max)", MsSqlType::VarBinary(Some(TypeParameter::Max)));
-        types.insert("nvarchar(max)", MsSqlType::NVarChar(Some(TypeParameter::Max)));
+        types.insert("varchar(max)", MsSqlType::VarChar(Some(Max)));
+        types.insert("varbinary(max)", MsSqlType::VarBinary(Some(Max)));
+        types.insert("nvarchar(max)", MsSqlType::NVarChar(Some(Max)));
 
         for (s, expected) in types.into_iter() {
             let typ: MsSqlType = s.parse()?;
@@ -514,13 +492,10 @@ mod tests {
         types.insert("float(24)", MsSqlType::Float(Some(24)));
         types.insert("char(123)", MsSqlType::Char(Some(123)));
         types.insert("nchar(456)", MsSqlType::NChar(Some(456)));
-        types.insert("varchar(1000)", MsSqlType::VarChar(Some(TypeParameter::Number(1000))));
-        types.insert("nvarchar(2000)", MsSqlType::NVarChar(Some(TypeParameter::Number(2000))));
+        types.insert("varchar(1000)", MsSqlType::VarChar(Some(Number(1000))));
+        types.insert("nvarchar(2000)", MsSqlType::NVarChar(Some(Number(2000))));
         types.insert("binary(1024)", MsSqlType::Binary(Some(1024)));
-        types.insert(
-            "varbinary(2048)",
-            MsSqlType::VarBinary(Some(TypeParameter::Number(2048))),
-        );
+        types.insert("varbinary(2048)", MsSqlType::VarBinary(Some(Number(2048))));
 
         for (s, expected) in types.into_iter() {
             let typ: MsSqlType = s.parse()?;
@@ -567,7 +542,7 @@ mod tests {
     #[test]
     fn parse_correct_type_with_garbage() -> anyhow::Result<()> {
         let typ: MsSqlType = " nVarchaR(MaX)".parse()?;
-        let expected = MsSqlType::NVarChar(Some(TypeParameter::Max));
+        let expected = MsSqlType::NVarChar(Some(Max));
 
         assert_eq!(expected, typ);
 

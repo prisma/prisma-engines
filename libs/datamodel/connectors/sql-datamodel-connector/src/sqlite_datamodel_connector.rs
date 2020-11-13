@@ -39,7 +39,7 @@ impl Connector for SqliteDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, _name: &str, _args: &[String]) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
                 connector_name: "sqlite".to_string(),

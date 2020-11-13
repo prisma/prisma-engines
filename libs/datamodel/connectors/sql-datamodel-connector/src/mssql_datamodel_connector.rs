@@ -2,6 +2,7 @@ use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
     Connector, ConnectorCapability,
 };
+use dml::scalars::ScalarType;
 use dml::{
     field::{Field, FieldType},
     model::{IndexType, Model},
@@ -10,9 +11,9 @@ use dml::{
 };
 use native_types::{
     MsSqlType::{self, *},
-    TypeParameter::*,
+    MsSqlTypeParameter::*,
 };
-use std::{borrow::Cow, convert::TryFrom};
+use std::borrow::Cow;
 
 static ENABLED_NATIVE_TYPES: &[MsSqlType] = &[
     TinyInt,
@@ -60,12 +61,50 @@ impl MsSqlDatamodelConnector {
 
         let constructors: Vec<_> = ENABLED_NATIVE_TYPES
             .into_iter()
-            .map(|kind| NativeTypeConstructor::from(*kind))
+            .map(|kind| Self::constructor_for(*kind))
             .collect();
 
         MsSqlDatamodelConnector {
             capabilities,
             constructors,
+        }
+    }
+
+    pub fn constructor_for(r#type: MsSqlType) -> NativeTypeConstructor {
+        let matching_types = match r#type {
+            MsSqlType::TinyInt => vec![ScalarType::Int],
+            MsSqlType::SmallInt => vec![ScalarType::Int],
+            MsSqlType::Int => vec![ScalarType::Int],
+            MsSqlType::BigInt => vec![ScalarType::BigInt],
+            MsSqlType::Decimal(_) => vec![ScalarType::Decimal],
+            MsSqlType::Numeric(_) => vec![ScalarType::Decimal],
+            MsSqlType::Money => vec![ScalarType::Float],
+            MsSqlType::SmallMoney => vec![ScalarType::Float],
+            MsSqlType::Bit => vec![ScalarType::Boolean, ScalarType::Int],
+            MsSqlType::Float(_) => vec![ScalarType::Float],
+            MsSqlType::Real => vec![ScalarType::Float],
+            MsSqlType::Date => vec![ScalarType::DateTime],
+            MsSqlType::Time => vec![ScalarType::DateTime],
+            MsSqlType::DateTime => vec![ScalarType::DateTime],
+            MsSqlType::DateTime2 => vec![ScalarType::DateTime],
+            MsSqlType::DateTimeOffset => vec![ScalarType::DateTime],
+            MsSqlType::SmallDateTime => vec![ScalarType::DateTime],
+            MsSqlType::Char(_) => vec![ScalarType::String],
+            MsSqlType::NChar(_) => vec![ScalarType::String],
+            MsSqlType::VarChar(_) => vec![ScalarType::String],
+            MsSqlType::Text => vec![ScalarType::String],
+            MsSqlType::NVarChar(_) => vec![ScalarType::String],
+            MsSqlType::NText => vec![ScalarType::String],
+            MsSqlType::Binary(_) => vec![ScalarType::Bytes],
+            MsSqlType::VarBinary(_) => vec![ScalarType::Bytes],
+            MsSqlType::Image => vec![ScalarType::Bytes],
+            MsSqlType::Xml => vec![ScalarType::String],
+            MsSqlType::UniqueIdentifier => vec![ScalarType::String],
+        };
+
+        match r#type.maximum_parameters() {
+            0 => NativeTypeConstructor::without_args(r#type.kind(), matching_types),
+            n => NativeTypeConstructor::with_optional_args(r#type.kind(), n, matching_types),
         }
     }
 }
@@ -78,8 +117,7 @@ impl Connector for MsSqlDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
-                // We've validated the type earlier (hopefully).
-                let r#type = MsSqlType::try_from(native_type).unwrap();
+                let r#type: MsSqlType = native_type.deserialize_native_type();
 
                 match r#type {
                     Decimal(Some(params)) | Numeric(Some(params)) => match params {
@@ -160,8 +198,7 @@ impl Connector for MsSqlDatamodelConnector {
 
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
-                    // We've validated the type earlier (hopefully).
-                    let r#type = MsSqlType::try_from(native_type).unwrap();
+                    let r#type: MsSqlType = native_type.deserialize_native_type();
 
                     if MsSqlType::heap_allocated().contains(&r#type) {
                         if index_definition.tpe == IndexType::Unique {
@@ -184,8 +221,7 @@ impl Connector for MsSqlDatamodelConnector {
             let field = model.find_field(id_field).unwrap();
 
             if let FieldType::NativeType(_, native_type) = field.field_type() {
-                // We've validated the type earlier (hopefully).
-                let r#type = MsSqlType::try_from(native_type).unwrap();
+                let r#type: MsSqlType = native_type.deserialize_native_type();
 
                 if MsSqlType::heap_allocated().contains(&r#type) {
                     return Err(ConnectorError::new_incompatible_native_type_with_id(
@@ -203,15 +239,14 @@ impl Connector for MsSqlDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, name: &str, args: &[String]) -> Result<NativeTypeInstance, ConnectorError> {
         let qualified = if args.len() > 0 {
             Cow::from(format!("{}({})", name, args.join(",")))
         } else {
             Cow::from(name)
         };
 
-        // Unwrapping as the core must guarantee to just call with known names.
-        let native_type: MsSqlType = qualified.parse().unwrap();
+        let native_type: MsSqlType = qualified.parse()?;
 
         Ok(NativeTypeInstance::new(
             native_type.kind(),

@@ -3,7 +3,7 @@ mod test_api;
 
 use crate::mssql::*;
 use barrel::{types, Migration};
-use native_types::{MsSqlType, NativeType, TypeParameter::*};
+use native_types::{MsSqlType, MsSqlTypeParameter::*, NativeType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 

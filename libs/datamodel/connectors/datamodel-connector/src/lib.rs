@@ -33,7 +33,7 @@ pub trait Connector: Send + Sync {
 
     /// This function is used during Schema parsing to calculate the concrete native type.
     /// This powers the use of native types for QE + ME.
-    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError>;
+    fn parse_native_type(&self, name: &str, args: &[String]) -> Result<NativeTypeInstance, ConnectorError>;
 
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
     /// powers IE

@@ -1,5 +1,3 @@
-use std::convert::TryFrom;
-
 use crate::{
     common::*,
     types::helper::{
@@ -9,7 +7,7 @@ use crate::{
 };
 use datamodel::{ast, diagnostics::DatamodelError};
 use indoc::indoc;
-use native_types::{MsSqlType, TypeParameter::*};
+use native_types::{MsSqlType, MsSqlTypeParameter::*};
 
 const BLOB_TYPES: &[&'static str] = &["VarBinary(Max)", "Image"];
 const TEXT_TYPES: &[&'static str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)"];
@@ -255,7 +253,7 @@ macro_rules! test_type {
                         .unwrap()
                         .clone();
 
-                    let result = MsSqlType::try_from(instance).unwrap();
+                    let result: MsSqlType = instance.deserialize_native_type();
 
                     assert_eq!($output, result);
                 )+

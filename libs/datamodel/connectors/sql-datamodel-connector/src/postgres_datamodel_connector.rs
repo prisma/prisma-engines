@@ -11,7 +11,7 @@ use dml::{
     native_type_instance::NativeTypeInstance,
     scalars::ScalarType,
 };
-use native_types::{PostgresType, TypeParameter::*};
+use native_types::{NativeTypeParameter::*, PostgresType};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -190,7 +190,7 @@ impl Connector for PostgresDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, name: &str, args: &[String]) -> Result<NativeTypeInstance, ConnectorError> {
         let parsed_args = parse_u32_arguments(args)?;
 
         let constructor = self.find_native_type_constructor(name);
