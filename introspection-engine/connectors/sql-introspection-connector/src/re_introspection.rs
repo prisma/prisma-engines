@@ -1,4 +1,4 @@
-use crate::misc_helpers::replace_field_names;
+use crate::introspection_helpers::replace_field_names;
 use crate::warnings::*;
 use datamodel::{Datamodel, DefaultValue, FieldType, ScalarType, ValueGenerator};
 use introspection_connector::Warning;

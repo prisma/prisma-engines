@@ -156,9 +156,9 @@ pub(crate) fn calculate_scalar_field(
         ColumnArity::List => FieldArity::List,
     };
 
-    let (default_value, default_string) = calculate_default(table, &column, &arity);
+    let (default_value, dbgenerated_string) = calculate_default(table, &column, &arity);
 
-    let (is_commented_out, documentation) = match (&field_type, default_string) {
+    let (is_commented_out, documentation) = match (&field_type, dbgenerated_string) {
         (FieldType::Unsupported(_), None) => (true, Some("This type is currently not supported.".to_string())),
         (FieldType::Unsupported(_), Some(default)) => (
             true,
