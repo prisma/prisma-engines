@@ -198,7 +198,7 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
-        let parsed_args = parse_u32_arguments(args)?;
+        let parsed_args = parse_u32_arguments(args.clone())?;
 
         let constructor = self.find_native_type_constructor(name);
         let native_type = match name {
@@ -276,7 +276,7 @@ impl Connector for PostgresDatamodelConnector {
 
         Ok(NativeTypeInstance::new(
             constructor.unwrap().name.as_str(),
-            parsed_args,
+            args,
             &native_type,
         ))
     }
@@ -311,7 +311,12 @@ impl Connector for PostgresDatamodelConnector {
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
+            let stringified_args = args.iter().map(|arg| arg.to_string()).collect();
+            Ok(NativeTypeInstance::new(
+                constructor.name.as_str(),
+                stringified_args,
+                &native_type,
+            ))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: constructor_name.parse().unwrap(),

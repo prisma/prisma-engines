@@ -183,6 +183,7 @@ impl Connector for MsSqlDatamodelConnector {
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+        let cloned_args = args.clone();
         let number_of_args = args.len();
         let native_type = match &name {
             &TINY_INT_TYPE_NAME => MssqlType::TinyInt,
@@ -240,7 +241,7 @@ impl Connector for MsSqlDatamodelConnector {
             _ => panic!(),
         };
 
-        Ok(NativeTypeInstance::new(name, vec![], &native_type))
+        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
     }
 
     fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
