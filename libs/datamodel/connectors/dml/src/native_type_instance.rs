@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use native_types::NativeType;
 use serde::de::DeserializeOwned;
 
@@ -30,5 +31,14 @@ impl NativeTypeInstance {
             self.serialized_native_type.as_str()
         );
         serde_json::from_value(self.serialized_native_type.clone()).expect(&error_msg)
+    }
+
+    pub fn render(&self) -> String {
+        if self.args.len() == 0 {
+            self.name.to_string()
+        } else {
+            let args_as_strings: Vec<String> = self.args.iter().map(|a| a.to_string()).collect();
+            format!("{}({})", self.name, args_as_strings.join(","))
+        }
     }
 }
