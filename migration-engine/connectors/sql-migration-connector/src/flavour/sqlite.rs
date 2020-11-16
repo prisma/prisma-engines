@@ -70,11 +70,9 @@ impl SqlFlavour for SqliteFlavour {
         };
 
         std::fs::remove_file(&file_path).map_err(|err| {
-            ConnectorError::generic(anyhow::anyhow!(
-                "Failed to delete SQLite database at `{}`.\n{}",
-                file_path,
-                err
-            ))
+            ConnectorError::generic(
+                anyhow::Error::new(err).context(format!("Failed to delete SQLite database at `{}`", file_path,)),
+            )
         })?;
 
         Ok(())

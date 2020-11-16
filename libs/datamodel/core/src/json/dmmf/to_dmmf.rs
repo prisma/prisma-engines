@@ -1,7 +1,7 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
 use crate::{dml, IndexType, ScalarType};
+use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
-use rust_decimal::prelude::ToPrimitive;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);
@@ -141,6 +141,7 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
             serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
         }
         PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        PrismaValue::BigInt(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
         PrismaValue::Null => serde_json::Value::Null,
         PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),

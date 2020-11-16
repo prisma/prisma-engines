@@ -7,6 +7,7 @@ mod connection_wrapper;
 mod database_info;
 mod error;
 mod flavour;
+mod pair;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
 mod sql_destructive_change_checker;
@@ -129,12 +130,6 @@ impl MigrationConnector for SqlMigrationConnector {
 
     async fn create_database(database_str: &str) -> ConnectorResult<String> {
         Self::create_database(database_str).await
-    }
-
-    async fn initialize(&self) -> ConnectorResult<()> {
-        self.migration_persistence().init().await?;
-
-        Ok(())
     }
 
     async fn reset(&self) -> ConnectorResult<()> {

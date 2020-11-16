@@ -1,6 +1,6 @@
 use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::introspection::introspect;
-use crate::misc_helpers::*;
+use crate::introspection_helpers::*;
 use crate::prisma_1_defaults::*;
 use crate::re_introspection::enrich;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;

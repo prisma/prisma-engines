@@ -153,8 +153,8 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
       """.stripMargin,
       project,
       legacy = false,
-      errorCode = 2012,
-      errorContains = "Missing a required value at `Mutation.upsertOneWithDefaultValue.create.WithDefaultValueCreateInput.reqString`"
+      errorCode = 2009,
+      errorContains = "Mutation.upsertOneWithDefaultValue.create.WithDefaultValueCreateInput.reqString`: A value is required but not set."
     )
   }
 

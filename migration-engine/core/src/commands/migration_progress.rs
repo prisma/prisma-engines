@@ -16,6 +16,7 @@ impl MigrationCommand for MigrationProgressCommand {
         D: DatabaseMigrationMarker + 'static,
     {
         let migration_persistence = engine.connector().migration_persistence();
+        migration_persistence.init().await?;
 
         let migration = migration_persistence
             .by_name(&input.migration_id)

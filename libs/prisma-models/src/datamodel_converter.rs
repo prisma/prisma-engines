@@ -352,7 +352,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
                 dml::ScalarType::String => TypeIdentifier::String,
                 dml::ScalarType::Json => TypeIdentifier::Json,
                 dml::ScalarType::Bytes => TypeIdentifier::Bytes,
-                dml::ScalarType::Duration => unimplemented!(),
+                dml::ScalarType::BigInt => TypeIdentifier::BigInt,
             },
             dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
             dml::FieldType::NativeType(scalar_type, _) => (*scalar_type).into(),

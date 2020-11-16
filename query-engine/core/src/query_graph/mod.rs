@@ -535,6 +535,7 @@ impl QueryGraph {
                             let content = self
                                 .remove_edge(parent_edge)
                                 .expect("Expected edges between marked nodes to be non-empty.");
+
                             self.create_edge(&parent_of_parent_node, &child_node, content)?;
                         }
                     }
@@ -563,8 +564,9 @@ impl QueryGraph {
 
             // Remove edge and reinsert edge in reverse.
             if let Some(edge) = existing_edge {
-                let content = self.remove_edge(edge).unwrap();
+                let content = self.pluck_edge(&edge);
                 self.create_edge(&child_node, &parent_node, content)?;
+                self.remove_edge(edge);
             }
         }
 

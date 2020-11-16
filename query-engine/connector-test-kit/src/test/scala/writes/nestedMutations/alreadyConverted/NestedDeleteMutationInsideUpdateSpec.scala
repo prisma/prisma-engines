@@ -49,7 +49,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         project,
         errorCode = 2009,
         errorContains =
-          "`Field does not exist on enclosing type.` at `Mutation.updateParent.data.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentOptInput.delete`"
+          "`Mutation.updateParent.data.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentOptInput.delete`: Field does not exist on enclosing type."
       )
     }
   }
@@ -382,12 +382,12 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         project,
         errorCode = 2009,
         errorContains =
-          """`Field does not exist on enclosing type.` at `Mutation.updateParent.data.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptInput.delete`"""
+          """`Mutation.updateParent.data.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptInput.delete`: Field does not exist on enclosing type."""
       )
     }
   }
 
-  "a P1 to CM  relation " should "work" taggedAs (IgnoreMsSql) in  {
+  "a P1 to CM  relation " should "work" taggedAs (IgnoreMsSql) in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel

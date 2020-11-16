@@ -1,25 +1,26 @@
-pub(crate) mod create_input_objects;
+pub(crate) mod arguments;
 pub(crate) mod field_filter_types;
-pub(crate) mod filter_input_objects;
 pub(crate) mod input_fields;
-pub(crate) mod update_input_objects;
+
+mod objects;
 
 use super::*;
 use crate::schema::*;
+use objects::*;
 use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
 /// Builds "<Model>OrderByInput" object types.
 pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let enum_type = Arc::new(string_enum_type("SortOrder", vec!["asc".to_owned(), "desc".to_owned()]));
-    let name = format!("{}OrderByInput", model.name);
+    let ident = Identifier::new(format!("{}OrderByInput", model.name), PRISMA_NAMESPACE);
 
-    return_cached_input!(ctx, &name);
+    return_cached_input!(ctx, &ident);
 
-    let mut input_object = init_input_object_type(name.clone());
+    let mut input_object = init_input_object_type(ident.clone());
     input_object.allow_at_most_one_field();
 
     let input_object = Arc::new(input_object);
-    ctx.cache_input_type(name, input_object.clone());
+    ctx.cache_input_type(ident, input_object.clone());
 
     let fields = model
         .fields()
@@ -45,6 +46,7 @@ fn map_scalar_input_type(field: &ScalarFieldRef) -> InputType {
         TypeIdentifier::Enum(_) => map_enum_input_type(&field),
         TypeIdentifier::Xml => InputType::xml(),
         TypeIdentifier::Bytes => InputType::bytes(),
+        TypeIdentifier::BigInt => InputType::bigint(),
     };
 
     if field.is_list {
@@ -66,13 +68,18 @@ fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
 
 /// Convenience function to return [object_type, list_object_type]
 /// (shorthand + full type) if the field is a list.
-fn list_union_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
-    let object_type = InputType::object(input);
+fn list_union_object_type(input: InputObjectTypeWeakRef, as_list: bool) -> Vec<InputType> {
+    let input_type = InputType::object(input);
+    list_union_type(input_type, as_list)
+}
 
+/// Convenience function to return [input_type, list_input_type]
+/// (shorthand + full type) if the field is a list.
+fn list_union_type(input_type: InputType, as_list: bool) -> Vec<InputType> {
     if as_list {
-        vec![object_type.clone(), InputType::list(object_type)]
+        vec![input_type.clone(), InputType::list(input_type)]
     } else {
-        vec![object_type]
+        vec![input_type]
     }
 }
 

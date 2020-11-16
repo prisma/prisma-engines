@@ -44,8 +44,10 @@ async fn main() -> Result<(), AnyError> {
 
     async fn main() -> Result<(), PrismaError> {
         let opts = PrismaOpt::from_args();
+
         init_logger(opts.log_format());
         feature_flags::initialize(opts.raw_feature_flags.as_slice())?;
+
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {

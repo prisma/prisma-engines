@@ -1,17 +1,15 @@
 use super::{common, IteratorJoin, Quoted, QuotedWithSchema, SqlRenderer};
 use crate::{
-    database_info::DatabaseInfo,
     flavour::MssqlFlavour,
+    pair::Pair,
     sql_migration::{
-        AddColumn, AlterColumn, AlterEnum, AlterIndex, AlterTable, CreateEnum, CreateIndex, DropColumn, DropEnum,
-        DropForeignKey, DropIndex, RedefineTable, TableChange,
+        AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
+        TableChange,
     },
-    sql_schema_differ::SqlSchemaDiffer,
 };
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
-    walkers::ForeignKeyWalker,
-    walkers::{ColumnWalker, SqlSchemaExt, TableWalker},
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write};
@@ -30,21 +28,21 @@ impl SqlRenderer for MssqlFlavour {
         Quoted::mssql_ident(name)
     }
 
-    fn render_alter_table(&self, alter_table: &AlterTable, differ: &SqlSchemaDiffer<'_>) -> Vec<String> {
-        let AlterTable {
-            table_index: (previous_idx, next_idx),
-            changes,
-        } = alter_table;
+    fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        let AlterTable { table_index, changes } = alter_table;
 
-        let previous_table = differ.previous.table_walker_at(*previous_idx);
-        let next_table = differ.next.table_walker_at(*next_idx);
+        let tables = schemas.tables(table_index);
 
         let mut lines = Vec::new();
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey { constraint_name } => {
-                    let constraint = constraint_name.as_ref().unwrap();
+                TableChange::DropPrimaryKey => {
+                    let constraint = tables
+                        .previous()
+                        .primary_key()
+                        .and_then(|pk| pk.constraint_name.as_ref())
+                        .expect("Missing constraint name in DropPrimaryKey on MSSQL");
                     lines.push(format!("DROP CONSTRAINT {}", self.quote(constraint)));
                 }
                 TableChange::AddPrimaryKey { columns } => {
@@ -52,12 +50,13 @@ impl SqlRenderer for MssqlFlavour {
                     lines.push(format!("ADD PRIMARY KEY ({})", columns));
                 }
                 TableChange::AddColumn(AddColumn { column_index }) => {
-                    let column = next_table.column_at(*column_index);
-                    let col_sql = self.render_column(column);
+                    let column = tables.next().column_at(*column_index);
+                    let col_sql = self.render_column(&column);
+
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { name, .. }) => {
-                    let name = self.quote(&name);
+                TableChange::DropColumn(DropColumn { index }) => {
+                    let name = self.quote(tables.previous().column_at(*index).name());
                     lines.push(format!("DROP COLUMN {}", name));
                 }
                 TableChange::DropAndRecreateColumn { .. } => todo!("DropAndRecreateColumn on MSSQL"),
@@ -71,16 +70,16 @@ impl SqlRenderer for MssqlFlavour {
 
         vec![format!(
             "ALTER TABLE {} {}",
-            self.quote_with_schema(previous_table.name()),
+            self.quote_with_schema(tables.previous().name()),
             lines.join(",\n")
         )]
     }
 
-    fn render_alter_enum(&self, _: &AlterEnum, _: &SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
-    fn render_column(&self, column: ColumnWalker<'_>) -> String {
+    fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
 
         let r#type = match &column.column_type().family {
@@ -89,9 +88,9 @@ impl SqlRenderer for MssqlFlavour {
             ColumnTypeFamily::Float => "decimal(32,16)",
             ColumnTypeFamily::Decimal => "decimal(32,16)",
             ColumnTypeFamily::Int => "int",
+            ColumnTypeFamily::BigInt => "bigint",
             ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
             ColumnTypeFamily::Binary => "varbinary(max)",
-            ColumnTypeFamily::Duration => unimplemented!("Duration not handled yet"),
             ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
             ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
             ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
@@ -160,48 +159,36 @@ impl SqlRenderer for MssqlFlavour {
         }
     }
 
-    fn render_alter_index(
-        &self,
-        alter_index: &AlterIndex,
-        _database_info: &DatabaseInfo,
-        _current_schema: &SqlSchema,
-    ) -> Vec<String> {
-        let AlterIndex {
-            table,
-            index_name,
-            index_new_name,
-        } = alter_index;
-
-        let index_with_table = Quoted::Single(format!("{}.{}.{}", self.schema_name(), table, index_name));
+    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        let index_with_table = Quoted::Single(format!(
+            "{}.{}.{}",
+            self.schema_name(),
+            indexes.previous().table().name(),
+            indexes.previous().name()
+        ));
 
         vec![format!(
             "EXEC SP_RENAME N{index_with_table}, N{index_new_name}, N'INDEX'",
             index_with_table = Quoted::Single(index_with_table),
-            index_new_name = Quoted::Single(index_new_name),
+            index_new_name = Quoted::Single(indexes.next().name()),
         )]
     }
 
-    fn render_create_enum(&self, _: &CreateEnum) -> Vec<String> {
+    fn render_create_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_create_enum on Microsoft SQL Server")
     }
 
-    fn render_create_index(&self, create_index: &CreateIndex) -> String {
-        let CreateIndex {
-            table,
-            index,
-            caused_by_create_table: _,
-        } = create_index;
-
-        let index_type = match index.tpe {
+    fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
+        let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
         };
 
-        let index_name = index.name.replace('.', "_");
+        let index_name = index.name().replace('.', "_");
         let index_name = self.quote(&index_name);
-        let table_reference = self.quote_with_schema(&table).to_string();
+        let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
-        let columns = index.columns.iter().map(|c| self.quote(c));
+        let columns = index.columns().map(|c| self.quote(c.name()));
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -213,7 +200,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table.columns().map(|column| self.render_column(column)).join(",\n");
+        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
 
         let primary_columns = table.primary_key_column_names();
 
@@ -256,7 +243,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_drop_enum(&self, _drop_enum: &DropEnum) -> Vec<String> {
+    fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
         unreachable!("render_drop_enum on MSSQL")
     }
 
@@ -276,7 +263,7 @@ impl SqlRenderer for MssqlFlavour {
         )
     }
 
-    fn render_redefine_tables(&self, _tables: &[RedefineTable], _differ: SqlSchemaDiffer<'_>) -> Vec<String> {
+    fn render_redefine_tables(&self, _tables: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_redefine_table on MSSQL")
     }
 

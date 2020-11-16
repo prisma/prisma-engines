@@ -17,11 +17,6 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
                     t.add_column("int", types::integer());
                     t.add_column("string", types::text());
                 });
-
-                migration.create_table("_RelayId", |t| {
-                    t.add_column("id", types::primary());
-                    t.inject_custom("stableModelIdentifier   int");
-                });
             },
             api.schema_name(),
         )
@@ -35,6 +30,61 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
             id      Int @id @default(autoincrement())
             int     Int
             string  String
+        }
+    "##};
+
+    assert_eq_datamodels!(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                });
+
+                migration.create_table("_RelayId", move |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("stablemodelidentifier", types::text());
+                });
+
+                migration.create_table("_Migration", move |t| {
+                    t.add_column("revision", types::text());
+                    t.add_column("name", types::text());
+                    t.add_column("datamodel", types::text());
+                    t.add_column("status", types::text());
+                    t.add_column("applied", types::text());
+                    t.add_column("rolled_back", types::text());
+                    t.add_column("datamodel_steps", types::text());
+                    t.add_column("database_migrations", types::text());
+                    t.add_column("errors", types::text());
+                    t.add_column("started_at", types::text());
+                    t.add_column("finished_at", types::text());
+                });
+
+                migration.create_table("_prisma_migrations", move |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("checksum", types::text());
+                    t.add_column("finished_at", types::text());
+                    t.add_column("migration_name", types::text());
+                    t.add_column("logs", types::text());
+                    t.add_column("rolled_back_at", types::text());
+                    t.add_column("started_at", types::text());
+                    t.add_column("applied_steps_count", types::text());
+                    t.add_column("script", types::text());
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {      
+            id      Int @id @default(autoincrement())
         }
     "##};
 
@@ -336,7 +386,7 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
         .execute(|migration| {
             migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("string_function text Default 'Concatenated'||E'\n'");
+                t.inject_custom("string_function text Default E'  ' || '>' || ' '");
                 t.inject_custom("int_serial Serial4");
                 t.inject_custom("int_function Integer DEFAULT EXTRACT(year from TIMESTAMP '2001-02-16 20:38:40')");
                 t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')"); // todo this is not recognized as autoincrement
@@ -348,14 +398,17 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> crate::TestResult {
 
     let dm = indoc! {r#"
         model Test {
-            id                      Int       @id @default(autoincrement())
-            string_function         String?   @default(dbgenerated())
-            int_serial              Int       @default(autoincrement())
-            int_function            Int?      @default(dbgenerated())
-            int_sequence            Int?      @default(dbgenerated())
-            datetime_now            DateTime? @default(now())
-            datetime_now_lc         DateTime? @default(now())
-        }
+          id              Int       @id @default(autoincrement())
+          /// This field's default value can currently not be parsed: `(('  '::text || '>'::text) || ' '::text)`.
+          string_function String?   @default(dbgenerated())
+          int_serial      Int       @default(autoincrement())
+          /// This field's default value can currently not be parsed: `date_part('year'::text, '2001-02-16 20:38:40'::timestamp without time zone)`.
+          int_function    Int?      @default(dbgenerated())
+          /// This field's default value can currently not be parsed: `nextval('test_seq'::regclass)`.
+          int_sequence    Int?      @default(dbgenerated())
+          datetime_now    DateTime? @default(now())
+          datetime_now_lc DateTime? @default(now())
+          }
     "#};
 
     assert_eq_datamodels!(dm, &api.introspect().await?);
@@ -528,6 +581,46 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> crate:
     );
 
     assert_eq_datamodels!(dm, &expected);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mariadb"))]
+async fn different_default_values_should_work(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.inject_custom("text Text Default \"one\"");
+                    t.inject_custom(
+                        "`tinytext_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"twelve\"",
+                    );
+                    t.inject_custom(
+                        "`tinytext_number_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"1\"",
+                    );
+                    t.inject_custom("`tinytext_number` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 10");
+                    t.inject_custom("`tinytext_float` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1.0");
+                    t.inject_custom("`tinytext_short` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                     Int     @id @default(autoincrement())
+          text                   String? @default("one")
+          tinytext_string        String  @default("twelve")
+          tinytext_number_string String  @default("1")
+          tinytext_number        String  @default("10")
+          tinytext_float         String  @default("1.0")
+          tinytext_short         String  @default("1")
+        }
+    "##};
+
+    assert_eq_datamodels!(dm, &api.introspect().await?);
 
     Ok(())
 }

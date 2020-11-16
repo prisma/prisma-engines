@@ -6,6 +6,7 @@
 #[allow(missing_docs)]
 mod apply_migration;
 mod apply_migrations;
+mod apply_script;
 #[allow(missing_docs)]
 mod calculate_database_steps;
 #[allow(missing_docs)]
@@ -19,8 +20,11 @@ mod get_database_version;
 #[allow(missing_docs)]
 mod infer_migration_steps;
 mod initialize;
+mod list_migration_directories;
 #[allow(missing_docs)]
 mod list_migrations;
+mod mark_migration_applied;
+mod mark_migration_rolled_back;
 #[allow(missing_docs)]
 mod migration_progress;
 mod plan_migration;
@@ -31,6 +35,7 @@ mod unapply_migration;
 
 pub use apply_migration::*;
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
+pub use apply_script::{ApplyScriptCommand, ApplyScriptInput, ApplyScriptOutput};
 pub use calculate_database_steps::*;
 pub use calculate_datamodel::*;
 pub use command::MigrationCommand;
@@ -44,7 +49,12 @@ pub use evaluate_data_loss::*;
 pub use get_database_version::*;
 pub use infer_migration_steps::*;
 pub use initialize::{InitializeCommand, InitializeInput, InitializeOutput};
+pub use list_migration_directories::*;
 pub use list_migrations::*;
+pub use mark_migration_applied::{MarkMigrationAppliedCommand, MarkMigrationAppliedInput, MarkMigrationAppliedOutput};
+pub use mark_migration_rolled_back::{
+    MarkMigrationRolledBackCommand, MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput,
+};
 pub use migration_progress::*;
 pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigrationOutput};
 pub use reset::ResetCommand;

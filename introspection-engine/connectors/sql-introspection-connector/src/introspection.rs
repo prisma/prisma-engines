@@ -1,9 +1,10 @@
-use crate::misc_helpers::{
+use crate::introspection_helpers::{
     calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
-    calculate_scalar_field, is_migration_table, is_prisma_1_point_0_join_table, is_prisma_1_point_1_or_2_join_table,
-    is_relay_table,
+    calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
+    is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::version_checker::VersionChecker;
+use crate::Dedup;
 use crate::SqlError;
 use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, FieldType, Model, RelationField};
 use quaint::connector::SqlFamily;
@@ -20,7 +21,8 @@ pub fn introspect(
     for table in schema
         .tables
         .iter()
-        .filter(|table| !is_migration_table(&table))
+        .filter(|table| !is_old_migration_table(&table))
+        .filter(|table| !is_new_migration_table(&table))
         .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table))
         .filter(|table| !is_prisma_1_point_0_join_table(&table))
         .filter(|table| !is_relay_table(&table))
@@ -145,22 +147,5 @@ fn calculate_fields_for_prisma_join_table(
 
             fields_to_be_added.push((referenced_model.name().to_owned(), field));
         }
-    }
-}
-
-trait Dedup<T: PartialEq + Clone> {
-    fn clear_duplicates(&mut self);
-}
-
-impl<T: PartialEq + Clone> Dedup<T> for Vec<T> {
-    fn clear_duplicates(&mut self) {
-        let mut already_seen = vec![];
-        self.retain(|item| match already_seen.contains(item) {
-            true => false,
-            _ => {
-                already_seen.push(item.clone());
-                true
-            }
-        })
     }
 }

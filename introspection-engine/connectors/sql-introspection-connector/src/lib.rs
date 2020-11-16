@@ -2,7 +2,7 @@ pub mod calculate_datamodel; // only exported to be able to unit test it
 mod commenting_out_guardrails;
 mod error;
 mod introspection;
-mod misc_helpers;
+mod introspection_helpers;
 mod prisma_1_defaults;
 mod re_introspection;
 mod sanitize_datamodel_names;
@@ -119,5 +119,22 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 
         Ok(introspection_result)
+    }
+}
+
+trait Dedup<T: PartialEq + Clone> {
+    fn clear_duplicates(&mut self);
+}
+
+impl<T: PartialEq + Clone> Dedup<T> for Vec<T> {
+    fn clear_duplicates(&mut self) {
+        let mut already_seen = vec![];
+        self.retain(|item| match already_seen.contains(item) {
+            true => false,
+            _ => {
+                already_seen.push(item.clone());
+                true
+            }
+        })
     }
 }

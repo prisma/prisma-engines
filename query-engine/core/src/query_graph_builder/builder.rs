@@ -68,7 +68,7 @@ impl QueryGraphBuilder {
         } else {
             Err(QueryGraphBuilderError::SchemaError(format!(
                 "Expected query information to be attached on schema object '{}', field '{}'.",
-                root_object.name(),
+                root_object.identifier.name(),
                 field_pair.parsed_field.name
             )))
         }

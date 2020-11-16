@@ -4,7 +4,6 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
-
   "Creating an item with an id field of type Int without default" should "work" in {
     val project = ProjectDsl.fromString {
       s"""
@@ -127,12 +126,18 @@ class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
     result.pathAsLong("data.createTodo.id") should equal(1)
   }
 
-  "Creating an item with an id field of type Int with autoincrement and providing an id" should "error" in {
+  "Creating an item with an id field of type Int with autoincrement and providing an id" should "error for checked inputs" in {
     val project = ProjectDsl.fromString {
       s"""
-         |model Todo {
-         |  id    Int @id @default(autoincrement())
-         |  title String
+         |model A {
+         |  id   Int @id @default(autoincrement())
+         |  b_id Int
+         |  b    B   @relation(fields: [b_id], references: [id])
+         |}
+         |
+         |model B {
+         |  id Int @id
+         |  a  A[]
          |}
        """.stripMargin
     }
@@ -141,14 +146,15 @@ class IntIdCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       """
         |mutation {
-        |  createTodo(data: { title: "the title", id: 2}){
+        |  createOneA(data: { id: 2, b: { connect: { id: 1 }}}) {
         |    id
-        |    title
+        |    b { id }
         |  }
         |}
       """.stripMargin,
       project,
-      0
+      errorCode = 2009,
+      legacy = false,
     )
   }
 

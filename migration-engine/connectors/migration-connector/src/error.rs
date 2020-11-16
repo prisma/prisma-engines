@@ -18,7 +18,7 @@ pub struct ConnectorError {
 
 impl Display for ConnectorError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}\n{}", self.report, self.context)
+        write!(f, "{:#}\n{}", self.report, self.context)
     }
 }
 

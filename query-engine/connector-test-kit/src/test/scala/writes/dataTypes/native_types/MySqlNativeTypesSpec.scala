@@ -9,19 +9,19 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
 
   "MySQL native int types" should "work" in {
     // MySQL only allows one autoinc column, so loop through all to test them.
-    for ((fieldName, annotation) <- Seq(("inc_int", "@test.Int"),
-                                        ("inc_sInt", "@test.SmallInt"),
-                                        ("inc_mInt", "@test.MediumInt"),
-                                        ("inc_bInt", "@test.BigInt"))) {
+    for ((fieldName, intType, annotation) <- Seq(("inc_int", "Int", "@test.Int"),
+                                                 ("inc_sInt", "Int", "@test.SmallInt"),
+                                                 ("inc_mInt", "Int", "@test.MediumInt"),
+                                                 ("inc_bInt", "BigInt", "@test.BigInt"))) {
 
       val project = ProjectDsl.fromString {
         s"""
         |model Model {
-        |  $fieldName Int @id @default(autoincrement()) $annotation
-        |  int      Int   @test.Int
-        |  sInt     Int   @test.SmallInt
-        |  mInt     Int   @test.MediumInt
-        |  bInt     Int   @test.BigInt
+        |  $fieldName $intType @id @default(autoincrement()) $annotation
+        |  int  Int    @test.Int
+        |  sInt Int    @test.SmallInt
+        |  mInt Int    @test.MediumInt
+        |  bInt BigInt @test.BigInt
         |}"""
       }
 
@@ -50,7 +50,11 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
         legacy = false
       )
 
-      res.toString should be(s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"mInt":8388607,"bInt":5294967295,"$fieldName":1}}}""")
+      if (intType == "BigInt") {
+        res.toString should be(s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"mInt":8388607,"bInt":"5294967295","$fieldName":"1"}}}""")
+      } else {
+        res.toString should be(s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"mInt":8388607,"bInt":"5294967295","$fieldName":1}}}""")
+      }
     }
   }
 

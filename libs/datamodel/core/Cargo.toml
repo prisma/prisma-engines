@@ -8,7 +8,7 @@ version = "0.1.0"
 datamodel-connector = {path = "../connectors/datamodel-connector"}
 dml = {path = "../connectors/dml"}
 prisma-value = {path = "../../prisma-value"}
-rust_decimal = "1.8.1"
+bigdecimal = "0.2"
 sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
 # Temporary until PR is accepted.
 bytecount = "0.5"
@@ -21,7 +21,7 @@ pest = {version = "2.1.0", package = 'pest_tmp'}
 pest_derive = {version = "2.1.0", package = 'pest_derive_tmp'}
 regex = "1.3.7"
 serde = {version = "1.0.90", features = ["derive"]}
-serde_json = {version = "1.0", features = ["preserve_order"]}
+serde_json = {version = "1.0", features = ["preserve_order", "float_roundtrip"]}
 thiserror = "1.0"
 tracing = "0.1"
 

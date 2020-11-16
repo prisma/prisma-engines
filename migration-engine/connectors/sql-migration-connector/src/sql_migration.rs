@@ -1,9 +1,9 @@
 pub(crate) mod expanded_alter_column;
 
-use crate::sql_schema_differ::ColumnChanges;
+use crate::{pair::Pair, sql_schema_differ::ColumnChanges};
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Serialize, Serializer};
-use sql_schema_describer::{Index, SqlSchema};
+use sql_schema_describer::SqlSchema;
 
 /// The database migration type for SqlMigrationConnector.
 #[derive(Debug, Serialize)]
@@ -11,6 +11,12 @@ pub struct SqlMigration {
     pub(crate) before: SqlSchema,
     pub(crate) after: SqlSchema,
     pub(crate) steps: Vec<SqlMigrationStep>,
+}
+
+impl SqlMigration {
+    pub(crate) fn schemas(&self) -> Pair<&SqlSchema> {
+        Pair::new(&self.before, &self.after)
+    }
 }
 
 impl DatabaseMigrationMarker for SqlMigration {
@@ -32,10 +38,11 @@ pub(crate) enum SqlMigrationStep {
     AlterTable(AlterTable),
     DropForeignKey(DropForeignKey),
     DropTable(DropTable),
+    RedefineIndex { table: Pair<usize>, index: Pair<usize> },
     RedefineTables(Vec<RedefineTable>),
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
-    AlterIndex(AlterIndex),
+    AlterIndex { table: Pair<usize>, index: Pair<usize> },
     CreateEnum(CreateEnum),
     DropEnum(DropEnum),
     AlterEnum(AlterEnum),
@@ -61,12 +68,13 @@ impl SqlMigrationStep {
             SqlMigrationStep::AddForeignKey(_) => "AddForeignKey",
             SqlMigrationStep::CreateTable(_) => "CreateTable",
             SqlMigrationStep::AlterTable(_) => "AlterTable",
+            SqlMigrationStep::RedefineIndex { .. } => "RedefineIndex",
             SqlMigrationStep::DropForeignKey(_) => "DropForeignKey",
             SqlMigrationStep::DropTable(_) => "DropTable",
             SqlMigrationStep::RedefineTables { .. } => "RedefineTables",
             SqlMigrationStep::CreateIndex(_) => "CreateIndex",
             SqlMigrationStep::DropIndex(_) => "DropIndex",
-            SqlMigrationStep::AlterIndex(_) => "AlterIndex",
+            SqlMigrationStep::AlterIndex { .. } => "AlterIndex",
             SqlMigrationStep::CreateEnum(_) => "CreateEnum",
             SqlMigrationStep::DropEnum(_) => "DropEnum",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
@@ -81,13 +89,13 @@ pub(crate) struct CreateTable {
 
 #[derive(Debug)]
 pub(crate) struct DropTable {
-    pub name: String,
+    pub table_index: usize,
 }
 
 #[derive(Debug)]
 pub(crate) struct AlterTable {
     /// Index in (previous_schema, next_schema).
-    pub table_index: (usize, usize),
+    pub table_index: Pair<usize>,
     pub changes: Vec<TableChange>,
 }
 
@@ -97,14 +105,12 @@ pub(crate) enum TableChange {
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
     DropAndRecreateColumn {
-        /// The index of the column in the table in (previous schema, next schema).
-        column_index: (usize, usize),
+        /// The index of the column in the table.
+        column_index: Pair<usize>,
         /// The change mask for the column.
         changes: ColumnChanges,
     },
-    DropPrimaryKey {
-        constraint_name: Option<String>,
-    },
+    DropPrimaryKey,
     AddPrimaryKey {
         columns: Vec<String>,
     },
@@ -117,13 +123,12 @@ pub(crate) struct AddColumn {
 
 #[derive(Debug)]
 pub(crate) struct DropColumn {
-    pub name: String,
     pub index: usize,
 }
 
 #[derive(Debug)]
 pub(crate) struct AlterColumn {
-    pub column_index: (usize, usize),
+    pub column_index: Pair<usize>,
     pub changes: ColumnChanges,
     pub type_change: Option<ColumnTypeChange>,
 }
@@ -143,7 +148,7 @@ pub(crate) struct AddForeignKey {
 }
 
 #[derive(Debug)]
-pub struct DropForeignKey {
+pub(crate) struct DropForeignKey {
     pub table: String,
     pub table_index: usize,
     pub foreign_key_index: usize,
@@ -151,39 +156,31 @@ pub struct DropForeignKey {
 }
 
 #[derive(Debug)]
-pub struct CreateIndex {
-    pub table: String,
-    pub index: Index,
+pub(crate) struct CreateIndex {
+    pub table_index: usize,
+    pub index_index: usize,
     pub caused_by_create_table: bool,
 }
 
 #[derive(Debug)]
-pub struct DropIndex {
+pub(crate) struct DropIndex {
     pub table: String,
     pub name: String,
 }
 
 #[derive(Debug)]
-pub struct AlterIndex {
-    pub table: String,
-    pub index_name: String,
-    pub index_new_name: String,
+pub(crate) struct CreateEnum {
+    pub enum_index: usize,
 }
 
 #[derive(Debug)]
-pub struct CreateEnum {
-    pub name: String,
-    pub variants: Vec<String>,
-}
-
-#[derive(Debug)]
-pub struct DropEnum {
-    pub name: String,
+pub(crate) struct DropEnum {
+    pub enum_index: usize,
 }
 
 #[derive(Debug)]
 pub(crate) struct AlterEnum {
-    pub name: String,
+    pub index: Pair<usize>,
     pub created_variants: Vec<String>,
     pub dropped_variants: Vec<String>,
 }
@@ -199,8 +196,8 @@ pub(crate) struct RedefineTable {
     pub added_columns: Vec<usize>,
     pub dropped_columns: Vec<usize>,
     pub dropped_primary_key: bool,
-    pub column_pairs: Vec<(usize, usize, ColumnChanges, Option<ColumnTypeChange>)>,
-    pub table_index: (usize, usize),
+    pub column_pairs: Vec<(Pair<usize>, ColumnChanges, Option<ColumnTypeChange>)>,
+    pub table_index: Pair<usize>,
 }
 
 #[cfg(test)]
@@ -218,7 +215,7 @@ mod tests {
                     foreign_key_index: 0,
                 }),
                 SqlMigrationStep::RedefineTables(vec![]),
-                SqlMigrationStep::DropTable(DropTable { name: "myTable".into() }),
+                SqlMigrationStep::DropTable(DropTable { table_index: 9 }),
             ],
         };
 

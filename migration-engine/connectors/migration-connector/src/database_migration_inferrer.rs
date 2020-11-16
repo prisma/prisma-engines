@@ -38,6 +38,7 @@ pub trait DatabaseMigrationInferrer<T>: Send + Sync {
     ) -> ConnectorResult<T>;
 
     /// Check that the current local database's schema matches its expected
-    /// state at the end of the passed in migrations history.
-    async fn detect_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<bool>;
+    /// state at the end of the passed in migrations history. If there is drift,
+    /// it should return a script to attempt to correct it.
+    async fn calculate_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<Option<String>>;
 }

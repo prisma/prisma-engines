@@ -36,7 +36,6 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
         errorContains = s"Unique constraint failed on the $errorTarget"
       )
     }
-
   }
 
   "A Create Mutation" should "error for id that is invalid" ignore { //Fixme does that make sense??
@@ -66,7 +65,7 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
          |}""",
         project = project,
         errorCode = 2009,
-        errorContains = """`Value types mismatch. Have: Boolean(true), want: String` at `Mutation.createParent.data.ParentCreateInput.id`"""
+        errorContains = """`Mutation.createParent.data.ParentCreateInput.id`: Value types mismatch. Have: Boolean(true), want: String"""
       )
     }
   }

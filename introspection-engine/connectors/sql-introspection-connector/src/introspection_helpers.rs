@@ -1,3 +1,4 @@
+use crate::Dedup;
 use crate::SqlError;
 use datamodel::{
     common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
@@ -12,7 +13,7 @@ use sql_schema_describer::{
 use tracing::debug;
 
 //checks
-pub fn is_migration_table(table: &Table) -> bool {
+pub fn is_old_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
         && table.columns.iter().any(|c| c.name == "revision")
         && table.columns.iter().any(|c| c.name == "name")
@@ -25,6 +26,19 @@ pub fn is_migration_table(table: &Table) -> bool {
         && table.columns.iter().any(|c| c.name == "errors")
         && table.columns.iter().any(|c| c.name == "started_at")
         && table.columns.iter().any(|c| c.name == "finished_at")
+}
+
+pub fn is_new_migration_table(table: &Table) -> bool {
+    table.name == "_prisma_migrations"
+        && table.columns.iter().any(|c| c.name == "id")
+        && table.columns.iter().any(|c| c.name == "checksum")
+        && table.columns.iter().any(|c| c.name == "finished_at")
+        && table.columns.iter().any(|c| c.name == "migration_name")
+        && table.columns.iter().any(|c| c.name == "logs")
+        && table.columns.iter().any(|c| c.name == "rolled_back_at")
+        && table.columns.iter().any(|c| c.name == "started_at")
+        && table.columns.iter().any(|c| c.name == "applied_steps_count")
+        && table.columns.iter().any(|c| c.name == "script")
 }
 
 pub(crate) fn is_relay_table(table: &Table) -> bool {
@@ -135,12 +149,6 @@ pub(crate) fn calculate_scalar_field(
     } else {
         calculate_scalar_field_type(column, family)
     };
-
-    let (is_commented_out, documentation) = match field_type {
-        FieldType::Unsupported(_) => (true, Some("This type is currently not supported.".to_string())),
-        _ => (false, None),
-    };
-
     let arity = match column.tpe.arity {
         _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
@@ -148,8 +156,25 @@ pub(crate) fn calculate_scalar_field(
         ColumnArity::List => FieldArity::List,
     };
 
+    let (default_value, dbgenerated_string) = calculate_default(table, &column, &arity);
+
+    let (is_commented_out, documentation) = match (&field_type, dbgenerated_string) {
+        (FieldType::Unsupported(_), None) => (true, Some("This type is currently not supported.".to_string())),
+        (FieldType::Unsupported(_), Some(default)) => (
+            true,
+            Some(format!(
+                "This type is currently not supported.\nThis field's default value can currently not be parsed: `{}`.",
+                default
+            )),
+        ),
+        (_, Some(default)) => (
+            false,
+            Some(format!("This field's default value can currently not be parsed: `{}`.", default).to_string()),
+        ),
+        _ => (false, None),
+    };
+
     let is_id = is_id(&column, &table);
-    let default_value = calculate_default(table, &column, &arity);
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
     ScalarField {
@@ -241,16 +266,33 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
+pub(crate) fn calculate_default(
+    table: &Table,
+    column: &Column,
+    arity: &FieldArity,
+) -> (Option<DMLDef>, Option<String>) {
     match (&column.default, &column.tpe.family) {
-        (_, _) if *arity == FieldArity::List => None,
-        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
-        (Some(SQLDef::VALUE(val)), _) => Some(DMLDef::Single(val.clone())),
-        _ => None,
+        (_, _) if *arity == FieldArity::List => (None, None),
+        (_, ColumnTypeFamily::Int) if column.auto_increment => {
+            (Some(DMLDef::Expression(VG::new_autoincrement())), None)
+        }
+        (_, ColumnTypeFamily::BigInt) if column.auto_increment => {
+            (Some(DMLDef::Expression(VG::new_autoincrement())), None)
+        }
+        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => {
+            (Some(DMLDef::Expression(VG::new_autoincrement())), None)
+        }
+        (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
+            (Some(DMLDef::Expression(VG::new_autoincrement())), None)
+        }
+        (Some(SQLDef::SEQUENCE(_)), _) => (Some(DMLDef::Expression(VG::new_autoincrement())), None),
+        (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => (Some(DMLDef::Expression(VG::new_now())), None),
+        (Some(SQLDef::DBGENERATED(default_string)), _) => (
+            Some(DMLDef::Expression(VG::new_dbgenerated())),
+            Some(default_string.clone()),
+        ),
+        (Some(SQLDef::VALUE(val)), _) => (Some(DMLDef::Single(val.clone())), None),
+        _ => (None, None),
     }
 }
 
@@ -276,11 +318,14 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
     let model_with_fk = &table.name;
     let fk_column_name = fk.columns.join("_");
 
-    let fk_to_same_model: Vec<&ForeignKey> = table
+    let mut fk_to_same_model: Vec<ForeignKey> = table
         .foreign_keys
-        .iter()
+        .clone()
+        .into_iter()
         .filter(|fk| &fk.referenced_table == referenced_model)
         .collect();
+
+    fk_to_same_model.clear_duplicates();
 
     match schema.table(referenced_model) {
         Err(table_name) => Err(SqlError::SchemaInconsistent {
@@ -344,12 +389,12 @@ pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -
         _ if is_mysql_bit => FieldType::Base(ScalarType::Int, None),
         _ if is_postgres_interval => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-        ColumnTypeFamily::Duration => FieldType::Base(ScalarType::DateTime, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
@@ -364,12 +409,12 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
 
     match &column.tpe.family {
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::BigInt, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
         ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Decimal, None),
         ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-        ColumnTypeFamily::Duration => FieldType::Base(ScalarType::Duration, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),

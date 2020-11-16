@@ -1,9 +1,9 @@
 use super::*;
 use crate::schema::*;
+use bigdecimal::{BigDecimal, ToPrimitive};
 use chrono::prelude::*;
 use indexmap::IndexMap;
 use prisma_value::PrismaValue;
-use rust_decimal::{prelude::ToPrimitive, Decimal};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, str::FromStr, sync::Arc};
 use uuid::Uuid;
 
@@ -22,7 +22,7 @@ impl QueryDocumentParser {
         selections: &[Selection],
         schema_object: &ObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedObject> {
-        let path = parent_path.add(schema_object.name().to_string());
+        let path = parent_path.add(schema_object.identifier.name().to_owned());
 
         // Basic invariant not (yet) encoded in the schema: Output objects can't be empty.
         if selections.is_empty() {
@@ -223,25 +223,30 @@ impl QueryDocumentParser {
     ) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
             (QueryValue::String(s), ScalarType::String) => Ok(PrismaValue::String(s)),
-            (QueryValue::String(s), ScalarType::DateTime) => {
-                Self::parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)
+            (QueryValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
+            (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(parent_path, &s),
+            (QueryValue::String(s), ScalarType::Bytes) => Self::parse_bytes(parent_path, s),
+            (QueryValue::String(s), ScalarType::Decimal) => Self::parse_decimal(parent_path, s),
+            (QueryValue::String(s), ScalarType::BigInt) => Self::parse_bigint(parent_path, s),
+            (QueryValue::String(s), ScalarType::UUID) => {
+                Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
             }
             (QueryValue::String(s), ScalarType::Json) => {
                 Ok(PrismaValue::Json(Self::parse_json(parent_path, &s).map(|_| s)?))
             }
-            (QueryValue::String(s), ScalarType::Xml) => Ok(PrismaValue::Xml(s)),
-            (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(parent_path, &s),
-            (QueryValue::String(s), ScalarType::UUID) => {
-                Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
+            (QueryValue::String(s), ScalarType::DateTime) => {
+                Self::parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)
             }
-            (QueryValue::String(s), ScalarType::Bytes) => Self::parse_bytes(parent_path, s),
-            (QueryValue::String(s), ScalarType::Decimal) => Self::parse_decimal(parent_path, s),
-            (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
-            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(Decimal::from(i))),
-            (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(Decimal::from(i))),
+
             (QueryValue::Int(i), ScalarType::Int) => Ok(PrismaValue::Int(i)),
+            (QueryValue::Int(i), ScalarType::Float) => Ok(PrismaValue::Float(BigDecimal::from(i))),
+            (QueryValue::Int(i), ScalarType::Decimal) => Ok(PrismaValue::Float(BigDecimal::from(i))),
+            (QueryValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
+
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
             (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().unwrap())),
+            (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
+
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
 
             // All other combinations are value type mismatches.
@@ -278,12 +283,19 @@ impl QueryDocumentParser {
     }
 
     pub fn parse_decimal(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
-        Decimal::from_str(&s)
+        BigDecimal::from_str(&s)
             .map(PrismaValue::Float)
             .map_err(|_| QueryParserError {
                 path: path.clone(),
-                error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid decimal string.", s)),
+                error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid decimal string", s)),
             })
+    }
+
+    pub fn parse_bigint(path: &QueryPath, s: String) -> QueryParserResult<PrismaValue> {
+        s.parse::<i64>().map(PrismaValue::BigInt).map_err(|_| QueryParserError {
+            path: path.clone(),
+            error_kind: QueryParserErrorKind::ValueParseError(format!("'{}' is not a valid big integer string", s)),
+        })
     }
 
     // [DTODO] This is likely incorrect or at least using the wrong abstractions.
@@ -362,9 +374,9 @@ impl QueryDocumentParser {
         };
 
         match typ.borrow() {
-            EnumType::Internal(i) => match i.map_input_value(&raw) {
+            EnumType::Database(db) => match db.map_input_value(&raw) {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
-                None => err(&i.name),
+                None => err(&db.name),
             },
             EnumType::String(s) => match s.value_for(raw.as_str()) {
                 Some(val) => Ok(ParsedInputValue::Single(PrismaValue::String(val.to_owned()))),
@@ -383,7 +395,7 @@ impl QueryDocumentParser {
         object: IndexMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
-        let path = parent_path.add(schema_object.name.clone());
+        let path = parent_path.add(schema_object.identifier.name().to_owned());
         let left: HashSet<&str> = schema_object
             .get_fields()
             .iter()

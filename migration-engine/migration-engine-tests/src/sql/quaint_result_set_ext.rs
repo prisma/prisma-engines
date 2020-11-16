@@ -85,7 +85,13 @@ impl<'a> RowAssertion<'a> {
     }
 
     pub fn assert_float_value(self, column_name: &str, expected_value: f64) -> AssertionResult<Self> {
-        let actual_value = self.0.get(column_name).and_then(|col: &Value<'_>| col.as_f64());
+        use bigdecimal::ToPrimitive;
+
+        let actual_value = self
+            .0
+            .get(column_name)
+            .and_then(|col: &Value<'_>| col.as_numeric())
+            .and_then(|num| num.to_f64());
 
         anyhow::ensure!(
             actual_value == Some(expected_value),

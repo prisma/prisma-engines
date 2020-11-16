@@ -248,10 +248,14 @@ impl SqlSchemaDescriber {
                             .or_else(|| DEFAULT_STRING.captures_iter(&default_string).next())
                             .or_else(|| DEFAULT_DB_GEN.captures_iter(&default_string).next())
                             .map(|cap| cap[1].to_string())
-                            .expect("Couldn't parse default value");
+                            .expect(&format!("Couldn't parse default value: `{}`", default_string));
 
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string) {
+                                Some(int_value) => DefaultValue::VALUE(int_value),
+                                None => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::BigInt => match parse_big_int(&default_string) {
                                 Some(int_value) => DefaultValue::VALUE(int_value),
                                 None => DefaultValue::DBGENERATED(default_string),
                             },
@@ -277,7 +281,6 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
                         })

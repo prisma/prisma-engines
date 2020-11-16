@@ -153,6 +153,15 @@ impl<'a> TableWalker<'a> {
         self.table().foreign_keys.len()
     }
 
+    /// Traverse to an index by index.
+    pub fn index_at(&self, index_index: usize) -> IndexWalker<'a> {
+        IndexWalker {
+            schema: self.schema,
+            table_index: self.table_index,
+            index_index,
+        }
+    }
+
     /// Traverse the indexes on the table.
     pub fn indexes(&self) -> impl Iterator<Item = IndexWalker<'a>> {
         let schema = self.schema;
@@ -316,31 +325,35 @@ pub struct IndexWalker<'a> {
 impl<'a> IndexWalker<'a> {
     /// The names of the indexed columns.
     pub fn column_names(&self) -> &[String] {
-        &self.index().columns
+        &self.get().columns
     }
 
     /// Traverse the indexed columns.
     pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
-        self.index().columns.iter().map(move |column_name| {
+        self.get().columns.iter().map(move |column_name| {
             self.table()
                 .column(column_name)
                 .expect("Failed to find column referenced in index")
         })
     }
 
-    /// The underlying index struct.
-    pub fn index(&self) -> &'a Index {
+    fn get(&self) -> &'a Index {
         &self.table().table().indices[self.index_index]
+    }
+
+    /// The index of the index in the parent table.
+    pub fn index(&self) -> usize {
+        self.index_index
     }
 
     /// The IndexType
     pub fn index_type(&self) -> &IndexType {
-        &self.index().tpe
+        &self.get().tpe
     }
 
     /// The name of the index.
     pub fn name(&self) -> &str {
-        &self.index().name
+        &self.get().name
     }
 
     /// Traverse to the table of the index.
@@ -352,8 +365,38 @@ impl<'a> IndexWalker<'a> {
     }
 }
 
+/// Traverse an enum.
+pub struct EnumWalker<'a> {
+    pub(crate) schema: &'a SqlSchema,
+    pub(crate) enum_index: usize,
+}
+
+impl<'a> EnumWalker<'a> {
+    /// The index of the enum in the parent schema.
+    pub fn enum_index(&self) -> usize {
+        self.enum_index
+    }
+
+    fn get(&self) -> &'a Enum {
+        &self.schema.enums[self.enum_index]
+    }
+
+    /// The name of the enum. This is a made up name on MySQL.
+    pub fn name(&self) -> &'a str {
+        &self.get().name
+    }
+
+    /// The values of the enum
+    pub fn values(&self) -> &'a [String] {
+        &self.get().values
+    }
+}
+
 /// Extension methods for the traversal of a SqlSchema.
 pub trait SqlSchemaExt {
+    /// Find an enum by index.
+    fn enum_walker_at<'a>(&'a self, index: usize) -> EnumWalker<'a>;
+
     /// Find a table by name.
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
 
@@ -362,6 +405,13 @@ pub trait SqlSchemaExt {
 }
 
 impl SqlSchemaExt for SqlSchema {
+    fn enum_walker_at<'a>(&'a self, index: usize) -> EnumWalker<'a> {
+        EnumWalker {
+            schema: self,
+            enum_index: index,
+        }
+    }
+
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
         Some(TableWalker {
             table_index: self.tables.iter().position(|table| table.name == name)?,

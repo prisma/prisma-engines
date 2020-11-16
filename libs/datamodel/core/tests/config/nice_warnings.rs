@@ -35,3 +35,19 @@ fn nice_warning_for_provider_array_deprecation() {
             29, 51,
         )));
 }
+
+#[test]
+fn nice_warning_for_provider_array_deprecation_on_single_element_in_array() {
+    let schema = r#"datasource db {
+  provider = ["postgres"]
+  url = "postgres://"
+}
+"#;
+
+    let res = parse_with_diagnostics(schema);
+
+    res.warnings
+        .assert_is(DatamodelWarning::new_deprecated_provider_array_warning(Span::new(
+            29, 41,
+        )));
+}

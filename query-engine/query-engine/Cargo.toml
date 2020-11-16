@@ -28,14 +28,14 @@ itertools = "0.8"
 once_cell = "1.3"
 prisma-models = {path = "../../libs/prisma-models"}
 query-core = {path = "../core"}
-rust_decimal = "1.8.1"
+bigdecimal = "0.2"
 serde = {version = "1.0", features = ["derive"]}
-serde_json = {version = "1.0", features = ["preserve_order"]}
+serde_json = {version = "1.0", features = ["preserve_order", "float_roundtrip"]}
 sql-connector = {path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector"}
 structopt = "0.3"
 thiserror = "1.0"
-tide = { version = "0.13.0", default-features = false, features = ["h1-server", "logger"] }
-tide-server-timing = "0.13.1"
+tide = { version = "0.15.0", default-features = false, features = ["h1-server", "logger"] }
+tide-server-timing = "0.15.0"
 url = "2.1"
 
 tracing = "0.1"
@@ -72,5 +72,6 @@ features = [
     "postgresql",
     "mysql",
     "mssql",
-    "tracing-log"
+    "tracing-log",
+    "bigdecimal"
 ]

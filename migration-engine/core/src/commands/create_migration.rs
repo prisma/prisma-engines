@@ -70,11 +70,10 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
         directory
             .write_migration_script(&migration_script, D::FILE_EXTENSION)
             .map_err(|err| {
-                CoreError::Generic(anyhow::anyhow!(
-                    "Failed to write the migration script to `{:?}`. {}",
+                CoreError::Generic(anyhow::Error::new(err).context(format!(
+                    "Failed to write the migration script to `{:?}`",
                     directory.path(),
-                    err
-                ))
+                )))
             })?;
 
         Ok(CreateMigrationOutput {

@@ -351,6 +351,10 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
                         &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
                         ast_field.span,
                     )),
+                    ScalarType::BigInt if !supports_native_types => Err(DatamodelError::new_connector_error(
+                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
+                        ast_field.span,
+                    )),
                     _ => Ok((dml::FieldType::Base(scalar_type, type_alias), vec![])),
                 }
             }

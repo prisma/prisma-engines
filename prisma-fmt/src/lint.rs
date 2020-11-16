@@ -40,10 +40,27 @@ pub fn run(opts: LintOpts) {
 
             mini_errors.append(&mut mini_warnings);
 
-            let json = serde_json::to_string(&mini_errors).expect("Failed to render JSON");
-
-            print!("{}", json)
+            print_diagnostics(mini_errors);
         }
-        _ => print!("[]"),
+        Ok(validated_datamodel) => {
+            let mini_warnings: Vec<MiniError> = validated_datamodel
+                .warnings
+                .into_iter()
+                .map(|warn: DatamodelWarning| MiniError {
+                    start: warn.span().start,
+                    end: warn.span().end,
+                    text: format!("{}", warn),
+                    is_warning: true,
+                })
+                .collect();
+
+            print_diagnostics(mini_warnings);
+        }
     }
+}
+
+fn print_diagnostics(diagnostics: Vec<MiniError>) {
+    let json = serde_json::to_string(&diagnostics).expect("Failed to render JSON");
+
+    print!("{}", json)
 }

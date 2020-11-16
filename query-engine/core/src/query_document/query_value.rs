@@ -1,12 +1,12 @@
+use bigdecimal::BigDecimal;
 use indexmap::IndexMap;
 use prisma_value::{stringify_date, PrismaValue};
-use rust_decimal::Decimal;
 use std::hash::Hash;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum QueryValue {
     Int(i64),
-    Float(Decimal),
+    Float(BigDecimal),
     String(String),
     Boolean(bool),
     Null,
@@ -57,6 +57,7 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::Json(s) => Self::String(s),
             PrismaValue::Xml(s) => Self::String(s),
             PrismaValue::Bytes(b) => Self::String(prisma_value::encode_bytes(&b)),
+            PrismaValue::BigInt(i) => Self::Int(i),
         }
     }
 }

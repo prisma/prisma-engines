@@ -6,6 +6,9 @@ mod diagnose_migration_history;
 mod evaluate_data_loss;
 mod infer;
 mod infer_apply;
+mod list_migration_directories;
+mod mark_migration_applied;
+mod mark_migration_rolled_back;
 mod reset;
 mod schema_push;
 mod unapply_migration;
@@ -18,11 +21,14 @@ pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
+pub use mark_migration_applied::MarkMigrationApplied;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
 
 use crate::AssertionResult;
+
+use self::mark_migration_rolled_back::MarkMigrationRolledBack;
 
 use super::assertions::SchemaAssertion;
 use super::{
@@ -31,13 +37,14 @@ use super::{
     InferAndApplyOutput,
 };
 use crate::connectors::Tags;
+use crate::test_api::list_migration_directories::ListMigrationDirectories;
 use enumflags2::BitFlags;
 use migration_connector::{
     ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord, MigrationStep,
 };
 use migration_core::{
     api::{GenericApi, MigrationApi},
-    commands::ApplyMigrationInput,
+    commands::{ApplyMigrationInput, ApplyScriptInput},
 };
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -87,8 +94,12 @@ impl TestApi {
         self.connector_name == "mysql_mariadb"
     }
 
-    pub fn migration_persistence(&self) -> &dyn MigrationPersistence {
-        self.api.connector().migration_persistence()
+    pub async fn migration_persistence(&self) -> &dyn MigrationPersistence {
+        let persistence = self.api.connector().migration_persistence();
+
+        persistence.init().await.unwrap();
+
+        persistence
     }
 
     pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
@@ -151,6 +162,18 @@ impl TestApi {
 
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
         ApplyMigrations::new(&self.api, migrations_directory)
+    }
+
+    pub fn list_migration_directories<'a>(&'a self, migrations_directory: &'a TempDir) -> ListMigrationDirectories<'a> {
+        ListMigrationDirectories::new(&self.api, migrations_directory)
+    }
+
+    pub async fn apply_script(&self, script: impl Into<String>) -> anyhow::Result<()> {
+        self.api
+            .apply_script(&ApplyScriptInput { script: script.into() })
+            .await?;
+
+        Ok(())
     }
 
     /// Convenient builder and assertions for the CreateMigration command.
@@ -219,6 +242,18 @@ impl TestApi {
         EvaluateDataLoss::new(&self.api, migrations_directory, prisma_schema.into())
     }
 
+    pub fn mark_migration_applied<'a>(
+        &'a self,
+        migration_name: impl Into<String>,
+        migrations_directory: &'a TempDir,
+    ) -> MarkMigrationApplied<'a> {
+        MarkMigrationApplied::new(&self.api, migration_name.into(), migrations_directory)
+    }
+
+    pub fn mark_migration_rolled_back<'a>(&'a self, migration_name: impl Into<String>) -> MarkMigrationRolledBack<'a> {
+        MarkMigrationRolledBack::new(&self.api, migration_name.into())
+    }
+
     pub fn reset(&self) -> Reset<'_> {
         Reset::new(&self.api)
     }
@@ -247,6 +282,13 @@ impl TestApi {
             .tables
             .into_iter()
             .filter(|t| t.name != MIGRATION_TABLE_NAME)
+            .collect();
+
+        // Also the sequences of the _Migration table
+        result.sequences = result
+            .sequences
+            .into_iter()
+            .filter(|seq| !seq.name.contains("_Migration"))
             .collect();
 
         Ok(result)

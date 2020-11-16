@@ -1,6 +1,7 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::PostgresFlavour,
+    pair::Pair,
     sql_migration::AlterEnum,
     sql_schema_differ::column::{ColumnDiffer, ColumnTypeChange},
     sql_schema_differ::SqlSchemaDiffer,
@@ -20,9 +21,9 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .enum_pairs()
             .filter_map(|differ| {
                 let step = AlterEnum {
+                    index: differ.enums.as_ref().map(|e| e.enum_index()),
                     created_variants: differ.created_values().map(String::from).collect(),
                     dropped_variants: differ.dropped_values().map(String::from).collect(),
-                    name: differ.previous.name.clone(),
                 };
 
                 if step.is_empty() {
@@ -68,13 +69,14 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         }
     }
 
-    fn index_should_be_renamed(&self, previous: &IndexWalker<'_>, next: &IndexWalker<'_>) -> bool {
+    fn index_should_be_renamed(&self, pair: &Pair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
-        if previous.name().len() == POSTGRES_IDENTIFIER_SIZE_LIMIT && next.name().len() > POSTGRES_IDENTIFIER_SIZE_LIMIT
-        {
-            previous.name()[0..POSTGRES_IDENTIFIER_SIZE_LIMIT] != next.name()[0..POSTGRES_IDENTIFIER_SIZE_LIMIT]
+        let (previous_name, next_name) = pair.as_ref().map(|idx| idx.name()).into_tuple();
+
+        if previous_name.len() == POSTGRES_IDENTIFIER_SIZE_LIMIT && next_name.len() > POSTGRES_IDENTIFIER_SIZE_LIMIT {
+            previous_name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT] != next_name[0..POSTGRES_IDENTIFIER_SIZE_LIMIT]
         } else {
-            previous.name() != next.name()
+            previous_name != next_name
         }
     }
 

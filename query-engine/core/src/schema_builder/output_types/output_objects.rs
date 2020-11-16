@@ -13,10 +13,8 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
         .to_owned()
         .into_iter()
         .for_each(|model| {
-            ctx.cache_output_type(
-                model.name.clone(),
-                Arc::new(ObjectType::new(model.name.clone(), Some(model))),
-            )
+            let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
+            ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident.clone(), Some(model))))
         });
 
     // Compute fields on all cached object types.
@@ -46,7 +44,8 @@ fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) 
 /// Returns an output object type for the given model.
 /// Relies on the output type cache being initalized.
 pub(crate) fn map_model_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    ctx.get_output_type(&model.name)
+    let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
+    ctx.get_output_type(&ident)
         .expect("Invariant violation: Initialized output object type for each model.")
 }
 
@@ -80,6 +79,7 @@ pub(crate) fn map_scalar_output_type(field: &ScalarFieldRef) -> OutputType {
         TypeIdentifier::Int => OutputType::int(),
         TypeIdentifier::Xml => OutputType::xml(),
         TypeIdentifier::Bytes => OutputType::bytes(),
+        TypeIdentifier::BigInt => OutputType::bigint(),
     };
 
     if field.is_list {
@@ -114,24 +114,25 @@ pub(crate) fn map_enum_field(scalar_field: &ScalarFieldRef) -> EnumType {
 }
 
 pub(crate) fn batch_payload_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
-    return_cached_output!(ctx, "BatchPayload");
+    let ident = Identifier::new("BatchPayload".to_owned(), PRISMA_NAMESPACE);
+    return_cached_output!(ctx, &ident);
 
     let object_type = Arc::new(object_type(
-        "BatchPayload",
+        ident.clone(),
         vec![field("count", vec![], OutputType::int(), None)],
         None,
     ));
 
-    ctx.cache_output_type("BatchPayload".into(), object_type.clone());
+    ctx.cache_output_type(ident, object_type.clone());
     Arc::downgrade(&object_type)
 }
 
 /// Builds aggregation object type for given model (e.g. AggregateUser).
 pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    let name = format!("Aggregate{}", capitalize(&model.name));
-    return_cached_output!(ctx, &name);
+    let ident = Identifier::new(format!("Aggregate{}", capitalize(&model.name)), PRISMA_NAMESPACE);
+    return_cached_output!(ctx, &ident);
 
-    let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
+    let object = ObjectTypeStrongRef::new(ObjectType::new(ident.clone(), Some(ModelRef::clone(model))));
     let mut fields = vec![count_field()];
 
     append_opt(
@@ -155,7 +156,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
     );
 
     object.set_fields(fields);
-    ctx.cache_output_type(name, ObjectTypeStrongRef::clone(&object));
+    ctx.cache_output_type(ident, ObjectTypeStrongRef::clone(&object));
 
     ObjectTypeStrongRef::downgrade(&object)
 }
@@ -204,23 +205,26 @@ pub(crate) fn map_numeric_field_aggregation_object<F>(
 where
     F: Fn(&ScalarFieldRef) -> OutputType,
 {
-    let name = format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix));
-    return_cached_output!(ctx, &name);
+    let ident = Identifier::new(
+        format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix)),
+        PRISMA_NAMESPACE,
+    );
+    return_cached_output!(ctx, &ident);
 
     let fields: Vec<OutputField> = fields
         .iter()
         .map(|sf| field(sf.name.clone(), vec![], type_mapper(sf), None).optional_if(!sf.is_required))
         .collect();
 
-    let object = Arc::new(object_type(name.clone(), fields, None));
-    ctx.cache_output_type(name, object.clone());
+    let object = Arc::new(object_type(ident.clone(), fields, None));
+    ctx.cache_output_type(ident, object.clone());
 
     Arc::downgrade(&object)
 }
 
 fn field_avg_output_type(field: &ScalarFieldRef) -> OutputType {
     match field.type_identifier {
-        TypeIdentifier::Int | TypeIdentifier::Float => OutputType::float(),
+        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         _ => map_scalar_output_type(field),
     }
@@ -234,7 +238,7 @@ fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
         .filter(|f| {
             matches!(
                 f.type_identifier,
-                TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::Decimal
+                TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
             )
         })
         .collect()

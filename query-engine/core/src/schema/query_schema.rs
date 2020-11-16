@@ -98,8 +98,7 @@ impl QuerySchema {
 }
 
 pub struct ObjectType {
-    name: String,
-
+    pub identifier: Identifier,
     fields: OnceCell<Vec<OutputFieldRef>>,
 
     // Object types can directly map to models.
@@ -109,7 +108,7 @@ pub struct ObjectType {
 impl Debug for ObjectType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ObjectType")
-            .field("name", &self.name)
+            .field("identifier", &self.identifier)
             .field("fields", &"#Fields Cell#")
             .field("model", &self.model)
             .finish()
@@ -117,19 +116,16 @@ impl Debug for ObjectType {
 }
 
 impl ObjectType {
-    pub fn new<T>(name: T, model: Option<ModelRef>) -> Self
-    where
-        T: Into<String>,
-    {
+    pub fn new(ident: Identifier, model: Option<ModelRef>) -> Self {
         Self {
-            name: name.into(),
+            identifier: ident,
             fields: OnceCell::new(),
             model,
         }
     }
 
-    pub fn name(&self) -> &str {
-        &self.name
+    pub fn identifier(&self) -> &Identifier {
+        &self.identifier
     }
 
     pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
@@ -229,9 +225,41 @@ impl fmt::Display for QueryTag {
     }
 }
 
+#[derive(PartialEq, Hash, Eq, Debug, Clone)]
+pub struct Identifier {
+    name: String,
+    namespace: String,
+}
+
+impl Identifier {
+    pub fn new<T>(name: String, namespace: T) -> Self
+    where
+        T: Into<String>,
+    {
+        Self {
+            name,
+            namespace: namespace.into(),
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn namespace(&self) -> &str {
+        &self.namespace
+    }
+}
+
+impl ToString for Identifier {
+    fn to_string(&self) -> String {
+        format!("{}.{}", self.namespace(), self.name())
+    }
+}
+
 #[derive(PartialEq)]
 pub struct InputObjectType {
-    pub name: String,
+    pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
     pub fields: OnceCell<Vec<InputFieldRef>>,
 }
@@ -248,7 +276,7 @@ pub struct InputObjectTypeConstraints {
 impl Debug for InputObjectType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("InputObjectType")
-            .field("name", &self.name)
+            .field("identifier", &self.identifier)
             .field("constraints", &self.constraints)
             .field("fields", &"#Input Fields Cell#")
             .finish()
@@ -322,6 +350,15 @@ impl InputField {
         self
     }
 
+    /// Sets the field as optional if the condition is true.
+    pub fn optional_if(self, condition: bool) -> Self {
+        if condition {
+            self.optional()
+        } else {
+            self
+        }
+    }
+
     /// Sets the field as nullable (accepting null inputs).
     pub fn nullable(self) -> Self {
         self.add_type(InputType::null())
@@ -357,7 +394,9 @@ impl PartialEq for InputType {
             (InputType::Scalar(st), InputType::Scalar(ost)) => st.eq(ost),
             (InputType::Enum(_), InputType::Enum(_)) => true,
             (InputType::List(lt), InputType::List(olt)) => lt.eq(olt),
-            (InputType::Object(obj), InputType::Object(oobj)) => obj.into_arc().name == oobj.into_arc().name,
+            (InputType::Object(obj), InputType::Object(oobj)) => {
+                obj.into_arc().identifier == oobj.into_arc().identifier
+            }
             _ => false,
         }
     }
@@ -366,7 +405,7 @@ impl PartialEq for InputType {
 impl Debug for InputType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            InputType::Object(obj) => write!(f, "Object({})", obj.into_arc().name),
+            InputType::Object(obj) => write!(f, "Object({})", obj.into_arc().identifier.name()),
             InputType::Scalar(s) => write!(f, "{:?}", s),
             InputType::Enum(e) => write!(f, "{:?}", e),
             InputType::List(l) => write!(f, "{:?}", l),
@@ -389,6 +428,10 @@ impl InputType {
 
     pub fn int() -> InputType {
         InputType::Scalar(ScalarType::Int)
+    }
+
+    pub fn bigint() -> InputType {
+        InputType::Scalar(ScalarType::BigInt)
     }
 
     pub fn float() -> InputType {
@@ -434,6 +477,15 @@ impl InputType {
     pub fn enum_type(containing: EnumTypeRef) -> InputType {
         InputType::Enum(containing)
     }
+
+    pub fn is_empty(&self) -> bool {
+        match self {
+            Self::Scalar(_) => false,
+            Self::Enum(_) => false,
+            Self::List(inner) => inner.is_empty(),
+            Self::Object(weak) => weak.into_arc().is_empty(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -459,6 +511,10 @@ impl OutputType {
 
     pub fn int() -> OutputType {
         OutputType::Scalar(ScalarType::Int)
+    }
+
+    pub fn bigint() -> OutputType {
+        OutputType::Scalar(ScalarType::BigInt)
     }
 
     pub fn float() -> OutputType {
@@ -518,6 +574,7 @@ pub enum ScalarType {
     Null,
     String,
     Int,
+    BigInt,
     Float,
     Decimal,
     Boolean,

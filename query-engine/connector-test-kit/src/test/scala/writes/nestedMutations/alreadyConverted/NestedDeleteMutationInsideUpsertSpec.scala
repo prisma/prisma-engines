@@ -58,7 +58,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         project,
         errorCode = 2009,
         errorContains =
-          """`Field does not exist on enclosing type.` at `Mutation.upsertParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentOptInput.delete`"""
+          """`Mutation.upsertParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentOptInput.delete`: Field does not exist on enclosing type."""
       )
 
     }
@@ -368,7 +368,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         project,
         errorCode = 2009,
         errorContains =
-          """`Field does not exist on enclosing type.` at `Mutation.upsertParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptInput.delete`"""
+          """`Mutation.upsertParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentsOptInput.delete`: Field does not exist on enclosing type."""
       )
     }
   }

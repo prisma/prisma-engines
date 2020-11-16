@@ -1,5 +1,6 @@
 use super::*;
 use crate::getters::Getter;
+use bigdecimal::ToPrimitive;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint, Value};
 use serde_json::from_str;
@@ -122,21 +123,20 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument(skip(self))]
     async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        use rust_decimal::prelude::*;
-
         let sql = r#"
             SELECT
             SUM(data_length + index_length) as size
             FROM information_schema.TABLES
             WHERE table_schema = ?
         "#;
+
         let result = self.conn.query_raw(sql, &[schema.into()]).await?;
         let size = result
             .first()
             .and_then(|row| {
                 row.get("size")
-                    .and_then(|x| x.as_decimal())
-                    .and_then(|decimal| decimal.round().to_usize())
+                    .and_then(|x| x.as_numeric())
+                    .and_then(|decimal| decimal.round(0).to_usize())
             })
             .unwrap_or(0);
 
@@ -264,6 +264,10 @@ async fn get_all_columns(
                             Some(int_value) => DefaultValue::VALUE(int_value),
                             None => DefaultValue::DBGENERATED(default_string),
                         },
+                        ColumnTypeFamily::BigInt => match parse_big_int(&default_string) {
+                            Some(int_value) => DefaultValue::VALUE(int_value),
+                            None => DefaultValue::DBGENERATED(default_string),
+                        },
                         ColumnTypeFamily::Float => match parse_float(&default_string) {
                             Some(float_value) => DefaultValue::VALUE(float_value),
                             None => DefaultValue::DBGENERATED(default_string),
@@ -291,7 +295,6 @@ async fn get_all_columns(
                         ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
                             &default_string.replace("_utf8mb4", "").replace("\\\'", ""),
                         ))),
-                        ColumnTypeFamily::Duration => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                     })
                 }
@@ -545,7 +548,7 @@ fn get_column_type_and_enum(
         "tinyint" if is_tinyint1() && !invalid_bool_default() => (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt)),
         "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
         "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
-        "bigint" => (ColumnTypeFamily::Int, Some(MySqlType::BigInt)),
+        "bigint" => (ColumnTypeFamily::BigInt, Some(MySqlType::BigInt)),
         "decimal" => (
             ColumnTypeFamily::Decimal,
             Some(MySqlType::Decimal(Some((
@@ -663,16 +666,20 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
 fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
     static MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\('|\\[^\\])|'(')"#).unwrap());
     static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
+    static MARIADB_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(.*)'"#).unwrap());
 
     let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
-        let unquoted: &str = &default[1..(default.len() - 1)];
+        let unquoted = MARIADB_DEFAULT_QUOTE_UNESCAPE_RE
+            .captures(&default)
+            .and_then(|cap| cap.get(1).map(|x| x.as_str()))
+            .unwrap_or(&default);
 
         MARIADB_NEWLINE_RE.replace_all(unquoted, "\n")
     } else {
         default.into()
     };
 
-    MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into()
+    MYSQL_ESCAPING_RE.replace_all(&maybe_unquoted, "$1$2").into()
 }
 
 /// Tests whether an introspected default value should be categorized as current_timestamp.

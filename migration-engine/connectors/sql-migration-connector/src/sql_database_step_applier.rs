@@ -1,7 +1,6 @@
 use crate::{
-    database_info::DatabaseInfo,
+    pair::Pair,
     sql_migration::{CreateTable, DropTable, SqlMigration, SqlMigrationStep},
-    sql_schema_differ::SqlSchemaDiffer,
     SqlFlavour, SqlMigrationConnector,
 };
 use migration_connector::{
@@ -18,8 +17,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
             &database_migration.steps,
             index,
             self.flavour(),
-            &database_migration.before,
-            &database_migration.after,
+            database_migration.schemas(),
         )
         .await
     }
@@ -28,13 +26,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
         &self,
         database_migration: &SqlMigration,
     ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-        render_steps_pretty(
-            &database_migration,
-            self.flavour(),
-            self.database_info(),
-            &database_migration.before,
-            &database_migration.after,
-        )
+        render_steps_pretty(&database_migration, self.flavour(), database_migration.schemas())
     }
 
     fn render_script(&self, database_migration: &SqlMigration, diagnostics: &DestructiveChangeDiagnostics) -> String {
@@ -68,9 +60,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
             let statements: Vec<String> = render_raw_sql(
                 step,
                 self.flavour(),
-                self.database_info(),
-                &database_migration.before,
-                &database_migration.after,
+                Pair::new(&database_migration.before, &database_migration.after),
             );
 
             if !statements.is_empty() {
@@ -99,8 +89,7 @@ impl SqlMigrationConnector {
         steps: &[SqlMigrationStep],
         index: usize,
         renderer: &(dyn SqlFlavour + Send + Sync),
-        current_schema: &SqlSchema,
-        next_schema: &SqlSchema,
+        schemas: Pair<&SqlSchema>,
     ) -> ConnectorResult<bool> {
         let has_this_one = steps.get(index).is_some();
 
@@ -111,7 +100,7 @@ impl SqlMigrationConnector {
         let step = &steps[index];
         tracing::debug!(?step);
 
-        for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema, next_schema) {
+        for sql_string in render_raw_sql(&step, renderer, schemas) {
             tracing::debug!(index, %sql_string);
 
             self.conn().raw_cmd(&sql_string).await?;
@@ -124,14 +113,12 @@ impl SqlMigrationConnector {
 fn render_steps_pretty(
     database_migration: &SqlMigration,
     renderer: &(dyn SqlFlavour + Send + Sync),
-    database_info: &DatabaseInfo,
-    current_schema: &SqlSchema,
-    next_schema: &SqlSchema,
+    schemas: Pair<&SqlSchema>,
 ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
     let mut steps = Vec::with_capacity(database_migration.steps.len());
 
     for step in &database_migration.steps {
-        let sql = render_raw_sql(&step, renderer, database_info, current_schema, next_schema).join(";\n");
+        let sql = render_raw_sql(&step, renderer, schemas).join(";\n");
 
         if !sql.is_empty() {
             steps.push(PrettyDatabaseMigrationStep {
@@ -147,40 +134,46 @@ fn render_steps_pretty(
 fn render_raw_sql(
     step: &SqlMigrationStep,
     renderer: &(dyn SqlFlavour + Send + Sync),
-    database_info: &DatabaseInfo,
-    previous_schema: &SqlSchema,
-    next_schema: &SqlSchema,
+    schemas: Pair<&SqlSchema>,
 ) -> Vec<String> {
-    let differ = SqlSchemaDiffer {
-        previous: previous_schema,
-        next: next_schema,
-        database_info,
-        flavour: renderer,
-    };
-
     match step {
-        SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, differ),
-        SqlMigrationStep::CreateEnum(create_enum) => renderer.render_create_enum(create_enum),
-        SqlMigrationStep::DropEnum(drop_enum) => renderer.render_drop_enum(drop_enum),
-        SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &differ),
+        SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &schemas),
+        SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, &schemas),
+        SqlMigrationStep::CreateEnum(create_enum) => {
+            renderer.render_create_enum(&schemas.next().enum_walker_at(create_enum.enum_index))
+        }
+        SqlMigrationStep::DropEnum(drop_enum) => {
+            renderer.render_drop_enum(&schemas.previous().enum_walker_at(drop_enum.enum_index))
+        }
         SqlMigrationStep::CreateTable(CreateTable { table_index }) => {
-            let table = next_schema.table_walker_at(*table_index);
+            let table = schemas.next().table_walker_at(*table_index);
 
             vec![renderer.render_create_table(&table)]
         }
-        SqlMigrationStep::DropTable(DropTable { name }) => renderer.render_drop_table(name),
+        SqlMigrationStep::DropTable(DropTable { table_index }) => {
+            renderer.render_drop_table(schemas.previous().table_walker_at(*table_index).name())
+        }
+        SqlMigrationStep::RedefineIndex { table, index } => {
+            renderer.render_drop_and_recreate_index(schemas.tables(table).indexes(index).as_ref())
+        }
         SqlMigrationStep::AddForeignKey(add_foreign_key) => {
-            let foreign_key = next_schema
+            let foreign_key = schemas
+                .next()
                 .table_walker_at(add_foreign_key.table_index)
                 .foreign_key_at(add_foreign_key.foreign_key_index);
             vec![renderer.render_add_foreign_key(&foreign_key)]
         }
         SqlMigrationStep::DropForeignKey(drop_foreign_key) => vec![renderer.render_drop_foreign_key(drop_foreign_key)],
-        SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &differ),
-        SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(create_index)],
+        SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &schemas),
+        SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(
+            &schemas
+                .next()
+                .table_walker_at(create_index.table_index)
+                .index_at(create_index.index_index),
+        )],
         SqlMigrationStep::DropIndex(drop_index) => vec![renderer.render_drop_index(drop_index)],
-        SqlMigrationStep::AlterIndex(alter_index) => {
-            renderer.render_alter_index(alter_index, database_info, previous_schema)
+        SqlMigrationStep::AlterIndex { table, index } => {
+            renderer.render_alter_index(schemas.tables(table).indexes(index).as_ref())
         }
     }
 }

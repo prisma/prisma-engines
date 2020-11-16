@@ -5,7 +5,7 @@ use user_facing_errors::{migration_engine::MigrateSystemDatabase, quaint::render
 pub(crate) fn quaint_error_to_connector_error(error: QuaintError, connection_info: &ConnectionInfo) -> ConnectorError {
     match render_quaint_error(error.kind(), connection_info) {
         Some(user_facing_error) => user_facing_error.into(),
-        None => ConnectorError::generic(anyhow::anyhow!("Error querying the database: {}", error)),
+        None => ConnectorError::generic(anyhow::Error::new(error).context("Database error")),
     }
 }
 

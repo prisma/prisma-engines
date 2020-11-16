@@ -5,9 +5,9 @@
 //! The transformers in this file helps consumers to directly access the data in the shape they
 //! assume the data has to be because of the structural guarantees of the query schema validation.
 use super::*;
+use bigdecimal::ToPrimitive;
 use chrono::prelude::*;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
-use rust_decimal::prelude::ToPrimitive;
 use std::convert::TryInto;
 
 impl TryInto<PrismaValue> for ParsedInputValue {
