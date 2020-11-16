@@ -28,19 +28,7 @@ where
             connector,
         };
 
-        engine.init().await?;
-
         Ok(engine)
-    }
-
-    pub async fn init(&self) -> CoreResult<()> {
-        self.connector().initialize().await?;
-        Ok(())
-    }
-
-    pub async fn reset(&self) -> CoreResult<()> {
-        self.connector().reset().await?;
-        Ok(())
     }
 
     pub fn connector(&self) -> &C {

@@ -49,9 +49,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// The version of the underlying database.
     fn version(&self) -> String;
 
-    /// Hook to perform connector-specific initialization. This is deprecated.
-    async fn initialize(&self) -> ConnectorResult<()>;
-
     /// Create the database with the provided URL.
     async fn create_database(database_str: &str) -> ConnectorResult<String>;
 

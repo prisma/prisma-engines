@@ -2047,7 +2047,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
     api.schema_push(dm1).send().await?.assert_green()?;
 
     // Drop the existing migrations.
-    api.migration_persistence().reset().await?;
+    api.migration_persistence().await.reset().await?;
 
     let dm2 = r#"
         datasource db {
