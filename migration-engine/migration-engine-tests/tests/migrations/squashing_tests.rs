@@ -205,7 +205,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -366,7 +366,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 

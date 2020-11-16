@@ -170,7 +170,7 @@ async fn count_values_in_column(column_name: &str, table: &str, conn: &Connectio
     use quaint::ast::*;
 
     let query = Select::from_table(conn.table_name(table))
-        .value(count(quaint::ast::Column::new(column_name)))
+        .value(count(asterisk()))
         .so_that(column_name.is_not_null());
 
     let values_count: i64 = conn

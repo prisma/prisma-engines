@@ -39,7 +39,7 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 

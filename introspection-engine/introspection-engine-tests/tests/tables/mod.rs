@@ -2,7 +2,7 @@ use barrel::{functions, types};
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
 use quaint::prelude::Queryable;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 #[test_each_connector]
 async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {

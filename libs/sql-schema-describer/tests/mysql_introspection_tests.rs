@@ -270,7 +270,7 @@ async fn all_mysql_column_types_must_work() {
                 native_type: Some(MySqlType::Timestamp(Some(0)).to_json()),
             },
 
-            default: Some(DefaultValue::NOW),
+            default: Some(DefaultValue::now()),
             auto_increment: false,
         },
         Column {

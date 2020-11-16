@@ -4,7 +4,7 @@ use introspection_core::RpcImpl;
 use introspection_engine_tests::{assert_eq_datamodels, assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 use test_setup::mysql_8_url;
 
 #[test_each_connector]

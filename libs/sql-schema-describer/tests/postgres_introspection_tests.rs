@@ -278,7 +278,7 @@ async fn all_postgres_column_types_must_work() {
                 native_type: Some(PostgresType::Integer.to_json()),
             },
 
-            default: Some(DefaultValue::SEQUENCE(format!(
+            default: Some(DefaultValue::sequence(format!(
                 "nextval('\"{}\".\"User_primary_col_seq\"'::regclass)",
                 SCHEMA
             ))),
@@ -339,7 +339,7 @@ async fn all_postgres_column_types_must_work() {
                 native_type: Some(PostgresType::BigInt.to_json()),
             },
 
-            default: Some(DefaultValue::SEQUENCE(format!(
+            default: Some(DefaultValue::sequence(format!(
                 "nextval('\"{}\".\"User_bigserial_col_seq\"'::regclass)",
                 SCHEMA
             ))),
@@ -582,7 +582,7 @@ async fn all_postgres_column_types_must_work() {
                 native_type: Some(PostgresType::SmallInt.to_json()),
             },
 
-            default: Some(DefaultValue::SEQUENCE(format!(
+            default: Some(DefaultValue::sequence(format!(
                 "nextval('\"{}\".\"User_smallserial_col_seq\"'::regclass)",
                 SCHEMA
             ))),
@@ -599,7 +599,7 @@ async fn all_postgres_column_types_must_work() {
                 native_type: Some(PostgresType::Integer.to_json()),
             },
 
-            default: Some(DefaultValue::SEQUENCE(format!(
+            default: Some(DefaultValue::sequence(format!(
                 "nextval('\"{}\".\"User_serial_col_seq\"'::regclass)",
                 SCHEMA
             ))),

@@ -1,4 +1,5 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
+use indoc::indoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind, prelude::SqlFamily};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
@@ -57,7 +58,7 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
+        let sql = indoc! {r#"
             CREATE TABLE _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
@@ -68,7 +69,7 @@ impl SqlFlavour for PostgresFlavour {
                 started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
                 applied_steps_count     INTEGER NOT NULL DEFAULT 0
             );
-        "#;
+        "#};
 
         Ok(connection.raw_cmd(sql).await?)
     }

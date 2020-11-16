@@ -4,7 +4,7 @@ use indoc::indoc;
 use quaint::ast::*;
 use quaint::connector::{ConnectionInfo, SqlFamily};
 use serde_json::json;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 static TODO: &str = indoc! {"
     model Todo {

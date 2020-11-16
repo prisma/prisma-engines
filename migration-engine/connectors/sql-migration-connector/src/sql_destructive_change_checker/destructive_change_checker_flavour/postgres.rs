@@ -9,7 +9,7 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
-use sql_schema_describer::{walkers::ColumnWalker, DefaultValue};
+use sql_schema_describer::{walkers::ColumnWalker, DefaultKind, DefaultValue};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_alter_column(
@@ -104,11 +104,11 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
 }
 
 fn default_can_be_rendered(default: Option<&DefaultValue>) -> bool {
-    match default {
+    match default.as_ref().map(|d| d.kind()) {
         None => false,
-        Some(DefaultValue::VALUE(_)) => true,
-        Some(DefaultValue::DBGENERATED(expr)) => !expr.is_empty(),
-        Some(DefaultValue::NOW) => true,
-        Some(DefaultValue::SEQUENCE(_)) => false,
+        Some(DefaultKind::VALUE(_)) => true,
+        Some(DefaultKind::DBGENERATED(expr)) => !expr.is_empty(),
+        Some(DefaultKind::NOW) => true,
+        Some(DefaultKind::SEQUENCE(_)) => false,
     }
 }

@@ -1,7 +1,7 @@
 use indoc::formatdoc;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 use test_setup::connectors::Tags;
 
 const TYPES: &[(&str, &str)] = &[

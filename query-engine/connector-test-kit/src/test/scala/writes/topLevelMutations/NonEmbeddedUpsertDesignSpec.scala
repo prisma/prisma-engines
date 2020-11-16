@@ -158,7 +158,7 @@ class NonEmbeddedUpsertDesignSpec extends FlatSpec with Matchers with ApiSpecBas
     countItems(project, "todoes") should be(1)
   }
 
-  "An upsert on the top level" should "execute a nested delete in the update branch" in {
+  "An upsert on the top level" should "execute a nested delete in the update branch" taggedAs (IgnoreMsSql) in {
     val project = SchemaDsl.fromStringV11()(dmP1ToC1)
     database.setup(project)
 

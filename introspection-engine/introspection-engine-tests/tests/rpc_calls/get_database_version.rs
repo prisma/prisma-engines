@@ -1,6 +1,6 @@
 use introspection_engine_tests::{test_api::*, BarrelMigrationExecutor};
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 async fn setup_empty(barrel: &BarrelMigrationExecutor, db_name: &str) -> crate::TestResult {
     barrel.execute_with_schema(|_| {}, db_name).await?;

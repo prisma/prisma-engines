@@ -1,5 +1,6 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
 use connection_string::JdbcString;
+use indoc::formatdoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use quaint::{connector::MssqlUrl, prelude::SqlFamily};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
@@ -35,15 +36,16 @@ impl SqlFlavour for MssqlFlavour {
 
         let conn = connect(jdbc_string).await?;
 
-        let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name());
+        let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),);
+
         conn.raw_cmd(&query).await?;
 
         Ok(db_name)
     }
 
     async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE [_prisma_migrations] (
+        let sql = formatdoc! { r#"
+            CREATE TABLE [{}].[_prisma_migrations] (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
                 finished_at             DATETIMEOFFSET,
@@ -54,9 +56,9 @@ impl SqlFlavour for MssqlFlavour {
                 applied_steps_count     INT NOT NULL DEFAULT 0,
                 script                  NVARCHAR(MAX) NOT NULL
             );
-        "#;
+        "#, self.schema_name()};
 
-        Ok(connection.raw_cmd(sql).await?)
+        Ok(connection.raw_cmd(&sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
@@ -140,7 +142,7 @@ impl SqlFlavour for MssqlFlavour {
         ))
         .await?;
 
-        conn.raw_cmd(&format!("CREATE SCHEMA {}", conn.connection_info().schema_name()))
+        conn.raw_cmd(&format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),))
             .await
             .unwrap();
 
@@ -159,9 +161,54 @@ impl SqlFlavour for MssqlFlavour {
 
     async fn sql_schema_from_migration_history(
         &self,
-        _: &[MigrationDirectory],
-        _: &Connection,
+        migrations: &[MigrationDirectory],
+        connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
-        todo!("Needs the connection string crate, so leaving it unimplemented for now")
+        let database_name = format!("prisma_migrations_shadow_database_{}", uuid::Uuid::new_v4());
+        let create_database = format!("CREATE DATABASE [{}]", database_name);
+
+        connection.raw_cmd(&create_database).await?;
+
+        let mut jdbc_string: JdbcString = self.0.connection_string().parse().unwrap();
+        jdbc_string
+            .properties_mut()
+            .insert("database".into(), database_name.clone());
+        let temporary_database_url = jdbc_string.to_string();
+
+        tracing::debug!("Connecting to temporary database at {}", temporary_database_url);
+
+        let sql_schema = {
+            let temporary_database = crate::connect(&temporary_database_url).await?;
+            let create_schema = format!("CREATE SCHEMA [{schema}]", schema = self.schema_name());
+
+            temporary_database.raw_cmd(&create_schema).await?;
+
+            for migration in migrations {
+                let script = migration.read_migration_script()?;
+
+                tracing::debug!(
+                    "Applying migration `{}` to temporary database.",
+                    migration.migration_name()
+                );
+
+                temporary_database
+                    .raw_cmd(&script)
+                    .await
+                    .map_err(ConnectorError::from)
+                    .map_err(|connector_error| {
+                        connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                    })?;
+            }
+
+            // the connection to the temporary database is dropped at the end of
+            // the block.
+            self.describe_schema(&temporary_database).await?
+        };
+
+        let drop_database = format!("DROP DATABASE [{}]", database = database_name);
+
+        connection.raw_cmd(&drop_database).await?;
+
+        Ok(sql_schema)
     }
 }

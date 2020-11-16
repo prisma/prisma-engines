@@ -1,6 +1,7 @@
 use super::*;
 use crate::getters::Getter;
 use crate::parsers::Parser;
+use indoc::indoc;
 use native_types::NativeType;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
@@ -37,7 +38,7 @@ static DEFAULT_NON_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\(\((.*)\)\)"
 /// ```ignore
 /// ('this is a test')
 /// ```
-static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('(.*)'\)").unwrap());
+static DEFAULT_STRING: Lazy<Regex> = Lazy::new(|| Regex::new(r"\('([\S\s]*)'\)").unwrap());
 
 /// Matches a database-generated value in the schema.
 ///
@@ -118,15 +119,12 @@ impl SqlSchemaDescriber {
     #[tracing::instrument]
     async fn get_table_names(&self, schema: &str) -> DescriberResult<Vec<String>> {
         let select = r#"
-            SELECT table_name
-            FROM information_schema.tables t
-            INNER JOIN sys.tables st
-                ON TABLE_NAME = st.name
-                AND SCHEMA_ID(t.TABLE_SCHEMA) = st.schema_id
-            WHERE table_schema = @P1
-            AND st.is_ms_shipped = 0
-            AND table_type = 'BASE TABLE'
-            ORDER BY table_name ASC
+            SELECT t.name AS table_name
+            FROM sys.tables t
+            WHERE SCHEMA_NAME(t.schema_id) = @P1
+            AND t.is_ms_shipped = 0
+            AND t.type = 'U'
+            ORDER BY t.name asc;
         "#;
 
         let rows = self.conn.query_raw(select, &[schema.into()]).await?;
@@ -143,7 +141,7 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument]
     async fn get_size(&self, schema: &str) -> DescriberResult<usize> {
-        let sql = r#"
+        let sql = indoc! {r#"
             SELECT
                 SUM(a.total_pages) * 8000 AS size
             FROM
@@ -152,13 +150,13 @@ impl SqlSchemaDescriber {
                 sys.partitions p ON t.object_id = p.object_id
             INNER JOIN
                 sys.allocation_units a ON p.partition_id = a.container_id
-            WHERE schema_name(t.schema_id) = @P1
+            WHERE SCHEMA_NAME(t.schema_id) = @P1
                 AND t.is_ms_shipped = 0
             GROUP BY
                 t.schema_id
             ORDER BY
                 size DESC;
-        "#;
+        "#};
 
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
@@ -194,27 +192,30 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_all_columns(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<Column>>> {
-        let sql = r#"
-            SELECT
-                column_name,
-                data_type,
-                character_maximum_length,
-                column_default,
-                is_nullable,
-                columnproperty(object_id(@P1 + '.' + table_name), column_name, 'IsIdentity') is_identity,
-                table_name,
-                numeric_precision,
-                numeric_scale
-            FROM information_schema.columns c
-            INNER JOIN sys.tables t
-            ON c.TABLE_NAME = t.name AND SCHEMA_ID(c.TABLE_SCHEMA) = t.schema_id
-            WHERE table_schema = @P1
-            AND t.is_ms_shipped = 'false'
-            ORDER BY ordinal_position
-        "#;
+        let sql = indoc! {r#"
+            SELECT c.name                                          AS column_name,
+                TYPE_NAME(c.system_type_id)                        AS data_type,
+                COLUMNPROPERTY(c.object_id, c.name, 'charmaxlen')  AS character_maximum_length,
+                OBJECT_DEFINITION(c.default_object_id)             AS column_default,
+                c.is_nullable                                      AS is_nullable,
+                COLUMNPROPERTY(c.object_id, c.name, 'IsIdentity')  AS is_identity,
+                OBJECT_NAME(c.object_id)                           AS table_name,
+                OBJECT_NAME(c.default_object_id)                   AS constraint_name,
+                convert(tinyint, CASE
+                    WHEN c.system_type_id IN (48, 52, 56, 59, 60, 62, 106, 108, 122, 127) THEN c.precision
+                    END)                                           AS numeric_precision,
+                convert(int, CASE
+                    WHEN c.system_type_id IN (40, 41, 42, 43, 58, 61) THEN NULL
+                    ELSE ODBCSCALE(c.system_type_id, c.scale) END) AS numeric_scale
+            FROM sys.columns c
+                    INNER JOIN sys.tables t ON c.object_id = t.object_id
+            WHERE OBJECT_SCHEMA_NAME(c.object_id) = @P1
+            AND t.is_ms_shipped = 0
+
+            ORDER BY COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
+        "#};
 
         let mut map = HashMap::new();
-
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for col in rows {
@@ -228,15 +229,9 @@ impl SqlSchemaDescriber {
 
             let numeric_precision = col.get_u32("numeric_precision");
             let numeric_scale = col.get_u32("numeric_scale");
-            let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
+            let is_nullable = &col.get_expect_bool("is_nullable");
 
-            let is_required = match is_nullable.as_ref() {
-                "no" => true,
-                "yes" => false,
-                x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
-            };
-
-            let arity = if is_required {
+            let arity = if !is_nullable {
                 ColumnArity::Required
             } else {
                 ColumnArity::Nullable
@@ -267,40 +262,46 @@ impl SqlSchemaDescriber {
                             .map(|cap| cap[1].to_string())
                             .expect(&format!("Couldn't parse default value: `{}`", default_string));
 
-                        Some(match tpe.family {
+                        let mut default = match tpe.family {
                             ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
-                                Some(int_value) => DefaultValue::VALUE(int_value),
-                                None => DefaultValue::DBGENERATED(default_string),
+                                Some(int_value) => DefaultValue::value(int_value),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
-                                Some(int_value) => DefaultValue::VALUE(int_value),
-                                None => DefaultValue::DBGENERATED(default_string),
+                                Some(int_value) => DefaultValue::value(int_value),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
-                                Some(float_value) => DefaultValue::VALUE(float_value),
-                                None => DefaultValue::DBGENERATED(default_string),
+                                Some(float_value) => DefaultValue::value(float_value),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
-                                Some(float_value) => DefaultValue::VALUE(float_value),
-                                None => DefaultValue::DBGENERATED(default_string),
+                                Some(float_value) => DefaultValue::value(float_value),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Boolean => match Self::parse_int(&default_string) {
-                                Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
-                                Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
-                                _ => DefaultValue::DBGENERATED(default_string),
+                                Some(PrismaValue::Int(1)) => DefaultValue::value(PrismaValue::Boolean(true)),
+                                Some(PrismaValue::Int(0)) => DefaultValue::value(PrismaValue::Boolean(false)),
+                                _ => DefaultValue::db_generated(default_string),
                             },
-                            ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(default_string)),
+                            ColumnTypeFamily::String => DefaultValue::value(default_string.replace("''", "'")),
                             //todo check other now() definitions
                             ColumnTypeFamily::DateTime => match default_string.as_str() {
-                                "getdate()" => DefaultValue::NOW,
-                                _ => DefaultValue::DBGENERATED(default_string),
+                                "getdate()" => DefaultValue::now(),
+                                _ => DefaultValue::db_generated(default_string),
                             },
-                            ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
+                            ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
+                            ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
+                            ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
                             ColumnTypeFamily::Enum(_) => unreachable!("No enums in MSSQL"),
-                        })
+                        };
+
+                        if let Some(name) = col.get_string("constraint_name") {
+                            default.set_constraint_name(name);
+                        }
+
+                        Some(default)
                     }
                 },
             };
@@ -323,13 +324,13 @@ impl SqlSchemaDescriber {
         let mut map = HashMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
 
-        let sql = r#"
+        let sql = indoc! {r#"
             SELECT DISTINCT
                 ind.name AS index_name,
                 ind.is_unique AS is_unique,
                 ind.is_primary_key AS is_primary_key,
                 col.name AS column_name,
-                ic.index_column_id AS seq_in_index,
+                ic.key_ordinal AS seq_in_index,
                 t.name AS table_name
             FROM
                 sys.indexes ind
@@ -344,7 +345,7 @@ impl SqlSchemaDescriber {
                 AND ind.filter_definition IS NULL
 
             ORDER BY index_name, seq_in_index
-        "#;
+        "#};
 
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
@@ -390,7 +391,7 @@ impl SqlSchemaDescriber {
                                 primary_key.replace(PrimaryKey {
                                     columns: vec![column_name],
                                     sequence: None,
-                                    constraint_name: None,
+                                    constraint_name: Some(index_name),
                                 });
                             }
                         };
@@ -434,42 +435,34 @@ impl SqlSchemaDescriber {
         // merge.
         let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
 
-        let sql = r#"
-            SELECT
-                OBJECT_NAME(fk.constraint_object_id) AS constraint_name,
-                parent_table.name AS table_name,
-                referenced_table.name AS referenced_table_name,
-                parent_column.name AS column_name,
-                referenced_column.name AS referenced_column_name,
-                rc.delete_rule AS delete_rule,
-                rc.update_rule AS update_rule,
-                kcu.ordinal_position AS ordinal_position
-            FROM
-                sys.foreign_key_columns AS fk
-            INNER JOIN sys.tables AS parent_table
-                ON fk.parent_object_id = parent_table.object_id
-            INNER JOIN sys.tables AS referenced_table
-                ON fk.referenced_object_id = referenced_table.object_id
-            INNER JOIN sys.columns AS parent_column
-                ON fk.parent_object_id = parent_column.object_id
-                AND fk.parent_column_id = parent_column.column_id
-            INNER JOIN sys.columns AS referenced_column
-                ON fk.referenced_object_id = referenced_column.object_id
-                AND fk.referenced_column_id = referenced_column.column_id
-            INNER JOIN information_schema.referential_constraints AS rc
-                ON OBJECT_NAME(fk.constraint_object_id) = rc.constraint_name
-                AND rc.constraint_schema = @P1
-            INNER JOIN information_schema.key_column_usage AS kcu
-                ON OBJECT_NAME(fk.constraint_object_id) = kcu.constraint_name
-                AND parent_column.name = kcu.column_name
-                AND parent_table.name = kcu.table_name
-                AND kcu.table_schema = @P1
-                AND referenced_column.name IS NOT NULL
-            WHERE parent_table.is_ms_shipped = 'false'
-            AND referenced_table.is_ms_shipped = 'false'
-            ORDER BY
-                ordinal_position
-        "#;
+        let sql = indoc! {r#"
+            SELECT OBJECT_NAME(fkc.constraint_object_id) AS constraint_name,
+                parent_table.name                     AS table_name,
+                referenced_table.name                 AS referenced_table_name,
+                parent_column.name                    AS column_name,
+                referenced_column.name                AS referenced_column_name,
+                fk.delete_referential_action          AS delete_referential_action,
+                fk.update_referential_action          AS update_referential_action,
+                fkc.constraint_column_id              AS ordinal_position
+            FROM sys.foreign_key_columns AS fkc
+                    INNER JOIN sys.tables AS parent_table
+                                ON fkc.parent_object_id = parent_table.object_id
+                    INNER JOIN sys.tables AS referenced_table
+                                ON fkc.referenced_object_id = referenced_table.object_id
+                    INNER JOIN sys.columns AS parent_column
+                                ON fkc.parent_object_id = parent_column.object_id
+                                    AND fkc.parent_column_id = parent_column.column_id
+                    INNER JOIN sys.columns AS referenced_column
+                                ON fkc.referenced_object_id = referenced_column.object_id
+                                    AND fkc.referenced_column_id = referenced_column.column_id
+                    INNER JOIN sys.foreign_keys AS fk
+                                ON fkc.constraint_object_id = fk.object_id
+                                    AND fkc.parent_object_id = fk.parent_object_id
+            WHERE parent_table.is_ms_shipped = 0
+            AND referenced_table.is_ms_shipped = 0
+            AND OBJECT_SCHEMA_NAME(fkc.parent_object_id) = @P1
+            ORDER BY ordinal_position
+        "#};
 
         let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
 
@@ -482,21 +475,20 @@ impl SqlSchemaDescriber {
             let referenced_table = row.get_expect_string("referenced_table_name");
             let referenced_column = row.get_expect_string("referenced_column_name");
             let ord_pos = row.get_expect_i64("ordinal_position");
-            let on_delete_action = match row.get_expect_string("delete_rule").to_lowercase().as_str() {
-                "cascade" => ForeignKeyAction::Cascade,
-                "set null" => ForeignKeyAction::SetNull,
-                "set default" => ForeignKeyAction::SetDefault,
-                "restrict" => ForeignKeyAction::Restrict,
-                "no action" => ForeignKeyAction::NoAction,
+
+            let on_delete_action = match row.get_expect_i64("delete_referential_action") {
+                0 => ForeignKeyAction::NoAction,
+                1 => ForeignKeyAction::Cascade,
+                2 => ForeignKeyAction::SetNull,
+                3 => ForeignKeyAction::SetDefault,
                 s => panic!(format!("Unrecognized on delete action '{}'", s)),
             };
 
-            let on_update_action = match row.get_expect_string("update_rule").to_lowercase().as_str() {
-                "cascade" => ForeignKeyAction::Cascade,
-                "set null" => ForeignKeyAction::SetNull,
-                "set default" => ForeignKeyAction::SetDefault,
-                "restrict" => ForeignKeyAction::Restrict,
-                "no action" => ForeignKeyAction::NoAction,
+            let on_update_action = match row.get_expect_i64("update_referential_action") {
+                0 => ForeignKeyAction::NoAction,
+                1 => ForeignKeyAction::Cascade,
+                2 => ForeignKeyAction::SetNull,
+                3 => ForeignKeyAction::SetDefault,
                 s => panic!(format!("Unrecognized on delete action '{}'", s)),
             };
 

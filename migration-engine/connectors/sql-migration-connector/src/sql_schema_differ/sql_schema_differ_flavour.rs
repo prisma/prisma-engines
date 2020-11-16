@@ -68,6 +68,11 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
+    /// Whether indexes should be recreated if one of the columns needs to be recreated
+    fn should_recreate_indexes_from_recreated_columns(&self) -> bool {
+        false
+    }
+
     fn table_names_match(&self, names: Pair<&str>) -> bool {
         names.previous() == names.next()
     }

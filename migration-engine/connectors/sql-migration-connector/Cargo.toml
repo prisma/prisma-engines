@@ -28,6 +28,7 @@ tracing = "0.1.10"
 tracing-futures = "0.2.0"
 url = "2.1.1"
 uuid = { version = "0.8", features = ["v4"] }
+indoc = "1.0"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"

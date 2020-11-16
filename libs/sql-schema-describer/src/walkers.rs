@@ -80,6 +80,16 @@ impl<'a> ColumnWalker<'a> {
         self.column().auto_increment
     }
 
+    /// Is this column a part of the table's primary key?
+    pub fn is_part_of_primary_key(&self) -> bool {
+        self.table().table().is_part_of_primary_key(self.name())
+    }
+
+    /// Is this column a part of the table's primary key?
+    pub fn is_part_of_foreign_key(&self) -> bool {
+        self.table().table().is_part_of_foreign_key(self.name())
+    }
+
     /// Returns whether two columns are named the same and belong to the same table.
     pub fn is_same_column(&self, other: &ColumnWalker<'_>) -> bool {
         self.name() == other.name() && self.table().name() == other.table().name()
@@ -108,7 +118,7 @@ impl<'a> ColumnWalker<'a> {
 }
 
 /// Traverse a table.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct TableWalker<'a> {
     /// The schema the column is contained in.
     schema: &'a SqlSchema,
@@ -186,6 +196,17 @@ impl<'a> TableWalker<'a> {
         })
     }
 
+    /// Traverse foreign keys from other tables, referencing current table.
+    pub fn referencing_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
+        let table_index = self.table_index;
+
+        self.schema
+            .table_walkers()
+            .filter(move |t| t.table_index() != table_index)
+            .flat_map(|t| t.foreign_keys())
+            .filter(move |fk| fk.referenced_table().table_index() == table_index)
+    }
+
     /// Get a foreign key by index.
     pub fn foreign_key_at(&self, index: usize) -> ForeignKeyWalker<'a> {
         ForeignKeyWalker {
@@ -228,6 +249,7 @@ impl<'a> TableWalker<'a> {
 }
 
 /// Traverse a foreign key.
+#[derive(Debug, Clone, Copy)]
 pub struct ForeignKeyWalker<'schema> {
     /// The index of the foreign key in the table.
     foreign_key_index: usize,
@@ -311,9 +333,15 @@ impl<'schema> ForeignKeyWalker<'schema> {
             table_index: self.table_index,
         }
     }
+
+    /// True if relation is back to the same table.
+    pub fn is_self_relation(&self) -> bool {
+        self.table().name() == self.referenced_table().name()
+    }
 }
 
 /// Traverse an index.
+#[derive(Debug, Clone, Copy)]
 pub struct IndexWalker<'a> {
     schema: &'a SqlSchema,
     /// The index of the table in the schema.
@@ -335,6 +363,11 @@ impl<'a> IndexWalker<'a> {
                 .column(column_name)
                 .expect("Failed to find column referenced in index")
         })
+    }
+
+    /// True if index contains the given column.
+    pub fn contains_column(&self, column_name: &str) -> bool {
+        self.get().columns.iter().any(|column| column == column_name)
     }
 
     fn get(&self) -> &'a Index {
@@ -366,6 +399,7 @@ impl<'a> IndexWalker<'a> {
 }
 
 /// Traverse an enum.
+#[derive(Debug, Clone, Copy)]
 pub struct EnumWalker<'a> {
     pub(crate) schema: &'a SqlSchema,
     pub(crate) enum_index: usize,
