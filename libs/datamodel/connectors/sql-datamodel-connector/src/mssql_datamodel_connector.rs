@@ -315,7 +315,6 @@ impl Connector for MsSqlDatamodelConnector {
             MsSqlType::Image => (IMAGE_TYPE_NAME, vec![]),
             MsSqlType::Xml => (XML_TYPE_NAME, vec![]),
             MsSqlType::UniqueIdentifier => (UNIQUE_IDENTIFIER_TYPE_NAME, vec![]),
-            _ => unreachable!(),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
