@@ -271,6 +271,9 @@ fn must_succeed_if_env_var_exists_and_override_was_provided() {
         from_env_var: None,
         value: url.to_string(),
     });
+
+    // make sure other tests that run afterwards are not run in a modified environment
+    std::env::remove_var("DATABASE_URL");
 }
 
 #[test]

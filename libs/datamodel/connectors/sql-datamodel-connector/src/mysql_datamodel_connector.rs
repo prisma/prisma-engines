@@ -156,45 +156,64 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
-        if let FieldType::NativeType(_, native_type) = field.field_type() {
-            let native_type_name = native_type.name.as_str();
-            if matches!(native_type_name, DECIMAL_TYPE_NAME | NUMERIC_TYPE_NAME) {
-                match native_type.args.as_slice() {
-                    [precision, scale] if scale > precision => {
-                        return Err(ConnectorError::new_scale_larger_than_precision_error(
-                            native_type_name,
-                            "MySQL",
-                        ))
-                    }
-                    [precision, _] if *precision > 65 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Precision can range from 1 to 65.",
-                            native_type_name,
-                            "MySQL",
-                        ))
-                    }
-                    [_, scale] if *scale > 30 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Scale can range from 0 to 30.",
-                            native_type_name,
-                            "MySQL",
-                        ))
-                    }
-                    _ => {}
+        if let FieldType::NativeType(_, native_type_instance) = field.field_type() {
+            let native_type_name = native_type_instance.name.as_str();
+            let native_type: MySqlType = native_type_instance.deserialize_native_type();
+
+            let precision_and_scale = match native_type {
+                MySqlType::Decimal(x) => x,
+                MySqlType::Numeric(x) => x,
+                _ => None,
+            };
+            match precision_and_scale {
+                Some((precision, scale)) if scale > precision => {
+                    return Err(ConnectorError::new_scale_larger_than_precision_error(
+                        native_type_name,
+                        "MySQL",
+                    ))
                 }
-            }
-            if matches!(native_type_name, BIT_TYPE_NAME) {
-                match native_type.args.as_slice() {
-                    [length] if length == &0 || length > &64 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "M can range from 1 to 64.",
-                            native_type_name,
-                            "MySQL",
-                        ))
-                    }
-                    _ => {}
+                Some((precision, _)) if precision > 65 => {
+                    return Err(ConnectorError::new_argument_m_out_of_range_error(
+                        "Precision can range from 1 to 65.",
+                        native_type_name,
+                        "MySQL",
+                    ))
                 }
+                Some((_, scale)) if scale > 30 => {
+                    return Err(ConnectorError::new_argument_m_out_of_range_error(
+                        "Scale can range from 0 to 30.",
+                        native_type_name,
+                        "MySQL",
+                    ))
+                }
+                _ => {}
             }
+
+            match native_type {
+                MySqlType::Bit(length) if length == 0 || length > 64 => {
+                    return Err(ConnectorError::new_argument_m_out_of_range_error(
+                        "M can range from 1 to 64.",
+                        native_type_name,
+                        "MySQL",
+                    ))
+                }
+                MySqlType::Char(length) if length > 255 => {
+                    return Err(ConnectorError::new_argument_m_out_of_range_error(
+                        "M can range from 0 to 255.",
+                        native_type_name,
+                        "MySQL",
+                    ))
+                }
+                MySqlType::VarChar(length) if length > 65535 => {
+                    return Err(ConnectorError::new_argument_m_out_of_range_error(
+                        "M can range from 0 to 65,535.",
+                        native_type_name,
+                        "MySQL",
+                    ))
+                }
+                _ => {}
+            }
+
             if field.is_unique() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
                 return Err(ConnectorError::new_incompatible_native_type_with_unique(
                     native_type_name,
@@ -206,30 +225,6 @@ impl Connector for MySqlDatamodelConnector {
                     native_type_name,
                     "MySQL",
                 ));
-            }
-            if matches!(native_type_name, CHAR_TYPE_NAME) {
-                match native_type.args.as_slice() {
-                    [length] if *length > 255 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "M can range from 0 to 255.",
-                            native_type_name,
-                            "MySQL",
-                        ))
-                    }
-                    _ => {}
-                }
-            }
-            if matches!(native_type_name, VAR_CHAR_TYPE_NAME) {
-                match native_type.args.as_slice() {
-                    [length] if *length > 65535 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "M can range from 0 to 65,535.",
-                            native_type_name,
-                            "MySQL",
-                        ))
-                    }
-                    _ => {}
-                }
             }
         }
         Ok(())
