@@ -394,11 +394,11 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             MySqlType::Float => (FLOAT_TYPE_NAME, vec![]),
             MySqlType::Double => (DOUBLE_TYPE_NAME, vec![]),
-            MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x]),
-            MySqlType::Char(x) => (CHAR_TYPE_NAME, vec![x]),
-            MySqlType::VarChar(x) => (VAR_CHAR_TYPE_NAME, vec![x]),
-            MySqlType::Binary(x) => (BINARY_TYPE_NAME, vec![x]),
-            MySqlType::VarBinary(x) => (VAR_BINARY_TYPE_NAME, vec![x]),
+            MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x.to_string()]),
+            MySqlType::Char(x) => (CHAR_TYPE_NAME, vec![x.to_string()]),
+            MySqlType::VarChar(x) => (VAR_CHAR_TYPE_NAME, vec![x.to_string()]),
+            MySqlType::Binary(x) => (BINARY_TYPE_NAME, vec![x.to_string()]),
+            MySqlType::VarBinary(x) => (VAR_BINARY_TYPE_NAME, vec![x.to_string()]),
             MySqlType::TinyBlob => (TINY_BLOB_TYPE_NAME, vec![]),
             MySqlType::Blob => (BLOB_TYPE_NAME, vec![]),
             MySqlType::MediumBlob => (MEDIUM_BLOB_TYPE_NAME, vec![]),
@@ -415,20 +415,15 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
         };
 
-        fn arg_vec_from_opt(input: Option<u32>) -> Vec<u32> {
+        fn arg_vec_from_opt(input: Option<u32>) -> Vec<String> {
             match input {
-                Some(arg) => vec![arg],
+                Some(arg) => vec![arg.to_string()],
                 None => vec![],
             }
         }
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            let stringified_args = args.iter().map(|arg| arg.to_string()).collect();
-            Ok(NativeTypeInstance::new(
-                constructor.name.as_str(),
-                stringified_args,
-                &native_type,
-            ))
+            Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: constructor_name.parse().unwrap(),

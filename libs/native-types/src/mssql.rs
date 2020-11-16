@@ -66,9 +66,9 @@ pub enum MsSqlType {
     /// A fixed size string. Before SQL Server 2019 supported only ASCII
     /// characters, and from that version on supports also UTF-8 when using the
     /// right collation.
-    Char(Option<u16>),
+    Char(Option<u32>),
     /// A fixed size UTF-16 string.
-    NChar(Option<u16>),
+    NChar(Option<u32>),
     /// A variable size string. Before SQL Server 2019 supported only ASCII
     /// characters, and from that version on supports also UTF-8 when using the
     /// right collation.
@@ -82,7 +82,7 @@ pub enum MsSqlType {
     /// `nvarchar(max)`.
     NText,
     /// A fixed size binary blob.
-    Binary(Option<u16>),
+    Binary(Option<u32>),
     /// A variable size binary blob.
     VarBinary(Option<MsSqlTypeParameter>),
     /// A heap-stored binary blob. Deprecated in favlour of `varbinary(max)`.

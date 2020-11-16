@@ -1,5 +1,5 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use datamodel_connector::helper::parse_u32_arguments;
+use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_u32_arguments};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
 use dml::model::{IndexType, Model};
@@ -255,12 +255,12 @@ impl Connector for MsSqlDatamodelConnector {
             &DATETIME_OFFSET_TYPE_NAME => MsSqlType::DateTimeOffset,
             &SMALL_DATETIME_TYPE_NAME => MsSqlType::SmallDateTime,
             &CHAR_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Char(Some((*x as u16))),
+                [x] => MsSqlType::Char(Some((*x as u32))),
                 [] => MsSqlType::Char(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
             &NCHAR_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::NChar(Some((*x as u16))),
+                [x] => MsSqlType::NChar(Some((*x as u32))),
                 [] => MsSqlType::NChar(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
@@ -269,7 +269,7 @@ impl Connector for MsSqlDatamodelConnector {
             &NVARCHAR_TYPE_NAME => MsSqlType::NVarChar(parse_mssql_type_parameter(args)),
             &NTEXT_TYPE_NAME => MsSqlType::NText,
             &BINARY_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Binary(Some((*x as u16))),
+                [x] => MsSqlType::Binary(Some((*x as u32))),
                 [] => MsSqlType::Binary(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
@@ -283,12 +283,54 @@ impl Connector for MsSqlDatamodelConnector {
         Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
-        Err(ConnectorError::from_kind(
-            ErrorKind::ConnectorNotSupportedForNativeTypes {
-                connector_name: "mssql".to_string(),
-            },
-        ))
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+        let native_type: MsSqlType = serde_json::from_value(native_type).unwrap();
+
+        let (constructor_name, args) = match native_type {
+            MsSqlType::TinyInt => (TINY_INT_TYPE_NAME, vec![]),
+            MsSqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
+            MsSqlType::Int => (INT_TYPE_NAME, vec![]),
+            MsSqlType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
+            MsSqlType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
+            MsSqlType::Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
+            MsSqlType::Money => (MONEY_TYPE_NAME, vec![]),
+            MsSqlType::SmallMoney => (SMALL_MONEY_TYPE_NAME, vec![]),
+            MsSqlType::Bit => (BIT_TYPE_NAME, vec![]),
+            MsSqlType::Float(x) => (FLOAT_TYPE_NAME, arg_vec_from_opt(x)),
+            MsSqlType::Real => (REAL_TYPE_NAME, vec![]),
+            MsSqlType::Date => (DATE_TYPE_NAME, vec![]),
+            MsSqlType::Time => (TIME_TYPE_NAME, vec![]),
+            MsSqlType::DateTime => (DATETIME_TYPE_NAME, vec![]),
+            MsSqlType::DateTime2 => (DATETIME2_TYPE_NAME, vec![]),
+            MsSqlType::DateTimeOffset => (DATETIME_OFFSET_TYPE_NAME, vec![]),
+            MsSqlType::SmallDateTime => (SMALL_DATETIME_TYPE_NAME, vec![]),
+            MsSqlType::Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
+            MsSqlType::NChar(x) => (NCHAR_TYPE_NAME, arg_vec_from_opt(x)),
+            MsSqlType::VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_for_type_param(x)),
+            MsSqlType::Text => (TEXT_TYPE_NAME, vec![]),
+            MsSqlType::NVarChar(x) => (NVARCHAR_TYPE_NAME, arg_vec_for_type_param(x)),
+            MsSqlType::NText => (NTEXT_TYPE_NAME, vec![]),
+            MsSqlType::Binary(x) => (BINARY_TYPE_NAME, arg_vec_from_opt(x)),
+            MsSqlType::VarBinary(x) => (VAR_BINARY_TYPE_NAME, arg_vec_for_type_param(x)),
+            MsSqlType::Image => (IMAGE_TYPE_NAME, vec![]),
+            MsSqlType::Xml => (XML_TYPE_NAME, vec![]),
+            MsSqlType::UniqueIdentifier => (UNIQUE_IDENTIFIER_TYPE_NAME, vec![]),
+            _ => unreachable!(),
+        };
+
+        if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
+            let stringified_args = args.iter().map(|arg| arg.to_string()).collect();
+            Ok(NativeTypeInstance::new(
+                constructor.name.as_str(),
+                stringified_args,
+                &native_type,
+            ))
+        } else {
+            Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                native_type: constructor_name.parse().unwrap(),
+                connector_name: "Postgres".parse().unwrap(),
+            }))
+        }
     }
 }
 
@@ -327,4 +369,12 @@ fn parse_mssql_type_parameter(args: Vec<String>) -> Option<MsSqlTypeParameter> {
             arg.parse().map(MsSqlTypeParameter::Number).unwrap()
         }
     })
+}
+
+fn arg_vec_for_type_param(type_param: Option<MsSqlTypeParameter>) -> Vec<String> {
+    match type_param {
+        Some(MsSqlTypeParameter::Max) => vec!["Max".to_string()],
+        Some(MsSqlTypeParameter::Number(l)) => vec![l.to_string()],
+        None => vec![],
+    }
 }

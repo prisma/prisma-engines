@@ -592,7 +592,7 @@ impl SqlSchemaDescriber {
 
         let full_data_type = format!("{}{}", data_type, params);
 
-        let casted_character_maximum_length = character_maximum_length.map(|x| x as u16);
+        let casted_character_maximum_length = character_maximum_length.map(|x| x as u32);
         let type_parameter = parse_type_parameter(character_maximum_length);
         let unsupported_type = || (Unsupported(full_data_type.clone()), None);
 

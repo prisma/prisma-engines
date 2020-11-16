@@ -311,12 +311,7 @@ impl Connector for PostgresDatamodelConnector {
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            let stringified_args = args.iter().map(|arg| arg.to_string()).collect();
-            Ok(NativeTypeInstance::new(
-                constructor.name.as_str(),
-                stringified_args,
-                &native_type,
-            ))
+            Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: constructor_name.parse().unwrap(),

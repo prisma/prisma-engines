@@ -29,13 +29,13 @@ pub fn parse_u32_arguments(args: Vec<String>) -> Result<Vec<u32>, ConnectorError
     }
 }
 
-pub fn arg_vec_from_opt(input: Option<u32>) -> Vec<u32> {
-    input.into_iter().collect()
+pub fn arg_vec_from_opt(input: Option<u32>) -> Vec<String> {
+    input.into_iter().map(|x| x.to_string()).collect()
 }
 
-pub fn args_vec_from_opt(input: Option<(u32, u32)>) -> Vec<u32> {
+pub fn args_vec_from_opt(input: Option<(u32, u32)>) -> Vec<String> {
     match input {
-        Some((x, y)) => vec![x, y],
+        Some((x, y)) => vec![x.to_string(), y.to_string()],
         None => vec![],
     }
 }
