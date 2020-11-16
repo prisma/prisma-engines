@@ -1,5 +1,5 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_u32_arguments};
+use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
 use dml::model::{IndexType, Model};
@@ -223,30 +223,17 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         let cloned_args = args.clone();
-        let number_of_args = args.len();
         let native_type = match &name {
             &TINY_INT_TYPE_NAME => MsSqlType::TinyInt,
             &SMALL_INT_TYPE_NAME => MsSqlType::SmallInt,
             &INT_TYPE_NAME => MsSqlType::Int,
             &BIG_INT_TYPE_NAME => MsSqlType::BigInt,
-            &DECIMAL_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [precision, scale] => MsSqlType::Decimal(Some((*precision, *scale))),
-                [] => MsSqlType::Decimal(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
-            },
-            &NUMERIC_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [precision, scale] => MsSqlType::Numeric(Some((*precision, *scale))),
-                [] => MsSqlType::Numeric(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
-            },
+            &DECIMAL_TYPE_NAME => MsSqlType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            &NUMERIC_TYPE_NAME => MsSqlType::Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
             &MONEY_TYPE_NAME => MsSqlType::Money,
             &SMALL_MONEY_TYPE_NAME => MsSqlType::SmallMoney,
             &BIT_TYPE_NAME => MsSqlType::Bit,
-            &FLOAT_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Float(Some(*x)),
-                [] => MsSqlType::Float(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
-            },
+            &FLOAT_TYPE_NAME => MsSqlType::Float(parse_one_opt_u32(args, FLOAT_TYPE_NAME)?),
             &REAL_TYPE_NAME => MsSqlType::Real,
             &DATE_TYPE_NAME => MsSqlType::Date,
             &TIME_TYPE_NAME => MsSqlType::Time,
@@ -254,25 +241,13 @@ impl Connector for MsSqlDatamodelConnector {
             &DATETIME2_TYPE_NAME => MsSqlType::DateTime2,
             &DATETIME_OFFSET_TYPE_NAME => MsSqlType::DateTimeOffset,
             &SMALL_DATETIME_TYPE_NAME => MsSqlType::SmallDateTime,
-            &CHAR_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Char(Some(*x as u32)),
-                [] => MsSqlType::Char(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
-            },
-            &NCHAR_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::NChar(Some(*x as u32)),
-                [] => MsSqlType::NChar(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
-            },
+            &CHAR_TYPE_NAME => MsSqlType::Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
+            &NCHAR_TYPE_NAME => MsSqlType::NChar(parse_one_opt_u32(args, NCHAR_TYPE_NAME)?),
             &VARCHAR_TYPE_NAME => MsSqlType::VarChar(parse_mssql_type_parameter(args)),
             &TEXT_TYPE_NAME => MsSqlType::Text,
             &NVARCHAR_TYPE_NAME => MsSqlType::NVarChar(parse_mssql_type_parameter(args)),
             &NTEXT_TYPE_NAME => MsSqlType::NText,
-            &BINARY_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Binary(Some(*x as u32)),
-                [] => MsSqlType::Binary(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
-            },
+            &BINARY_TYPE_NAME => MsSqlType::Binary(parse_one_opt_u32(args, BINARY_TYPE_NAME)?),
             &VAR_BINARY_TYPE_NAME => MsSqlType::VarBinary(parse_mssql_type_parameter(args)),
             &IMAGE_TYPE_NAME => MsSqlType::Image,
             &XML_TYPE_NAME => MsSqlType::Xml,
