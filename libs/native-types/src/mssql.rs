@@ -32,10 +32,10 @@ pub enum MsSqlType {
     BigInt,
     /// Numeric data types that have fixed precision and scale. Decimal and
     /// numeric are synonyms and can be used interchangeably.
-    Decimal(Option<(u8, u8)>),
+    Decimal(Option<(u32, u32)>),
     /// Numeric data types that have fixed precision and scale. Decimal and
     /// numeric are synonyms and can be used interchangeably.
-    Numeric(Option<(u8, u8)>),
+    Numeric(Option<(u32, u32)>),
     /// 8-byte numeric money value, accurate to a ten-thousandth of the monetary
     /// units.
     Money,
@@ -46,7 +46,7 @@ pub enum MsSqlType {
     Bit,
     /// A floating point value. Has two sizes: numbers 1 to 24 represent `f32`,
     /// 25 to 53 represent `f64`.
-    Float(Option<u8>),
+    Float(Option<u32>),
     /// A synonym for `float(24)`/`f32`.
     Real,
     /// Defines a date.

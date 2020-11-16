@@ -629,7 +629,7 @@ fn get_column_type_and_enum(
     let tpe = ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
-        character_maximum_length: precision.character_maximum_length,
+        character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
         family: family.clone(),
         arity,
         native_type: native_type.map(|x| x.to_json()),

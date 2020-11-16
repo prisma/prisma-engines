@@ -230,12 +230,12 @@ impl Connector for MsSqlDatamodelConnector {
             &INT_TYPE_NAME => MsSqlType::Int,
             &BIG_INT_TYPE_NAME => MsSqlType::BigInt,
             &DECIMAL_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [precision, scale] => MsSqlType::Decimal(Some((*precision as u8, *scale as u8))),
+                [precision, scale] => MsSqlType::Decimal(Some((*precision, *scale))),
                 [] => MsSqlType::Decimal(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
             &NUMERIC_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [precision, scale] => MsSqlType::Numeric(Some((*precision as u8, *scale as u8))),
+                [precision, scale] => MsSqlType::Numeric(Some((*precision, *scale))),
                 [] => MsSqlType::Numeric(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
@@ -243,7 +243,7 @@ impl Connector for MsSqlDatamodelConnector {
             &SMALL_MONEY_TYPE_NAME => MsSqlType::SmallMoney,
             &BIT_TYPE_NAME => MsSqlType::Bit,
             &FLOAT_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Float(Some((*x as u8))),
+                [x] => MsSqlType::Float(Some((*x))),
                 [] => MsSqlType::Float(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
