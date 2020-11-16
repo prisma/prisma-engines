@@ -41,7 +41,6 @@ impl MigrationCommand for SchemaPushCommand {
                 tracing::warn!(unexecutable = ?checks.unexecutable_migrations, "Aborting migration because at least one unexecutable step was detected.")
             }
             (0, 0, _) | (0, _, true) => {
-                println!("{:?}", applier.render_steps_pretty(&database_migration));
                 while applier.apply_step(&database_migration, step as usize).await? {
                     step += 1
                 }
