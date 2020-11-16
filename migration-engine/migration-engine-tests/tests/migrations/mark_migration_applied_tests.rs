@@ -561,7 +561,8 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
     };
 
     // Mark the baseline migration as applied
-    api.mark_migration_applied(&baseline_migration_name, &migrations_directory)
+    let _ = api
+        .mark_migration_applied(&baseline_migration_name, &migrations_directory)
         .expect_failed(false)
         .send()
         .await;
