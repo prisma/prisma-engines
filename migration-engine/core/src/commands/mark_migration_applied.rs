@@ -52,7 +52,7 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
                 .collect(),
             Err(_) => {
                 if !input.expect_failed {
-                    persistence.initialize().await?;
+                    persistence.initialize(true).await?;
                 }
 
                 vec![]

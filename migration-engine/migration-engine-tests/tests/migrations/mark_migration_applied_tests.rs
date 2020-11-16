@@ -533,3 +533,6 @@ async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_f
 
     Ok(())
 }
+
+//baselining case
+//mark migration applied on a non-empty database that matches the local migration.
