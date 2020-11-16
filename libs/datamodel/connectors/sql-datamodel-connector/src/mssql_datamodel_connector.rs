@@ -2,7 +2,7 @@ use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use datamodel_connector::helper::parse_u32_arguments;
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
-use dml::model::Model;
+use dml::model::{IndexType, Model};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
@@ -174,7 +174,46 @@ impl Connector for MsSqlDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
+    fn validate_model(&self, model: &Model) -> Result<(), ConnectorError> {
+        for index_definition in model.indices.iter() {
+            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+
+            for field in fields {
+                if let FieldType::NativeType(_, native_type) = field.field_type() {
+                    let r#type: MssqlType = native_type.deserialize_native_type();
+
+                    if heap_allocated_types().contains(&r#type) {
+                        if index_definition.tpe == IndexType::Unique {
+                            return Err(ConnectorError::new_incompatible_native_type_with_unique(
+                                &native_type.render(),
+                                "SQL Server",
+                            ));
+                        } else {
+                            return Err(ConnectorError::new_incompatible_native_type_with_index(
+                                &native_type.render(),
+                                "SQL Server",
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        for id_field in model.id_fields.iter() {
+            let field = model.find_field(id_field).unwrap();
+
+            if let FieldType::NativeType(_, native_type) = field.field_type() {
+                let r#type: MssqlType = native_type.deserialize_native_type();
+
+                if heap_allocated_types().contains(&r#type) {
+                    return Err(ConnectorError::new_incompatible_native_type_with_id(
+                        &native_type.render(),
+                        "SQL Server",
+                    ));
+                }
+            }
+        }
+
         Ok(())
     }
 
