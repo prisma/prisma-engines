@@ -7,7 +7,7 @@ use crate::{
 };
 use datamodel::{ast, diagnostics::DatamodelError};
 use indoc::indoc;
-use native_types::{MsSqlTypeParameter::*, MssqlType as MsSqlType};
+use native_types::{MsSqlType, MsSqlTypeParameter::*};
 
 const BLOB_TYPES: &[&'static str] = &["VarBinary(Max)", "Image"];
 const TEXT_TYPES: &[&'static str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)"];

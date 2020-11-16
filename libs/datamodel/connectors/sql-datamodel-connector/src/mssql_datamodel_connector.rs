@@ -6,10 +6,10 @@ use dml::model::{IndexType, Model};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
-use native_types::{MsSqlTypeParameter, MssqlType};
+use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
+use MsSqlType::*;
 use MsSqlTypeParameter::*;
-use MssqlType::*;
 
 const TINY_INT_TYPE_NAME: &str = "TinyInt";
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
@@ -99,7 +99,7 @@ impl Connector for MsSqlDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
-                let r#type: MssqlType = native_type.deserialize_native_type();
+                let r#type: MsSqlType = native_type.deserialize_native_type();
 
                 match r#type {
                     Decimal(Some(params)) | Numeric(Some(params)) => match params {
@@ -180,7 +180,7 @@ impl Connector for MsSqlDatamodelConnector {
 
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
-                    let r#type: MssqlType = native_type.deserialize_native_type();
+                    let r#type: MsSqlType = native_type.deserialize_native_type();
 
                     if heap_allocated_types().contains(&r#type) {
                         if index_definition.tpe == IndexType::Unique {
@@ -203,7 +203,7 @@ impl Connector for MsSqlDatamodelConnector {
             let field = model.find_field(id_field).unwrap();
 
             if let FieldType::NativeType(_, native_type) = field.field_type() {
-                let r#type: MssqlType = native_type.deserialize_native_type();
+                let r#type: MsSqlType = native_type.deserialize_native_type();
 
                 if heap_allocated_types().contains(&r#type) {
                     return Err(ConnectorError::new_incompatible_native_type_with_id(
@@ -225,58 +225,58 @@ impl Connector for MsSqlDatamodelConnector {
         let cloned_args = args.clone();
         let number_of_args = args.len();
         let native_type = match &name {
-            &TINY_INT_TYPE_NAME => MssqlType::TinyInt,
-            &SMALL_INT_TYPE_NAME => MssqlType::SmallInt,
-            &INT_TYPE_NAME => MssqlType::Int,
-            &BIG_INT_TYPE_NAME => MssqlType::BigInt,
+            &TINY_INT_TYPE_NAME => MsSqlType::TinyInt,
+            &SMALL_INT_TYPE_NAME => MsSqlType::SmallInt,
+            &INT_TYPE_NAME => MsSqlType::Int,
+            &BIG_INT_TYPE_NAME => MsSqlType::BigInt,
             &DECIMAL_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [precision, scale] => MssqlType::Decimal(Some((*precision as u8, *scale as u8))),
-                [] => MssqlType::Decimal(None),
+                [precision, scale] => MsSqlType::Decimal(Some((*precision as u8, *scale as u8))),
+                [] => MsSqlType::Decimal(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
             &NUMERIC_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [precision, scale] => MssqlType::Numeric(Some((*precision as u8, *scale as u8))),
-                [] => MssqlType::Numeric(None),
+                [precision, scale] => MsSqlType::Numeric(Some((*precision as u8, *scale as u8))),
+                [] => MsSqlType::Numeric(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
-            &MONEY_TYPE_NAME => MssqlType::Money,
-            &SMALL_MONEY_TYPE_NAME => MssqlType::SmallMoney,
-            &BIT_TYPE_NAME => MssqlType::Bit,
+            &MONEY_TYPE_NAME => MsSqlType::Money,
+            &SMALL_MONEY_TYPE_NAME => MsSqlType::SmallMoney,
+            &BIT_TYPE_NAME => MsSqlType::Bit,
             &FLOAT_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MssqlType::Float(Some((*x as u8))),
-                [] => MssqlType::Float(None),
+                [x] => MsSqlType::Float(Some((*x as u8))),
+                [] => MsSqlType::Float(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
-            &REAL_TYPE_NAME => MssqlType::Real,
-            &DATE_TYPE_NAME => MssqlType::Date,
-            &TIME_TYPE_NAME => MssqlType::Time,
-            &DATETIME_TYPE_NAME => MssqlType::DateTime,
-            &DATETIME2_TYPE_NAME => MssqlType::DateTime2,
-            &DATETIME_OFFSET_TYPE_NAME => MssqlType::DateTimeOffset,
-            &SMALL_DATETIME_TYPE_NAME => MssqlType::SmallDateTime,
+            &REAL_TYPE_NAME => MsSqlType::Real,
+            &DATE_TYPE_NAME => MsSqlType::Date,
+            &TIME_TYPE_NAME => MsSqlType::Time,
+            &DATETIME_TYPE_NAME => MsSqlType::DateTime,
+            &DATETIME2_TYPE_NAME => MsSqlType::DateTime2,
+            &DATETIME_OFFSET_TYPE_NAME => MsSqlType::DateTimeOffset,
+            &SMALL_DATETIME_TYPE_NAME => MsSqlType::SmallDateTime,
             &CHAR_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MssqlType::Char(Some((*x as u16))),
-                [] => MssqlType::Char(None),
+                [x] => MsSqlType::Char(Some((*x as u16))),
+                [] => MsSqlType::Char(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
             &NCHAR_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MssqlType::NChar(Some((*x as u16))),
-                [] => MssqlType::NChar(None),
+                [x] => MsSqlType::NChar(Some((*x as u16))),
+                [] => MsSqlType::NChar(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
-            &VARCHAR_TYPE_NAME => MssqlType::VarChar(parse_mssql_type_parameter(args)),
-            &TEXT_TYPE_NAME => MssqlType::Text,
-            &NVARCHAR_TYPE_NAME => MssqlType::NVarChar(parse_mssql_type_parameter(args)),
-            &NTEXT_TYPE_NAME => MssqlType::NText,
+            &VARCHAR_TYPE_NAME => MsSqlType::VarChar(parse_mssql_type_parameter(args)),
+            &TEXT_TYPE_NAME => MsSqlType::Text,
+            &NVARCHAR_TYPE_NAME => MsSqlType::NVarChar(parse_mssql_type_parameter(args)),
+            &NTEXT_TYPE_NAME => MsSqlType::NText,
             &BINARY_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MssqlType::Binary(Some((*x as u16))),
-                [] => MssqlType::Binary(None),
+                [x] => MsSqlType::Binary(Some((*x as u16))),
+                [] => MsSqlType::Binary(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
-            &VAR_BINARY_TYPE_NAME => MssqlType::VarBinary(parse_mssql_type_parameter(args)),
-            &IMAGE_TYPE_NAME => MssqlType::Image,
-            &XML_TYPE_NAME => MssqlType::Xml,
-            &UNIQUE_IDENTIFIER_TYPE_NAME => MssqlType::UniqueIdentifier,
+            &VAR_BINARY_TYPE_NAME => MsSqlType::VarBinary(parse_mssql_type_parameter(args)),
+            &IMAGE_TYPE_NAME => MsSqlType::Image,
+            &XML_TYPE_NAME => MsSqlType::Xml,
+            &UNIQUE_IDENTIFIER_TYPE_NAME => MsSqlType::UniqueIdentifier,
             _ => panic!(),
         };
 
@@ -292,21 +292,21 @@ impl Connector for MsSqlDatamodelConnector {
     }
 }
 
-static HEAP_ALLOCATED: Lazy<Vec<MssqlType>> = Lazy::new(|| {
+static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
     vec![
-        MssqlType::Text,
-        MssqlType::NText,
-        MssqlType::Image,
-        MssqlType::Xml,
-        MssqlType::VarBinary(Some(Max)),
-        MssqlType::VarChar(Some(Max)),
-        MssqlType::NVarChar(Some(Max)),
+        MsSqlType::Text,
+        MsSqlType::NText,
+        MsSqlType::Image,
+        MsSqlType::Xml,
+        MsSqlType::VarBinary(Some(Max)),
+        MsSqlType::VarChar(Some(Max)),
+        MsSqlType::NVarChar(Some(Max)),
     ]
 });
 
 /// A collection of types stored outside of the row to the heap, having
 /// certain properties such as not allowed in keys or normal indices.
-pub fn heap_allocated_types() -> &'static [MssqlType] {
+pub fn heap_allocated_types() -> &'static [MsSqlType] {
     &*HEAP_ALLOCATED
 }
 

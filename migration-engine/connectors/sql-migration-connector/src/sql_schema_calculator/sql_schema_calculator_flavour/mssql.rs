@@ -2,7 +2,7 @@ use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
 use datamodel::walkers::ModelWalker;
 use datamodel::{walkers::ScalarFieldWalker, FieldArity, NativeTypeInstance, ScalarType};
-use native_types::MssqlType;
+use native_types::MsSqlType;
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, ForeignKeyAction};
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {
@@ -12,8 +12,8 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> ColumnType {
-        use MssqlType::*;
-        let mssql_type: MssqlType = native_type_instance.deserialize_native_type();
+        use MsSqlType::*;
+        let mssql_type: MsSqlType = native_type_instance.deserialize_native_type();
 
         let data_type = match mssql_type {
             TinyInt => "tinyint".to_string(),

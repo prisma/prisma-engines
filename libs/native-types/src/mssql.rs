@@ -21,7 +21,7 @@ impl fmt::Display for MsSqlTypeParameter {
 
 /// Representing a type in SQL Server database.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
-pub enum MssqlType {
+pub enum MsSqlType {
     /// Maps to `i8` in Rust.
     TinyInt,
     /// Maps to `i16` in Rust.
@@ -95,7 +95,7 @@ pub enum MssqlType {
     UniqueIdentifier,
 }
 
-impl super::NativeType for MssqlType {
+impl super::NativeType for MsSqlType {
     fn to_json(&self) -> Value {
         serde_json::to_value(&self)
             .unwrap_or_else(|_| panic!("Serializing the native type to json failed: {:?}", &self))
