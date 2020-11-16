@@ -26,6 +26,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
+        migration_persistence.init().await?;
         let database_migration_inferrer = connector.database_migration_inferrer();
 
         let assume_to_be_applied = cmd.assume_to_be_applied();

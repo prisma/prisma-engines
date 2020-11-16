@@ -17,6 +17,7 @@ impl<'a> MigrationCommand for ListMigrationsCommand {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let migration_persistence = engine.connector().migration_persistence();
+        migration_persistence.init().await?;
 
         let migrations: Self::Output = migration_persistence
             .load_all()

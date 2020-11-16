@@ -23,14 +23,14 @@ fn empty_migration(name: String) -> Migration {
 
 #[test_each_connector]
 async fn last_should_return_none_if_there_is_no_migration(api: &TestApi) {
-    let persistence = api.migration_persistence();
+    let persistence = api.migration_persistence().await;
     let result = persistence.last().await.unwrap();
     assert_eq!(result.is_some(), false);
 }
 
 #[test_each_connector]
 async fn last_must_return_none_if_there_is_no_successful_migration(api: &TestApi) -> TestResult {
-    let persistence = api.migration_persistence();
+    let persistence = api.migration_persistence().await;
     persistence.create(empty_migration("my_migration".to_string())).await?;
     let loaded = persistence.last().await?;
     assert_eq!(loaded, None);
@@ -40,14 +40,14 @@ async fn last_must_return_none_if_there_is_no_successful_migration(api: &TestApi
 
 #[test_each_connector]
 async fn load_all_should_return_empty_if_there_is_no_migration(api: &TestApi) {
-    let persistence = api.migration_persistence();
+    let persistence = api.migration_persistence().await;
     let result = persistence.load_all().await.unwrap();
     assert_eq!(result.is_empty(), true);
 }
 
 #[test_each_connector]
 async fn load_all_must_return_all_created_migrations(api: &TestApi) {
-    let persistence = api.migration_persistence();
+    let persistence = api.migration_persistence().await;
     let migration1 = persistence
         .create(empty_migration("migration_1".to_string()))
         .await
@@ -80,7 +80,7 @@ async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
         }
     "#;
 
-    let persistence = api.migration_persistence();
+    let persistence = api.migration_persistence().await;
     let mut migration = empty_migration("my_migration".to_string());
     migration.status = MigrationStatus::MigrationSuccess;
     migration.datamodel_string = dm.to_owned();
@@ -107,7 +107,7 @@ async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
 
 #[test_each_connector]
 async fn create_should_increment_revisions(api: &TestApi) {
-    let persistence = api.migration_persistence();
+    let persistence = api.migration_persistence().await;
     let migration1 = persistence
         .create(empty_migration("migration_1".to_string()))
         .await
@@ -121,7 +121,7 @@ async fn create_should_increment_revisions(api: &TestApi) {
 
 #[test_each_connector]
 async fn update_must_work(api: &TestApi) {
-    let persistence = api.migration_persistence();
+    let persistence = api.migration_persistence().await;
     let migration = persistence
         .create(empty_migration("my_migration".to_string()))
         .await
@@ -152,7 +152,7 @@ async fn update_must_work(api: &TestApi) {
 
 #[test_each_connector]
 async fn migration_is_already_applied_must_work(api: &TestApi) -> TestResult {
-    let persistence = api.migration_persistence();
+    let persistence = api.migration_persistence().await;
 
     let mut migration_1 = empty_migration("migration_1".to_string());
     migration_1.status = MigrationStatus::MigrationSuccess;

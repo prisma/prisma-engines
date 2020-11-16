@@ -24,6 +24,7 @@ impl<'a> MigrationCommand for ApplyMigrationCommand<'a> {
 
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
+        migration_persistence.init().await?;
 
         match migration_persistence.last().await? {
             Some(ref last_migration) if last_migration.is_watch_migration() && !cmd.input.is_watch_migration() => {

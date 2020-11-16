@@ -94,8 +94,12 @@ impl TestApi {
         self.connector_name == "mysql_mariadb"
     }
 
-    pub fn migration_persistence(&self) -> &dyn MigrationPersistence {
-        self.api.connector().migration_persistence()
+    pub async fn migration_persistence(&self) -> &dyn MigrationPersistence {
+        let persistence = self.api.connector().migration_persistence();
+
+        persistence.init().await.unwrap();
+
+        persistence
     }
 
     pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
@@ -278,6 +282,13 @@ impl TestApi {
             .tables
             .into_iter()
             .filter(|t| t.name != MIGRATION_TABLE_NAME)
+            .collect();
+
+        // Also the sequences of the _Migration table
+        result.sequences = result
+            .sequences
+            .into_iter()
+            .filter(|seq| !seq.name.contains("_Migration"))
             .collect();
 
         Ok(result)
