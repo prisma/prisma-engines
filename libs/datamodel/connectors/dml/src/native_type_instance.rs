@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use native_types::NativeType;
 use serde::de::DeserializeOwned;
 

@@ -243,7 +243,7 @@ impl Connector for MsSqlDatamodelConnector {
             &SMALL_MONEY_TYPE_NAME => MsSqlType::SmallMoney,
             &BIT_TYPE_NAME => MsSqlType::Bit,
             &FLOAT_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Float(Some((*x))),
+                [x] => MsSqlType::Float(Some(*x)),
                 [] => MsSqlType::Float(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
@@ -255,12 +255,12 @@ impl Connector for MsSqlDatamodelConnector {
             &DATETIME_OFFSET_TYPE_NAME => MsSqlType::DateTimeOffset,
             &SMALL_DATETIME_TYPE_NAME => MsSqlType::SmallDateTime,
             &CHAR_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Char(Some((*x as u32))),
+                [x] => MsSqlType::Char(Some(*x as u32)),
                 [] => MsSqlType::Char(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
             &NCHAR_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::NChar(Some((*x as u32))),
+                [x] => MsSqlType::NChar(Some(*x as u32)),
                 [] => MsSqlType::NChar(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
@@ -269,7 +269,7 @@ impl Connector for MsSqlDatamodelConnector {
             &NVARCHAR_TYPE_NAME => MsSqlType::NVarChar(parse_mssql_type_parameter(args)),
             &NTEXT_TYPE_NAME => MsSqlType::NText,
             &BINARY_TYPE_NAME => match parse_u32_arguments(args)?.as_slice() {
-                [x] => MsSqlType::Binary(Some((*x as u32))),
+                [x] => MsSqlType::Binary(Some(*x as u32)),
                 [] => MsSqlType::Binary(None),
                 _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, number_of_args)),
             },
