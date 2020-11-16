@@ -227,3 +227,36 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> crate::TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn db_genererated_values_should_add_comments(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.inject_custom("number Integer Default 1");
+                    t.inject_custom("bigger_number Integer DEFAULT sqrt(4)");
+                    t.inject_custom("point Point DEFAULT Point(0, 0)");
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id            Int    @id @default(autoincrement())
+          number        Int?   @default(1)
+          /// This field's default value can currently not be parsed: `sqrt((4)::double precision)`.
+          bigger_number Int?   @default(dbgenerated())
+          // This type is currently not supported.
+          // This field's default value can currently not be parsed: `point((0)::double precision, (0)::double precision)`.
+          // point      point? @default(dbgenerated())
+        }
+    "##};
+
+    assert_eq!(dm, &api.introspect().await?);
+
+    Ok(())
+}

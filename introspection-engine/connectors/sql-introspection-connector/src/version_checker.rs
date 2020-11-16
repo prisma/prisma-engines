@@ -1,4 +1,4 @@
-use crate::misc_helpers::{
+use crate::introspection_helpers::{
     is_old_migration_table, is_prisma_1_or_11_list_table, is_prisma_1_point_0_join_table,
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };

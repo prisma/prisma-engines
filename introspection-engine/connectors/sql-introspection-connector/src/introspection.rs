@@ -1,4 +1,4 @@
-use crate::misc_helpers::{
+use crate::introspection_helpers::{
     calculate_backrelation_field, calculate_index, calculate_many_to_many_field, calculate_relation_field,
     calculate_scalar_field, is_new_migration_table, is_old_migration_table, is_prisma_1_point_0_join_table,
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
