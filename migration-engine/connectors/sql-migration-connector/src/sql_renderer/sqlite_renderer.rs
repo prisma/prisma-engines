@@ -291,43 +291,45 @@ fn copy_current_table_into_new_table(
     temporary_table_name: &str,
     flavour: &SqliteFlavour,
 ) {
-    if !redefine_table.column_pairs.is_empty() {
-        let destination_columns = redefine_table
-            .column_pairs
-            .iter()
-            .map(|(column_indexes, _, _)| tables.next().column_at(*column_indexes.next()).name());
-
-        let source_columns = redefine_table.column_pairs.iter().map(|(column_indexes, changes, _)| {
-            let columns = tables.columns(column_indexes);
-
-            let col_became_required_with_a_default =
-                changes.arity_changed() && columns.next().arity().is_required() && columns.next().default().is_some();
-
-            if col_became_required_with_a_default {
-                format!(
-                    "coalesce({column_name}, {default_value}) AS {column_name}",
-                    column_name = Quoted::sqlite_ident(columns.previous().name()),
-                    default_value = flavour.render_default(
-                        columns
-                            .next()
-                            .default()
-                            .expect("default on required column with default"),
-                        &columns.next().column_type_family()
-                    )
-                )
-            } else {
-                Quoted::sqlite_ident(columns.previous().name()).to_string()
-            }
-        });
-
-        let query = format!(
-            r#"INSERT INTO "{temporary_table_name}" ({destination_columns}) SELECT {source_columns} FROM "{previous_table_name}""#,
-            temporary_table_name = temporary_table_name,
-            destination_columns = destination_columns.map(Quoted::sqlite_ident).join(", "),
-            source_columns = source_columns.join(", "),
-            previous_table_name = tables.previous().name(),
-        );
-
-        steps.push(query)
+    if redefine_table.column_pairs.is_empty() {
+        return;
     }
+
+    let destination_columns = redefine_table
+        .column_pairs
+        .iter()
+        .map(|(column_indexes, _, _)| tables.next().column_at(*column_indexes.next()).name());
+
+    let source_columns = redefine_table.column_pairs.iter().map(|(column_indexes, changes, _)| {
+        let columns = tables.columns(column_indexes);
+
+        let col_became_required_with_a_default =
+            changes.arity_changed() && columns.next().arity().is_required() && columns.next().default().is_some();
+
+        if col_became_required_with_a_default {
+            format!(
+                "coalesce({column_name}, {default_value}) AS {column_name}",
+                column_name = Quoted::sqlite_ident(columns.previous().name()),
+                default_value = flavour.render_default(
+                    columns
+                        .next()
+                        .default()
+                        .expect("default on required column with default"),
+                    &columns.next().column_type_family()
+                )
+            )
+        } else {
+            Quoted::sqlite_ident(columns.previous().name()).to_string()
+        }
+    });
+
+    let query = format!(
+        r#"INSERT INTO "{temporary_table_name}" ({destination_columns}) SELECT {source_columns} FROM "{previous_table_name}""#,
+        temporary_table_name = temporary_table_name,
+        destination_columns = destination_columns.map(Quoted::sqlite_ident).join(", "),
+        source_columns = source_columns.join(", "),
+        previous_table_name = tables.previous().name(),
+    );
+
+    steps.push(query)
 }
