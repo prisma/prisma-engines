@@ -2,7 +2,6 @@ use serde::*;
 use serde_json::Value;
 
 use std::fmt;
-use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Copy)]
 pub enum MsSqlTypeParameter {
