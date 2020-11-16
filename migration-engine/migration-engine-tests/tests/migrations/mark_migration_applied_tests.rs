@@ -551,23 +551,20 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
             }
         "#;
 
-        let output_initial_migration = api
-            .create_migration("01init", dm1, &migrations_directory)
+        let output_baseline_migration = api
+            .create_migration("01baseline", dm1, &migrations_directory)
             .send()
             .await?
             .into_output();
 
-        output_initial_migration.generated_migration_name.unwrap()
+        output_baseline_migration.generated_migration_name.unwrap()
     };
 
-    // Mark the second migration as applied
-    let error = api
-        .mark_migration_applied(&baseline_migration_name, &migrations_directory)
+    // Mark the baseline migration as applied
+    api.mark_migration_applied(&baseline_migration_name, &migrations_directory)
         .expect_failed(false)
         .send()
         .await;
-
-    println!("{:?}", error);
 
     let applied_migrations = persistence.list_migrations().await?.unwrap();
 
