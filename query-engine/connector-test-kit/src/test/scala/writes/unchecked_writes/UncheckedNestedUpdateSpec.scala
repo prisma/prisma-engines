@@ -328,8 +328,8 @@ class UncheckedNestedUpdateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
       """
     }
