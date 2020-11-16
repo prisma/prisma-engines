@@ -8,8 +8,6 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
   // Validates fix for: "Incorrect handling of "undefined" in queries"
   // https://github.com/prisma/prisma/issues/4088
 
-  // override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
-
   def create(str: String, project: Project): String = {
     val res = server.query(
       s"""mutation {
@@ -45,15 +43,13 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
     create("ac", project)
 
     val res = server.query(
-      """{
-        |TestModel(where: {
-        |  OR: [
-        |    { str: "aa" }
-        |    { str: undefined }
-        |  ]
-        |}) {
-        |  str
-        |}}
+      """query {
+        |  findManyTestModel(
+        |    where: { OR: [{ str: { equals: "aa" }}, {str: { equals: undefined }}]}
+        |  ) {
+        |    str
+        |  }
+        |}
       """.stripMargin,
       project,
       legacy = false
