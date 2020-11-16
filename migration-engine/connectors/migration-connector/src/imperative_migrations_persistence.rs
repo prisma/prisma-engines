@@ -12,8 +12,9 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     ///
     /// If the migration persistence is not present in the target database,
     /// check whether the database schema is empty. If it is, initialize the
-    /// migration persistence. If not, return a DatabaseSchemaNotEmpty error.
-    async fn initialize(&self) -> ConnectorResult<()>;
+    /// migration persistence. If not, return a DatabaseSchemaNotEmpty error unless
+    /// we are in the baselining case.
+    async fn initialize(&self, baseline: bool) -> ConnectorResult<()>;
 
     /// Implementation in the connector for the core's MarkMigrationApplied
     /// command. See the docs there. Note that the started_at and finished_at

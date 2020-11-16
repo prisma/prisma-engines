@@ -6,7 +6,7 @@ use pretty_assertions::assert_eq;
 async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 
-    persistence.initialize().await?;
+    persistence.initialize(false).await?;
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
@@ -44,7 +44,7 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
 async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 
-    persistence.initialize().await?;
+    persistence.initialize(false).await?;
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
@@ -86,7 +86,7 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
 async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 
-    persistence.initialize().await?;
+    persistence.initialize(false).await?;
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
@@ -129,7 +129,7 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
 async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
     let persistence = api.imperative_migration_persistence();
 
-    persistence.initialize().await?;
+    persistence.initialize(false).await?;
 
     let script_1 = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 

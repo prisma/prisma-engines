@@ -533,3 +533,50 @@ async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_f
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn baselining_should_work(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+    let persistence = api.imperative_migration_persistence();
+
+    api.apply_script("Create Table test(id Integer Primary Key);")
+        .await
+        .unwrap();
+
+    // Create a first local migration that matches the db contents
+    let baseline_migration_name = {
+        let dm1 = r#"
+            model test {
+                id Int @id
+            }
+        "#;
+
+        let output_baseline_migration = api
+            .create_migration("01baseline", dm1, &migrations_directory)
+            .send()
+            .await?
+            .into_output();
+
+        output_baseline_migration.generated_migration_name.unwrap()
+    };
+
+    // Mark the baseline migration as applied
+    api.mark_migration_applied(&baseline_migration_name, &migrations_directory)
+        .expect_failed(false)
+        .send()
+        .await;
+
+    let applied_migrations = persistence.list_migrations().await?.unwrap();
+
+    assert_eq!(applied_migrations.len(), 1);
+    assert_eq!(&applied_migrations[0].migration_name, &baseline_migration_name);
+    assert!(&applied_migrations[0].finished_at.is_some());
+
+    api.assert_schema()
+        .await?
+        .assert_tables_count(2)?
+        .assert_has_table("_prisma_migrations")?
+        .assert_has_table("test")?;
+
+    Ok(())
+}
