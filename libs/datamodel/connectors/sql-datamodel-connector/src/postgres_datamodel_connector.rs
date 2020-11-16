@@ -199,6 +199,7 @@ impl Connector for PostgresDatamodelConnector {
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         let cloned_args = args.clone();
+
         let native_type = match name {
             SMALL_INT_TYPE_NAME => PostgresType::SmallInt,
             INTEGER_TYPE_NAME => PostgresType::Integer,
