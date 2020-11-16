@@ -162,13 +162,10 @@ pub(crate) fn calculate_scalar_field(
         (FieldType::Unsupported(_), None) => (true, Some("This type is currently not supported.".to_string())),
         (FieldType::Unsupported(_), Some(default)) => (
             true,
-            Some(
-                format!(
-                    "This type is currently not supported.\nThis field's default value can currently not be parsed: `{}`.",
-                    default
-                )
-                .to_string(),
-            ),
+            Some(format!(
+                "This type is currently not supported.\nThis field's default value can currently not be parsed: `{}`.",
+                default
+            )),
         ),
         (_, Some(default)) => (
             false,
