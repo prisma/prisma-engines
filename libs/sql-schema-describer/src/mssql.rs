@@ -1,8 +1,11 @@
 use super::*;
 use crate::getters::Getter;
+use native_types::NativeType;
+use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
+use std::borrow::Cow;
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     convert::TryInto,
@@ -196,7 +199,9 @@ impl SqlSchemaDescriber {
                 column_default,
                 is_nullable,
                 columnproperty(object_id(@P1 + '.' + table_name), column_name, 'IsIdentity') is_identity,
-                table_name
+                table_name,
+                numeric_precision,
+                numeric_scale
             FROM information_schema.columns c
             INNER JOIN sys.tables t
             ON c.TABLE_NAME = t.name AND SCHEMA_ID(c.TABLE_SCHEMA) = t.schema_id
@@ -213,9 +218,13 @@ impl SqlSchemaDescriber {
             debug!("Got column: {:?}", col);
 
             let table_name = col.get_expect_string("table_name");
+
             let name = col.get_expect_string("column_name");
             let data_type = col.get_expect_string("data_type");
-            let character_maximum_length = col.get_u32("character_maximum_length");
+            let character_maximum_length = col.get_i64("character_maximum_length");
+
+            let numeric_precision = col.get_u32("numeric_precision");
+            let numeric_scale = col.get_u32("numeric_scale");
             let is_nullable = col.get_expect_string("is_nullable").to_lowercase();
 
             let is_required = match is_nullable.as_ref() {
@@ -230,10 +239,15 @@ impl SqlSchemaDescriber {
                 ColumnArity::Nullable
             };
 
-            let tpe = self.get_column_type(&data_type, character_maximum_length, arity);
+            let tpe = self.get_column_type(
+                &data_type,
+                character_maximum_length,
+                numeric_precision,
+                numeric_scale,
+                arity,
+            );
 
             let auto_increment = col.get_expect_bool("is_identity");
-
             let entry = map.entry(table_name).or_insert_with(Vec::new);
 
             let default = match col.get("column_default") {
@@ -250,7 +264,7 @@ impl SqlSchemaDescriber {
                             .map(|cap| cap[1].to_string())
                             .expect(&format!("Couldn't parse default value: `{}`", default_string));
 
-                        Some(match &tpe.family {
+                        Some(match tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string) {
                                 Some(int_value) => DefaultValue::VALUE(int_value),
                                 None => DefaultValue::DBGENERATED(default_string),
@@ -533,29 +547,98 @@ impl SqlSchemaDescriber {
     fn get_column_type(
         &self,
         data_type: &str,
-        character_maximum_length: Option<u32>,
+        character_maximum_length: Option<i64>,
+        numeric_precision: Option<u32>,
+        numeric_scale: Option<u32>,
         arity: ColumnArity,
     ) -> ColumnType {
         use ColumnTypeFamily::*;
 
-        let family = match data_type {
-            "date" | "time" | "datetime" | "datetime2" | "smalldatetime" | "datetimeoffset" => DateTime,
-            "numeric" | "decimal" | "float" | "real" | "smallmoney" | "money" => Float,
-            "char" | "nchar" | "varchar" | "nvarchar" | "text" | "ntext" => String,
-            "tinyint" | "smallint" | "int" | "bigint" => Int,
-            "binary" | "varbinary" | "image" => Binary,
-            "uniqueidentifier" => Uuid,
-            "bit" => Boolean,
-            r#type => Unsupported(r#type.into()),
+        // TODO: can we achieve this more elegantly?
+        let params = match data_type {
+            "numeric" | "decimal" => match (numeric_precision, numeric_scale) {
+                (Some(p), Some(s)) => Cow::from(format!("({},{})", p, s)),
+                (None, None) => Cow::from(""),
+                _ => unreachable!("Unexpected params for a decimal field."),
+            },
+            "float" => match numeric_precision {
+                Some(p) => Cow::from(format!("({})", p)),
+                None => Cow::from(""),
+            },
+            "varchar" | "nvarchar" | "varbinary" => match character_maximum_length {
+                Some(-1) => Cow::from("(max)"),
+                Some(length) => Cow::from(format!("({})", length)),
+                None => Cow::from(""),
+            },
+            "char" | "nchar" | "binary" => match character_maximum_length {
+                Some(-1) => unreachable!("Cannot have a `max` variant for type `{}`", data_type),
+                Some(length) => Cow::from(format!("({})", length)),
+                None => Cow::from(""),
+            },
+            _ => Cow::from(""),
+        };
+
+        let full_data_type = format!("{}{}", data_type, params);
+
+        let casted_character_maximum_length = character_maximum_length.map(|x| x as u32);
+        let type_parameter = parse_type_parameter(character_maximum_length);
+        let unsupported_type = || (Unsupported(full_data_type.clone()), None);
+
+        let (family, native_type) = match data_type {
+            "tinyint" => (Int, Some(MsSqlType::TinyInt)),
+            "smallint" => (Int, Some(MsSqlType::SmallInt)),
+            "int" => (Int, Some(MsSqlType::Int)),
+            "bigint" => (BigInt, Some(MsSqlType::BigInt)),
+            "numeric" => match (numeric_precision, numeric_scale) {
+                (Some(p), Some(s)) => (Decimal, Some(MsSqlType::Numeric(Some((p, s))))),
+                (None, None) => (Decimal, Some(MsSqlType::Numeric(None))),
+                _ => unreachable!("Unexpected params for a numeric field."),
+            },
+            "decimal" => match (numeric_precision, numeric_scale) {
+                (Some(p), Some(s)) => (Decimal, Some(MsSqlType::Decimal(Some((p, s))))),
+                (None, None) => (Decimal, Some(MsSqlType::Decimal(None))),
+                _ => unreachable!("Unexpected params for a decimal field."),
+            },
+            "money" => (Float, Some(MsSqlType::Money)),
+            "smallmoney" => (Float, Some(MsSqlType::SmallMoney)),
+            "bit" => (Boolean, Some(MsSqlType::Bit)),
+            "float" => (Float, Some(MsSqlType::Float(numeric_precision))),
+            "real" => (Float, Some(MsSqlType::Real)),
+            "date" => (DateTime, Some(MsSqlType::Date)),
+            "time" => (DateTime, Some(MsSqlType::Time)),
+            "datetime" => (DateTime, Some(MsSqlType::DateTime)),
+            "datetime2" => (DateTime, Some(MsSqlType::DateTime2)),
+            "datetimeoffset" => (DateTime, Some(MsSqlType::DateTimeOffset)),
+            "smalldatetime" => (DateTime, Some(MsSqlType::SmallDateTime)),
+            "char" => (String, Some(MsSqlType::Char(casted_character_maximum_length))),
+            "nchar" => (String, Some(MsSqlType::NChar(casted_character_maximum_length))),
+            "varchar" => (String, Some(MsSqlType::VarChar(type_parameter))),
+            "text" => (String, Some(MsSqlType::Text)),
+            "nvarchar" => (String, Some(MsSqlType::NVarChar(type_parameter))),
+            "ntext" => (String, Some(MsSqlType::NText)),
+            "binary" => (Binary, Some(MsSqlType::Binary(casted_character_maximum_length))),
+            "varbinary" => (Binary, Some(MsSqlType::VarBinary(type_parameter))),
+            "image" => (Binary, Some(MsSqlType::Image)),
+            "xml" => (String, Some(MsSqlType::Xml)),
+            "uniqueidentifier" => (Uuid, Some(MsSqlType::UniqueIdentifier)),
+            _ => unsupported_type(),
         };
 
         ColumnType {
             data_type: data_type.into(),
-            full_data_type: data_type.into(),
+            full_data_type,
             character_maximum_length,
             family,
             arity,
-            native_type: Default::default(),
+            native_type: native_type.map(|x| x.to_json()),
         }
+    }
+}
+
+fn parse_type_parameter(character_maximum_length: Option<i64>) -> Option<MsSqlTypeParameter> {
+    match character_maximum_length {
+        Some(-1) => Some(MsSqlTypeParameter::Max),
+        Some(x) => Some(MsSqlTypeParameter::Number(x as u16)),
+        None => None,
     }
 }

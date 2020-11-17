@@ -1,5 +1,5 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use datamodel_connector::helper::{args_vec_from_opt, parse_u32_arguments};
+use datamodel_connector::helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
 use dml::model::{IndexType, Model};
@@ -272,9 +272,8 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
-        let parsed_args = parse_u32_arguments(args)?;
+        let cloned_args = args.clone();
 
-        let constructor = self.find_native_type_constructor(name);
         let native_type = match name {
             INT_TYPE_NAME => MySqlType::Int,
             UNSIGNED_INT_TYPE_NAME => MySqlType::UnsignedInt,
@@ -286,40 +285,15 @@ impl Connector for MySqlDatamodelConnector {
             UNSIGNED_MEDIUM_INT_TYPE_NAME => MySqlType::UnsignedMediumInt,
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
             UNSIGNED_BIG_INT_TYPE_NAME => MySqlType::UnsignedBigInt,
-            DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
-                [scale, precision] => MySqlType::Decimal(Some((*scale, *precision))),
-                [] => MySqlType::Decimal(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, parsed_args.len())),
-            },
-            NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
-                [scale, precision] => MySqlType::Numeric(Some((*scale, *precision))),
-                [] => MySqlType::Numeric(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(NUMERIC_TYPE_NAME, 2, parsed_args.len())),
-            },
+            DECIMAL_TYPE_NAME => MySqlType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            NUMERIC_TYPE_NAME => MySqlType::Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
             FLOAT_TYPE_NAME => MySqlType::Float,
             DOUBLE_TYPE_NAME => MySqlType::Double,
-            BIT_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => MySqlType::Bit(*arg),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(BIT_TYPE_NAME, 1, parsed_args.len())),
-            },
-            CHAR_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => MySqlType::Char(*arg),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, parsed_args.len())),
-            },
-            VAR_CHAR_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => MySqlType::VarChar(*arg),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(VAR_CHAR_TYPE_NAME, 1, parsed_args.len())),
-            },
-            BINARY_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => MySqlType::Binary(*arg),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(BINARY_TYPE_NAME, 1, parsed_args.len())),
-            },
-            VAR_BINARY_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => MySqlType::VarBinary(*arg),
-                _ => {
-                    return Err(self.wrap_in_argument_count_mismatch_error(VAR_BINARY_TYPE_NAME, 1, parsed_args.len()))
-                }
-            },
+            BIT_TYPE_NAME => MySqlType::Bit(parse_one_u32(args, BIT_TYPE_NAME)?),
+            CHAR_TYPE_NAME => MySqlType::Char(parse_one_u32(args, CHAR_TYPE_NAME)?),
+            VAR_CHAR_TYPE_NAME => MySqlType::VarChar(parse_one_u32(args, VAR_CHAR_TYPE_NAME)?),
+            BINARY_TYPE_NAME => MySqlType::Binary(parse_one_u32(args, BINARY_TYPE_NAME)?),
+            VAR_BINARY_TYPE_NAME => MySqlType::VarBinary(parse_one_u32(args, VAR_BINARY_TYPE_NAME)?),
             TINY_BLOB_TYPE_NAME => MySqlType::TinyBlob,
             BLOB_TYPE_NAME => MySqlType::Blob,
             MEDIUM_BLOB_TYPE_NAME => MySqlType::MediumBlob,
@@ -329,39 +303,9 @@ impl Connector for MySqlDatamodelConnector {
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
-            TIME_TYPE_NAME => match parsed_args.as_slice() {
-                [fractions] => MySqlType::Time(Some(*fractions)),
-                [] => MySqlType::Time(None),
-                _ => {
-                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
-                        TIME_TYPE_NAME,
-                        1,
-                        parsed_args.len(),
-                    ))
-                }
-            },
-            DATETIME_TYPE_NAME => match parsed_args.as_slice() {
-                [fractions] => MySqlType::DateTime(Some(*fractions)),
-                [] => MySqlType::DateTime(None),
-                _ => {
-                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
-                        DATETIME_TYPE_NAME,
-                        1,
-                        parsed_args.len(),
-                    ))
-                }
-            },
-            TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
-                [fractions] => MySqlType::Timestamp(Some(*fractions)),
-                [] => MySqlType::Timestamp(None),
-                _ => {
-                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
-                        TIMESTAMP_TYPE_NAME,
-                        1,
-                        parsed_args.len(),
-                    ))
-                }
-            },
+            TIME_TYPE_NAME => MySqlType::Time(parse_one_opt_u32(args, TIME_TYPE_NAME)?),
+            DATETIME_TYPE_NAME => MySqlType::DateTime(parse_one_opt_u32(args, DATETIME_TYPE_NAME)?),
+            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
             x => unreachable!(format!(
@@ -370,11 +314,7 @@ impl Connector for MySqlDatamodelConnector {
             )),
         };
 
-        Ok(NativeTypeInstance::new(
-            constructor.unwrap().name.as_str(),
-            parsed_args,
-            &native_type,
-        ))
+        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
     }
 
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
@@ -394,11 +334,11 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             MySqlType::Float => (FLOAT_TYPE_NAME, vec![]),
             MySqlType::Double => (DOUBLE_TYPE_NAME, vec![]),
-            MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x]),
-            MySqlType::Char(x) => (CHAR_TYPE_NAME, vec![x]),
-            MySqlType::VarChar(x) => (VAR_CHAR_TYPE_NAME, vec![x]),
-            MySqlType::Binary(x) => (BINARY_TYPE_NAME, vec![x]),
-            MySqlType::VarBinary(x) => (VAR_BINARY_TYPE_NAME, vec![x]),
+            MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x.to_string()]),
+            MySqlType::Char(x) => (CHAR_TYPE_NAME, vec![x.to_string()]),
+            MySqlType::VarChar(x) => (VAR_CHAR_TYPE_NAME, vec![x.to_string()]),
+            MySqlType::Binary(x) => (BINARY_TYPE_NAME, vec![x.to_string()]),
+            MySqlType::VarBinary(x) => (VAR_BINARY_TYPE_NAME, vec![x.to_string()]),
             MySqlType::TinyBlob => (TINY_BLOB_TYPE_NAME, vec![]),
             MySqlType::Blob => (BLOB_TYPE_NAME, vec![]),
             MySqlType::MediumBlob => (MEDIUM_BLOB_TYPE_NAME, vec![]),
@@ -415,9 +355,9 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
         };
 
-        fn arg_vec_from_opt(input: Option<u32>) -> Vec<u32> {
+        fn arg_vec_from_opt(input: Option<u32>) -> Vec<String> {
             match input {
-                Some(arg) => vec![arg],
+                Some(arg) => vec![arg.to_string()],
                 None => vec![],
             }
         }

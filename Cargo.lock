@@ -884,6 +884,7 @@ dependencies = [
  "itertools",
  "native-types",
  "once_cell",
+ "paste",
  "pest_derive_tmp",
  "pest_tmp",
  "pretty_assertions",
@@ -943,6 +944,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cuid",
+ "itertools",
  "native-types",
  "prisma-value",
  "serde",
@@ -2485,6 +2487,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "paste"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7151b083b0664ed58ed669fcdd92f01c3d2fdbf10af4931a301474950b52bfa9"
+
+[[package]]
 name = "percent-encoding"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3369,6 +3377,7 @@ dependencies = [
  "datamodel-connector",
  "dml",
  "native-types",
+ "once_cell",
  "serde_json",
 ]
 
@@ -3734,9 +3743,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.4.14"
+version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c8a2492671391fc34198ed782b6a9a6bb14aa7cc709044eed4eb6c2d9c517c2"
+checksum = "a68fe7afe3fd8cdbacd6987cad811072770810f8185252f2225195fadfc36741"
 dependencies = [
  "async-native-tls",
  "async-stream",
