@@ -87,7 +87,7 @@ fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     field(
         field_name,
         args,
-        OutputType::object(aggregate::aggregation_object_type(ctx, &model)),
+        OutputType::object(aggregation::plain::aggregation_object_type(ctx, &model)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::Aggregate,

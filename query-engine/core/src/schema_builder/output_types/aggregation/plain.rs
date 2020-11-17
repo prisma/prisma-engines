@@ -3,7 +3,7 @@ use prisma_models::ScalarFieldRef;
 use super::output_objects::map_scalar_output_type;
 use super::*;
 
-/// Builds aggregation object type for given model (e.g. AggregateUser).
+/// Builds plain aggregation object type for given model (e.g. AggregateUser).
 pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
     let ident = Identifier::new(format!("Aggregate{}", capitalize(&model.name)), PRISMA_NAMESPACE);
     return_cached_output!(ctx, &ident);
