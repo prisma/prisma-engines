@@ -100,6 +100,10 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
                 .iter()
                 .find(|fs_migration| db_migration.migration_name == fs_migration.migration_name());
 
+            if db_migration.finished_at.is_none() && db_migration.rolled_back_at.is_none() {
+                diagnostics.failed_migrations.push(db_migration);
+            }
+
             if corresponding_fs_migration.is_none() {
                 diagnostics.db_migrations_not_in_fs.push((index, db_migration))
             }

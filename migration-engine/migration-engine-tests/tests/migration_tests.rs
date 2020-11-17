@@ -2299,14 +2299,14 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
 }
 
 #[test_each_connector]
-async fn changing_referenced_columns_of_foreign_key_works(api: &TestApi) -> TestResult {
+async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
        model Post {
           id        Int     @default(autoincrement()) @id
           author    User?   @relation(fields: [authorId], references: [id])
           authorId  Int?
         }
-        
+
         model User {
           id       Int     @default(autoincrement()) @id
           posts    Post[]
@@ -2321,7 +2321,7 @@ async fn changing_referenced_columns_of_foreign_key_works(api: &TestApi) -> Test
           author    User?   @relation(fields: [authorId], references: [uid])
           authorId  Int?
         }
-        
+
         model User {
           uid   Int    @id
           posts Post[]

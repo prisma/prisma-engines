@@ -1,5 +1,7 @@
 use crate::*;
-use migration_core::commands::{DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic};
+use migration_core::commands::{
+    CreateMigrationOutput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic,
+};
 use pretty_assertions::assert_eq;
 use user_facing_errors::UserFacingError;
 
@@ -131,11 +133,11 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
         .send()
         .await?
         .modify_migration(|migration| {
-            dbg!(&migration);
             migration.push_str("\nSELECT YOLO;");
         })?;
 
-    api.apply_migrations(&directory).send().await.ok();
+    let err = api.apply_migrations(&directory).send().await.unwrap_err().to_string();
+    assert!(err.contains("yolo") || err.contains("YOLO"), err);
 
     migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()))?;
 
@@ -163,7 +165,7 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
     assert!(rollback.starts_with(expected_rollback_warnings), rollback);
 
     assert!(history.is_none());
-    assert!(failed_migration_names.is_empty());
+    assert_eq!(failed_migration_names.len(), 1);
     assert_eq!(edited_migration_names.len(), 1);
     assert!(has_migrations_table);
 
@@ -507,6 +509,59 @@ async fn diagnose_migrations_history_with_a_nonexistent_migrations_directory_wor
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(!has_migrations_table);
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn with_a_failed_migration(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm = r#"
+        model Test {
+            id Int @id
+        }
+    "#;
+
+    let CreateMigrationOutput {
+        generated_migration_name,
+    } = api
+        .create_migration("01-init", dm, &migrations_directory)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .modify_migration(|migration| {
+            migration.clear();
+            migration.push_str("CREATE_BROKEN");
+        })?
+        .into_output();
+
+    let err = api
+        .apply_migrations(&migrations_directory)
+        .send()
+        .await
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("syntax"), err);
+
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        failed_migration_names,
+        edited_migration_names,
+        has_migrations_table,
+    } = api
+        .diagnose_migration_history(&migrations_directory)
+        .send()
+        .await?
+        .into_output();
+
+    assert!(drift.is_none());
+    assert!(history.is_none());
+    assert!(edited_migration_names.is_empty());
+    assert!(has_migrations_table);
+
+    assert_eq!(failed_migration_names, &[generated_migration_name.unwrap()]);
 
     Ok(())
 }

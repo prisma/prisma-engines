@@ -499,10 +499,11 @@ pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
 }
 
 pub trait MigrationsAssertions: Sized {
-    fn assert_checksum(self, expected: &str) -> AssertionResult<Self>;
-    fn assert_migration_name(self, expected: &str) -> AssertionResult<Self>;
-    fn assert_logs(self, expected: &str) -> AssertionResult<Self>;
     fn assert_applied_steps_count(self, count: u32) -> AssertionResult<Self>;
+    fn assert_checksum(self, expected: &str) -> AssertionResult<Self>;
+    fn assert_failed(self) -> AssertionResult<Self>;
+    fn assert_logs(self, expected: &str) -> AssertionResult<Self>;
+    fn assert_migration_name(self, expected: &str) -> AssertionResult<Self>;
     fn assert_success(self) -> AssertionResult<Self>;
 }
 
@@ -533,6 +534,12 @@ impl MigrationsAssertions for MigrationRecord {
 
     fn assert_success(self) -> AssertionResult<Self> {
         assert!(self.finished_at.is_some());
+
+        Ok(self)
+    }
+
+    fn assert_failed(self) -> AssertionResult<Self> {
+        assert!(self.finished_at.is_none() && self.rolled_back_at.is_none());
 
         Ok(self)
     }
