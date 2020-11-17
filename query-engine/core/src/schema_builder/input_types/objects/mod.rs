@@ -1,6 +1,7 @@
 pub(super) mod connect_or_create_objects;
 pub(super) mod create_objects;
 pub(super) mod filter_objects;
+pub(super) mod group_by_objects;
 pub(super) mod update_many_objects;
 pub(super) mod update_one_objects;
 pub(super) mod upsert_objects;

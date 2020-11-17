@@ -129,3 +129,8 @@ pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> I
     )
     .optional()
 }
+
+pub(crate) fn group_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
+    let object_type = InputType::object(group_by_objects::group_by_input_object_type(ctx, model));
+    input_field("groupBy", vec![InputType::list(object_type.clone()), object_type], None)
+}

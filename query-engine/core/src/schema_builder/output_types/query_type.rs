@@ -82,15 +82,9 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
 fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::many_records_arguments(ctx, &model);
-    let field_name = ctx.pluralize_internal(
-        format!("aggregate{}", model.name), // Has no legacy counterpart.
-        format!("aggregate{}", model.name),
-    );
-
     field(
-        field_name,
-        args,
+        format!("aggregate{}", model.name),
+        arguments::many_records_arguments(ctx, &model),
         OutputType::object(aggregation::plain::aggregation_object_type(ctx, &model)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
@@ -101,14 +95,13 @@ fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Output
 
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
 fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::many_records_arguments(ctx, &model);
-    let field_name = ctx.pluralize_internal(
-        format!("groupBy{}", model.name), // Has no legacy counterpart.
-        format!("groupBy{}", model.name),
-    );
+    let mut args = arguments::many_records_arguments(ctx, &model);
+    let group_by_arg = arguments::group_by_argument(ctx, &model);
+
+    args.push(group_by_arg);
 
     field(
-        field_name,
+        format!("groupBy{}", model.name),
         args,
         OutputType::object(aggregation::group_by::group_by_output_object_type(ctx, &model)),
         Some(QueryInfo {
