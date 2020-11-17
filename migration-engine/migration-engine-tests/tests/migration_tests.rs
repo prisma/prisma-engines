@@ -614,7 +614,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
         }
         model B {
             id Int @id
-            a A // remove this once the implicit back relation field is implemented
+            a  A? // remove this once the implicit back relation field is implemented
         }
     "#;
 
@@ -667,7 +667,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
     let dm1 = r#"
         model A {
             id Int @id
-            b String
+            b  String
         }
         model B {
             id Int @id
@@ -687,7 +687,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
         }
         model B {
             id Int @id
-            a A
+            a  A?
         }
     "#;
     let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
@@ -1340,14 +1340,14 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
 async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) {
     let dm = r#"
         model Cat {
-            id Int @id
-            box Box
+            id Int   @id
+            box Box?
         }
 
         model Box {
-            id Int @id
+            id     Int @id
             cat_id Int
-            cat Cat @relation(fields: [cat_id], references: [id])
+            cat    Cat @relation(fields: [cat_id], references: [id])
         }
     "#;
 

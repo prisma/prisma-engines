@@ -203,18 +203,18 @@ class UncheckedNestedCreateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
          |
          |model ModelC {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
          |
          |model ModelD {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
       """
     }
@@ -256,14 +256,14 @@ class UncheckedNestedCreateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |  b_id Int
          |  d_id Int
          |
-         |  b ModelB @relation(fields: [b_id], references: [id])
-         |  c ModelC
-         |  d ModelD @relation(fields: [d_id], references: [id])
+         |  b ModelB  @relation(fields: [b_id], references: [id])
+         |  c ModelC?
+         |  d ModelD  @relation(fields: [d_id], references: [id])
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
          |
          |model ModelC {
@@ -333,8 +333,8 @@ class UncheckedNestedCreateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
          |
          |model ModelC {
@@ -387,8 +387,8 @@ class UncheckedNestedCreateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
       """
     }

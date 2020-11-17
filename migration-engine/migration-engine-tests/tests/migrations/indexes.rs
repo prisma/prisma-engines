@@ -90,14 +90,14 @@ async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api:
 
     let dm = r#"
         model Cat {
-            id Int @id
+            id    Int @id
             boxId Int @unique
-            box Box @relation(fields: [boxId], references: [id])
+            box   Box @relation(fields: [boxId], references: [id])
         }
 
         model Box {
-            id Int @id
-            cat Cat
+            id  Int  @id
+            cat Cat?
         }
     "#;
 

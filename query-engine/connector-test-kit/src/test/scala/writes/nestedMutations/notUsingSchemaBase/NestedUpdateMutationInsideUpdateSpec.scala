@@ -7,57 +7,6 @@ import util._
 class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
-  "A P1! to C1! relation relation" should "work" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      val res =
-        server
-          .query(
-            s"""mutation {
-               |  createParent(data: {
-               |    p: "p1", p_1: "p", p_2: "1",
-               |    childReq: {
-               |      create: {c: "c1", c_1: "c", c_2: "1"}
-               |    }
-               |  }){
-               |
-               |    ${t.parent.selection}
-               |    childReq{
-               |       ${t.child.selection}
-               |    }
-               |  }
-               |}""",
-            project
-          )
-
-      val parentIdentifier = t.parent.where(res, "data.createParent")
-
-      val finalRes = server.query(
-        s"""mutation {
-           |  updateParent(
-           |  where: $parentIdentifier
-           |  data:{
-           |    childReq: {
-           |        update: { non_unique: { set: "updated" }}
-           |      }
-           |  }){
-           |    childReq {
-           |      non_unique
-           |    }
-           |  }
-           |}""",
-        project
-      )
-
-      finalRes.toString() should be("{\"data\":{\"updateParent\":{\"childReq\":{\"non_unique\":\"updated\"}}}}")
-
-    }
-  }
-
   "A P1 to CM relation relation" should "work" in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {

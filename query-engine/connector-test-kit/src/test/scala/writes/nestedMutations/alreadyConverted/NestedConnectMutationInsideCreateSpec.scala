@@ -7,55 +7,6 @@ import util._
 class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
-  "a P1! to C1! relation with the child already in a relation" should "error when connecting by id since old required parent relation would be broken" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      val child1 = t.child.where(
-        server
-          .query(
-            s"""mutation {
-            |  createParent(data: {
-            |    p: "p1", p_1:"p", p_2: "1",
-            |    childReq: {
-            |      create: {c: "c1", c_1:"c", c_2: "1"}
-            |    }
-            |  }){
-            |    childReq{
-            |       ${t.child.selection}
-            |    }
-            |  }
-            |}""",
-            project
-          ),
-        "data.createParent.childReq"
-      )
-
-      server.queryThatMustFail(
-        s"""
-           |mutation {
-           |  createParent(data:{
-           |    p: "p2"
-           |    p_1: "asda",
-           |    p_2: "ASdad",
-           |    childReq: {connect: $child1}
-           |  }){
-           |    childReq {
-           |      c
-           |    }
-           |  }
-           |}
-        """.stripMargin,
-        project,
-        errorCode = 2014,
-        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models"""
-      )
-    }
-  }
-
   "a P1! to C1 relation with the child already in a relation" should "should fail on existing old parent" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {

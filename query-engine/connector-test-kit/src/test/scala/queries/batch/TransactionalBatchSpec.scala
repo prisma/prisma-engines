@@ -14,7 +14,7 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
       |
       |model ModelB {
       |  id Int @id
-      |  a  ModelA
+      |  a  ModelA?
       |}
       |
       |model ModelC {
