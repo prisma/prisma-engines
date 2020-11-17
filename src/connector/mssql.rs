@@ -175,6 +175,11 @@ impl MssqlUrl {
     pub fn port(&self) -> u16 {
         self.query_params.port()
     }
+
+    /// The JDBC connection string
+    pub fn connection_string(&self) -> &str {
+        &self.connection_string
+    }
 }
 
 impl MssqlQueryParams {
