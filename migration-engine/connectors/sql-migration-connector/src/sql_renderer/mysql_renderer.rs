@@ -7,7 +7,6 @@ use crate::{
     flavour::{MysqlFlavour, SqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
     pair::Pair,
     sql_migration::{
-        expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
         AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
         TableChange,
     },
@@ -93,7 +92,7 @@ impl SqlRenderer for MysqlFlavour {
                     type_change: _,
                 }) => {
                     let columns = tables.columns(column_index);
-                    let expanded = expand_mysql_alter_column(&columns, &changes);
+                    let expanded = MysqlAlterColumn::new(&columns, &changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
@@ -389,4 +388,45 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 
 fn mysql_drop_index(table_name: &str, index_name: &str) -> String {
     format!("DROP INDEX `{}` ON `{}`", index_name, table_name)
+}
+
+/// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html
+///
+/// We don't use SET DEFAULT because it can't be used to set the default to an expression on most
+/// MySQL versions. We use MODIFY for default changes instead.
+#[derive(Debug)]
+pub(crate) enum MysqlAlterColumn {
+    DropDefault,
+    Modify {
+        new_default: Option<DefaultValue>,
+        changes: ColumnChanges,
+    },
+}
+
+impl MysqlAlterColumn {
+    fn new(columns: &Pair<ColumnWalker<'_>>, changes: &ColumnChanges) -> Self {
+        if changes.only_default_changed() && columns.next().default().is_none() {
+            return MysqlAlterColumn::DropDefault;
+        }
+
+        if changes.column_was_renamed() {
+            unreachable!("MySQL column renaming.")
+        }
+
+        // @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
+        // transfer it from the introspected current state of the database.
+        let new_default = match (columns.previous().default(), columns.next().default()) {
+            (Some(DefaultValue::DBGENERATED(previous)), Some(DefaultValue::DBGENERATED(next)))
+                if next.is_empty() && !previous.is_empty() =>
+            {
+                Some(DefaultValue::DBGENERATED(previous.clone()))
+            }
+            _ => columns.next().default().cloned(),
+        };
+
+        MysqlAlterColumn::Modify {
+            changes: changes.clone(),
+            new_default,
+        }
+    }
 }

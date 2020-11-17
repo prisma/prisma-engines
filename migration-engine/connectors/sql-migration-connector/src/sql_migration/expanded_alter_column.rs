@@ -2,33 +2,7 @@ use crate::{
     pair::Pair,
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use sql_schema_describer::{walkers::ColumnWalker, ColumnArity, ColumnType, DefaultValue};
-
-pub(crate) fn expand_mysql_alter_column(columns: &Pair<ColumnWalker<'_>>, changes: &ColumnChanges) -> MysqlAlterColumn {
-    if changes.only_default_changed() && columns.next().default().is_none() {
-        return MysqlAlterColumn::DropDefault;
-    }
-
-    if changes.column_was_renamed() {
-        unreachable!("MySQL column renaming.")
-    }
-
-    // @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
-    // transfer it from the introspected current state of the database.
-    let new_default = match (columns.previous().default(), columns.next().default()) {
-        (Some(DefaultValue::DBGENERATED(previous)), Some(DefaultValue::DBGENERATED(next)))
-            if next.is_empty() && !previous.is_empty() =>
-        {
-            Some(DefaultValue::DBGENERATED(previous.clone()))
-        }
-        _ => columns.next().default().cloned(),
-    };
-
-    MysqlAlterColumn::Modify {
-        changes: changes.clone(),
-        new_default,
-    }
-}
+use sql_schema_describer::{walkers::ColumnWalker, ColumnArity, ColumnType};
 
 pub(crate) fn expand_postgres_alter_column(
     columns: &Pair<ColumnWalker<'_>>,
@@ -93,17 +67,4 @@ pub(crate) enum PostgresAlterColumn {
     SetNotNull,
     /// Add an auto-incrementing sequence as a default on the column.
     AddSequence,
-}
-
-/// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html
-///
-/// We don't use SET DEFAULT because it can't be used to set the default to an expression on most
-/// MySQL versions. We use MODIFY for default changes instead.
-#[derive(Debug)]
-pub(crate) enum MysqlAlterColumn {
-    DropDefault,
-    Modify {
-        new_default: Option<DefaultValue>,
-        changes: ColumnChanges,
-    },
 }
