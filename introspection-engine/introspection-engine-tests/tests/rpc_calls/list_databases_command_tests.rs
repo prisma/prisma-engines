@@ -37,7 +37,7 @@ async fn databases_for_sqlite_should_work(api: &TestApi) -> crate::TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 
     let result = api.list_databases().await?;
-    assert!(result.contains(&format!("{}.db", "databases_for_sqlite_should_work")));
+    assert!(result.iter().any(|db| db == "databases_for_sqlite_should_work"));
 
     Ok(())
 }
