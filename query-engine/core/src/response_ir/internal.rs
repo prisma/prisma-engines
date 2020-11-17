@@ -73,7 +73,6 @@ fn serialize_aggregation(
     };
 
     for result in results {
-        dbg!(&result);
         match result {
             AggregationResult::Count(count) => {
                 flattened.insert("count".to_owned(), Item::Value(count));
@@ -91,7 +90,6 @@ fn serialize_aggregation(
 
             AggregationResult::Min(field, value) => {
                 let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "min", &field.name);
-                dbg!(&output_field);
                 flattened.insert(
                     format!("min_{}", &field.name),
                     serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
@@ -100,7 +98,6 @@ fn serialize_aggregation(
 
             AggregationResult::Max(field, value) => {
                 let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "max", &field.name);
-                dbg!(&output_field);
                 flattened.insert(
                     format!("max_{}", &field.name),
                     serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
