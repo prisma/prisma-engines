@@ -281,15 +281,6 @@ fn handle_one_to_one(
     let parent_link = parent_relation_field.linking_fields();
     let child_link = child_relation_field.linking_fields();
 
-    // Build-time check
-    if !parent_is_create && (parent_side_required && child_side_required) {
-        // Both sides are required, which means that we know that there already has to be a parent connected a child (it must exist).
-        // Creating a new child for the parent would disconnect the other child, violating the required side of the existing child.
-        return Err(QueryGraphBuilderError::RelationViolation(
-            (parent_relation_field).into(),
-        ));
-    }
-
     let create_node = create_nodes
         .pop()
         .expect("[Query Graph] Expected only one nested create node on a 1:m relation with inline IDs on the parent.");

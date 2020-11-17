@@ -332,15 +332,6 @@ fn handle_one_to_one(
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let relation_inlined_child = !relation_inlined_parent;
 
-    // Build-time check
-    if parent_side_required && child_side_required {
-        // Both sides are required, which means that we know that there has to be already a parent connected to the child (as it exists).
-        // A connect to the child would disconnect the other parent connection, violating the required side of the existing parent.
-        return Err(QueryGraphBuilderError::RelationViolation(
-            (parent_relation_field).into(),
-        ));
-    }
-
     let read_query = utils::read_ids_infallible(child_model.clone(), child_linking_fields.clone(), filter);
     let read_new_child_node = graph.create_node(read_query);
 
