@@ -54,6 +54,7 @@ macro_rules! flags {
 
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases
 // `uncheckedScalarInputs`: Unchecked scalar inputs for relation fields support in the QE.
+// `groupBy`: Group-By aggregations in the QE.
 flags!(microsoftSqlServer, uncheckedScalarInputs);
 
 /// Initializes the feature flags with given flags.
