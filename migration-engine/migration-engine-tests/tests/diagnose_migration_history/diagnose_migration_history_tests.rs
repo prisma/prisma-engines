@@ -451,7 +451,7 @@ async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly
         .await?
         .assert_applied_migrations(&["initial", "second-migration"])?;
 
-    let _initial_migration_name = initial_assertions
+    let initial_migration_name = initial_assertions
         .modify_migration(|script| {
             script.push_str("SELECT YOLO;\n");
         })?
@@ -459,37 +459,31 @@ async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly
         .generated_migration_name
         .unwrap();
 
-    let known_error = api
-        .diagnose_migration_history(&directory)
-        .send()
-        .await
-        .unwrap_err()
-        .render_user_facing()
-        .unwrap_known();
+    let DiagnoseMigrationHistoryOutput {
+        failed_migration_names,
+        edited_migration_names,
+        history,
+        drift,
+        has_migrations_table,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
-    assert_eq!(
-        known_error.error_code,
-        user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly::ERROR_CODE
-    );
+    assert!(has_migrations_table);
+    assert_eq!(edited_migration_names, &[initial_migration_name.as_str()]);
+    assert!(failed_migration_names.is_empty());
+    assert_eq!(history, None);
 
-    // let DiagnoseMigrationHistoryOutput {
-    //     failed_migration_names,
-    //     edited_migration_names,
-    //     history,
-    //     drift,
-    // } = api.diagnose_migration_history(&directory).send().await?.into_output();
-
-    // assert_eq!(edited_migration_names, &[initial_migration_name.as_str()]);
-    // assert!(failed_migration_names.is_empty());
-    // assert_eq!(history, None);
-
-    // match &drift {
-    //     Some(DriftDiagnostic::MigrationFailedToApply { error, migration_name }) => {
-    //         assert_eq!(migration_name.as_str(), initial_migration_name.as_str());
-    //         assert!(error.contains("yolo") || error.contains("YOLO"))
-    //     }
-    //     _ => panic!("assertion failed"),
-    // }
+    match drift {
+        Some(DriftDiagnostic::MigrationFailedToApply { error }) => {
+            let known_error = error.unwrap_known();
+            assert_eq!(
+                known_error.error_code,
+                user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly::ERROR_CODE
+            );
+            assert_eq!(known_error.meta["migration_name"], initial_migration_name.as_str());
+            assert!(known_error.message.contains("yolo") || known_error.message.contains("YOLO"));
+        }
+        _ => panic!("assertion failed"),
+    }
 
     Ok(())
 }

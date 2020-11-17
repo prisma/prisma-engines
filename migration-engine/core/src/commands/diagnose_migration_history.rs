@@ -117,10 +117,16 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             .cloned()
             .collect();
 
-        diagnostics.drift = migration_inferrer.calculate_drift(&applied_migrations).await?;
+        let drift = match migration_inferrer.calculate_drift(&applied_migrations).await {
+            Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected { rollback }),
+            Err(error) => Some(DriftDiagnostic::MigrationFailedToApply {
+                error: error.to_user_facing(),
+            }),
+            _ => None,
+        };
 
         Ok(DiagnoseMigrationHistoryOutput {
-            drift: diagnostics.drift(),
+            drift,
             history: diagnostics.history(),
             failed_migration_names: diagnostics.failed_migration_names(),
             edited_migration_names: diagnostics.edited_migration_names(),
@@ -135,10 +141,6 @@ struct Diagnostics<'a> {
     db_migrations_not_in_fs: Vec<(usize, &'a MigrationRecord)>,
     edited_migrations: Vec<&'a MigrationRecord>,
     failed_migrations: Vec<&'a MigrationRecord>,
-    /// A rollback script, in case we detected drift.
-    drift: Option<String>,
-    /// Name and error.
-    migration_failed_to_apply: Option<(String, String)>,
     fs_migrations: &'a [MigrationDirectory],
 }
 
@@ -149,8 +151,6 @@ impl<'a> Diagnostics<'a> {
             db_migrations_not_in_fs: Vec::new(),
             edited_migrations: Vec::new(),
             failed_migrations: Vec::new(),
-            drift: None,
-            migration_failed_to_apply: None,
             fs_migrations,
         }
     }
@@ -205,23 +205,6 @@ impl<'a> Diagnostics<'a> {
             }),
         }
     }
-
-    fn drift(&self) -> Option<DriftDiagnostic> {
-        if let Some(rollback) = &self.drift {
-            return Some(DriftDiagnostic::DriftDetected {
-                rollback: rollback.clone(),
-            });
-        }
-
-        if let Some((migration_name, error)) = &self.migration_failed_to_apply {
-            return Some(DriftDiagnostic::MigrationFailedToApply {
-                migration_name: migration_name.clone(),
-                error: error.clone(),
-            });
-        }
-
-        None
-    }
 }
 
 /// A diagnostic returned by `diagnoseMigrationHistory` when looking at the
@@ -274,10 +257,8 @@ pub enum DriftDiagnostic {
     /// When a migration fails to apply cleanly to a temporary database.
     #[serde(rename_all = "camelCase")]
     MigrationFailedToApply {
-        /// The name of the migration that failed.
-        migration_name: String,
         /// The full error.
-        error: String,
+        error: user_facing_errors::Error,
     },
 }
 
