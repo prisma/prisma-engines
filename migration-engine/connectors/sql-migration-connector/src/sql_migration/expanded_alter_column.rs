@@ -107,9 +107,3 @@ pub(crate) enum MysqlAlterColumn {
         changes: ColumnChanges,
     },
 }
-
-// Not used yet: SQLite only supports column renamings, which we don't. All
-// other transformations will involve redefining the table.
-// https://www.sqlite.org/lang_altertable.html
-#[derive(Debug)]
-pub(crate) enum SqliteAlterColumn {}
