@@ -274,8 +274,6 @@ fn handle_one_to_one(
 ) -> QueryGraphBuilderResult<()> {
     let parent_is_create = utils::node_is_create(graph, &parent_node);
     let child_relation_field = parent_relation_field.related_field();
-    let parent_side_required = parent_relation_field.is_required;
-    let child_side_required = child_relation_field.is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
 
     let parent_link = parent_relation_field.linking_fields();
