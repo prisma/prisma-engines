@@ -5,7 +5,7 @@ use migration_engine_tests::sql::*;
 
 #[test_each_connector]
 async fn single_watch_migrations_must_work(api: &TestApi) {
-    let migration_persistence = api.migration_persistence();
+    let migration_persistence = api.migration_persistence().await;
 
     let steps = vec![
         create_model_step("Test"),
@@ -35,7 +35,7 @@ async fn single_watch_migrations_must_work(api: &TestApi) {
 
 #[test_each_connector]
 async fn multiple_watch_migrations_must_work(api: &TestApi) {
-    let migration_persistence = api.migration_persistence();
+    let migration_persistence = api.migration_persistence().await;
 
     let steps1 = vec![
         create_model_step("Test"),
@@ -80,7 +80,7 @@ async fn multiple_watch_migrations_must_work(api: &TestApi) {
 
 #[test_each_connector]
 async fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &TestApi) {
-    let migration_persistence = api.migration_persistence();
+    let migration_persistence = api.migration_persistence().await;
 
     let steps1 = vec![
         create_model_step("Test"),
@@ -111,7 +111,7 @@ async fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &T
 
 #[test_each_connector]
 async fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: &TestApi) {
-    let migration_persistence = api.migration_persistence();
+    let migration_persistence = api.migration_persistence().await;
 
     let steps1 = vec![
         create_model_step("Test"),

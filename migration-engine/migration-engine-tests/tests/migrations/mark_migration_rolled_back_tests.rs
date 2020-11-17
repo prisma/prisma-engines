@@ -15,7 +15,7 @@ async fn mark_migration_rolled_back_on_an_empty_database_errors(api: &TestApi) -
 
 #[test_each_connector]
 async fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: &TestApi) -> TestResult {
-    api.imperative_migration_persistence().initialize().await?;
+    api.imperative_migration_persistence().initialize(false).await?;
 
     let err = api.mark_migration_rolled_back("anything").send().await.unwrap_err();
 

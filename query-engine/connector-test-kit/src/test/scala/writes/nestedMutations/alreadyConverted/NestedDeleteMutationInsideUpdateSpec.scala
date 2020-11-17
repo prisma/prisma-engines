@@ -7,53 +7,6 @@ import util._
 class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "a P1! to C1! relation " should "error when deleting the child" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      val res = server
-        .query(
-          s"""mutation {
-          |  createParent(data: {
-          |    p: "p1", p_1: "p", p_2: "1",
-          |    childReq: {
-          |      create: {c: "c1", c_1: "c", c_2: "1"}
-          |    }
-          |  }){
-          |    ${t.parent.selection}
-          |  }
-          |}""",
-          project
-        )
-
-      val parentIdentifier = t.parent.where(res, "data.createParent")
-
-      server.queryThatMustFail(
-        s"""
-         |mutation {
-         |  updateParent(
-         |  where: $parentIdentifier
-         |  data:{
-         |    p: { set: "p2" }, p_1: { set: "p" }, p_2: { set: "2" },
-         |    childReq: {delete: true}
-         |  }){
-         |    childReq {
-         |      c
-         |    }
-         |  }
-         |}
-      """,
-        project,
-        errorCode = 2009,
-        errorContains =
-          "`Mutation.updateParent.data.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentReqInput.delete`: Field does not exist on enclosing type."
-      )
-    }
-  }
-
   "a P1! to C1 relation" should "always fail when trying to delete the child" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {

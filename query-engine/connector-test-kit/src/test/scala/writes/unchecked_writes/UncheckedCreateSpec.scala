@@ -143,13 +143,13 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
          |
          |model ModelC {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
       """
     }
@@ -186,13 +186,13 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}
          |
          |model ModelB {
-         |  id Int    @id
+         |  id Int     @id
          |  a  ModelA?
          |}
          |
          |model ModelC {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
       """
     }
@@ -254,12 +254,12 @@ class UncheckedCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
       """|model ModelA {
          |  id   Int @id
          |  b_id Int
-         |  b ModelB @relation(fields: [b_id], references: [id])
-         |  c ModelC
+         |  b ModelB  @relation(fields: [b_id], references: [id])
+         |  c ModelC?
          |}
          |
          |model ModelB {
-         |  id Int    @id
+         |  id Int     @id
          |  a  ModelA?
          |}
          |

@@ -10,7 +10,7 @@ use elapsed_middleware::ElapsedMiddleware;
 use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
 use tide::http::{mime, StatusCode};
-use tide::{Body, Request, Response};
+use tide::{prelude::*, Body, Request, Response};
 use tide_server_timing::TimingMiddleware;
 
 use std::sync::Arc;
@@ -73,16 +73,14 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     app.at("/server_info").get(server_info_handler);
     app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
 
-    // NOTE: This println is essential for the correct working of the client.
-    info!("Started http server");
-
     // Start the Tide server and log the server details.
-    // TODO: Tide should have a panicking listen_unix impl.
-    if let Some(path) = opts.unix_path() {
-        app.listen(&*format!("http+unix://{}", path)).await?;
-    } else {
-        app.listen((&*opts.host, opts.port)).await?;
-    }
+    // NOTE: The `info!` statement is essential for the correct working of the client.
+    let mut listener = match opts.unix_path() {
+        Some(path) => app.bind(format!("http+unix://{}", path)).await?,
+        None => app.bind(format!("{}:{}", opts.host.as_str(), opts.port)).await?,
+    };
+    info!("Started http server on {}", listener);
+    listener.accept().await?;
     Ok(())
 }
 

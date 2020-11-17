@@ -49,7 +49,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attr
     let dml = r#"
         datasource db {
             provider        = "postgres"
-            url             = env("DATABASE_URL")
+            url             = "postgresql://"
         }
 
         generator client {

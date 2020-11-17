@@ -18,7 +18,8 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         .flatten()
         .collect();
 
-    let strong_ref = Arc::new(object_type("Query", fields, None));
+    let ident = Identifier::new("Query".to_owned(), PRISMA_NAMESPACE);
+    let strong_ref = Arc::new(object_type(ident, fields, None));
 
     (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)
 }

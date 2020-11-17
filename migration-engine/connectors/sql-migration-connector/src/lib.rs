@@ -132,12 +132,6 @@ impl MigrationConnector for SqlMigrationConnector {
         Self::create_database(database_str).await
     }
 
-    async fn initialize(&self) -> ConnectorResult<()> {
-        self.migration_persistence().init().await?;
-
-        Ok(())
-    }
-
     async fn reset(&self) -> ConnectorResult<()> {
         self.flavour.reset(self.conn()).await
     }

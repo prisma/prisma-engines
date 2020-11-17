@@ -117,41 +117,48 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
-        if let FieldType::NativeType(_scalar_type, native_type) = field.field_type() {
-            let native_type_name = native_type.name.as_str();
-            if matches!(native_type_name, DECIMAL_TYPE_NAME | NUMERIC_TYPE_NAME) {
-                match native_type.args.as_slice() {
-                    [precision, scale] if scale > precision => {
-                        return Err(ConnectorError::new_scale_larger_than_precision_error(
-                            native_type_name,
-                            "Postgres",
-                        ));
-                    }
-                    [precision, _] if *precision > 1000 || *precision <= 0 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Precision must be positive with a maximum value of 1000.",
-                            native_type_name,
-                            "Postgres",
-                        ));
-                    }
-                    _ => {}
+        if let FieldType::NativeType(_scalar_type, native_type_instance) = field.field_type() {
+            let native_type_name = native_type_instance.name.as_str();
+            let native_type: PostgresType = native_type_instance.deserialize_native_type();
+
+            let precision_and_scale = match native_type {
+                PostgresType::Decimal(x) => x,
+                PostgresType::Numeric(x) => x,
+                _ => None,
+            };
+            match precision_and_scale {
+                Some((precision, scale)) if scale > precision => {
+                    return Err(ConnectorError::new_scale_larger_than_precision_error(
+                        native_type_name,
+                        "Postgres",
+                    ));
                 }
-            }
-            if matches!(native_type_name, BIT_TYPE_NAME | VAR_BIT_TYPE_NAME) {
-                match native_type.args.as_slice() {
-                    [length] if length == &0 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "M must be a positive integer.",
-                            native_type_name,
-                            "Postgres",
-                        ))
-                    }
-                    _ => {}
+                Some((precision, _)) if precision > 1000 || precision <= 0 => {
+                    return Err(ConnectorError::new_argument_m_out_of_range_error(
+                        "Precision must be positive with a maximum value of 1000.",
+                        native_type_name,
+                        "Postgres",
+                    ));
                 }
+                _ => {}
             }
+
+            let length = match native_type {
+                PostgresType::Bit(l) => l,
+                PostgresType::VarBit(l) => l,
+                _ => None,
+            };
+            if length == Some(0) {
+                return Err(ConnectorError::new_argument_m_out_of_range_error(
+                    "M must be a positive integer.",
+                    native_type_name,
+                    "Postgres",
+                ));
+            }
+
             if matches!(
-                native_type_name,
-                SMALL_SERIAL_TYPE_NAME | SERIAL_TYPE_NAME | BIG_SERIAL_TYPE_NAME
+                native_type,
+                PostgresType::SmallSerial | PostgresType::Serial | PostgresType::BigSerial
             ) {
                 if let Some(DefaultValue::Single(_)) = field.default_value() {
                     return Err(
@@ -162,16 +169,20 @@ impl Connector for PostgresDatamodelConnector {
                     );
                 }
             }
-            if matches!(native_type_name, TIMESTAMP_TYPE_NAME | TIME_TYPE_NAME) {
-                match native_type.args.as_slice() {
-                    [precision] if *precision > 6 => {
-                        return Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "M can range from 0 to 6.",
-                            native_type_name,
-                            "Postgres",
-                        ))
-                    }
-                    _ => {}
+
+            let time_precision = match native_type {
+                PostgresType::Timestamp(p) => p,
+                PostgresType::Time(p) => p,
+                _ => None,
+            };
+
+            if let Some(precision) = time_precision {
+                if precision > 6 {
+                    return Err(ConnectorError::new_argument_m_out_of_range_error(
+                        "M can range from 0 to 6.",
+                        native_type_name,
+                        "Postgres",
+                    ));
                 }
             }
         }

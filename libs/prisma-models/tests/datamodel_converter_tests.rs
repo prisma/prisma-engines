@@ -448,9 +448,9 @@ fn ambiguous_relations() {
     let datamodel = convert(
         r#"
             model Blog {
-                id    Int  @id
-                post1 Post @relation(name: "Relation1")
-                post2 Post @relation(name: "Relation2")
+                id    Int   @id
+                post1 Post? @relation(name: "Relation1")
+                post2 Post? @relation(name: "Relation2")
             }
 
             model Post {

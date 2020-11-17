@@ -93,23 +93,23 @@ impl BuilderContext {
     }
 
     /// Get an input (object) type.
-    pub fn get_input_type(&mut self, name: &str) -> Option<InputObjectTypeWeakRef> {
-        self.cache.input_types.get(name)
+    pub fn get_input_type(&mut self, ident: &Identifier) -> Option<InputObjectTypeWeakRef> {
+        self.cache.input_types.get(ident)
     }
 
     /// Get an output (object) type.
-    pub fn get_output_type(&mut self, name: &str) -> Option<ObjectTypeWeakRef> {
-        self.cache.output_types.get(name)
+    pub fn get_output_type(&mut self, ident: &Identifier) -> Option<ObjectTypeWeakRef> {
+        self.cache.output_types.get(ident)
     }
 
     /// Caches an input (object) type.
-    pub fn cache_input_type(&mut self, name: String, typ: InputObjectTypeStrongRef) {
-        self.cache.input_types.insert(name, typ);
+    pub fn cache_input_type(&mut self, ident: Identifier, typ: InputObjectTypeStrongRef) {
+        self.cache.input_types.insert(ident, typ);
     }
 
     /// Caches an output (object) type.
-    pub fn cache_output_type(&mut self, name: String, typ: ObjectTypeStrongRef) {
-        self.cache.output_types.insert(name, typ);
+    pub fn cache_output_type(&mut self, ident: Identifier, typ: ObjectTypeStrongRef) {
+        self.cache.output_types.insert(ident, typ);
     }
 }
 

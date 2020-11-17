@@ -1,12 +1,12 @@
 use super::*;
 use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    CoreError, EnumType, OutputFieldRef, QueryResult, RecordAggregation, RecordSelection,
+    CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregation, RecordSelection,
 };
 use bigdecimal::ToPrimitive;
 use connector::AggregationResult;
 use indexmap::IndexMap;
-use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
+use prisma_models::{PrismaValue, RecordProjection};
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
@@ -343,7 +343,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
     match (&value, field.field_type.as_ref()) {
         (PrismaValue::Null, _) if !field.is_required => Ok(Item::Value(PrismaValue::Null)),
         (_, OutputType::Enum(et)) => match et.borrow() {
-            EnumType::Internal(ref i) => convert_enum(value, i),
+            EnumType::Database(ref db) => convert_enum(value, db),
             _ => unreachable!(),
         },
         (PrismaValue::List(_), OutputType::List(arc_type)) => match arc_type.as_ref() {
@@ -359,7 +359,7 @@ fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result
                 let items = unwrap_prisma_value(value)
                     .into_iter()
                     .map(|v| match et.borrow() {
-                        EnumType::Internal(ref i) => convert_enum(v, i),
+                        EnumType::Database(ref dbt) => convert_enum(v, dbt),
                         _ => unreachable!(),
                     })
                     .collect::<Result<Vec<Item>, CoreError>>()?;
@@ -419,19 +419,19 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
     Ok(item_value)
 }
 
-fn convert_enum(value: PrismaValue, i: &InternalEnum) -> Result<Item, CoreError> {
+fn convert_enum(value: PrismaValue, dbt: &DatabaseEnumType) -> Result<Item, CoreError> {
     match value {
-        PrismaValue::String(s) | PrismaValue::Enum(s) => match i.map_output_value(&s) {
+        PrismaValue::String(s) | PrismaValue::Enum(s) => match dbt.map_output_value(&s) {
             Some(inum) => Ok(Item::Value(inum)),
             None => Err(CoreError::SerializationError(format!(
                 "Value '{}' not found in enum '{:?}'",
-                s, i
+                s, dbt
             ))),
         },
 
         val => Err(CoreError::SerializationError(format!(
             "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
-            val, i
+            val, dbt
         ))),
     }
 }

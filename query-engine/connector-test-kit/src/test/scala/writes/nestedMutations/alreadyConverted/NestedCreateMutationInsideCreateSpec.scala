@@ -9,42 +9,6 @@ import util._
 class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "a P1! to C1! relation should be possible" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      val res = server
-        .query(
-          """mutation {
-            |  createParent(data: {
-            |    p: "p1"
-            |    p_1: "p_1"
-            |    p_2: "p_2"
-            |    childReq: {
-            |      create: {
-            |        c: "c1"
-            |        c_1: "c_1"
-            |        c_2: "c_2"
-            |      }
-            |    }
-            |  }){
-            |    p
-            |    childReq{
-            |       c
-            |    }
-            |  }
-            |}""",
-          project
-        )
-
-      res.toString should be("""{"data":{"createParent":{"p":"p1","childReq":{"c":"c1"}}}}""")
-
-    }
-  }
-
   "a P1! to C1 relation should work" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {

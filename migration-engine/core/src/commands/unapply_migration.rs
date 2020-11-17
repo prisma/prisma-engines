@@ -21,8 +21,10 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
         let cmd = UnapplyMigrationCommand { input };
         tracing::debug!("{:?}", cmd.input);
         let connector = engine.connector();
+        let persistence = connector.migration_persistence();
+        persistence.init().await?;
 
-        let result = match connector.migration_persistence().last_two_migrations().await? {
+        let result = match persistence.last_two_migrations().await? {
             (None, _) => UnapplyMigrationOutput {
                 rolled_back: "not-applicable".to_string(),
                 active: None,

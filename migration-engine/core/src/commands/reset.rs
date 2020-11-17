@@ -15,7 +15,7 @@ impl<'a> MigrationCommand for ResetCommand {
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
     {
-        engine.reset().await?;
+        engine.connector().reset().await?;
 
         Ok(())
     }

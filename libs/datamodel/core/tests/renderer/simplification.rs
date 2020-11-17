@@ -34,8 +34,8 @@ fn test_exclude_default_relation_names_from_rendering() {
         }
 
         model User {
-            id Int @id
-            todo Todo @relation("TodoToUser")
+            id   Int   @id
+            todo Todo? @relation("TodoToUser")
         }
     "#;
 
@@ -46,8 +46,8 @@ fn test_exclude_default_relation_names_from_rendering() {
 }
 
 model User {
-  id   Int  @id
-  todo Todo
+  id   Int   @id
+  todo Todo?
 }
 "#;
 

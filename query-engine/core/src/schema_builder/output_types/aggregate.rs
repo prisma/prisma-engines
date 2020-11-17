@@ -5,10 +5,10 @@ use super::*;
 
 /// Builds aggregation object type for given model (e.g. AggregateUser).
 pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    let name = format!("Aggregate{}", capitalize(&model.name));
-    return_cached_output!(ctx, &name);
+    let ident = Identifier::new(format!("Aggregate{}", capitalize(&model.name)), PRISMA_NAMESPACE);
+    return_cached_output!(ctx, &ident);
 
-    let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
+    let object = ObjectTypeStrongRef::new(ObjectType::new(ident.clone(), Some(ModelRef::clone(model))));
     let mut fields = vec![count_field()];
 
     append_opt(
@@ -32,7 +32,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
     );
 
     object.set_fields(fields);
-    ctx.cache_output_type(name, ObjectTypeStrongRef::clone(&object));
+    ctx.cache_output_type(ident, ObjectTypeStrongRef::clone(&object));
 
     ObjectTypeStrongRef::downgrade(&object)
 }
@@ -81,16 +81,19 @@ pub(crate) fn map_numeric_field_aggregation_object<F>(
 where
     F: Fn(&ScalarFieldRef) -> OutputType,
 {
-    let name = format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix));
-    return_cached_output!(ctx, &name);
+    let ident = Identifier::new(
+        format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix)),
+        PRISMA_NAMESPACE,
+    );
+    return_cached_output!(ctx, &ident);
 
     let fields: Vec<OutputField> = fields
         .iter()
         .map(|sf| field(sf.name.clone(), vec![], type_mapper(sf), None).optional_if(!sf.is_required))
         .collect();
 
-    let object = Arc::new(object_type(name.clone(), fields, None));
-    ctx.cache_output_type(name, object.clone());
+    let object = Arc::new(object_type(ident.clone(), fields, None));
+    ctx.cache_output_type(ident, object.clone());
 
     Arc::downgrade(&object)
 }

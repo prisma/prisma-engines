@@ -13,7 +13,7 @@ use test_macros::test_each_connector;
 
 #[tokio::test]
 async fn sqlite_column_types_must_work() {
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new();
     migration.create_table("User", move |t| {
         t.inject_custom("int_col int not null");
         t.add_column("int4_col", types::integer());
@@ -126,18 +126,16 @@ async fn sqlite_column_types_must_work() {
 
 #[tokio::test]
 async fn sqlite_foreign_key_on_delete_must_be_handled() {
-    let sql = format!(
-        "CREATE TABLE \"{0}\".City (id INTEGER NOT NULL PRIMARY KEY);
-         CREATE TABLE \"{0}\".User (
+    let sql = "
+        CREATE TABLE City (id INTEGER NOT NULL PRIMARY KEY);
+        CREATE TABLE User (
             id INTEGER NOT NULL PRIMARY KEY,
             city INTEGER REFERENCES City(id) ON DELETE NO ACTION,
             city_cascade INTEGER REFERENCES City(id) ON DELETE CASCADE,
             city_restrict INTEGER REFERENCES City (id) ON DELETE RESTRICT,
             city_set_default INTEGER REFERENCES City(id) ON DELETE SET DEFAULT,
             city_set_null INTEGER REFERENCES City(id) ON DELETE SET NULL
-        )",
-        SCHEMA
-    );
+        )";
     let inspector = get_sqlite_describer(&sql, "sqlite_foreign_key_on_delete_must_be_handled").await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
@@ -283,7 +281,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
 
 #[tokio::test]
 async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes() {
-    let mut migration = Migration::new().schema(SCHEMA);
+    let mut migration = Migration::new();
     migration.create_table("User", move |t| {
         t.add_column("int4_col", types::integer());
         t.add_column("text_col", types::text());

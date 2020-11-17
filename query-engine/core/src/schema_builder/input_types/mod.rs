@@ -12,15 +12,15 @@ use prisma_models::{RelationFieldRef, ScalarFieldRef};
 /// Builds "<Model>OrderByInput" object types.
 pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let enum_type = Arc::new(string_enum_type("SortOrder", vec!["asc".to_owned(), "desc".to_owned()]));
-    let name = format!("{}OrderByInput", model.name);
+    let ident = Identifier::new(format!("{}OrderByInput", model.name), PRISMA_NAMESPACE);
 
-    return_cached_input!(ctx, &name);
+    return_cached_input!(ctx, &ident);
 
-    let mut input_object = init_input_object_type(name.clone());
+    let mut input_object = init_input_object_type(ident.clone());
     input_object.allow_at_most_one_field();
 
     let input_object = Arc::new(input_object);
-    ctx.cache_input_type(name, input_object.clone());
+    ctx.cache_input_type(ident, input_object.clone());
 
     let fields = model
         .fields()

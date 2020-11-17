@@ -71,7 +71,7 @@ model A {
 
 model B {
   id Int @id
-  a  A
+  a  A?
 }
 
 enum CategoryEnum {

@@ -19,12 +19,12 @@ impl DmmfObjectRenderer {
     fn render_input_object(&self, input_object: &InputObjectTypeWeakRef, ctx: &mut RenderContext) {
         let input_object = input_object.into_arc();
 
-        if ctx.already_rendered(&input_object.name) {
+        if ctx.already_rendered(&input_object.identifier) {
             return;
         }
 
         // This will prevent the type and its fields to be re-rendered.
-        ctx.mark_as_rendered(input_object.name.clone());
+        ctx.mark_as_rendered(input_object.identifier.clone());
 
         let fields = input_object.get_fields();
         let mut rendered_fields = Vec::with_capacity(fields.len());
@@ -34,7 +34,7 @@ impl DmmfObjectRenderer {
         }
 
         let input_type = DmmfInputType {
-            name: input_object.name.clone(),
+            name: input_object.identifier.name().to_owned(),
             constraints: DmmfInputTypeConstraints {
                 max_num_fields: input_object.constraints.max_num_fields,
                 min_num_fields: input_object.constraints.min_num_fields,
@@ -42,18 +42,18 @@ impl DmmfObjectRenderer {
             fields: rendered_fields,
         };
 
-        ctx.add_input_type(input_type);
+        ctx.add_input_type(input_object.identifier.clone(), input_type);
     }
 
     fn render_output_object(&self, output_object: &ObjectTypeWeakRef, ctx: &mut RenderContext) {
         let output_object = output_object.into_arc();
 
-        if ctx.already_rendered(&output_object.name()) {
+        if ctx.already_rendered(&output_object.identifier) {
             return;
         }
 
         // This will prevent the type and its fields to be re-rendered.
-        ctx.mark_as_rendered(output_object.name().to_owned());
+        ctx.mark_as_rendered(output_object.identifier.clone());
 
         let fields = output_object.get_fields();
         let mut rendered_fields: Vec<DmmfOutputField> = Vec::with_capacity(fields.len());
@@ -63,10 +63,10 @@ impl DmmfObjectRenderer {
         }
 
         let output_type = DmmfOutputType {
-            name: output_object.name().to_string(),
+            name: output_object.identifier.name().to_string(),
             fields: rendered_fields,
         };
 
-        ctx.add_output_type(output_type);
+        ctx.add_output_type(output_object.identifier.clone(), output_type);
     }
 }

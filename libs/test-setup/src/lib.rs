@@ -40,25 +40,30 @@ impl TestAPIArgs {
     }
 }
 
-pub fn server_root() -> &'static str {
-    static SERVER_ROOT: Lazy<String> =
-        Lazy::new(|| std::env::var("SERVER_ROOT").expect("SERVER_ROOT env var is not defined"));
-
-    SERVER_ROOT.as_ref()
-}
-
 pub fn sqlite_test_url(db_name: &str) -> String {
     format!("file:{}?db_name={}", sqlite_test_file(db_name), SCHEMA_NAME)
 }
 
 pub fn sqlite_test_file(db_name: &str) -> String {
-    let database_folder_path = format!("{}/db", server_root());
-    let file_path = format!("{}/{}.db", database_folder_path, db_name);
+    static SERVER_ROOT: Lazy<std::path::PathBuf> = Lazy::new(|| {
+        std::env::var("SERVER_ROOT")
+            .map(|root| std::path::Path::new(&root).join("db"))
+            .unwrap_or_else(|_| {
+                let dir = std::env::temp_dir().join("prisma_tests_server_root");
+                let path = dir.to_string_lossy().into_owned();
+
+                std::fs::create_dir_all(&path).expect("failed to create SERVER_ROOT directory");
+
+                path.into()
+            })
+    });
+
+    let file_path = SERVER_ROOT.join(db_name);
 
     // Truncate the file.
     std::fs::File::create(&file_path).expect("Failed to create or truncate SQLite database.");
 
-    file_path
+    file_path.to_string_lossy().into_owned()
 }
 
 pub fn postgres_9_url(db_name: &str) -> String {

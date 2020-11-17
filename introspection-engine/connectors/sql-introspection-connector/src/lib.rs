@@ -2,7 +2,7 @@ pub mod calculate_datamodel; // only exported to be able to unit test it
 mod commenting_out_guardrails;
 mod error;
 mod introspection;
-mod misc_helpers;
+mod introspection_helpers;
 mod prisma_1_defaults;
 mod re_introspection;
 mod sanitize_datamodel_names;

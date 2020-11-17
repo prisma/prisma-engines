@@ -154,14 +154,18 @@ where
         .map(|f| {
             let name = f.name.clone();
             let list_input_type = map_scalar_input_type(&f);
-            let set_object_name = format!("{}{}{}Input", model_name, input_object_name, f.name);
-            let input_object = match ctx.get_input_type(&set_object_name) {
+            let set_object_ident = Identifier::new(
+                format!("{}{}{}Input", model_name, input_object_name, f.name),
+                PRISMA_NAMESPACE,
+            );
+
+            let input_object = match ctx.get_input_type(&set_object_ident) {
                 Some(t) => t,
                 None => {
                     let set_fields = vec![input_field("set", list_input_type.clone(), None)];
-                    let input_object = Arc::new(input_object_type(set_object_name.clone(), set_fields));
+                    let input_object = Arc::new(input_object_type(set_object_ident.clone(), set_fields));
 
-                    ctx.cache_input_type(set_object_name, input_object.clone());
+                    ctx.cache_input_type(set_object_ident, input_object.clone());
                     Arc::downgrade(&input_object)
                 }
             };

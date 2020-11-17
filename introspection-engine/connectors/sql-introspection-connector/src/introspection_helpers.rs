@@ -149,12 +149,6 @@ pub(crate) fn calculate_scalar_field(
     } else {
         calculate_scalar_field_type(column, family)
     };
-
-    let (is_commented_out, documentation) = match field_type {
-        FieldType::Unsupported(_) => (true, Some("This type is currently not supported.".to_string())),
-        _ => (false, None),
-    };
-
     let arity = match column.tpe.arity {
         _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
@@ -162,8 +156,25 @@ pub(crate) fn calculate_scalar_field(
         ColumnArity::List => FieldArity::List,
     };
 
+    let (default_value, dbgenerated_string) = calculate_default(table, &column, &arity);
+
+    let (is_commented_out, documentation) = match (&field_type, dbgenerated_string) {
+        (FieldType::Unsupported(_), None) => (true, Some("This type is currently not supported.".to_string())),
+        (FieldType::Unsupported(_), Some(default)) => (
+            true,
+            Some(format!(
+                "This type is currently not supported.\nThis field's default value can currently not be parsed: `{}`.",
+                default
+            )),
+        ),
+        (_, Some(default)) => (
+            false,
+            Some(format!("This field's default value can currently not be parsed: `{}`.", default).to_string()),
+        ),
+        _ => (false, None),
+    };
+
     let is_id = is_id(&column, &table);
-    let default_value = calculate_default(table, &column, &arity);
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
     ScalarField {
@@ -255,20 +266,33 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
+pub(crate) fn calculate_default(
+    table: &Table,
+    column: &Column,
+    arity: &FieldArity,
+) -> (Option<DMLDef>, Option<String>) {
     match (&column.default, &column.tpe.family) {
-        (_, _) if *arity == FieldArity::List => None,
-        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::BigInt) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
-            Some(DMLDef::Expression(VG::new_autoincrement()))
+        (_, _) if *arity == FieldArity::List => (None, None),
+        (_, ColumnTypeFamily::Int) if column.auto_increment => {
+            (Some(DMLDef::Expression(VG::new_autoincrement())), None)
         }
-        (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
-        (Some(SQLDef::VALUE(val)), _) => Some(DMLDef::Single(val.clone())),
-        _ => None,
+        (_, ColumnTypeFamily::BigInt) if column.auto_increment => {
+            (Some(DMLDef::Expression(VG::new_autoincrement())), None)
+        }
+        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => {
+            (Some(DMLDef::Expression(VG::new_autoincrement())), None)
+        }
+        (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
+            (Some(DMLDef::Expression(VG::new_autoincrement())), None)
+        }
+        (Some(SQLDef::SEQUENCE(_)), _) => (Some(DMLDef::Expression(VG::new_autoincrement())), None),
+        (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => (Some(DMLDef::Expression(VG::new_now())), None),
+        (Some(SQLDef::DBGENERATED(default_string)), _) => (
+            Some(DMLDef::Expression(VG::new_dbgenerated())),
+            Some(default_string.clone()),
+        ),
+        (Some(SQLDef::VALUE(val)), _) => (Some(DMLDef::Single(val.clone())), None),
+        _ => (None, None),
     }
 }
 

@@ -291,6 +291,10 @@ fn copy_current_table_into_new_table(
     temporary_table_name: &str,
     flavour: &SqliteFlavour,
 ) {
+    if redefine_table.column_pairs.is_empty() {
+        return;
+    }
+
     let destination_columns = redefine_table
         .column_pairs
         .iter()

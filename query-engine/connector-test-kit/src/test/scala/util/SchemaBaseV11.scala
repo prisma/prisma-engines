@@ -127,28 +127,39 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
   sealed trait RelationField {
     def field: String
-    def isList: Boolean        = false
+    def isList: Boolean
+    def isRequired: Boolean
     def optionalSuffix: String = if (field.endsWith("?")) "?" else ""
   }
   final case object ParentList extends RelationField {
     override def field: String   = "parentsOpt   Parent[]"
     override def isList: Boolean = true
+    override def isRequired: Boolean = false
   }
   final case object ChildList extends RelationField {
     override def field: String   = "childrenOpt  Child[]"
     override def isList: Boolean = true
+    override def isRequired: Boolean = false
   }
   final case object ParentOpt extends RelationField {
     override def field: String = "parentOpt     Parent?"
+    override def isList: Boolean = false
+    override def isRequired: Boolean = false
   }
   final case object ParentReq extends RelationField {
     override def field: String = "parentReq     Parent"
+    override def isList: Boolean = false
+    override def isRequired: Boolean = true
   }
   final case object ChildOpt extends RelationField {
     override def field: String = "childOpt      Child?"
+    override def isList: Boolean = false
+    override def isRequired: Boolean = false
   }
   final case object ChildReq extends RelationField {
     override def field: String = "childReq      Child"
+    override def isList: Boolean = false
+    override def isRequired: Boolean = true
   }
 
   def schemaWithRelation(onParent: RelationField, onChild: RelationField, withoutParams: Boolean = false) = {
@@ -214,8 +225,11 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                     childId <- idOptions;
 
                                     // Based on Id and relation fields
-                                    childReference  <- childReferences(simple, parentId, onParent, onChild);
-                                    parentReference <- parentReferences(simple, childId, childReference, onParent, onChild);
+                                    childReferenceToParent  <- childReferences(simple, parentId, onParent, onChild);
+                                    parentReferenceToChild <- parentReferences(simple, childId, childReferenceToParent, onParent, onChild);
+
+                                    // skip required virtual relation fields as those are not allowed
+                                    if onParent.isRequired && parentReferenceToChild != noRef;
 
                                     // Only based on id
                                     parentParams <- if (withoutParams) {
@@ -245,7 +259,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                     p             String    @unique
                     p_1           String
                     p_2           String
-                    ${onParent.field}         $parentReference
+                    ${onParent.field}         $parentReferenceToChild
                     non_unique    String?
                     $parentId
 
@@ -256,7 +270,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                     c             String    @unique
                     c_1           String
                     c_2           String
-                    ${onChild.field}          $childReference
+                    ${onChild.field}          $childReferenceToParent
                     non_unique    String?
                     $childId
 

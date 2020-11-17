@@ -25,16 +25,19 @@ fn nested_upsert_list_input_object(
         return None;
     }
 
-    let type_name = format!(
-        "{}UpsertWithWhereUniqueWithout{}Input",
-        related_model.name,
-        capitalize(&parent_field.related_field().name)
+    let ident = Identifier::new(
+        format!(
+            "{}UpsertWithWhereUniqueWithout{}Input",
+            related_model.name,
+            capitalize(&parent_field.related_field().name)
+        ),
+        PRISMA_NAMESPACE,
     );
 
-    match ctx.get_input_type(&type_name) {
+    match ctx.get_input_type(&ident) {
         None => {
-            let input_object = Arc::new(init_input_object_type(type_name.clone()));
-            ctx.cache_input_type(type_name, input_object.clone());
+            let input_object = Arc::new(init_input_object_type(ident.clone()));
+            ctx.cache_input_type(ident, input_object.clone());
 
             let fields = vec![
                 input_field("where", InputType::object(where_object), None),
@@ -62,16 +65,19 @@ fn nested_upsert_nonlist_input_object(
         return None;
     }
 
-    let type_name = format!(
-        "{}UpsertWithout{}Input",
-        related_model.name,
-        capitalize(&parent_field.related_field().name)
+    let ident = Identifier::new(
+        format!(
+            "{}UpsertWithout{}Input",
+            related_model.name,
+            capitalize(&parent_field.related_field().name)
+        ),
+        PRISMA_NAMESPACE,
     );
 
-    match ctx.get_input_type(&type_name) {
+    match ctx.get_input_type(&ident) {
         None => {
-            let input_object = Arc::new(init_input_object_type(type_name.clone()));
-            ctx.cache_input_type(type_name, input_object.clone());
+            let input_object = Arc::new(init_input_object_type(ident.clone()));
+            ctx.cache_input_type(ident, input_object.clone());
 
             let fields = vec![
                 input_field("update", update_types, None),

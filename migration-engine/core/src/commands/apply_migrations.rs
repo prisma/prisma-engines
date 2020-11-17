@@ -40,7 +40,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
         let applier = connector.database_migration_step_applier();
         let migration_persistence = connector.new_migration_persistence();
 
-        migration_persistence.initialize().await?;
+        migration_persistence.initialize(false).await?;
 
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
