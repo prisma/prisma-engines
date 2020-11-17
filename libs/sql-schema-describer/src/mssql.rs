@@ -554,18 +554,6 @@ impl SqlSchemaDescriber {
     ) -> ColumnType {
         use ColumnTypeFamily::*;
 
-        //        let family = match data_type {
-        //            "date" | "time" | "datetime" | "datetime2" | "smalldatetime" | "datetimeoffset" => DateTime,
-        //            "char" | "nchar" | "varchar" | "nvarchar" | "text" | "ntext" | "xml" => String,
-        //            "numeric" | "decimal" | "float" | "real" | "smallmoney" | "money" => Float,
-        //            "binary" | "varbinary" | "image" => Binary,
-        //
-        //            "uniqueidentifier" => Uuid,
-        //            "bigint" => BigInt,
-        //            "bit" => Boolean,
-        //            r#type => Unsupported(r#type.into()),
-        //        };
-        //
         // TODO: can we achieve this more elegantly?
         let params = match data_type {
             "numeric" | "decimal" => match (numeric_precision, numeric_scale) {
