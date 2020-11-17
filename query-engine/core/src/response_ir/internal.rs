@@ -73,6 +73,7 @@ fn serialize_aggregation(
     };
 
     for result in results {
+        dbg!(&result);
         match result {
             AggregationResult::Count(count) => {
                 flattened.insert("count".to_owned(), Item::Value(count));
@@ -90,12 +91,20 @@ fn serialize_aggregation(
 
             AggregationResult::Min(field, value) => {
                 let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "min", &field.name);
-                flattened.insert(format!("min_{}", &field.name), serialize_scalar(&output_field, value)?);
+                dbg!(&output_field);
+                flattened.insert(
+                    format!("min_{}", &field.name),
+                    serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
+                );
             }
 
             AggregationResult::Max(field, value) => {
                 let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "max", &field.name);
-                flattened.insert(format!("max_{}", &field.name), serialize_scalar(&output_field, value)?);
+                dbg!(&output_field);
+                flattened.insert(
+                    format!("max_{}", &field.name),
+                    serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
+                );
             }
         }
     }
@@ -137,6 +146,13 @@ fn find_nested_aggregate_output_field(
     };
 
     nested_object_type.find_field(nested_field_name).unwrap()
+}
+
+fn coerce_non_numeric(value: PrismaValue, output: &OutputType) -> PrismaValue {
+    match (value, output.borrow()) {
+        (PrismaValue::Int(x), OutputType::Scalar(ScalarType::String)) if x == 0 => PrismaValue::Null,
+        (x, _) => x,
+    }
 }
 
 fn serialize_record_selection(

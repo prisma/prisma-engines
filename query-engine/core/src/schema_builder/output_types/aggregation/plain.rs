@@ -59,21 +59,14 @@ where
     if fields.is_empty() {
         None
     } else {
-        let object_type = OutputType::object(map_numeric_field_aggregation_object(
-            ctx,
-            model,
-            name,
-            &fields,
-            type_mapper,
-        ));
+        let object_type = OutputType::object(map_field_aggregation_object(ctx, model, name, &fields, type_mapper));
 
         Some(field(name, vec![], object_type, None).optional())
     }
 }
 
-/// Maps the object type for aggregations that operate on a (numeric) field level, rather than the entire model.
-/// Fields inside the object may have a fixed output type.
-pub(crate) fn map_numeric_field_aggregation_object<F>(
+/// Maps the object type for aggregations that operate on a field level, rather than the entire model.
+pub(crate) fn map_field_aggregation_object<F>(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     suffix: &str,
@@ -91,7 +84,7 @@ where
 
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|sf| field(sf.name.clone(), vec![], type_mapper(sf), None).optional_if(!sf.is_required))
+        .map(|sf| field(sf.name.clone(), vec![], type_mapper(sf), None).optional_if(!sf.is_required || !is_numeric(sf)))
         .collect();
 
     let object = Arc::new(object_type(ident.clone(), fields, None));
@@ -117,11 +110,13 @@ fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
         .fields()
         .scalar()
         .into_iter()
-        .filter(|f| {
-            matches!(
-                f.type_identifier,
-                TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
-            )
-        })
+        .filter(|field| is_numeric(field))
         .collect()
+}
+
+fn is_numeric(field: &ScalarFieldRef) -> bool {
+    matches!(
+        field.type_identifier,
+        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
+    )
 }
