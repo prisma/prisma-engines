@@ -2,6 +2,7 @@
 
 mod aggregate;
 mod first;
+mod group_by;
 mod many;
 mod one;
 mod related;
@@ -9,6 +10,7 @@ mod utils;
 
 pub use aggregate::*;
 pub use first::*;
+pub use group_by::*;
 pub use many::*;
 pub use one::*;
 pub use related::*;

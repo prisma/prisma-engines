@@ -9,7 +9,8 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
             let mut vec = vec![
                 find_first_field(ctx, &model),
                 all_items_field(ctx, &model),
-                aggregation_field(ctx, &model),
+                plain_aggregation_field(ctx, &model),
+                group_by_aggregation_field(ctx, &model),
             ];
 
             append_opt(&mut vec, find_one_field(ctx, &model));
@@ -77,7 +78,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 }
 
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
-fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model);
     let field_name = ctx.pluralize_internal(
         format!("aggregate{}", model.name), // Has no legacy counterpart.
@@ -91,6 +92,25 @@ fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::Aggregate,
+        }),
+    )
+}
+
+/// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
+fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+    let args = arguments::many_records_arguments(ctx, &model);
+    let field_name = ctx.pluralize_internal(
+        format!("groupBy{}", model.name), // Has no legacy counterpart.
+        format!("groupBy{}", model.name),
+    );
+
+    field(
+        field_name,
+        args,
+        OutputType::object(aggregation::group_by::group_by_output_object_type(ctx, &model)),
+        Some(QueryInfo {
+            model: Some(Arc::clone(&model)),
+            tag: QueryTag::GroupBy,
         }),
     )
 }
