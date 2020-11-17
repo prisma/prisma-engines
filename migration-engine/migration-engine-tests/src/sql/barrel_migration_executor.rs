@@ -1,5 +1,5 @@
 use crate::sql::TestApi;
-use quaint::{prelude::Queryable, single::Quaint};
+use quaint::prelude::Queryable;
 use sql_migration_connector::MIGRATION_TABLE_NAME;
 use sql_schema_describer::SqlSchema;
 
@@ -24,7 +24,7 @@ impl BarrelMigrationExecutor<'_> {
         migration_fn(&mut migration);
 
         let full_sql = migration.make_from(self.sql_variant);
-        run_full_sql(&self.api.database(), &full_sql).await?;
+        self.api.database().raw_cmd(&full_sql).await.unwrap();
 
         let mut result = self.api.describe_database().await.expect("Description failed");
 
@@ -37,12 +37,4 @@ impl BarrelMigrationExecutor<'_> {
 
         Ok(result)
     }
-}
-
-async fn run_full_sql(database: &Quaint, full_sql: &str) -> anyhow::Result<()> {
-    for sql in full_sql.split(';').filter(|sql| !sql.is_empty()) {
-        database.query_raw(&sql, &[]).await?;
-    }
-
-    Ok(())
 }
