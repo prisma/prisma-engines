@@ -121,10 +121,3 @@ pub struct MigrationRecord {
     /// The whole migration script.
     pub script: String,
 }
-
-impl MigrationRecord {
-    /// Is the migration in a failed state?
-    pub fn is_failed(&self) -> bool {
-        self.finished_at.is_none() && self.rolled_back_at.is_none()
-    }
-}
