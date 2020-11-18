@@ -451,7 +451,7 @@ impl QueryDocumentParser {
 
                         // Ensure only whitelisted constraints are allowed to be empty.
                         if let ParsedInputValue::Map(map) = &parsed {
-                            if map.is_empty() && !matches!(k.as_str(), "some" | "none" | "is" | "every") {
+                            if map.is_empty() && !matches!(k.as_str(), "some" | "none" | "is" | "every" | "where") {
                                 return Err(QueryParserError {
                                     path: path.add(k.clone()),
                                     error_kind: QueryParserErrorKind::RequiredValueNotSetError,
