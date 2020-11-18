@@ -74,7 +74,9 @@ fn serialize_aggregation(
 
     for result in results {
         match result {
-            AggregationResult::Count(count) => {
+            AggregationResult::Field(_field, _value) => todo!(),
+
+            AggregationResult::Count(_field, count) => {
                 flattened.insert("count".to_owned(), Item::Value(count));
             }
 

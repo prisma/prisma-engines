@@ -25,9 +25,10 @@ impl SqlRow {
         aggregators
             .iter()
             .flat_map(|aggregator| match aggregator {
-                Aggregator::Count(_) => vec![AggregationResult::Count(coerce_null_to_zero_value(
-                    values.pop().unwrap(),
-                ))],
+                Aggregator::Count(field) => vec![AggregationResult::Count(
+                    field.clone(),
+                    coerce_null_to_zero_value(values.pop().unwrap()),
+                )],
 
                 Aggregator::Average(fields) => fields
                     .iter()

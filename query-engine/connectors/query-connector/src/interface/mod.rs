@@ -86,7 +86,7 @@ impl From<RecordProjection> for RecordFilter {
 #[derive(Debug, Clone)]
 pub enum Aggregator {
     /// Counts records of the model that match the query.
-    /// If a field is provided,
+    /// If a field is provided, counts based on that field instead of rows (e.g. * in SQL).
     Count(Option<ScalarFieldRef>),
 
     /// Compute average for each field contained.
@@ -130,12 +130,12 @@ impl Aggregator {
 }
 
 /// Result of an aggregation operation on a model or field.
-/// It is expected that the type of a `PrismaValue` matches the `TypeIdentifier`
-/// of the accompanying `ScalarFieldRef` for `Sum`, `Min` and `Max`.
-/// `Count` and `Average` are expected to be of `int` and `float` types, respectively.
+/// A `Field` return type is only interesting for aggregations involving
+/// group bys, as they return field values alongside group aggregates.
 #[derive(Debug, Clone)]
 pub enum AggregationResult {
-    Count(PrismaValue),
+    Field(ScalarFieldRef, PrismaValue),
+    Count(Option<ScalarFieldRef>, PrismaValue),
     Average(ScalarFieldRef, PrismaValue),
     Sum(ScalarFieldRef, PrismaValue),
     Min(ScalarFieldRef, PrismaValue),
