@@ -54,35 +54,38 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
-        .map(|(key, value): (String, ParsedInputValue)| {
+        .map(|(key, value)| {
             // 2 possibilities: Either a filter group (and, or, not) with a vector/object, or a field name with a filter object behind.
-            if let Ok(nested) = FilterGrouping::from_str(&key) {
-                let value: QueryGraphBuilderResult<Vec<Filter>> = match value {
-                    ParsedInputValue::List(values) => values
-                        .into_iter()
-                        .map(|val| extract_filter(val.try_into()?, model))
-                        .collect(),
+            match FilterGrouping::from_str(&key) {
+                Ok(nested) => {
+                    let value = match value {
+                        ParsedInputValue::List(values) => values
+                            .into_iter()
+                            .map(|val| extract_filter(val.try_into()?, model))
+                            .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?,
 
-                    // Single map to vec coercion
-                    ParsedInputValue::Map(map) => extract_filter(map, model).map(|res| vec![res]),
+                        // Single map to vec coercion
+                        ParsedInputValue::Map(map) => extract_filter(map, model).map(|res| vec![res])?,
 
-                    _ => unreachable!(),
-                };
+                        _ => unreachable!(),
+                    };
 
-                value.map(|value| match nested {
-                    FilterGrouping::And => Filter::and(value),
-                    FilterGrouping::Or => Filter::or(value),
-                    FilterGrouping::Not => Filter::not(value),
-                })
-            } else {
-                let field = model.fields().find_from_all(&key)?;
+                    match nested {
+                        FilterGrouping::And => Ok(Filter::and(value)),
+                        FilterGrouping::Or => Ok(Filter::or(value)),
+                        FilterGrouping::Not => Ok(Filter::not(value)),
+                    }
+                }
+                Err(_) => {
+                    let field = model.fields().find_from_all(&key)?;
 
-                let filters = match field {
-                    Field::Relation(rf) => extract_relation_filters(rf, value),
-                    Field::Scalar(sf) => extract_scalar_filters(sf, value),
-                }?;
+                    let filters = match field {
+                        Field::Relation(rf) => extract_relation_filters(rf, value),
+                        Field::Scalar(sf) => extract_scalar_filters(sf, value),
+                    }?;
 
-                Ok(Filter::And(filters))
+                    Ok(Filter::And(filters))
+                }
             }
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
