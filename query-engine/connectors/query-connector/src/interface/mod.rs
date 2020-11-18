@@ -85,6 +85,9 @@ impl From<RecordProjection> for RecordFilter {
 
 #[derive(Debug, Clone)]
 pub enum Aggregator {
+    /// Single field selector. Only valid in the context of group by statements.
+    Field(ScalarFieldRef),
+
     /// Counts records of the model that match the query.
     /// If a field is provided, counts based on that field instead of rows (e.g. * in SQL).
     Count(Option<ScalarFieldRef>),
@@ -105,6 +108,7 @@ pub enum Aggregator {
 impl Aggregator {
     pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         match self {
+            Aggregator::Field(field) => vec![(field.type_identifier.clone(), FieldArity::Required)],
             Aggregator::Count(_) => vec![(TypeIdentifier::Int, FieldArity::Required)],
             Aggregator::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
             Aggregator::Sum(fields) => Self::map_field_types(&fields, None),

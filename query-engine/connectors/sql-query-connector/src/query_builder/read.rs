@@ -104,26 +104,28 @@ pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArgume
     aggregators
         .iter()
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
+            Aggregator::Field(field) => select.column(field.as_column()),
+
             Aggregator::Count(field) => match field {
                 Some(field) => select.value(count(Column::from(field.db_name().to_owned()))),
                 None => select.value(count(asterisk())),
             },
 
-            Aggregator::Average(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(avg(Column::from(next_field.db_name().to_owned())))
-            }),
+            Aggregator::Average(fields) => fields
+                .iter()
+                .fold(select, |select, next_field| select.value(avg(next_field.as_column()))),
 
-            Aggregator::Sum(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(sum(Column::from(next_field.db_name().to_owned())))
-            }),
+            Aggregator::Sum(fields) => fields
+                .iter()
+                .fold(select, |select, next_field| select.value(sum(next_field.as_column()))),
 
-            Aggregator::Min(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(min(Column::from(next_field.db_name().to_owned())))
-            }),
+            Aggregator::Min(fields) => fields
+                .iter()
+                .fold(select, |select, next_field| select.value(min(next_field.as_column()))),
 
-            Aggregator::Max(fields) => fields.iter().fold(select, |select, next_field| {
-                select.value(max(Column::from(next_field.db_name().to_owned())))
-            }),
+            Aggregator::Max(fields) => fields
+                .iter()
+                .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
         })
 }
 
@@ -131,6 +133,7 @@ fn extract_columns(model: &ModelRef, aggregators: &[Aggregator]) -> Vec<Column<'
     let fields: Vec<_> = aggregators
         .iter()
         .flat_map(|aggregator| match aggregator {
+            Aggregator::Field(field) => vec![field.clone()],
             Aggregator::Count(field) => match field {
                 Some(field) => vec![field.clone()],
                 None => model.primary_identifier().scalar_fields().collect(),
