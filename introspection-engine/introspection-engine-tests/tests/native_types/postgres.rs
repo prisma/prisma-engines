@@ -82,11 +82,11 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             text            String   @postgres.Text
             bytea           Bytes    @postgres.ByteA
             ts              DateTime @postgres.Timestamp(0)
-            tstz            DateTime @postgres.Timestamp(2)
+            tstz            DateTime 
             date            DateTime @postgres.Date
             time            DateTime @postgres.Time(2)
             time_2          DateTime @postgres.Time(6)
-            timetz          DateTime @postgres.Time(2)
+            timetz          DateTime
             bool            Boolean  @postgres.Boolean
             bit             String   @postgres.Bit(1)
             varbit          String   @postgres.VarBit(1)

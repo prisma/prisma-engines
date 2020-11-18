@@ -417,8 +417,8 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Binary => FieldType::Base(ScalarType::Bytes, None),
+        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }
@@ -436,13 +436,13 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
     };
 
     match scalar_type {
-        FieldType::Base(scal_type, _) => {
-            let native_type_instance = connector
-                .introspect_native_type(column.tpe.native_type.clone().unwrap())
-                .unwrap();
-
-            FieldType::NativeType(scal_type, native_type_instance)
-        }
+        FieldType::Base(scal_type, _) => match &column.tpe.native_type {
+            None => scalar_type,
+            Some(native_type) => {
+                let native_type_instance = connector.introspect_native_type(native_type.clone()).unwrap();
+                FieldType::NativeType(scal_type, native_type_instance)
+            }
+        },
         field_type => field_type,
     }
 }
