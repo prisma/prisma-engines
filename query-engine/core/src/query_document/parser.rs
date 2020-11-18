@@ -449,9 +449,9 @@ impl QueryDocumentParser {
                         let path = path.add(field.name.clone());
                         let parsed = Self::parse_input_value(path.clone(), v, &field.field_types)?;
 
-                        // Ensure `OR/AND/NOT` statements are never empty.
+                        // Ensure only whitelisted constraints are allowed to be empty.
                         if let ParsedInputValue::Map(map) = &parsed {
-                            if map.is_empty() {
+                            if map.is_empty() && !matches!(k.as_str(), "some" | "none" | "is" | "every") {
                                 return Err(QueryParserError {
                                     path: path.add(k.clone()),
                                     error_kind: QueryParserErrorKind::RequiredValueNotSetError,
