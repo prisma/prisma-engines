@@ -11,7 +11,10 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
     );
     return_cached_output!(ctx, &ident);
 
-    let object = ObjectTypeStrongRef::new(ObjectType::new(ident.clone(), Some(ModelRef::clone(model))));
+    let mut object = ObjectType::new(ident.clone(), Some(ModelRef::clone(model)));
+    object.do_allow_empty();
+
+    let object = ObjectTypeStrongRef::new(object);
 
     // Model fields that can be grouped by value.
     let mut object_fields = scalar_fields(model);

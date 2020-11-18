@@ -1,20 +1,23 @@
 use super::*;
-use crate::{query_document::ParsedField, AggregateRecordsQuery, FieldPair, ReadQuery};
+use crate::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, FieldPair, ReadQuery};
 use connector::Aggregator;
 use prisma_models::{ModelRef, ScalarFieldRef};
 
-pub fn group_by(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
+pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
     let alias = field.alias;
     let model = model;
     let nested_fields = field.nested_fields.unwrap().fields;
     let selection_order = collect_selection_tree(&nested_fields);
+
+    let by_argument = field.arguments.lookup("by");
+
     let args = extractors::extract_query_args(field.arguments, &model)?;
 
-    // Reject unstable cursors for aggregations, because we can't do post-processing on those (we haven't implemented a in-memory aggregator yet).
+    // Reject unstable cursors for group-by aggregations, because we can't do post-processing on those (we haven't implemented a in-memory aggregator yet).
     if args.contains_unstable_cursor() {
         return Err(QueryGraphBuilderError::InputError(
-            "The chosen cursor and orderBy combination is not stable (unique) and can't be used for aggregations."
+            "The chosen cursor and orderBy combination is not stable (unique) and can't be used for group-by aggregations."
                 .to_owned(),
         ));
     }
