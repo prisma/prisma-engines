@@ -104,7 +104,10 @@ pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArgume
     aggregators
         .iter()
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
-            Aggregator::Count => select.value(count(asterisk())),
+            Aggregator::Count(field) => match field {
+                Some(field) => select.value(count(Column::from(field.db_name().to_owned()))),
+                None => select.value(count(asterisk())),
+            },
 
             Aggregator::Average(fields) => fields.iter().fold(select, |select, next_field| {
                 select.value(avg(Column::from(next_field.db_name().to_owned())))
@@ -128,7 +131,10 @@ fn extract_columns(model: &ModelRef, aggregators: &[Aggregator]) -> Vec<Column<'
     let fields: Vec<_> = aggregators
         .iter()
         .flat_map(|aggregator| match aggregator {
-            Aggregator::Count => model.primary_identifier().scalar_fields().collect(),
+            Aggregator::Count(field) => match field {
+                Some(field) => vec![field.clone()],
+                None => model.primary_identifier().scalar_fields().collect(),
+            },
             Aggregator::Average(fields) => fields.clone(),
             Aggregator::Sum(fields) => fields.clone(),
             Aggregator::Min(fields) => fields.clone(),

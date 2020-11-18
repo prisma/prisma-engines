@@ -37,7 +37,7 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
 /// Resolves the given field as a aggregation query.
 fn resolve_query(field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<Aggregator> {
     let query = match field.parsed_field.name.as_str() {
-        "count" => Aggregator::Count,
+        "count" => Aggregator::Count(None),
         "avg" => Aggregator::Average(resolve_fields(model, field)),
         "sum" => Aggregator::Sum(resolve_fields(model, field)),
         "min" => Aggregator::Min(resolve_fields(model, field)),

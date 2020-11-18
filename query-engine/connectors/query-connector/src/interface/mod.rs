@@ -85,8 +85,9 @@ impl From<RecordProjection> for RecordFilter {
 
 #[derive(Debug, Clone)]
 pub enum Aggregator {
-    /// Counts all records of the model that match the query.
-    Count,
+    /// Counts records of the model that match the query.
+    /// If a field is provided,
+    Count(Option<ScalarFieldRef>),
 
     /// Compute average for each field contained.
     Average(Vec<ScalarFieldRef>),
@@ -104,7 +105,7 @@ pub enum Aggregator {
 impl Aggregator {
     pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         match self {
-            Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
+            Aggregator::Count(_) => vec![(TypeIdentifier::Int, FieldArity::Required)],
             Aggregator::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
             Aggregator::Sum(fields) => Self::map_field_types(&fields, None),
             Aggregator::Min(fields) => Self::map_field_types(&fields, None),
