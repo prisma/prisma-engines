@@ -45,7 +45,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
     val res = server.query(
       """query {
         |  findManyTestModel(
-        |    where: { OR: [{ str: { equals: "aa" }}, {str: { equals: undefined }}]}
+        |    where: { OR: [{ str: { equals: "aa" }}, {str: {} }]}
         |  ) {
         |    str
         |  }
