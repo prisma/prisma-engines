@@ -438,22 +438,33 @@ impl QueryDocumentParser {
             .collect::<QueryParserResult<Vec<_>>>()
             .and_then(|defaults| {
                 // Checks all fields on the provided input object. This will catch extra / unknown fields and parsing errors.
-                object
+                let mut tuples = object
                     .into_iter()
-                    .map(|(k, v)| match schema_object.find_field(k.as_str()) {
-                        Some(field) => Self::parse_input_value(path.add(field.name.clone()), v, &field.field_types)
-                            .map(|parsed| (k, parsed)),
-
-                        None => Err(QueryParserError {
-                            path: path.add(k),
+                    .map(|(k, v)| {
+                        let field = schema_object.find_field(k.as_str()).ok_or_else(|| QueryParserError {
+                            path: path.add(k.clone()),
                             error_kind: QueryParserErrorKind::FieldNotFoundError,
-                        }),
+                        })?;
+
+                        let path = path.add(field.name.clone());
+                        let parsed = Self::parse_input_value(path.clone(), v, &field.field_types)?;
+
+                        // Ensure `OR/AND/NOT` statements are never empty.
+                        if let ParsedInputValue::Map(map) = &parsed {
+                            if map.is_empty() {
+                                return Err(QueryParserError {
+                                    path: path.add(k.clone()),
+                                    error_kind: QueryParserErrorKind::RequiredValueNotSetError,
+                                });
+                            }
+                        }
+
+                        Ok((k, parsed))
                     })
-                    .collect::<QueryParserResult<Vec<_>>>()
-                    .map(|mut tuples| {
-                        tuples.extend(defaults.into_iter());
-                        tuples.into_iter().collect()
-                    })
+                    .collect::<QueryParserResult<ParsedInputMap>>()?;
+
+                tuples.extend(defaults.into_iter());
+                Ok(tuples)
             })
             .and_then(|map: ParsedInputMap| {
                 let num_fields = map.len();
