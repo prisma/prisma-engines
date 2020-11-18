@@ -704,6 +704,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "timetz" | "_timetz" => (DateTime, None),
         "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision))),
         "timestamptz" | "_timestamptz" => (DateTime, None),
+        "interval" | "_interval" => (String, None),
         "tsquery" | "_tsquery" => unsupported_type(),
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),

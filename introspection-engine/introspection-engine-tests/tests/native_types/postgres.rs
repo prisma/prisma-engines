@@ -24,6 +24,7 @@ const TYPES: &[(&str, &str)] = &[
     ("time", "Time(2)"),
     ("time_2", "Time"),
     ("timetz", "Timetz(2)"),
+    ("interval", "Interval(2)"),
     ("bool", "Boolean"),
     ("bit", "Bit(1)"),
     ("varbit", "VarBit(1)"),
@@ -87,6 +88,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             time            DateTime @postgres.Time(2)
             time_2          DateTime @postgres.Time(6)
             timetz          DateTime
+            interval        String
             bool            Boolean  @postgres.Boolean
             bit             String   @postgres.Bit(1)
             varbit          String   @postgres.VarBit(1)
@@ -160,6 +162,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             time            DateTime
             time_2          DateTime
             timetz          DateTime
+            interval        String
             bool            Boolean
             bit             String
             varbit          String
