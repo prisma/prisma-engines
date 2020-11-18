@@ -33,10 +33,10 @@ fn aggregation_operation_enum() -> EnumTypeRef {
     Arc::new(string_enum_type(
         "AggregateOperationEnum",
         vec![
-            "COUNT".to_owned(),
-            "AVG".to_owned(),
-            "SUM".to_owned(),
-            "MIN".to_owned(),
+            "count".to_owned(),
+            "avg".to_owned(),
+            "sum".to_owned(),
+            "min".to_owned(),
             "max".to_owned(),
         ],
     ))

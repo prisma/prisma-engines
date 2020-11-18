@@ -96,7 +96,7 @@ fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Output
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
 fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let mut args = arguments::many_records_arguments(ctx, &model);
-    let group_by_arg = arguments::group_by_argument(ctx, &model);
+    let group_by_arg = arguments::by_argument(ctx, &model);
 
     args.push(group_by_arg);
 
