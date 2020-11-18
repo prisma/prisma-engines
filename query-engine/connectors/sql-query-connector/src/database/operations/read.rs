@@ -164,3 +164,12 @@ pub async fn aggregate(
 
     Ok(row.into_aggregation_results(&aggregators))
 }
+
+pub async fn group_by(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    aggregators: Vec<Aggregator>,
+    query_arguments: QueryArguments,
+) -> crate::Result<Vec<AggregationResult>> {
+    todo!()
+}

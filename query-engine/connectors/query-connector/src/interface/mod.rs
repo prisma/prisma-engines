@@ -197,6 +197,14 @@ pub trait ReadOperations {
         aggregators: Vec<Aggregator>,
         query_arguments: QueryArguments,
     ) -> crate::Result<Vec<AggregationResult>>;
+
+    /// Groups records for a specific model based on the given aggregators.
+    async fn group_by_records(
+        &self,
+        model: &ModelRef,
+        by: Vec<Aggregator>,
+        query_arguments: QueryArguments,
+    ) -> crate::Result<Vec<AggregationResult>>;
 }
 
 #[async_trait]

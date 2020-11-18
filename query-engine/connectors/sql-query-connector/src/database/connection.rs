@@ -94,6 +94,16 @@ where
         self.catch(async move { read::aggregate(&self.inner, model, aggregators, query_arguments).await })
             .await
     }
+
+    async fn group_by_records(
+        &self,
+        model: &ModelRef,
+        by: Vec<Aggregator>,
+        query_arguments: QueryArguments,
+    ) -> connector::Result<Vec<AggregationResult>> {
+        self.catch(async move { read::group_by(&self.inner, model, by, query_arguments).await })
+            .await
+    }
 }
 
 #[async_trait]

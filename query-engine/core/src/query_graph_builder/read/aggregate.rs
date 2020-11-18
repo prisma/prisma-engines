@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_document::ParsedField, AggregateRecordsQuery, FieldPair, ReadQuery};
+use crate::{query_document::ParsedField, AggregateRecordsQuery, AggregationType, FieldPair, ReadQuery};
 use connector::Aggregator;
 use prisma_models::{ModelRef, ScalarFieldRef};
 
@@ -30,7 +30,7 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
         model,
         selection_order,
         args,
-        aggregators,
+        typ: AggregationType::Plain(aggregators),
     }))
 }
 

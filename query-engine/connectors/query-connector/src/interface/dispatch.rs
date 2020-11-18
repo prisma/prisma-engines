@@ -50,6 +50,18 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
             Self::Transaction(tx) => tx.aggregate_records(model, aggregators, query_arguments).await,
         }
     }
+
+    async fn group_by_records(
+        &self,
+        model: &ModelRef,
+        by: Vec<Aggregator>,
+        query_arguments: QueryArguments,
+    ) -> crate::Result<Vec<AggregationResult>> {
+        match self {
+            Self::Connection(c) => c.group_by_records(model, by, query_arguments).await,
+            Self::Transaction(tx) => tx.group_by_records(model, by, query_arguments).await,
+        }
+    }
 }
 
 #[async_trait]
