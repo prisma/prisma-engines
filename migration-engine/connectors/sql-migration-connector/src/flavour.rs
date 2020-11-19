@@ -7,18 +7,19 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
+use datamodel::Datamodel;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
 
 use crate::{
-    connection_wrapper::Connection, database_info::DatabaseInfo, error::CheckDatabaseInfoResult,
-    sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
-    sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
+    connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
+    sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
+    sql_schema_differ::SqlSchemaDifferFlavour,
 };
 use migration_connector::{ConnectorResult, MigrationDirectory};
-use quaint::connector::ConnectionInfo;
+use quaint::{connector::ConnectionInfo, prelude::SqlFamily};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
 
@@ -29,7 +30,10 @@ pub(crate) const MYSQL_IDENTIFIER_SIZE_LIMIT: usize = 64;
 
 pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     match connection_info {
-        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour(url.clone())),
+        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour {
+            url: url.clone(),
+            circumstances: Default::default(),
+        }),
         ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour(url.clone())),
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
@@ -44,9 +48,11 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
 pub(crate) trait SqlFlavour:
     DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
 {
-    /// Optionally validate the database info.
-    fn check_database_info(&self, _database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
-        Ok(())
+    fn check_database_version_compatibility(
+        &self,
+        _datamodel: &Datamodel,
+    ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
+        None
     }
 
     /// Create a database for the given URL on the server, if applicable.
@@ -71,6 +77,9 @@ pub(crate) trait SqlFlavour:
 
     /// Drop the database and recreate it empty.
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;
+
+    /// This should be considered deprecated.
+    fn sql_family(&self) -> SqlFamily;
 
     /// Apply the given migration history to a temporary database, and return
     /// the final introspected SQL schema.

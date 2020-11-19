@@ -1,6 +1,7 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::{flavour::MysqlFlavour, sql_schema_calculator::SqlSchemaCalculator};
 use datamodel::{
+    walkers::ModelWalker,
     walkers::{walk_scalar_fields, ScalarFieldWalker},
     NativeTypeInstance, ScalarType,
 };
@@ -101,6 +102,16 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
             native_type: Some(native_type_instance.serialized_native_type.clone()),
+        }
+    }
+
+    fn table_name(&self, model: &ModelWalker<'_>) -> String {
+        let name: &str = model.database_name();
+
+        if self.lower_cases_table_names() {
+            name.to_lowercase()
+        } else {
+            name.to_owned()
         }
     }
 }

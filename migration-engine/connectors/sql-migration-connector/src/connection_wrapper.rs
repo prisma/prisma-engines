@@ -82,6 +82,13 @@ impl Connection {
         })
     }
 
+    pub(crate) async fn version(&self) -> ConnectionResult<'_, Option<String>> {
+        self.0.version().await.map_err(|quaint_error| ConnectionError {
+            quaint_error,
+            connection_info: self.connection_info(),
+        })
+    }
+
     /// Render a table name with the required prefixing for use with quaint query building.
     pub(crate) fn table_name<'a>(&'a self, name: &'a str) -> quaint::ast::Table<'a> {
         if self.connection_info().sql_family().is_sqlite() {

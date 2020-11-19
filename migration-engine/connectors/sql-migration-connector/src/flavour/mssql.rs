@@ -1,7 +1,7 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
 use connection_string::JdbcString;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
-use quaint::connector::MssqlUrl;
+use quaint::{connector::MssqlUrl, prelude::SqlFamily};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::str::FromStr;
 
@@ -151,6 +151,10 @@ impl SqlFlavour for MssqlFlavour {
         connection.raw_cmd("SELECT 1").await?;
 
         Ok(())
+    }
+
+    fn sql_family(&self) -> SqlFamily {
+        SqlFamily::Mssql
     }
 
     async fn sql_schema_from_migration_history(

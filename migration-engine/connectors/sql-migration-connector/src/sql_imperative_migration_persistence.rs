@@ -23,7 +23,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         if !schema.is_empty() && !baseline {
             return Err(ConnectorError::user_facing_error(
                 user_facing_errors::migration_engine::DatabaseSchemaNotEmpty {
-                    database_name: self.database_info.connection_info().database_location().to_owned(),
+                    database_name: self.connection.connection_info().database_location().to_owned(),
                 },
             ));
         }
@@ -152,7 +152,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         };
 
         let rows = quaint::serde::from_rows(result)
-            .map_err(|err| quaint_error_to_connector_error(err, self.database_info().connection_info()))?;
+            .map_err(|err| quaint_error_to_connector_error(err, self.connection.connection_info()))?;
 
         tracing::debug!("Found {} migrations in the migrations table.", rows.len());
 

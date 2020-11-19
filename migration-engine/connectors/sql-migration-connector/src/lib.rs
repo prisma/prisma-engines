@@ -4,7 +4,6 @@
 #![allow(clippy::trivial_regex)] // these will grow
 
 mod connection_wrapper;
-mod database_info;
 mod error;
 mod flavour;
 mod pair;
@@ -22,7 +21,6 @@ pub use sql_migration::SqlMigration;
 pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use connection_wrapper::Connection;
-use database_info::DatabaseInfo;
 use datamodel::Datamodel;
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
@@ -34,7 +32,6 @@ use sql_schema_describer::SqlSchema;
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
     connection: Connection,
-    database_info: DatabaseInfo,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
 }
 
@@ -42,17 +39,11 @@ impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let connection = connect(database_str).await?;
-        let database_info = DatabaseInfo::new(connection.quaint(), connection.connection_info().clone()).await?;
-        let flavour = flavour::from_connection_info(database_info.connection_info());
+        let flavour = flavour::from_connection_info(connection.connection_info());
 
-        flavour.check_database_info(&database_info)?;
         flavour.ensure_connection_validity(&connection).await?;
 
-        Ok(Self {
-            flavour,
-            database_info,
-            connection,
-        })
+        Ok(Self { flavour, connection })
     }
 
     /// Create the database corresponding to the connection string, without initializing the connector.
@@ -86,10 +77,6 @@ impl SqlMigrationConnector {
         &self.connection
     }
 
-    fn database_info(&self) -> &DatabaseInfo {
-        &self.database_info
-    }
-
     fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync) {
         self.flavour.as_ref()
     }
@@ -105,11 +92,11 @@ impl SqlMigrationConnector {
     }
 
     fn schema_name(&self) -> &str {
-        self.database_info.connection_info().schema_name()
+        self.connection.connection_info().schema_name()
     }
 
     fn sql_family(&self) -> SqlFamily {
-        self.database_info.sql_family()
+        self.connection.connection_info().sql_family()
     }
 }
 
@@ -118,14 +105,15 @@ impl MigrationConnector for SqlMigrationConnector {
     type DatabaseMigration = SqlMigration;
 
     fn connector_type(&self) -> &'static str {
-        self.database_info.connection_info().sql_family().as_str()
+        self.connection.connection_info().sql_family().as_str()
     }
 
-    fn version(&self) -> String {
-        self.database_info
-            .database_version
-            .clone()
-            .unwrap_or_else(|| "Database version information not available.".into())
+    async fn version(&self) -> ConnectorResult<String> {
+        Ok(self
+            .connection
+            .version()
+            .await?
+            .unwrap_or_else(|| "Database version information not available.".into()))
     }
 
     async fn create_database(database_str: &str) -> ConnectorResult<String> {
@@ -142,7 +130,7 @@ impl MigrationConnector for SqlMigrationConnector {
         &self,
         datamodel: &Datamodel,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
-        self.database_info.check_database_version_compatibility(datamodel)
+        self.flavour.check_database_version_compatibility(datamodel)
     }
 
     fn migration_persistence(&self) -> &dyn MigrationPersistence {

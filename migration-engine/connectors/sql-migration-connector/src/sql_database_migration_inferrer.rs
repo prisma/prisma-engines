@@ -1,5 +1,4 @@
 use crate::{
-    database_info::DatabaseInfo,
     flavour::SqlFlavour,
     pair::Pair,
     sql_migration::{SqlMigration, SqlMigrationStep},
@@ -21,26 +20,16 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
         let current_database_schema: SqlSchema = self.describe_schema().await?;
-        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info(), self.flavour());
-        Ok(infer(
-            current_database_schema,
-            expected_database_schema,
-            self.database_info(),
-            self.flavour(),
-        ))
+        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.flavour());
+        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
     }
 
     /// Infer the database migration steps, skipping the schema describer and assuming an empty database.
     fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<SqlMigration> {
         let current_database_schema = SqlSchema::empty();
-        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info(), self.flavour());
+        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.flavour());
 
-        Ok(infer(
-            current_database_schema,
-            expected_database_schema,
-            self.database_info(),
-            self.flavour(),
-        ))
+        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
     }
 
     fn infer_from_datamodels(
@@ -49,16 +38,10 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema: SqlSchema =
-            SqlSchemaCalculator::calculate(previous, self.database_info(), self.flavour());
-        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info(), self.flavour());
+        let current_database_schema: SqlSchema = SqlSchemaCalculator::calculate(previous, self.flavour());
+        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.flavour());
 
-        Ok(infer(
-            current_database_schema,
-            expected_database_schema,
-            self.database_info(),
-            self.flavour(),
-        ))
+        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
     }
 
     #[tracing::instrument(skip(self, previous_migrations, target_schema))]
@@ -71,15 +54,9 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
             .flavour()
             .sql_schema_from_migration_history(previous_migrations, self.conn())
             .await?;
-        let expected_database_schema =
-            SqlSchemaCalculator::calculate(target_schema, self.database_info(), self.flavour());
+        let expected_database_schema = SqlSchemaCalculator::calculate(target_schema, self.flavour());
 
-        Ok(infer(
-            current_database_schema,
-            expected_database_schema,
-            self.database_info(),
-            self.flavour(),
-        ))
+        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
     }
 
     #[tracing::instrument(skip(self, applied_migrations))]
@@ -91,11 +68,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
 
         let actual_schema = self.describe_schema().await?;
 
-        let steps = sql_schema_differ::calculate_steps(
-            Pair::new(&actual_schema, &expected_schema),
-            self.flavour(),
-            self.database_info(),
-        );
+        let steps = sql_schema_differ::calculate_steps(Pair::new(&actual_schema, &expected_schema), self.flavour());
 
         if steps.is_empty() {
             return Ok(None);
@@ -129,14 +102,10 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
 fn infer(
     current_database_schema: SqlSchema,
     expected_database_schema: SqlSchema,
-    database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlMigration {
-    let steps = sql_schema_differ::calculate_steps(
-        Pair::new(&current_database_schema, &expected_database_schema),
-        flavour,
-        &database_info,
-    );
+    let steps =
+        sql_schema_differ::calculate_steps(Pair::new(&current_database_schema, &expected_database_schema), flavour);
 
     SqlMigration {
         before: current_database_schema,

@@ -1,6 +1,6 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
-use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind};
+use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind, prelude::SqlFamily};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
 use url::Url;
@@ -163,6 +163,10 @@ impl SqlFlavour for PostgresFlavour {
             .await?;
 
         Ok(())
+    }
+
+    fn sql_family(&self) -> SqlFamily {
+        SqlFamily::Postgres
     }
 
     #[tracing::instrument(skip(self, migrations, connection))]

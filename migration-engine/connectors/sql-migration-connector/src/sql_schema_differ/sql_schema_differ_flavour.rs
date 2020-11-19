@@ -1,5 +1,5 @@
 use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
-use crate::{database_info::DatabaseInfo, pair::Pair, sql_migration::AlterEnum};
+use crate::{pair::Pair, sql_migration::AlterEnum};
 use sql_schema_describer::walkers::IndexWalker;
 use std::collections::HashSet;
 
@@ -18,9 +18,8 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// If this returns `true`, the differ will generate
     /// SqlMigrationStep::RedefineIndex steps instead of
     /// SqlMigrationStep::AlterIndex.
-    fn can_alter_index(&self, database_info: &DatabaseInfo) -> bool {
-        // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
-        !database_info.is_mariadb() && !database_info.is_mysql_5_6()
+    fn can_alter_index(&self) -> bool {
+        true
     }
 
     /// Return whether a column's type needs to be migrated, and how.
@@ -49,9 +48,19 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
+    /// Whether to skip diffing JSON defaults.
+    fn should_ignore_json_defaults(&self) -> bool {
+        false
+    }
+
     /// Whether `AddForeignKey` steps should be generated for created tables.
     fn should_push_foreign_keys_from_created_tables(&self) -> bool {
         true
+    }
+
+    /// Whether indexes matching a foreign key should be skipped.
+    fn should_skip_fk_indexes(&self) -> bool {
+        false
     }
 
     /// Whether a specific index should *not* be produced.

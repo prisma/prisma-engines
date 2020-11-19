@@ -13,7 +13,7 @@ use crate::{
         self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterTable, CreateEnum, CreateIndex, CreateTable,
         DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep, TableChange,
     },
-    wrap_as_step, DatabaseInfo, SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
+    wrap_as_step, SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
 };
 use column::ColumnTypeChange;
 use enums::EnumDiffer;
@@ -21,16 +21,8 @@ use sql_schema_describer::walkers::{EnumWalker, ForeignKeyWalker, TableWalker};
 use std::collections::HashSet;
 use table::TableDiffer;
 
-pub(crate) fn calculate_steps(
-    schemas: Pair<&SqlSchema>,
-    flavour: &dyn SqlFlavour,
-    database_info: &DatabaseInfo,
-) -> Vec<SqlMigrationStep> {
-    let differ = SqlSchemaDiffer {
-        schemas,
-        flavour,
-        database_info,
-    };
+pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
+    let differ = SqlSchemaDiffer { schemas, flavour };
 
     differ.diff_internal().into_steps()
 }
@@ -38,7 +30,6 @@ pub(crate) fn calculate_steps(
 #[derive(Debug)]
 pub(crate) struct SqlSchemaDiffer<'a> {
     schemas: Pair<&'a SqlSchema>,
-    database_info: &'a DatabaseInfo,
     flavour: &'a dyn SqlFlavour,
 }
 
@@ -110,7 +101,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn diff_internal(&self) -> SqlSchemaDiff {
         let tables_to_redefine = self.flavour.tables_to_redefine(&self);
         let mut alter_indexes = self.alter_indexes(&tables_to_redefine);
-        let redefine_indexes = if self.flavour.can_alter_index(&self.database_info) {
+        let redefine_indexes = if self.flavour.can_alter_index() {
             Vec::new()
         } else {
             std::mem::replace(&mut alter_indexes, Vec::new())
@@ -343,7 +334,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.database_info.sql_family().is_mysql() && index::index_covers_fk(&tables.previous(), &index) {
+                if self.flavour.should_skip_fk_indexes() && index::index_covers_fk(&tables.previous(), &index) {
                     continue;
                 }
 
@@ -436,7 +427,6 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     .find(move |next_table| tables_match(&previous_table, &next_table))
                     .map(move |next_table| TableDiffer {
                         flavour: self.flavour,
-                        database_info: self.database_info,
                         tables: Pair::new(previous_table, next_table),
                     })
             })
