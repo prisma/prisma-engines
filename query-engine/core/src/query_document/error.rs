@@ -8,6 +8,13 @@ pub struct QueryParserError {
     pub error_kind: QueryParserErrorKind,
 }
 
+impl QueryParserError {
+    /// Create a new instance of `QueryParserError`.
+    pub fn new(path: QueryPath, error_kind: QueryParserErrorKind) -> Self {
+        Self { path, error_kind }
+    }
+}
+
 impl fmt::Display for QueryParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(

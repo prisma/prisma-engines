@@ -408,91 +408,77 @@ impl QueryDocumentParser {
         // First, check that all fields **not** provided in the query (left diff) are optional,
         // i.e. run the validation but disregard the result, or have defaults, in which case the
         // value pair gets added to the result.
-        diff.left
+        let defaults = diff
+            .left
             .into_iter()
             .filter_map(|unset_field_name| {
                 let field = schema_object.find_field(*unset_field_name).unwrap();
                 let path = path.add(field.name.clone());
-                let default_pair = field.default_value.clone().map(|def| (&field.name, def));
 
                 // If the input field has a default, add the default to the result.
                 // If it's not optional and has no default, a required field has not been provided.
-                match default_pair {
-                    Some((k, dv)) => {
-                        dv.get().map(
-                            |pv| match Self::parse_input_value(path, pv.into(), &field.field_types) {
-                                Ok(value) => Ok((k.clone(), value)),
-                                Err(err) => Err(err),
-                            },
-                        )
-                    }
-
-                    None if field.is_required => Some(Err(QueryParserError {
-                        path,
-                        error_kind: QueryParserErrorKind::RequiredValueNotSetError,
-                    })),
-
-                    _ => None,
-                }
-            })
-            .collect::<QueryParserResult<Vec<_>>>()
-            .and_then(|defaults| {
-                // Checks all fields on the provided input object. This will catch extra / unknown fields and parsing errors.
-                let mut tuples = object
-                    .into_iter()
-                    .map(|(k, v)| {
-                        let field = schema_object.find_field(k.as_str()).ok_or_else(|| QueryParserError {
-                            path: path.add(k.clone()),
-                            error_kind: QueryParserErrorKind::FieldNotFoundError,
-                        })?;
-
-                        let path = path.add(field.name.clone());
-                        let parsed = Self::parse_input_value(path.clone(), v, &field.field_types)?;
-
-                        // Ensure only whitelisted constraints are allowed to be empty.
-                        if let ParsedInputValue::Map(map) = &parsed {
-                            if map.is_empty() && !matches!(k.as_str(), "some" | "none" | "is" | "every" | "where") {
-                                return Err(QueryParserError {
-                                    path: path.add(k.clone()),
-                                    error_kind: QueryParserErrorKind::RequiredValueNotSetError,
-                                });
-                            }
+                match &field.default_value {
+                    Some(default_value) => {
+                        let query_value = default_value.get()?.into();
+                        match Self::parse_input_value(path, query_value, &field.field_types) {
+                            Ok(value) => Some(Ok((field.name.clone(), value))),
+                            Err(err) => Some(Err(err)),
                         }
-
-                        Ok((k, parsed))
-                    })
-                    .collect::<QueryParserResult<ParsedInputMap>>()?;
-
-                tuples.extend(defaults.into_iter());
-                Ok(tuples)
-            })
-            .and_then(|map: ParsedInputMap| {
-                let num_fields = map.len();
-                let too_many = schema_object
-                    .constraints
-                    .max_num_fields
-                    .map(|max| num_fields > max)
-                    .unwrap_or(false);
-
-                let too_few = schema_object
-                    .constraints
-                    .min_num_fields
-                    .map(|min| num_fields < min)
-                    .unwrap_or(false);
-
-                if too_many || too_few {
-                    Err(QueryParserError {
-                        path,
-                        error_kind: QueryParserErrorKind::FieldCountError(FieldCountError::new(
-                            schema_object.constraints.min_num_fields,
-                            schema_object.constraints.max_num_fields,
-                            map.len(),
-                        )),
-                    })
-                } else {
-                    Ok(map)
+                    }
+                    None => {
+                        if field.is_required {
+                            let kind = QueryParserErrorKind::RequiredValueNotSetError;
+                            Some(Err(QueryParserError::new(path, kind)))
+                        } else {
+                            None
+                        }
+                    }
                 }
             })
+            .collect::<QueryParserResult<Vec<_>>>()?;
+
+        // Checks all fields on the provided input object. This will catch extra
+        // or unknown fields and parsing errors.
+        let mut map = object
+            .into_iter()
+            .map(|(k, v)| {
+                let field = schema_object.find_field(k.as_str()).ok_or_else(|| {
+                    let kind = QueryParserErrorKind::FieldNotFoundError;
+                    QueryParserError::new(path.add(k.clone()), kind)
+                })?;
+
+                let path = path.add(field.name.clone());
+                let parsed = Self::parse_input_value(path.clone(), v, &field.field_types)?;
+
+                Ok((k, parsed))
+            })
+            .collect::<QueryParserResult<ParsedInputMap>>()?;
+        map.extend(defaults.into_iter());
+
+        // Ensure the constraints are upheld.
+        let num_fields = map.len();
+        let too_many = schema_object
+            .constraints
+            .max_num_fields
+            .map(|max| num_fields > max)
+            .unwrap_or(false);
+
+        let too_few = schema_object
+            .constraints
+            .min_num_fields
+            .map(|min| num_fields < min)
+            .unwrap_or(false);
+
+        if too_many || too_few {
+            let error_kind = QueryParserErrorKind::FieldCountError(FieldCountError::new(
+                schema_object.constraints.min_num_fields,
+                schema_object.constraints.max_num_fields,
+                map.len(),
+            ));
+            return Err(QueryParserError::new(path, error_kind));
+        }
+
+        Ok(map)
     }
 }
 
