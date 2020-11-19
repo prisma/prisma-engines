@@ -79,7 +79,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
 
-        let insert = Insert::single_into((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
+        let insert = Insert::single_into(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .value("id", id.as_str())
             .value("checksum", checksum)
             .value("started_at", now)
@@ -96,7 +96,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
         use quaint::ast::*;
 
-        let update = Update::table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
+        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .so_that(Column::from("id").equals(id))
             .set(
                 "applied_steps_count",
@@ -110,7 +110,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     }
 
     async fn record_failed_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
-        let update = Update::table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
+        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .so_that(Column::from("id").equals(id))
             .set("logs", logs);
 
@@ -120,7 +120,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     }
 
     async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()> {
-        let update = Update::table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
+        let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .so_that(Column::from("id").equals(id))
             .set("finished_at", chrono::Utc::now()); // TODO maybe use a database generated timestamp
 
@@ -131,7 +131,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
 
     #[tracing::instrument(skip(self))]
     async fn list_migrations(&self) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>> {
-        let select = Select::from_table((self.schema_name(), IMPERATIVE_MIGRATIONS_TABLE_NAME))
+        let select = Select::from_table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .column("id")
             .column("checksum")
             .column("finished_at")

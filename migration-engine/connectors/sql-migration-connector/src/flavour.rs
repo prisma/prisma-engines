@@ -7,7 +7,6 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use datamodel::Datamodel;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
@@ -18,6 +17,7 @@ use crate::{
     sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
     sql_schema_differ::SqlSchemaDifferFlavour,
 };
+use datamodel::Datamodel;
 use migration_connector::{ConnectorResult, MigrationDirectory};
 use quaint::{connector::ConnectionInfo, prelude::SqlFamily};
 use sql_schema_describer::SqlSchema;

@@ -25,7 +25,7 @@ use datamodel::Datamodel;
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
-use quaint::{prelude::ConnectionInfo, prelude::SqlFamily, single::Quaint};
+use quaint::{prelude::ConnectionInfo, single::Quaint};
 use sql_database_migration_inferrer::*;
 use sql_schema_describer::SqlSchema;
 
@@ -89,14 +89,6 @@ impl SqlMigrationConnector {
     /// Made public for tests.
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         self.flavour.describe_schema(&self.connection).await
-    }
-
-    fn schema_name(&self) -> &str {
-        self.connection.connection_info().schema_name()
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        self.connection.connection_info().sql_family()
     }
 }
 
