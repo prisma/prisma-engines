@@ -171,5 +171,43 @@ pub async fn group_by(
     aggregators: Vec<Aggregator>,
     query_arguments: QueryArguments,
 ) -> crate::Result<Vec<AggregationResult>> {
-    todo!()
+    let base_query = read::aggregate(model, &aggregators, query_arguments);
+    let query = aggregators
+        .iter()
+        .fold(base_query, |query, next_aggregator| match next_aggregator {
+            Aggregator::Field(field) => query.group_by(field.as_column()),
+
+            Aggregator::Count(field) => match field {
+                Some(field) => query.group_by(count(field.as_column())),
+                None => query.group_by(count(asterisk())),
+            },
+
+            Aggregator::Average(fields) => fields
+                .into_iter()
+                .fold(query, |query, field| query.group_by(avg(field.as_column()))),
+
+            Aggregator::Sum(fields) => fields
+                .into_iter()
+                .fold(query, |query, field| query.group_by(sum(field.as_column()))),
+
+            Aggregator::Min(fields) => fields
+                .into_iter()
+                .fold(query, |query, field| query.group_by(min(field.as_column()))),
+
+            Aggregator::Max(fields) => fields
+                .into_iter()
+                .fold(query, |query, field| query.group_by(max(field.as_column()))),
+        });
+
+    let idents: Vec<_> = aggregators
+        .iter()
+        .flat_map(|aggregator| aggregator.identifiers())
+        .collect();
+
+    let mut rows = conn.filter(query.into(), idents.as_slice()).await?;
+    let row = rows
+        .pop()
+        .expect("Expected exactly one return row for aggregation query.");
+
+    Ok(row.into_aggregation_results(&aggregators))
 }

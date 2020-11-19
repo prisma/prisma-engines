@@ -30,3 +30,6 @@ members = [
 
 [profile.dev.package.backtrace]
 opt-level = 3
+
+[patch."https://github.com/prisma/quaint"]
+quaint = {path = "/Users/dom/Documents/Repositories/quaint"}
