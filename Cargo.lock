@@ -483,12 +483,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3b5ca7a04898ad4bcd41c90c5285445ff5b791899bb1b0abdd2a2aa791211d7"
 
 [[package]]
-name = "bytecount"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be0fdd54b507df8f22012890aadd099979befdba27713c767993f8380112ca7c"
-
-[[package]]
 name = "byteorder"
 version = "1.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -873,7 +867,6 @@ name = "datamodel"
 version = "0.1.0"
 dependencies = [
  "bigdecimal 0.2.0",
- "bytecount",
  "chrono",
  "clap",
  "colored",
@@ -944,7 +937,6 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cuid",
- "itertools",
  "native-types",
  "prisma-value",
  "serde",
@@ -1673,13 +1665,11 @@ dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
- "pretty_assertions",
  "serde",
  "serde_derive",
  "serde_json",
  "sql-introspection-connector",
  "structopt",
- "test-setup",
  "thiserror",
  "tokio",
  "tracing",
@@ -2953,12 +2943,10 @@ dependencies = [
  "graphql-parser",
  "indexmap",
  "indoc 0.3.6",
- "introspection-core",
  "itertools",
  "migration-connector",
  "migration-core",
  "once_cell",
- "pretty_assertions",
  "prisma-models",
  "quaint",
  "query-connector",
@@ -3387,7 +3375,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "barrel",
  "bigdecimal 0.2.0",
  "datamodel",
  "datamodel-connector",
@@ -3402,8 +3389,6 @@ dependencies = [
  "serde_json",
  "sql-datamodel-connector",
  "sql-schema-describer",
- "test-macros",
- "test-setup",
  "thiserror",
  "tokio",
  "tracing",
