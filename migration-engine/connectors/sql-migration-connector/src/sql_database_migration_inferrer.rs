@@ -1,9 +1,15 @@
-use crate::*;
-use crate::{sql_schema_calculator::SqlSchemaCalculator, sql_schema_differ::SqlSchemaDiffer};
+use crate::{
+    database_info::DatabaseInfo,
+    flavour::SqlFlavour,
+    pair::Pair,
+    sql_migration::{SqlMigration, SqlMigrationStep},
+    sql_schema_calculator::SqlSchemaCalculator,
+    sql_schema_differ, SqlMigrationConnector,
+};
 use datamodel::*;
-use migration_connector::steps::MigrationStep;
-use migration_connector::*;
-use sql_migration::SqlMigrationStep;
+use migration_connector::{
+    steps::MigrationStep, ConnectorResult, DatabaseMigrationInferrer, MigrationConnector, MigrationDirectory,
+};
 use sql_schema_describer::*;
 
 #[async_trait::async_trait]
@@ -85,17 +91,20 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
 
         let actual_schema = self.describe_schema().await?;
 
-        let diff =
-            SqlSchemaDiffer::diff(&actual_schema, &expected_schema, self.flavour(), self.database_info()).into_steps();
+        let steps = sql_schema_differ::calculate_steps(
+            Pair::new(&actual_schema, &expected_schema),
+            self.flavour(),
+            self.database_info(),
+        );
 
-        if diff.is_empty() {
+        if steps.is_empty() {
             return Ok(None);
         }
 
         let migration = SqlMigration {
             before: actual_schema,
             after: expected_schema,
-            steps: diff,
+            steps: steps,
         };
 
         let diagnostics = self.destructive_change_checker().pure_check(&migration);
@@ -114,13 +123,11 @@ fn infer(
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlMigration {
-    let steps = SqlSchemaDiffer::diff(
-        &current_database_schema,
-        &expected_database_schema,
+    let steps = sql_schema_differ::calculate_steps(
+        Pair::new(&current_database_schema, &expected_database_schema),
         flavour,
         &database_info,
-    )
-    .into_steps();
+    );
 
     SqlMigration {
         before: current_database_schema,

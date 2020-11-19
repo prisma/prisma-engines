@@ -21,15 +21,29 @@ use sql_schema_describer::walkers::{EnumWalker, ForeignKeyWalker, TableWalker};
 use std::collections::HashSet;
 use table::TableDiffer;
 
-#[derive(Debug)]
-pub(crate) struct SqlSchemaDiffer<'a> {
-    pub(crate) schemas: Pair<&'a SqlSchema>,
-    pub(crate) database_info: &'a DatabaseInfo,
-    pub(crate) flavour: &'a dyn SqlFlavour,
+pub(crate) fn calculate_steps(
+    schemas: Pair<&SqlSchema>,
+    flavour: &dyn SqlFlavour,
+    database_info: &DatabaseInfo,
+) -> Vec<SqlMigrationStep> {
+    let differ = SqlSchemaDiffer {
+        schemas,
+        flavour,
+        database_info,
+    };
+
+    differ.diff_internal().into_steps()
 }
 
 #[derive(Debug)]
-pub struct SqlSchemaDiff {
+pub(crate) struct SqlSchemaDiffer<'a> {
+    schemas: Pair<&'a SqlSchema>,
+    database_info: &'a DatabaseInfo,
+    flavour: &'a dyn SqlFlavour,
+}
+
+#[derive(Debug)]
+struct SqlSchemaDiff {
     add_foreign_keys: Vec<AddForeignKey>,
     drop_foreign_keys: Vec<DropForeignKey>,
     drop_tables: Vec<DropTable>,
@@ -50,7 +64,7 @@ pub struct SqlSchemaDiff {
 impl SqlSchemaDiff {
     /// Translate the diff into steps that should be executed in order. The general idea in the
     /// ordering of steps is to drop obsolete constraints first, alter/create tables, then add the new constraints.
-    pub(crate) fn into_steps(self) -> Vec<SqlMigrationStep> {
+    fn into_steps(self) -> Vec<SqlMigrationStep> {
         let redefine_tables = Some(self.redefine_tables)
             .filter(|tables| !tables.is_empty())
             .map(SqlMigrationStep::RedefineTables);
@@ -93,20 +107,6 @@ impl SqlSchemaDiff {
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
-    pub(crate) fn diff(
-        previous: &SqlSchema,
-        next: &SqlSchema,
-        flavour: &dyn SqlFlavour,
-        database_info: &DatabaseInfo,
-    ) -> SqlSchemaDiff {
-        let differ = SqlSchemaDiffer {
-            schemas: Pair::new(previous, next),
-            flavour,
-            database_info,
-        };
-        differ.diff_internal()
-    }
-
     fn diff_internal(&self) -> SqlSchemaDiff {
         let tables_to_redefine = self.flavour.tables_to_redefine(&self);
         let mut alter_indexes = self.alter_indexes(&tables_to_redefine);
