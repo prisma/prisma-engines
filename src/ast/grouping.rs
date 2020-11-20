@@ -1,3 +1,4 @@
+use super::Function;
 use crate::ast::{Column, Expression};
 
 /// Defines a grouping for the `GROUP BY` statement.
@@ -52,6 +53,12 @@ impl<'a> IntoGroupByDefinition<'a> for (&'a str, &'a str) {
 }
 
 impl<'a> IntoGroupByDefinition<'a> for Column<'a> {
+    fn into_group_by_definition(self) -> GroupByDefinition<'a> {
+        self.into()
+    }
+}
+
+impl<'a> IntoGroupByDefinition<'a> for Function<'a> {
     fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         self.into()
     }
