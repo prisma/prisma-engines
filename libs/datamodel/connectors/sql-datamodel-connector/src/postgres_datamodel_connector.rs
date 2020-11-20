@@ -24,8 +24,10 @@ const CHAR_TYPE_NAME: &str = "Char";
 const TEXT_TYPE_NAME: &str = "Text";
 const BYTE_A_TYPE_NAME: &str = "ByteA";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
+const TIMESTAMP_TZ_TYPE_NAME: &str = "Timestamptz";
 const DATE_TYPE_NAME: &str = "Date";
 const TIME_TYPE_NAME: &str = "Time";
+const TIME_TZ_TYPE_NAME: &str = "Timetz";
 const BOOLEAN_TYPE_NAME: &str = "Boolean";
 const BIT_TYPE_NAME: &str = "Bit";
 const VAR_BIT_TYPE_NAME: &str = "VarBit";
@@ -67,8 +69,11 @@ impl PostgresDatamodelConnector {
         let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]);
         let byte_a = NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, vec![ScalarType::Bytes]);
         let timestamp = NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let timestamptz =
+            NativeTypeConstructor::with_optional_args(TIMESTAMP_TZ_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, vec![ScalarType::DateTime]);
         let time = NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let timetz = NativeTypeConstructor::with_optional_args(TIME_TZ_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let boolean = NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, vec![ScalarType::Boolean]);
         let bit = NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, vec![ScalarType::String]);
         let varbit = NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, vec![ScalarType::String]);
@@ -93,8 +98,10 @@ impl PostgresDatamodelConnector {
             text,
             byte_a,
             timestamp,
+            timestamptz,
             date,
             time,
+            timetz,
             boolean,
             bit,
             varbit,
@@ -172,7 +179,9 @@ impl Connector for PostgresDatamodelConnector {
 
             let time_precision = match native_type {
                 PostgresType::Timestamp(p) => p,
+                PostgresType::Timestamptz(p) => p,
                 PostgresType::Time(p) => p,
+                PostgresType::Timetz(p) => p,
                 _ => None,
             };
 
@@ -216,8 +225,10 @@ impl Connector for PostgresDatamodelConnector {
             TEXT_TYPE_NAME => PostgresType::Text,
             BYTE_A_TYPE_NAME => PostgresType::ByteA,
             TIMESTAMP_TYPE_NAME => PostgresType::Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
+            TIMESTAMP_TZ_TYPE_NAME => PostgresType::Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME)?),
             DATE_TYPE_NAME => PostgresType::Date,
             TIME_TYPE_NAME => PostgresType::Time(parse_one_opt_u32(args, TIME_TYPE_NAME)?),
+            TIME_TZ_TYPE_NAME => PostgresType::Time(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME)?),
             BOOLEAN_TYPE_NAME => PostgresType::Boolean,
             BIT_TYPE_NAME => PostgresType::Bit(parse_one_opt_u32(args, BIT_TYPE_NAME)?),
             VAR_BIT_TYPE_NAME => PostgresType::VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME)?),
@@ -249,8 +260,10 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::Text => (TEXT_TYPE_NAME, vec![]),
             PostgresType::ByteA => (BYTE_A_TYPE_NAME, vec![]),
             PostgresType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
+            PostgresType::Timestamptz(x) => (TIMESTAMP_TZ_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Date => (DATE_TYPE_NAME, vec![]),
             PostgresType::Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
+            PostgresType::Timetz(x) => (TIME_TZ_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Boolean => (BOOLEAN_TYPE_NAME, vec![]),
             PostgresType::Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),
