@@ -10,10 +10,12 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
     let selection_order = collect_selection_tree(&nested_fields);
     let args = extractors::extract_query_args(field.arguments, &model)?;
 
-    // Reject unstable cursors for aggregations, because we can't do post-processing on those (we haven't implemented a in-memory aggregator yet).
-    if args.contains_unstable_cursor() {
+    // Reject any inmemory-requiring operation for aggregations, we don't have an in-memory aggregator yet.
+    if args.requires_inmemory_processing() {
         return Err(QueryGraphBuilderError::InputError(
-            "The chosen cursor and orderBy combination is not stable (unique) and can't be used for aggregations."
+            "Unable to process combination of query arguments for aggregation query. \
+             Please note that it is not possible at the moment to have a null-cursor, \
+             or a cursor and orderBy combination that not stable (unique) ."
                 .to_owned(),
         ));
     }

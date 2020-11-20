@@ -1,4 +1,4 @@
-use super::*;
+// use super::*;
 
 // pub(crate) fn group_by_input_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
 //     let name = format!("{}GroupBySelection", model.name);
@@ -17,17 +17,17 @@ use super::*;
 //     Arc::downgrade(&input_object)
 // }
 
-pub fn model_field_enum(model: &ModelRef) -> EnumTypeRef {
-    Arc::new(EnumType::FieldRef(FieldRefEnumType {
-        name: format!("{}GroupByFieldEnum", capitalize(&model.name)),
-        values: model
-            .fields()
-            .scalar()
-            .into_iter()
-            .map(|field| (field.name.clone(), field))
-            .collect(),
-    }))
-}
+// pub fn model_field_enum(model: &ModelRef) -> EnumTypeRef {
+//     Arc::new(EnumType::FieldRef(FieldRefEnumType {
+//         name: format!("{}GroupByFieldEnum", capitalize(&model.name)),
+//         values: model
+//             .fields()
+//             .scalar()
+//             .into_iter()
+//             .map(|field| (field.name.clone(), field))
+//             .collect(),
+//     }))
+// }
 
 // fn aggregation_operation_enum() -> EnumTypeRef {
 //     Arc::new(string_enum_type(

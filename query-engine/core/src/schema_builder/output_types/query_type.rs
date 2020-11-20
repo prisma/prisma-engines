@@ -49,7 +49,7 @@ fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputFi
 
 /// Builds a find first item field for given model.
 fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::many_records_arguments(ctx, &model);
+    let args = arguments::many_records_arguments(ctx, &model, true);
     let field_name = format!("findFirst{}", model.name);
 
     field(
@@ -66,7 +66,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::many_records_arguments(ctx, &model);
+    let args = arguments::many_records_arguments(ctx, &model, true);
     let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
 
     field(
@@ -84,7 +84,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
         format!("aggregate{}", model.name),
-        arguments::many_records_arguments(ctx, &model),
+        arguments::many_records_arguments(ctx, &model, false),
         OutputType::object(aggregation::plain::aggregation_object_type(ctx, &model)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
@@ -95,7 +95,7 @@ fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Output
 
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
 fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let mut args = arguments::many_records_arguments(ctx, &model);
+    let mut args = arguments::many_records_arguments(ctx, &model, false);
     let group_by_arg = arguments::by_argument(ctx, &model);
 
     args.push(group_by_arg);
