@@ -1,6 +1,6 @@
 use super::*;
-use crate::{query_document::ParsedField, AggregateRecordsQuery, AggregationType, FieldPair, ReadQuery};
-use connector::Aggregator;
+use crate::{query_document::ParsedField, AggregateRecordsQuery, FieldPair, ReadQuery};
+use connector::AggregationSelection;
 use prisma_models::{ModelRef, ScalarFieldRef};
 
 pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
@@ -19,7 +19,7 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
         ));
     }
 
-    let aggregators: Vec<_> = nested_fields
+    let selectors: Vec<_> = nested_fields
         .into_iter()
         .map(|field| resolve_query(field, &model))
         .collect::<QueryGraphBuilderResult<_>>()?;
@@ -30,18 +30,19 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
         model,
         selection_order,
         args,
-        typ: AggregationType::Plain(aggregators),
+        selectors,
+        group_by: vec![],
     }))
 }
 
 /// Resolves the given field as a aggregation query.
-fn resolve_query(field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<Aggregator> {
+fn resolve_query(field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<AggregationSelection> {
     let query = match field.parsed_field.name.as_str() {
-        "count" => Aggregator::Count(None),
-        "avg" => Aggregator::Average(resolve_fields(model, field)),
-        "sum" => Aggregator::Sum(resolve_fields(model, field)),
-        "min" => Aggregator::Min(resolve_fields(model, field)),
-        "max" => Aggregator::Max(resolve_fields(model, field)),
+        "count" => AggregationSelection::Count(None),
+        "avg" => AggregationSelection::Average(resolve_fields(model, field)),
+        "sum" => AggregationSelection::Sum(resolve_fields(model, field)),
+        "min" => AggregationSelection::Min(resolve_fields(model, field)),
+        "max" => AggregationSelection::Max(resolve_fields(model, field)),
         _ => unreachable!(),
     };
 

@@ -130,7 +130,7 @@ pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> I
     .optional()
 }
 
-pub(crate) fn by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
-    let object_type = InputType::object(group_by_objects::group_by_input_object_type(ctx, model));
-    input_field("by", vec![InputType::list(object_type.clone()), object_type], None)
+pub(crate) fn by_argument(_ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
+    let enum_type = InputType::Enum(group_by_objects::model_field_enum(model));
+    input_field("by", vec![InputType::list(enum_type.clone()), enum_type], None)
 }

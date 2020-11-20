@@ -39,7 +39,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   "Using a simple groupBy without any records in the database" should "return 0 for all aggregations" in {
     val result = server.query(
       s"""{
-         |  groupByModel(by: [{ field: id, operation: count }, { field: float }, { field: int, operation: sum }]) {
+         |  groupByModel(by: [{ field: id }, { field: float }, { field: int }]) {
          |    count { id }
          |    float
          |    sum { int }

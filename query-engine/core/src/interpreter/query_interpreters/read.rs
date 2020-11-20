@@ -153,11 +153,9 @@ async fn aggregate<'a, 'b>(
 ) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
 
-    let results = match query.typ {
-        AggregationType::Plain(aggregators) => tx.aggregate_records(&query.model, aggregators, query.args),
-        AggregationType::GroupBy(by) => tx.group_by_records(&query.model, by, query.args),
-    }
-    .await?;
+    let results = tx
+        .aggregate_records(&query.model, query.selectors, query.group_by, query.args)
+        .await?;
 
     Ok(QueryResult::RecordAggregation(RecordAggregation {
         selection_order,

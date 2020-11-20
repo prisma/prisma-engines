@@ -2,10 +2,9 @@ use std::convert::TryInto;
 
 use super::*;
 use crate::{
-    query_document::ParsedField, AggregateRecordsQuery, AggregationType, ArgumentListLookup, FieldPair,
-    ParsedInputValue, ReadQuery,
+    query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, FieldPair, ParsedInputValue, ReadQuery,
 };
-use connector::Aggregator;
+use connector::AggregationSelection;
 use prisma_models::{ModelRef, PrismaValue, ScalarFieldRef};
 
 pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
@@ -13,12 +12,14 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
     let alias = field.alias;
     let model = model;
 
-    let by_argument = field.arguments.lookup("by").unwrap();
-    let aggregators = extract_aggregators(&model, by_argument.value)?;
+    let by_arg = field.arguments.lookup("by").unwrap().value;
+    let group_by = extract_grouping(&model, by_arg)?;
 
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let nested_fields = field.nested_fields.unwrap().fields;
     let selection_order = vec![];
+
+    let selectors = vec![];
 
     // Todo: Generate nested selection based on the grouping. Ordering of fields is best-effort based on occurrence.
 
@@ -28,11 +29,29 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         model,
         selection_order,
         args,
-        typ: AggregationType::GroupBy(aggregators),
+        selectors,
+        group_by,
     }))
 }
 
-fn extract_aggregators(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Aggregator>> {
+fn extract_grouping(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<ScalarFieldRef>> {
+    match value {
+        ParsedInputValue::ScalarField(field) => Ok(vec![field]),
+
+        ParsedInputValue::List(list) => list
+            .into_iter()
+            .map(|item| Ok(item.try_into()?))
+            .collect::<QueryGraphBuilderResult<Vec<ScalarFieldRef>>>(),
+
+        _ => {
+            return Err(QueryGraphBuilderError::InputError(
+                "Expected parsing to guarantee either a single enum or list a list of enums is provided for group by `by` arg.".to_owned(),
+            ))
+        }
+    }
+}
+
+fn extract_selections(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<AggregationSelection>> {
     match value {
         ParsedInputValue::Map(mut map) => {
             let field: ScalarFieldRef = map
@@ -45,22 +64,22 @@ fn extract_aggregators(model: &ModelRef, value: ParsedInputValue) -> QueryGraphB
                 .map(|op| {
                     let op: PrismaValue = op.try_into().unwrap();
                     let field = field.clone();
-                    let aggregator = match op.into_string().unwrap().as_str() {
-                        "count" => Aggregator::Count(None),
-                        "avg" => Aggregator::Average(vec![field]),
-                        "sum" => Aggregator::Sum(vec![field]),
-                        "min" => Aggregator::Min(vec![field]),
-                        "max" => Aggregator::Max(vec![field]),
+                    let selection = match op.into_string().unwrap().as_str() {
+                        "count" => AggregationSelection::Count(None),
+                        "avg" => AggregationSelection::Average(vec![field]),
+                        "sum" => AggregationSelection::Sum(vec![field]),
+                        "min" => AggregationSelection::Min(vec![field]),
+                        "max" => AggregationSelection::Max(vec![field]),
                         _ => unreachable!(),
                     };
 
-                    vec![aggregator]
+                    vec![selection]
                 })
-                .unwrap_or_else(|| vec![Aggregator::Field(field)]))
+                .unwrap_or_else(|| vec![AggregationSelection::Field(field)]))
         }
         ParsedInputValue::List(list) => list
             .into_iter()
-            .map(|item| extract_aggregators(model, item))
+            .map(|item| extract_selections(model, item))
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|lists| lists.into_iter().flatten().collect()),
         _ => {

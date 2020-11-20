@@ -83,8 +83,9 @@ impl From<RecordProjection> for RecordFilter {
     }
 }
 
+/// Selections for aggregation queries.
 #[derive(Debug, Clone)]
-pub enum Aggregator {
+pub enum AggregationSelection {
     /// Single field selector. Only valid in the context of group by statements.
     Field(ScalarFieldRef),
 
@@ -105,15 +106,15 @@ pub enum Aggregator {
     Max(Vec<ScalarFieldRef>),
 }
 
-impl Aggregator {
+impl AggregationSelection {
     pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         match self {
-            Aggregator::Field(field) => vec![(field.type_identifier.clone(), FieldArity::Required)],
-            Aggregator::Count(_) => vec![(TypeIdentifier::Int, FieldArity::Required)],
-            Aggregator::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
-            Aggregator::Sum(fields) => Self::map_field_types(&fields, None),
-            Aggregator::Min(fields) => Self::map_field_types(&fields, None),
-            Aggregator::Max(fields) => Self::map_field_types(&fields, None),
+            AggregationSelection::Field(field) => vec![(field.type_identifier.clone(), FieldArity::Required)],
+            AggregationSelection::Count(_) => vec![(TypeIdentifier::Int, FieldArity::Required)],
+            AggregationSelection::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
+            AggregationSelection::Sum(fields) => Self::map_field_types(&fields, None),
+            AggregationSelection::Min(fields) => Self::map_field_types(&fields, None),
+            AggregationSelection::Max(fields) => Self::map_field_types(&fields, None),
         }
     }
 
@@ -187,22 +188,16 @@ pub trait ReadOperations {
         from_record_ids: &[RecordProjection],
     ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>>;
 
-    /// Aggregates records for a specific model based on the given aggregators.
+    /// Aggregates records for a specific model based on the given selections.
     /// Whether or not the aggregations can be executed in a single query or
     /// requires multiple roundtrips to the underlying data source is at the
     /// discretion of the implementing connector.
+    ///
     async fn aggregate_records(
         &self,
         model: &ModelRef,
-        aggregators: Vec<Aggregator>,
-        query_arguments: QueryArguments,
-    ) -> crate::Result<Vec<AggregationResult>>;
-
-    /// Groups records for a specific model based on the given aggregators.
-    async fn group_by_records(
-        &self,
-        model: &ModelRef,
-        by: Vec<Aggregator>,
+        selections: Vec<AggregationSelection>,
+        group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
     ) -> crate::Result<Vec<AggregationResult>>;
 }

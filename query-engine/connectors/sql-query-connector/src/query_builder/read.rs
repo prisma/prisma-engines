@@ -1,5 +1,5 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering};
-use connector_interface::{filter::Filter, Aggregator, QueryArguments};
+use connector_interface::{filter::Filter, AggregationSelection, QueryArguments};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
@@ -96,52 +96,52 @@ where
 ///             1 = 1
 ///     ) AS `sub`;
 /// ```
-pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArguments) -> Select<'static> {
-    let columns = extract_columns(model, &aggregators);
+pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: QueryArguments) -> Select<'static> {
+    let columns = extract_columns(model, &selections);
     let sub_query = get_records(model, columns.into_iter(), args);
     let sub_table = Table::from(sub_query).alias("sub");
 
-    aggregators
+    selections
         .iter()
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
-            Aggregator::Field(field) => select.column(field.as_column()),
+            AggregationSelection::Field(field) => select.column(field.as_column()),
 
-            Aggregator::Count(field) => match field {
+            AggregationSelection::Count(field) => match field {
                 Some(field) => select.value(count(Column::from(field.db_name().to_owned()))),
                 None => select.value(count(asterisk())),
             },
 
-            Aggregator::Average(fields) => fields
+            AggregationSelection::Average(fields) => fields
                 .iter()
                 .fold(select, |select, next_field| select.value(avg(next_field.as_column()))),
 
-            Aggregator::Sum(fields) => fields
+            AggregationSelection::Sum(fields) => fields
                 .iter()
                 .fold(select, |select, next_field| select.value(sum(next_field.as_column()))),
 
-            Aggregator::Min(fields) => fields
+            AggregationSelection::Min(fields) => fields
                 .iter()
                 .fold(select, |select, next_field| select.value(min(next_field.as_column()))),
 
-            Aggregator::Max(fields) => fields
+            AggregationSelection::Max(fields) => fields
                 .iter()
                 .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
         })
 }
 
-fn extract_columns(model: &ModelRef, aggregators: &[Aggregator]) -> Vec<Column<'static>> {
-    let fields: Vec<_> = aggregators
+fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec<Column<'static>> {
+    let fields: Vec<_> = selections
         .iter()
-        .flat_map(|aggregator| match aggregator {
-            Aggregator::Field(field) => vec![field.clone()],
-            Aggregator::Count(field) => match field {
+        .flat_map(|selection| match selection {
+            AggregationSelection::Field(field) => vec![field.clone()],
+            AggregationSelection::Count(field) => match field {
                 Some(field) => vec![field.clone()],
                 None => model.primary_identifier().scalar_fields().collect(),
             },
-            Aggregator::Average(fields) => fields.clone(),
-            Aggregator::Sum(fields) => fields.clone(),
-            Aggregator::Min(fields) => fields.clone(),
-            Aggregator::Max(fields) => fields.clone(),
+            AggregationSelection::Average(fields) => fields.clone(),
+            AggregationSelection::Sum(fields) => fields.clone(),
+            AggregationSelection::Min(fields) => fields.clone(),
+            AggregationSelection::Max(fields) => fields.clone(),
         })
         .unique_by(|field| field.db_name().to_owned())
         .collect();
