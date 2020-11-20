@@ -286,6 +286,10 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 ..
             } => {
                 if row.values.is_empty() {
+                    if let Some(returning) = insert.returning {
+                        self.visit_returning(returning)?;
+                    }
+
                     self.write(" DEFAULT VALUES")?;
                 } else {
                     self.write(" ")?;
