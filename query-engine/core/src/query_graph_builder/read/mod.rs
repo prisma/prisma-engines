@@ -1,16 +1,14 @@
 //! Unwraps in this module are safe because of query validation that ensures conformity to the query schema.
 
-mod aggregate;
+mod aggregations;
 mod first;
-mod group_by;
 mod many;
 mod one;
 mod related;
 mod utils;
 
-pub use aggregate::*;
+pub use aggregations::*;
 pub use first::*;
-pub use group_by::*;
 pub use many::*;
 pub use one::*;
 pub use related::*;

@@ -148,11 +148,21 @@ pub async fn get_related_m2m_record_ids(
 pub async fn aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
-    aggregators: Vec<AggregationSelection>,
+    selections: Vec<AggregationSelection>,
+    group_by: Vec<ScalarFieldRef>,
     query_arguments: QueryArguments,
 ) -> crate::Result<Vec<AggregationResult>> {
-    let query = read::aggregate(model, &aggregators, query_arguments);
-    let idents: Vec<_> = aggregators
+    let query = read::aggregate(model, &selections, query_arguments);
+
+    let query = if group_by.len() > 0 {
+        group_by
+            .into_iter()
+            .fold(query, |query, field| query.group_by(field.as_column()))
+    } else {
+        query
+    };
+
+    let idents: Vec<_> = selections
         .iter()
         .flat_map(|aggregator| aggregator.identifiers())
         .collect();
@@ -162,7 +172,7 @@ pub async fn aggregate(
         .pop()
         .expect("Expected exactly one return row for aggregation query.");
 
-    Ok(row.into_aggregation_results(&aggregators))
+    Ok(row.into_aggregation_results(&selections))
 }
 
 pub async fn group_by(

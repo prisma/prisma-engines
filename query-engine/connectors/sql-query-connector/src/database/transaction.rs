@@ -85,7 +85,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
     ) -> connector::Result<Vec<AggregationResult>> {
-        self.catch(async move { read::aggregate(&self.inner, model, selections, query_arguments).await })
+        self.catch(async move { read::aggregate(&self.inner, model, selections, group_by, query_arguments).await })
             .await
     }
 }
