@@ -1,7 +1,7 @@
 use crate::command_error::CommandError;
 use crate::error::Error;
 use datamodel::configuration::preview_features::PreviewFeatures;
-use datamodel::{Configuration, Datamodel};
+use datamodel::{Configuration, Datamodel, FieldArity};
 use futures::{FutureExt, TryFutureExt};
 use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
 use jsonrpc_derive::rpc;
@@ -98,11 +98,7 @@ impl RpcImpl {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
         let input_data_model = if !force {
-            datamodel::parse_datamodel(&schema).map(|d| d.subject).map_err(|err| {
-                Error::from(CommandError::ReceivedBadDatamodel(
-                    err.to_pretty_string("schema.prisma", &schema),
-                ))
-            })?
+            Self::parse_datamodel(&schema, &config)?
         } else {
             Datamodel::new()
         };
@@ -135,6 +131,51 @@ impl RpcImpl {
         };
 
         result.map_err(RpcError::from)
+    }
+
+    /// This function parses the provided schema and returns the contained Datamodel.
+    /// In this processes it applies a patch to turn virtual relation fields that are required into optional instead.
+    /// The reason for this is that we introduced a breaking change to disallow required virtual relation fields.
+    /// With this patch we can tell users to simply run `prisma introspect` to fix their schema.
+    fn parse_datamodel(schema: &str, config: &Configuration) -> RpcResult<Datamodel> {
+        // 1. Parse the schema without any validations & standardisations. A required virtual relation field would fail validation as it is forbidden.
+        let mut dm_that_needs_fixing = datamodel::parse_datamodel_without_validation(&schema).map_err(|err| {
+            Error::from(CommandError::ReceivedBadDatamodel(
+                err.to_pretty_string("schema.prisma", &schema),
+            ))
+        })?;
+
+        // 2. Turn all virtual relation fields that are required into optional ones.
+        let cloned_dm = dm_that_needs_fixing.clone();
+        for model in dm_that_needs_fixing.models.iter_mut() {
+            for relation_field in model.relation_fields_mut() {
+                // if there's no related field we don't know enough to do this patch
+                if let Some(related_field) = cloned_dm.find_related_field(relation_field) {
+                    let is_required_virtual_relation_field =
+                        relation_field.arity.is_required() && relation_field.is_virtual();
+
+                    // we only do this if the related field is not virtual
+                    // if the related field is virtual as well this means standardisation has not run yet and we don't know which one is virtual for sure
+                    if is_required_virtual_relation_field && !related_field.is_virtual() {
+                        relation_field.arity = FieldArity::Optional;
+                    }
+                }
+            }
+        }
+
+        // 3. Render the datamodel and then parse it. This makes sure the validations & standardisations have been run.
+        // TODO: unwrap is safe because printing can't fail. Will prove this to the compiler soon.
+        let rendered_datamodel =
+            datamodel::render_datamodel_and_config_to_string(&dm_that_needs_fixing, &config).unwrap();
+        datamodel::parse_datamodel(&rendered_datamodel)
+            .map(|d| d.subject)
+            .map_err(|err| {
+                Error::from(CommandError::ReceivedBadDatamodel(
+                    err.to_pretty_string("schema.prisma", &schema),
+                ))
+            })?;
+
+        Ok(dm_that_needs_fixing)
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {

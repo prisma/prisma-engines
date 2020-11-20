@@ -107,6 +107,15 @@ pub fn parse_datamodel_and_ignore_datasource_urls(
     parse_datamodel_internal(datamodel_string, true)
 }
 
+pub fn parse_datamodel_without_validation(datamodel_string: &str) -> Result<Datamodel, diagnostics::Diagnostics> {
+    let ast = ast::parser::parse_schema(datamodel_string)?;
+    let sources = load_sources(&ast, true, vec![])?;
+    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let validator = ValidationPipeline::new(&sources.subject, &generators.subject);
+
+    validator.lift_without_validation(&ast)
+}
+
 /// Parses and validates a datamodel string, using core attributes only.
 /// In case of an error, a pretty, colorful string is returned.
 pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {

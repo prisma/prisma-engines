@@ -14,7 +14,7 @@ use test_setup::connectors::Tags;
 use test_setup::*;
 
 pub struct TestApi {
-    db_name: &'static str,
+    pub db_name: &'static str,
     connection_info: ConnectionInfo,
     sql_family: SqlFamily,
     database: Quaint,
