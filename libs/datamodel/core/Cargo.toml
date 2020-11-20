@@ -10,8 +10,6 @@ dml = {path = "../connectors/dml"}
 prisma-value = {path = "../../prisma-value"}
 bigdecimal = "0.2"
 sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
-# Temporary until PR is accepted.
-bytecount = "0.5"
 chrono = {version = "0.4.6", features = ["serde"]}
 colored = "1.8.0"
 cuid = {git = "https://github.com/prisma/cuid-rust"}

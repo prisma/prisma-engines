@@ -34,10 +34,6 @@ tracing-futures = "0.2"
 version = "0.2"
 features = ["macros"]
 
-[dev-dependencies]
-pretty_assertions = "0.6.1"
-test-setup = { path = "../../libs/test-setup" }
-
 [[bin]]
 name = "introspection-engine"
 path = "src/main.rs"
