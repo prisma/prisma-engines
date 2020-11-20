@@ -96,6 +96,8 @@ where
 ///             1 = 1
 ///     ) AS `sub`;
 /// ```
+/// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
+/// not absolute - e.g. `SELECT "field" FROM (...)` NOT `SELECT "full"."path"."to"."field" FROM (...)`.
 pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: QueryArguments) -> Select<'static> {
     let columns = extract_columns(model, &selections);
     let sub_query = get_records(model, columns.into_iter(), args);
@@ -104,28 +106,28 @@ pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: Qu
     selections
         .iter()
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
-            AggregationSelection::Field(field) => select.column(field.as_column()),
+            AggregationSelection::Field(field) => select.column(Column::from(field.db_name().to_owned())),
 
             AggregationSelection::Count(field) => match field {
                 Some(field) => select.value(count(Column::from(field.db_name().to_owned()))),
                 None => select.value(count(asterisk())),
             },
 
-            AggregationSelection::Average(fields) => fields
-                .iter()
-                .fold(select, |select, next_field| select.value(avg(next_field.as_column()))),
+            AggregationSelection::Average(fields) => fields.iter().fold(select, |select, next_field| {
+                select.value(avg(Column::from(next_field.db_name().to_owned())))
+            }),
 
-            AggregationSelection::Sum(fields) => fields
-                .iter()
-                .fold(select, |select, next_field| select.value(sum(next_field.as_column()))),
+            AggregationSelection::Sum(fields) => fields.iter().fold(select, |select, next_field| {
+                select.value(sum(Column::from(next_field.db_name().to_owned())))
+            }),
 
-            AggregationSelection::Min(fields) => fields
-                .iter()
-                .fold(select, |select, next_field| select.value(min(next_field.as_column()))),
+            AggregationSelection::Min(fields) => fields.iter().fold(select, |select, next_field| {
+                select.value(min(Column::from(next_field.db_name().to_owned())))
+            }),
 
-            AggregationSelection::Max(fields) => fields
-                .iter()
-                .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
+            AggregationSelection::Max(fields) => fields.iter().fold(select, |select, next_field| {
+                select.value(max(Column::from(next_field.db_name().to_owned())))
+            }),
         })
 }
 
