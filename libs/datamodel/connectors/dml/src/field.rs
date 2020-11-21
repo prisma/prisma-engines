@@ -252,6 +252,12 @@ impl RelationField {
     pub fn is_optional(&self) -> bool {
         self.arity.is_optional()
     }
+
+    /// A relation field is virtual if there's no reference to the related model stored in this model.
+    /// example: In SQL this means that this will return true if the foreign key is stored on the other side.
+    pub fn is_virtual(&self) -> bool {
+        self.relation_info.fields.is_empty() && self.relation_info.to_fields.is_empty()
+    }
 }
 
 /// Represents a scalar field in a model.

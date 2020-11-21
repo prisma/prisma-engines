@@ -1689,6 +1689,7 @@ dependencies = [
  "eyre",
  "indoc 1.0.3",
  "introspection-connector",
+ "introspection-core",
  "pretty_assertions",
  "quaint",
  "serde",

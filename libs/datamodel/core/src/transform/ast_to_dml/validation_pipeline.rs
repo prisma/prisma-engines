@@ -1,5 +1,5 @@
 use super::*;
-use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
+use crate::{ast, configuration, diagnostics::Diagnostics, Datamodel, ValidatedDatamodel};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
@@ -90,5 +90,12 @@ impl<'a, 'b> ValidationPipeline<'a, 'b> {
                 warnings: diagnostics.warnings,
             })
         }
+    }
+
+    pub fn lift_without_validation(&self, ast_schema: &ast::SchemaAst) -> Result<Datamodel, Diagnostics> {
+        // Phase 2: Prechecks.
+        precheck::Precheck::precheck(&ast_schema)?;
+        // Phase 3: Lift AST to DML.
+        self.lifter.lift(ast_schema)
     }
 }
