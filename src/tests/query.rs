@@ -521,6 +521,24 @@ async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
+#[cfg(feature = "mssql")]
+#[test_each_connector(tags("mssql"))]
+async fn multiple_resultset_should_return_the_last_one(api: &mut dyn TestApi) -> crate::Result<()> {
+    let res = api
+        .conn()
+        .query_raw("SELECT 1 AS foo; SELECT 1 AS foo, 2 AS bar;", &[])
+        .await?;
+
+    assert_eq!(&vec!["foo", "bar"], res.columns());
+
+    let row = res.into_single()?;
+
+    assert_eq!(Some(&Value::Integer(Some(1))), row.get("foo"));
+    assert_eq!(Some(&Value::Integer(Some(2))), row.get("bar"));
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn single_insert_conflict_do_nothing_single_unique(api: &mut dyn TestApi) -> crate::Result<()> {
     let constraint = api.unique_constraint("id");
@@ -1010,7 +1028,7 @@ async fn float_columns_cast_to_f32(api: &mut dyn TestApi) -> crate::Result<()> {
     let row = api.conn().query(select.into()).await?.into_single()?;
     let value = row.at(0).unwrap();
 
-    assert_eq!(Some(6.412345), value.as_f64());
+    assert_eq!(Some(6.4123454), value.as_f32());
 
     Ok(())
 }
@@ -1287,7 +1305,10 @@ async fn op_test_div_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
     let q = Select::from_table(&table).value(col!("a") / col!("b"));
     let row = api.conn().select(q).await?.into_single()?;
 
-    assert_eq!(Some(2.0), row[0].as_f64());
+    match api.system() {
+        "mssql" => assert_eq!(Some(2.0), row[0].as_f32()),
+        _ => assert_eq!(Some(2.0), row[0].as_f64()),
+    }
 
     Ok(())
 }

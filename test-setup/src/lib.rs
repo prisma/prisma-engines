@@ -14,15 +14,10 @@ pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
 
 fn connector_names() -> Vec<(&'static str, Tags)> {
     vec![
-        #[cfg(feature = "mssql")]
         ("mssql", Tags::MSSQL),
-        #[cfg(feature = "mysql")]
         ("mysql", Tags::MYSQL),
-        #[cfg(feature = "mysql")]
         ("mysql8", Tags::MYSQL8),
-        #[cfg(feature = "postgresql")]
         ("postgres", Tags::POSTGRES),
-        #[cfg(feature = "sqlite")]
         ("sqlite", Tags::SQLITE),
     ]
 }

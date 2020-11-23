@@ -112,13 +112,14 @@ fn test_each_connector_async_wrapper_functions(
     };
 
     for connector in args.connectors_to_test() {
-        let connector_test_fn_name =
-            Ident::new(&format!("{}_on_{}", test_fn_name, connector.name()), Span::call_site());
+        let connector_name = connector.name();
+        let connector_test_fn_name = Ident::new(&format!("{}_on_{}", test_fn_name, connector_name), Span::call_site());
 
         let conn_api_factory = Ident::new(connector.test_api(), Span::call_site());
 
         let test = quote! {
             #[test]
+            #[cfg(feature = #connector_name)]
             fn #connector_test_fn_name() {
                 let fut = async {
                     let mut api = #conn_api_factory().await#optional_unwrap;
