@@ -73,6 +73,28 @@ fn must_fail_if_the_schema_is_invalid() {
     assert!(test_dmmf_cli_command(schema).is_err());
 }
 
+#[test]
+#[serial]
+fn must_add_model_and_purpose_to_create_one_input_type() {
+    let schema = r#"
+        model Blog {
+            id String @id
+        }
+    "#;
+
+    let (query_schema, datamodel) = get_query_schema(schema);
+    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+    let mut inputs_types_per_namespace = dmmf.schema.input_object_types;
+
+    let mut all_inputs_types = Vec::new();
+    for (_namespace, mut input_types) in inputs_types_per_namespace.iter_mut() {
+        all_inputs_types.append(&mut input_types);
+    }
+    let create_one_input = all_inputs_types.iter().find(|it| it.name == "BlogCreateInput").unwrap();
+    assert_eq!(create_one_input.model, Some("Blog".to_string()));
+    assert_eq!(create_one_input.purpose, Some("CreateOne".to_string()));
+}
+
 fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
     feature_flags::initialize(&[String::from("all")]).unwrap();
 

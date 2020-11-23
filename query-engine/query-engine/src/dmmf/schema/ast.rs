@@ -26,6 +26,8 @@ pub struct DmmfInputType {
     pub name: String,
     pub constraints: DmmfInputTypeConstraints,
     pub fields: Vec<DmmfInputField>,
+    pub model: Option<String>,
+    pub purpose: Option<String>, // TODO: lift this into a proper enum once we are sure about this direction
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -262,6 +262,13 @@ pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
     pub fields: OnceCell<Vec<InputFieldRef>>,
+    pub model: Option<String>,
+    pub purpose: Option<InputObjectTypePurpose>,
+}
+
+#[derive(PartialEq, Debug)]
+pub enum InputObjectTypePurpose {
+    CreateOne,
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -327,6 +334,11 @@ impl InputObjectType {
     /// Require a minimum of `min` fields to be present in the input.
     pub fn set_min_fields(&mut self, min: usize) {
         self.constraints.min_num_fields = Some(min);
+    }
+
+    pub fn set_model_and_purpose(&mut self, model: String, purpose: InputObjectTypePurpose) {
+        self.model = Some(model);
+        self.purpose = Some(purpose);
     }
 }
 

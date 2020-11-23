@@ -40,6 +40,8 @@ impl DmmfObjectRenderer {
                 min_num_fields: input_object.constraints.min_num_fields,
             },
             fields: rendered_fields,
+            model: input_object.model.clone(),
+            purpose: input_object.purpose.as_ref().map(|p| format!("{:?}", &p)),
         };
 
         ctx.add_input_type(input_object.identifier.clone(), input_type);

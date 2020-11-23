@@ -42,8 +42,11 @@ fn checked_create_input_type(
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
-    ctx.cache_input_type(ident, input_object.clone());
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_model_and_purpose(model.name.to_string(), InputObjectTypePurpose::CreateOne);
+
+    let input_object_arc = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object_arc.clone());
 
     // Compute input fields for scalar fields.
     let scalar_fields: Vec<ScalarFieldRef> = model
@@ -73,8 +76,8 @@ fn checked_create_input_type(
 
     fields.append(&mut relational_fields);
 
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
+    input_object_arc.set_fields(fields);
+    Arc::downgrade(&input_object_arc)
 }
 
 /// For checked create input types only. Compute input fields for relational fields.

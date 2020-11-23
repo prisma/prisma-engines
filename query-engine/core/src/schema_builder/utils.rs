@@ -27,6 +27,8 @@ pub fn init_input_object_type(ident: Identifier) -> InputObjectType {
         identifier: ident,
         constraints: InputObjectTypeConstraints::default(),
         fields: OnceCell::new(),
+        model: None,
+        purpose: None,
     }
 }
 
