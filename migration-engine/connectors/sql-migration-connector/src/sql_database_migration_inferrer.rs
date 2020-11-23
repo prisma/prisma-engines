@@ -115,6 +115,15 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
 
         Ok(Some(rollback))
     }
+
+    #[tracing::instrument(skip(self, migrations))]
+    async fn validate_migrations(&self, migrations: &[MigrationDirectory]) -> ConnectorResult<()> {
+        self.flavour()
+            .sql_schema_from_migration_history(migrations, self.conn())
+            .await?;
+
+        Ok(())
+    }
 }
 
 fn infer(

@@ -86,6 +86,7 @@ async fn diagnose_migration_history_calculates_drift(api: &TestApi) -> TestResul
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     let expected_rollback_warnings =
@@ -99,6 +100,7 @@ async fn diagnose_migration_history_calculates_drift(api: &TestApi) -> TestResul
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     Ok(())
 }
@@ -147,6 +149,7 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     let rollback = drift.unwrap().unwrap_drift_detected();
@@ -168,6 +171,7 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
     assert_eq!(failed_migration_names.len(), 1);
     assert_eq!(edited_migration_names.len(), 1);
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     Ok(())
 }
@@ -212,6 +216,7 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -224,6 +229,7 @@ async fn diagnose_migrations_history_can_detect_when_the_database_is_behind(api:
         })
     );
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     Ok(())
 }
@@ -271,6 +277,7 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(failed_migration_names.is_empty());
@@ -283,6 +290,7 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
         })
     );
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     Ok(())
 }
@@ -354,6 +362,7 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(failed_migration_names.is_empty());
@@ -368,6 +377,7 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
         })
     );
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     Ok(())
 }
@@ -414,6 +424,7 @@ async fn diagnose_migrations_history_can_detect_edited_migrations(api: &TestApi)
         edited_migration_names,
         failed_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -421,6 +432,7 @@ async fn diagnose_migrations_history_can_detect_edited_migrations(api: &TestApi)
     assert!(failed_migration_names.is_empty());
     assert_eq!(edited_migration_names, &[initial_migration_name]);
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     Ok(())
 }
@@ -467,12 +479,14 @@ async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly
         history,
         drift,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(has_migrations_table);
     assert_eq!(edited_migration_names, &[initial_migration_name.as_str()]);
     assert!(failed_migration_names.is_empty());
     assert_eq!(history, None);
+    assert!(error_in_unapplied_migration.is_none());
 
     match drift {
         Some(DriftDiagnostic::MigrationFailedToApply { error }) => {
@@ -502,6 +516,7 @@ async fn diagnose_migrations_history_with_a_nonexistent_migrations_directory_wor
         edited_migration_names,
         failed_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -509,6 +524,7 @@ async fn diagnose_migrations_history_with_a_nonexistent_migrations_directory_wor
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(!has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     Ok(())
 }
@@ -550,6 +566,7 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api
         .diagnose_migration_history(&migrations_directory)
         .send()
@@ -560,8 +577,92 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
     assert!(history.is_none());
     assert!(edited_migration_names.is_empty());
     assert!(has_migrations_table);
-
     assert_eq!(failed_migration_names, &[generated_migration_name.unwrap()]);
+
+    let error_in_unapplied_migration =
+        error_in_unapplied_migration.expect("No error in unapplied migrations, but we expected one.");
+
+    let message = error_in_unapplied_migration.message().to_owned();
+
+    assert!(
+        message.contains("01-init` failed to apply cleanly to a temporary database."),
+        message,
+    );
+    assert_eq!(
+        error_in_unapplied_migration.unwrap_known().error_code,
+        user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly::ERROR_CODE,
+    );
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id      Int @id
+            name    String
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    api.apply_migrations(&directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["initial"])?;
+
+    let dm2 = r#"
+        model Cat {
+            id          Int @id
+            name        String
+            fluffiness  Float
+        }
+    "#;
+
+    let CreateMigrationOutput {
+        generated_migration_name,
+    } = api
+        .create_migration("second-migration", dm2, &directory)
+        .send()
+        .await?
+        .modify_migration(|script| {
+            *script = "CREATE BROKEN".into();
+        })?
+        .into_output();
+
+    let DiagnoseMigrationHistoryOutput {
+        failed_migration_names,
+        edited_migration_names,
+        history,
+        drift,
+        has_migrations_table,
+        error_in_unapplied_migration,
+    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+
+    assert!(has_migrations_table);
+    assert!(edited_migration_names.is_empty());
+    assert!(failed_migration_names.is_empty());
+    assert!(
+        matches!(history, Some(HistoryDiagnostic::DatabaseIsBehind { unapplied_migration_names: names }) if names == &[generated_migration_name.unwrap()])
+    );
+    assert!(drift.is_none());
+
+    let error_in_unapplied_migration =
+        error_in_unapplied_migration.expect("No error in unapplied migrations, but we expected one.");
+
+    let message = error_in_unapplied_migration.message().to_owned();
+
+    assert!(
+        message.contains("_second-migration` failed to apply cleanly to a temporary database."),
+        message,
+    );
+    assert_eq!(
+        error_in_unapplied_migration.unwrap_known().error_code,
+        user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly::ERROR_CODE,
+    );
 
     Ok(())
 }

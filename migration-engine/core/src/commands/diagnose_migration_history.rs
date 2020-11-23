@@ -30,6 +30,10 @@ pub struct DiagnoseMigrationHistoryOutput {
     /// migration directory does not match the checksum of the applied migration
     /// in the database.
     pub edited_migration_names: Vec<String>,
+    /// An optional error encountered when applying a migration that is not
+    /// applied in the main database to the shadow database. We do this to
+    /// validate that unapplied migrations are at least minimally valid.
+    pub error_in_unapplied_migration: Option<user_facing_errors::Error>,
     /// Is the migrations table initialized in the database.
     pub has_migrations_table: bool,
 }
@@ -129,11 +133,22 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             _ => None,
         };
 
+        let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. })) {
+            migration_inferrer
+                .validate_migrations(&migrations_from_filesystem)
+                .await
+                .err()
+                .map(|connector_error| connector_error.to_user_facing())
+        } else {
+            None
+        };
+
         Ok(DiagnoseMigrationHistoryOutput {
             drift,
             history: diagnostics.history(),
             failed_migration_names: diagnostics.failed_migration_names(),
             edited_migration_names: diagnostics.edited_migration_names(),
+            error_in_unapplied_migration,
             has_migrations_table,
         })
     }
