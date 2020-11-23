@@ -3,13 +3,11 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use super::SqlSchemaCalculator;
-use datamodel::walkers::ModelWalker;
-use datamodel::{walkers::ScalarFieldWalker, NativeTypeInstance, ScalarType};
+use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, ScalarType};
 use sql_schema_describer as sql;
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
-    fn calculate_enums(&self, _calculator: &SqlSchemaCalculator<'_>) -> Vec<sql::Enum> {
+    fn calculate_enums(&self, _datamodel: &Datamodel) -> Vec<sql::Enum> {
         Vec::new()
     }
 
@@ -24,7 +22,7 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         sql::ForeignKeyAction::Cascade
     }
 
-    fn table_name(&self, model: &ModelWalker<'_>) -> String {
-        model.database_name().into()
+    fn render_table_name(&self, original: &str) -> String {
+        original.to_owned()
     }
 }

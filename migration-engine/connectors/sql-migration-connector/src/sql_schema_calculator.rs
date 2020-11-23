@@ -11,17 +11,20 @@ use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{self as sql, ColumnArity};
 
-pub struct SqlSchemaCalculator<'a> {
+pub(crate) fn calculate_sql_schema(datamodel: &Datamodel, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
+    let calculator = SqlSchemaCalculator {
+        data_model: datamodel,
+        flavour,
+    };
+    calculator.calculate_internal()
+}
+
+struct SqlSchemaCalculator<'a> {
     data_model: &'a Datamodel,
     flavour: &'a dyn SqlFlavour,
 }
 
 impl<'a> SqlSchemaCalculator<'a> {
-    pub(crate) fn calculate(data_model: &Datamodel, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
-        let calculator = SqlSchemaCalculator { data_model, flavour };
-        calculator.calculate_internal()
-    }
-
     fn calculate_internal(&self) -> sql::SqlSchema {
         let mut tables = Vec::with_capacity(self.data_model.models().len());
         let model_tables_without_inline_relations = self.calculate_model_tables();
@@ -33,7 +36,7 @@ impl<'a> SqlSchemaCalculator<'a> {
 
         tables.extend(self.calculate_relation_tables());
 
-        let enums = self.flavour.calculate_enums(self);
+        let enums = self.flavour.calculate_enums(&self.data_model);
         let sequences = Vec::new();
 
         sql::SqlSchema {
@@ -138,7 +141,7 @@ impl<'a> SqlSchemaCalculator<'a> {
             });
 
             let table = sql::Table {
-                name: model.database_name().to_owned(),
+                name: self.flavour.render_table_name(model.database_name()),
                 columns,
                 indices: single_field_indexes.chain(multiple_field_indexes).collect(),
                 primary_key,
@@ -167,7 +170,9 @@ impl<'a> SqlSchemaCalculator<'a> {
                 let fk = sql::ForeignKey {
                     constraint_name: None,
                     columns: fk_columns,
-                    referenced_table: relation_field.referenced_table_name().to_owned(),
+                    referenced_table: self
+                        .flavour
+                        .render_table_name(&relation_field.referenced_model().database_name()),
                     referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
                     on_update_action: sql::ForeignKeyAction::Cascade,
                     on_delete_action: match column_arity(relation_field.arity()) {
@@ -185,7 +190,7 @@ impl<'a> SqlSchemaCalculator<'a> {
         walk_relations(self.data_model)
             .filter_map(|relation| relation.as_m2m())
             .map(move |m2m| {
-                let table_name = m2m.table_name();
+                let table_name = self.flavour.render_table_name(&m2m.table_name());
                 let model_a_id = m2m.model_a_id();
                 let model_b_id = m2m.model_b_id();
                 let model_a = model_a_id.model();

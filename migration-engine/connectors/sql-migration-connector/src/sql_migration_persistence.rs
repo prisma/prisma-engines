@@ -8,24 +8,26 @@ use std::convert::TryFrom;
 #[async_trait::async_trait]
 impl MigrationPersistence for SqlMigrationConnector {
     async fn init(&self) -> Result<(), ConnectorError> {
+        let schema_name = self.conn().connection_info().schema_name();
+
         let sql_str = match self.flavour.sql_family() {
             SqlFamily::Sqlite => {
-                let mut m = barrel::Migration::new();
+                let mut m = barrel::Migration::new().schema(schema_name);
                 m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_sqlite);
                 m.make_from(barrel::SqlVariant::Sqlite)
             }
             SqlFamily::Postgres => {
-                let mut m = barrel::Migration::new();
+                let mut m = barrel::Migration::new().schema(schema_name);
                 m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_postgres);
-                m.make_from(barrel::SqlVariant::Pg)
+                m.schema(schema_name).make_from(barrel::SqlVariant::Pg)
             }
             SqlFamily::Mysql => {
-                let mut m = barrel::Migration::new();
+                let mut m = barrel::Migration::new().schema(schema_name);
                 m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_mysql);
                 m.make_from(barrel::SqlVariant::Mysql)
             }
             SqlFamily::Mssql => {
-                let mut m = barrel::Migration::new();
+                let mut m = barrel::Migration::new().schema(schema_name);
                 m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_mssql);
                 m.make_from(barrel::SqlVariant::Mssql)
             }
@@ -39,7 +41,13 @@ impl MigrationPersistence for SqlMigrationConnector {
     async fn reset(&self) -> ConnectorResult<()> {
         use quaint::ast::Delete;
 
-        self.conn().query(Delete::from_table(MIGRATION_TABLE_NAME)).await.ok();
+        self.conn()
+            .query(Delete::from_table((
+                self.conn().connection_info().schema_name(),
+                MIGRATION_TABLE_NAME,
+            )))
+            .await
+            .ok();
 
         Ok(())
     }
@@ -193,7 +201,17 @@ fn migration_table_setup(
 
 impl SqlMigrationConnector {
     fn table(&self) -> Table<'_> {
-        MIGRATION_TABLE_NAME.into()
+        match self.flavour.sql_family() {
+            SqlFamily::Sqlite => {
+                // sqlite case. Otherwise quaint produces invalid SQL
+                MIGRATION_TABLE_NAME.to_string().into()
+            }
+            _ => (
+                self.conn().connection_info().schema_name().to_string(),
+                MIGRATION_TABLE_NAME.to_string(),
+            )
+                .into(),
+        }
     }
 
     fn convert_datetime(&self, datetime: DateTime<Utc>) -> Value<'_> {
