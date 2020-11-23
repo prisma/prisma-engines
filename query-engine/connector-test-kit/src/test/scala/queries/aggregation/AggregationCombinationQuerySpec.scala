@@ -330,7 +330,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
       """.stripMargin,
       project,
       errorCode = 2019,
-      errorContains = "The chosen cursor and orderBy combination is not stable"
+      errorContains = "Unable to process combination of query arguments for aggregation query"
     )
   }
 }
