@@ -51,14 +51,20 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 }
 
 /// Extracts a regular filter potentially matching many records.
+///
+/// This function recurses to create a structure of `AND/OR/NOT` conditions.
+/// After each recursion we check whether the filter group was populated. If no
+/// filter was defined a `Filter::Empty` is returned. If an `AND/OR/NOT` filter group
+/// was found that has only a single member, we only return the inner filter.
+/// This results in an optimal filter tree.
 pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(key, value)| {
             // 2 possibilities: Either a filter group (and, or, not) with a vector/object, or a field name with a filter object behind.
             match FilterGrouping::from_str(&key) {
-                Ok(nested) => {
-                    let value = match value {
+                Ok(filter_kind) => {
+                    let filters = match value {
                         ParsedInputValue::List(values) => values
                             .into_iter()
                             .map(|val| extract_filter(val.try_into()?, model))
@@ -70,27 +76,50 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                         _ => unreachable!(),
                     };
 
-                    match nested {
-                        FilterGrouping::And => Ok(Filter::and(value)),
-                        FilterGrouping::Or => Ok(Filter::or(value)),
-                        FilterGrouping::Not => Ok(Filter::not(value)),
+                    // strip empty filters
+                    let filters = filters
+                        .into_iter()
+                        .filter(|filter| !matches!(filter, Filter::Empty))
+                        .collect::<Vec<Filter>>();
+
+                    match filters.len() {
+                        0 => Ok(Filter::empty()),
+                        1 => Ok(filters.into_iter().next().unwrap()),
+                        _ => match filter_kind {
+                            FilterGrouping::And => Ok(Filter::and(filters)),
+                            FilterGrouping::Or => Ok(Filter::or(filters)),
+                            FilterGrouping::Not => Ok(Filter::not(filters)),
+                        },
                     }
                 }
                 Err(_) => {
-                    let field = model.fields().find_from_all(&key)?;
-
-                    let filters = match field {
+                    let filters = match model.fields().find_from_all(&key)? {
                         Field::Relation(rf) => extract_relation_filters(rf, value),
                         Field::Scalar(sf) => extract_scalar_filters(sf, value),
                     }?;
 
-                    Ok(Filter::And(filters))
+                    // strip empty filters
+                    let filters = filters
+                        .into_iter()
+                        .filter(|filter| !matches!(filter, Filter::Empty))
+                        .collect::<Vec<Filter>>();
+
+                    match filters.len() {
+                        0 => Ok(Filter::empty()),
+                        1 => Ok(filters.into_iter().next().unwrap()),
+                        _ => Ok(Filter::and(filters)),
+                    }
                 }
             }
         })
+        .filter(|filter| !matches!(filter, Ok(Filter::Empty)))
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
-    Ok(Filter::and(filters))
+    match filters.len() {
+        0 => Ok(Filter::empty()),
+        1 => Ok(filters.into_iter().next().unwrap()),
+        _ => Ok(Filter::and(filters)),
+    }
 }
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
