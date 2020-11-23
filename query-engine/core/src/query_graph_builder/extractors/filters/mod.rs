@@ -54,7 +54,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 ///
 /// This function recurses to create a structure of `AND/OR/NOT` conditions.
 /// After each recursion we check whether the filter group was populated. If no
-/// filter was defined a `Filter::Empty` is returned. If an `AND/OR/NOT` filter group
+/// filter was defined a `Filter::Empty` is returned. If an `AND/OR` filter group
 /// was found that has only a single member, we only return the inner filter.
 /// This results in an optimal filter tree.
 pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
@@ -84,7 +84,10 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
 
                     match filters.len() {
                         0 => Ok(Filter::empty()),
-                        1 => Ok(filters.into_iter().next().unwrap()),
+                        1 => match filter_kind {
+                            FilterGrouping::Not => Ok(Filter::not(filters)),
+                            _ => Ok(filters.into_iter().next().unwrap()),
+                        },
                         _ => match filter_kind {
                             FilterGrouping::And => Ok(Filter::and(filters)),
                             FilterGrouping::Or => Ok(Filter::or(filters)),
