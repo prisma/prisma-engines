@@ -42,7 +42,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
     create("ab", project)
     create("ac", project)
 
-    server.queryThatMustFail(
+    val res = server.query(
       """query {
         |  findManyTestModel(
         |    where: { OR: [{ str: { equals: "aa" }}, {str: {} }]}
@@ -52,9 +52,9 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
         |}
       """.stripMargin,
       project,
-      errorCode = 2009,
-      errorContains = """A value is required but not set.""",
       legacy = false
     )
+
+    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"aa\"}]}}""")
   }
 }
