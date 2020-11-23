@@ -103,12 +103,4 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             native_type: Some(native_type_instance.serialized_native_type.clone()),
         }
     }
-
-    fn render_table_name(&self, original: &str) -> String {
-        if self.lower_cases_table_names() {
-            original.to_lowercase()
-        } else {
-            original.to_owned()
-        }
-    }
 }

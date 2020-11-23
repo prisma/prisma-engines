@@ -141,7 +141,7 @@ impl<'a> SqlSchemaCalculator<'a> {
             });
 
             let table = sql::Table {
-                name: self.flavour.render_table_name(model.database_name()),
+                name: model.database_name().to_owned(),
                 columns,
                 indices: single_field_indexes.chain(multiple_field_indexes).collect(),
                 primary_key,
@@ -170,9 +170,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 let fk = sql::ForeignKey {
                     constraint_name: None,
                     columns: fk_columns,
-                    referenced_table: self
-                        .flavour
-                        .render_table_name(&relation_field.referenced_model().database_name()),
+                    referenced_table: relation_field.referenced_model().database_name().to_owned(),
                     referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
                     on_update_action: sql::ForeignKeyAction::Cascade,
                     on_delete_action: match column_arity(relation_field.arity()) {
@@ -190,7 +188,7 @@ impl<'a> SqlSchemaCalculator<'a> {
         walk_relations(self.data_model)
             .filter_map(|relation| relation.as_m2m())
             .map(move |m2m| {
-                let table_name = self.flavour.render_table_name(&m2m.table_name());
+                let table_name = m2m.table_name();
                 let model_a_id = m2m.model_a_id();
                 let model_b_id = m2m.model_b_id();
                 let model_a = model_a_id.model();

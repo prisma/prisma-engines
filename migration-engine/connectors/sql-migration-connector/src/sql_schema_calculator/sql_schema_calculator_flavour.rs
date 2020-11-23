@@ -21,8 +21,4 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn m2m_foreign_key_action(&self, _model_a: &ModelWalker<'_>, _model_b: &ModelWalker<'_>) -> sql::ForeignKeyAction {
         sql::ForeignKeyAction::Cascade
     }
-
-    fn render_table_name(&self, original: &str) -> String {
-        original.to_owned()
-    }
 }

@@ -68,6 +68,10 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
+    fn table_names_match(&self, names: Pair<&str>) -> bool {
+        names.previous() == names.next()
+    }
+
     /// Return the tables that cannot be migrated without being redefined. This
     /// is currently useful only on SQLite.
     fn tables_to_redefine(&self, _differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {

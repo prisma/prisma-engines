@@ -424,7 +424,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 self.schemas
                     .next()
                     .table_walkers()
-                    .find(move |next_table| tables_match(&previous_table, &next_table))
+                    .find(move |next_table| {
+                        self.flavour
+                            .table_names_match(Pair::new(previous_table.name(), next_table.name()))
+                    })
                     .map(move |next_table| TableDiffer {
                         flavour: self.flavour,
                         tables: Pair::new(previous_table, next_table),
@@ -457,9 +460,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn dropped_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
         self.previous_tables().filter(move |previous_table| {
-            !self
-                .next_tables()
-                .any(|next_table| tables_match(previous_table, &next_table))
+            !self.next_tables().any(|next_table| {
+                self.flavour
+                    .table_names_match(Pair::new(previous_table.name(), next_table.name()))
+            })
         })
     }
 
@@ -562,10 +566,6 @@ fn foreign_keys_match(previous: &ForeignKeyWalker<'_>, next: &ForeignKeyWalker<'
         && constrains_same_column_count
         && constrains_same_columns
         && references_same_columns
-}
-
-fn tables_match(previous: &TableWalker<'_>, next: &TableWalker<'_>) -> bool {
-    previous.name() == next.name()
 }
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {

@@ -49,7 +49,8 @@ impl DiagnoseMigrationHistoryOutput {
                 has_migrations_table: _,
                 failed_migration_names,
                 edited_migration_names,
-            } if drift.is_none() && history.is_none() && failed_migration_names.is_empty() && edited_migration_names.is_empty()
+                error_in_unapplied_migration,
+            } if drift.is_none() && history.is_none() && failed_migration_names.is_empty() && edited_migration_names.is_empty() && error_in_unapplied_migration.is_none()
         )
     }
 }
