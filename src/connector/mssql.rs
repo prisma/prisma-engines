@@ -285,30 +285,32 @@ impl Queryable for Mssql {
             let params = conversion::conv_params(params)?;
             let query = client.query(sql, params.as_slice());
 
-            let results = self.timeout(query).await?;
+            let mut results = self.timeout(query).await?.into_results().await?;
+            match results.pop() {
+                Some(rows) => {
+                    let mut columns_set = false;
+                    let mut columns = Vec::new();
+                    let mut result_rows = Vec::with_capacity(rows.len());
 
-            let columns = results
-                .columns()
-                .unwrap_or(&[])
-                .iter()
-                .map(|c| c.name().to_string())
-                .collect();
+                    for row in rows.into_iter() {
+                        if !columns_set {
+                            columns = row.columns().iter().map(|c| c.name().to_string()).collect();
+                            columns_set = true;
+                        }
 
-            let rows = results.into_first_result().await?;
+                        let mut values: Vec<Value<'_>> = Vec::with_capacity(row.len());
 
-            let mut result = ResultSet::new(columns, Vec::new());
+                        for val in row.into_iter() {
+                            values.push(Value::try_from(val)?);
+                        }
 
-            for row in rows {
-                let mut values: Vec<Value<'_>> = Vec::with_capacity(row.len());
+                        result_rows.push(values);
+                    }
 
-                for val in row.into_iter() {
-                    values.push(Value::try_from(val)?);
+                    Ok(ResultSet::new(columns, result_rows))
                 }
-
-                result.rows.push(values);
+                None => Ok(ResultSet::new(Vec::new(), Vec::new())),
             }
-
-            Ok(result)
         })
         .await
     }
