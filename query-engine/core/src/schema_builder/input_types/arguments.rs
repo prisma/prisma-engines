@@ -134,7 +134,20 @@ pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> I
     .optional()
 }
 
-pub(crate) fn by_argument(_ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
-    let enum_type = InputType::Enum(model_field_enum(model));
-    input_field("by", vec![InputType::list(enum_type.clone()), enum_type], None)
+pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
+    let field_enum_type = InputType::Enum(model_field_enum(model));
+
+    let mut args = vec![
+        where_argument(ctx, &model),
+        order_by_argument(ctx, &model),
+        input_field(
+            "by",
+            vec![InputType::list(field_enum_type.clone()), field_enum_type],
+            None,
+        ),
+        input_field("take", InputType::int(), None).optional(),
+        input_field("skip", InputType::int(), None).optional(),
+    ];
+
+    args
 }
