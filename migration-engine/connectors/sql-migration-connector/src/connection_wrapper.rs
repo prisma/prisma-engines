@@ -18,7 +18,6 @@ use sql_schema_describer::SqlSchema;
 #[derive(Debug, Clone)]
 pub(crate) struct Connection {
     quaint: Quaint,
-    database_version: Option<String>,
     flavour: Arc<dyn SqlFlavour + Send + Sync + 'static>,
 }
 
@@ -34,15 +33,7 @@ impl Connection {
             .await
             .map_err(|err| quaint_error_to_connector_error(err, &connection_info))?;
 
-        let database_version = quaint
-            .version()
-            .await
-            .map_err(|error| quaint_error_to_connector_error(error, &connection_info))?;
-
-        flavour.check_self()?;
-
         let connection = Connection {
-            database_version,
             flavour: flavour.into(),
             quaint,
         };
@@ -63,8 +54,6 @@ impl Connection {
             )
         })?;
 
-        let database_version = quaint.version().await.expect("failed to get SQLite version");
-
         let flavour = SqliteFlavour {
             file_path: String::from("/dev/null"),
             attached_name: attached_name.to_owned(),
@@ -72,7 +61,6 @@ impl Connection {
 
         Ok(Connection {
             quaint,
-            database_version,
             flavour: Arc::new(flavour),
         })
     }

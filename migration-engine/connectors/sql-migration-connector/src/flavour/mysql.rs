@@ -42,19 +42,29 @@ impl MysqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
-    // fn check_database_version_compatibility(
-    //     &self,
-    //     datamodel: &Datamodel,
-    // ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
-    //     if self.is_mysql_5_6() {
-    //         let mut errors = Vec::new();
-
-    //         check_datamodel_for_mysql_5_6(datamodel, &mut errors);
-    //     }
-    // }
-
     async fn acquire_advisory_lock(&self, connection: &Connection) -> ConnectorResult<()> {
         connection.raw_cmd("SELECT GET_LOCK('prisma-migrate', 10)").await?;
+
+        Ok(())
+    }
+
+    /// Optionally validate the connection string, e.g. to ensure we are not trying to migrate a system database.
+    fn check_connection_string(&self) -> ConnectorResult<()> {
+        static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
+            RegexSet::new(&[
+                "(?i)^mysql$",
+                "(?i)^information_schema$",
+                "(?i)^performance_schema$",
+                "(?i)^sys$",
+            ])
+            .unwrap()
+        });
+
+        let db_name = self.url.dbname();
+
+        if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
+            return Err(SystemDatabase(db_name.to_owned()).into());
+        }
 
         Ok(())
     }
@@ -87,26 +97,6 @@ impl SqlFlavour for MysqlFlavour {
             errors: errors_string,
             database_version: "MySQL 5.6".into(),
         })
-    }
-
-    fn check_self(&self) -> Result<(), SystemDatabase> {
-        static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
-            RegexSet::new(&[
-                "(?i)^mysql$",
-                "(?i)^information_schema$",
-                "(?i)^performance_schema$",
-                "(?i)^sys$",
-            ])
-            .unwrap()
-        });
-
-        let db_name = self.url.dbname();
-
-        if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
-            return Err(SystemDatabase(db_name.to_owned()).into());
-        }
-
-        Ok(())
     }
 
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {

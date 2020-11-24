@@ -14,9 +14,9 @@ pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
 
 use crate::{
-    connection_wrapper::Connection, error::SystemDatabase,
-    sql_destructive_change_checker::DestructiveChangeCheckerFlavour, sql_renderer::SqlRenderer,
-    sql_schema_calculator::SqlSchemaCalculatorFlavour, sql_schema_differ::SqlSchemaDifferFlavour,
+    connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
+    sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
+    sql_schema_differ::SqlSchemaDifferFlavour,
 };
 use migration_connector::{ConnectorResult, MigrationDirectory};
 use quaint::{connector::ConnectionInfo, prelude::SqlFamily};
@@ -50,17 +50,17 @@ pub(crate) trait SqlFlavour:
 {
     async fn acquire_advisory_lock(&self, connection: &Connection) -> ConnectorResult<()>;
 
+    /// Optionally validate the connection string, e.g. to ensure we are not trying to migrate a system database.
+    fn check_connection_string(&self) -> ConnectorResult<()> {
+        Ok(())
+    }
+
+    /// Optionally validate a datamodel against specific database version information.
     fn check_database_version_compatibility(
         &self,
         _datamodel: &Datamodel,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         None
-    }
-
-    /// Validate the data contained in the flavour. This can be used for example
-    /// to check that we do not try to migrate a system database.
-    fn check_self(&self) -> Result<(), SystemDatabase> {
-        Ok(())
     }
 
     /// Create a database for the given URL on the server, if applicable.
