@@ -454,8 +454,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn created_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> + 'a {
-        self.next_tables()
-            .filter(move |next_table| !self.schemas.previous().has_table(next_table.name()))
+        self.next_tables().filter(move |next_table| {
+            !self.previous_tables().any(|previous_table| {
+                self.flavour
+                    .table_names_match(Pair::new(previous_table.name(), next_table.name()))
+            })
+        })
     }
 
     fn dropped_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {

@@ -58,10 +58,6 @@ pub struct SqlSchema {
 }
 
 impl SqlSchema {
-    pub fn has_table(&self, name: &str) -> bool {
-        self.get_table(name).is_some()
-    }
-
     /// Get a table.
     pub fn get_table(&self, name: &str) -> Option<&Table> {
         self.tables.iter().find(|x| x.name == name)
