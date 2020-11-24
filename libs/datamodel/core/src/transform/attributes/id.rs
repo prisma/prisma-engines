@@ -30,17 +30,14 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
         }
     }
 
-    fn serialize(
-        &self,
-        field: &dml::Field,
-        _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::ScalarField(sf) = field {
             if sf.is_id {
-                return Ok(vec![ast::Attribute::new(self.attribute_name(), Vec::new())]);
+                return vec![ast::Attribute::new(self.attribute_name(), Vec::new())];
             }
         }
-        Ok(vec![])
+
+        vec![]
     }
 }
 
@@ -126,11 +123,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
         Ok(())
     }
 
-    fn serialize(
-        &self,
-        model: &dml::Model,
-        _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if !model.id_fields.is_empty() {
             let mut args = Vec::new();
 
@@ -143,9 +136,9 @@ impl AttributeValidator<dml::Model> for ModelLevelIdAttributeValidator {
                     .collect(),
             ));
 
-            return Ok(vec![ast::Attribute::new(self.attribute_name(), args)]);
+            return vec![ast::Attribute::new(self.attribute_name(), args)];
         }
 
-        Ok(vec![])
+        vec![]
     }
 }

@@ -53,19 +53,15 @@ impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
         Ok(())
     }
 
-    fn serialize(
-        &self,
-        field: &dml::Field,
-        _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let Some(default_value) = field.default_value() {
-            return Ok(vec![ast::Attribute::new(
+            return vec![ast::Attribute::new(
                 self.attribute_name(),
                 vec![ast::Argument::new("", lower_default_value(default_value.clone()))],
-            )]);
+            )];
         }
 
-        Ok(vec![])
+        vec![]
     }
 }
 
