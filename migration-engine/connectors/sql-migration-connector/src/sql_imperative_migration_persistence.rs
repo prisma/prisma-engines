@@ -1,7 +1,6 @@
 use crate::{error::quaint_error_to_connector_error, SqlMigrationConnector};
 use migration_connector::{
-    ConnectionToken, ConnectorError, ConnectorResult, ImperativeMigrationsPersistence, MigrationRecord,
-    PersistenceNotInitializedError,
+    ConnectorError, ConnectorResult, ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError,
 };
 use quaint::{ast::*, error::ErrorKind as QuaintKind};
 use uuid::Uuid;
@@ -10,9 +9,9 @@ const IMPERATIVE_MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 
 #[async_trait::async_trait]
 impl ImperativeMigrationsPersistence for SqlMigrationConnector {
-    async fn initialize(&self, baseline: bool, connection_token: &ConnectionToken) -> ConnectorResult<()> {
-        let conn = self.conn(connection_token).await?;
-        let schema = self.describe_schema(connection_token).await?;
+    async fn initialize(&self, baseline: bool) -> ConnectorResult<()> {
+        let conn = self.conn().await?;
+        let schema = conn.describe_schema().await?;
 
         if schema
             .tables
@@ -30,7 +29,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             ));
         }
 
-        self.flavour().create_imperative_migrations_table(&conn).await?;
+        conn.flavour().create_imperative_migrations_table(&conn).await?;
 
         Ok(())
     }
@@ -40,9 +39,8 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         migration_name: &str,
         script: &str,
         checksum: &str,
-        connection_token: &ConnectionToken,
     ) -> ConnectorResult<String> {
-        let conn = self.conn(connection_token).await?;
+        let connection = self.conn().await?;
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
 
@@ -55,17 +53,13 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .value("migration_name", migration_name)
             .value("script", script);
 
-        conn.execute(insert).await?;
+        connection.execute(insert).await?;
 
         Ok(id)
     }
 
-    async fn mark_migration_rolled_back_by_id(
-        &self,
-        migration_id: &str,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<()> {
-        let conn = self.conn(connection_token).await?;
+    async fn mark_migration_rolled_back_by_id(&self, migration_id: &str) -> ConnectorResult<()> {
+        let conn = self.conn().await?;
 
         let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .so_that(Column::from("id").equals(migration_id))
@@ -81,9 +75,8 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         migration_name: &str,
         script: &str,
         checksum: &str,
-        connection_token: &ConnectionToken,
     ) -> ConnectorResult<String> {
-        let conn = self.conn(connection_token).await?;
+        let conn = self.conn().await?;
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
 
@@ -101,13 +94,8 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(id)
     }
 
-    async fn record_successful_step(
-        &self,
-        id: &str,
-        logs: &str,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<()> {
-        let conn = self.conn(connection_token).await?;
+    async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
+        let conn = self.conn().await?;
 
         let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .so_that(Column::from("id").equals(id))
@@ -122,37 +110,29 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(())
     }
 
-    async fn record_failed_step(
-        &self,
-        id: &str,
-        logs: &str,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<()> {
+    async fn record_failed_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
         let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .so_that(Column::from("id").equals(id))
             .set("logs", logs);
 
-        self.conn(connection_token).await?.execute(update).await?;
+        self.conn().await?.execute(update).await?;
 
         Ok(())
     }
 
-    async fn record_migration_finished(&self, id: &str, connection_token: &ConnectionToken) -> ConnectorResult<()> {
+    async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()> {
         let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .so_that(Column::from("id").equals(id))
             .set("finished_at", chrono::Utc::now()); // TODO maybe use a database generated timestamp
 
-        self.conn(connection_token).await?.execute(update).await?;
+        self.conn().await?.execute(update).await?;
 
         Ok(())
     }
 
     #[tracing::instrument(skip(self))]
-    async fn list_migrations(
-        &self,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>> {
-        let connection = self.conn(connection_token).await?;
+    async fn list_migrations(&self) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>> {
+        let connection = self.conn().await?;
 
         let select = Select::from_table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
             .column("id")
@@ -166,7 +146,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .column("script")
             .order_by("started_at".ascend());
 
-        let result = match self.conn(connection_token).await?.query(select).await {
+        let result = match connection.query(select).await {
             Ok(result) => result,
             Err(err) if matches!(err.kind(), QuaintKind::TableDoesNotExist { table } if table.contains(IMPERATIVE_MIGRATIONS_TABLE_NAME)) => {
                 return Ok(Err(PersistenceNotInitializedError))

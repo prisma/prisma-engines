@@ -2,7 +2,6 @@
 
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
-mod connection_token;
 mod database_migration_inferrer;
 mod database_migration_step_applier;
 mod destructive_change_checker;
@@ -18,7 +17,6 @@ pub mod steps;
 
 mod migrations_directory;
 
-pub use connection_token::ConnectionToken;
 pub use database_migration_inferrer::*;
 pub use database_migration_step_applier::*;
 pub use destructive_change_checker::*;
@@ -44,6 +42,11 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// For example, in the SQL connector, a step would represent an SQL statement like `CREATE TABLE`.
     type DatabaseMigration: DatabaseMigrationMarker + Send + Sync + 'static;
 
+    /// Acquire an advisory lock on the database, ensuring only the current
+    /// connection can run with that lock on the target database. The lock will
+    /// be held until the engine shuts down.
+    async fn acquire_advisory_lock(&self) -> ConnectorResult<()>;
+
     /// A string that should identify what database backend is being used. Note that this is not necessarily
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
@@ -53,12 +56,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     /// Create the database with the provided URL.
     async fn create_database(database_str: &str) -> ConnectorResult<String>;
-
-    /// Return the token of the default connection. It should always be available.
-    fn default_connection_token(&self) -> ConnectionToken;
-
-    /// Open a new connection, and — if possible on the target connector — acquire an exclusive lock on the database.
-    async fn open_exclusive_connection(&self) -> ConnectorResult<ConnectionToken>;
 
     /// Drop all database state.
     async fn reset(&self) -> ConnectorResult<()>;

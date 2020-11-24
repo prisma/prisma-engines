@@ -8,8 +8,9 @@ use std::convert::TryFrom;
 #[async_trait::async_trait]
 impl MigrationPersistence for SqlMigrationConnector {
     async fn init(&self) -> Result<(), ConnectorError> {
-        let sql_family = self.default_connection.connection_info().sql_family();
-        let schema_name = self.default_connection.connection_info().schema_name();
+        let connection = self.conn().await?;
+        let sql_family = connection.connection_info().sql_family();
+        let schema_name = connection.connection_info().schema_name();
 
         let sql_str = match sql_family {
             SqlFamily::Sqlite => {
@@ -34,7 +35,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             }
         };
 
-        self.default_connection.raw_cmd(&sql_str).await.ok();
+        connection.raw_cmd(&sql_str).await.ok();
 
         Ok(())
     }
@@ -42,7 +43,7 @@ impl MigrationPersistence for SqlMigrationConnector {
     async fn reset(&self) -> ConnectorResult<()> {
         use quaint::ast::Delete;
 
-        let connection = self.conn(&self.default_connection_token).await?;
+        let connection = self.conn().await?;
 
         connection
             .query(Delete::from_table((
@@ -56,12 +57,12 @@ impl MigrationPersistence for SqlMigrationConnector {
     }
 
     async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
-        last_applied_migrations(&self.default_connection, self.table()).await
+        last_applied_migrations(&self.conn().await?, self.table()).await
     }
 
     async fn load_all(&self) -> ConnectorResult<Vec<Migration>> {
         let query = Select::from_table(self.table()).order_by(REVISION_COLUMN.ascend());
-        let result_set = self.default_connection.query(query).await?;
+        let result_set = self.conn().await?.query(query).await?;
 
         Ok(parse_rows_new(result_set))
     }
@@ -71,17 +72,18 @@ impl MigrationPersistence for SqlMigrationConnector {
         let query = Select::from_table(self.table())
             .so_that(conditions)
             .order_by(REVISION_COLUMN.descend());
-        let result_set = self.default_connection.query(query).await?;
+        let result_set = self.conn().await?.query(query).await?;
 
         Ok(parse_rows_new(result_set).into_iter().next())
     }
 
     async fn create(&self, migration: Migration) -> Result<Migration, ConnectorError> {
+        let connection = self.conn().await?;
         let mut cloned = migration.clone();
         let model_steps_json = serde_json::to_string(&migration.datamodel_steps).unwrap();
         let database_migration_json = serde_json::to_string(&migration.database_migration).unwrap();
         let errors_json = serde_json::to_string(&migration.errors).unwrap();
-        let sql_family = self.default_connection.connection_info().sql_family();
+        let sql_family = connection.connection_info().sql_family();
 
         let insert = Insert::single_into(self.table())
             .value(DATAMODEL_COLUMN, migration.datamodel_string)
@@ -92,19 +94,22 @@ impl MigrationPersistence for SqlMigrationConnector {
             .value(DATAMODEL_STEPS_COLUMN, model_steps_json)
             .value(DATABASE_MIGRATION_COLUMN, database_migration_json)
             .value(ERRORS_COLUMN, errors_json)
-            .value(STARTED_AT_COLUMN, self.convert_datetime(migration.started_at))
+            .value(
+                STARTED_AT_COLUMN,
+                self.convert_datetime(migration.started_at, &connection.connection_info().sql_family()),
+            )
             .value(FINISHED_AT_COLUMN, Option::<DateTime<Utc>>::None);
 
         match sql_family {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
-                let result_set = self.default_connection.query(insert).await.unwrap();
+                let result_set = connection.query(insert).await.unwrap();
                 let id = result_set.last_insert_id().unwrap();
 
                 cloned.revision = usize::try_from(id).unwrap();
             }
             SqlFamily::Postgres | SqlFamily::Mssql => {
                 let returning_insert = Insert::from(insert).returning(&["revision"]);
-                let result_set = self.default_connection.query(returning_insert).await.unwrap();
+                let result_set = connection.query(returning_insert).await.unwrap();
 
                 if let Some(row) = result_set.into_iter().next() {
                     cloned.revision = row["revision"].as_i64().unwrap() as usize;
@@ -116,8 +121,9 @@ impl MigrationPersistence for SqlMigrationConnector {
     }
 
     async fn update(&self, params: &MigrationUpdateParams) -> Result<(), ConnectorError> {
+        let connection = self.conn().await?;
         let finished_at_value = match params.finished_at {
-            Some(x) => self.convert_datetime(x),
+            Some(x) => self.convert_datetime(x, &connection.connection_info().sql_family()),
             None => Value::from(Option::<DateTime<Utc>>::None),
         };
         let errors_json = serde_json::to_string(&params.errors).unwrap();
@@ -134,7 +140,7 @@ impl MigrationPersistence for SqlMigrationConnector {
                     .and(REVISION_COLUMN.equals(params.revision)),
             );
 
-        self.default_connection.query(query).await?;
+        connection.query(query).await?;
 
         Ok(())
     }
@@ -208,8 +214,8 @@ impl SqlMigrationConnector {
         MIGRATION_TABLE_NAME.to_string().into()
     }
 
-    fn convert_datetime(&self, datetime: DateTime<Utc>) -> Value<'_> {
-        match self.flavour().sql_family() {
+    fn convert_datetime(&self, datetime: DateTime<Utc>, sql_family: &SqlFamily) -> Value<'_> {
+        match sql_family {
             SqlFamily::Sqlite => Value::integer(datetime.timestamp_millis()),
             SqlFamily::Postgres => Value::datetime(datetime),
             SqlFamily::Mysql => Value::datetime(datetime),

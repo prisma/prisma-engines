@@ -18,17 +18,23 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema = self.describe_schema(&self.default_connection_token).await?;
-        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, self.flavour());
-        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
+        let connection = self.conn().await?;
+        let current_database_schema = self.describe_schema().await?;
+        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, connection.flavour());
+        Ok(infer(
+            current_database_schema,
+            expected_database_schema,
+            connection.flavour(),
+        ))
     }
 
     /// Infer the database migration steps, skipping the schema describer and assuming an empty database.
     fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<SqlMigration> {
+        let flavour = self.abstract_flavour().as_ref();
         let current_database_schema = SqlSchema::empty();
-        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, self.flavour());
+        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, flavour);
 
-        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
+        Ok(infer(current_database_schema, expected_database_schema, flavour))
     }
 
     fn infer_from_datamodels(
@@ -37,10 +43,11 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema = sql_schema_calculator::calculate_sql_schema(previous, self.flavour());
-        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, self.flavour());
+        let flavour = self.abstract_flavour().as_ref();
+        let current_database_schema = sql_schema_calculator::calculate_sql_schema(previous, flavour);
+        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, flavour);
 
-        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
+        Ok(infer(current_database_schema, expected_database_schema, flavour))
     }
 
     #[tracing::instrument(skip(self, previous_migrations, target_schema))]
@@ -49,26 +56,34 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         previous_migrations: &[MigrationDirectory],
         target_schema: &Datamodel,
     ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema = self
+        let connection = self.conn().await?;
+        let current_database_schema = connection
             .flavour()
-            .sql_schema_from_migration_history(previous_migrations, &self.default_connection)
+            .sql_schema_from_migration_history(previous_migrations, &connection)
             .await?;
 
-        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(target_schema, self.flavour());
+        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(target_schema, connection.flavour());
 
-        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
+        Ok(infer(
+            current_database_schema,
+            expected_database_schema,
+            connection.flavour(),
+        ))
     }
 
     #[tracing::instrument(skip(self, applied_migrations))]
     async fn calculate_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<Option<String>> {
-        let expected_schema = self
+        let connection = self.conn().await?;
+
+        let expected_schema = connection
             .flavour()
-            .sql_schema_from_migration_history(applied_migrations, &self.default_connection)
+            .sql_schema_from_migration_history(applied_migrations, &connection)
             .await?;
 
-        let actual_schema = self.describe_schema(&self.default_connection_token).await?;
+        let actual_schema = self.describe_schema().await?;
 
-        let steps = sql_schema_differ::calculate_steps(Pair::new(&actual_schema, &expected_schema), self.flavour());
+        let steps =
+            sql_schema_differ::calculate_steps(Pair::new(&actual_schema, &expected_schema), connection.flavour());
 
         if steps.is_empty() {
             return Ok(None);
@@ -91,8 +106,9 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
 
     #[tracing::instrument(skip(self, migrations))]
     async fn validate_migrations(&self, migrations: &[MigrationDirectory]) -> ConnectorResult<()> {
-        let conn = self.conn(&self.default_connection_token).await?;
-        self.flavour()
+        let conn = self.conn().await?;
+
+        conn.flavour()
             .sql_schema_from_migration_history(migrations, &conn)
             .await?;
 

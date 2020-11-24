@@ -1,4 +1,4 @@
-use crate::{checksum, ConnectionToken, ConnectorError, ConnectorResult};
+use crate::{checksum, ConnectorError, ConnectorResult};
 use serde::Deserialize;
 
 /// A timestamp.
@@ -14,7 +14,7 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// check whether the database schema is empty. If it is, initialize the
     /// migration persistence. If not, return a DatabaseSchemaNotEmpty error unless
     /// we are in the baselining case.
-    async fn initialize(&self, baseline: bool, connection: &ConnectionToken) -> ConnectorResult<()>;
+    async fn initialize(&self, baseline: bool) -> ConnectorResult<()>;
 
     /// Implementation in the connector for the core's MarkMigrationApplied
     /// command. See the docs there. Note that the started_at and finished_at
@@ -22,13 +22,8 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     ///
     /// Connectors should implement mark_migration_applied_impl to avoid doing
     /// the checksuming themselves.
-    async fn mark_migration_applied(
-        &self,
-        migration_name: &str,
-        script: &str,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<String> {
-        self.mark_migration_applied_impl(migration_name, script, &checksum(script), connection_token)
+    async fn mark_migration_applied(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
+        self.mark_migration_applied_impl(migration_name, script, &checksum(script))
             .await
     }
 
@@ -40,29 +35,19 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
         migration_name: &str,
         script: &str,
         checksum: &str,
-        connection_token: &ConnectionToken,
     ) -> ConnectorResult<String>;
 
     /// Mark the failed instances of the migration in the persistence as rolled
     /// back, so they will be ignored by the engine in the future.
-    async fn mark_migration_rolled_back_by_id(
-        &self,
-        migration_id: &str,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<()>;
+    async fn mark_migration_rolled_back_by_id(&self, migration_id: &str) -> ConnectorResult<()>;
 
     /// Record that a migration is about to be applied. Returns the unique
     /// identifier for the migration.
     ///
     /// This is a default method that computes the checkum. Implementors should
     /// implement record_migration_started_impl.
-    async fn record_migration_started(
-        &self,
-        migration_name: &str,
-        script: &str,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<String> {
-        self.record_migration_started_impl(migration_name, script, &checksum(script), connection_token)
+    async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
+        self.record_migration_started_impl(migration_name, script, &checksum(script))
             .await
     }
 
@@ -76,32 +61,22 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
         migration_name: &str,
         script: &str,
         checksum: &str,
-        connection_token: &ConnectionToken,
     ) -> ConnectorResult<String>;
 
     /// Increase the applied_steps_count counter, and append the given logs.
-    async fn record_successful_step(
-        &self,
-        id: &str,
-        logs: &str,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<()>;
+    async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
 
     /// Report logs for a failed migration step. We assume the next steps in the
     /// migration will not be applied, and the error reported.
-    async fn record_failed_step(&self, id: &str, logs: &str, connection_token: &ConnectionToken)
-        -> ConnectorResult<()>;
+    async fn record_failed_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
 
     /// Record that the migration completed *successfully*. This means
     /// populating the `finished_at` field in the migration record.
-    async fn record_migration_finished(&self, id: &str, connection_token: &ConnectionToken) -> ConnectorResult<()>;
+    async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()>;
 
     /// List all applied migrations, ordered by `started_at`. This should fail
     /// hard if the migration persistence is not initialized.
-    async fn list_migrations(
-        &self,
-        connection_token: &ConnectionToken,
-    ) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>;
+    async fn list_migrations(&self) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>;
 }
 
 /// Error returned when the persistence is not initialized.
