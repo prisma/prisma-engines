@@ -9,8 +9,6 @@ pub(crate) fn quaint_error_to_connector_error(error: QuaintError, connection_inf
     }
 }
 
-pub(crate) type CheckDatabaseInfoResult = Result<(), SystemDatabase>;
-
 #[derive(Debug)]
 pub(crate) struct SystemDatabase(pub(crate) String);
 

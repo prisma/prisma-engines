@@ -61,7 +61,7 @@ fn resolve_related_field() {
     post_model
         .assert_has_relation_field("user")
         .assert_relation_to("User")
-        .assert_relation_to_fields(&["firstName"]);
+        .assert_relation_referenced_fields(&["firstName"]);
 }
 
 #[test]
@@ -92,7 +92,7 @@ fn resolve_related_fields() {
         .assert_has_relation_field("user")
         .assert_relation_to("User")
         .assert_relation_base_fields(&["authorFirstName", "authorLastName"])
-        .assert_relation_to_fields(&["firstName", "lastName"]);
+        .assert_relation_referenced_fields(&["firstName", "lastName"]);
 }
 
 #[test]

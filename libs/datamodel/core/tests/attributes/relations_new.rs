@@ -27,7 +27,7 @@ fn relation_happy_path() {
         .assert_arity(&dml::FieldArity::List)
         .assert_relation_to("Post")
         .assert_relation_base_fields(&[])
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 
     let post_model = schema.assert_has_model("Post");
     post_model
@@ -35,7 +35,7 @@ fn relation_happy_path() {
         .assert_arity(&dml::FieldArity::Required)
         .assert_relation_to("User")
         .assert_relation_base_fields(&["userId"])
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 }
 
 #[test]
@@ -209,7 +209,7 @@ fn required_relation_field_must_error_if_it_is_virtual() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The relation field `address` on Model `User` is required. This is invalid as it is not possible to enforce this constraint at the database level. Please make it optional instead.",
+        "The relation field `address` on Model `User` is required. This is no longer valid because it\'s not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.",
         "relation",
         Span::new(54, 77),
     ));

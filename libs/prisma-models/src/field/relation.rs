@@ -128,14 +128,14 @@ impl RelationField {
     pub fn linking_fields(&self) -> ModelProjection {
         if self.relation().is_many_to_many() {
             self.model().primary_identifier()
-        } else if self.relation_info.to_fields.is_empty() {
+        } else if self.relation_info.references.is_empty() {
             let related_field = self.related_field();
             let model = self.model();
             let fields = model.fields();
 
-            let to_fields: Vec<_> = related_field
+            let referenced_fields: Vec<_> = related_field
                 .relation_info
-                .to_fields
+                .references
                 .iter()
                 .map(|field_name| {
                     fields
@@ -150,7 +150,7 @@ impl RelationField {
                 })
                 .collect();
 
-            ModelProjection::new(to_fields)
+            ModelProjection::new(referenced_fields)
         } else {
             ModelProjection::new(vec![Arc::new(self.clone()).into()])
         }
@@ -214,7 +214,7 @@ impl RelationField {
                 let is_self_rel = relation.is_self_relation();
 
                 if is_self_rel {
-                    !self.relation_info.to_fields.is_empty()
+                    !self.relation_info.references.is_empty()
                 } else {
                     m.in_table_of_model_name == self.model().name
                 }

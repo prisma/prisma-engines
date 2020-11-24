@@ -30,7 +30,7 @@ pub trait RelationFieldAsserts {
     fn assert_relation_name(&self, t: &str) -> &Self;
     fn assert_relation_to(&self, t: &str) -> &Self;
     fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self;
-    fn assert_relation_to_fields(&self, t: &[&str]) -> &Self;
+    fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self;
     fn assert_relation_base_fields(&self, t: &[&str]) -> &Self;
 }
 
@@ -186,8 +186,8 @@ impl RelationFieldAsserts for dml::RelationField {
         self
     }
 
-    fn assert_relation_to_fields(&self, t: &[&str]) -> &Self {
-        assert_eq!(self.relation_info.to_fields, t);
+    fn assert_relation_referenced_fields(&self, t: &[&str]) -> &Self {
+        assert_eq!(self.relation_info.references, t);
         self
     }
 
@@ -430,5 +430,12 @@ pub const MYSQL_SOURCE: &str = r#"
     datasource db {
         provider = "mysql"
         url      = "mysql://localhost:3306"
+    }
+"#;
+
+pub const MSSQL_SOURCE: &str = r#"
+    datasource db {
+        provider = "sqlserver"
+        url      = "sqlserver://localhost:1433"
     }
 "#;

@@ -2,7 +2,7 @@ mod sql_schema_calculator_flavour;
 
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
-use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin, DatabaseInfo};
+use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
     Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType, ValueGenerator, ValueGeneratorFn,
@@ -11,26 +11,20 @@ use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{self as sql, ColumnArity};
 
-pub struct SqlSchemaCalculator<'a> {
+pub(crate) fn calculate_sql_schema(datamodel: &Datamodel, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
+    let calculator = SqlSchemaCalculator {
+        data_model: datamodel,
+        flavour,
+    };
+    calculator.calculate_internal()
+}
+
+struct SqlSchemaCalculator<'a> {
     data_model: &'a Datamodel,
-    database_info: &'a DatabaseInfo,
     flavour: &'a dyn SqlFlavour,
 }
 
 impl<'a> SqlSchemaCalculator<'a> {
-    pub(crate) fn calculate(
-        data_model: &Datamodel,
-        database_info: &DatabaseInfo,
-        flavour: &dyn SqlFlavour,
-    ) -> sql::SqlSchema {
-        let calculator = SqlSchemaCalculator {
-            data_model,
-            database_info,
-            flavour,
-        };
-        calculator.calculate_internal()
-    }
-
     fn calculate_internal(&self) -> sql::SqlSchema {
         let mut tables = Vec::with_capacity(self.data_model.models().len());
         let model_tables_without_inline_relations = self.calculate_model_tables();
@@ -42,7 +36,7 @@ impl<'a> SqlSchemaCalculator<'a> {
 
         tables.extend(self.calculate_relation_tables());
 
-        let enums = self.flavour.calculate_enums(self);
+        let enums = self.flavour.calculate_enums(&self.data_model);
         let sequences = Vec::new();
 
         sql::SqlSchema {
@@ -61,7 +55,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
 
                         // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
-                        let is_sqlite_integer_primary_key = self.database_info.sql_family().is_sqlite() && f.is_id() && f.field_type().is_int();
+                        let is_sqlite_integer_primary_key = self.flavour.sql_family().is_sqlite() && f.is_id() && f.field_type().is_int();
 
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
@@ -74,7 +68,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         let enum_db_name = r#enum.db_name();
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
-                            tpe: enum_column_type(&f, &self.database_info, enum_db_name),
+                            tpe: enum_column_type(&f, &self.flavour.sql_family(), enum_db_name),
                             default: migration_value_new(&f),
                             auto_increment: false,
                         })
@@ -83,7 +77,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
 
                         // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
-                        let is_sqlite_integer_primary_key = self.database_info.sql_family().is_sqlite() && f.is_id() && f.field_type().is_int();
+                        let is_sqlite_integer_primary_key = self.flavour.sql_family().is_sqlite() && f.is_id() && f.field_type().is_int();
 
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
@@ -176,7 +170,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 let fk = sql::ForeignKey {
                     constraint_name: None,
                     columns: fk_columns,
-                    referenced_table: relation_field.referenced_table_name().to_owned(),
+                    referenced_table: relation_field.referenced_model().database_name().to_owned(),
                     referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
                     on_update_action: sql::ForeignKeyAction::Cascade,
                     on_delete_action: match column_arity(relation_field.arity()) {
@@ -291,9 +285,9 @@ fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_descr
     Some(sql_schema_describer::DefaultValue::VALUE(value))
 }
 
-fn enum_column_type(field: &ScalarFieldWalker<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
+fn enum_column_type(field: &ScalarFieldWalker<'_>, sql_family: &SqlFamily, db_name: &str) -> sql::ColumnType {
     let arity = column_arity(field.arity());
-    match database_info.sql_family() {
+    match sql_family {
         SqlFamily::Postgres => sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity),
         SqlFamily::Mysql => sql::ColumnType::pure(
             sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().db_name(), field.db_name())),

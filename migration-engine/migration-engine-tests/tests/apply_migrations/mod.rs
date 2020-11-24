@@ -119,13 +119,15 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
     let second = migrations.pop().unwrap();
     let first = migrations.pop().unwrap();
 
-    let first = first.assert_migration_name("initial")?.assert_applied_steps_count(1)?;
-    assert!(!first.is_failed());
+    first
+        .assert_migration_name("initial")?
+        .assert_applied_steps_count(1)?
+        .assert_success()?;
 
-    assert!(second.is_failed());
     second
         .assert_migration_name("second-migration")?
-        .assert_applied_steps_count(0)?;
+        .assert_applied_steps_count(0)?
+        .assert_failed()?;
 
     Ok(())
 }

@@ -12,11 +12,11 @@ pub trait RelationFieldExt {
 
 impl RelationFieldExt for RelationField {
     fn m2m_columns(&self) -> Vec<Column<'static>> {
-        let to_fields = &self.relation_info.to_fields;
+        let references = &self.relation_info.references;
         let prefix = if self.relation_side.is_a() { "B" } else { "A" };
 
-        if to_fields.len() > 1 {
-            to_fields
+        if references.len() > 1 {
+            references
                 .iter()
                 .map(|to_field| format!("{}_{}", prefix, to_field))
                 .map(|name| Column::from(name).table(self.as_table()))

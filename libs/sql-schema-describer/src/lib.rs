@@ -58,10 +58,6 @@ pub struct SqlSchema {
 }
 
 impl SqlSchema {
-    pub fn has_table(&self, name: &str) -> bool {
-        self.get_table(name).is_some()
-    }
-
     /// Get a table.
     pub fn get_table(&self, name: &str) -> Option<&Table> {
         self.tables.iter().find(|x| x.name == name)
@@ -270,7 +266,7 @@ pub struct ColumnType {
     /// The full SQL data type.
     pub full_data_type: String,
     /// The maximum length for character or string bit types if specified.
-    pub character_maximum_length: Option<u32>,
+    pub character_maximum_length: Option<i64>,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
     /// The arity of the column.

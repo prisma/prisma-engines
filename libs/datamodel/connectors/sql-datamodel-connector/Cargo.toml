@@ -11,3 +11,4 @@ datamodel-connector = { path = "../datamodel-connector" }
 dml = { path = "../dml" }
 native-types = { path = "../../../native-types" }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
+once_cell = "1.3"

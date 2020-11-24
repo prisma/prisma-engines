@@ -82,7 +82,7 @@ fn settings_must_be_deteced() {
     todo_model
         .assert_has_relation_field("parent_todo")
         .assert_relation_to("Todo")
-        .assert_relation_to_fields(&["id"])
+        .assert_relation_referenced_fields(&["id"])
         .assert_arity(&dml::FieldArity::Optional);
     // TODO: bring `onDelete` back once `prisma migrate` is a thing
     //        .assert_relation_delete_strategy(dml::OnDeleteStrategy::Cascade);

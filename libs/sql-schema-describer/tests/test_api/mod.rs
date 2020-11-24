@@ -244,14 +244,6 @@ impl BarrelMigrationExecutor {
         migration_fn(&mut migration);
 
         let full_sql = migration.make_from(self.sql_variant);
-        run_full_sql(&self.database, &full_sql).await;
-    }
-}
-
-async fn run_full_sql(database: &Quaint, full_sql: &str) {
-    for sql in full_sql.split(';') {
-        if sql != "" {
-            database.query_raw(&sql, &[]).await.unwrap();
-        }
+        self.database.raw_cmd(&full_sql).await.unwrap();
     }
 }

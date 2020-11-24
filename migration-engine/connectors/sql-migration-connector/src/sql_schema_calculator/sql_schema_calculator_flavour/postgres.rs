@@ -1,13 +1,12 @@
 use super::SqlSchemaCalculatorFlavour;
-use crate::{flavour::PostgresFlavour, sql_schema_calculator::SqlSchemaCalculator};
-use datamodel::{walkers::ScalarFieldWalker, NativeTypeInstance, ScalarType, WithDatabaseName};
+use crate::flavour::PostgresFlavour;
+use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, ScalarType, WithDatabaseName};
 use native_types::PostgresType;
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
-    fn calculate_enums(&self, calculator: &SqlSchemaCalculator<'_>) -> Vec<sql::Enum> {
-        calculator
-            .data_model
+    fn calculate_enums(&self, datamodel: &Datamodel) -> Vec<sql::Enum> {
+        datamodel
             .enums()
             .map(|r#enum| sql::Enum {
                 name: r#enum.final_database_name().to_owned(),
@@ -53,8 +52,10 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             PostgresType::Text => "TEXT".to_owned(),
             PostgresType::ByteA => "BYTEA".to_owned(),
             PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)),
+            PostgresType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render(precision)),
             PostgresType::Date => "DATE".to_owned(),
             PostgresType::Time(precision) => format!("TIME{}", render(precision)),
+            PostgresType::Timetz(precision) => format!("TIMETZ{}", render(precision)),
             PostgresType::Boolean => "BOOLEAN".to_owned(),
             PostgresType::Bit(length) => format!("BIT{}", render(length)),
             PostgresType::VarBit(length) => format!("VARBIT{}", render(length)),

@@ -93,7 +93,7 @@ fn id_must_error_when_multi_field_is_referring_to_undefined_fields() {
 }
 
 #[test]
-fn must_error_when_multi_field_is_referring_to_fields_that_are_not_required() {
+fn must_error_when_multi_field_is_referring_fields_that_are_not_required() {
     let dml = r#"
     model Model {
       a String

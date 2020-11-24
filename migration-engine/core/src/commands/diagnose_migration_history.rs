@@ -30,6 +30,10 @@ pub struct DiagnoseMigrationHistoryOutput {
     /// migration directory does not match the checksum of the applied migration
     /// in the database.
     pub edited_migration_names: Vec<String>,
+    /// An optional error encountered when applying a migration that is not
+    /// applied in the main database to the shadow database. We do this to
+    /// validate that unapplied migrations are at least minimally valid.
+    pub error_in_unapplied_migration: Option<user_facing_errors::Error>,
     /// Is the migrations table initialized in the database.
     pub has_migrations_table: bool,
 }
@@ -37,10 +41,17 @@ pub struct DiagnoseMigrationHistoryOutput {
 impl DiagnoseMigrationHistoryOutput {
     /// True if no problem was found
     pub fn is_empty(&self) -> bool {
-        self.drift.is_none()
-            && self.history.is_none()
-            && self.failed_migration_names.is_empty()
-            && self.edited_migration_names.is_empty()
+        matches!(
+            self,
+            DiagnoseMigrationHistoryOutput {
+                drift,
+                history,
+                has_migrations_table: _,
+                failed_migration_names,
+                edited_migration_names,
+                error_in_unapplied_migration,
+            } if drift.is_none() && history.is_none() && failed_migration_names.is_empty() && edited_migration_names.is_empty() && error_in_unapplied_migration.is_none()
+        )
     }
 }
 
@@ -100,6 +111,10 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
                 .iter()
                 .find(|fs_migration| db_migration.migration_name == fs_migration.migration_name());
 
+            if db_migration.finished_at.is_none() && db_migration.rolled_back_at.is_none() {
+                diagnostics.failed_migrations.push(db_migration);
+            }
+
             if corresponding_fs_migration.is_none() {
                 diagnostics.db_migrations_not_in_fs.push((index, db_migration))
             }
@@ -117,13 +132,30 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             .cloned()
             .collect();
 
-        diagnostics.drift = migration_inferrer.calculate_drift(&applied_migrations).await?;
+        let drift = match migration_inferrer.calculate_drift(&applied_migrations).await {
+            Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected { rollback }),
+            Err(error) => Some(DriftDiagnostic::MigrationFailedToApply {
+                error: error.to_user_facing(),
+            }),
+            _ => None,
+        };
+
+        let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. })) {
+            migration_inferrer
+                .validate_migrations(&migrations_from_filesystem)
+                .await
+                .err()
+                .map(|connector_error| connector_error.to_user_facing())
+        } else {
+            None
+        };
 
         Ok(DiagnoseMigrationHistoryOutput {
-            drift: diagnostics.drift(),
+            drift,
             history: diagnostics.history(),
             failed_migration_names: diagnostics.failed_migration_names(),
             edited_migration_names: diagnostics.edited_migration_names(),
+            error_in_unapplied_migration,
             has_migrations_table,
         })
     }
@@ -135,10 +167,6 @@ struct Diagnostics<'a> {
     db_migrations_not_in_fs: Vec<(usize, &'a MigrationRecord)>,
     edited_migrations: Vec<&'a MigrationRecord>,
     failed_migrations: Vec<&'a MigrationRecord>,
-    /// A rollback script, in case we detected drift.
-    drift: Option<String>,
-    /// Name and error.
-    migration_failed_to_apply: Option<(String, String)>,
     fs_migrations: &'a [MigrationDirectory],
 }
 
@@ -149,8 +177,6 @@ impl<'a> Diagnostics<'a> {
             db_migrations_not_in_fs: Vec::new(),
             edited_migrations: Vec::new(),
             failed_migrations: Vec::new(),
-            drift: None,
-            migration_failed_to_apply: None,
             fs_migrations,
         }
     }
@@ -205,23 +231,6 @@ impl<'a> Diagnostics<'a> {
             }),
         }
     }
-
-    fn drift(&self) -> Option<DriftDiagnostic> {
-        if let Some(rollback) = &self.drift {
-            return Some(DriftDiagnostic::DriftDetected {
-                rollback: rollback.clone(),
-            });
-        }
-
-        if let Some((migration_name, error)) = &self.migration_failed_to_apply {
-            return Some(DriftDiagnostic::MigrationFailedToApply {
-                migration_name: migration_name.clone(),
-                error: error.clone(),
-            });
-        }
-
-        None
-    }
 }
 
 /// A diagnostic returned by `diagnoseMigrationHistory` when looking at the
@@ -274,10 +283,8 @@ pub enum DriftDiagnostic {
     /// When a migration fails to apply cleanly to a temporary database.
     #[serde(rename_all = "camelCase")]
     MigrationFailedToApply {
-        /// The name of the migration that failed.
-        migration_name: String,
         /// The full error.
-        error: String,
+        error: user_facing_errors::Error,
     },
 }
 

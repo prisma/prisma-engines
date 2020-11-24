@@ -207,16 +207,6 @@ async fn test_drop_postgres_database() {
 async fn test_drop_mysql_database() {
     let url = mysql_url(Some("this_should_be_dropped"));
 
-    // Drop the existing database
-    {
-        let url = mysql_url(Some("mysql"));
-        let conn = Quaint::new(&url).await.unwrap();
-
-        conn.raw_cmd("DROP DATABASE IF EXISTS `this_should_exist`")
-            .await
-            .unwrap();
-    }
-
     run(&["--datasource", &url, "create-database"]).await.unwrap();
     run(&["--datasource", &url, "can-connect-to-database"]).await.unwrap();
     run(&["--datasource", &url, "drop-database"]).await.unwrap();

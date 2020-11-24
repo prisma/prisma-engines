@@ -3,11 +3,10 @@ use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
     sql_migration::{
-        expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
         AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
         TableChange,
     },
-    sql_schema_differ::ColumnChanges,
+    sql_schema_differ::{ColumnChange, ColumnChanges},
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -415,7 +414,7 @@ fn render_alter_column(
     static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
 
-    let steps = expand_postgres_alter_column(columns, column_changes);
+    let steps = expand_alter_column(columns, column_changes);
     let table_name = Quoted::postgres_ident(columns.previous().table().name());
     let column_name = Quoted::postgres_ident(columns.previous().name());
 
@@ -483,4 +482,66 @@ fn render_alter_column(
             }
         }
     }
+}
+
+fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &ColumnChanges) -> Vec<PostgresAlterColumn> {
+    let mut changes = Vec::new();
+    let mut set_type = false;
+
+    for change in column_changes.iter() {
+        match change {
+            ColumnChange::Default => match (columns.previous().default(), columns.next().default()) {
+                (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault((*next_default).clone())),
+                (_, None) => changes.push(PostgresAlterColumn::DropDefault),
+            },
+            ColumnChange::Arity => match (columns.previous().arity(), columns.next().arity()) {
+                (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
+                (ColumnArity::Nullable, ColumnArity::Required) => changes.push(PostgresAlterColumn::SetNotNull),
+                (ColumnArity::List, ColumnArity::Nullable) => {
+                    set_type = true;
+                    changes.push(PostgresAlterColumn::DropNotNull)
+                }
+                (ColumnArity::List, ColumnArity::Required) => {
+                    set_type = true;
+                    changes.push(PostgresAlterColumn::SetNotNull)
+                }
+                (ColumnArity::Nullable, ColumnArity::List) | (ColumnArity::Required, ColumnArity::List) => {
+                    set_type = true;
+                }
+                (ColumnArity::Nullable, ColumnArity::Nullable)
+                | (ColumnArity::Required, ColumnArity::Required)
+                | (ColumnArity::List, ColumnArity::List) => (),
+            },
+            ColumnChange::TypeChanged => set_type = true,
+            ColumnChange::Sequence => {
+                if columns.previous().is_autoincrement() {
+                    // The sequence should be dropped.
+                    changes.push(PostgresAlterColumn::DropDefault)
+                } else {
+                    // The sequence should be created.
+                    changes.push(PostgresAlterColumn::AddSequence)
+                }
+            }
+            ColumnChange::Renaming => unreachable!("column renaming"),
+        }
+    }
+
+    // This is a flag so we don't push multiple SetTypes from arity and type changes.
+    if set_type {
+        changes.push(PostgresAlterColumn::SetType(columns.next().column_type().clone()));
+    }
+
+    changes
+}
+
+/// https://www.postgresql.org/docs/9.1/sql-altertable.html
+#[derive(Debug)]
+enum PostgresAlterColumn {
+    SetDefault(sql_schema_describer::DefaultValue),
+    DropDefault,
+    DropNotNull,
+    SetType(ColumnType),
+    SetNotNull,
+    /// Add an auto-incrementing sequence as a default on the column.
+    AddSequence,
 }

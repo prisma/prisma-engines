@@ -108,7 +108,7 @@ pub fn calculate_many_to_many_field(
         name: relation_name,
         fields: vec![],
         to: opposite_foreign_key.referenced_table.clone(),
-        to_fields: opposite_foreign_key.referenced_columns.clone(),
+        references: opposite_foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
     };
 
@@ -203,7 +203,7 @@ pub(crate) fn calculate_relation_field(
         name: calculate_relation_name(schema, foreign_key, table)?,
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
-        to_fields: foreign_key.referenced_columns.clone(),
+        references: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
     };
 
@@ -237,7 +237,7 @@ pub(crate) fn calculate_backrelation_field(
                 name: relation_info.name.clone(),
                 to: model.name.clone(),
                 fields: vec![],
-                to_fields: vec![],
+                references: vec![],
                 on_delete: OnDeleteStrategy::None,
             };
 
@@ -417,8 +417,8 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
         ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
         ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Binary => FieldType::Base(ScalarType::Bytes, None),
+        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
         ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }
@@ -436,13 +436,13 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, fam
     };
 
     match scalar_type {
-        FieldType::Base(scal_type, _) => {
-            let native_type_instance = connector
-                .introspect_native_type(column.tpe.native_type.clone().unwrap())
-                .unwrap();
-
-            FieldType::NativeType(scal_type, native_type_instance)
-        }
+        FieldType::Base(scal_type, _) => match &column.tpe.native_type {
+            None => scalar_type,
+            Some(native_type) => {
+                let native_type_instance = connector.introspect_native_type(native_type.clone()).unwrap();
+                FieldType::NativeType(scal_type, native_type_instance)
+            }
+        },
         field_type => field_type,
     }
 }

@@ -1,5 +1,5 @@
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_u32_arguments};
+use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::default_value::DefaultValue;
 use dml::field::{Field, FieldType};
@@ -24,8 +24,10 @@ const CHAR_TYPE_NAME: &str = "Char";
 const TEXT_TYPE_NAME: &str = "Text";
 const BYTE_A_TYPE_NAME: &str = "ByteA";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
+const TIMESTAMP_TZ_TYPE_NAME: &str = "Timestamptz";
 const DATE_TYPE_NAME: &str = "Date";
 const TIME_TYPE_NAME: &str = "Time";
+const TIME_TZ_TYPE_NAME: &str = "Timetz";
 const BOOLEAN_TYPE_NAME: &str = "Boolean";
 const BIT_TYPE_NAME: &str = "Bit";
 const VAR_BIT_TYPE_NAME: &str = "VarBit";
@@ -67,8 +69,11 @@ impl PostgresDatamodelConnector {
         let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]);
         let byte_a = NativeTypeConstructor::without_args(BYTE_A_TYPE_NAME, vec![ScalarType::Bytes]);
         let timestamp = NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let timestamptz =
+            NativeTypeConstructor::with_optional_args(TIMESTAMP_TZ_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, vec![ScalarType::DateTime]);
         let time = NativeTypeConstructor::with_optional_args(TIME_TYPE_NAME, 1, vec![ScalarType::DateTime]);
+        let timetz = NativeTypeConstructor::with_optional_args(TIME_TZ_TYPE_NAME, 1, vec![ScalarType::DateTime]);
         let boolean = NativeTypeConstructor::without_args(BOOLEAN_TYPE_NAME, vec![ScalarType::Boolean]);
         let bit = NativeTypeConstructor::with_optional_args(BIT_TYPE_NAME, 1, vec![ScalarType::String]);
         let varbit = NativeTypeConstructor::with_optional_args(VAR_BIT_TYPE_NAME, 1, vec![ScalarType::String]);
@@ -93,8 +98,10 @@ impl PostgresDatamodelConnector {
             text,
             byte_a,
             timestamp,
+            timestamptz,
             date,
             time,
+            timetz,
             boolean,
             bit,
             varbit,
@@ -172,7 +179,9 @@ impl Connector for PostgresDatamodelConnector {
 
             let time_precision = match native_type {
                 PostgresType::Timestamp(p) => p,
+                PostgresType::Timestamptz(p) => p,
                 PostgresType::Time(p) => p,
+                PostgresType::Timetz(p) => p,
                 _ => None,
             };
 
@@ -198,75 +207,31 @@ impl Connector for PostgresDatamodelConnector {
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
-        let parsed_args = parse_u32_arguments(args)?;
+        let cloned_args = args.clone();
 
-        let constructor = self.find_native_type_constructor(name);
         let native_type = match name {
             SMALL_INT_TYPE_NAME => PostgresType::SmallInt,
             INTEGER_TYPE_NAME => PostgresType::Integer,
             BIG_INT_TYPE_NAME => PostgresType::BigInt,
-            DECIMAL_TYPE_NAME => match parsed_args.as_slice() {
-                [precision, scale] => PostgresType::Decimal(Some((*precision, *scale))),
-                [] => PostgresType::Decimal(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(DECIMAL_TYPE_NAME, 2, parsed_args.len())),
-            },
-            NUMERIC_TYPE_NAME => match parsed_args.as_slice() {
-                [scale, precision] => PostgresType::Numeric(Some((*scale, *precision))),
-                [] => PostgresType::Numeric(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(NUMERIC_TYPE_NAME, 2, parsed_args.len())),
-            },
+            DECIMAL_TYPE_NAME => PostgresType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            NUMERIC_TYPE_NAME => PostgresType::Decimal(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
             REAL_TYPE_NAME => PostgresType::Real,
             DOUBLE_PRECISION_TYPE_NAME => PostgresType::DoublePrecision,
             SMALL_SERIAL_TYPE_NAME => PostgresType::SmallSerial,
             SERIAL_TYPE_NAME => PostgresType::Serial,
             BIG_SERIAL_TYPE_NAME => PostgresType::BigSerial,
-            VARCHAR_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::VarChar(Some(*arg)),
-                [] => PostgresType::VarChar(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(VARCHAR_TYPE_NAME, 1, parsed_args.len())),
-            },
-            CHAR_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Char(Some(*arg)),
-                [] => PostgresType::Char(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, parsed_args.len())),
-            },
+            VARCHAR_TYPE_NAME => PostgresType::VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME)?),
+            CHAR_TYPE_NAME => PostgresType::Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
             TEXT_TYPE_NAME => PostgresType::Text,
             BYTE_A_TYPE_NAME => PostgresType::ByteA,
-            TIMESTAMP_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Timestamp(Option::Some(*arg)),
-                [] => PostgresType::Timestamp(None),
-                _ => {
-                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
-                        TIMESTAMP_TYPE_NAME,
-                        1,
-                        parsed_args.len(),
-                    ))
-                }
-            },
-
+            TIMESTAMP_TYPE_NAME => PostgresType::Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
+            TIMESTAMP_TZ_TYPE_NAME => PostgresType::Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME)?),
             DATE_TYPE_NAME => PostgresType::Date,
-            TIME_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Time(Option::Some(*arg)),
-                [] => PostgresType::Time(None),
-                _ => {
-                    return Err(self.wrap_in_optional_argument_count_mismatch_error(
-                        TIME_TYPE_NAME,
-                        1,
-                        parsed_args.len(),
-                    ))
-                }
-            },
+            TIME_TYPE_NAME => PostgresType::Time(parse_one_opt_u32(args, TIME_TYPE_NAME)?),
+            TIME_TZ_TYPE_NAME => PostgresType::Time(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME)?),
             BOOLEAN_TYPE_NAME => PostgresType::Boolean,
-            BIT_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::Bit(Some(*arg)),
-                [] => PostgresType::Bit(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(BIT_TYPE_NAME, 1, parsed_args.len())),
-            },
-            VAR_BIT_TYPE_NAME => match parsed_args.as_slice() {
-                [arg] => PostgresType::VarBit(Some(*arg)),
-                [] => PostgresType::VarBit(None),
-                _ => return Err(self.wrap_in_argument_count_mismatch_error(VAR_BIT_TYPE_NAME, 1, parsed_args.len())),
-            },
+            BIT_TYPE_NAME => PostgresType::Bit(parse_one_opt_u32(args, BIT_TYPE_NAME)?),
+            VAR_BIT_TYPE_NAME => PostgresType::VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME)?),
             UUID_TYPE_NAME => PostgresType::UUID,
             XML_TYPE_NAME => PostgresType::Xml,
             JSON_TYPE_NAME => PostgresType::JSON,
@@ -274,11 +239,7 @@ impl Connector for PostgresDatamodelConnector {
             _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
         };
 
-        Ok(NativeTypeInstance::new(
-            constructor.unwrap().name.as_str(),
-            parsed_args,
-            &native_type,
-        ))
+        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
     }
 
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
@@ -299,8 +260,10 @@ impl Connector for PostgresDatamodelConnector {
             PostgresType::Text => (TEXT_TYPE_NAME, vec![]),
             PostgresType::ByteA => (BYTE_A_TYPE_NAME, vec![]),
             PostgresType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
+            PostgresType::Timestamptz(x) => (TIMESTAMP_TZ_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Date => (DATE_TYPE_NAME, vec![]),
             PostgresType::Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
+            PostgresType::Timetz(x) => (TIME_TZ_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::Boolean => (BOOLEAN_TYPE_NAME, vec![]),
             PostgresType::Bit(x) => (BIT_TYPE_NAME, arg_vec_from_opt(x)),
             PostgresType::VarBit(x) => (VAR_BIT_TYPE_NAME, arg_vec_from_opt(x)),

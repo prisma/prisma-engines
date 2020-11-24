@@ -1,6 +1,10 @@
+use crate::{common::*, test_api::*};
 use barrel::types;
+use native_types::{MsSqlType, MsSqlTypeParameter, MySqlType, NativeType, PostgresType};
 use pretty_assertions::assert_eq;
+use prisma_value::PrismaValue;
 use quaint::prelude::{Queryable, SqlFamily};
+use serde_json::Value;
 use sql_schema_describer::*;
 use test_macros::test_each_connector_mssql as test_each_connector;
 
@@ -10,12 +14,6 @@ mod mysql;
 mod postgres;
 mod sqlite;
 mod test_api;
-
-use crate::common::*;
-use crate::test_api::*;
-use native_types::{MySqlType, NativeType, PostgresType};
-use prisma_value::PrismaValue;
-use serde_json::Value;
 
 fn int_full_data_type(api: &TestApi) -> String {
     match (api.sql_family(), api.connector_name()) {
@@ -33,7 +31,7 @@ fn int_native_type(api: &TestApi) -> Option<Value> {
         (SqlFamily::Sqlite, _) => None,
         (SqlFamily::Mysql, "mysql8") => Some(MySqlType::Int.to_json()),
         (SqlFamily::Mysql, _) => Some(MySqlType::Int.to_json()),
-        (SqlFamily::Mssql, _) => None,
+        (SqlFamily::Mssql, _) => Some(MsSqlType::Int.to_json()),
     }
 }
 
@@ -63,7 +61,7 @@ fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
         (SqlFamily::Sqlite, _) => format!("VARCHAR({})", length),
         (SqlFamily::Mysql, "mysql8") => format!("varchar({})", length),
         (SqlFamily::Mysql, _) => format!("varchar({})", length),
-        (SqlFamily::Mssql, _) => "varchar".into(),
+        (SqlFamily::Mssql, _) => format!("varchar({})", length).into(),
     }
 }
 
@@ -73,7 +71,7 @@ fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
         (SqlFamily::Sqlite, _) => None,
         (SqlFamily::Mysql, "mysql8") => Some(MySqlType::VarChar(length).to_json()),
         (SqlFamily::Mysql, _) => Some(MySqlType::VarChar(length).to_json()),
-        (SqlFamily::Mssql, _) => None,
+        (SqlFamily::Mssql, _) => Some(MsSqlType::VarChar(Some(MsSqlTypeParameter::Number(length as u16))).to_json()),
     }
 }
 

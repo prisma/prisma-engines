@@ -47,7 +47,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn connector_type(&self) -> &'static str;
 
     /// The version of the underlying database.
-    fn version(&self) -> String;
+    async fn version(&self) -> ConnectorResult<String>;
 
     /// Create the database with the provided URL.
     async fn create_database(database_str: &str) -> ConnectorResult<String>;

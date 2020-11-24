@@ -24,7 +24,7 @@ fn must_add_back_relation_fields_for_given_list_field() {
     user_model
         .assert_has_relation_field("posts")
         .assert_relation_to("Post")
-        .assert_relation_to_fields(&[])
+        .assert_relation_referenced_fields(&[])
         .assert_arity(&datamodel::dml::FieldArity::List);
 
     let post_model = schema.assert_has_model("Post");
@@ -32,7 +32,7 @@ fn must_add_back_relation_fields_for_given_list_field() {
         .assert_has_relation_field("User")
         .assert_relation_to("User")
         .assert_relation_base_fields(&["userId"])
-        .assert_relation_to_fields(&["id"])
+        .assert_relation_referenced_fields(&["id"])
         .assert_arity(&datamodel::dml::FieldArity::Optional);
     post_model
         .assert_has_scalar_field("userId")
@@ -60,7 +60,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
     user_model
         .assert_has_relation_field("post")
         .assert_relation_to("Post")
-        .assert_relation_to_fields(&["post_id"])
+        .assert_relation_referenced_fields(&["post_id"])
         .assert_arity(&datamodel::dml::FieldArity::Required);
 
     let post_model = schema.assert_has_model("Post");
@@ -68,7 +68,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
         .assert_has_relation_field("User")
         .assert_relation_to("User")
         .assert_relation_base_fields(&[])
-        .assert_relation_to_fields(&[])
+        .assert_relation_referenced_fields(&[])
         .assert_arity(&datamodel::dml::FieldArity::List);
 }
 
@@ -105,7 +105,7 @@ model Post {
 
 #[test]
 #[ignore]
-fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
+fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
     // the to fields are always added to model with the lower name in lexicographic order
     let dml = r#"
     model User1 {
@@ -134,28 +134,28 @@ fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
     schema
         .assert_has_model("User1")
         .assert_has_relation_field("referenceA")
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 
     schema
         .assert_has_model("User2")
         .assert_has_relation_field("referenceB")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 
     schema
         .assert_has_model("User3")
         .assert_has_relation_field("referenceB")
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 
     schema
         .assert_has_model("User4")
         .assert_has_relation_field("referenceA")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 }
 
 #[test]
 #[ignore]
-fn must_add_to_fields_correctly_for_one_to_one_relations() {
-    // Post is lower that User. So the to_fields should be stored in Post.
+fn must_add_referenced_fields_correctly_for_one_to_one_relations() {
+    // Post is lower that User. So the references should be stored in Post.
     let dml = r#"
     model User {
         user_id Int  @id
@@ -173,15 +173,15 @@ fn must_add_to_fields_correctly_for_one_to_one_relations() {
     schema
         .assert_has_model("User")
         .assert_has_relation_field("post")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("user")
-        .assert_relation_to_fields(&["user_id"]);
+        .assert_relation_referenced_fields(&["user_id"]);
 }
 
 #[test]
-fn must_add_to_fields_on_both_sides_for_many_to_many_relations() {
+fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
     let dml = r#"
     model User {
         user_id Int    @id
@@ -199,16 +199,16 @@ fn must_add_to_fields_on_both_sides_for_many_to_many_relations() {
     schema
         .assert_has_model("User")
         .assert_has_relation_field("posts")
-        .assert_relation_to_fields(&["post_id"]);
+        .assert_relation_referenced_fields(&["post_id"]);
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("users")
-        .assert_relation_to_fields(&["user_id"]);
+        .assert_relation_referenced_fields(&["user_id"]);
 }
 
 #[test]
 #[ignore]
-fn must_add_to_fields_on_both_sides_for_one_to_many_relations() {
+fn must_add_referenced_fields_on_both_sides_for_one_to_many_relations() {
     let dml = r#"
     model User {
         user_id Int    @id
@@ -226,11 +226,11 @@ fn must_add_to_fields_on_both_sides_for_one_to_many_relations() {
     schema
         .assert_has_model("User")
         .assert_has_relation_field("posts")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("user")
-        .assert_relation_to_fields(&["user_id"]);
+        .assert_relation_referenced_fields(&["user_id"]);
 
     // prove that lexicographic order does not have an influence.
     let dml = r#"
@@ -250,11 +250,11 @@ fn must_add_to_fields_on_both_sides_for_one_to_many_relations() {
     schema
         .assert_has_model("User")
         .assert_has_relation_field("post")
-        .assert_relation_to_fields(&["post_id"]);
+        .assert_relation_referenced_fields(&["post_id"]);
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("users")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 }
 
 #[test]
@@ -341,7 +341,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_has_model("Post")
         .assert_has_relation_field("User")
         .assert_relation_to("User")
-        .assert_relation_to_fields(&["id"])
+        .assert_relation_referenced_fields(&["id"])
         .assert_relation_name("PostToUser")
         .assert_is_generated(true)
         .assert_arity(&datamodel::dml::FieldArity::Optional);
@@ -351,7 +351,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_has_model("User")
         .assert_has_relation_field("posts")
         .assert_relation_to("Post")
-        .assert_relation_to_fields(&[])
+        .assert_relation_referenced_fields(&[])
         .assert_relation_name("PostToUser")
         .assert_is_generated(false)
         .assert_arity(&datamodel::dml::FieldArity::List);
@@ -363,7 +363,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_has_model("Comment")
         .assert_has_relation_field("Post")
         .assert_relation_to("Post")
-        .assert_relation_to_fields(&["post_id"])
+        .assert_relation_referenced_fields(&["post_id"])
         .assert_relation_name("CommentToPost")
         .assert_is_generated(true)
         .assert_arity(&datamodel::dml::FieldArity::Optional);
@@ -373,7 +373,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_has_model("Post")
         .assert_has_relation_field("comments")
         .assert_relation_to("Comment")
-        .assert_relation_to_fields(&[])
+        .assert_relation_referenced_fields(&[])
         .assert_relation_name("CommentToPost")
         .assert_is_generated(false)
         .assert_arity(&datamodel::dml::FieldArity::List);
@@ -385,7 +385,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_has_model("Category")
         .assert_has_relation_field("posts")
         .assert_relation_to("PostToCategory")
-        .assert_relation_to_fields(&[])
+        .assert_relation_referenced_fields(&[])
         .assert_relation_name("CategoryToPostToCategory")
         .assert_is_generated(false)
         .assert_arity(&datamodel::dml::FieldArity::List);
@@ -395,7 +395,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_has_model("PostToCategory")
         .assert_has_relation_field("category")
         .assert_relation_to("Category")
-        .assert_relation_to_fields(&["category_id"])
+        .assert_relation_referenced_fields(&["category_id"])
         .assert_relation_name("CategoryToPostToCategory")
         .assert_is_generated(false)
         .assert_arity(&datamodel::dml::FieldArity::Required);
@@ -407,7 +407,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_has_model("Post")
         .assert_has_relation_field("categories")
         .assert_relation_to("PostToCategory")
-        .assert_relation_to_fields(&[])
+        .assert_relation_referenced_fields(&[])
         .assert_relation_name("PostToPostToCategory")
         .assert_is_generated(false)
         .assert_arity(&datamodel::dml::FieldArity::List);
@@ -417,7 +417,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_has_model("PostToCategory")
         .assert_has_relation_field("post")
         .assert_relation_to("Post")
-        .assert_relation_to_fields(&["post_id"])
+        .assert_relation_referenced_fields(&["post_id"])
         .assert_relation_name("PostToPostToCategory")
         .assert_is_generated(false)
         .assert_arity(&datamodel::dml::FieldArity::Required);
@@ -425,7 +425,7 @@ fn should_add_back_relations_for_more_complex_cases() {
 
 #[test]
 #[ignore]
-fn should_add_to_fields_on_the_correct_side_tie_breaker() {
+fn should_add_referenced_fields_on_the_correct_side_tie_breaker() {
     let dml = r#"
     model User {
         user_id Int @id
@@ -443,18 +443,18 @@ fn should_add_to_fields_on_the_correct_side_tie_breaker() {
     user_model
         .assert_has_relation_field("post")
         .assert_relation_to("Post")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 
     let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_relation_field("user")
         .assert_relation_to("User")
-        .assert_relation_to_fields(&["user_id"]);
+        .assert_relation_referenced_fields(&["user_id"]);
 }
 
 #[test]
 #[ignore]
-fn should_add_to_fields_on_the_correct_side_list() {
+fn should_add_referenced_fields_on_the_correct_side_list() {
     let dml = r#"
     model User {
         id Int @id
@@ -472,13 +472,13 @@ fn should_add_to_fields_on_the_correct_side_list() {
     user_model
         .assert_has_relation_field("post")
         .assert_relation_to("Post")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 
     let post_model = schema.assert_has_model("Post");
     post_model
         .assert_has_relation_field("user")
         .assert_relation_to("User")
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 }
 
 #[test]
@@ -518,13 +518,13 @@ fn must_add_back_relation_fields_for_self_relations() {
         .assert_has_relation_field("son")
         .assert_relation_to("Human")
         .assert_arity(&FieldArity::Optional)
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 
     model
         .assert_has_relation_field("Human")
         .assert_relation_to("Human")
         .assert_arity(&FieldArity::List)
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 }
 
 #[test]
@@ -543,13 +543,13 @@ fn should_add_embed_ids_on_self_relations() {
     model
         .assert_has_relation_field("son")
         .assert_relation_to("Human")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 
     model
         .assert_has_relation_field("father")
         .assert_relation_to("Human")
         // Fieldname tie breaker.
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 }
 
 #[test]
@@ -577,37 +577,37 @@ fn should_not_get_confused_with_complicated_self_relations() {
     model
         .assert_has_relation_field("son")
         .assert_relation_to("Human")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 
     model
         .assert_has_relation_field("father")
         .assert_relation_to("Human")
         // Fieldname tie breaker.
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 
     model
         .assert_has_relation_field("wife")
         .assert_relation_to("Human")
         .assert_relation_name("Marrige")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 
     model
         .assert_has_relation_field("husband")
         .assert_relation_to("Human")
         .assert_relation_name("Marrige")
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 
     model
         .assert_has_relation_field("children")
         .assert_relation_to("Human")
         .assert_relation_name("Offspring")
-        .assert_relation_to_fields(&[]);
+        .assert_relation_referenced_fields(&[]);
 
     model
         .assert_has_relation_field("parent")
         .assert_relation_to("Human")
         .assert_relation_name("Offspring")
-        .assert_relation_to_fields(&["id"]);
+        .assert_relation_referenced_fields(&["id"]);
 }
 
 #[test]
