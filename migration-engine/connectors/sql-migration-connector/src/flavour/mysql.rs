@@ -170,7 +170,7 @@ impl SqlFlavour for MysqlFlavour {
             assert_eq!(setting_name, "lower_case_table_names");
 
             // https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html
-            if setting_value == 2 {
+            if setting_value == 1 {
                 circumstances |= Circumstances::LowerCasesTableNames;
             }
         }
