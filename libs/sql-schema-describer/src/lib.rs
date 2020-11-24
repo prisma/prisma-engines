@@ -493,7 +493,7 @@ impl DefaultValue {
 }
 
 //fixme These do not handle negative values -.-
-static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
+static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)'?$").expect("compile regex"));
 static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
 
 pub fn parse_int(value: &str) -> Option<PrismaValue> {

@@ -574,25 +574,25 @@ fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<
             Some(x) if x.starts_with("NULL") => None,
             Some(default_string) => {
                 Some(match &tpe.family {
-                    ColumnTypeFamily::Int => match parse_int(&default_string) {
+                    ColumnTypeFamily::Int => match parse_pg_int(&default_string) {
                         Some(int_value) => DefaultValue::VALUE(int_value),
                         None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
                             true => DefaultValue::SEQUENCE(default_string),
                             false => DefaultValue::DBGENERATED(default_string),
                         },
                     },
-                    ColumnTypeFamily::BigInt => match parse_big_int(&default_string) {
+                    ColumnTypeFamily::BigInt => match parse_pg_big_int(&default_string) {
                         Some(int_value) => DefaultValue::VALUE(int_value),
                         None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
                             true => DefaultValue::SEQUENCE(default_string),
                             false => DefaultValue::DBGENERATED(default_string),
                         },
                     },
-                    ColumnTypeFamily::Float => match parse_float(&default_string) {
+                    ColumnTypeFamily::Float => match parse_pg_float(&default_string) {
                         Some(float_value) => DefaultValue::VALUE(float_value),
                         None => DefaultValue::DBGENERATED(default_string),
                     },
-                    ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                    ColumnTypeFamily::Decimal => match parse_pg_float(&default_string) {
                         Some(float_value) => DefaultValue::VALUE(float_value),
                         None => DefaultValue::DBGENERATED(default_string),
                     },
@@ -785,6 +785,42 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
     let first_capture = captures.get(1).unwrap().as_str();
 
     Some(first_capture.into())
+}
+
+static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)('::.*)?$").expect("compile regex"));
+static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)('::.*)?$").expect("compile regex"));
+
+pub fn parse_pg_int(value: &str) -> Option<PrismaValue> {
+    let captures = RE_NUM.captures(value)?;
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<i64>();
+    match num_rslt {
+        Ok(num) => Some(PrismaValue::Int(num)),
+        Err(_) => None,
+    }
+}
+
+pub fn parse_pg_big_int(value: &str) -> Option<PrismaValue> {
+    let captures = RE_NUM.captures(value)?;
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<i64>();
+    match num_rslt {
+        Ok(num) => Some(PrismaValue::BigInt(num)),
+        Err(_) => None,
+    }
+}
+
+pub fn parse_pg_float(value: &str) -> Option<PrismaValue> {
+    let captures = RE_FLOAT.captures(value)?;
+    let num_str = captures.get(1).expect("get capture").as_str();
+
+    match BigDecimal::from_str(num_str) {
+        Ok(num) => Some(PrismaValue::Float(num)),
+        Err(_) => {
+            debug!("Couldn't parse float '{}'", value);
+            None
+        }
+    }
 }
 
 // See https://www.postgresql.org/docs/9.3/sql-syntax-lexical.html
