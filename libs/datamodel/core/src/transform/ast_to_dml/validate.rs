@@ -946,8 +946,8 @@ impl<'a> Validator<'a> {
                     if field.is_required() && !related_field_rel_info.to_fields.is_empty() {
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &format!(
-                                "The relation field `{}` on Model `{}` is required. This is invalid as it is not possible to enforce this constraint at the database level. Please make it optional instead.",
-                                &field.name, &model.name,
+                                "The relation field `{}` on Model `{}` is required. This is no longer valid because it's not possible to enforce this constraint on the database. Change field `{}` to `{}?` to fix this.",
+                                &field.name, &model.name, &field.name, &field.name,
                             ),
                             RELATION_ATTRIBUTE_NAME,
                             field_span,
