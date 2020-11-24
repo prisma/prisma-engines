@@ -155,7 +155,7 @@ fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
 #[test]
 #[ignore]
 fn must_add_to_fields_correctly_for_one_to_one_relations() {
-    // Post is lower that User. So the to_fields should be stored in Post.
+    // Post is lower that User. So the references should be stored in Post.
     let dml = r#"
     model User {
         user_id Int  @id

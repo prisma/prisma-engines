@@ -42,7 +42,7 @@ fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<Str
                     info.name = sanitize_string(&info.name);
                     info.to = sanitize_string(&reformat_reserved_string(&info.to));
 
-                    info.to_fields = sanitize_strings(&info.to_fields);
+                    info.references = sanitize_strings(&info.references);
                     info.fields = sanitize_strings(&info.fields);
                 }
 

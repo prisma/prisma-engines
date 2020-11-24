@@ -12,7 +12,7 @@ use std::collections::HashMap;
 /// Helper for standardsing a datamodel.
 ///
 /// When standardsing, datamodel will be made consistent.
-/// Implicit back relation fields, relation names and `to_fields` will be generated.
+/// Implicit back relation fields, relation names and `references` will be generated.
 pub struct Standardiser {}
 
 impl Standardiser {
@@ -34,7 +34,7 @@ impl Standardiser {
         Ok(())
     }
 
-    /// For any relations which are missing to_fields, sets them to the @id fields
+    /// For any relations which are missing references, sets them to the @id fields
     /// of the foreign model.
     /// Also adds missing underlying scalar fields.
     fn set_relation_to_field_to_id_if_missing(
@@ -82,8 +82,8 @@ impl Standardiser {
 
                     if embed_here {
                         // user input has precedence
-                        if rel_info.to_fields.is_empty() && related_field_rel_info.to_fields.is_empty() {
-                            rel_info.to_fields = related_model
+                        if rel_info.references.is_empty() && related_field_rel_info.references.is_empty() {
+                            rel_info.references = related_model
                                 .first_unique_criterion()
                                 .iter()
                                 .map(|f| f.name.to_owned())
@@ -224,7 +224,7 @@ impl Standardiser {
                     let relation_info = dml::RelationInfo {
                         to: model.name.clone(),
                         fields: vec![],
-                        to_fields: vec![],
+                        references: vec![],
                         name: rel_info.name.clone(),
                         on_delete: OnDeleteStrategy::None,
                     };
@@ -295,7 +295,7 @@ impl Standardiser {
                     let relation_info = dml::RelationInfo {
                         to: model.name.clone(),
                         fields: underlying_field_names,
-                        to_fields: unique_criteria_field_names,
+                        references: unique_criteria_field_names,
                         name: rel_info.name.clone(),
                         on_delete: OnDeleteStrategy::None,
                     };
