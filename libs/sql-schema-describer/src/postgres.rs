@@ -2,6 +2,7 @@
 
 use super::*;
 use crate::getters::Getter;
+use crate::parsers::Parser;
 use native_types::{NativeType, PostgresType};
 use quaint::connector::ResultRow;
 use quaint::{prelude::Queryable, single::Quaint};
@@ -56,6 +57,19 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     #[tracing::instrument]
     async fn version(&self, schema: &str) -> crate::DescriberResult<Option<String>> {
         Ok(self.conn.version().await?)
+    }
+}
+
+static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)('::.*)?$").expect("compile regex"));
+static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)('::.*)?$").expect("compile regex"));
+
+impl Parser for SqlSchemaDescriber {
+    fn re_num() -> &'static Regex {
+        &PG_RE_NUM
+    }
+
+    fn re_float() -> &'static Regex {
+        &PG_RE_FLOAT
     }
 }
 
@@ -180,7 +194,7 @@ impl SqlSchemaDescriber {
             };
 
             let tpe = get_column_type(&col, enums);
-            let default = get_default_value(schema, &col, &tpe);
+            let default = Self::get_default_value(schema, &col, &tpe);
 
             let auto_increment = is_identity || matches!(default, Some(DefaultValue::SEQUENCE(_)));
 
@@ -552,6 +566,85 @@ impl SqlSchemaDescriber {
 
         Ok(enums)
     }
+
+    fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<DefaultValue> {
+        let table_name = col.get_expect_string("table_name");
+        let col_name = col.get_expect_string("column_name");
+        match col.get("column_default") {
+            None => None,
+            Some(param_value) => match param_value.to_string() {
+                None => None,
+                Some(x) if x.starts_with("NULL") => None,
+                Some(default_string) => {
+                    Some(match &tpe.family {
+                        ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
+                            Some(int_value) => DefaultValue::VALUE(int_value),
+                            None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
+                                true => DefaultValue::SEQUENCE(default_string),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            },
+                        },
+                        ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
+                            Some(int_value) => DefaultValue::VALUE(int_value),
+                            None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
+                                true => DefaultValue::SEQUENCE(default_string),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            },
+                        },
+                        ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
+                            Some(float_value) => DefaultValue::VALUE(float_value),
+                            None => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
+                            Some(float_value) => DefaultValue::VALUE(float_value),
+                            None => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Boolean => match Self::parse_bool(&default_string) {
+                            Some(bool_value) => DefaultValue::VALUE(bool_value),
+                            None => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::String => {
+                            match unsuffix_default_literal(&default_string, &tpe.data_type, &tpe.full_data_type) {
+                                Some(default_literal) => DefaultValue::VALUE(PrismaValue::String(
+                                    process_string_literal(default_literal.as_ref()).into(),
+                                )),
+                                None => DefaultValue::DBGENERATED(default_string),
+                            }
+                        }
+                        ColumnTypeFamily::DateTime => {
+                            match default_string.to_lowercase().as_str() {
+                                "now()" | "current_timestamp" => DefaultValue::NOW,
+                                _ => DefaultValue::DBGENERATED(default_string), //todo parse values
+                            }
+                        }
+                        ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                        // JSON/JSONB defaults come in the '{}'::jsonb form.
+                        ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
+                            .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
+                            .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
+                            .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
+                        ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Enum(enum_name) => {
+                            let enum_suffix_without_quotes = format!("::{}", enum_name);
+                            let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
+                            if default_string.ends_with(&enum_suffix_with_quotes) {
+                                DefaultValue::VALUE(PrismaValue::Enum(Self::unquote_string(
+                                    &default_string.replace(&enum_suffix_with_quotes, ""),
+                                )))
+                            } else if default_string.ends_with(&enum_suffix_without_quotes) {
+                                DefaultValue::VALUE(PrismaValue::Enum(Self::unquote_string(
+                                    &default_string.replace(&enum_suffix_without_quotes, ""),
+                                )))
+                            } else {
+                                DefaultValue::DBGENERATED(default_string)
+                            }
+                        }
+                        ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                    })
+                }
+            },
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -562,85 +655,6 @@ struct IndexRow {
     is_primary_key: bool,
     table_name: String,
     sequence_name: Option<String>,
-}
-
-fn get_default_value(schema: &str, col: &ResultRow, tpe: &ColumnType) -> Option<DefaultValue> {
-    let table_name = col.get_expect_string("table_name");
-    let col_name = col.get_expect_string("column_name");
-    match col.get("column_default") {
-        None => None,
-        Some(param_value) => match param_value.to_string() {
-            None => None,
-            Some(x) if x.starts_with("NULL") => None,
-            Some(default_string) => {
-                Some(match &tpe.family {
-                    ColumnTypeFamily::Int => match parse_pg_int(&default_string) {
-                        Some(int_value) => DefaultValue::VALUE(int_value),
-                        None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
-                            true => DefaultValue::SEQUENCE(default_string),
-                            false => DefaultValue::DBGENERATED(default_string),
-                        },
-                    },
-                    ColumnTypeFamily::BigInt => match parse_pg_big_int(&default_string) {
-                        Some(int_value) => DefaultValue::VALUE(int_value),
-                        None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
-                            true => DefaultValue::SEQUENCE(default_string),
-                            false => DefaultValue::DBGENERATED(default_string),
-                        },
-                    },
-                    ColumnTypeFamily::Float => match parse_pg_float(&default_string) {
-                        Some(float_value) => DefaultValue::VALUE(float_value),
-                        None => DefaultValue::DBGENERATED(default_string),
-                    },
-                    ColumnTypeFamily::Decimal => match parse_pg_float(&default_string) {
-                        Some(float_value) => DefaultValue::VALUE(float_value),
-                        None => DefaultValue::DBGENERATED(default_string),
-                    },
-                    ColumnTypeFamily::Boolean => match parse_bool(&default_string) {
-                        Some(bool_value) => DefaultValue::VALUE(bool_value),
-                        None => DefaultValue::DBGENERATED(default_string),
-                    },
-                    ColumnTypeFamily::String => {
-                        match unsuffix_default_literal(&default_string, &tpe.data_type, &tpe.full_data_type) {
-                            Some(default_literal) => DefaultValue::VALUE(PrismaValue::String(
-                                process_string_literal(default_literal.as_ref()).into(),
-                            )),
-                            None => DefaultValue::DBGENERATED(default_string),
-                        }
-                    }
-                    ColumnTypeFamily::DateTime => {
-                        match default_string.to_lowercase().as_str() {
-                            "now()" | "current_timestamp" => DefaultValue::NOW,
-                            _ => DefaultValue::DBGENERATED(default_string), //todo parse values
-                        }
-                    }
-                    ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
-                    // JSON/JSONB defaults come in the '{}'::jsonb form.
-                    ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
-                        .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
-                        .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
-                        .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
-                    ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                    ColumnTypeFamily::Enum(enum_name) => {
-                        let enum_suffix_without_quotes = format!("::{}", enum_name);
-                        let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
-                        if default_string.ends_with(&enum_suffix_with_quotes) {
-                            DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
-                                &default_string.replace(&enum_suffix_with_quotes, ""),
-                            )))
-                        } else if default_string.ends_with(&enum_suffix_without_quotes) {
-                            DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
-                                &default_string.replace(&enum_suffix_without_quotes, ""),
-                            )))
-                        } else {
-                            DefaultValue::DBGENERATED(default_string)
-                        }
-                    }
-                    ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
-                })
-            }
-        },
-    }
 }
 
 fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
@@ -785,42 +799,6 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
     let first_capture = captures.get(1).unwrap().as_str();
 
     Some(first_capture.into())
-}
-
-static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)('::.*)?$").expect("compile regex"));
-static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)('::.*)?$").expect("compile regex"));
-
-pub fn parse_pg_int(value: &str) -> Option<PrismaValue> {
-    let captures = RE_NUM.captures(value)?;
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i64>();
-    match num_rslt {
-        Ok(num) => Some(PrismaValue::Int(num)),
-        Err(_) => None,
-    }
-}
-
-pub fn parse_pg_big_int(value: &str) -> Option<PrismaValue> {
-    let captures = RE_NUM.captures(value)?;
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i64>();
-    match num_rslt {
-        Ok(num) => Some(PrismaValue::BigInt(num)),
-        Err(_) => None,
-    }
-}
-
-pub fn parse_pg_float(value: &str) -> Option<PrismaValue> {
-    let captures = RE_FLOAT.captures(value)?;
-    let num_str = captures.get(1).expect("get capture").as_str();
-
-    match BigDecimal::from_str(num_str) {
-        Ok(num) => Some(PrismaValue::Float(num)),
-        Err(_) => {
-            debug!("Couldn't parse float '{}'", value);
-            None
-        }
-    }
 }
 
 // See https://www.postgresql.org/docs/9.3/sql-syntax-lexical.html

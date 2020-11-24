@@ -1,5 +1,6 @@
 //! SQLite description.
 use super::*;
+use crate::parsers::Parser;
 use quaint::{ast::Value, prelude::Queryable, single::Quaint};
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
@@ -65,6 +66,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         Ok(self.conn.version().await?)
     }
 }
+
+impl Parser for SqlSchemaDescriber {}
 
 impl SqlSchemaDescriber {
     /// Constructor.
@@ -163,26 +166,26 @@ impl SqlSchemaDescriber {
                             None
                         } else {
                             Some(match &tpe.family {
-                                ColumnTypeFamily::Int => match parse_int(&default_string) {
+                                ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
                                     Some(int_value) => DefaultValue::VALUE(int_value),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::BigInt => match parse_big_int(&default_string) {
+                                ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
                                     Some(int_value) => DefaultValue::VALUE(int_value),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::Float => match parse_float(&default_string) {
+                                ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
                                     Some(float_value) => DefaultValue::VALUE(float_value),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::Decimal => match parse_float(&default_string) {
+                                ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
                                     Some(float_value) => DefaultValue::VALUE(float_value),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::Boolean => match parse_int(&default_string) {
+                                ColumnTypeFamily::Boolean => match Self::parse_int(&default_string) {
                                     Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
                                     Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
-                                    _ => match parse_bool(&default_string) {
+                                    _ => match Self::parse_bool(&default_string) {
                                         Some(bool_value) => DefaultValue::VALUE(bool_value),
                                         None => DefaultValue::DBGENERATED(default_string),
                                     },
