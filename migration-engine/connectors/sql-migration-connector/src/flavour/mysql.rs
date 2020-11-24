@@ -164,13 +164,13 @@ impl SqlFlavour for MysqlFlavour {
 
         if let Some((setting_name, setting_value)) = result_set.into_single().ok().and_then(|row| {
             let setting_name = row.at(0).and_then(|row| row.to_string())?;
-            let setting_value = row.at(1).and_then(|row| row.as_i64())?;
+            let setting_value = row.at(1).and_then(|row| row.to_string())?;
             Some((setting_name, setting_value))
         }) {
             assert_eq!(setting_name, "lower_case_table_names");
 
             // https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html
-            if setting_value == 1 {
+            if setting_value == "1" {
                 circumstances |= Circumstances::LowerCasesTableNames;
             }
         }
