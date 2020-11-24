@@ -193,6 +193,29 @@ fn required_relation_field_must_error_when_all_underlying_fields_are_optional() 
 }
 
 #[test]
+fn required_relation_field_must_error_if_it_is_virtual() {
+    let dml = r#"
+    model User {
+        id      Int     @id
+        address Address       
+    }
+
+    model Address {
+        id     Int     @id
+        userId Int          
+        user   User    @relation(fields: [userId], references: [id])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "The relation field `address` on Model `User` is required. This is invalid as it is not possible to enforce this constraint at the database level. Please make it optional instead.",
+        "relation",
+        Span::new(54, 77),
+    ));
+}
+
+#[test]
 fn relation_must_error_when_referenced_field_does_not_exist() {
     let dml = r#"
     model User {
@@ -490,7 +513,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     model User {
         id        Int @id
         firstName String
-        post      Post
+        post      Post?
     }
 
     model Post {

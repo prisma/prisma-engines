@@ -10,22 +10,7 @@ const IMPERATIVE_MIGRATIONS_TABLE_NAME: &str = "_prisma_migrations";
 #[async_trait::async_trait]
 impl ImperativeMigrationsPersistence for SqlMigrationConnector {
     async fn initialize(&self, baseline: bool) -> ConnectorResult<()> {
-        let mut schema = self.describe_schema().await?;
-
-        // Temporary workaround, for as long as the _Migration table is automatically initialized.
-        {
-            schema.tables = schema
-                .tables
-                .drain(..)
-                .filter(|table| table.name != "_Migration")
-                .collect();
-
-            schema.sequences = schema
-                .sequences
-                .drain(..)
-                .filter(|seq| !seq.name.contains("_Migration"))
-                .collect();
-        }
+        let schema = self.describe_schema().await?;
 
         if schema
             .tables

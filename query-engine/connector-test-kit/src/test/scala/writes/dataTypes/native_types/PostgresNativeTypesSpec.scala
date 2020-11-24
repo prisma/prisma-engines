@@ -184,10 +184,17 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     val project = ProjectDsl.fromString {
       """
         |model Model {
-        |  id     String   @id @default(cuid())
-        |  date   DateTime @test.Date
-        |  time   DateTime @test.Time(3)
-        |  ts     DateTime @test.Timestamp(3)
+        |  id         String   @id @default(cuid())
+        |  date       DateTime @test.Date
+        |  date_2     DateTime @test.Date
+        |  time       DateTime @test.Time(3)
+        |  time_2     DateTime @test.Time(3)
+        |  time_tz    DateTime @test.Timetz(3)
+        |  time_tz_2  DateTime @test.Timetz(3)
+        |  ts         DateTime @test.Timestamp(3)
+        |  ts_2       DateTime @test.Timestamp(3)
+        |  ts_tz      DateTime @test.Timestamptz(3)
+        |  ts_tz_2    DateTime @test.Timestamptz(3)
         |}"""
     }
 
@@ -199,13 +206,27 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
        |  createOneModel(
        |    data: {
        |      date: "2016-09-24T00:00:00.000Z"
+       |      date_2: "2016-09-24T00:00:00.000+03:00"
        |      time: "1111-11-11T13:02:20.321Z"
+       |      time_2: "1111-11-11T13:02:20.321+03:00"
+       |      time_tz: "1111-11-11T13:02:20.321Z"
+       |      time_tz_2: "1111-11-11T13:02:20.321+03:00"
        |      ts: "2016-09-24T14:01:30.213Z"
+       |      ts_2: "2016-09-24T14:01:30.213+03:00"
+       |      ts_tz: "2016-09-24T14:01:30.213Z"
+       |      ts_tz_2: "2016-09-24T14:01:30.213+03:00"
        |    }
        |  ) {
        |    date
+       |    date_2
        |    time
+       |    time_2
+       |    time_tz
+       |    time_tz_2
        |    ts
+       |    ts_2
+       |    ts_tz
+       |    ts_tz_2
        |  }
        |}""".stripMargin,
       project,
@@ -213,6 +234,6 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     )
 
     res.toString should be(
-      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","time":"1970-01-01T13:02:20.321+00:00","ts":"2016-09-24T14:01:30.213+00:00"}}}""")
+      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","date_2":"2016-09-23T00:00:00+00:00","time":"1970-01-01T13:02:20.321+00:00","time_2":"1970-01-01T10:02:20.321+00:00","time_tz":"1970-01-01T13:02:20.321+00:00","time_tz_2":"1970-01-01T10:02:20.321+00:00","ts":"2016-09-24T14:01:30.213+00:00","ts_2":"2016-09-24T11:01:30.213+00:00","ts_tz":"2016-09-24T14:01:30.213+00:00","ts_tz_2":"2016-09-24T11:01:30.213+00:00"}}}""")
   }
 }

@@ -432,3 +432,10 @@ pub const MYSQL_SOURCE: &str = r#"
         url      = "mysql://localhost:3306"
     }
 "#;
+
+pub const MSSQL_SOURCE: &str = r#"
+    datasource db {
+        provider = "sqlserver"
+        url      = "sqlserver://localhost:1433"
+    }
+"#;

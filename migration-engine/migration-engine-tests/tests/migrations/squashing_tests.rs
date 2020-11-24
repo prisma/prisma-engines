@@ -94,6 +94,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_some());
@@ -112,6 +113,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     api.mark_migration_applied("0000_initial", &directory).send().await?;
 
@@ -121,8 +123,10 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
+    assert!(error_in_unapplied_migration.is_none());
     assert!(drift.is_none());
     assert!(
         matches!(&history, Some(HistoryDiagnostic::MigrationsDirectoryIsBehind { unpersisted_migration_names }) if unpersisted_migration_names.len() == 3),
@@ -144,6 +148,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -155,6 +160,7 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     api.assert_schema().await?.assert_equals(&initial_schema)?;
 
@@ -291,6 +297,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -302,6 +309,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     api.apply_migrations(&directory)
         .send()
@@ -314,6 +322,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -325,6 +334,7 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     api.assert_schema().await?.assert_equals(&initial_schema)?;
 
@@ -438,6 +448,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -449,6 +460,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     api.apply_migrations(&directory)
         .send()
@@ -461,6 +473,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
         failed_migration_names,
         edited_migration_names,
         has_migrations_table,
+        error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
     assert!(drift.is_none());
@@ -472,6 +485,7 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
     assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     api.assert_schema().await?.assert_equals(&initial_schema)?;
 

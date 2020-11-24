@@ -146,7 +146,7 @@ class UncheckedNestedUpdateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |
          |model ModelB {
          |  id Int      @id
-         |  a  ModelA
+         |  a  ModelA?
          |}
          """
     }
@@ -188,18 +188,18 @@ class UncheckedNestedUpdateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
          |
          |model ModelC {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
          |
          |model ModelD {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
       """
     }
@@ -245,8 +245,8 @@ class UncheckedNestedUpdateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
          |
          |model ModelC {
@@ -328,8 +328,8 @@ class UncheckedNestedUpdateSpec extends FlatSpec with Matchers with ApiSpecBase 
          |}
          |
          |model ModelB {
-         |  id Int    @id
-         |  a  ModelA
+         |  id Int     @id
+         |  a  ModelA?
          |}
       """
     }

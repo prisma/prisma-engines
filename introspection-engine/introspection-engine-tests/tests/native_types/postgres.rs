@@ -19,9 +19,11 @@ const TYPES: &[(&str, &str)] = &[
     ("text", "Text"),
     ("bytea", "ByteA"),
     ("ts", "Timestamp(0)"),
+    ("tstz", "Timestamptz(2)"),
     ("date", "Date"),
     ("time", "Time(2)"),
     ("time_2", "Time"),
+    ("timetz", "Timetz(2)"),
     ("bool", "Boolean"),
     ("bit", "Bit(1)"),
     ("varbit", "VarBit(1)"),
@@ -80,9 +82,11 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             text            String   @postgres.Text
             bytea           Bytes    @postgres.ByteA
             ts              DateTime @postgres.Timestamp(0)
+            tstz            DateTime @postgres.Timestamptz(2)
             date            DateTime @postgres.Date
             time            DateTime @postgres.Time(2)
             time_2          DateTime @postgres.Time(6)
+            timetz          DateTime @postgres.Timetz(2)
             bool            Boolean  @postgres.Boolean
             bit             String   @postgres.Bit(1)
             varbit          String   @postgres.VarBit(1)
@@ -151,9 +155,11 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             // This type is currently not supported.
             // bytea        bytea
             ts              DateTime
+            tstz            DateTime
             date            DateTime
             time            DateTime
             time_2          DateTime
+            timetz          DateTime
             bool            Boolean
             bit             String
             varbit          String

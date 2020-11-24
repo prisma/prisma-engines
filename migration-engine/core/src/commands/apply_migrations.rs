@@ -123,7 +123,7 @@ fn diagnose_migration_history(
 
     let mut failed_migrations = migrations_from_database
         .iter()
-        .filter(|migration| migration.is_failed())
+        .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none())
         .peekable();
 
     if failed_migrations.peek().is_some() {

@@ -270,7 +270,7 @@ pub struct ColumnType {
     /// The full SQL data type.
     pub full_data_type: String,
     /// The maximum length for character or string bit types if specified.
-    pub character_maximum_length: Option<u32>,
+    pub character_maximum_length: Option<i64>,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
     /// The arity of the column.

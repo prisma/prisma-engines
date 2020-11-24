@@ -50,7 +50,9 @@ async fn all_postgres_column_types_must_work() {
         t.add_column("string1_col", types::text());
         t.add_column("string2_col", types::varchar(1));
         t.add_column("time_col", types::custom("TIME"));
+        t.add_column("timetz_col", types::custom("TIMETZ"));
         t.add_column("timestamp_col", types::custom("TIMESTAMP"));
+        t.add_column("timestamptz_col", types::custom("TIMESTAMPTZ"));
         t.add_column("tsquery_col", types::custom("TSQUERY"));
         t.add_column("tsvector_col", types::custom("TSVECTOR"));
         t.add_column("txid_col", types::custom("TXID_SNAPSHOT"));
@@ -442,6 +444,20 @@ async fn all_postgres_column_types_must_work() {
             auto_increment: false,
         },
         Column {
+            name: "timetz_col".into(),
+            tpe: ColumnType {
+                data_type: "time with time zone".into(),
+                full_data_type: "timetz".into(),
+                character_maximum_length: None,
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(PostgresType::Timetz(Some(6)).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
             name: "timestamp_col".into(),
             tpe: ColumnType {
                 data_type: "timestamp without time zone".into(),
@@ -451,6 +467,21 @@ async fn all_postgres_column_types_must_work() {
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Timestamp(Some(6)).to_json()),
+            },
+
+            default: None,
+            auto_increment: false,
+        },
+        Column {
+            name: "timestamptz_col".into(),
+            tpe: ColumnType {
+                data_type: "timestamp with time zone".into(),
+                full_data_type: "timestamptz".into(),
+                character_maximum_length: None,
+
+                family: ColumnTypeFamily::DateTime,
+                arity: ColumnArity::Required,
+                native_type: Some(PostgresType::Timestamptz(Some(6)).to_json()),
             },
 
             default: None,

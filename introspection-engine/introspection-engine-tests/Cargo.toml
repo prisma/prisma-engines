@@ -8,6 +8,7 @@ edition = "2018"
 sql-datamodel-connector = { path = "../../libs/datamodel/connectors/sql-datamodel-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 introspection-connector = { path = "../connectors/introspection-connector" }
+introspection-core = { path = "../core" }
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
 datamodel = { path = "../../libs/datamodel/core" }

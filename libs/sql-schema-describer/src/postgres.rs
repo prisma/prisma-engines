@@ -701,7 +701,9 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "money" | "_money" => (Float, None),
         "pg_lsn" | "_pg_lsn" => unsupported_type(),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
+        "timetz" | "_timetz" => (DateTime, Some(PostgresType::Timetz(precision.time_precision))),
         "timestamp" | "_timestamp" => (DateTime, Some(PostgresType::Timestamp(precision.time_precision))),
+        "timestamptz" | "_timestamptz" => (DateTime, Some(PostgresType::Timestamptz(precision.time_precision))),
         "tsquery" | "_tsquery" => unsupported_type(),
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
@@ -719,7 +721,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
-        character_maximum_length: precision.character_maximum_length,
+        character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
         family,
         arity,
         native_type: native_type.map(|x| x.to_json()),

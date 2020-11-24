@@ -1,5 +1,3 @@
-pub(crate) mod expanded_alter_column;
-
 use crate::{pair::Pair, sql_schema_differ::ColumnChanges};
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Serialize, Serializer};

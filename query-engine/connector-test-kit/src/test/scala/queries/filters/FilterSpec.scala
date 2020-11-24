@@ -24,7 +24,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
      |  brand  String?
      |  parked Boolean?
      |
-     |  owner  User
+     |  owner  User?
      |}
      |
      |model ParkingLot {

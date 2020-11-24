@@ -7,63 +7,6 @@ import util._
 class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "a P1! to C1! relation " should "error when deleting the child" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      val res = server
-        .query(
-          s"""mutation {
-          |  createParent(data: {
-          |    p: "p1"
-          |    p_1: "p_1"
-          |    p_2: "p_2"
-          |    childReq: {
-          |      create: {
-          |        c: "c1"
-          |        c_1: "c_1"
-          |        c_2: "c_2"
-          |      }
-          |    }
-          |  }){
-          |    ${t.parent.selection}
-          |    childReq{
-          |       ${t.child.selection}
-          |    }
-          |  }
-          |}""",
-          project
-        )
-      val childId  = t.child.where(res, "data.createParent.childReq")
-      val parentId = t.parent.where(res, "data.createParent")
-
-      server.queryThatMustFail(
-        s"""mutation {
-         |  upsertParent(
-         |  where: $parentId
-         |  update:{
-         |    p: { set: "p2" }
-         |    childReq: {delete: true}
-         |  }
-         |  create:{p: "Should not matter", p_1: "lol", p_2: "muh", childReq: {create: {c: "Should not matter", c_1: "no no yes", c_2: "no no no"}}}
-         |  ){
-         |    childReq {
-         |      c
-         |    }
-         |  }
-         |}
-      """,
-        project,
-        errorCode = 2009,
-        errorContains =
-          """`Mutation.upsertParent.update.ParentUpdateInput.childReq.ChildUpdateOneRequiredWithoutParentReqInput.delete`: Field does not exist on enclosing type."""
-      )
-    }
-  }
-
   "a P1! to C1 relation" should "always fail when trying to delete the child" in {
     schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {

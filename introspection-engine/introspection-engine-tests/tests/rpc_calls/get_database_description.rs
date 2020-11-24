@@ -269,7 +269,7 @@ async fn database_description_for_mssql_should_work(api: &TestApi) -> crate::Tes
                             "characterMaximumLength": null,
                             "family": "int",
                             "arity": "required",
-                            "nativeType": null
+                            "nativeType": "Int"
                         },
                         "default": null,
                         "autoIncrement": true
@@ -282,7 +282,7 @@ async fn database_description_for_mssql_should_work(api: &TestApi) -> crate::Tes
                             "characterMaximumLength": 2147483647,
                             "family": "string",
                             "arity": "required",
-                            "nativeType": null
+                            "nativeType": "Text"
                         },
                         "default": null,
                         "autoIncrement": false

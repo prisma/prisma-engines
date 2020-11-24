@@ -182,10 +182,7 @@ pub async fn test_api_helper_for_postgres(url: String, args: TestAPIArgs, connec
 
 pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
-
-    let database_file_path = sqlite_test_file(db_name);
-    std::fs::remove_file(database_file_path.clone()).ok(); // ignore potential errors
-    let connection_string = sqlite_test_url(args.test_function_name);
+    let connection_string = sqlite_test_url(db_name);
     let database = Quaint::new(&connection_string).await.unwrap();
 
     TestApi {
@@ -247,14 +244,6 @@ impl BarrelMigrationExecutor {
         migration_fn(&mut migration);
 
         let full_sql = migration.make_from(self.sql_variant);
-        run_full_sql(&self.database, &full_sql).await;
-    }
-}
-
-async fn run_full_sql(database: &Quaint, full_sql: &str) {
-    for sql in full_sql.split(';') {
-        if sql != "" {
-            database.query_raw(&sql, &[]).await.unwrap();
-        }
+        self.database.raw_cmd(&full_sql).await.unwrap();
     }
 }

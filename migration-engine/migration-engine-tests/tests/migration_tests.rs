@@ -614,7 +614,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
         }
         model B {
             id Int @id
-            a A // remove this once the implicit back relation field is implemented
+            a  A? // remove this once the implicit back relation field is implemented
         }
     "#;
 
@@ -667,7 +667,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
     let dm1 = r#"
         model A {
             id Int @id
-            b String
+            b  String
         }
         model B {
             id Int @id
@@ -687,7 +687,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
         }
         model B {
             id Int @id
-            a A
+            a  A?
         }
     "#;
     let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
@@ -1340,14 +1340,14 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
 async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) {
     let dm = r#"
         model Cat {
-            id Int @id
-            box Box
+            id Int   @id
+            box Box?
         }
 
         model Box {
-            id Int @id
+            id     Int @id
             cat_id Int
-            cat Cat @relation(fields: [cat_id], references: [id])
+            cat    Cat @relation(fields: [cat_id], references: [id])
         }
     "#;
 
@@ -2299,14 +2299,14 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
 }
 
 #[test_each_connector]
-async fn changing_referenced_columns_of_foreign_key_works(api: &TestApi) -> TestResult {
+async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
        model Post {
           id        Int     @default(autoincrement()) @id
           author    User?   @relation(fields: [authorId], references: [id])
           authorId  Int?
         }
-        
+
         model User {
           id       Int     @default(autoincrement()) @id
           posts    Post[]
@@ -2321,7 +2321,7 @@ async fn changing_referenced_columns_of_foreign_key_works(api: &TestApi) -> Test
           author    User?   @relation(fields: [authorId], references: [uid])
           authorId  Int?
         }
-        
+
         model User {
           uid   Int    @id
           posts Post[]
