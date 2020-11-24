@@ -1,7 +1,6 @@
-use datamodel::walkers::ScalarFieldWalker;
-
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::SqliteFlavour;
+use datamodel::walkers::ScalarFieldWalker;
 
 impl SqlSchemaCalculatorFlavour for SqliteFlavour {
     fn column_type_for_native_type(
