@@ -2,40 +2,75 @@ use super::SqlFlavour;
 use crate::{
     connect,
     connection_wrapper::Connection,
-    database_info::DatabaseInfo,
-    error::CheckDatabaseInfoResult,
     error::{quaint_error_to_connector_error, SystemDatabase},
 };
+use datamodel::{walkers::walk_scalar_fields, Datamodel};
+use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
-use quaint::connector::MysqlUrl;
+use quaint::{connector::MysqlUrl, prelude::SqlFamily};
 use regex::RegexSet;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
+use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
 
 #[derive(Debug)]
-pub(crate) struct MysqlFlavour(pub(super) MysqlUrl);
+pub(crate) struct MysqlFlavour {
+    pub(super) url: MysqlUrl,
+    /// See the [Circumstances] enum.
+    pub(super) circumstances: AtomicU8,
+}
+
+impl MysqlFlavour {
+    pub(crate) fn is_mariadb(&self) -> bool {
+        BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
+            .unwrap_or_default()
+            .contains(Circumstances::IsMariadb)
+    }
+
+    pub(crate) fn is_mysql_5_6(&self) -> bool {
+        BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
+            .unwrap_or_default()
+            .contains(Circumstances::IsMysql56)
+    }
+
+    pub(crate) fn lower_cases_table_names(&self) -> bool {
+        BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
+            .unwrap_or_default()
+            .contains(Circumstances::LowerCasesTableNames)
+    }
+}
 
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
-    fn check_database_info(&self, database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
-        static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
-            RegexSet::new(&[
-                "(?i)^mysql$",
-                "(?i)^information_schema$",
-                "(?i)^performance_schema$",
-                "(?i)^sys$",
-            ])
-            .unwrap()
-        });
+    fn check_database_version_compatibility(
+        &self,
+        datamodel: &Datamodel,
+    ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
+        if self.is_mysql_5_6() {
+            let mut errors = Vec::new();
 
-        let db_name = database_info.connection_info().schema_name();
+            check_datamodel_for_mysql_5_6(datamodel, &mut errors);
 
-        if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
-            return Err(SystemDatabase(db_name.to_owned()));
+            if errors.is_empty() {
+                return None;
+            }
+
+            let mut errors_string = String::with_capacity(errors.iter().map(|err| err.len() + 3).sum());
+
+            for error in &errors {
+                errors_string.push_str("- ");
+                errors_string.push_str(error);
+                errors_string.push_str("\n");
+            }
+
+            Some(user_facing_errors::common::DatabaseVersionIncompatibility {
+                errors: errors_string,
+                database_version: "MySQL 5.6".into(),
+            })
+        } else {
+            None
         }
-
-        Ok(())
     }
 
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
@@ -43,7 +78,7 @@ impl SqlFlavour for MysqlFlavour {
         url.set_path("/mysql");
 
         let conn = connect(&url.to_string()).await?;
-        let db_name = self.0.dbname();
+        let db_name = self.url.dbname();
 
         let query = format!(
             "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
@@ -94,7 +129,53 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
-        connection.raw_cmd("SELECT 1").await?;
+        static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
+            RegexSet::new(&[
+                "(?i)^mysql$",
+                "(?i)^information_schema$",
+                "(?i)^performance_schema$",
+                "(?i)^sys$",
+            ])
+            .unwrap()
+        });
+
+        let db_name = connection.connection_info().schema_name();
+
+        if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
+            return Err(SystemDatabase(db_name.to_owned()).into());
+        }
+
+        let version = connection.version().await?;
+        let mut circumstances = BitFlags::<Circumstances>::default();
+
+        if let Some(version) = version {
+            if version.starts_with("5.6") {
+                circumstances |= Circumstances::IsMysql56;
+            }
+
+            if version.contains("MariaDB") {
+                circumstances |= Circumstances::IsMariadb;
+            }
+        }
+
+        let result_set = connection
+            .query_raw("SHOW VARIABLES WHERE variable_name = 'lower_case_table_names'", &[])
+            .await?;
+
+        if let Some((setting_name, setting_value)) = result_set.into_single().ok().and_then(|row| {
+            let setting_name = row.at(0).and_then(|row| row.to_string())?;
+            let setting_value = row.at(1).and_then(|row| row.to_string())?;
+            Some((setting_name, setting_value))
+        }) {
+            assert_eq!(setting_name, "lower_case_table_names");
+
+            // https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html
+            if setting_value == "1" {
+                circumstances |= Circumstances::LowerCasesTableNames;
+            }
+        }
+
+        self.circumstances.store(circumstances.bits(), Ordering::Relaxed);
 
         Ok(())
     }
@@ -104,7 +185,7 @@ impl SqlFlavour for MysqlFlavour {
         url.set_path("/mysql");
 
         let conn = connect(&url.to_string()).await?;
-        let db_name = self.0.dbname();
+        let db_name = self.url.dbname();
 
         let query = format!("DROP DATABASE IF EXISTS `{}`", db_name);
         conn.raw_cmd(&query).await?;
@@ -128,6 +209,10 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
+    fn sql_family(&self) -> SqlFamily {
+        SqlFamily::Mysql
+    }
+
     #[tracing::instrument(skip(self, migrations, connection))]
     async fn sql_schema_from_migration_history(
         &self,
@@ -141,7 +226,7 @@ impl SqlFlavour for MysqlFlavour {
         connection.raw_cmd(&drop_database).await?;
         connection.raw_cmd(&create_database).await?;
 
-        let mut temporary_database_url = self.0.url().clone();
+        let mut temporary_database_url = self.url.url().clone();
         temporary_database_url.set_path(&format!("/{}", database_name));
         let temporary_database_url = temporary_database_url.to_string();
 
@@ -172,4 +257,24 @@ impl SqlFlavour for MysqlFlavour {
 
         Ok(sql_schema)
     }
+}
+
+#[derive(BitFlags, Debug, Clone, Copy, PartialEq)]
+#[repr(u8)]
+pub enum Circumstances {
+    LowerCasesTableNames = 0b0001,
+    IsMysql56 = 0b0010,
+    IsMariadb = 0b0100,
+}
+
+fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<String>) {
+    walk_scalar_fields(datamodel).for_each(|field| {
+        if field.field_type().is_json() {
+            errors.push(format!(
+                "The `Json` data type used in {}.{} is not supported on MySQL 5.6.",
+                field.model().name(),
+                field.name()
+            ))
+        }
+    });
 }

@@ -13,7 +13,7 @@ use crate::{
         self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterTable, CreateEnum, CreateIndex, CreateTable,
         DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep, TableChange,
     },
-    wrap_as_step, DatabaseInfo, SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
+    wrap_as_step, SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
 };
 use column::ColumnTypeChange;
 use enums::EnumDiffer;
@@ -21,16 +21,8 @@ use sql_schema_describer::walkers::{EnumWalker, ForeignKeyWalker, TableWalker};
 use std::collections::HashSet;
 use table::TableDiffer;
 
-pub(crate) fn calculate_steps(
-    schemas: Pair<&SqlSchema>,
-    flavour: &dyn SqlFlavour,
-    database_info: &DatabaseInfo,
-) -> Vec<SqlMigrationStep> {
-    let differ = SqlSchemaDiffer {
-        schemas,
-        flavour,
-        database_info,
-    };
+pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
+    let differ = SqlSchemaDiffer { schemas, flavour };
 
     differ.diff_internal().into_steps()
 }
@@ -38,7 +30,6 @@ pub(crate) fn calculate_steps(
 #[derive(Debug)]
 pub(crate) struct SqlSchemaDiffer<'a> {
     schemas: Pair<&'a SqlSchema>,
-    database_info: &'a DatabaseInfo,
     flavour: &'a dyn SqlFlavour,
 }
 
@@ -110,7 +101,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn diff_internal(&self) -> SqlSchemaDiff {
         let tables_to_redefine = self.flavour.tables_to_redefine(&self);
         let mut alter_indexes = self.alter_indexes(&tables_to_redefine);
-        let redefine_indexes = if self.flavour.can_alter_index(&self.database_info) {
+        let redefine_indexes = if self.flavour.can_alter_index() {
             Vec::new()
         } else {
             std::mem::replace(&mut alter_indexes, Vec::new())
@@ -343,7 +334,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.database_info.sql_family().is_mysql() && index::index_covers_fk(&tables.previous(), &index) {
+                if self.flavour.should_skip_fk_indexes() && index::index_covers_fk(&tables.previous(), &index) {
                     continue;
                 }
 
@@ -433,10 +424,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 self.schemas
                     .next()
                     .table_walkers()
-                    .find(move |next_table| tables_match(&previous_table, &next_table))
+                    .find(move |next_table| {
+                        self.flavour
+                            .table_names_match(Pair::new(previous_table.name(), next_table.name()))
+                    })
                     .map(move |next_table| TableDiffer {
                         flavour: self.flavour,
-                        database_info: self.database_info,
                         tables: Pair::new(previous_table, next_table),
                     })
             })
@@ -461,15 +454,20 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn created_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> + 'a {
-        self.next_tables()
-            .filter(move |next_table| !self.schemas.previous().has_table(next_table.name()))
+        self.next_tables().filter(move |next_table| {
+            !self.previous_tables().any(|previous_table| {
+                self.flavour
+                    .table_names_match(Pair::new(previous_table.name(), next_table.name()))
+            })
+        })
     }
 
     fn dropped_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'schema>> + 'a {
         self.previous_tables().filter(move |previous_table| {
-            !self
-                .next_tables()
-                .any(|next_table| tables_match(previous_table, &next_table))
+            !self.next_tables().any(|next_table| {
+                self.flavour
+                    .table_names_match(Pair::new(previous_table.name(), next_table.name()))
+            })
         })
     }
 
@@ -572,10 +570,6 @@ fn foreign_keys_match(previous: &ForeignKeyWalker<'_>, next: &ForeignKeyWalker<'
         && constrains_same_column_count
         && constrains_same_columns
         && references_same_columns
-}
-
-fn tables_match(previous: &TableWalker<'_>, next: &TableWalker<'_>) -> bool {
-    previous.name() == next.name()
 }
 
 fn enums_match(previous: &EnumWalker<'_>, next: &EnumWalker<'_>) -> bool {

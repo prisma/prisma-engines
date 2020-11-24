@@ -251,7 +251,7 @@ impl<'a> RelationFieldWalker<'a> {
     pub fn opposite_side(&self) -> RelationFieldWalker<'a> {
         RelationFieldWalker {
             datamodel: self.datamodel,
-            model: self.referenced_model(),
+            model: self.referenced_model().model,
             field: self.datamodel.find_related_field_bang(self.field),
         }
     }
@@ -279,7 +279,7 @@ impl<'a> RelationFieldWalker<'a> {
             .map(move |field| {
                 let model = self.referenced_model();
                 let field = model.find_scalar_field(field.as_str())
-                .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `references` to point to fields on the related model.", field, model.name));
+                .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `references` to point to fields on the related model.", field, model.name()));
 
                 field.db_name()
             })
@@ -289,19 +289,19 @@ impl<'a> RelationFieldWalker<'a> {
         self.field.relation_info.name.as_ref()
     }
 
-    pub fn referenced_table_name(&self) -> &'a str {
-        self.referenced_model().final_database_name()
-    }
-
-    fn referenced_model(&self) -> &'a Model {
-        self.datamodel
-            .find_model(&self.field.relation_info.to)
-            .unwrap_or_else(|| {
-                panic!(
-                    "Invariant violation: could not find model {} referenced in relation info.",
-                    self.field.relation_info.to
-                )
-            })
+    pub fn referenced_model(&self) -> ModelWalker<'a> {
+        ModelWalker {
+            datamodel: &self.datamodel,
+            model: self
+                .datamodel
+                .find_model(&self.field.relation_info.to)
+                .unwrap_or_else(|| {
+                    panic!(
+                        "Invariant violation: could not find model {} referenced in relation info.",
+                        self.field.relation_info.to
+                    )
+                }),
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 use crate::*;
-use pretty_assertions::{assert_eq, assert_ne};
+use pretty_assertions::assert_eq;
 
 #[test_each_connector]
 async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> TestResult {
@@ -153,10 +153,6 @@ async fn mark_migration_applied_on_a_non_empty_database_without_failed_works(api
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
     assert!(&applied_migrations[0].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_some());
     assert_eq!(
@@ -238,10 +234,6 @@ async fn mark_migration_applied_on_a_non_empty_database_with_wrong_expect_failed
     assert_eq!(applied_migrations.len(), 1);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
     assert!(&applied_migrations[0].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
 
     api.assert_schema()
         .await?
@@ -320,16 +312,8 @@ async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
     assert!(&applied_migrations[0].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
 
     api.assert_schema()
         .await?
@@ -414,10 +398,6 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
     assert_eq!(applied_migrations.len(), 3);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
     assert!(&applied_migrations[0].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
 
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_none());
@@ -516,10 +496,6 @@ async fn mark_migration_applied_when_the_migration_is_failed_and_expect_failed_f
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
     assert!(&applied_migrations[0].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
 
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_none());

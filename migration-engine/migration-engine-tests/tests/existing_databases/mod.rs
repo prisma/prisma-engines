@@ -39,7 +39,7 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
             }
         "#;
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
-    assert!(initial_result.has_table("Post"));
+    assert!(initial_result.get_table("Post").is_some());
 
     let result = api
         .barrel()
@@ -48,7 +48,7 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
         })
         .await?;
 
-    assert!(!result.has_table("Post"));
+    assert!(!result.get_table("Post").is_some());
 
     let dm2 = r#"
             model Blog {
@@ -165,7 +165,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
             }
         "#;
     let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
-    assert!(!initial_result.has_table("Blog_tags"));
+    assert!(!initial_result.get_table("Blog_tags").is_some());
 
     let result = api
         .barrel()

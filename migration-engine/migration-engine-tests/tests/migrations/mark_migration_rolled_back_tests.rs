@@ -101,10 +101,6 @@ async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi)
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
     assert!(&applied_migrations[0].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
 
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_none());
@@ -189,10 +185,6 @@ async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &Tes
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
     assert!(&applied_migrations[0].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
 
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_some());
@@ -283,10 +275,6 @@ async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &
     assert_eq!(applied_migrations.len(), 3);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
     assert!(&applied_migrations[0].finished_at.is_some());
-    assert_ne!(
-        &applied_migrations[0].started_at,
-        applied_migrations[0].finished_at.as_ref().unwrap()
-    );
 
     assert_eq!(&applied_migrations[1].migration_name, &second_migration_name);
     assert!(&applied_migrations[1].finished_at.is_none());

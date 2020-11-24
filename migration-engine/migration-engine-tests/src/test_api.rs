@@ -58,18 +58,12 @@ use test_setup::*;
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
 pub struct TestApi {
-    /// More precise than SqlFamily.
-    connector_name: &'static str,
     database: Quaint,
     api: MigrationApi<SqlMigrationConnector, SqlMigration>,
     tags: BitFlags<Tags>,
 }
 
 impl TestApi {
-    pub fn connector_name(&self) -> &str {
-        self.connector_name
-    }
-
     pub fn schema_name(&self) -> &str {
         self.connection_info().schema_name()
     }
@@ -87,11 +81,11 @@ impl TestApi {
     }
 
     pub fn is_mysql_8(&self) -> bool {
-        self.connector_name == "mysql_8"
+        self.tags.contains(Tags::Mysql8)
     }
 
     pub fn is_mariadb(&self) -> bool {
-        self.connector_name == "mysql_mariadb"
+        self.tags.contains(Tags::Mariadb)
     }
 
     pub async fn migration_persistence(&self) -> &dyn MigrationPersistence {
@@ -377,7 +371,6 @@ pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "mysql_8",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -390,7 +383,6 @@ pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "mysql_5_6",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -403,7 +395,6 @@ pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "mysql",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -416,7 +407,6 @@ pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
     let connector = mysql_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "mysql_mariadb",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -429,7 +419,6 @@ pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "postgres9",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -442,7 +431,6 @@ pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "postgres",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -455,7 +443,6 @@ pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "postgres11",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -467,7 +454,6 @@ pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "postgres12",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -479,7 +465,6 @@ pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
     let connector = postgres_migration_connector(&url).await;
 
     TestApi {
-        connector_name: "postgres13",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,
@@ -491,7 +476,6 @@ pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
     let connector = sqlite_migration_connector(db_name).await;
 
     TestApi {
-        connector_name: "sqlite",
         database: connector.quaint().clone(),
         api: test_api(connector).await,
         tags: args.test_tag,

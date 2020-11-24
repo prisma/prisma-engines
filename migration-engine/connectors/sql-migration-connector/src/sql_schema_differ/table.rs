@@ -1,12 +1,11 @@
 use super::column::ColumnDiffer;
-use crate::{database_info::DatabaseInfo, flavour::SqlFlavour, pair::Pair};
+use crate::{flavour::SqlFlavour, pair::Pair};
 use sql_schema_describer::{
     walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     PrimaryKey,
 };
 
 pub(crate) struct TableDiffer<'a> {
-    pub(crate) database_info: &'a DatabaseInfo,
     pub(crate) flavour: &'a dyn SqlFlavour,
     pub(crate) tables: Pair<TableWalker<'a>>,
 }
@@ -20,7 +19,6 @@ impl<'schema> TableDiffer<'schema> {
                     .map(|next_column| (previous_column, next_column))
             })
             .map(move |(previous, next)| ColumnDiffer {
-                database_info: self.database_info,
                 flavour: self.flavour,
                 previous,
                 next,

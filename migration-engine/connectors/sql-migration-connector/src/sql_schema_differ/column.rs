@@ -1,4 +1,4 @@
-use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
+use crate::flavour::SqlFlavour;
 use enumflags2::BitFlags;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultValue};
@@ -6,7 +6,6 @@ use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultValue
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
     pub(crate) flavour: &'a dyn SqlFlavour,
-    pub(crate) database_info: &'a DatabaseInfo,
     pub(crate) previous: ColumnWalker<'a>,
     pub(crate) next: ColumnWalker<'a>,
 }
@@ -59,7 +58,7 @@ impl<'a> ColumnDiffer<'a> {
     /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
     fn defaults_match(&self) -> bool {
         // JSON defaults on MySQL should be ignored.
-        if self.database_info.sql_family().is_mysql()
+        if self.flavour.should_ignore_json_defaults()
             && (self.previous.column_type_family().is_json() || self.next.column_type_family().is_json())
         {
             return true;

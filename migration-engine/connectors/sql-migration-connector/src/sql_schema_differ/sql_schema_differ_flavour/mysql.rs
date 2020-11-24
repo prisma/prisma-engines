@@ -9,8 +9,12 @@ use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
 const MARIADB_ALIASES: &[ColumnTypeFamily] = &[ColumnTypeFamily::String, ColumnTypeFamily::Json];
 
 impl SqlSchemaDifferFlavour for MysqlFlavour {
+    fn can_alter_index(&self) -> bool {
+        !self.is_mariadb() && !self.is_mysql_5_6()
+    }
+
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
-        if differ.database_info.is_mariadb()
+        if self.is_mariadb()
             && MARIADB_ALIASES.contains(&differ.previous.column_type_family())
             && MARIADB_ALIASES.contains(&differ.next.column_type_family())
         {
@@ -60,5 +64,21 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
 
     fn should_create_indexes_from_created_tables(&self) -> bool {
         false
+    }
+
+    fn should_ignore_json_defaults(&self) -> bool {
+        true
+    }
+
+    fn should_skip_fk_indexes(&self) -> bool {
+        true
+    }
+
+    fn table_names_match(&self, names: Pair<&str>) -> bool {
+        if self.lower_cases_table_names() {
+            names.previous().eq_ignore_ascii_case(names.next())
+        } else {
+            names.previous() == names.next()
+        }
     }
 }

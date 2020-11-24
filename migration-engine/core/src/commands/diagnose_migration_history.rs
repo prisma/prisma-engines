@@ -41,10 +41,17 @@ pub struct DiagnoseMigrationHistoryOutput {
 impl DiagnoseMigrationHistoryOutput {
     /// True if no problem was found
     pub fn is_empty(&self) -> bool {
-        self.drift.is_none()
-            && self.history.is_none()
-            && self.failed_migration_names.is_empty()
-            && self.edited_migration_names.is_empty()
+        matches!(
+            self,
+            DiagnoseMigrationHistoryOutput {
+                drift,
+                history,
+                has_migrations_table: _,
+                failed_migration_names,
+                edited_migration_names,
+                error_in_unapplied_migration,
+            } if drift.is_none() && history.is_none() && failed_migration_names.is_empty() && edited_migration_names.is_empty() && error_in_unapplied_migration.is_none()
+        )
     }
 }
 
