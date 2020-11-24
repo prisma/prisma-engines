@@ -8,7 +8,6 @@ pub struct MarkMigrationApplied<'a> {
     api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
     migration_name: String,
-    expect_failed: bool,
 }
 
 impl<'a> MarkMigrationApplied<'a> {
@@ -17,14 +16,7 @@ impl<'a> MarkMigrationApplied<'a> {
             api,
             migrations_directory,
             migration_name,
-            expect_failed: false,
         }
-    }
-
-    pub fn expect_failed(mut self, expect_failed: bool) -> Self {
-        self.expect_failed = expect_failed;
-
-        self
     }
 
     pub async fn send(self) -> CoreResult<MarkMigrationAppliedAssertion<'a>> {
@@ -33,7 +25,6 @@ impl<'a> MarkMigrationApplied<'a> {
             .mark_migration_applied(&MarkMigrationAppliedInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
                 migration_name: self.migration_name,
-                expect_failed: self.expect_failed,
             })
             .await?;
 
