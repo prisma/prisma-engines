@@ -74,7 +74,7 @@ impl TestApi {
     }
 }
 
-pub async fn mysql_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mysql_url(db_name);
@@ -90,7 +90,7 @@ pub async fn mysql_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_8_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mysql_8_url(db_name);
@@ -106,7 +106,7 @@ pub async fn mysql_8_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_5_6_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mysql_5_6_url(db_name);
@@ -122,7 +122,7 @@ pub async fn mysql_5_6_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_mariadb_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mariadb_url(db_name);
@@ -138,27 +138,27 @@ pub async fn mysql_mariadb_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn postgres_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
     test_api_helper_for_postgres(postgres_10_url(args.test_function_name), args, "postgres10").await
 }
 
-pub async fn postgres9_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
     test_api_helper_for_postgres(postgres_9_url(args.test_function_name), args, "postgres9").await
 }
 
-pub async fn postgres11_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
     test_api_helper_for_postgres(postgres_11_url(args.test_function_name), args, "postgres11").await
 }
 
-pub async fn postgres12_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
     test_api_helper_for_postgres(postgres_12_url(args.test_function_name), args, "postgres12").await
 }
 
-pub async fn postgres13_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
     test_api_helper_for_postgres(postgres_13_url(args.test_function_name), args, "postgres13").await
 }
 
-pub async fn test_api_helper_for_postgres(url: String, args: TestApiArgs, connector_name: &'static str) -> TestApi {
+pub async fn test_api_helper_for_postgres(url: String, args: TestAPIArgs, connector_name: &'static str) -> TestApi {
     let database = test_setup::create_postgres_database(&url.parse().unwrap())
         .await
         .unwrap();
@@ -180,7 +180,7 @@ pub async fn test_api_helper_for_postgres(url: String, args: TestApiArgs, connec
     }
 }
 
-pub async fn sqlite_test_api(args: TestApiArgs) -> TestApi {
+pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let connection_string = sqlite_test_url(db_name);
     let database = Quaint::new(&connection_string).await.unwrap();
@@ -195,15 +195,15 @@ pub async fn sqlite_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn mssql_2017_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
     mssql_test_api(mssql_2017_url("master"), args, "mssql2017").await
 }
 
-pub async fn mssql_2019_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
     mssql_test_api(mssql_2019_url("master"), args, "mssql2017").await
 }
 
-pub async fn mssql_test_api(connection_string: String, args: TestApiArgs, connector_name: &'static str) -> TestApi {
+pub async fn mssql_test_api(connection_string: String, args: TestAPIArgs, connector_name: &'static str) -> TestApi {
     use test_setup::connectors::mssql;
 
     let schema = args.test_function_name;

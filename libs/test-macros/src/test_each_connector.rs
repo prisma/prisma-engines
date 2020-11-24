@@ -196,7 +196,7 @@ fn test_each_connector_async_wrapper_functions(
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
-                let test_api_args = test_setup::TestApiArgs::new(#test_fn_name_str, #tags);
+                let test_api_args = test_setup::TestAPIArgs::new(#test_fn_name_str, #tags);
                 run(Box::pin(super::#connector_api_factory(test_api_args)))
             }
         };

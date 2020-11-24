@@ -371,7 +371,7 @@ impl<'a> TestApiSelect<'a> {
     }
 }
 
-pub async fn mysql_8_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_8_url(db_name);
     let connector = mysql_migration_connector(&url).await;
@@ -383,7 +383,7 @@ pub async fn mysql_8_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_5_6_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_5_6_url(db_name);
     let connector = mysql_migration_connector(&url).await;
@@ -395,7 +395,7 @@ pub async fn mysql_5_6_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mysql_url(db_name);
     let connector = mysql_migration_connector(&url).await;
@@ -407,7 +407,7 @@ pub async fn mysql_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn mysql_mariadb_test_api(args: TestApiArgs) -> TestApi {
+pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = mariadb_url(db_name);
     let connector = mysql_migration_connector(&url).await;
@@ -419,7 +419,7 @@ pub async fn mysql_mariadb_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn postgres9_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_9_url(db_name);
     let connector = postgres_migration_connector(&url).await;
@@ -431,7 +431,7 @@ pub async fn postgres9_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn postgres_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_10_url(db_name);
     let connector = postgres_migration_connector(&url).await;
@@ -443,7 +443,7 @@ pub async fn postgres_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn postgres11_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let url = postgres_11_url(db_name);
     let connector = postgres_migration_connector(&url).await;
@@ -455,7 +455,7 @@ pub async fn postgres11_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn postgres12_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
     let url = postgres_12_url(args.test_function_name);
     let connector = postgres_migration_connector(&url).await;
 
@@ -466,7 +466,7 @@ pub async fn postgres12_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn postgres13_test_api(args: TestApiArgs) -> TestApi {
+pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
     let url = postgres_13_url(args.test_function_name);
     let connector = postgres_migration_connector(&url).await;
 
@@ -477,7 +477,7 @@ pub async fn postgres13_test_api(args: TestApiArgs) -> TestApi {
     }
 }
 
-pub async fn sqlite_test_api(args: TestApiArgs) -> TestApi {
+pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
     let db_name = args.test_function_name;
     let connector = sqlite_migration_connector(db_name).await;
 
