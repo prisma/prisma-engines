@@ -193,7 +193,7 @@ fn get_relation_from_fields(field: &dml::Field) -> Option<Vec<String>> {
 
 fn get_relation_to_fields(field: &dml::Field) -> Option<Vec<String>> {
     match &field {
-        dml::Field::RelationField(rf) => Some(rf.relation_info.to_fields.clone()),
+        dml::Field::RelationField(rf) => Some(rf.relation_info.references.clone()),
         _ => None,
     }
 }

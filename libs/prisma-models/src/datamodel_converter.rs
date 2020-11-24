@@ -143,7 +143,7 @@ impl<'a> DatamodelConverter<'a> {
         for model in datamodel.models() {
             for field in model.relation_fields() {
                 let dml::RelationInfo {
-                    to, to_fields, name, ..
+                    to, references, name, ..
                 } = &field.relation_info;
 
                 let related_model = datamodel
@@ -160,16 +160,16 @@ impl<'a> DatamodelConverter<'a> {
                         related_model.clone(),
                         field.clone(),
                         related_field.clone(),
-                        to_fields,
-                        &related_field_info.to_fields,
+                        references,
+                        &related_field_info.references,
                     ),
                     _ if related_model.name < model.name => (
                         related_model.clone(),
                         model.clone(),
                         related_field.clone(),
                         field.clone(),
-                        &related_field_info.to_fields,
-                        to_fields,
+                        &related_field_info.references,
+                        references,
                     ),
                     // SELF RELATION CASE
                     _ => {
@@ -183,8 +183,8 @@ impl<'a> DatamodelConverter<'a> {
                             related_model.clone(),
                             field_a,
                             field_b,
-                            to_fields,
-                            &related_field_info.to_fields,
+                            references,
+                            &related_field_info.references,
                         )
                     }
                 };
@@ -201,20 +201,19 @@ impl<'a> DatamodelConverter<'a> {
                 let inline_on_this_model = TempManifestationHolder::Inline {
                     in_table_of_model: model.name.clone(),
                     field: field.clone(),
-                    referenced_fields: to_fields.clone(),
+                    referenced_fields: references.clone(),
                 };
                 let inline_on_related_model = TempManifestationHolder::Inline {
                     in_table_of_model: related_model.name.clone(),
                     field: related_field.clone(),
-                    referenced_fields: related_field_info.to_fields.clone(),
+                    referenced_fields: related_field_info.references.clone(),
                 };
 
                 let manifestation = match (field_a.is_list(), field_b.is_list()) {
                         (true, true) => TempManifestationHolder::Table,
                         (false, true) => inline_on_model_a,
                         (true, false) => inline_on_model_b,
-                        // TODO: to_fields is now a list, please fix this line.
-                        (false, false) => match (to_fields.first(), &related_field_info.to_fields.first()) {
+                        (false, false) => match (references.first(), &related_field_info.references.first()) {
                             (Some(_), None) => inline_on_this_model,
                             (None, Some(_)) => inline_on_related_model,
                             (None, None) => {

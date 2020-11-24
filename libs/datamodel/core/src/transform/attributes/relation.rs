@@ -24,7 +24,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
             }
 
             if let Ok(related_fields) = args.arg("references") {
-                rf.relation_info.to_fields = related_fields.as_array().to_literal_vec()?;
+                rf.relation_info.references = related_fields.as_array().to_literal_vec()?;
             }
 
             if let Ok(base_fields) = args.arg("fields") {
@@ -62,7 +62,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                 args.push(ast::Argument::new_string("", &relation_info.name));
             }
 
-            let mut relation_fields = relation_info.to_fields.clone();
+            let mut relation_fields = relation_info.references.clone();
 
             relation_fields.sort();
             all_related_ids.sort();
@@ -77,7 +77,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
             }
 
             // if we are on the physical field
-            if !relation_info.to_fields.is_empty() {
+            if !relation_info.references.is_empty() {
                 let is_many_to_many = match &field {
                     Field::RelationField(relation_field) => {
                         let related_field = datamodel.find_related_field(&relation_field).unwrap();
@@ -86,8 +86,8 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
                     _ => false,
                 };
 
-                let mut related_fields: Vec<ast::Expression> = Vec::with_capacity(relation_info.to_fields.len());
-                for related_field in &relation_info.to_fields {
+                let mut related_fields: Vec<ast::Expression> = Vec::with_capacity(relation_info.references.len());
+                for related_field in &relation_info.references {
                     related_fields.push(ast::Expression::ConstantValue(
                         related_field.clone(),
                         ast::Span::empty(),

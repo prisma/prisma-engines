@@ -274,7 +274,7 @@ impl<'a> RelationFieldWalker<'a> {
         self
             .field
             .relation_info
-            .to_fields
+            .references
             .iter()
             .map(move |field| {
                 let model = self.referenced_model();

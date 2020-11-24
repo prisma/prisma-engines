@@ -6,7 +6,7 @@ pub struct RelationInfo {
     /// The fields forming the relation.
     pub fields: Vec<String>,
     /// The target field of the relation a.k.a. `references`
-    pub to_fields: Vec<String>,
+    pub references: Vec<String>,
     /// The name of the relation. Internally, an empty string signals no name.
     pub name: String,
     /// A strategy indicating what happens when
@@ -19,7 +19,7 @@ impl PartialEq for RelationInfo {
     fn eq(&self, other: &Self) -> bool {
         self.to == other.to
             && self.fields == other.fields
-            && self.to_fields == other.to_fields
+            && self.references == other.references
             && self.on_delete == other.on_delete
     }
 }
@@ -31,7 +31,7 @@ impl RelationInfo {
         RelationInfo {
             to: String::from(to),
             fields: Vec::new(),
-            to_fields: Vec::new(),
+            references: Vec::new(),
             name: String::new(),
             on_delete: OnDeleteStrategy::None,
         }

@@ -521,7 +521,7 @@ impl<'a> Validator<'a> {
                     // TODO: I am not sure if this check is d'accord with the query engine.
                     let related_field = datamodel.find_related_field_bang(&field);
 
-                    if rel_info.to_fields.is_empty() && !related_field.is_generated {
+                    if rel_info.references.is_empty() && !related_field.is_generated {
                         // TODO: Refactor that out, it's way too much boilerplate.
                         return Err(DatamodelError::new_model_validation_error(
                             "Embedded models cannot have back relation fields.",
@@ -637,20 +637,20 @@ impl<'a> Validator<'a> {
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
 
             let unknown_fields: Vec<String> = rel_info
-                .to_fields
+                .references
                 .iter()
                 .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
                 .cloned()
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
-                .to_fields
+                .references
                 .iter()
                 .filter(|base_field| related_model.find_relation_field(&base_field).is_some())
                 .cloned()
                 .collect();
 
-            let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.to_fields.iter())
+            let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.references.iter())
                     .filter_map(|(base_field, referenced_field)| {
                         let base_field = model.find_field(&base_field)?;
                         let referenced_field = related_model.find_field(&referenced_field)?;
@@ -691,7 +691,7 @@ impl<'a> Validator<'a> {
                     );
             }
 
-            if !rel_info.to_fields.is_empty() && !errors.has_errors() {
+            if !rel_info.references.is_empty() && !errors.has_errors() {
                 let strict_relation_field_order = self
                     .source
                     .map(|s| !s.active_connector.allows_relation_fields_in_arbitrary_order())
@@ -702,19 +702,19 @@ impl<'a> Validator<'a> {
                     let mut criteria_field_names: Vec<_> = criteria.fields.iter().map(|f| f.name.to_owned()).collect();
                     criteria_field_names.sort();
 
-                    let mut to_fields_sorted = rel_info.to_fields.clone();
-                    to_fields_sorted.sort();
+                    let mut references_sorted = rel_info.references.clone();
+                    references_sorted.sort();
 
-                    criteria_field_names == to_fields_sorted
+                    criteria_field_names == references_sorted
                 });
 
-                let reference_order_correct = if strict_relation_field_order && rel_info.to_fields.len() > 1 {
+                let reference_order_correct = if strict_relation_field_order && rel_info.references.len() > 1 {
                     related_model.loose_unique_criterias().iter().any(|criteria| {
                         let criteria_fields = criteria.fields.iter().map(|f| f.name.as_str());
-                        let to_fields = rel_info.to_fields.iter().map(|f| f.as_str());
+                        let references = rel_info.references.iter().map(|f| f.as_str());
 
-                        let same_length = criteria_fields.len() == to_fields.len();
-                        let same_order = criteria_fields.zip(to_fields).all(|(a, b)| a == b);
+                        let same_length = criteria_fields.len() == references.len();
+                        let same_order = criteria_fields.zip(references).all(|(a, b)| a == b);
 
                         same_length && same_order
                     })
@@ -722,8 +722,8 @@ impl<'a> Validator<'a> {
                     true
                 };
 
-                let references_singular_id_field = if rel_info.to_fields.len() == 1 {
-                    let field_name = rel_info.to_fields.first().unwrap();
+                let references_singular_id_field = if rel_info.references.len() == 1 {
+                    let field_name = rel_info.references.first().unwrap();
                     // the unwrap is safe. We error out earlier if an unknown field is referenced.
                     let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
                     referenced_field.is_id
@@ -748,14 +748,14 @@ impl<'a> Validator<'a> {
                     errors.push_error(DatamodelError::new_validation_error(
                             &format!("The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
                                      &related_model.name,
-                                     rel_info.to_fields.join(", ")),
+                                     rel_info.references.join(", ")),
                             ast_field.span)
                         );
                 } else if !reference_order_correct {
                     errors.push_error(DatamodelError::new_validation_error(
                         &format!("The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.",
                                  &related_model.name,
-                                 rel_info.to_fields.join(", ")),
+                                 rel_info.references.join(", ")),
                         ast_field.span)
                     );
                 }
@@ -767,7 +767,7 @@ impl<'a> Validator<'a> {
                             &format!(
                                 "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
                                 &related_model.name,
-                                rel_info.to_fields.join(", ")
+                                rel_info.references.join(", ")
                             ),
                             ast_field.span)
                         );
@@ -775,8 +775,8 @@ impl<'a> Validator<'a> {
             }
 
             if !rel_info.fields.is_empty()
-                && !rel_info.to_fields.is_empty()
-                && rel_info.fields.len() != rel_info.to_fields.len()
+                && !rel_info.references.is_empty()
+                && rel_info.fields.len() != rel_info.references.len()
             {
                 errors.push_error(DatamodelError::new_attribute_validation_error(
                     "You must specify the same number of fields in `fields` and `references`.",
@@ -832,7 +832,7 @@ impl<'a> Validator<'a> {
                         ));
                 }
 
-                if rel_info.to_fields.is_empty() {
+                if rel_info.references.is_empty() {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation field `{}` on Model `{}` must specify the `references` argument in the {} attribute.",
@@ -846,7 +846,7 @@ impl<'a> Validator<'a> {
 
             if field.is_list()
                 && !related_field.is_list()
-                && (!rel_info.fields.is_empty() || !rel_info.to_fields.is_empty())
+                && (!rel_info.fields.is_empty() || !rel_info.references.is_empty())
             {
                 errors.push_error(DatamodelError::new_attribute_validation_error(
                     &format!(
@@ -885,7 +885,7 @@ impl<'a> Validator<'a> {
                         ));
                 }
 
-                if rel_info.to_fields.is_empty() && related_field_rel_info.to_fields.is_empty() {
+                if rel_info.references.is_empty() && related_field_rel_info.references.is_empty() {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.",
@@ -896,7 +896,7 @@ impl<'a> Validator<'a> {
                         ));
                 }
 
-                if !rel_info.to_fields.is_empty() && !related_field_rel_info.to_fields.is_empty() {
+                if !rel_info.references.is_empty() && !related_field_rel_info.references.is_empty() {
                     errors.push_error(DatamodelError::new_attribute_validation_error(
                         &format!(
                             "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} attribute. You have to provide it only on one of the two fields.",
@@ -919,7 +919,7 @@ impl<'a> Validator<'a> {
                 }
 
                 if !errors.has_errors() {
-                    if !rel_info.fields.is_empty() && !related_field_rel_info.to_fields.is_empty() {
+                    if !rel_info.fields.is_empty() && !related_field_rel_info.references.is_empty() {
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` provides the `fields` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.",
@@ -930,7 +930,7 @@ impl<'a> Validator<'a> {
                             ));
                     }
 
-                    if !rel_info.to_fields.is_empty() && !related_field_rel_info.fields.is_empty() {
+                    if !rel_info.references.is_empty() && !related_field_rel_info.fields.is_empty() {
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` provides the `references` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.",
@@ -943,7 +943,7 @@ impl<'a> Validator<'a> {
                 }
 
                 if !errors.has_errors() {
-                    if field.is_required() && !related_field_rel_info.to_fields.is_empty() {
+                    if field.is_required() && !related_field_rel_info.references.is_empty() {
                         errors.push_error(DatamodelError::new_attribute_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` is required. This is invalid as it is not possible to enforce this constraint at the database level. Please make it optional instead.",

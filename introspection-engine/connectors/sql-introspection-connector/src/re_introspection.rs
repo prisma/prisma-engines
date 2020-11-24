@@ -87,13 +87,13 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             }
         }
 
-        // change RelationInfo.to_fields
+        // change RelationInfo.references
         for changed_field_name in &changed_scalar_field_names {
             let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&changed_field_name.0.model);
             for f in fields_to_be_changed {
                 let field = new_data_model.find_relation_field_mut(&f.0, &f.1);
                 replace_field_names(
-                    &mut field.relation_info.to_fields,
+                    &mut field.relation_info.references,
                     &changed_field_name.0.field,
                     &changed_field_name.1,
                 );
