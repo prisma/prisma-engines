@@ -198,10 +198,6 @@ async fn group_by_aggregate(
 
     let rows = conn.filter(query.into(), idents.as_slice()).await?;
 
-    // group_by.into_iter().fold(query, |query, field| {
-    //     query.group_by(Column::from(field.db_name().to_owned()))
-    // })
-
     Ok(rows
         .into_iter()
         .map(|row| row.into_aggregation_results(&selections))

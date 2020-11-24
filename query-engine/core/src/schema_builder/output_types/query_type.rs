@@ -93,12 +93,14 @@ fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Output
     )
 }
 
-/// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
+/// Builds a "group by" aggregation query field (e.g. "groupByUser") for given model.
 fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
         format!("groupBy{}", model.name),
         arguments::group_by_arguments(ctx, &model),
-        OutputType::object(aggregation::group_by::group_by_output_object_type(ctx, &model)),
+        OutputType::list(OutputType::object(aggregation::group_by::group_by_output_object_type(
+            ctx, &model,
+        ))),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::GroupBy,

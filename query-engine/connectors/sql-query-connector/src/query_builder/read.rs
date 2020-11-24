@@ -137,7 +137,36 @@ pub fn group_by_aggregate(
     selections: &[AggregationSelection],
     args: QueryArguments,
 ) -> Select<'static> {
-    todo!()
+    let base_query: Select = args.into_select(model);
+
+    let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
+        AggregationSelection::Field(field) => select.column(field.as_column()),
+
+        AggregationSelection::Count(field) => match field {
+            Some(field) => select.value(count(field.as_column())),
+            None => select.value(count(asterisk())),
+        },
+
+        AggregationSelection::Average(fields) => fields
+            .iter()
+            .fold(select, |select, next_field| select.value(avg(next_field.as_column()))),
+
+        AggregationSelection::Sum(fields) => fields
+            .iter()
+            .fold(select, |select, next_field| select.value(sum(next_field.as_column()))),
+
+        AggregationSelection::Min(fields) => fields
+            .iter()
+            .fold(select, |select, next_field| select.value(min(next_field.as_column()))),
+
+        AggregationSelection::Max(fields) => fields
+            .iter()
+            .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
+    });
+
+    group_by
+        .into_iter()
+        .fold(select_query, |query, field| query.group_by(field.as_column()))
 }
 
 fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec<Column<'static>> {

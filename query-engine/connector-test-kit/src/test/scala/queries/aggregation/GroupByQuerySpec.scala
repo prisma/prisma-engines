@@ -50,5 +50,4 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
 //    result.toString should be("""""")
   }
-
 }

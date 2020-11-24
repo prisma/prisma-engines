@@ -64,10 +64,7 @@ fn serialize_aggregations(
     record_aggregations: RecordAggregations,
 ) -> crate::Result<CheckedItemsWithParents> {
     let ordering = record_aggregations.selection_order;
-    let aggregate_object_type = match output_field.field_type.borrow() {
-        OutputType::Object(obj) => obj.into_arc(),
-        _ => unreachable!("Aggregate output must be an object."),
-    };
+    let aggregate_object_type = extract_aggregate_object_type(output_field.field_type.borrow());
 
     let mut results = vec![];
 
@@ -134,12 +131,26 @@ fn serialize_aggregations(
     let mut envelope = CheckedItemsWithParents::new();
 
     match output_field.field_type.borrow() {
-        OutputType::List(_) => envelope.insert(None, Item::List(results.into())),
-        OutputType::Object(_) => envelope.insert(None, results.pop().unwrap()),
+        OutputType::List(_) => {
+            envelope.insert(None, Item::List(results.into()));
+        }
+        OutputType::Object(_) => {
+            if let Some(item) = results.pop() {
+                envelope.insert(None, item);
+            };
+        }
         _ => unreachable!(),
     };
 
     Ok(envelope)
+}
+
+fn extract_aggregate_object_type(output_type: &OutputType) -> ObjectTypeStrongRef {
+    match output_type {
+        OutputType::Object(obj) => obj.into_arc(),
+        OutputType::List(inner) => extract_aggregate_object_type(inner),
+        _ => unreachable!("Aggregate output must be a list or an object."),
+    }
 }
 
 // Workaround until we streamline serialization.
