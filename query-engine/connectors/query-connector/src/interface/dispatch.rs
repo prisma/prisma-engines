@@ -45,7 +45,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
-    ) -> crate::Result<Vec<AggregationResult>> {
+    ) -> crate::Result<Vec<Vec<AggregationResult>>> {
         match self {
             Self::Connection(c) => c.aggregate_records(model, selections, group_by, query_arguments).await,
             Self::Transaction(tx) => tx.aggregate_records(model, selections, group_by, query_arguments).await,

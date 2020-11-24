@@ -154,7 +154,7 @@ async fn aggregate<'a, 'b>(
         .aggregate_records(&query.model, query.selectors, query.group_by, query.args)
         .await?;
 
-    Ok(QueryResult::RecordAggregation(RecordAggregation {
+    Ok(QueryResult::RecordAggregations(RecordAggregations {
         selection_order,
         results,
     }))

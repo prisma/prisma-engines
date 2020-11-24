@@ -131,6 +131,15 @@ pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: Qu
         })
 }
 
+pub fn group_by_aggregate(
+    model: &ModelRef,
+    group_by: Vec<ScalarFieldRef>,
+    selections: &[AggregationSelection],
+    args: QueryArguments,
+) -> Select<'static> {
+    todo!()
+}
+
 fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec<Column<'static>> {
     let fields: Vec<_> = selections
         .iter()

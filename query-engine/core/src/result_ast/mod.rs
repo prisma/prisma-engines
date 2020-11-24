@@ -7,7 +7,7 @@ pub enum QueryResult {
     Count(usize),
     RecordSelection(RecordSelection),
     Json(serde_json::Value),
-    RecordAggregation(RecordAggregation),
+    RecordAggregations(RecordAggregations),
     Unit,
 }
 
@@ -35,10 +35,10 @@ pub struct RecordSelection {
 }
 
 #[derive(Debug, Clone)]
-pub struct RecordAggregation {
+pub struct RecordAggregations {
     /// Ordered list of selected fields as defined by the original incoming query.
     pub selection_order: Vec<(String, Option<Vec<String>>)>,
 
     /// Actual aggregation results.
-    pub results: Vec<AggregationResult>,
+    pub results: Vec<Vec<AggregationResult>>,
 }

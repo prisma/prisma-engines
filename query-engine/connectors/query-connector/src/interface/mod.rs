@@ -192,14 +192,13 @@ pub trait ReadOperations {
     /// Whether or not the aggregations can be executed in a single query or
     /// requires multiple roundtrips to the underlying data source is at the
     /// discretion of the implementing connector.
-    ///
     async fn aggregate_records(
         &self,
         model: &ModelRef,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
-    ) -> crate::Result<Vec<AggregationResult>>;
+    ) -> crate::Result<Vec<Vec<AggregationResult>>>;
 }
 
 #[async_trait]

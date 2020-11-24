@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregation, RecordSelection,
+    CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregations, RecordSelection,
 };
 use bigdecimal::ToPrimitive;
 use connector::AggregationResult;
@@ -40,7 +40,7 @@ pub fn serialize_internal(
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
         QueryResult::RecordSelection(rs) => serialize_record_selection(rs, field, &field.field_type, is_list),
-        QueryResult::RecordAggregation(ra) => serialize_aggregation(field, ra),
+        QueryResult::RecordAggregations(ras) => serialize_aggregations(field, ras),
 
         QueryResult::Count(c) => {
             // Todo needs a real implementation or needs to move to RecordAggregation
@@ -59,75 +59,85 @@ pub fn serialize_internal(
     }
 }
 
-fn serialize_aggregation(
+fn serialize_aggregations(
     output_field: &OutputFieldRef,
-    record_aggregation: RecordAggregation,
+    record_aggregations: RecordAggregations,
 ) -> crate::Result<CheckedItemsWithParents> {
-    let ordering = record_aggregation.selection_order;
-    let results = record_aggregation.results;
-
-    let mut flattened = HashMap::with_capacity(ordering.len());
+    let ordering = record_aggregations.selection_order;
     let aggregate_object_type = match output_field.field_type.borrow() {
         OutputType::Object(obj) => obj.into_arc(),
         _ => unreachable!("Aggregate output must be an object."),
     };
 
-    for result in results {
-        match result {
-            AggregationResult::Field(_field, _value) => todo!(),
+    let mut results = vec![];
 
-            AggregationResult::Count(_field, count) => {
-                flattened.insert("count".to_owned(), Item::Value(count));
-            }
+    for row in record_aggregations.results {
+        let mut flattened = HashMap::with_capacity(ordering.len());
 
-            AggregationResult::Average(field, value) => {
-                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "avg", &field.name);
-                flattened.insert(format!("avg_{}", &field.name), serialize_scalar(&output_field, value)?);
-            }
+        for result in row {
+            match result {
+                AggregationResult::Field(_field, _value) => todo!(),
 
-            AggregationResult::Sum(field, value) => {
-                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "sum", &field.name);
-                flattened.insert(format!("sum_{}", &field.name), serialize_scalar(&output_field, value)?);
-            }
+                AggregationResult::Count(_field, count) => {
+                    flattened.insert("count".to_owned(), Item::Value(count));
+                }
 
-            AggregationResult::Min(field, value) => {
-                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "min", &field.name);
-                flattened.insert(
-                    format!("min_{}", &field.name),
-                    serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
-                );
-            }
+                AggregationResult::Average(field, value) => {
+                    let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "avg", &field.name);
+                    flattened.insert(format!("avg_{}", &field.name), serialize_scalar(&output_field, value)?);
+                }
 
-            AggregationResult::Max(field, value) => {
-                let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "max", &field.name);
-                flattened.insert(
-                    format!("max_{}", &field.name),
-                    serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
-                );
+                AggregationResult::Sum(field, value) => {
+                    let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "sum", &field.name);
+                    flattened.insert(format!("sum_{}", &field.name), serialize_scalar(&output_field, value)?);
+                }
+
+                AggregationResult::Min(field, value) => {
+                    let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "min", &field.name);
+                    flattened.insert(
+                        format!("min_{}", &field.name),
+                        serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
+                    );
+                }
+
+                AggregationResult::Max(field, value) => {
+                    let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "max", &field.name);
+                    flattened.insert(
+                        format!("max_{}", &field.name),
+                        serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
+                    );
+                }
             }
         }
-    }
 
-    // Reorder fields based on the original query selection.
-    let mut inner_map: Map = IndexMap::with_capacity(ordering.len());
-    for (query, field_order) in ordering {
-        if let Some(order) = field_order {
-            let mut nested_map = Map::new();
+        // Reorder fields based on the original query selection.
+        let mut inner_map: Map = IndexMap::with_capacity(ordering.len());
+        for (query, field_order) in ordering.iter() {
+            if let Some(order) = field_order {
+                let mut nested_map = Map::new();
 
-            for field in order {
-                let item = flattened.remove(&format!("{}_{}", query, field)).unwrap();
-                nested_map.insert(field, item);
+                for field in order {
+                    let item = flattened.remove(&format!("{}_{}", query, field)).unwrap();
+                    nested_map.insert(field.clone(), item);
+                }
+
+                inner_map.insert(query.clone(), Item::Map(nested_map));
+            } else {
+                let item = flattened.remove(&query.clone()).unwrap();
+                inner_map.insert(query.clone(), item);
             }
-
-            inner_map.insert(query, Item::Map(nested_map));
-        } else {
-            let item = flattened.remove(&query).unwrap();
-            inner_map.insert(query, item);
         }
+
+        results.push(Item::Map(inner_map));
     }
 
     let mut envelope = CheckedItemsWithParents::new();
-    envelope.insert(None, Item::Map(inner_map));
+
+    match output_field.field_type.borrow() {
+        OutputType::List(_) => envelope.insert(None, Item::List(results.into())),
+        OutputType::Object(_) => envelope.insert(None, results.pop().unwrap()),
+        _ => unreachable!(),
+    };
 
     Ok(envelope)
 }

@@ -91,7 +91,7 @@ where
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
-    ) -> connector::Result<Vec<AggregationResult>> {
+    ) -> connector::Result<Vec<Vec<AggregationResult>>> {
         self.catch(async move { read::aggregate(&self.inner, model, selections, group_by, query_arguments).await })
             .await
     }

@@ -21,13 +21,7 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         .map(|field| resolve_query(field, &model))
         .collect::<QueryGraphBuilderResult<_>>()?;
 
-    // Reject unstable cursors for aggregations, because we can't do post-processing on those (we haven't implemented a in-memory aggregator yet).
-    if args.contains_unstable_cursor() {
-        return Err(QueryGraphBuilderError::InputError(
-            "The chosen cursor and orderBy combination is not stable (unique) and can't be used for aggregations."
-                .to_owned(),
-        ));
-    }
+    // Todo cross verify selections and group by
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
         name,
