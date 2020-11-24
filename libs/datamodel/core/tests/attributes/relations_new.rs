@@ -209,7 +209,7 @@ fn required_relation_field_must_error_if_it_is_virtual() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "The relation field `address` on Model `User` is required. This is invalid as it is not possible to enforce this constraint at the database level. Please make it optional instead.",
+        "The relation field `address` on Model `User` is required. This is no longer valid because it\'s not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.",
         "relation",
         Span::new(54, 77),
     ));
