@@ -48,7 +48,7 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
                 .filter(|migration| migration.migration_name == input.migration_name)
                 .collect(),
             Err(_) => {
-                persistence.initialize(true).await?;
+                persistence.baseline_initialize().await?;
 
                 vec![]
             }
