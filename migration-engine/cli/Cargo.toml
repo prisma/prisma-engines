@@ -11,20 +11,20 @@ migration-connector = { path = "../connectors/migration-connector" }
 migration-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
-base64 = "0.13"
-futures = "0.3"
+base64 = "0.13.0"
+futures = "0.3.8"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
-structopt = "0.3.8"
-tokio = { version = "0.2.13", features = ["macros"] }
-tracing = "0.1"
-tracing-subscriber = "0.2"
+serde_json = { version = "1.0.59", features = ["float_roundtrip"] }
+structopt = "0.3.20"
+tokio = { version = "0.2.23", features = ["macros"] }
+tracing = "0.1.22"
+tracing-subscriber = "0.2.15"
 tracing-error = "0.1.2"
 
 [dev-dependencies]
 tempfile = "3.1.0"
 test-setup = { path = "../../libs/test-setup" }
-url = "2.1.1"
+url = "2.2.0"
 quaint = { git = "https://github.com/prisma/quaint" }
 
 [features]

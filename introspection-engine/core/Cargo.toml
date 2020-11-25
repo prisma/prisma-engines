@@ -11,27 +11,27 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 
-structopt = "0.3"
-serde = "1.0.102"
-anyhow = "1.0.26"
-thiserror = "1.0.9"
-futures = { version = "0.3", features = ["compat"] }
-futures01 = { package = "futures", version = "0.1" }
+structopt = "0.3.20"
+serde = "1.0.117"
+anyhow = "1.0.34"
+thiserror = "1.0.22"
+futures = { version = "0.1.30", features = ["compat"] }
+futures01 = { package = "futures", version = "0.1.30" }
 
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
-serde_derive = "1.0"
-async-trait = "0.1.17"
-jsonrpc-core = "14.0"
-jsonrpc-derive = "14.0"
-jsonrpc-core-client = "14.0"
+serde_json = { version = "1.0.59", features = ["float_roundtrip"] }
+serde_derive = "1.0.117"
+async-trait = "0.1.42"
+jsonrpc-core = "14.2.0"
+jsonrpc-derive = "14.2.2"
+jsonrpc-core-client = "14.2.0"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 
-tracing = "0.1"
-tracing-subscriber = "0.2"
-tracing-futures = "0.2"
+tracing = "0.1.22"
+tracing-subscriber = "0.2.15"
+tracing-futures = "0.2.4"
 
 [dependencies.tokio]
-version = "0.2"
+version = "0.2.23"
 features = ["macros"]
 
 [[bin]]

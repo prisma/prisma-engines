@@ -5,16 +5,16 @@ name = "sql-query-connector"
 version = "0.1.0"
 
 [dependencies]
-anyhow = "1.0"
-async-trait = "0.1"
-futures = "0.3"
-itertools = "0.8"
-rand = "0.7"
-bigdecimal = "0.2"
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
-thiserror = "1.0"
-tokio = "0.2.13"
-uuid = "0.8"
+anyhow = "1.0.34"
+async-trait = "0.1.42"
+futures = "0.3.8"
+itertools = "0.8.2"
+rand = "0.7.3"
+bigdecimal = "0.2.0"
+serde_json = { version = "1.0.59", features = ["float_roundtrip"] }
+thiserror = "1.0.22"
+tokio = "0.2.23"
+uuid = "0.8.1"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
@@ -45,14 +45,14 @@ path = "../../../libs/prisma-value"
 
 [dependencies.chrono]
 features = ["serde"]
-version = "0.4"
+version = "0.4.19"
 
 [dependencies.datamodel]
 path = "../../../libs/datamodel/core"
 
 [dependencies.serde]
 features = ["derive"]
-version = "1.0"
+version = "1.0.117"
 
 [dependencies.cuid]
 git = "https://github.com/prisma/cuid-rust"
