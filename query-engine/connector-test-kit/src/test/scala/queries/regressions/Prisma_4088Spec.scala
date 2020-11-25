@@ -210,7 +210,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
     res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"ab\"},{\"str\":\"ac\"}]}}""")
   }
 
-  "FindMany queries with an NOT condition" should "and two filters, of which one is undefined, should only apply one filter" in {
+  "FindMany queries with an NOT condition and two filters, of which one is undefined" should "only apply one filter" in {
     database.setup(project)
     create("aa", project)
     create("ab", project)
