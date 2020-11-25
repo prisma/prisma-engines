@@ -15,7 +15,7 @@ structopt = "0.3.20"
 serde = "1.0.117"
 anyhow = "1.0.34"
 thiserror = "1.0.22"
-futures = { version = "0.1.30", features = ["compat"] }
+futures = { version = "0.3.8", features = ["compat"] }
 futures01 = { package = "futures", version = "0.1.30" }
 
 serde_json = { version = "1.0.59", features = ["float_roundtrip"] }
