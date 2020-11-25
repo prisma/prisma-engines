@@ -74,7 +74,6 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
         let filters = value_map
             .into_iter()
             .map(|(key, value)| {
-                dbg!(&key);
                 // 2 possibilities: Either a filter group (and, or, not) with a vector/object, or a field name with a filter object behind.
                 match FilterGrouping::from_str(&key) {
                     Ok(filter_kind) => {
@@ -146,7 +145,7 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
             _ => Ok(Filter::and(filters)),
         }
     }
-    dbg!(extract_filter(value_map, model, 0))
+    extract_filter(value_map, model, 0)
 }
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
