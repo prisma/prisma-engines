@@ -53,7 +53,67 @@ async fn diagnose_migrations_history_after_two_migrations_happy_path(api: &TestA
 }
 
 #[test_each_connector]
-async fn diagnose_migration_history_calculates_drift(api: &TestApi) -> TestResult {
+async fn diagnose_migration_history_with_opt_in_to_shadow_database_calculates_drift(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id      Int @id
+            name    String
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    api.apply_migrations(&directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["initial"])?;
+
+    let dm2 = r#"
+        model Cat {
+            id          Int @id
+            name        String
+            fluffiness  Float
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?;
+
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        failed_migration_names,
+        edited_migration_names,
+        has_migrations_table,
+        error_in_unapplied_migration,
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
+
+    let expected_rollback_warnings =
+         "/*\n  Warnings:\n\n  - You are about to drop the column `fluffiness` on the `Cat` table. All the data in the column will be lost.\n\n*/";
+
+    let rollback = drift.unwrap().unwrap_drift_detected();
+
+    assert!(rollback.starts_with(expected_rollback_warnings), rollback);
+
+    assert!(history.is_none());
+    assert!(failed_migration_names.is_empty());
+    assert!(edited_migration_names.is_empty());
+    assert!(has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn diagnose_migration_history_without_opt_in_to_shadow_database_does_not_calculate_drift(
+    api: &TestApi,
+) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
     let dm1 = r#"
@@ -89,13 +149,7 @@ async fn diagnose_migration_history_calculates_drift(api: &TestApi) -> TestResul
         error_in_unapplied_migration,
     } = api.diagnose_migration_history(&directory).send().await?.into_output();
 
-    let expected_rollback_warnings =
-         "/*\n  Warnings:\n\n  - You are about to drop the column `fluffiness` on the `Cat` table. All the data in the column will be lost.\n\n*/";
-
-    let rollback = drift.unwrap().unwrap_drift_detected();
-
-    assert!(rollback.starts_with(expected_rollback_warnings), rollback);
-
+    assert!(drift.is_none());
     assert!(history.is_none());
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -150,7 +204,12 @@ async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migra
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     let rollback = drift.unwrap().unwrap_drift_detected();
 
@@ -278,7 +337,12 @@ async fn diagnose_migrations_history_can_detect_when_the_folder_is_behind(api: &
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -363,7 +427,12 @@ async fn diagnose_migrations_history_can_detect_when_history_diverges(api: &Test
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(failed_migration_names.is_empty());
     assert!(edited_migration_names.is_empty());
@@ -480,7 +549,12 @@ async fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly
         drift,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(has_migrations_table);
     assert_eq!(edited_migration_names, &[initial_migration_name.as_str()]);
@@ -569,6 +643,7 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
         error_in_unapplied_migration,
     } = api
         .diagnose_migration_history(&migrations_directory)
+        .opt_in_to_shadow_database(true)
         .send()
         .await?
         .into_output();
@@ -640,7 +715,12 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
         drift,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(has_migrations_table);
     assert!(edited_migration_names.is_empty());

@@ -95,7 +95,12 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(drift.is_some());
     assert!(
@@ -124,7 +129,12 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(error_in_unapplied_migration.is_none());
     assert!(drift.is_none());
@@ -149,7 +159,12 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(drift.is_none());
     assert!(
@@ -298,7 +313,12 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(drift.is_none());
     assert!(
@@ -323,7 +343,12 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(drift.is_none());
     assert!(
@@ -449,7 +474,12 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(drift.is_none());
     assert!(
@@ -474,7 +504,12 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
         edited_migration_names,
         has_migrations_table,
         error_in_unapplied_migration,
-    } = api.diagnose_migration_history(&directory).send().await?.into_output();
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
 
     assert!(drift.is_none());
     assert!(
