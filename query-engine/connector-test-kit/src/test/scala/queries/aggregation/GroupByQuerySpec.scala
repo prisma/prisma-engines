@@ -20,7 +20,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
-  def createItem(float: Double, int: Int, dec: String, s: String, id: Option[String] = None) = {
+  def create(float: Double, int: Int, dec: String, s: String, id: Option[String] = None) = {
     val idString = id match {
       case Some(i) => s"""id: "$i","""
       case None    => ""
@@ -36,7 +36,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Using a simple groupBy without any records in the database" should "return 0 for all aggregations" in {
+  "Using a simple groupBy without any records in the database" should "return no groups" in {
     val result = server.query(
       s"""{
          |  groupByModel(by: [id, float, int]) {
@@ -48,6 +48,31 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-//    result.toString should be("""""")
+    result.toString should be("""{"data":{"groupByModel":[]}}""")
   }
+
+  "Using a simple groupBy" should "return the correct groups" in {
+    create(10.1, 5, "1.1", "group1", Some("1"))
+    create(5.5, 0, "6.7", "group1", Some("2"))
+    create(10, 5, "11", "group2", Some("3"))
+    create(10, 5, "11", "group3", Some("4"))
+
+    val result = server.query(
+      s"""{
+         |  groupByModel(by: [s]) {
+         |    count { s }
+         |    sum { float }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be("""{"data":{"groupByModel":[]}}""")
+  }
+
+  // todo
+  // orderBy
+  // where
+  // skip
+  // take
 }
