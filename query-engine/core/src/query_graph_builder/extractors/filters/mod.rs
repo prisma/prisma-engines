@@ -52,11 +52,17 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 
 /// Extracts a regular filter potentially matching many records.
 ///
-/// This function recurses to create a structure of `AND/OR/NOT` conditions.
-/// After each recursion we check whether the filter group was populated. If no
-/// filter was defined a `Filter::Empty` is returned. If an `AND/OR` filter group
-/// was found that has only a single member, we only return the inner filter.
-/// This results in an optimal filter tree.
+/// # Filter rules
+///
+/// This function recurses to create a structure of `AND/OR/NOT` conditions. The
+/// rules are defined as follows:
+///
+/// | Name | 0 filters          | 1 filter               | n filters            |
+/// |---   |---                 |---                     |---                   |
+/// | OR   | return empty list  | validate single filter | validate all filters |
+/// | AND  | return empty list  | validate single filter | validate all filters |
+/// | NOT  | return all results | validate single filter | validate all filters |
+///
 pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
