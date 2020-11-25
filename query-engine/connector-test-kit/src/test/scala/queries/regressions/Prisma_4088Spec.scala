@@ -132,7 +132,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
     val res = server.query(
       """query {
         |  findManyTestModel(
-        |    where: { AND: [] }
+        |    where: { AND: [{ str: { equals: "aa" } }]}
         |  ) {
         |    str
         |  }
@@ -185,7 +185,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
       legacy = false
     )
 
-    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"aa\"}, {\"str\":\"ab\"}, {\"str\":\"ac\"}]}}""")
+    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"aa\"},{\"str\":\"ab\"},{\"str\":\"ac\"}]}}""")
   }
 
   "FindMany queries with an NOT condition and one filter " should "only apply one filter" in {
@@ -197,7 +197,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
     val res = server.query(
       """query {
         |  findManyTestModel(
-        |    where: { NOT: [] }
+        |    where: { NOT: [{ str: { equals: "aa" } }] }
         |  ) {
         |    str
         |  }
@@ -207,7 +207,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
       legacy = false
     )
 
-    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"aa\"}]}}""")
+    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"ab\"},{\"str\":\"ac\"}]}}""")
   }
 
   "FindMany queries with an NOT condition" should "and two filters, of which one is undefined, should only apply one filter" in {
@@ -229,6 +229,6 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
       legacy = false
     )
 
-    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"aa\"}]}}""")
+    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"ab\"},{\"str\":\"ac\"}]}}""")
   }
 }
