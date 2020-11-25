@@ -139,8 +139,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         let migration = Migration::new(NewMigration {
             name: self.input.migration_id.clone(),
             datamodel_steps: self.input.steps.clone(),
-            datamodel_string: datamodel::render_schema_ast_to_string(&next_schema_ast)
-                .map_err(CoreError::ProducedBadDatamodel)?,
+            datamodel_string: datamodel::render_schema_ast_to_string(&next_schema_ast),
             database_migration: database_migration_json,
         });
 
@@ -179,7 +178,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         } = diagnostics;
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render_datamodel_to_string(&next_datamodel.subject).unwrap(),
+            datamodel: datamodel::render_datamodel_to_string(&next_datamodel.subject),
             datamodel_steps: self.input.steps.clone(),
             database_steps: database_steps_json_pretty,
             errors: [],

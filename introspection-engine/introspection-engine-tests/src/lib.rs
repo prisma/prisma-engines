@@ -10,8 +10,8 @@ macro_rules! assert_eq_datamodels {
         let parsed_expected = datamodel::parse_datamodel($left).unwrap().subject;
         let parsed_result = datamodel::parse_datamodel($right).unwrap().subject;
 
-        let reformatted_expected = datamodel::render_datamodel_to_string(&parsed_expected).unwrap();
-        let reformatted_result = datamodel::render_datamodel_to_string(&parsed_result).unwrap();
+        let reformatted_expected = datamodel::render_datamodel_to_string(&parsed_expected);
+        let reformatted_result = datamodel::render_datamodel_to_string(&parsed_result);
 
         pretty_assertions::assert_eq!(reformatted_result, reformatted_expected);
     };

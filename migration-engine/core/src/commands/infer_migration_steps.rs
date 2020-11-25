@@ -109,7 +109,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         debug!(?returned_datamodel_steps);
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
+            datamodel: datamodel::render_datamodel_to_string(&next_datamodel),
             datamodel_steps: returned_datamodel_steps,
             database_steps,
             errors: [],

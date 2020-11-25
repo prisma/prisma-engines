@@ -98,7 +98,7 @@ model Post {
 
     let schema = parse(dml);
 
-    let rendered = dbg!(render_datamodel_to_string(&schema).unwrap());
+    let rendered = dbg!(render_datamodel_to_string(&schema));
 
     assert_eq!(rendered, expected);
 }

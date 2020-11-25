@@ -74,7 +74,7 @@ impl TestApi {
             .introspect(&Datamodel::new(), false)
             .await?;
 
-        Ok(render_datamodel_to_string(&introspection_result.data_model)?)
+        Ok(datamodel::render_datamodel_to_string(&introspection_result.data_model))
     }
 
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
@@ -87,7 +87,7 @@ impl TestApi {
             .introspect(&data_model, native_types)
             .await?;
 
-        let dm = render_datamodel_and_config_to_string(&introspection_result.data_model, &config)?;
+        let dm = datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config);
 
         Ok(dm)
     }
@@ -162,24 +162,10 @@ fn parse_datamodel(dm: &str) -> Result<Datamodel> {
     }
 }
 
-fn render_datamodel_to_string(dm: &Datamodel) -> Result<String> {
-    match datamodel::render_datamodel_to_string(dm) {
-        Ok(dm) => Ok(dm),
-        Err(_) => Err(Report::msg("Could not render datamodel to a string.")),
-    }
-}
-
 fn parse_configuration(dm: &str) -> Result<Configuration> {
     match datamodel::parse_configuration(dm) {
         Ok(dm) => Ok(dm.subject),
         Err(e) => Err(Report::msg(e.to_pretty_string("schema.prisma", dm))),
-    }
-}
-
-pub fn render_datamodel_and_config_to_string(datamodel: &Datamodel, config: &Configuration) -> Result<String> {
-    match datamodel::render_datamodel_and_config_to_string(datamodel, config) {
-        Ok(dm) => Ok(dm),
-        Err(_) => Err(Report::msg("Could not render datamodel and configuration to a string.")),
     }
 }
 

@@ -117,14 +117,14 @@ impl RpcImpl {
                 if introspection_result.data_model.is_empty() {
                     Err(Error::from(CommandError::IntrospectionResultEmpty(url.to_string())))
                 } else {
-                    match datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config) {
-                        Err(e) => Err(Error::from(e)),
-                        Ok(dm) => Ok(IntrospectionResultOutput {
-                            datamodel: dm,
-                            warnings: introspection_result.warnings,
-                            version: introspection_result.version,
-                        }),
-                    }
+                    Ok(IntrospectionResultOutput {
+                        datamodel: datamodel::render_datamodel_and_config_to_string(
+                            &introspection_result.data_model,
+                            &config,
+                        ),
+                        warnings: introspection_result.warnings,
+                        version: introspection_result.version,
+                    })
                 }
             }
             Err(e) => Err(Error::from(e)),
@@ -164,9 +164,7 @@ impl RpcImpl {
         }
 
         // 3. Render the datamodel and then parse it. This makes sure the validations & standardisations have been run.
-        // TODO: unwrap is safe because printing can't fail. Will prove this to the compiler soon.
-        let rendered_datamodel =
-            datamodel::render_datamodel_and_config_to_string(&dm_that_needs_fixing, &config).unwrap();
+        let rendered_datamodel = datamodel::render_datamodel_and_config_to_string(&dm_that_needs_fixing, &config);
         datamodel::parse_datamodel(&rendered_datamodel)
             .map(|d| d.subject)
             .map_err(|err| {
