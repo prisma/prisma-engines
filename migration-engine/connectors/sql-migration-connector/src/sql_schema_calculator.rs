@@ -8,7 +8,6 @@ use datamodel::{
     Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType, ValueGenerator, ValueGeneratorFn,
 };
 use prisma_value::PrismaValue;
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::{self as sql, ColumnArity};
 
 pub(crate) fn calculate_sql_schema(datamodel: &Datamodel, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
@@ -54,21 +53,18 @@ impl<'a> SqlSchemaCalculator<'a> {
                     TypeWalker::Base(_) => {
                         let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
 
-                        // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
-                        let is_sqlite_integer_primary_key = self.flavour.sql_family().is_sqlite() && f.is_id() && f.field_type().is_int();
-
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
                             tpe: column_type(&f),
                             default: migration_value_new(&f),
-                            auto_increment: has_auto_increment_default || is_sqlite_integer_primary_key,
+                            auto_increment: has_auto_increment_default || self.flavour.field_is_implicit_autoincrement_primary_key(&f),
                         })
                     },
                     TypeWalker::Enum(r#enum) => {
                         let enum_db_name = r#enum.db_name();
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
-                            tpe: enum_column_type(&f, &self.flavour.sql_family(), enum_db_name),
+                            tpe: self.flavour.enum_column_type(&f,  enum_db_name),
                             default: migration_value_new(&f),
                             auto_increment: false,
                         })
@@ -76,14 +72,11 @@ impl<'a> SqlSchemaCalculator<'a> {
                     TypeWalker::NativeType(scalar_type, native_type_instance) =>{
                         let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
 
-                        // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
-                        let is_sqlite_integer_primary_key = self.flavour.sql_family().is_sqlite() && f.is_id() && f.field_type().is_int();
-
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
                             tpe: self.flavour.column_type_for_native_type(&f, scalar_type, native_type_instance),
                             default: migration_value_new(&f),
-                            auto_increment: has_auto_increment_default || is_sqlite_integer_primary_key
+                            auto_increment: has_auto_increment_default || self.flavour.field_is_implicit_autoincrement_primary_key(&f)
                         })
                     } ,
                     _ => None,
@@ -283,18 +276,6 @@ fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_descr
     };
 
     Some(sql_schema_describer::DefaultValue::VALUE(value))
-}
-
-fn enum_column_type(field: &ScalarFieldWalker<'_>, sql_family: &SqlFamily, db_name: &str) -> sql::ColumnType {
-    let arity = column_arity(field.arity());
-    match sql_family {
-        SqlFamily::Postgres => sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity),
-        SqlFamily::Mysql => sql::ColumnType::pure(
-            sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().db_name(), field.db_name())),
-            arity,
-        ),
-        _ => unreachable!("enum_column_type on flavour that does not support enums"),
-    }
 }
 
 fn column_type(field: &ScalarFieldWalker<'_>) -> sql::ColumnType {
