@@ -7,14 +7,16 @@ pub type Timestamp = chrono::DateTime<chrono::Utc>;
 /// Management of imperative migrations state in the database.
 #[async_trait::async_trait]
 pub trait ImperativeMigrationsPersistence: Send + Sync {
+    /// Initialize the migration persistence without checking the database first.
+    async fn baseline_initialize(&self) -> ConnectorResult<()>;
+
     /// This method is responsible for checking whether the migrations
     /// persistence is initialized.
     ///
     /// If the migration persistence is not present in the target database,
     /// check whether the database schema is empty. If it is, initialize the
-    /// migration persistence. If not, return a DatabaseSchemaNotEmpty error unless
-    /// we are in the baselining case.
-    async fn initialize(&self, baseline: bool) -> ConnectorResult<()>;
+    /// migration persistence. If not, return a DatabaseSchemaNotEmpty error.
+    async fn initialize(&self) -> ConnectorResult<()>;
 
     /// Implementation in the connector for the core's MarkMigrationApplied
     /// command. See the docs there. Note that the started_at and finished_at
