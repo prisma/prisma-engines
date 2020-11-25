@@ -624,3 +624,39 @@ async fn different_default_values_should_work(api: &TestApi) -> crate::TestResul
 
     Ok(())
 }
+
+#[test_each_connector(ignore("sqlite"))]
+async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", move |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("int", types::integer().default(1));
+                    t.add_column("neg_int", types::integer().default(-1));
+                    t.add_column("float", types::float().default(2.1));
+                    t.add_column("neg_float", types::float().default(-2.1));
+                    t.add_column("big_int", types::custom("bigint").default(3));
+                    t.add_column("neg_big_int", types::custom("bigint").default(-3));
+                });
+            },
+            api.schema_name(),
+        )
+        .await?;
+
+    let dm = indoc! {r##"
+        model Blog {
+          id                     Int     @id @default(autoincrement())
+          int                    Int     @default(1)
+          neg_int                Int     @default(-1)
+          float                  Float   @default(2.1)
+          neg_float              Float   @default(-2.1)
+          big_int                Int     @default(3)
+          neg_big_int            Int     @default(-3)
+        }
+    "##};
+
+    assert_eq_datamodels!(dm, &api.introspect().await?);
+
+    Ok(())
+}

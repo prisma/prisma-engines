@@ -3,13 +3,15 @@
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
-use bigdecimal::BigDecimal;
+use std::fmt;
+
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{fmt, str::FromStr};
 use tracing::debug;
+
+pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
+use prisma_value::PrismaValue;
 use walkers::{EnumWalker, TableWalker};
 
 pub mod getters;
@@ -20,8 +22,7 @@ pub mod sqlite;
 pub mod walkers;
 
 mod error;
-
-pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
+mod parsers;
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -484,49 +485,6 @@ impl DefaultValue {
         match self {
             DefaultValue::VALUE(v) => Some(v),
             _ => None,
-        }
-    }
-}
-
-static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
-static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
-
-pub fn parse_int(value: &str) -> Option<PrismaValue> {
-    let captures = RE_NUM.captures(value)?;
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i64>();
-    match num_rslt {
-        Ok(num) => Some(PrismaValue::Int(num)),
-        Err(_) => None,
-    }
-}
-
-pub fn parse_big_int(value: &str) -> Option<PrismaValue> {
-    let captures = RE_NUM.captures(value)?;
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i64>();
-    match num_rslt {
-        Ok(num) => Some(PrismaValue::BigInt(num)),
-        Err(_) => None,
-    }
-}
-
-pub fn parse_bool(value: &str) -> Option<PrismaValue> {
-    match value.to_lowercase().parse() {
-        Ok(val) => Some(PrismaValue::Boolean(val)),
-        Err(_) => None,
-    }
-}
-
-pub fn parse_float(value: &str) -> Option<PrismaValue> {
-    let captures = RE_FLOAT.captures(value)?;
-    let num_str = captures.get(1).expect("get capture").as_str();
-
-    match BigDecimal::from_str(num_str) {
-        Ok(num) => Some(PrismaValue::Float(num)),
-        Err(_) => {
-            debug!("Couldn't parse float '{}'", value);
-            None
         }
     }
 }
