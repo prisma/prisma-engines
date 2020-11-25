@@ -12,6 +12,6 @@ datamodel = { path = "../../../libs/datamodel/core" }
 thiserror = "1.0.9"
 anyhow = "1.0.26"
 
-serde = { version = "1.0", features = ["derive"]}
+serde = { version = "1.0.102", features = ["derive"]}
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
