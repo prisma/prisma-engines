@@ -28,8 +28,11 @@ fn resolve_query(field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<
 }
 
 fn resolve_fields(model: &ModelRef, field: FieldPair) -> Vec<ScalarFieldRef> {
-    let fields = field.parsed_field.nested_fields.unwrap().fields;
     let scalars = model.fields().scalar();
+    let fields = match field.parsed_field.nested_fields {
+        Some(nested_obj) => nested_obj.fields,
+        None => vec![],
+    };
 
     fields
         .into_iter()
