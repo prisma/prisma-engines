@@ -22,6 +22,8 @@ impl SqlRow {
         let mut values = self.values;
         values.reverse();
 
+        dbg!(selections);
+
         selections
             .iter()
             .flat_map(|selection| match selection {

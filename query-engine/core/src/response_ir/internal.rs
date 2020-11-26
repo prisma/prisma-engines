@@ -67,16 +67,25 @@ fn serialize_aggregations(
     let aggregate_object_type = extract_aggregate_object_type(output_field.field_type.borrow());
 
     let mut results = vec![];
+    dbg!(&ordering);
 
     for row in record_aggregations.results {
+        dbg!(&row);
         let mut flattened = HashMap::with_capacity(ordering.len());
 
         for result in row {
             match result {
-                AggregationResult::Field(_field, _value) => todo!(),
+                AggregationResult::Field(field, value) => {
+                    let output_field = aggregate_object_type.find_field(&field.name).unwrap();
+                    flattened.insert(field.name.clone(), serialize_scalar(&output_field, value)?);
+                }
 
-                AggregationResult::Count(_field, count) => {
-                    flattened.insert("count".to_owned(), Item::Value(count));
+                AggregationResult::Count(field, count) => {
+                    if let Some(f) = field {
+                        flattened.insert(format!("count_{}", &f.name), Item::Value(count));
+                    } else {
+                        flattened.insert("count".to_owned(), Item::Value(count));
+                    }
                 }
 
                 AggregationResult::Average(field, value) => {
@@ -106,6 +115,8 @@ fn serialize_aggregations(
                 }
             }
         }
+
+        dbg!(&flattened);
 
         // Reorder fields based on the original query selection.
         let mut inner_map: Map = IndexMap::with_capacity(ordering.len());

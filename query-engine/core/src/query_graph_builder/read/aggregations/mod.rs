@@ -13,7 +13,10 @@ use prisma_models::{ModelRef, ScalarFieldRef};
 /// Resolves the given field as a aggregation query.
 fn resolve_query(field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<AggregationSelection> {
     let query = match field.parsed_field.name.as_str() {
-        "count" => AggregationSelection::Count(None),
+        "count" => {
+            let field = resolve_fields(model, field).pop();
+            AggregationSelection::Count(field)
+        }
         "avg" => AggregationSelection::Average(resolve_fields(model, field)),
         "sum" => AggregationSelection::Sum(resolve_fields(model, field)),
         "min" => AggregationSelection::Min(resolve_fields(model, field)),

@@ -52,6 +52,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Using a simple groupBy" should "return the correct groups" in {
+    // Float, int, dec, s, id
     create(10.1, 5, "1.1", "group1", Some("1"))
     create(5.5, 0, "6.7", "group1", Some("2"))
     create(10, 5, "11", "group2", Some("3"))
@@ -60,6 +61,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       s"""{
          |  groupByModel(by: [s]) {
+         |    s
          |    count { s }
          |    sum { float }
          |  }
