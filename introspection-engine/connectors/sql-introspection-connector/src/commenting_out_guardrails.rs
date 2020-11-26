@@ -73,6 +73,8 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         };
     }
 
+    // we could have a separate case and warning for models without columns
+    //on postgres this is allowed, on the other dbs, this could be a symptom of missing privileges
     // models without uniques / ids
     for model in datamodel.models_mut() {
         if model.strict_unique_criterias().is_empty() {
@@ -99,6 +101,8 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     }
 
     let mut warnings = vec![];
+
+    //extra warning about missing columns
 
     if !models_without_identifiers.is_empty() {
         warnings.push(warning_models_without_identifier(&models_without_identifiers))
