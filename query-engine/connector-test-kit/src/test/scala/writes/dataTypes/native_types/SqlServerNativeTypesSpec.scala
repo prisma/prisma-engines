@@ -17,10 +17,12 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
         s"""
            |model Model {
            |  $fieldName $intType @id @default(autoincrement()) $annotation
-           |  int  Int    @test.Int
-           |  sInt Int    @test.SmallInt
-           |  tInt Int    @test.TinyInt
-           |  bInt BigInt @test.BigInt
+           |  int  Int     @test.Int
+           |  sInt Int     @test.SmallInt
+           |  tInt Int     @test.TinyInt
+           |  bInt BigInt  @test.BigInt
+           |  bit  Int     @test.Bit
+           |  bool Boolean @test.Bit
            |}"""
       }
 
@@ -36,12 +38,16 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
            |      sInt: 32767
            |      tInt: 12
            |      bInt: 5294967295
+           |      bit: 1
+           |      bool: false
            |    }
            |  ) {
            |    int
            |    sInt
            |    tInt
            |    bInt
+           |    bit
+           |    bool
            |    $fieldName
            |  }
            |}""".stripMargin,
@@ -50,9 +56,11 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
       )
 
       if (intType == "BigInt") {
-        res.toString should be(s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","$fieldName":"1"}}}""")
+        res should be(
+          s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit": 1,"bool": false,"$fieldName":"1"}}}""".parseJson)
       } else {
-        res.toString should be(s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","$fieldName":1}}}""")
+        res should be(
+          s"""{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"tInt":12,"bInt":"5294967295","bit": 1,"bool": false,"$fieldName":1}}}""".parseJson)
       }
     }
   }
@@ -99,7 +107,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
     )
 
     // decFloat is cut due to precision
-    res.toString should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"money":22.14,"smallMoney":22.12,"decFloat":"3.1","numFloat":"4.12345"}}}""")
+    res should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"money":22.14,"smallMoney":22.12,"decFloat":"3.1","numFloat":"4.12345"}}}""".parseJson)
   }
 
   "SQL Server native string types" should "work" in {
@@ -108,6 +116,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
         |model Model {
         |  id     String @id @default(uuid()) @test.UniqueIdentifier
         |  char   String @test.Char(10)
+        |  nchar  String @test.NChar(10)
         |  vChar  String @test.VarChar(Max)
         |  nVChar String @test.NVarChar(1000)
         |  text   String @test.Text
@@ -123,13 +132,15 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
          |  createOneModel(
          |    data: {
          |      char: "1234567890"
+         |      nchar: "1234567890"
          |      vChar: "12345678910"
          |      nVChar: "教育漢字教育漢字"
          |      text: "text"
          |      nText: "教育漢字"
          |    }
-         |  ) {
+         |  ) {    
          |    char
+         |    nchar
          |    vChar
          |    nVChar
          |    text
@@ -140,7 +151,8 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"char":"1234567890","vChar":"12345678910","nVChar":"教育漢字教育漢字","text":"text","nText":"教育漢字"}}}""")
+    res should be(
+      """{"data":{"createOneModel":{"char":"1234567890","nchar":"1234567890","vChar":"12345678910","nVChar":"教育漢字教育漢字","text":"text","nText":"教育漢字"}}}""".parseJson)
   }
 
   "SQL Server native date types" should "work" in {
@@ -184,8 +196,8 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
       legacy = false
     )
 
-    res.toString should be(
-      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","time":"1970-01-01T13:14:15.123+00:00","dtime":"2016-09-24T12:29:32.343333333+00:00","dtime2":"2016-09-24T12:29:32.342+00:00","dtoff":"2016-09-24T12:29:32.342+00:00","small":"2016-09-24T12:30:00+00:00"}}}""")
+    res should be(
+      """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","time":"1970-01-01T13:14:15.123+00:00","dtime":"2016-09-24T12:29:32.343333333+00:00","dtime2":"2016-09-24T12:29:32.342+00:00","dtoff":"2016-09-24T12:29:32.342+00:00","small":"2016-09-24T12:30:00+00:00"}}}""".parseJson)
   }
 
   "SQL Server native binary types" should "work" in {
@@ -220,7 +232,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"bin":"dGVzdA==","vBin":"dGVzdA==","image":"dGVzdA=="}}}""")
+    res should be("""{"data":{"createOneModel":{"bin":"dGVzdA==","vBin":"dGVzdA==","image":"dGVzdA=="}}}""".parseJson)
   }
 
   "Other SQL Server native types" should "work" in {
@@ -252,6 +264,6 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"xml":"<meow>purr</meow>","uuid":"ab309dfd-d041-4110-b162-75d7b95fe989"}}}""")
+    res should be("""{"data":{"createOneModel":{"xml":"<meow>purr</meow>","uuid":"ab309dfd-d041-4110-b162-75d7b95fe989"}}}""".parseJson)
   }
 }
