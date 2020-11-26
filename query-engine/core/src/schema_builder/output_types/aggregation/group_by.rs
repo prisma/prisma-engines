@@ -26,7 +26,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
     // Count is available on all fields.
     append_opt(
         &mut object_fields,
-        aggregation_field(ctx, "count", &model, model.fields().scalar(), field_avg_output_type),
+        aggregation_field(ctx, "count", &model, model.fields().scalar(), |_| OutputType::int()),
     );
 
     append_opt(

@@ -73,6 +73,21 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group3","count":{"s":1},"sum":{"float":10}},{"s":"group1","count":{"s":2},"sum":{"float":15.6}}]}}""")
   }
 
+  "Using a groupBy with mismatching by-arguments and query selections" should "return an error detailing the missing fields" in {
+    server.queryThatMustFail(
+      s"""{
+         |  groupByModel(by: [int]) {
+         |    s
+         |    count { s }
+         |    sum { float }
+         |  }
+         |}""".stripMargin,
+      project,
+      errorCode = 2019,
+      errorContains = "Every selected scalar field that is not part of an aggregation must be included in the by-arguments of the query. Missing fields: s"
+    )
+  }
+
   // todo
   // null / zero behavior
   // orderBy
@@ -81,4 +96,5 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   // take
   // errors:
   // - incorrect group by for selection set
+  // - 2 fields on count
 }

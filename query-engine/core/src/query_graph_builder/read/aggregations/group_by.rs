@@ -21,7 +21,7 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         .map(|field| resolve_query(field, &model))
         .collect::<QueryGraphBuilderResult<_>>()?;
 
-    // Todo cross verify selections and group by
+    verify_selections(&selectors, &group_by)?;
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
         name,
@@ -32,6 +32,31 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         selectors,
         group_by,
     }))
+}
+
+/// Cross checks that the selections of the request are valid with regard to the requested group bys.
+/// Rules:
+/// - Every plain scalar field in the selectors must be present in the group by as well.
+fn verify_selections(selectors: &[AggregationSelection], group_by: &[ScalarFieldRef]) -> QueryGraphBuilderResult<()> {
+    let mut missing_fields = vec![];
+
+    for selector in selectors {
+        if let AggregationSelection::Field(field) = selector {
+            if !group_by.contains(&field) {
+                missing_fields.push(field.name.clone());
+            }
+        }
+    }
+
+    if missing_fields.is_empty() {
+        Ok(())
+    } else {
+        Err(QueryGraphBuilderError::InputError(format!(
+            "Every selected scalar field that is not part of an aggregation \
+        must be included in the by-arguments of the query. Missing fields: {}",
+            missing_fields.join(", ")
+        )))
+    }
 }
 
 fn extract_grouping(value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<ScalarFieldRef>> {
