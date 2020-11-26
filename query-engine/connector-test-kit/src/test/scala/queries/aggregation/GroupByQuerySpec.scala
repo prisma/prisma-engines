@@ -70,7 +70,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10.0}},{"s":"group3","count":{"s":1},"sum":{"float":10.0}},{"s":"group1","count":{"s":2},"sum":{"float":15.6}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group3","count":{"s":1},"sum":{"float":10}},{"s":"group1","count":{"s":2},"sum":{"float":15.6}}]}}""")
   }
 
   // todo

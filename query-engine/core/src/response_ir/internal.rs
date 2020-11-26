@@ -67,10 +67,8 @@ fn serialize_aggregations(
     let aggregate_object_type = extract_aggregate_object_type(output_field.field_type.borrow());
 
     let mut results = vec![];
-    dbg!(&ordering);
 
     for row in record_aggregations.results {
-        dbg!(&row);
         let mut flattened = HashMap::with_capacity(ordering.len());
 
         for result in row {
@@ -115,8 +113,6 @@ fn serialize_aggregations(
                 }
             }
         }
-
-        dbg!(&flattened);
 
         // Reorder fields based on the original query selection.
         let mut inner_map: Map = IndexMap::with_capacity(ordering.len());
