@@ -1,5 +1,5 @@
 use super::{super::helpers::*, AttributeValidator};
-use crate::ast::{Attribute, Span};
+use crate::ast::Span;
 use crate::diagnostics::DatamodelError;
 use crate::{ast, dml, Datamodel, WithDatabaseName};
 
@@ -17,7 +17,7 @@ impl AttributeValidator<dml::Model> for MapAttributeValidator {
         internal_validate_and_apply(args, obj)
     }
 
-    fn serialize(&self, obj: &dml::Model, _datamodel: &Datamodel) -> Result<Vec<Attribute>, DatamodelError> {
+    fn serialize(&self, obj: &dml::Model, _datamodel: &Datamodel) -> Vec<ast::Attribute> {
         internal_serialize(obj)
     }
 }
@@ -41,7 +41,7 @@ impl AttributeValidator<dml::Field> for MapAttributeValidatorForField {
         internal_validate_and_apply(args, obj)
     }
 
-    fn serialize(&self, obj: &dml::Field, _datamodel: &Datamodel) -> Result<Vec<Attribute>, DatamodelError> {
+    fn serialize(&self, obj: &dml::Field, _datamodel: &Datamodel) -> Vec<ast::Attribute> {
         internal_serialize(obj)
     }
 }
@@ -55,7 +55,7 @@ impl AttributeValidator<dml::Enum> for MapAttributeValidator {
         internal_validate_and_apply(args, obj)
     }
 
-    fn serialize(&self, obj: &dml::Enum, _datamodel: &Datamodel) -> Result<Vec<Attribute>, DatamodelError> {
+    fn serialize(&self, obj: &dml::Enum, _datamodel: &Datamodel) -> Vec<ast::Attribute> {
         internal_serialize(obj)
     }
 }
@@ -69,7 +69,7 @@ impl AttributeValidator<dml::EnumValue> for MapAttributeValidator {
         internal_validate_and_apply(args, obj)
     }
 
-    fn serialize(&self, obj: &dml::EnumValue, _datamodel: &Datamodel) -> Result<Vec<Attribute>, DatamodelError> {
+    fn serialize(&self, obj: &dml::EnumValue, _datamodel: &Datamodel) -> Vec<ast::Attribute> {
         internal_serialize(obj)
     }
 }
@@ -82,15 +82,15 @@ fn internal_validate_and_apply(args: &mut Arguments, obj: &mut dyn WithDatabaseN
     Ok(())
 }
 
-fn internal_serialize(obj: &dyn WithDatabaseName) -> Result<Vec<ast::Attribute>, DatamodelError> {
+fn internal_serialize(obj: &dyn WithDatabaseName) -> Vec<ast::Attribute> {
     match obj.database_name() {
-        Some(db_name) => Ok(vec![ast::Attribute::new(
+        Some(db_name) => vec![ast::Attribute::new(
             ATTRIBUTE_NAME,
             vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
                 String::from(db_name),
                 Span::empty(),
             ))],
-        )]),
-        None => Ok(vec![]),
+        )],
+        None => vec![],
     }
 }

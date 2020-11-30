@@ -44,6 +44,6 @@ where
     }
 
     pub fn render_schema_ast(&self, schema_ast: &SchemaAst) -> String {
-        datamodel::render_schema_ast_to_string(&schema_ast).expect("Rendering the schema failed")
+        datamodel::render_schema_ast_to_string(&schema_ast)
     }
 }

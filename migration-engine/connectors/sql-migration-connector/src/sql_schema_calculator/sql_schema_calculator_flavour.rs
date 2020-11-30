@@ -18,6 +18,14 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType;
 
+    fn enum_column_type(&self, _field: &ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {
+        unreachable!("unreachable enum_column_type")
+    }
+
+    fn field_is_implicit_autoincrement_primary_key(&self, _field: &ScalarFieldWalker<'_>) -> bool {
+        false
+    }
+
     fn m2m_foreign_key_action(&self, _model_a: &ModelWalker<'_>, _model_b: &ModelWalker<'_>) -> sql::ForeignKeyAction {
         sql::ForeignKeyAction::Cascade
     }

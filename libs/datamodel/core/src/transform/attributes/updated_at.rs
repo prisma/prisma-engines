@@ -31,15 +31,11 @@ impl AttributeValidator<dml::Field> for UpdatedAtAttributeValidator {
         )
     }
 
-    fn serialize(
-        &self,
-        field: &dml::Field,
-        _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if field.is_updated_at() {
-            Ok(vec![ast::Attribute::new(self.attribute_name(), Vec::new())])
+            vec![ast::Attribute::new(self.attribute_name(), Vec::new())]
         } else {
-            Ok(vec![])
+            vec![]
         }
     }
 }

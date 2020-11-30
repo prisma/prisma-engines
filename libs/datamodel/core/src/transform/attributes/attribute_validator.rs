@@ -19,7 +19,7 @@ pub trait AttributeValidator<T> {
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut T) -> Result<(), DatamodelError>;
 
     /// Serializes the given attribute's arguments for rendering.
-    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, DatamodelError>;
+    fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Vec<ast::Attribute>;
 
     /// Shorthand to construct an attribute validation error.
     fn new_attribute_validation_error(&self, msg: &str, span: ast::Span) -> Result<(), DatamodelError> {

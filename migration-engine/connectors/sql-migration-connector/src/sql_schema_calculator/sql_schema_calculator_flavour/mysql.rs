@@ -103,4 +103,13 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             native_type: Some(native_type_instance.serialized_native_type.clone()),
         }
     }
+
+    fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {
+        let arity = super::super::column_arity(field.arity());
+
+        sql::ColumnType::pure(
+            sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().db_name(), field.db_name())),
+            arity,
+        )
+    }
 }

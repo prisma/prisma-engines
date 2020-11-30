@@ -26,7 +26,20 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
         &self,
         database_migration: &SqlMigration,
     ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-        render_steps_pretty(&database_migration, self.flavour(), database_migration.schemas())
+        let mut steps = Vec::with_capacity(database_migration.steps.len());
+
+        for step in &database_migration.steps {
+            let sql = render_raw_sql(&step, self.flavour(), database_migration.schemas()).join(";\n");
+
+            if !sql.is_empty() {
+                steps.push(PrettyDatabaseMigrationStep {
+                    step: serde_json::to_value(&step).unwrap_or_else(|_| serde_json::json!({})),
+                    raw: sql,
+                });
+            }
+        }
+
+        Ok(steps)
     }
 
     fn render_script(&self, database_migration: &SqlMigration, diagnostics: &DestructiveChangeDiagnostics) -> String {
@@ -108,27 +121,6 @@ impl SqlMigrationConnector {
 
         Ok(true)
     }
-}
-
-fn render_steps_pretty(
-    database_migration: &SqlMigration,
-    renderer: &(dyn SqlFlavour + Send + Sync),
-    schemas: Pair<&SqlSchema>,
-) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-    let mut steps = Vec::with_capacity(database_migration.steps.len());
-
-    for step in &database_migration.steps {
-        let sql = render_raw_sql(&step, renderer, schemas).join(";\n");
-
-        if !sql.is_empty() {
-            steps.push(PrettyDatabaseMigrationStep {
-                step: serde_json::to_value(&step).unwrap_or_else(|_| serde_json::json!({})),
-                raw: sql,
-            });
-        }
-    }
-
-    Ok(steps)
 }
 
 fn render_raw_sql(

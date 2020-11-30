@@ -1,7 +1,6 @@
 use super::super::attributes::AllAttributes;
 use crate::ast::Span;
 use crate::configuration::preview_features::PreviewFeatures;
-use crate::diagnostics::Diagnostics;
 use crate::dml::FieldType::NativeType;
 use crate::{ast, dml, Datasource, Generator};
 
@@ -21,75 +20,60 @@ impl<'a> LowerDmlToAst<'a> {
         }
     }
 
-    pub fn lower(&self, datamodel: &dml::Datamodel) -> Result<ast::SchemaAst, Diagnostics> {
+    pub fn lower(&self, datamodel: &dml::Datamodel) -> ast::SchemaAst {
         let mut tops: Vec<ast::Top> = Vec::new();
-        let mut errors = Diagnostics::new();
 
         for model in datamodel.models() {
             if !model.is_generated {
-                match self.lower_model(model, datamodel) {
-                    Ok(res) => tops.push(ast::Top::Model(res)),
-                    Err(mut err) => errors.append(&mut err),
-                }
+                tops.push(ast::Top::Model(self.lower_model(model, datamodel)))
             }
         }
 
         for enm in datamodel.enums() {
-            match self.lower_enum(enm, datamodel) {
-                Ok(res) => tops.push(ast::Top::Enum(res)),
-                Err(mut err) => errors.append(&mut err),
-            }
+            tops.push(ast::Top::Enum(self.lower_enum(enm, datamodel)))
         }
 
-        Ok(ast::SchemaAst { tops })
+        ast::SchemaAst { tops }
     }
 
-    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, Diagnostics> {
-        let mut errors = Diagnostics::new();
+    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> ast::Model {
         let mut fields: Vec<ast::Field> = Vec::new();
 
         for field in model.fields() {
-            match self.lower_field(field, datamodel) {
-                Ok(ast_field) => fields.push(ast_field),
-                Err(mut err) => errors.append(&mut err),
-            };
+            fields.push(self.lower_field(field, datamodel))
         }
 
-        if errors.has_errors() {
-            return Err(errors);
-        }
-
-        Ok(ast::Model {
+        ast::Model {
             name: ast::Identifier::new(&model.name),
             fields,
-            attributes: self.attributes.model.serialize(model, datamodel)?,
+            attributes: self.attributes.model.serialize(model, datamodel),
             documentation: model.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
             commented_out: model.is_commented_out,
-        })
+        }
     }
 
-    fn lower_enum(&self, enm: &dml::Enum, datamodel: &dml::Datamodel) -> Result<ast::Enum, Diagnostics> {
-        Ok(ast::Enum {
+    fn lower_enum(&self, enm: &dml::Enum, datamodel: &dml::Datamodel) -> ast::Enum {
+        ast::Enum {
             name: ast::Identifier::new(&enm.name),
             values: enm
                 .values()
                 .map(|v| ast::EnumValue {
                     name: ast::Identifier::new(&v.name),
-                    attributes: self.attributes.enm_value.serialize(v, datamodel).unwrap(),
+                    attributes: self.attributes.enm_value.serialize(v, datamodel),
                     documentation: v.documentation.clone().map(|text| ast::Comment { text }),
                     span: ast::Span::empty(),
                     commented_out: v.commented_out,
                 })
                 .collect(),
-            attributes: self.attributes.enm.serialize(enm, datamodel)?,
+            attributes: self.attributes.enm.serialize(enm, datamodel),
             documentation: enm.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
-        })
+        }
     }
 
-    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, Diagnostics> {
-        let mut attributes = self.attributes.field.serialize(field, datamodel)?;
+    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> ast::Field {
+        let mut attributes = self.attributes.field.serialize(field, datamodel);
         if let (dml::Field::ScalarField(sf), Some(datasource)) = (field, self.datasource) {
             if let NativeType(_prisma_tpe, native_tpe) = sf.clone().field_type {
                 if self.generators.iter().any(|g| g.has_preview_feature("nativeTypes")) {
@@ -107,7 +91,7 @@ impl<'a> LowerDmlToAst<'a> {
             }
         }
 
-        Ok(ast::Field {
+        ast::Field {
             name: ast::Identifier::new(&field.name()),
             arity: self.lower_field_arity(field.arity()),
             attributes,
@@ -117,7 +101,7 @@ impl<'a> LowerDmlToAst<'a> {
                 .map(|text| ast::Comment { text: text.to_string() }),
             span: ast::Span::empty(),
             is_commented_out: field.is_commented_out(),
-        })
+        }
     }
 
     /// Internal: Lowers a field's arity.

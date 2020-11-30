@@ -42,7 +42,7 @@ impl<'a> Reformatter<'a> {
 
             for field in model.fields() {
                 if ast_model.fields.iter().find(|f| f.name.name == field.name()).is_none() {
-                    let ast_field = lowerer.lower_field(&field, &validated_datamodel.subject)?;
+                    let ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
 
                     result.push(MissingField {
                         model: model.name.clone(),
@@ -72,7 +72,7 @@ impl<'a> Reformatter<'a> {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
                 let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
-                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject)?;
+                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
                 if original_ast_field.is_some() {
                     for attribute in new_ast_field.attributes {
                         if let Some(original_field) = original_ast_field {

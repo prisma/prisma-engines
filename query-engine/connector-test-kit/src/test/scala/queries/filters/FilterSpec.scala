@@ -124,7 +124,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Empty AND filter" should "work" in {
     val filter = """(where: {AND:[]})"""
 
-    userUniques(filter) should be(Vector(1, 2, 3, 4))
+    userUniques(filter) should be(Vector())
   }
 
   "OR filter" should "work" taggedAs (IgnoreMongo) in {

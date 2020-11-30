@@ -10,6 +10,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
     fn attribute_name(&self) -> &'static str {
         &"relation"
     }
+
     fn validate_and_apply(&self, args: &mut Arguments, field: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(rf) = field {
             if let Ok(name_arg) = args.default_arg("name") {
@@ -42,7 +43,7 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
         }
     }
 
-    fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::RelationField(rf) = field {
             let mut args = Vec::new();
 
@@ -107,9 +108,10 @@ impl AttributeValidator<dml::Field> for RelationAttributeValidator {
             }
 
             if !args.is_empty() {
-                return Ok(vec![ast::Attribute::new(self.attribute_name(), args)]);
+                return vec![ast::Attribute::new(self.attribute_name(), args)];
             }
         }
-        Ok(vec![])
+
+        vec![]
     }
 }

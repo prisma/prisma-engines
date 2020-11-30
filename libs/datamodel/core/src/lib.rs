@@ -264,37 +264,33 @@ fn load_sources(
 //
 
 /// Renders to a return string.
-pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> Result<String, diagnostics::Diagnostics> {
+pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
     let mut writable_string = common::WritableString::new();
-    render_datamodel_to(&mut writable_string, datamodel)?;
-    Ok(writable_string.into())
+    render_datamodel_to(&mut writable_string, datamodel);
+    writable_string.into()
 }
 
 /// Renders an AST to a string.
-pub fn render_schema_ast_to_string(schema: &SchemaAst) -> Result<String, diagnostics::Diagnostics> {
+pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
     let mut writable_string = common::WritableString::new();
     render_schema_ast_to(&mut writable_string, &schema, 2);
-    Ok(writable_string.into())
+    writable_string.into()
 }
 
 /// Renders as a string into the stream.
-pub fn render_datamodel_to(
-    stream: &mut dyn std::io::Write,
-    datamodel: &dml::Datamodel,
-) -> Result<(), diagnostics::Diagnostics> {
-    let lowered = LowerDmlToAst::new(None, &vec![]).lower(datamodel)?;
+pub fn render_datamodel_to(stream: &mut dyn std::io::Write, datamodel: &dml::Datamodel) {
+    let lowered = LowerDmlToAst::new(None, &vec![]).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
-    Ok(())
 }
 
 /// Renders a datamodel, sources and generators to a string.
 pub fn render_datamodel_and_config_to_string(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
-) -> Result<String, diagnostics::Diagnostics> {
+) -> String {
     let mut writable_string = common::WritableString::new();
-    render_datamodel_and_config_to(&mut writable_string, datamodel, config)?;
-    Ok(writable_string.into())
+    render_datamodel_and_config_to(&mut writable_string, datamodel, config);
+    writable_string.into()
 }
 
 /// Renders a datamodel, generators and sources to a stream as a string.
@@ -302,15 +298,13 @@ fn render_datamodel_and_config_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
-) -> Result<(), diagnostics::Diagnostics> {
-    let mut lowered = LowerDmlToAst::new(config.datasources.first(), &config.generators).lower(datamodel)?;
+) {
+    let mut lowered = LowerDmlToAst::new(config.datasources.first(), &config.generators).lower(datamodel);
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
 
     render_schema_ast_to(stream, &lowered, 2);
-
-    Ok(())
 }
 
 /// Renders as a string into the stream.

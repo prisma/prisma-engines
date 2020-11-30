@@ -62,7 +62,7 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
             .render_steps_pretty(&database_migration)?;
 
         Ok(MigrationStepsResultOutput {
-            datamodel: datamodel::render_schema_ast_to_string(&next_datamodel_ast).unwrap(),
+            datamodel: datamodel::render_schema_ast_to_string(&next_datamodel_ast),
             datamodel_steps: steps_to_apply.to_vec(),
             database_steps: database_steps_json,
             errors: [],

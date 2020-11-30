@@ -13,9 +13,6 @@ pub struct MarkMigrationAppliedInput {
     pub migration_name: String,
     /// The path to the root of the migrations directory.
     pub migrations_directory_path: String,
-    /// Signal to the engine that we expect to find one failed migration with
-    /// that name in the table.
-    pub expect_failed: bool,
 }
 
 /// The output of the `markMigrationApplied` command.
@@ -51,55 +48,34 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
                 .filter(|migration| migration.migration_name == input.migration_name)
                 .collect(),
             Err(_) => {
-                if !input.expect_failed {
-                    persistence.initialize(true).await?;
-                }
+                persistence.baseline_initialize().await?;
 
                 vec![]
             }
         };
 
-        match (relevant_migrations.len(), input.expect_failed) {
-            (0, false) => {
-                persistence
-                    .mark_migration_applied(migration_directory.migration_name(), &script)
-                    .await?;
-            }
-            (0, true) => {
-                return Err(CoreError::Generic(anyhow::anyhow!(
-                    "Invariant violation: expect_failed was passed but no failed migration was found in the database."
-                )))
-            }
-            (_, _)
-                if relevant_migrations
-                    .iter()
-                    .any(|migration| migration.finished_at.is_some()) =>
-            {
-                return Err(CoreError::UserFacing(user_facing_errors::KnownError::new(
-                    MigrationAlreadyApplied {
-                        migration_name: input.migration_name.clone(),
-                    },
-                )));
-            }
-            (_, false) => {
-                return Err(CoreError::Generic(anyhow::anyhow!(
-                "Invariant violation: there are failed migrations in the database, but expect_failed was not passed."
-            )))
-            }
-            (_, true) => {
-                let migrations_to_mark_rolled_back = relevant_migrations
-                    .iter()
-                    .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none());
-
-                for migration in migrations_to_mark_rolled_back {
-                    persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
-                }
-
-                persistence
-                    .mark_migration_applied(migration_directory.migration_name(), &script)
-                    .await?;
-            }
+        if relevant_migrations
+            .iter()
+            .any(|migration| migration.finished_at.is_some())
+        {
+            return Err(CoreError::UserFacing(user_facing_errors::KnownError::new(
+                MigrationAlreadyApplied {
+                    migration_name: input.migration_name.clone(),
+                },
+            )));
         }
+
+        let migrations_to_mark_rolled_back = relevant_migrations
+            .iter()
+            .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none());
+
+        for migration in migrations_to_mark_rolled_back {
+            persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
+        }
+
+        persistence
+            .mark_migration_applied(migration_directory.migration_name(), &script)
+            .await?;
 
         Ok(Default::default())
     }

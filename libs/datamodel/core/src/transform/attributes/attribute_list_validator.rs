@@ -106,19 +106,11 @@ impl<T: 'static> AttributeListValidator<T> {
         Ok(())
     }
 
-    pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Attribute>, Diagnostics> {
-        let mut errors = Diagnostics::new();
-        let mut result: Vec<ast::Attribute> = Vec::new();
-
-        for attribute in self.known_attributes.values() {
-            match attribute.serialize(t, datamodel) {
-                Ok(mut attributes) => result.append(&mut attributes),
-                Err(err) => errors.push_error(err),
-            };
-        }
-
-        errors.to_result()?;
-
-        Ok(result)
+    pub fn serialize(&self, t: &T, datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
+        self.known_attributes
+            .values()
+            .map(|attribute| attribute.serialize(t, datamodel))
+            .flatten()
+            .collect()
     }
 }

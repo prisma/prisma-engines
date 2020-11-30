@@ -49,17 +49,13 @@ impl AttributeValidator<dml::Field> for FieldLevelUniqueAttributeValidator {
         Ok(())
     }
 
-    fn serialize(
-        &self,
-        field: &dml::Field,
-        _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize(&self, field: &dml::Field, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         if let dml::Field::ScalarField(sf) = field {
             if sf.is_unique {
-                return Ok(vec![ast::Attribute::new(self.attribute_name(), vec![])]);
+                return vec![ast::Attribute::new(self.attribute_name(), vec![])];
             }
         }
-        Ok(vec![])
+        vec![]
     }
 }
 
@@ -83,11 +79,7 @@ impl AttributeValidator<dml::Model> for ModelLevelUniqueAttributeValidator {
         Ok(())
     }
 
-    fn serialize(
-        &self,
-        model: &dml::Model,
-        _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         self.serialize_index_definitions(&model, IndexType::Unique)
     }
 }
@@ -112,11 +104,7 @@ impl AttributeValidator<dml::Model> for ModelLevelIndexAttributeValidator {
         Ok(())
     }
 
-    fn serialize(
-        &self,
-        model: &dml::Model,
-        _datamodel: &dml::Datamodel,
-    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize(&self, model: &dml::Model, _datamodel: &dml::Datamodel) -> Vec<ast::Attribute> {
         self.serialize_index_definitions(&model, IndexType::Normal)
     }
 }
@@ -234,11 +222,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
         Ok(index_def)
     }
 
-    fn serialize_index_definitions(
-        &self,
-        model: &dml::Model,
-        index_type: IndexType,
-    ) -> Result<Vec<ast::Attribute>, DatamodelError> {
+    fn serialize_index_definitions(&self, model: &dml::Model, index_type: IndexType) -> Vec<ast::Attribute> {
         let attributes: Vec<ast::Attribute> = model
             .indices
             .iter()
@@ -262,7 +246,7 @@ trait IndexAttributeBase<T>: AttributeValidator<T> {
             })
             .collect();
 
-        Ok(attributes)
+        attributes
     }
 }
 
