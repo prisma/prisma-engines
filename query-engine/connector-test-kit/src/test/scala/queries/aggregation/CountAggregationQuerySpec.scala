@@ -7,8 +7,9 @@ import util._
 class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model Item {
-      |  id   String @id @default(cuid())
-      |  name String?
+      |  id String @id @default(cuid())
+      |  s1 String?
+      |  s2 String?
       |}
     """.stripMargin
   }
@@ -18,15 +19,15 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     database.setup(project)
   }
 
-  def createItem(name: Option[String]) = {
-    val stringified = name match {
+  def createItem(s1: Option[String] = None, s2: Option[String] = None) = {
+    def stringified(s: Option[String]) = s match {
       case Some(n) => s""""$n""""
       case None    => "null"
     }
 
     server.query(
       s"""mutation {
-         |  createItem(data: { name: $stringified }) {
+         |  createItem(data: { s1: ${stringified(s1)}, s2: ${stringified(s2)} }) {
          |    id
          |  }
          |}""".stripMargin,
@@ -48,8 +49,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
   }
 
   "Counting with 2 records in the database" should "return 2" in {
-    createItem(Some("1"))
-    createItem(Some("2"))
+    createItem()
+    createItem()
 
     val result = server.query(
       s"""{
@@ -64,21 +65,23 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
   }
 
   "Counting fields that contain null" should "only return the count of these fields that don't have null" in {
-    createItem(Some("1"))
-    createItem(None)
+    createItem(Some("1"), None)
+    createItem(None, Some("1"))
 
     val result = server.query(
       s"""{
          |  aggregateItem {
          |    count {
-         |      name
+         |      s1
+         |      s2
          |    }
          |  }
          |}""".stripMargin,
       project
     )
 
-    result.pathAsLong("data.aggregateItem.count.name") should be(1)
+    result.pathAsLong("data.aggregateItem.count.s1") should be(1)
+    result.pathAsLong("data.aggregateItem.count.s2") should be(1)
   }
 
   "Counting with all sorts of query arguments" should "work" in {
@@ -125,7 +128,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result4 = server.query(
       """{
-        |  aggregateItem(where: { name: { gt: "2" }}) {
+        |  aggregateItem(where: { s1: { gt: "2" }}) {
         |    count
         |  }
         |}
@@ -137,7 +140,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result5 = server.query(
       """{
-        |  aggregateItem(where: { name: { gt: "1" }} orderBy: { name: desc }) {
+        |  aggregateItem(where: { s1: { gt: "1" }} orderBy: { s1: desc }) {
         |    count
         |  }
         |}
