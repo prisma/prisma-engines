@@ -15,7 +15,7 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
         return Err(QueryGraphBuilderError::InputError(
             "Unable to process combination of query arguments for aggregation query. \
              Please note that it is not possible at the moment to have a null-cursor, \
-             or a cursor and orderBy combination that not stable (unique) ."
+             or a cursor and orderBy combination that not stable (unique)."
                 .to_owned(),
         ));
     }

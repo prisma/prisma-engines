@@ -90,8 +90,8 @@ pub enum AggregationSelection {
     Field(ScalarFieldRef),
 
     /// Counts records of the model that match the query.
-    /// If a field is provided, counts based on that field instead of rows (e.g. * in SQL).
-    Count(Option<ScalarFieldRef>),
+    /// If fields are provided, counts based on these fields instead of rows (e.g. * in SQL).
+    Count(Vec<ScalarFieldRef>),
 
     /// Compute average for each field contained.
     Average(Vec<ScalarFieldRef>),
@@ -110,7 +110,7 @@ impl AggregationSelection {
     pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         match self {
             AggregationSelection::Field(field) => vec![(field.type_identifier.clone(), FieldArity::Required)],
-            AggregationSelection::Count(_) => vec![(TypeIdentifier::Int, FieldArity::Required)],
+            AggregationSelection::Count(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Int)),
             AggregationSelection::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
             AggregationSelection::Sum(fields) => Self::map_field_types(&fields, None),
             AggregationSelection::Min(fields) => Self::map_field_types(&fields, None),
