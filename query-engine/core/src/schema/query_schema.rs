@@ -152,8 +152,9 @@ impl ObjectType {
     }
 
     /// Signals that empty set of fields is allowed for this output object.
-    pub fn do_allow_empty(&mut self) {
+    pub fn do_allow_empty(mut self) -> Self {
         self.allow_empty = true;
+        self
     }
 }
 

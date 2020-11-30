@@ -8,7 +8,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
   val project = SchemaDsl.fromStringV11() {
     """model Item {
       |  id   String @id @default(cuid())
-      |  name String
+      |  name String?
       |}
     """.stripMargin
   }
@@ -18,10 +18,15 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     database.setup(project)
   }
 
-  def createItem(name: String) = {
+  def createItem(name: Option[String]) = {
+    val stringified = name match {
+      case Some(n) => s""""$n""""
+      case None    => "null"
+    }
+
     server.query(
       s"""mutation {
-         |  createItem(data: { name: "$name" }) {
+         |  createItem(data: { name: $stringified }) {
          |    id
          |  }
          |}""".stripMargin,
@@ -43,8 +48,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
   }
 
   "Counting with 2 records in the database" should "return 2" in {
-    createItem("1")
-    createItem("2")
+    createItem(Some("1"))
+    createItem(Some("2"))
 
     val result = server.query(
       s"""{
@@ -58,11 +63,29 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     result.pathAsLong("data.aggregateItem.count") should be(2)
   }
 
+  "Counting fields that contain null" should "only return the count of these fields that don't have null" in {
+    createItem(Some("1"))
+    createItem(None)
+
+    val result = server.query(
+      s"""{
+         |  aggregateItem {
+         |    count {
+         |      name
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.pathAsLong("data.aggregateItem.count") should be(1)
+  }
+
   "Counting with all sorts of query arguments" should "work" in {
-    createItem("1")
-    val i2 = createItem("2")
-    createItem("3")
-    createItem("4")
+    createItem(Some("1"))
+    val i2 = createItem(Some("2"))
+    createItem(Some("3"))
+    createItem(Some("4"))
 
     val result = server.query(
       """{

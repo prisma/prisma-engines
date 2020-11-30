@@ -55,12 +55,18 @@ fn collect_selection_tree(fields: &[FieldPair]) -> Vec<(String, Option<Vec<Strin
             let field = &field.parsed_field;
             (
                 field.name.clone(),
-                field.nested_fields.as_ref().map(|nested_object| {
-                    nested_object
+                field.nested_fields.as_ref().and_then(|nested_object| {
+                    let nested: Vec<_> = nested_object
                         .fields
                         .iter()
                         .map(|f| f.parsed_field.name.clone())
-                        .collect()
+                        .collect();
+
+                    if nested.is_empty() {
+                        None
+                    } else {
+                        Some(nested)
+                    }
                 }),
             )
         })

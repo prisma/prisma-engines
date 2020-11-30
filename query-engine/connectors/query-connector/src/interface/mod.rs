@@ -110,7 +110,13 @@ impl AggregationSelection {
     pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         match self {
             AggregationSelection::Field(field) => vec![(field.type_identifier.clone(), FieldArity::Required)],
-            AggregationSelection::Count(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Int)),
+            AggregationSelection::Count(fields) => {
+                if fields.is_empty() {
+                    vec![(TypeIdentifier::Int, FieldArity::Required)]
+                } else {
+                    Self::map_field_types(&fields, Some(TypeIdentifier::Int))
+                }
+            }
             AggregationSelection::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
             AggregationSelection::Sum(fields) => Self::map_field_types(&fields, None),
             AggregationSelection::Min(fields) => Self::map_field_types(&fields, None),

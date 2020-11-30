@@ -29,12 +29,24 @@ impl SqlRow {
                     vec![AggregationResult::Field(field.clone(), values.pop().unwrap())]
                 }
 
-                AggregationSelection::Count(fields) => fields
-                    .iter()
-                    .map(|field| {
-                        AggregationResult::Count(Some(field.clone()), coerce_null_to_zero_value(values.pop().unwrap()))
-                    })
-                    .collect(),
+                AggregationSelection::Count(fields) => {
+                    if fields.is_empty() {
+                        vec![AggregationResult::Count(
+                            None,
+                            coerce_null_to_zero_value(values.pop().unwrap()),
+                        )]
+                    } else {
+                        fields
+                            .iter()
+                            .map(|field| {
+                                AggregationResult::Count(
+                                    Some(field.clone()),
+                                    coerce_null_to_zero_value(values.pop().unwrap()),
+                                )
+                            })
+                            .collect()
+                    }
+                }
 
                 AggregationSelection::Average(fields) => fields
                     .iter()
