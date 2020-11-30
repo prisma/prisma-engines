@@ -282,7 +282,7 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> crate::TestRes
     assert_eq_json!(expected, api.introspection_warnings().await?);
 
     let dm = indoc! {r#"
-        // We could not retrieve columns for the underlying table. Please check your privileges.
+        // We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
         // model Test {
         // }
     "#};

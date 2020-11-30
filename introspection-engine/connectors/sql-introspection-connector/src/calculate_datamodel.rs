@@ -38,7 +38,7 @@ pub fn calculate_datamodel(
     tracing::debug!("Enriching datamodel is done: {:?}", data_model);
 
     // commenting out models, fields, enums, enum values
-    warnings.append(&mut commenting_out_guardrails(&mut data_model));
+    warnings.append(&mut commenting_out_guardrails(&mut data_model, family));
 
     // try to identify whether the schema was created by a previous Prisma version
     let version = version_check.version(&warnings, &data_model);

@@ -5,8 +5,9 @@ use crate::warnings::{
 };
 use datamodel::{Datamodel, FieldType};
 use introspection_connector::Warning;
+use quaint::connector::SqlFamily;
 
-pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
+pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
     let mut models_without_columns = vec![];
     let mut fields_with_empty_names = vec![];
@@ -79,9 +80,17 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     for model in datamodel.models_mut() {
         if model.fields.is_empty() {
             model.is_commented_out = true;
-            model.documentation = Some(
-                "We could not retrieve columns for the underlying table. Please check your privileges.".to_string(),
-            );
+
+            let comment = match family {
+                SqlFamily::Postgres =>
+                    "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.".to_string(),
+
+                _ => "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.".to_string(),
+
+            };
+            //postgres could be valid, or privileges, commenting out because we cannot handle it.
+            //others, this is invalid,, commenting out because we cannot handle it.
+            model.documentation = Some(comment);
             models_without_columns.push(Model {
                 model: model.name.clone(),
             })
