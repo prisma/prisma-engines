@@ -11,6 +11,8 @@ use serde::{Deserialize, Serialize};
 pub struct DiagnoseMigrationHistoryInput {
     /// The location of the migrations directory.
     pub migrations_directory_path: String,
+    /// Whether creating shadow/temporary databases is allowed.
+    pub opt_in_to_shadow_database: bool,
 }
 
 /// The output of the `DiagnoseMigrationHistory` command.
@@ -132,22 +134,31 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
             .cloned()
             .collect();
 
-        let drift = match migration_inferrer.calculate_drift(&applied_migrations).await {
-            Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected { rollback }),
-            Err(error) => Some(DriftDiagnostic::MigrationFailedToApply {
-                error: error.to_user_facing(),
-            }),
-            _ => None,
-        };
+        let (drift, error_in_unapplied_migration) = {
+            if input.opt_in_to_shadow_database {
+                let drift = match migration_inferrer.calculate_drift(&applied_migrations).await {
+                    Ok(Some(rollback)) => Some(DriftDiagnostic::DriftDetected { rollback }),
+                    Err(error) => Some(DriftDiagnostic::MigrationFailedToApply {
+                        error: error.to_user_facing(),
+                    }),
+                    _ => None,
+                };
 
-        let error_in_unapplied_migration = if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. })) {
-            migration_inferrer
-                .validate_migrations(&migrations_from_filesystem)
-                .await
-                .err()
-                .map(|connector_error| connector_error.to_user_facing())
-        } else {
-            None
+                let error_in_unapplied_migration =
+                    if !matches!(drift, Some(DriftDiagnostic::MigrationFailedToApply { .. })) {
+                        migration_inferrer
+                            .validate_migrations(&migrations_from_filesystem)
+                            .await
+                            .err()
+                            .map(|connector_error| connector_error.to_user_facing())
+                    } else {
+                        None
+                    };
+
+                (drift, error_in_unapplied_migration)
+            } else {
+                (None, None)
+            }
         };
 
         Ok(DiagnoseMigrationHistoryOutput {

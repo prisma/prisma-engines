@@ -7,6 +7,7 @@ use tempfile::TempDir;
 pub struct DiagnoseMigrationHistory<'a> {
     api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
+    opt_in_to_shadow_database: bool,
 }
 
 impl<'a> DiagnoseMigrationHistory<'a> {
@@ -14,7 +15,14 @@ impl<'a> DiagnoseMigrationHistory<'a> {
         DiagnoseMigrationHistory {
             api,
             migrations_directory,
+            opt_in_to_shadow_database: false,
         }
+    }
+
+    pub fn opt_in_to_shadow_database(mut self, opt_in_to_shadow_database: bool) -> Self {
+        self.opt_in_to_shadow_database = opt_in_to_shadow_database;
+
+        self
     }
 
     pub async fn send(self) -> CoreResult<DiagnoseMigrationHistoryAssertions<'a>> {
@@ -22,6 +30,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
             .api
             .diagnose_migration_history(&DiagnoseMigrationHistoryInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+                opt_in_to_shadow_database: self.opt_in_to_shadow_database,
             })
             .await?;
 
