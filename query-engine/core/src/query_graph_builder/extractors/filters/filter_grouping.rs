@@ -1,6 +1,7 @@
 use crate::{QueryGraphBuilderError, QueryGraphBuilderResult};
 use std::str::FromStr;
 
+#[derive(Debug)]
 pub enum FilterGrouping {
     And,
     Or,
