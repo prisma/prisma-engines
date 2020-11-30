@@ -95,6 +95,28 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"groupByModel":[{"s":"group3","count":{"s":1},"sum":{"float":10}},{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group1","count":{"s":2},"sum":{"float":15.6}}]}}""")
   }
 
+  "Using a simple groupBy with multiple orderings" should "return the correct groups" in {
+    // Float, int, dec, s, id
+    create(10.1, 5, "1.1", "group1", Some("1"))
+    create(5.5, 0, "6.7", "group1", Some("2"))
+    create(10, 5, "11", "group2", Some("3"))
+    create(10, 5, "11", "group3", Some("4"))
+
+    val result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: desc }) {
+         |    s
+         |    count { s }
+         |    sum { float }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group3","count":{"s":1},"sum":{"float":10}},{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group1","count":{"s":2},"sum":{"float":15.6}}]}}""")
+  }
+
   "Using a groupBy with mismatching by-arguments and query selections" should "return an error detailing the missing fields" in {
     server.queryThatMustFail(
       s"""{
@@ -107,6 +129,20 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project,
       errorCode = 2019,
       errorContains = "Every selected scalar field that is not part of an aggregation must be included in the by-arguments of the query. Missing fields: s"
+    )
+  }
+
+  "Using a groupBy with mismatching by-arguments and orderBy" should "return an error detailing the missing fields" in {
+    server.queryThatMustFail(
+      s"""{
+         |  groupByModel(by: [int], orderBy: { s: desc }) {
+         |    count { int }
+         |    sum { float }
+         |  }
+         |}""".stripMargin,
+      project,
+      errorCode = 2019,
+      errorContains = "Every field used for orderBy must be included in the by-arguments of the query. Missing fields: s"
     )
   }
 

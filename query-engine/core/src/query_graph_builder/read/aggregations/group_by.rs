@@ -2,7 +2,7 @@ use std::convert::TryInto;
 
 use super::*;
 use crate::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
-use prisma_models::{ModelRef, ScalarFieldRef};
+use prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
 
 pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
     let name = field.name;
@@ -21,7 +21,7 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         .map(|field| resolve_query(field, &model))
         .collect::<QueryGraphBuilderResult<_>>()?;
 
-    verify_selections(&selectors, &group_by)?;
+    verify_selections(&selectors, &group_by).and_then(|_| verify_orderings(&args.order_by, &group_by))?;
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
         name,
@@ -54,6 +54,27 @@ fn verify_selections(selectors: &[AggregationSelection], group_by: &[ScalarField
         Err(QueryGraphBuilderError::InputError(format!(
             "Every selected scalar field that is not part of an aggregation \
         must be included in the by-arguments of the query. Missing fields: {}",
+            missing_fields.join(", ")
+        )))
+    }
+}
+
+/// Cross checks that the requested order-bys of the request are valid with regard to the requested group bys.
+/// Every ordered field must be present in the group by as well. (Note: We do not yet allow order by aggregate)
+fn verify_orderings(orderings: &[OrderBy], group_by: &[ScalarFieldRef]) -> QueryGraphBuilderResult<()> {
+    let mut missing_fields = vec![];
+
+    for ordering in orderings {
+        if !group_by.contains(&ordering.field) {
+            missing_fields.push(ordering.field.name.clone());
+        }
+    }
+
+    if missing_fields.is_empty() {
+        Ok(())
+    } else {
+        Err(QueryGraphBuilderError::InputError(format!(
+            "Every field used for orderBy must be included in the by-arguments of the query. Missing fields: {}",
             missing_fields.join(", ")
         )))
     }
