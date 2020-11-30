@@ -78,7 +78,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
       project
     )
 
-    result.pathAsLong("data.aggregateItem.count") should be(1)
+    result.pathAsLong("data.aggregateItem.count.name") should be(1)
   }
 
   "Counting with all sorts of query arguments" should "work" in {
