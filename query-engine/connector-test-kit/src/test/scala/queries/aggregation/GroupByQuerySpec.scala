@@ -36,7 +36,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Using a simple groupBy without any records in the database" should "return no groups" in {
+  "Using a groupBy without any records in the database" should "return no groups" in {
     val result = server.query(
       s"""{
          |  groupByModel(by: [id, float, int]) {
@@ -73,7 +73,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"groupByModel":[{"s":"group1","count":{"s":2},"sum":{"float":15.6}},{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group3","count":{"s":1},"sum":{"float":10}}]}}""")
   }
 
-  "Using a simple groupBy with reverse ordering" should "return the correct groups" in {
+  "Using a groupBy with reverse ordering" should "return the correct groups" in {
     // Float, int, dec, s, id
     create(10.1, 5, "1.1", "group1", Some("1"))
     create(5.5, 0, "6.7", "group1", Some("2"))
@@ -95,7 +95,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"groupByModel":[{"s":"group3","count":{"s":1},"sum":{"float":10}},{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group1","count":{"s":2},"sum":{"float":15.6}}]}}""")
   }
 
-  "Using a simple groupBy with multiple orderings" should "return the correct groups" in {
+  "Using a groupBy with multiple orderings" should "return the correct groups" in {
     // Float, int, dec, s, id
     create(10.1, 5, "1.1", "group1", Some("1"))
     create(5.5, 0, "6.7", "group1", Some("2"))
@@ -117,6 +117,63 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     result.toString should be(
       """{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}},{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":5.5},"min":{"int":0}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
+  }
+
+  "Using a groupBy with take and skip" should "return the correct groups" in {
+    // Float, int, dec, s, id
+    create(10.1, 5, "1.1", "group1", Some("1"))
+    create(10, 5, "11", "group2", Some("3"))
+    create(10, 5, "11", "group3", Some("4"))
+    create(15, 5, "11", "group3", Some("5"))
+
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [s, int], orderBy: { s: desc }, take: 1, skip: 1) {
+         |    s
+         |    count { s }
+         |    sum { float }
+         |    min { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    // group3 is the first one with 2, then group2 with one, then group1 with 1.
+    // group2 is returned, because group3 is skipped.
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}}]}}""")
+
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s, int], orderBy: { s: desc }, take: -1, skip: 2) {
+         |    s
+         |    count { s }
+         |    sum { float }
+         |    min { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    // group3 is the first one with 2, then group2 with one, then group1 with 1.
+    // group3 is returned, because group1 and 2 is skipped (reverse order due to negative take).
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}}]}}""")
+
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s, int], orderBy: { s: desc }, take: 2, skip: 1) {
+         |    s
+         |    count { s }
+         |    sum { float }
+         |    min { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    // group3 is the first one with 2, then group2 with one, then group1 with 1.
+    // group2 & 1 are returned, because group3 is skipped.
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
   }
 
   "Using a groupBy with mismatching by-arguments and query selections" should "return an error detailing the missing fields" in {
@@ -153,6 +210,4 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   // where
   // skip
   // take
-  // errors:
-  // - 2 fields on count
 }
