@@ -1,12 +1,14 @@
 use crate::warnings::{
-    warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_identifier,
-    warning_unsupported_types, EnumAndValue, Model, ModelAndField, ModelAndFieldAndType,
+    warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_columns,
+    warning_models_without_identifier, warning_unsupported_types, EnumAndValue, Model, ModelAndField,
+    ModelAndFieldAndType,
 };
 use datamodel::{Datamodel, FieldType};
 use introspection_connector::Warning;
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
+    let mut models_without_columns = vec![];
     let mut fields_with_empty_names = vec![];
     let mut enum_values_with_empty_names = vec![];
     let mut unsupported_types = vec![];
@@ -73,10 +75,24 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         };
     }
 
-    // we could have a separate case and warning for models without columns
     //on postgres this is allowed, on the other dbs, this could be a symptom of missing privileges
-    // models without uniques / ids
     for model in datamodel.models_mut() {
+        if model.fields.is_empty() {
+            model.is_commented_out = true;
+            model.documentation = Some(
+                "We could not retrieve columns for the underlying table. Please check your privileges.".to_string(),
+            );
+            models_without_columns.push(Model {
+                model: model.name.clone(),
+            })
+        }
+    }
+
+    // models without uniques / ids
+    for model in datamodel
+        .models_mut()
+        .filter(|model| !models_without_columns.iter().any(|m| m.model == model.name))
+    {
         if model.strict_unique_criterias().is_empty() {
             model.is_commented_out = true;
             model.documentation = Some(
@@ -103,6 +119,9 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut warnings = vec![];
 
     //extra warning about missing columns
+    if !models_without_columns.is_empty() {
+        warnings.push(warning_models_without_columns(&models_without_columns))
+    }
 
     if !models_without_identifiers.is_empty() {
         warnings.push(warning_models_without_identifier(&models_without_identifiers))

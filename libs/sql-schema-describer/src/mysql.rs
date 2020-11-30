@@ -156,9 +156,7 @@ impl SqlSchemaDescriber {
         indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
         foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
     ) -> (Table, Vec<Enum>) {
-        let (columns, enums) = columns
-            .remove(name)
-            .expect(&format!("Columns not found for table {}", name));
+        let (columns, enums) = columns.remove(name).unwrap_or((vec![], vec![]));
         let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
 
         let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
