@@ -60,7 +60,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val result = server.query(
       s"""{
-         |  groupByModel(by: [s]) {
+         |  groupByModel(by: [s], orderBy: { s: asc }) {
          |    s
          |    count { s }
          |    sum { float }
@@ -70,7 +70,7 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group3","count":{"s":1},"sum":{"float":10}},{"s":"group1","count":{"s":2},"sum":{"float":15.6}}]}}""")
+      """{"data":{"groupByModel":[{"s":"group1","count":{"s":2},"sum":{"float":15.6}},{"s":"group2","count":{"s":1},"sum":{"float":10}},{"s":"group3","count":{"s":1},"sum":{"float":10}}]}}""")
   }
 
   "Using a groupBy with mismatching by-arguments and query selections" should "return an error detailing the missing fields" in {
@@ -95,6 +95,5 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   // skip
   // take
   // errors:
-  // - incorrect group by for selection set
   // - 2 fields on count
 }
