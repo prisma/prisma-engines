@@ -14,10 +14,10 @@ pub struct WriteArgs {
     pub args: HashMap<DatasourceFieldName, WriteExpression>,
 }
 
-#[derive(Debug, PartialEq, Clone, Hash, Eq)]
 /// Wrapper struct to force a bit of a reflection whether or not the string passed
 /// to the write arguments is the data source field name, not the model field name.
 /// Also helps to avoid errors with convenient from-field conversions.
+#[derive(Debug, PartialEq, Clone, Hash, Eq)]
 pub struct DatasourceFieldName(pub String);
 
 impl Deref for DatasourceFieldName {
