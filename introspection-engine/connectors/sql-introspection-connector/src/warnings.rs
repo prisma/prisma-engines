@@ -178,3 +178,11 @@ pub fn warning_enriched_with_updated_at(affected: &Vec<ModelAndField>) -> Warnin
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }
+
+pub fn warning_models_without_columns(affected: &Vec<Model>) -> Warning {
+    Warning {
+        code: 14,
+        message: "The following models were commented out as we could not retrieve columns for them. Please check your privileges.".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}

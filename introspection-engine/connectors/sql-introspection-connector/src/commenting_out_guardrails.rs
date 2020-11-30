@@ -1,12 +1,15 @@
 use crate::warnings::{
-    warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_identifier,
-    warning_unsupported_types, EnumAndValue, Model, ModelAndField, ModelAndFieldAndType,
+    warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_columns,
+    warning_models_without_identifier, warning_unsupported_types, EnumAndValue, Model, ModelAndField,
+    ModelAndFieldAndType,
 };
 use datamodel::{Datamodel, FieldType};
 use introspection_connector::Warning;
+use quaint::connector::SqlFamily;
 
-pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
+pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
+    let mut models_without_columns = vec![];
     let mut fields_with_empty_names = vec![];
     let mut enum_values_with_empty_names = vec![];
     let mut unsupported_types = vec![];
@@ -73,8 +76,32 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         };
     }
 
-    // models without uniques / ids
+    //on postgres this is allowed, on the other dbs, this could be a symptom of missing privileges
     for model in datamodel.models_mut() {
+        if model.fields.is_empty() {
+            model.is_commented_out = true;
+
+            let comment = match family {
+                SqlFamily::Postgres =>
+                    "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.".to_string(),
+
+                _ => "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.".to_string(),
+
+            };
+            //postgres could be valid, or privileges, commenting out because we cannot handle it.
+            //others, this is invalid,, commenting out because we cannot handle it.
+            model.documentation = Some(comment);
+            models_without_columns.push(Model {
+                model: model.name.clone(),
+            })
+        }
+    }
+
+    // models without uniques / ids
+    for model in datamodel
+        .models_mut()
+        .filter(|model| !models_without_columns.iter().any(|m| m.model == model.name))
+    {
         if model.strict_unique_criterias().is_empty() {
             model.is_commented_out = true;
             model.documentation = Some(
@@ -99,6 +126,11 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     }
 
     let mut warnings = vec![];
+
+    //extra warning about missing columns
+    if !models_without_columns.is_empty() {
+        warnings.push(warning_models_without_columns(&models_without_columns))
+    }
 
     if !models_without_identifiers.is_empty() {
         warnings.push(warning_models_without_identifier(&models_without_identifiers))

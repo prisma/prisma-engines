@@ -136,7 +136,7 @@ impl SqlSchemaDescriber {
     ) -> Table {
         let (indices, primary_key) = indices.remove(name).unwrap_or_else(|| (Vec::new(), None));
         let foreign_keys = foreign_keys.remove(name).unwrap_or_else(Vec::new);
-        let columns = columns.remove(name).expect("could not get columns");
+        let columns = columns.remove(name).unwrap_or(vec![]);
         Table {
             name: name.to_string(),
             columns,

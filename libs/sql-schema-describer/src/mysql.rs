@@ -156,7 +156,7 @@ impl SqlSchemaDescriber {
         indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
         foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
     ) -> (Table, Vec<Enum>) {
-        let (columns, enums) = columns.remove(name).expect("table columns not found");
+        let (columns, enums) = columns.remove(name).unwrap_or((vec![], vec![]));
         let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
 
         let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
@@ -207,7 +207,7 @@ impl SqlSchemaDescriber {
             trace!("Got column: {:?}", col);
             let table_name = col.get_expect_string("table_name");
             let name = col.get_expect_string("column_name");
-            let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+            let data_type = col.get_expect_string("data_type");
             let full_data_type = col.get_expect_string("full_data_type");
 
             let is_nullable = col.get_expect_string("is_nullable").to_lowercase();

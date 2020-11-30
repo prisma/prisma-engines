@@ -260,3 +260,34 @@ async fn db_genererated_values_should_add_comments(api: &TestApi) -> crate::Test
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn commenting_out_a_table_without_columns(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |_t| {});
+        })
+        .await?;
+
+    let expected = json!([{
+        "code": 14,
+        "message": "The following models were commented out as we could not retrieve columns for them. Please check your privileges.",
+        "affected": [
+            {
+                "model": "Test"
+            }
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let dm = indoc! {r#"
+        // We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.
+        // model Test {
+        // }
+    "#};
+
+    assert_eq!(dm, &api.introspect().await?);
+
+    Ok(())
+}
