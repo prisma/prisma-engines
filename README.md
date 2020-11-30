@@ -177,7 +177,7 @@ If you want to use the command line, start `sbt` in
 ### Set up & run cargo tests:
 
 **Prerequisites:**
-- Installed Rust roolchain.
+- Installed Rust toolchain.
 - Installed Docker and Docker-Compose.
 - Installed `direnv`, then `direnv allow` on the repository root.
     - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
