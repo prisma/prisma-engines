@@ -220,10 +220,8 @@ impl SqlFlavour for MysqlFlavour {
         connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
-        let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
         let create_database = format!("CREATE DATABASE `{}`", database_name);
 
-        connection.raw_cmd(&drop_database).await?;
         connection.raw_cmd(&create_database).await?;
 
         let mut temporary_database_url = self.url.url().clone();
@@ -260,6 +258,7 @@ impl SqlFlavour for MysqlFlavour {
         })()
         .await;
 
+        let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
         connection.raw_cmd(&drop_database).await?;
 
         sql_schema_result

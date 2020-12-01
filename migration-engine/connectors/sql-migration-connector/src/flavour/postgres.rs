@@ -176,11 +176,9 @@ impl SqlFlavour for PostgresFlavour {
         connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         let database_name = format!("prisma_migrations_shadow_database_{}", uuid::Uuid::new_v4());
-        let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", database_name);
         let create_database = format!("CREATE DATABASE \"{}\"", database_name);
         let create_schema = format!("CREATE SCHEMA IF NOT EXISTS \"{}\"", self.schema_name());
 
-        connection.raw_cmd(&drop_database).await?;
         connection.raw_cmd(&create_database).await?;
 
         let mut temporary_database_url = self.0.url().clone();
@@ -223,6 +221,7 @@ impl SqlFlavour for PostgresFlavour {
         })()
         .await;
 
+        let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", database_name);
         connection.raw_cmd(&drop_database).await?;
 
         sql_schema_result

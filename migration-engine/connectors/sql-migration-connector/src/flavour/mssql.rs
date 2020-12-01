@@ -53,8 +53,7 @@ impl SqlFlavour for MssqlFlavour {
                 logs                    NVARCHAR(MAX) NOT NULL,
                 rolled_back_at          DATETIMEOFFSET,
                 started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                applied_steps_count     INT NOT NULL DEFAULT 0,
-                script                  NVARCHAR(MAX) NOT NULL
+                applied_steps_count     INT NOT NULL DEFAULT 0
             );
         "#, self.schema_name()};
 
@@ -164,7 +163,7 @@ impl SqlFlavour for MssqlFlavour {
         migrations: &[MigrationDirectory],
         connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
-        let database_name = format!("prisma_migrations_shadow_database_{}", uuid::Uuid::new_v4());
+        let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
         let create_database = format!("CREATE DATABASE [{}]", database_name);
 
         connection.raw_cmd(&create_database).await?;
@@ -175,40 +174,47 @@ impl SqlFlavour for MssqlFlavour {
             .insert("database".into(), database_name.clone());
         let temporary_database_url = jdbc_string.to_string();
 
-        tracing::debug!("Connecting to temporary database at {}", temporary_database_url);
+        tracing::debug!("Connecting to temporary database at `{}`", temporary_database_url);
 
-        let sql_schema = {
-            let temporary_database = crate::connect(&temporary_database_url).await?;
+        // We must create a connection in a block, closing it before dropping
+        // the database.
+        let sql_schema_result = {
+            let temp_database = crate::connect(&temporary_database_url).await?;
+
+            // We go through the whole process without early return, then clean up
+            // the temporary database, and only then return the result. This avoids
+            // leaving shadow databases behind in case of e.g. faulty migrations.
+
             let create_schema = format!("CREATE SCHEMA [{schema}]", schema = self.schema_name());
 
-            temporary_database.raw_cmd(&create_schema).await?;
+            temp_database.raw_cmd(&create_schema).await?;
 
-            for migration in migrations {
-                let script = migration.read_migration_script()?;
+            (|| async {
+                for migration in migrations {
+                    let script = migration.read_migration_script()?;
 
-                tracing::debug!(
-                    "Applying migration `{}` to temporary database.",
-                    migration.migration_name()
-                );
+                    tracing::debug!(
+                        "Applying migration `{}` to temporary database.",
+                        migration.migration_name()
+                    );
 
-                temporary_database
-                    .raw_cmd(&script)
-                    .await
-                    .map_err(ConnectorError::from)
-                    .map_err(|connector_error| {
-                        connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
-                    })?;
-            }
+                    temp_database
+                        .raw_cmd(&script)
+                        .await
+                        .map_err(ConnectorError::from)
+                        .map_err(|connector_error| {
+                            connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                        })?;
+                }
 
-            // the connection to the temporary database is dropped at the end of
-            // the block.
-            self.describe_schema(&temporary_database).await?
+                self.describe_schema(&temp_database).await
+            })()
+            .await
         };
 
         let drop_database = format!("DROP DATABASE [{}]", database = database_name);
-
         connection.raw_cmd(&drop_database).await?;
 
-        Ok(sql_schema)
+        sql_schema_result
     }
 }
