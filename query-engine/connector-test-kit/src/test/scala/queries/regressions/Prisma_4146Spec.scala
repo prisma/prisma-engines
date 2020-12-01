@@ -30,9 +30,9 @@ class Prisma_4146Spec extends FlatSpec with Matchers with ApiSpecBase with Schem
   }
 
   "Updating a list of fields over a connect bound" should "change the update fields tagged with @updatedAt" taggedAs (IgnoreMsSql) in {
-    server.query(
-      s"""mutation createAccount{
-         |createAccount(data: {
+    val res = server.query(
+      s"""mutation createOneToken{
+         |createOneToken(data: {
          |    name: "a",
          |})
          |{name}
@@ -41,5 +41,18 @@ class Prisma_4146Spec extends FlatSpec with Matchers with ApiSpecBase with Schem
       project,
       legacy = false,
     )
+    println(res)
+
+    // val res2 = server.query(
+    //   s"""mutation createAccount{
+    //      |createOneAccount(data: {
+    //      |    name: "a",
+    //      |})
+    //      |{name}
+    //      |}
+    //   """.stripMargin,
+    //   project,
+    //   legacy = false,
+    // )
   }
 }
