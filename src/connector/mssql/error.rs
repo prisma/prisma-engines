@@ -97,6 +97,19 @@ impl From<tiberius::error::Error> for Error {
 
                 builder.build()
             }
+            tiberius::error::Error::Server(e) if e.code() == 1505 => {
+                let mut splitted = e.message().split('\'');
+                let index = splitted.nth(3).unwrap().to_string();
+
+                let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
+                    constraint: DatabaseConstraint::Index(index),
+                });
+
+                builder.set_original_code(format!("{}", e.code()));
+                builder.set_original_message(e.message().to_string());
+
+                builder.build()
+            }
             tiberius::error::Error::Server(e) if e.code() == 2601 => {
                 let mut splitted = e.message().split_whitespace();
                 let mut splitted = splitted.nth(11).unwrap().split('\'');
