@@ -11,6 +11,12 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       |  int   Int     @map("db_int")
       |  dec   Decimal @map("db_dec")
       |  s     String  @map("db_s")
+      |  other Other?
+      |}
+      |
+      |model Other {
+      |  id    Int    @id
+      |  field String
       |}
     """.stripMargin
   }
@@ -20,15 +26,20 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
-  def create(float: Double, int: Int, dec: String, s: String, id: Option[String] = None) = {
+  def create(float: Double, int: Int, dec: String, s: String, id: Option[String] = None, other: Option[(Int, String)] = None) = {
     val idString = id match {
       case Some(i) => s"""id: "$i","""
       case None    => ""
     }
 
+    val stringifiedOther = other match {
+      case Some(other) => s""", other: { create: { id: ${other._1}, field: "${other._2}" } }"""
+      case None        => ""
+    }
+
     server.query(
       s"""mutation {
-         |  createModel(data: { $idString float: $float, int: $int, dec: $dec, s: "$s" }) {
+         |  createModel(data: { $idString float: $float, int: $int, dec: $dec, s: "$s" $stringifiedOther }) {
          |    id
          |  }
          |}""".stripMargin,
@@ -207,6 +218,56 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // => All groups have count 1
     result.toString should be(
       """{"data":{"groupByModel":[{"s":"group3","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
+  }
+
+  "Using a groupBy with relation filters" should "return the correct groups" in {
+    // What this test checks: Scalar filters apply before the grouping is done,
+    // changing the aggregations of the groups, not the groups directly.
+    // Float, int, dec, s, id
+    create(10.1, 5, "1.1", "group1", Some("1"), other = Some((1, "a")))
+    create(5.5, 0, "6.7", "group1", Some("2"))
+    create(10, 5, "11", "group2", Some("3"))
+    create(10, 5, "13", "group3", Some("4"), other = Some((2, "b")))
+    create(15, 5, "10", "group3", Some("5"), other = Some((3, "b")))
+
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [s, int], orderBy: { s: desc }, where: {
+         |    other: { isNot: null }
+         |  }) {
+         |    s
+         |    count { s }
+         |    sum { float }
+         |    min { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    // Group3 has 2
+    // Group2 has 0
+    // Group1 has 1
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
+
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s, int], orderBy: { s: desc }, where: {
+         |    other: { is: { field: { equals: "b" }}}
+         |  }) {
+         |    s
+         |    count { s }
+         |    sum { float }
+         |    min { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    // Group3 has 2 matches
+    // Group2 has 0 matches
+    // Group1 has 0 matches
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group3","count":{"s":2},"sum":{"float":25},"min":{"int":5}}]}}""")
   }
 
   /////// Error Cases
