@@ -234,28 +234,35 @@ impl SqlFlavour for MysqlFlavour {
 
         let temp_database = crate::connect(&temporary_database_url).await?;
 
-        for migration in migrations {
-            let script = migration.read_migration_script()?;
+        // We go through the whole process without early return, then clean up
+        // the temporary database, and only then return the result. This avoids
+        // leaving shadow databases behind in case of e.g. faulty migrations.
 
-            tracing::debug!(
-                "Applying migration `{}` to temporary database.",
-                migration.migration_name()
-            );
+        let sql_schema_result = (|| async {
+            for migration in migrations {
+                let script = migration.read_migration_script()?;
 
-            temp_database
-                .raw_cmd(&script)
-                .await
-                .map_err(ConnectorError::from)
-                .map_err(|connector_error| {
-                    connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
-                })?;
-        }
+                tracing::debug!(
+                    "Applying migration `{}` to temporary database.",
+                    migration.migration_name()
+                );
 
-        let sql_schema = self.describe_schema(&temp_database).await?;
+                temp_database
+                    .raw_cmd(&script)
+                    .await
+                    .map_err(ConnectorError::from)
+                    .map_err(|connector_error| {
+                        connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                    })?;
+            }
+
+            self.describe_schema(&temp_database).await
+        })()
+        .await;
 
         connection.raw_cmd(&drop_database).await?;
 
-        Ok(sql_schema)
+        sql_schema_result
     }
 }
 
