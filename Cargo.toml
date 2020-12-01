@@ -32,6 +32,6 @@ members = [
 opt-level = 3
 
 [profile.release.package.introspection-core]
-#opt-level = 'z'  # Optimize for size.
-#codegen-units = 1
+opt-level = 'z'  # Optimize for size.
+codegen-units = 1
 #strip="symbols"

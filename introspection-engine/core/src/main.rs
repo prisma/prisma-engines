@@ -6,18 +6,13 @@ mod rpc;
 use jsonrpc_core::*;
 use rpc::{Rpc, RpcImpl};
 
-struct IntrospectionArgs {
-    pub version: bool,
-}
-
 #[tokio::main]
 async fn main() {
-    let mut args = pico_args::Arguments::from_env();
-    let args = IntrospectionArgs {
-        version: args.contains(["-v", "--version"]),
-    };
+    use std::env;
 
-    if args.version {
+    let arguments: Vec<String> = env::args().collect();
+
+    if arguments.len() == 2 && arguments.iter().any(|i| i == "--version") {
         println!("introspection-core {}", env!("GIT_HASH"));
     } else {
         init_logger();
@@ -27,7 +22,7 @@ async fn main() {
         io_handler.extend_with(RpcImpl::new().to_delegate());
 
         json_rpc_stdio::run(&io_handler).await.unwrap();
-    }
+    };
 }
 
 fn init_logger() {
