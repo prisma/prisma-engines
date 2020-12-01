@@ -47,7 +47,7 @@ pub struct MigrateSystemDatabase {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3005",
-    message = "The database schema for `{database_name}` is not empty. Please follow the to-be-written instructions on how to set up migrate with an existing database, or use an empty database."
+    message = "The database schema for `{database_name}` is not empty. Read more about how to baseline an existing production database: https://pris.ly/migrate-baseline"
 )]
 pub struct DatabaseSchemaNotEmpty {
     pub database_name: String,
