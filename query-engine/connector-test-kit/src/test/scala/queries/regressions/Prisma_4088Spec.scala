@@ -102,7 +102,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
     res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[]}}""")
   }
 
-  "FindMany queries with an AND condition and no filters" should "return an empty list" in {
+  "FindMany queries with an AND condition and no filters" should "return all items" in {
     database.setup(project)
     create("aa", project)
     create("ab", project)
@@ -120,7 +120,7 @@ class Regression4088Spec extends FlatSpec with Matchers with ApiSpecBase with Sc
       legacy = false
     )
 
-    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[]}}""")
+    res.toString() should be(s"""{\"data\":{\"findManyTestModel\":[{\"str\":\"aa\"},{\"str\":\"ab\"},{\"str\":\"ac\"}]}}""")
   }
 
   "FindMany queries with an AND condition and one filter" should "only apply one filter" in {

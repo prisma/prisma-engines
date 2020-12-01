@@ -391,8 +391,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
 
     server
       .query(query = """{albums(where:{Tracks: { some: { AND:[] }}}){Title}}""", project = project)
-      .toString should be("""{"data":{"albums":[]}}""")
-
+      .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
   }
 
   "2 level m-relation filters that have subfilters that are connected with an explicit AND" should "work for `every`" taggedAs (IgnoreMongo) in {
@@ -411,7 +410,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
     server
       .query(query = """{albums(where: { Tracks: { every:{ AND: [] }}}){Title}}""", project = project)
       .toString should be(
-      """{"data":{"albums":[{"Title":"TheAlbumWithoutTracks"}]}}""")
+      """{"data":{"albums":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
   }
 
   "2 level m-relation filters that have subfilters that are connected with an explicit OR" should "work" taggedAs (IgnoreMongo) in {

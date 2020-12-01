@@ -60,13 +60,8 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 /// | Name | 0 filters         | 1 filter               | n filters            |
 /// |---   |---                |---                     |---                   |
 /// | OR   | return empty list | validate single filter | validate all filters |
-/// | AND  | return empty list | validate single filter | validate all filters |
+/// | AND  | return all items  | validate single filter | validate all filters |
 /// | NOT  | return all items  | validate single filter | validate all filters |
-///
-/// Ommitting filters at the root changes the behavior. In the "0 filters" case,
-/// we will always return an empty OR and AND filter, but will always remove the
-/// NOT filter. This is so OR and AND return empty lists, but NOT will always
-/// return all items.
 pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     // We define an internal function so we can track the recursion depth. Empty
     // filters at the root layer can not always be removed.
@@ -98,8 +93,7 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                         match filters.len() {
                             0 => match depth {
                                 0 => match filter_kind {
-                                    // HACKS: We convert an empty AND filter to an OR to ensure it always returns an empty list.
-                                    FilterGrouping::And => Ok(Filter::or(filters)),
+                                    FilterGrouping::And => Ok(Filter::and(filters)),
                                     FilterGrouping::Or => Ok(Filter::or(filters)),
                                     FilterGrouping::Not => Ok(Filter::not(filters)),
                                 },
