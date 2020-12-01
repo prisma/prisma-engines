@@ -151,7 +151,7 @@ pub async fn aggregate(
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
     query_arguments: QueryArguments,
-) -> crate::Result<Vec<Vec<AggregationResult>>> {
+) -> crate::Result<Vec<AggregationRow>> {
     if group_by.len() > 0 {
         group_by_aggregate(conn, model, selections, group_by, query_arguments).await
     } else {
@@ -188,7 +188,7 @@ async fn group_by_aggregate(
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
     query_arguments: QueryArguments,
-) -> crate::Result<Vec<Vec<AggregationResult>>> {
+) -> crate::Result<Vec<AggregationRow>> {
     let query = read::group_by_aggregate(model, group_by, &selections, query_arguments);
 
     let idents: Vec<_> = selections

@@ -140,6 +140,8 @@ impl AggregationSelection {
     }
 }
 
+pub type AggregationRow = Vec<AggregationResult>;
+
 /// Result of an aggregation operation on a model or field.
 /// A `Field` return type is only interesting for aggregations involving
 /// group bys, as they return field values alongside group aggregates.
@@ -204,7 +206,7 @@ pub trait ReadOperations {
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
-    ) -> crate::Result<Vec<Vec<AggregationResult>>>;
+    ) -> crate::Result<Vec<AggregationRow>>;
 }
 
 #[async_trait]

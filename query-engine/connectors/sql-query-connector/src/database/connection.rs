@@ -2,7 +2,7 @@ use super::transaction::SqlConnectorTransaction;
 use crate::{database::operations::*, QueryExt, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
-    self as connector, filter::Filter, AggregationResult, AggregationSelection, Connection, QueryArguments,
+    self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
     ReadOperations, RecordFilter, Transaction, WriteArgs, WriteOperations,
 };
 use prisma_models::prelude::*;
@@ -91,7 +91,7 @@ where
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
-    ) -> connector::Result<Vec<Vec<AggregationResult>>> {
+    ) -> connector::Result<Vec<AggregationRow>> {
         self.catch(async move { read::aggregate(&self.inner, model, selections, group_by, query_arguments).await })
             .await
     }

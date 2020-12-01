@@ -1,4 +1,4 @@
-use connector::{AggregationResult, QueryArguments};
+use connector::{AggregationRow, QueryArguments};
 use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
 
 #[derive(Debug, Clone)]
@@ -40,5 +40,5 @@ pub struct RecordAggregations {
     pub selection_order: Vec<(String, Option<Vec<String>>)>,
 
     /// Actual aggregation results.
-    pub results: Vec<Vec<AggregationResult>>,
+    pub results: Vec<AggregationRow>,
 }
