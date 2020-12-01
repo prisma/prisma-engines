@@ -39,12 +39,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(())
     }
 
-    async fn mark_migration_applied_impl(
-        &self,
-        migration_name: &str,
-        script: &str,
-        checksum: &str,
-    ) -> ConnectorResult<String> {
+    async fn mark_migration_applied_impl(&self, migration_name: &str, checksum: &str) -> ConnectorResult<String> {
         let conn = self.conn();
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
@@ -55,8 +50,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .value("logs", "")
             .value("started_at", now)
             .value("finished_at", now)
-            .value("migration_name", migration_name)
-            .value("script", script);
+            .value("migration_name", migration_name);
 
         conn.execute(insert).await?;
 
@@ -75,12 +69,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(())
     }
 
-    async fn record_migration_started_impl(
-        &self,
-        migration_name: &str,
-        script: &str,
-        checksum: &str,
-    ) -> ConnectorResult<String> {
+    async fn record_migration_started_impl(&self, migration_name: &str, checksum: &str) -> ConnectorResult<String> {
         let conn = self.conn();
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
@@ -91,8 +80,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .value("started_at", now)
             // We need this line because MySQL can't default a text field to an empty string
             .value("logs", "")
-            .value("migration_name", migration_name)
-            .value("script", script);
+            .value("migration_name", migration_name);
 
         conn.execute(insert).await?;
 
@@ -146,7 +134,6 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .column("rolled_back_at")
             .column("started_at")
             .column("applied_steps_count")
-            .column("script")
             .order_by("started_at".ascend());
 
         let result = match self.conn().query(select).await {

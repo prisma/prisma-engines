@@ -30,7 +30,6 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     assert_eq!(first_migration.logs, "");
     assert_eq!(first_migration.rolled_back_at, None);
     assert_eq!(first_migration.applied_steps_count, 0);
-    assert_eq!(first_migration.script, script);
 
     let duration_since_started_at = chrono::Utc::now().signed_duration_since(first_migration.started_at);
 
@@ -68,7 +67,6 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
     assert_eq!(first_migration.logs, "");
     assert_eq!(first_migration.rolled_back_at, None);
     assert_eq!(first_migration.applied_steps_count, 0);
-    assert_eq!(first_migration.script, script);
 
     let duration_since_started_at = chrono::Utc::now().signed_duration_since(first_migration.started_at);
     let duration_between_started_at_and_finished_at =
@@ -111,7 +109,6 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
     assert_eq!(first_migration.logs, "oï");
     assert_eq!(first_migration.rolled_back_at, None);
     assert_eq!(first_migration.applied_steps_count, 1);
-    assert_eq!(first_migration.script, script);
 
     let duration_since_started_at = chrono::Utc::now().signed_duration_since(first_migration.started_at);
     let duration_between_started_at_and_finished_at =
@@ -166,7 +163,6 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
         assert_eq!(first_migration.logs, "oï");
         assert_eq!(first_migration.rolled_back_at, None);
         assert_eq!(first_migration.applied_steps_count, 1);
-        assert_eq!(first_migration.script, script_1);
 
         let duration_since_started_at = chrono::Utc::now().signed_duration_since(first_migration.started_at);
         let duration_between_started_at_and_finished_at =
@@ -191,7 +187,6 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
         assert_eq!(second_migration.logs, "logs for the second migration");
         assert_eq!(second_migration.rolled_back_at, None);
         assert_eq!(second_migration.applied_steps_count, 1);
-        assert_eq!(second_migration.script, script_2);
         assert_eq!(second_migration.finished_at, None);
 
         let duration_since_started_at = chrono::Utc::now().signed_duration_since(second_migration.started_at);

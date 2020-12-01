@@ -100,8 +100,7 @@ impl SqlFlavour for MysqlFlavour {
                 logs                    TEXT NOT NULL,
                 rolled_back_at          DATETIME(3),
                 started_at              DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-                applied_steps_count     INTEGER UNSIGNED NOT NULL DEFAULT 0,
-                script                  TEXT NOT NULL
+                applied_steps_count     INTEGER UNSIGNED NOT NULL DEFAULT 0
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         "#;
 

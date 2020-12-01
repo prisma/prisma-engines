@@ -66,8 +66,7 @@ impl SqlFlavour for PostgresFlavour {
                 logs                    TEXT NOT NULL,
                 rolled_back_at          TIMESTAMPTZ,
                 started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
-                applied_steps_count     INTEGER NOT NULL DEFAULT 0,
-                script                  TEXT NOT NULL
+                applied_steps_count     INTEGER NOT NULL DEFAULT 0
             );
         "#;
 

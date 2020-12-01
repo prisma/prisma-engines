@@ -25,19 +25,14 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// Connectors should implement mark_migration_applied_impl to avoid doing
     /// the checksuming themselves.
     async fn mark_migration_applied(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
-        self.mark_migration_applied_impl(migration_name, script, &checksum(script))
+        self.mark_migration_applied_impl(migration_name, &checksum(script))
             .await
     }
 
     /// Implementation in the connector for the core's MarkMigrationApplied
     /// command. See the docs there. Note that the started_at and finished_at
     /// for the migration should be the same.
-    async fn mark_migration_applied_impl(
-        &self,
-        migration_name: &str,
-        script: &str,
-        checksum: &str,
-    ) -> ConnectorResult<String>;
+    async fn mark_migration_applied_impl(&self, migration_name: &str, checksum: &str) -> ConnectorResult<String>;
 
     /// Mark the failed instances of the migration in the persistence as rolled
     /// back, so they will be ignored by the engine in the future.
@@ -49,7 +44,7 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// This is a default method that computes the checkum. Implementors should
     /// implement record_migration_started_impl.
     async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
-        self.record_migration_started_impl(migration_name, script, &checksum(script))
+        self.record_migration_started_impl(migration_name, &checksum(script))
             .await
     }
 
@@ -58,12 +53,7 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     ///
     /// This is an implementation detail, consumers should use
     /// `record_migration_started()` instead.
-    async fn record_migration_started_impl(
-        &self,
-        migration_name: &str,
-        script: &str,
-        checksum: &str,
-    ) -> ConnectorResult<String>;
+    async fn record_migration_started_impl(&self, migration_name: &str, checksum: &str) -> ConnectorResult<String>;
 
     /// Increase the applied_steps_count counter, and append the given logs.
     async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
@@ -120,6 +110,4 @@ pub struct MigrationRecord {
     pub started_at: Timestamp,
     /// The number of migration steps that were successfully applied.
     pub applied_steps_count: u32,
-    /// The whole migration script.
-    pub script: String,
 }
