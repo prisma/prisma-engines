@@ -176,6 +176,41 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"groupByModel":[{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
   }
 
+  "Using a groupBy with scalar filters" should "return the correct groups" in {
+    // What this test checks: Scalar filters apply before the grouping is done,
+    // changing the aggregations of the groups, not the groups directly.
+    // Float, int, dec, s, id
+    create(10.1, 5, "1.1", "group1", Some("1"))
+    create(5.5, 0, "6.7", "group1", Some("2"))
+    create(10, 5, "11", "group2", Some("3"))
+    create(10, 5, "13", "group3", Some("4"))
+    create(15, 5, "10", "group3", Some("5"))
+
+    val result = server.query(
+      s"""{
+         |  groupByModel(by: [s, int], orderBy: { s: desc }, where: {
+         |    int: 5,
+         |    float: { lt: 15 }
+         |  }) {
+         |    s
+         |    count { s }
+         |    sum { float }
+         |    min { int }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+
+    // Group3 has only id 4, id 5 is filtered.
+    // Group2 has id 3.
+    // Group1 id 1, id 2 is filtered.
+    // => All groups have count 1
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group3","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group2","count":{"s":1},"sum":{"float":10},"min":{"int":5}},{"s":"group1","count":{"s":1},"sum":{"float":10.1},"min":{"int":5}}]}}""")
+  }
+
+  /////// Error Cases
+
   "Using a groupBy with mismatching by-arguments and query selections" should "return an error detailing the missing fields" in {
     server.queryThatMustFail(
       s"""{
@@ -204,10 +239,4 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       errorContains = "Every field used for orderBy must be included in the by-arguments of the query. Missing fields: s"
     )
   }
-
-  // todo
-  // null / zero behavior
-  // where
-  // skip
-  // take
 }
