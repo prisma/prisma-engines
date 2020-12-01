@@ -5,23 +5,29 @@ mod rpc;
 
 use jsonrpc_core::*;
 use rpc::{Rpc, RpcImpl};
-use structopt::StructOpt;
 
-#[derive(Debug, StructOpt, Clone)]
-#[structopt(version = env!("GIT_HASH"))]
-pub struct IntrospectionOpt {}
+struct IntrospectionArgs {
+    pub version: bool,
+}
 
 #[tokio::main]
 async fn main() {
-    init_logger();
+    let mut args = pico_args::Arguments::from_env();
+    let args = IntrospectionArgs {
+        version: args.contains(["-v", "--version"]),
+    };
 
-    let _ = IntrospectionOpt::from_args();
-    user_facing_errors::set_panic_hook();
+    if args.version {
+        println!("introspection-core {}", env!("GIT_HASH"));
+    } else {
+        init_logger();
+        user_facing_errors::set_panic_hook();
 
-    let mut io_handler = IoHandler::new();
-    io_handler.extend_with(RpcImpl::new().to_delegate());
+        let mut io_handler = IoHandler::new();
+        io_handler.extend_with(RpcImpl::new().to_delegate());
 
-    json_rpc_stdio::run(&io_handler).await.unwrap();
+        json_rpc_stdio::run(&io_handler).await.unwrap();
+    }
 }
 
 fn init_logger() {
