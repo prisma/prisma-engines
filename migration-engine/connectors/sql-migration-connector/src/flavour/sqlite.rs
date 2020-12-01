@@ -43,8 +43,7 @@ impl SqlFlavour for SqliteFlavour {
                 "logs"                  TEXT NOT NULL,
                 "rolled_back_at"        DATETIME,
                 "started_at"            DATETIME NOT NULL DEFAULT current_timestamp,
-                "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0,
-                "script"                TEXT NOT NULL
+                "applied_steps_count"   INTEGER UNSIGNED NOT NULL DEFAULT 0
             );
         "#;
 
