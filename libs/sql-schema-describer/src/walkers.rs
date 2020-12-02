@@ -2,6 +2,8 @@
 
 #![deny(missing_docs)]
 
+use std::fmt;
+
 use crate::{
     Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
     IndexType, PrimaryKey, SqlSchema, Table,
@@ -19,7 +21,7 @@ pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWal
 }
 
 /// Traverse a table column.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct ColumnWalker<'a> {
     /// The schema the column is contained in.
     schema: &'a SqlSchema,
@@ -27,6 +29,15 @@ pub struct ColumnWalker<'a> {
     column_index: usize,
     /// The index of the table in the schema.
     table_index: usize,
+}
+
+impl<'a> fmt::Debug for ColumnWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ColumnWalker")
+            .field("column_index", &self.column_index)
+            .field("table_index", &self.table_index)
+            .finish()
+    }
 }
 
 impl<'a> ColumnWalker<'a> {
@@ -118,12 +129,20 @@ impl<'a> ColumnWalker<'a> {
 }
 
 /// Traverse a table.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct TableWalker<'a> {
     /// The schema the column is contained in.
     schema: &'a SqlSchema,
     /// The index of the table in the schema.
     table_index: usize,
+}
+
+impl<'a> fmt::Debug for TableWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("TableWalker")
+            .field("table_index", &self.table_index)
+            .finish()
+    }
 }
 
 impl<'a> TableWalker<'a> {
@@ -249,13 +268,22 @@ impl<'a> TableWalker<'a> {
 }
 
 /// Traverse a foreign key.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct ForeignKeyWalker<'schema> {
     /// The index of the foreign key in the table.
     foreign_key_index: usize,
     /// The index of the table in the schema.
     table_index: usize,
     schema: &'schema SqlSchema,
+}
+
+impl<'a> fmt::Debug for ForeignKeyWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ForeignKeyWalker")
+            .field("foreign_key_index", &self.foreign_key_index)
+            .field("table_index", &self.table_index)
+            .finish()
+    }
 }
 
 impl<'schema> ForeignKeyWalker<'schema> {
@@ -341,13 +369,22 @@ impl<'schema> ForeignKeyWalker<'schema> {
 }
 
 /// Traverse an index.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct IndexWalker<'a> {
     schema: &'a SqlSchema,
     /// The index of the table in the schema.
     table_index: usize,
     /// The index of the database index in the table.
     index_index: usize,
+}
+
+impl<'a> fmt::Debug for IndexWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("IndexWalker")
+            .field("index_index", &self.index_index)
+            .field("table_index", &self.table_index)
+            .finish()
+    }
 }
 
 impl<'a> IndexWalker<'a> {
@@ -399,10 +436,18 @@ impl<'a> IndexWalker<'a> {
 }
 
 /// Traverse an enum.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct EnumWalker<'a> {
     pub(crate) schema: &'a SqlSchema,
     pub(crate) enum_index: usize,
+}
+
+impl<'a> fmt::Debug for EnumWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("EnumWalker")
+            .field("enum_index", &self.enum_index)
+            .finish()
+    }
 }
 
 impl<'a> EnumWalker<'a> {

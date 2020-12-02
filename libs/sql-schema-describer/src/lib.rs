@@ -3,7 +3,7 @@
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
-use std::fmt;
+use std::fmt::{self, Debug};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -47,7 +47,7 @@ pub struct SQLMetadata {
 }
 
 /// The result of describing a database schema.
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct SqlSchema {
     /// The schema's tables.

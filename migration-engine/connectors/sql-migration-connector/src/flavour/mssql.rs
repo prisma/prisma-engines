@@ -49,8 +49,8 @@ impl SqlFlavour for MssqlFlavour {
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
                 finished_at             DATETIMEOFFSET,
-                migration_name          NVARCHAR(MAX) NOT NULL,
-                logs                    NVARCHAR(MAX) NOT NULL,
+                migration_name          NVARCHAR(250) NOT NULL,
+                logs                    NVARCHAR(MAX) NULL,
                 rolled_back_at          DATETIMEOFFSET,
                 started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 applied_steps_count     INT NOT NULL DEFAULT 0
