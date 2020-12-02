@@ -5,23 +5,32 @@ mod rpc;
 
 use jsonrpc_core::*;
 use rpc::{Rpc, RpcImpl};
-use structopt::StructOpt;
-
-#[derive(Debug, StructOpt, Clone)]
-#[structopt(version = env!("GIT_HASH"))]
-pub struct IntrospectionOpt {}
 
 #[tokio::main]
 async fn main() {
-    init_logger();
+    use std::env;
 
-    let _ = IntrospectionOpt::from_args();
-    user_facing_errors::set_panic_hook();
+    let arguments: Vec<String> = env::args().collect();
 
-    let mut io_handler = IoHandler::new();
-    io_handler.extend_with(RpcImpl::new().to_delegate());
+    if arguments.len() == 2 && arguments.iter().any(|i| i == "--version" || i == "-v") {
+        println!("introspection-core {}", env!("GIT_HASH"));
+    } else if arguments.len() == 2 && arguments.iter().any(|i| i == "--help" || i == "-h") {
+        println!("Usage");
+        println!("Version       --version or -v");
+        println!("Help          --help    or -h");
+    } else if arguments.len() > 1 {
+        println!("Usage");
+        println!("Version       --version or -v");
+        println!("Help          --help    or -h");
+    } else {
+        init_logger();
+        user_facing_errors::set_panic_hook();
 
-    json_rpc_stdio::run(&io_handler).await.unwrap();
+        let mut io_handler = IoHandler::new();
+        io_handler.extend_with(RpcImpl::new().to_delegate());
+
+        json_rpc_stdio::run(&io_handler).await.unwrap();
+    };
 }
 
 fn init_logger() {
