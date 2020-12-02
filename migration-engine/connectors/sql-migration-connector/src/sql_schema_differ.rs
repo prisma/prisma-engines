@@ -291,13 +291,15 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn add_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
-        differ
+        let from_psl_change = differ
             .created_primary_key()
             .filter(|pk| !pk.columns.is_empty())
             .map(|pk| TableChange::AddPrimaryKey {
                 columns: pk.columns.clone(),
-            })
-            .or_else(|| {
+            });
+
+        if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
+            from_psl_change.or_else(|| {
                 let from_recreate = Self::alter_columns(differ).any(|tc| match tc {
                     TableChange::DropAndRecreateColumn { column_index, .. } => {
                         let idx = *column_index.previous();
@@ -314,13 +316,16 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     None
                 }
             })
+        } else {
+            from_psl_change
+        }
     }
 
     fn drop_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
-        differ
-            .dropped_primary_key()
-            .map(|_pk| TableChange::DropPrimaryKey)
-            .or_else(|| {
+        let from_psl_change = differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey);
+
+        if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
+            from_psl_change.or_else(|| {
                 let from_recreate = Self::alter_columns(differ).any(|tc| match tc {
                     TableChange::DropAndRecreateColumn { column_index, .. } => {
                         let idx = *column_index.previous();
@@ -335,6 +340,9 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     None
                 }
             })
+        } else {
+            from_psl_change
+        }
     }
 
     fn create_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<CreateIndex> {

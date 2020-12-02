@@ -68,8 +68,9 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
-    /// Whether indexes should be recreated if one of the columns needs to be recreated
-    fn should_recreate_indexes_from_recreated_columns(&self) -> bool {
+    /// Whether the primary key should be recreated if the column part of it is
+    /// recreated.
+    fn should_recreate_the_primary_key_on_column_recreate(&self) -> bool {
         false
     }
 

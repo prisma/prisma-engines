@@ -11,7 +11,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
         index.index_type().is_unique()
     }
 
-    fn should_recreate_indexes_from_recreated_columns(&self) -> bool {
+    fn should_recreate_the_primary_key_on_column_recreate(&self) -> bool {
         true
     }
 
