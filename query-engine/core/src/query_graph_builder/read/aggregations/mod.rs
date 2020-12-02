@@ -26,24 +26,26 @@ fn resolve_query(field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<
 
 fn resolve_fields(model: &ModelRef, field: FieldPair) -> Vec<ScalarFieldRef> {
     let scalars = model.fields().scalar();
-    let fields = match field.parsed_field.nested_fields {
-        Some(nested_obj) => nested_obj.fields,
-        None => vec![],
-    };
+    let fields = field
+        .parsed_field
+        .nested_fields
+        .expect("Expected at least one selection for aggregate")
+        .fields;
 
     fields
         .into_iter()
-        .map(|f| {
-            scalars
-                .iter()
-                .find_map(|sf| {
+        .filter_map(|f| {
+            if f.parsed_field.name == "_all" {
+                None
+            } else {
+                scalars.iter().find_map(|sf| {
                     if sf.name == f.parsed_field.name {
                         Some(sf.clone())
                     } else {
                         None
                     }
                 })
-                .expect("Expected validation to guarantee valid aggregation fields.")
+            }
         })
         .collect()
 }

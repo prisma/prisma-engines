@@ -41,7 +41,7 @@ fn aggregation_field<F, G>(
     model: &ModelRef,
     fields: Vec<ScalarFieldRef>,
     type_mapper: F,
-    constraint_mapper: G,
+    object_mapper: G,
 ) -> Option<OutputField>
 where
     F: Fn(&ScalarFieldRef) -> OutputType,
@@ -56,7 +56,7 @@ where
             name,
             &fields,
             type_mapper,
-            constraint_mapper,
+            object_mapper,
         ));
 
         Some(field(name, vec![], object_type, None).optional())
@@ -70,7 +70,7 @@ fn map_field_aggregation_object<F, G>(
     suffix: &str,
     fields: &[ScalarFieldRef],
     type_mapper: F,
-    constraint_mapper: G,
+    object_mapper: G,
 ) -> ObjectTypeWeakRef
 where
     F: Fn(&ScalarFieldRef) -> OutputType,
@@ -87,7 +87,7 @@ where
         .map(|sf| field(sf.name.clone(), vec![], type_mapper(sf), None).optional_if(!sf.is_required || !is_numeric(sf)))
         .collect();
 
-    let object = constraint_mapper(object_type(ident.clone(), fields, None));
+    let object = object_mapper(object_type(ident.clone(), fields, None));
     let object = Arc::new(object);
 
     ctx.cache_output_type(ident, object.clone());

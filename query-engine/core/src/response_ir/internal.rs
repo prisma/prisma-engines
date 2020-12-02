@@ -82,7 +82,7 @@ fn serialize_aggregations(
                     if let Some(f) = field {
                         flattened.insert(format!("count_{}", &f.name), Item::Value(count));
                     } else {
-                        flattened.insert("count".to_owned(), Item::Value(count));
+                        flattened.insert("count__all".to_owned(), Item::Value(count));
                     }
                 }
 

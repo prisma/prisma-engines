@@ -28,7 +28,10 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             &model,
             model.fields().scalar(),
             |_| OutputType::int(),
-            |obj| obj.do_allow_empty(),
+            |mut obj| {
+                obj.add_field(field("_all", vec![], OutputType::int(), None));
+                obj
+            },
         ),
     );
 

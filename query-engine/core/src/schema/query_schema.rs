@@ -100,7 +100,6 @@ impl QuerySchema {
 pub struct ObjectType {
     pub identifier: Identifier,
     fields: OnceCell<Vec<OutputFieldRef>>,
-    allow_empty: bool,
 
     // Object types can directly map to models.
     model: Option<ModelRef>,
@@ -121,7 +120,6 @@ impl ObjectType {
         Self {
             identifier: ident,
             fields: OnceCell::new(),
-            allow_empty: false,
             model,
         }
     }
@@ -130,8 +128,8 @@ impl ObjectType {
         &self.identifier
     }
 
-    pub fn allow_empty(&self) -> bool {
-        self.allow_empty
+    pub fn add_field(&mut self, field: OutputField) {
+        self.fields.get_mut().unwrap().push(Arc::new(field));
     }
 
     pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
@@ -149,12 +147,6 @@ impl ObjectType {
     /// True if fields are empty, false otherwise.
     pub fn is_empty(&self) -> bool {
         self.get_fields().is_empty()
-    }
-
-    /// Signals that empty set of fields is allowed for this output object.
-    pub fn do_allow_empty(mut self) -> Self {
-        self.allow_empty = true;
-        self
     }
 }
 
