@@ -90,9 +90,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
             match applier.apply_script(&script).await {
                 Ok(()) => {
                     tracing::debug!("Successfully applied the script.");
-                    migration_persistence
-                        .record_successful_step(&migration_id, &script)
-                        .await?;
+                    migration_persistence.record_successful_step(&migration_id).await?;
                     migration_persistence.record_migration_finished(&migration_id).await?;
                     applied_migration_names.push(unapplied_migration.migration_name().to_owned());
                 }

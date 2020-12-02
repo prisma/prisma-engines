@@ -55,8 +55,8 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// `record_migration_started()` instead.
     async fn record_migration_started_impl(&self, migration_name: &str, checksum: &str) -> ConnectorResult<String>;
 
-    /// Increase the applied_steps_count counter, and append the given logs.
-    async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
+    /// Increase the applied_steps_count counter.
+    async fn record_successful_step(&self, id: &str) -> ConnectorResult<()>;
 
     /// Report logs for a failed migration step. We assume the next steps in the
     /// migration will not be applied, and the error reported.
