@@ -77,6 +77,7 @@ async fn main() -> anyhow::Result<()> {
             } else {
                 unreachable!()
             };
+
             //todo configurable
             let introspected = introspection_core::RpcImpl::introspect_internal(schema, false)
                 .await

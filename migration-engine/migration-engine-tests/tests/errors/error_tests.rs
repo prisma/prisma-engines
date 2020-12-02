@@ -1,3 +1,4 @@
+use indoc::formatdoc;
 use migration_connector::steps::{DeleteModel, MigrationStep};
 use migration_core::{api::RpcApi, GateKeeper};
 use migration_engine_tests::sql::*;
@@ -515,53 +516,64 @@ async fn native_types_are_not_allowed_in_migration_engine() {
 }
 
 #[tokio::test]
-async fn one_can_allow_all_preview_features() {
-    let url = mssql_2019_url("master");
+async fn connection_string_problems_give_a_nice_error() {
+    let providers = &[
+        ("mysql", "mysql://root:password-with-#@localhost:3306/database"),
+        (
+            "postgresql",
+            "postgresql://root:password-with-#@localhost:5432/postgres",
+        ),
+        ("sqlserver", "sqlserver://root:password-with-#@localhost:5432/postgres"),
+    ];
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "sqlserver"
-              url = "{}"
-            }}
-
-            generator js {{
-              provider = "prisma-client-js"
-              previewFeatures = ["microsoftSqlServer", "nativeTypes"]
-            }}
+    for provider in providers {
+        let dm = formatdoc!(
+            r#"
+                datasource db {{
+                  provider = "{}"
+                  url = "{}"
+                }}
         "#,
-        url
-    );
+            provider.0,
+            provider.1
+        );
 
-    assert!(RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
-        .await
-        .map(|_| ())
-        .is_ok());
-}
+        let error = RpcApi::new(&dm, vec![]).await.map(|_| ()).unwrap_err();
 
-#[tokio::test]
-async fn one_can_allow_microsoft_sql_server() {
-    let url = mssql_2019_url("master");
+        let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "sqlserver"
-              url = "{}"
-            }}
+        let details = match provider.0 {
+            "sqlserver" => {
+                formatdoc!(
+                    "Error parsing connection string: Conversion error: invalid digit found in string in `{connection_string}`.
+                    Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
+                    for constructing a correct connection string. In some cases, certain characters must be escaped.
+                    Please check the string for any illegal characters.",
+                    connection_string = provider.1
+                ).replace('\n', " ")
+            },
+            _ => {
+                formatdoc!(
+                    "Error parsing connection string: invalid port number in `{connection_string}`.
+                    Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
+                    for constructing a correct connection string. In some cases, certain characters must be escaped.
+                    Please check the string for any illegal characters.",
+                    connection_string = provider.1
+                ).replace('\n', " ")
+            }
+        };
 
-            generator js {{
-              provider = "prisma-client-js"
-              previewFeatures = ["microsoftSqlServer"]
-            }}
-        "#,
-        url
-    );
+        let expected = json!({
+            "is_panic": false,
+            "message": format!("The provided database string is invalid. {}", &details),
+            "meta": {
+                "details": &details,
+            },
+            "error_code": "P1013"
+        });
 
-    assert!(RpcApi::new(&dm, vec![String::from("microsoftSqlServer")])
-        .await
-        .map(|_| ())
-        .is_ok());
+        assert_eq!(expected, json_error);
+    }
 }
 
 #[tokio::test]

@@ -29,6 +29,7 @@ use migration_connector::ConnectorError;
 use migration_engine::MigrationEngine;
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
+use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 /// Top-level constructor for the migration engine API.
 pub async fn migration_api(
@@ -47,8 +48,15 @@ pub async fn migration_api(
     let connector = match &source.active_provider {
         #[cfg(feature = "sql")]
         provider if POSTGRES_SOURCE_NAME == provider => {
-            let mut u = url::Url::parse(&source.url().value).map_err(|url_error| {
-                CoreError::ConnectorError(ConnectorError::url_parse_error(url_error, &source.url().value))
+            let database_str = &source.url().value;
+
+            let mut u = url::Url::parse(database_str).map_err(|err| {
+                let details = user_facing_errors::quaint::invalid_url_description(
+                    database_str,
+                    &format!("Error parsing connection string: {}", err),
+                );
+
+                ConnectorError::from(KnownError::new(InvalidDatabaseString { details }))
             })?;
 
             let params: Vec<(String, String)> = u.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
