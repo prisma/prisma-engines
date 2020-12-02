@@ -2,7 +2,10 @@ use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_conn
 use connection_string::JdbcString;
 use indoc::formatdoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
-use quaint::{connector::MssqlUrl, prelude::SqlFamily};
+use quaint::{
+    connector::MssqlUrl,
+    prelude::{SqlFamily, Table},
+};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::str::FromStr;
 
@@ -27,6 +30,10 @@ impl MssqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MssqlFlavour {
+    fn imperative_migrations_table<'a>(&'a self) -> Table<'a> {
+        (self.schema_name(), self.imperative_migrations_table_name()).into()
+    }
+
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
         let (db_name, master_uri) = Self::master_url(jdbc_string)?;
         let conn = connect(&master_uri.to_string()).await?;
@@ -45,7 +52,7 @@ impl SqlFlavour for MssqlFlavour {
 
     async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = formatdoc! { r#"
-            CREATE TABLE [{}].[_prisma_migrations] (
+            CREATE TABLE [{}].[{}] (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
                 finished_at             DATETIMEOFFSET,
@@ -55,7 +62,7 @@ impl SqlFlavour for MssqlFlavour {
                 started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 applied_steps_count     INT NOT NULL DEFAULT 0
             );
-        "#, self.schema_name()};
+        "#, self.schema_name(), self.imperative_migrations_table_name()};
 
         Ok(connection.raw_cmd(&sql).await?)
     }

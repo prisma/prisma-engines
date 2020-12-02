@@ -90,11 +90,6 @@ impl SqlMigrationConnector {
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         self.flavour.describe_schema(&self.connection).await
     }
-
-    /// For migration table queries
-    fn schema_name(&self) -> &str {
-        self.connection.connection_info().schema_name()
-    }
 }
 
 #[async_trait::async_trait]
