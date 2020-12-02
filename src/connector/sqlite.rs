@@ -111,7 +111,10 @@ impl TryFrom<&str> for Sqlite {
         let params = SqliteParams::try_from(path)?;
         let file_path = params.file_path;
 
-        let conn = rusqlite::Connection::open(file_path.as_str())?;
+        let conn = rusqlite::Connection::open(file_path.as_str()).map_err(|e| {
+            let kind = ErrorKind::DatabaseUrlIsInvalid(e.to_string());
+            Error::builder(kind).build()
+        })?;
 
         if let Some(timeout) = params.socket_timeout {
             conn.busy_timeout(timeout)?;

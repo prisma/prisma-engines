@@ -221,8 +221,7 @@ impl From<num::TryFromIntError> for Error {
 
 impl From<connection_string::Error> for Error {
     fn from(err: connection_string::Error) -> Error {
-        let err = Cow::Owned(format!("{}", err));
-        Self::builder(ErrorKind::ConversionError(err)).build()
+        Self::builder(ErrorKind::DatabaseUrlIsInvalid(err.to_string())).build()
     }
 }
 
