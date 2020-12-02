@@ -3,6 +3,7 @@ use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
 use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
+use user_facing_errors::{migration_engine::FoundFailedMigrations, KnownError};
 
 /// The input to the `ApplyMigrations` command.
 #[derive(Deserialize, Debug)]
@@ -114,49 +115,33 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
 }
 
 fn detect_failed_migrations(migrations_from_database: &[MigrationRecord]) -> CoreResult<()> {
-    tracing::debug!("Checking for failed migrations.");
+    use std::fmt::Write as _;
 
-    let mut history_problems = HistoryProblems::default();
+    tracing::debug!("Checking for failed migrations.");
 
     let mut failed_migrations = migrations_from_database
         .iter()
         .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none())
         .peekable();
 
-    if failed_migrations.peek().is_some() {
-        history_problems
-            .failed_migrations
-            .extend(failed_migrations.map(|failed_migration| {
-                format!(
-                    "The `{name}` migration started at {started_at} failed with the following logs:\n{logs}",
-                    name = failed_migration.migration_name,
-                    started_at = failed_migration.started_at,
-                    logs = failed_migration.logs
-                )
-            }))
+    if failed_migrations.peek().is_none() {
+        return Ok(());
     }
 
-    history_problems.to_result()
-}
+    let mut details = String::new();
 
-#[derive(Default, Debug)]
-struct HistoryProblems {
-    failed_migrations: Vec<String>,
-}
-
-impl HistoryProblems {
-    fn to_result(&self) -> CoreResult<()> {
-        if self.failed_migrations.is_empty() {
-            return Ok(());
-        }
-
-        let mut error = String::with_capacity(self.failed_migrations.iter().map(|err| err.len() + 1).sum::<usize>());
-
-        for failed_migration in &self.failed_migrations {
-            error.push_str(&failed_migration);
-            error.push('\n');
-        }
-
-        Err(CoreError::Generic(anyhow::Error::msg(error)))
+    for failed_migration in failed_migrations {
+        writeln!(
+            details,
+            "The `{name}` migration started at {started_at} failed with the following logs:\n{logs}",
+            name = failed_migration.migration_name,
+            started_at = failed_migration.started_at,
+            logs = failed_migration.logs
+        )
+        .unwrap();
     }
+
+    Err(CoreError::UserFacing(KnownError::new(FoundFailedMigrations {
+        details,
+    })))
 }
