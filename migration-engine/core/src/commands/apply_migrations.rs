@@ -98,11 +98,11 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
                 Err(err) => {
                     tracing::debug!("Failed to apply the script.");
 
-                    let logs = format!("script:\n{}\n\nerror:\n{}", script, err);
+                    let logs = err.to_string();
 
                     migration_persistence.record_failed_step(&migration_id, &logs).await?;
 
-                    return Err(err.into()); // todo: give more context
+                    return Err(err.into());
                 }
             }
         }
