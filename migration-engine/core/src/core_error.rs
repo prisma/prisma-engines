@@ -19,9 +19,6 @@ pub enum CoreError {
     /// When a saved datamodel from a migration in the migrations table is no longer valid.
     InvalidPersistedDatamodel(String),
 
-    /// Failed to render a prisma schema to a string.
-    DatamodelRenderingError(datamodel::diagnostics::Diagnostics),
-
     /// Errors from the connector.
     ConnectorError(ConnectorError),
 
@@ -50,7 +47,6 @@ impl Display for CoreError {
             CoreError::InvalidPersistedDatamodel(err) => {
                 write!(f, "The migration contains an invalid schema.\n{}", err)
             }
-            CoreError::DatamodelRenderingError(err) => write!(f, "Failed to render the schema to a string ({:?})", err),
             CoreError::ConnectorError(err) => write!(f, "Connector error: {:#}", err),
             CoreError::GatedPreviewFeatures(features) => {
                 let feats: Vec<_> = features.iter().map(|f| format!("`{}`", f)).collect();
@@ -70,7 +66,6 @@ impl StdError for CoreError {
             CoreError::ReceivedBadDatamodel(_) => None,
             CoreError::ProducedBadDatamodel(_) => None,
             CoreError::InvalidPersistedDatamodel(_) => None,
-            CoreError::DatamodelRenderingError(_) => None,
             CoreError::GatedPreviewFeatures(_) => None,
             CoreError::UserFacing(_) => None,
             CoreError::ConnectorError(err) => Some(err),
