@@ -7,7 +7,6 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
-use alter_table::AlterTableConstructor;
 use indoc::formatdoc;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
@@ -33,7 +32,8 @@ impl SqlRenderer for MssqlFlavour {
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
         let AlterTable { table_index, changes } = alter_table;
         let tables = schemas.tables(table_index);
-        AlterTableConstructor::new(&self, tables, changes).into_statements()
+
+        alter_table::create_statements(&self, tables, changes)
     }
 
     fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {

@@ -10,8 +10,27 @@ use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::DefaultValue;
 use std::collections::BTreeSet;
 
-/// A constructor for a SQL Server `ALTER TABLE` structure.
-pub(crate) struct AlterTableConstructor<'a> {
+/// Creates a set of `ALTER TABLE` statements in a correct execution order.
+pub(crate) fn create_statements(
+    renderer: &MssqlFlavour,
+    tables: Pair<TableWalker<'_>>,
+    changes: &[TableChange],
+) -> Vec<String> {
+    let constructor = AlterTableConstructor {
+        renderer,
+        tables,
+        changes,
+        drop_constraints: BTreeSet::new(),
+        add_constraints: BTreeSet::new(),
+        add_columns: Vec::new(),
+        drop_columns: Vec::new(),
+        column_mods: Vec::new(),
+    };
+
+    constructor.into_statements()
+}
+
+struct AlterTableConstructor<'a> {
     renderer: &'a MssqlFlavour,
     tables: Pair<TableWalker<'a>>,
     changes: &'a [TableChange],
@@ -23,22 +42,7 @@ pub(crate) struct AlterTableConstructor<'a> {
 }
 
 impl<'a> AlterTableConstructor<'a> {
-    /// Create a new constructor for the table changes.
-    pub fn new(renderer: &'a MssqlFlavour, tables: Pair<TableWalker<'a>>, changes: &'a [TableChange]) -> Self {
-        Self {
-            renderer,
-            tables,
-            changes,
-            drop_constraints: BTreeSet::new(),
-            add_constraints: BTreeSet::new(),
-            add_columns: Vec::new(),
-            drop_columns: Vec::new(),
-            column_mods: Vec::new(),
-        }
-    }
-
-    /// Turn the constructor into `ALTER TABLE` statements.
-    pub fn into_statements(mut self) -> Vec<String> {
+    fn into_statements(mut self) -> Vec<String> {
         for change in self.changes {
             match change {
                 TableChange::DropPrimaryKey => {
