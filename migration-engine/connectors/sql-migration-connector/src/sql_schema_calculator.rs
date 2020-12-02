@@ -167,7 +167,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
                     on_update_action: sql::ForeignKeyAction::Cascade,
                     on_delete_action: match column_arity(relation_field.arity()) {
-                        ColumnArity::Required => sql::ForeignKeyAction::Cascade,
+                        ColumnArity::Required => sql::ForeignKeyAction::Restrict,
                         _ => sql::ForeignKeyAction::SetNull,
                     },
                 };
