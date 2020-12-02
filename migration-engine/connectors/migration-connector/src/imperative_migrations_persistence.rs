@@ -100,10 +100,7 @@ pub struct MigrationRecord {
     pub migration_name: String,
     /// The human-readable log of actions performed by the engine, up to and
     /// including the point where the migration failed, with the relevant error.
-    ///
-    /// Implementation detail note: a tracing collector with specific events in
-    /// the database applier.
-    pub logs: String,
+    pub logs: Option<String>,
     /// If the migration was rolled back, and when.
     pub rolled_back_at: Option<Timestamp>,
     /// The time the migration started being applied.

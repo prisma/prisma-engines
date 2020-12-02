@@ -27,7 +27,7 @@ async fn starting_a_migration_works(api: &TestApi) -> TestResult {
     );
     assert_eq!(first_migration.finished_at, None);
     assert_eq!(first_migration.migration_name, "initial_migration");
-    assert_eq!(first_migration.logs, "");
+    assert_eq!(first_migration.logs.as_deref(), Some(""));
     assert_eq!(first_migration.rolled_back_at, None);
     assert_eq!(first_migration.applied_steps_count, 0);
 
@@ -64,7 +64,7 @@ async fn finishing_a_migration_works(api: &TestApi) -> TestResult {
         "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec72e772429fb20d8cc69a864"
     );
     assert_eq!(first_migration.migration_name, "initial_migration");
-    assert_eq!(first_migration.logs, "");
+    assert_eq!(first_migration.logs.as_deref(), Some(""));
     assert_eq!(first_migration.rolled_back_at, None);
     assert_eq!(first_migration.applied_steps_count, 0);
 
@@ -106,7 +106,7 @@ async fn updating_then_finishing_a_migration_works(api: &TestApi) -> TestResult 
         "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec72e772429fb20d8cc69a864"
     );
     assert_eq!(first_migration.migration_name, "initial_migration");
-    assert_eq!(first_migration.logs, "oï");
+    assert_eq!(first_migration.logs.as_deref(), Some("oï"));
     assert_eq!(first_migration.rolled_back_at, None);
     assert_eq!(first_migration.applied_steps_count, 1);
 
@@ -160,7 +160,7 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
             "e0c9674d3b332d71b8bc304aae5b7b8a8bb8ec72e772429fb20d8cc69a864"
         );
         assert_eq!(first_migration.migration_name, "initial_migration");
-        assert_eq!(first_migration.logs, "oï");
+        assert_eq!(first_migration.logs.as_deref(), Some("oï"));
         assert_eq!(first_migration.rolled_back_at, None);
         assert_eq!(first_migration.applied_steps_count, 1);
 
@@ -184,7 +184,7 @@ async fn multiple_successive_migrations_work(api: &TestApi) -> TestResult {
             "822db1ee793d76eaa1319eb2c453a7ec92ab6ec235268b4d27ac395c6c5a6ef"
         );
         assert_eq!(second_migration.migration_name, "second_migration");
-        assert_eq!(second_migration.logs, "logs for the second migration");
+        assert_eq!(second_migration.logs.as_deref(), Some("logs for the second migration"));
         assert_eq!(second_migration.rolled_back_at, None);
         assert_eq!(second_migration.applied_steps_count, 1);
         assert_eq!(second_migration.finished_at, None);

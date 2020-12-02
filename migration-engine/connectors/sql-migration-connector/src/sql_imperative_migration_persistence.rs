@@ -78,8 +78,6 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .value("id", id.as_str())
             .value("checksum", checksum)
             .value("started_at", now)
-            // We need this line because MySQL can't default a text field to an empty string
-            .value("logs", "")
             .value("migration_name", migration_name);
 
         conn.execute(insert).await?;

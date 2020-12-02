@@ -96,8 +96,8 @@ impl SqlFlavour for MysqlFlavour {
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
                 finished_at             DATETIME(3),
-                migration_name          TEXT NOT NULL,
-                logs                    TEXT NOT NULL,
+                migration_name          VARCHAR(255) NOT NULL,
+                logs                    TEXT,
                 rolled_back_at          DATETIME(3),
                 started_at              DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
                 applied_steps_count     INTEGER UNSIGNED NOT NULL DEFAULT 0
