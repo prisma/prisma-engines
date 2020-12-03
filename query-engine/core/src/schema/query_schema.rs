@@ -128,6 +128,10 @@ impl ObjectType {
         &self.identifier
     }
 
+    pub fn add_field(&mut self, field: OutputField) {
+        self.fields.get_mut().unwrap().push(Arc::new(field));
+    }
+
     pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
         self.fields.get().unwrap()
     }
@@ -200,6 +204,7 @@ pub enum QueryTag {
     DeleteMany,
     UpsertOne,
     Aggregate,
+    GroupBy,
     ExecuteRaw,
     QueryRaw,
 }
@@ -217,6 +222,7 @@ impl fmt::Display for QueryTag {
             Self::DeleteMany => "deleteMany",
             Self::UpsertOne => "upsertOne",
             Self::Aggregate => "aggregate",
+            Self::GroupBy => "groupBy",
             Self::ExecuteRaw => "executeRaw",
             Self::QueryRaw => "queryRaw",
         };

@@ -1,7 +1,7 @@
 use crate::error::SqlError;
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
-use connector_interface::{AggregationResult, Aggregator};
+use connector_interface::{AggregationResult, AggregationSelection};
 use datamodel::FieldArity;
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use quaint::{
@@ -18,39 +18,58 @@ pub struct SqlRow {
 }
 
 impl SqlRow {
-    pub fn into_aggregation_results(self, aggregators: &[Aggregator]) -> Vec<AggregationResult> {
+    pub fn into_aggregation_results(self, selections: &[AggregationSelection]) -> Vec<AggregationResult> {
         let mut values = self.values;
         values.reverse();
 
-        aggregators
+        selections
             .iter()
-            .flat_map(|aggregator| match aggregator {
-                Aggregator::Count => vec![AggregationResult::Count(coerce_null_to_zero_value(
-                    values.pop().unwrap(),
-                ))],
+            .flat_map(|selection| match selection {
+                AggregationSelection::Field(field) => {
+                    vec![AggregationResult::Field(field.clone(), values.pop().unwrap())]
+                }
 
-                Aggregator::Average(fields) => fields
+                AggregationSelection::Count(fields) => {
+                    if fields.is_empty() {
+                        vec![AggregationResult::Count(
+                            None,
+                            coerce_null_to_zero_value(values.pop().unwrap()),
+                        )]
+                    } else {
+                        fields
+                            .iter()
+                            .map(|field| {
+                                AggregationResult::Count(
+                                    Some(field.clone()),
+                                    coerce_null_to_zero_value(values.pop().unwrap()),
+                                )
+                            })
+                            .collect()
+                    }
+                }
+
+                AggregationSelection::Average(fields) => fields
                     .iter()
                     .map(|field| {
                         AggregationResult::Average(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
                     })
                     .collect(),
 
-                Aggregator::Sum(fields) => fields
+                AggregationSelection::Sum(fields) => fields
                     .iter()
                     .map(|field| {
                         AggregationResult::Sum(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
                     })
                     .collect(),
 
-                Aggregator::Min(fields) => fields
+                AggregationSelection::Min(fields) => fields
                     .iter()
                     .map(|field| {
                         AggregationResult::Min(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))
                     })
                     .collect(),
 
-                Aggregator::Max(fields) => fields
+                AggregationSelection::Max(fields) => fields
                     .iter()
                     .map(|field| {
                         AggregationResult::Max(field.clone(), coerce_null_to_zero_value(values.pop().unwrap()))

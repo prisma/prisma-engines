@@ -140,6 +140,7 @@ fn compound_field_unique_object_type(
         format!("{}CompoundUniqueInput", compound_object_name(alias, &from_fields)),
         PRISMA_NAMESPACE,
     );
+
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));

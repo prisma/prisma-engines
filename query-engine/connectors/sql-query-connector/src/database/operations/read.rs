@@ -148,11 +148,28 @@ pub async fn get_related_m2m_record_ids(
 pub async fn aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
-    aggregators: Vec<Aggregator>,
+    selections: Vec<AggregationSelection>,
+    group_by: Vec<ScalarFieldRef>,
+    query_arguments: QueryArguments,
+) -> crate::Result<Vec<AggregationRow>> {
+    if group_by.len() > 0 {
+        group_by_aggregate(conn, model, selections, group_by, query_arguments).await
+    } else {
+        plain_aggregate(conn, model, selections, query_arguments)
+            .await
+            .map(|v| vec![v])
+    }
+}
+
+async fn plain_aggregate(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    selections: Vec<AggregationSelection>,
     query_arguments: QueryArguments,
 ) -> crate::Result<Vec<AggregationResult>> {
-    let query = read::aggregate(model, &aggregators, query_arguments);
-    let idents: Vec<_> = aggregators
+    let query = read::aggregate(model, &selections, query_arguments);
+
+    let idents: Vec<_> = selections
         .iter()
         .flat_map(|aggregator| aggregator.identifiers())
         .collect();
@@ -162,5 +179,27 @@ pub async fn aggregate(
         .pop()
         .expect("Expected exactly one return row for aggregation query.");
 
-    Ok(row.into_aggregation_results(&aggregators))
+    Ok(row.into_aggregation_results(&selections))
+}
+
+async fn group_by_aggregate(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    selections: Vec<AggregationSelection>,
+    group_by: Vec<ScalarFieldRef>,
+    query_arguments: QueryArguments,
+) -> crate::Result<Vec<AggregationRow>> {
+    let query = read::group_by_aggregate(model, group_by, &selections, query_arguments);
+
+    let idents: Vec<_> = selections
+        .iter()
+        .flat_map(|aggregator| aggregator.identifiers())
+        .collect();
+
+    let rows = conn.filter(query.into(), idents.as_slice()).await?;
+
+    Ok(rows
+        .into_iter()
+        .map(|row| row.into_aggregation_results(&selections))
+        .collect())
 }

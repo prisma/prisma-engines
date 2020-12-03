@@ -83,10 +83,15 @@ impl From<RecordProjection> for RecordFilter {
     }
 }
 
+/// Selections for aggregation queries.
 #[derive(Debug, Clone)]
-pub enum Aggregator {
-    /// Counts all records of the model that match the query.
-    Count,
+pub enum AggregationSelection {
+    /// Single field selector. Only valid in the context of group by statements.
+    Field(ScalarFieldRef),
+
+    /// Counts records of the model that match the query.
+    /// If fields are provided, counts based on these fields instead of rows (e.g. * in SQL).
+    Count(Vec<ScalarFieldRef>),
 
     /// Compute average for each field contained.
     Average(Vec<ScalarFieldRef>),
@@ -101,14 +106,21 @@ pub enum Aggregator {
     Max(Vec<ScalarFieldRef>),
 }
 
-impl Aggregator {
+impl AggregationSelection {
     pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         match self {
-            Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
-            Aggregator::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
-            Aggregator::Sum(fields) => Self::map_field_types(&fields, None),
-            Aggregator::Min(fields) => Self::map_field_types(&fields, None),
-            Aggregator::Max(fields) => Self::map_field_types(&fields, None),
+            AggregationSelection::Field(field) => vec![(field.type_identifier.clone(), FieldArity::Required)],
+            AggregationSelection::Count(fields) => {
+                if fields.is_empty() {
+                    vec![(TypeIdentifier::Int, FieldArity::Required)]
+                } else {
+                    Self::map_field_types(&fields, Some(TypeIdentifier::Int))
+                }
+            }
+            AggregationSelection::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
+            AggregationSelection::Sum(fields) => Self::map_field_types(&fields, None),
+            AggregationSelection::Min(fields) => Self::map_field_types(&fields, None),
+            AggregationSelection::Max(fields) => Self::map_field_types(&fields, None),
         }
     }
 
@@ -128,13 +140,15 @@ impl Aggregator {
     }
 }
 
+pub type AggregationRow = Vec<AggregationResult>;
+
 /// Result of an aggregation operation on a model or field.
-/// It is expected that the type of a `PrismaValue` matches the `TypeIdentifier`
-/// of the accompanying `ScalarFieldRef` for `Sum`, `Min` and `Max`.
-/// `Count` and `Average` are expected to be of `int` and `float` types, respectively.
+/// A `Field` return type is only interesting for aggregations involving
+/// group bys, as they return field values alongside group aggregates.
 #[derive(Debug, Clone)]
 pub enum AggregationResult {
-    Count(PrismaValue),
+    Field(ScalarFieldRef, PrismaValue),
+    Count(Option<ScalarFieldRef>, PrismaValue),
     Average(ScalarFieldRef, PrismaValue),
     Sum(ScalarFieldRef, PrismaValue),
     Min(ScalarFieldRef, PrismaValue),
@@ -182,16 +196,17 @@ pub trait ReadOperations {
         from_record_ids: &[RecordProjection],
     ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>>;
 
-    /// Aggregates records for a specific model based on the given aggregators.
+    /// Aggregates records for a specific model based on the given selections.
     /// Whether or not the aggregations can be executed in a single query or
     /// requires multiple roundtrips to the underlying data source is at the
     /// discretion of the implementing connector.
     async fn aggregate_records(
         &self,
         model: &ModelRef,
-        aggregators: Vec<Aggregator>,
+        selections: Vec<AggregationSelection>,
+        group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
-    ) -> crate::Result<Vec<AggregationResult>>;
+    ) -> crate::Result<Vec<AggregationRow>>;
 }
 
 #[async_trait]

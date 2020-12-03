@@ -73,10 +73,7 @@ fn read_many<'a, 'b>(
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let scalars = if query.args.distinct.is_some()
-            || query.args.contains_unstable_cursor()
-            || query.args.contains_null_cursor()
-        {
+        let scalars = if query.args.requires_inmemory_processing() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
                 .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
@@ -152,11 +149,12 @@ async fn aggregate<'a, 'b>(
     query: AggregateRecordsQuery,
 ) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
+
     let results = tx
-        .aggregate_records(&query.model, query.aggregators, query.args)
+        .aggregate_records(&query.model, query.selectors, query.group_by, query.args)
         .await?;
 
-    Ok(QueryResult::RecordAggregation(RecordAggregation {
+    Ok(QueryResult::RecordAggregations(RecordAggregations {
         selection_order,
         results,
     }))

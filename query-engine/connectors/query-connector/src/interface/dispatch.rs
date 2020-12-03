@@ -42,12 +42,13 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     async fn aggregate_records(
         &self,
         model: &ModelRef,
-        aggregators: Vec<Aggregator>,
+        selections: Vec<AggregationSelection>,
+        group_by: Vec<ScalarFieldRef>,
         query_arguments: QueryArguments,
-    ) -> crate::Result<Vec<AggregationResult>> {
+    ) -> crate::Result<Vec<AggregationRow>> {
         match self {
-            Self::Connection(c) => c.aggregate_records(model, aggregators, query_arguments).await,
-            Self::Transaction(tx) => tx.aggregate_records(model, aggregators, query_arguments).await,
+            Self::Connection(c) => c.aggregate_records(model, selections, group_by, query_arguments).await,
+            Self::Transaction(tx) => tx.aggregate_records(model, selections, group_by, query_arguments).await,
         }
     }
 }

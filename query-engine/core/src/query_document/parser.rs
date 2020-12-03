@@ -24,7 +24,6 @@ impl QueryDocumentParser {
     ) -> QueryParserResult<ParsedObject> {
         let path = parent_path.add(schema_object.identifier.name().to_owned());
 
-        // Basic invariant not (yet) encoded in the schema: Output objects can't be empty.
         if selections.is_empty() {
             return Err(QueryParserError {
                 path,
