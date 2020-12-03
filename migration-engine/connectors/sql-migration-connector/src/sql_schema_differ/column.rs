@@ -49,6 +49,8 @@ impl<'a> ColumnDiffer<'a> {
             (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float) => None,
             (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal) => None,
             (ColumnTypeFamily::Float, ColumnTypeFamily::Float) => None,
+            (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => None,
+            (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => None,
             (_, _) => self.flavour.column_type_change(self),
         }
     }
