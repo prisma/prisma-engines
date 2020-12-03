@@ -135,6 +135,7 @@ pub(crate) struct AlterColumn {
 pub(crate) enum ColumnTypeChange {
     RiskyCast,
     SafeCast,
+    NotCastable,
 }
 
 #[derive(Debug)]

@@ -43,17 +43,31 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
             return;
         }
 
-        if matches!(type_change, Some(ColumnTypeChange::RiskyCast)) {
-            plan.push_warning(
-                SqlMigrationWarningCheck::RiskyCast {
-                    table: columns.previous().table().name().to_owned(),
-                    column: columns.previous().name().to_owned(),
-                    previous_type: format!("{:?}", columns.previous().column_type_family()),
-                    next_type: format!("{:?}", columns.next().column_type_family()),
-                },
-                step_index,
-            );
-        }
+        match type_change {
+            Some(ColumnTypeChange::SafeCast) | None => (),
+            Some(ColumnTypeChange::RiskyCast) => {
+                plan.push_warning(
+                    SqlMigrationWarningCheck::RiskyCast {
+                        table: columns.previous().table().name().to_owned(),
+                        column: columns.previous().name().to_owned(),
+                        previous_type: format!("{:?}", columns.previous().column_type_family()),
+                        next_type: format!("{:?}", columns.next().column_type_family()),
+                    },
+                    step_index,
+                );
+            }
+            Some(ColumnTypeChange::NotCastable) => {
+                plan.push_warning(
+                    SqlMigrationWarningCheck::NotCastable {
+                        table: columns.previous().table().name().to_owned(),
+                        column: columns.previous().name().to_owned(),
+                        previous_type: format!("{:?}", columns.previous().column_type_family()),
+                        next_type: format!("{:?}", columns.next().column_type_family()),
+                    },
+                    step_index,
+                );
+            }
+        };
     }
 
     fn check_drop_and_recreate_column(

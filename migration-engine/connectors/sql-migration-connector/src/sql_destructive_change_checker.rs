@@ -192,6 +192,15 @@ impl SqlMigrationConnector {
                                         step_index,
                                     );
                                 }
+                                Some(ColumnTypeChange::NotCastable) => plan.push_warning(
+                                    SqlMigrationWarningCheck::NotCastable {
+                                        table: columns.previous().table().name().to_owned(),
+                                        column: columns.previous().name().to_owned(),
+                                        previous_type: format!("{:?}", columns.previous().column_type_family()),
+                                        next_type: format!("{:?}", columns.next().column_type_family()),
+                                    },
+                                    step_index,
+                                ),
                             }
                         }
                     }

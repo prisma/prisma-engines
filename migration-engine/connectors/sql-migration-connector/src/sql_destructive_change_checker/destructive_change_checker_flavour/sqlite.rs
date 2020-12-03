@@ -60,6 +60,9 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
                     step_index,
                 );
             }
+            Some(ColumnTypeChange::NotCastable) => {
+                unreachable!("NotCastable on SQLite")
+            }
         }
     }
 

@@ -446,10 +446,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                             type_change.map(|tc| match tc {
                                 ColumnTypeChange::SafeCast => sql_migration::ColumnTypeChange::SafeCast,
                                 ColumnTypeChange::RiskyCast => sql_migration::ColumnTypeChange::RiskyCast,
-                                ColumnTypeChange::NotCastable => {
-                                    sql_migration::ColumnTypeChange::RiskyCast
-                                    //unreachable!("ColumnTypeChange::NotCastable in redefine_tables")
-                                }
+                                ColumnTypeChange::NotCastable => sql_migration::ColumnTypeChange::NotCastable,
                             }),
                         )
                     })
