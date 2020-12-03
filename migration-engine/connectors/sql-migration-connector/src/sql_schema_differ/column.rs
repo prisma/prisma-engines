@@ -1,7 +1,7 @@
 use crate::flavour::SqlFlavour;
 use enumflags2::BitFlags;
 use prisma_value::PrismaValue;
-use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultValue};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultKind};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
@@ -42,6 +42,10 @@ impl<'a> ColumnDiffer<'a> {
         self.previous.arity() != self.next.arity()
     }
 
+    pub(crate) fn autoincrement_changed(&self) -> bool {
+        self.previous.is_autoincrement() != self.next.is_autoincrement()
+    }
+
     fn column_type_change(&self) -> Option<ColumnTypeChange> {
         match (self.previous.column_type_family(), self.next.column_type_family()) {
             (_, _) if self.arity_changed() => self.flavour.column_type_change(self),
@@ -64,45 +68,50 @@ impl<'a> ColumnDiffer<'a> {
             return true;
         }
 
-        match (&self.previous.default(), &self.next.default()) {
+        let defaults = (
+            &self.previous.default().as_ref().map(|d| d.kind()),
+            &self.next.default().as_ref().map(|d| d.kind()),
+        );
+
+        match defaults {
             // Avoid naive string comparisons for JSON defaults.
             (
-                Some(DefaultValue::VALUE(PrismaValue::Json(prev_json))),
-                Some(DefaultValue::VALUE(PrismaValue::Json(next_json))),
+                Some(DefaultKind::VALUE(PrismaValue::Json(prev_json))),
+                Some(DefaultKind::VALUE(PrismaValue::Json(next_json))),
             )
             | (
-                Some(DefaultValue::VALUE(PrismaValue::String(prev_json))),
-                Some(DefaultValue::VALUE(PrismaValue::Json(next_json))),
+                Some(DefaultKind::VALUE(PrismaValue::String(prev_json))),
+                Some(DefaultKind::VALUE(PrismaValue::Json(next_json))),
             )
             | (
-                Some(DefaultValue::VALUE(PrismaValue::Json(prev_json))),
-                Some(DefaultValue::VALUE(PrismaValue::String(next_json))),
+                Some(DefaultKind::VALUE(PrismaValue::Json(prev_json))),
+                Some(DefaultKind::VALUE(PrismaValue::String(next_json))),
             ) => json_defaults_match(prev_json, next_json),
 
-            (Some(DefaultValue::VALUE(prev)), Some(DefaultValue::VALUE(next))) => prev == next,
-            (Some(DefaultValue::VALUE(_)), Some(DefaultValue::NOW)) => false,
-            (Some(DefaultValue::VALUE(_)), None) => false,
+            (Some(DefaultKind::VALUE(prev)), Some(DefaultKind::VALUE(next))) => prev == next,
+            (Some(DefaultKind::VALUE(_)), Some(DefaultKind::NOW)) => false,
+            (Some(DefaultKind::VALUE(_)), None) => false,
 
-            (Some(DefaultValue::NOW), Some(DefaultValue::NOW)) => true,
-            (Some(DefaultValue::NOW), None) => false,
-            (Some(DefaultValue::NOW), Some(DefaultValue::VALUE(_))) => false,
+            (Some(DefaultKind::NOW), Some(DefaultKind::NOW)) => true,
+            (Some(DefaultKind::NOW), None) => false,
+            (Some(DefaultKind::NOW), Some(DefaultKind::VALUE(_))) => false,
 
-            (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::VALUE(_))) => false,
-            (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::NOW)) => false,
-            (Some(DefaultValue::DBGENERATED(_)), None) => false,
+            (Some(DefaultKind::DBGENERATED(_)), Some(DefaultKind::VALUE(_))) => false,
+            (Some(DefaultKind::DBGENERATED(_)), Some(DefaultKind::NOW)) => false,
+            (Some(DefaultKind::DBGENERATED(_)), None) => false,
 
-            (Some(DefaultValue::SEQUENCE(_)), None) => true, // sequences are dropped separately
-            (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::VALUE(_))) => false,
-            (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::NOW)) => false,
+            (Some(DefaultKind::SEQUENCE(_)), None) => true, // sequences are dropped separately
+            (Some(DefaultKind::SEQUENCE(_)), Some(DefaultKind::VALUE(_))) => false,
+            (Some(DefaultKind::SEQUENCE(_)), Some(DefaultKind::NOW)) => false,
 
             (None, None) => true,
-            (None, Some(DefaultValue::VALUE(_))) => false,
-            (None, Some(DefaultValue::NOW)) => false,
+            (None, Some(DefaultKind::VALUE(_))) => false,
+            (None, Some(DefaultKind::NOW)) => false,
 
             // We can never migrate to @dbgenerated
-            (_, Some(DefaultValue::DBGENERATED(_))) => true,
+            (_, Some(DefaultKind::DBGENERATED(_))) => true,
             // Sequence migrations are handled separately.
-            (_, Some(DefaultValue::SEQUENCE(_))) => true,
+            (_, Some(DefaultKind::SEQUENCE(_))) => true,
         }
     }
 }
@@ -126,7 +135,7 @@ pub(crate) enum ColumnChange {
 
 // This should be pub(crate), but SqlMigration is exported, so it has to be
 // public at the moment.
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct ColumnChanges {
     changes: BitFlags<ColumnChange>,
 }
@@ -146,6 +155,10 @@ impl ColumnChanges {
 
     pub(crate) fn arity_changed(&self) -> bool {
         self.changes.contains(ColumnChange::Arity)
+    }
+
+    pub(crate) fn default_changed(&self) -> bool {
+        self.changes.contains(ColumnChange::Default)
     }
 
     pub(crate) fn only_default_changed(&self) -> bool {

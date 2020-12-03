@@ -3,6 +3,7 @@ use migration_core::{api::RpcApi, GateKeeper};
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
+use quaint::prelude::SqlFamily;
 use serde_json::json;
 use url::Url;
 
@@ -389,7 +390,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         .values(("apple",))
         .values(("banana",));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await?;
 
     let dm2 = r#"
         model Fruit {
@@ -405,27 +406,26 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         .await?
         .datamodel_steps;
 
-    let error = api
+    let res = api
         .apply()
         .steps(Some(steps))
         .force(Some(true))
         .migration_id(Some("the-migration"))
         .send_user_facing()
-        .await
-        .unwrap_err();
+        .await;
 
-    let json_error = serde_json::to_value(&error).unwrap();
+    let json_error = serde_json::to_value(&res.unwrap_err()).unwrap();
 
-    let expected_msg = if api.sql_family().is_mysql() {
-        "Unique constraint failed on the constraint: `name_unique`"
-    } else {
-        "Unique constraint failed on the fields: (`name`)"
+    let expected_msg = match api.sql_family() {
+        SqlFamily::Mysql => "Unique constraint failed on the constraint: `name_unique`",
+        SqlFamily::Mssql => "Unique constraint failed on the constraint: `Fruit_name_unique`",
+        _ => "Unique constraint failed on the fields: (`name`)",
     };
 
-    let expected_target = if api.sql_family().is_mysql() {
-        json!("name_unique")
-    } else {
-        json!(["name"])
+    let expected_target = match api.sql_family() {
+        SqlFamily::Mysql => json!("name_unique"),
+        SqlFamily::Mssql => json!("Fruit_name_unique"),
+        _ => json!(["name"]),
     };
 
     let expected_json = json!({
@@ -474,44 +474,6 @@ async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
         .contains("- The `Json` data type used in Test.j is not supported on MySQL 5.6.\n"));
 
     Ok(())
-}
-
-#[tokio::test]
-async fn microsoft_sql_server_is_not_allowed_in_migration_engine() {
-    let url = mssql_2019_url("master");
-
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "sqlserver"
-              url = "{}"
-            }}
-
-            generator js {{
-              provider = "prisma-client-js"
-              previewFeatures = ["microsoftSqlServer"]
-            }}
-        "#,
-        url
-    );
-
-    let error = RpcApi::new(&dm, vec![String::from("nativeTypes")])
-        .await
-        .map(|_| ())
-        .unwrap_err();
-
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
-
-    let expected = json!({
-        "is_panic": false,
-        "message": "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: `microsoftSqlServer`)",
-        "meta": {
-            "features": ["microsoftSqlServer"]
-        },
-        "error_code": "P3007"
-    });
-
-    assert_eq!(expected, json_error);
 }
 
 #[tokio::test]

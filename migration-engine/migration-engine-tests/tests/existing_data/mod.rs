@@ -549,7 +549,7 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
         .map(drop)
 }
 
-#[test_each_connector(capabilities("enums"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(capabilities("enums"))]
 async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -801,7 +801,7 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
         .assert_warnings(&[])?;
 
     api.assert_schema().await?.assert_table("User", |table| {
-        table.assert_column("created_at", |column| column.assert_default(Some(DefaultValue::NOW)))
+        table.assert_column("created_at", |column| column.assert_default(Some(DefaultValue::now())))
     })?;
 
     Ok(())

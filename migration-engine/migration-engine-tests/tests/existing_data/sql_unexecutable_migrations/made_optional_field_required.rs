@@ -1,5 +1,4 @@
 use migration_engine_tests::sql::*;
-use prisma_value::PrismaValue;
 use quaint::Value;
 use sql_schema_describer::DefaultValue;
 
@@ -86,7 +85,7 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
         table.assert_column("age", |column| {
             column
                 .assert_is_required()?
-                .assert_default(Some(DefaultValue::VALUE(PrismaValue::Int(84))))
+                .assert_default(Some(DefaultValue::value(84)))
         })
     })?;
 

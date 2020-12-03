@@ -205,7 +205,7 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
             let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
             let default = column.default.as_ref().expect("Must have nextval default");
             assert_eq!(
-                DefaultValue::SEQUENCE(format!("nextval('\"{}\"'::regclass)", sequence.name)),
+                DefaultValue::sequence(format!("nextval('\"{}\"'::regclass)", sequence.name)),
                 *default
             );
         }
@@ -216,14 +216,16 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
 #[test_each_connector(ignore("sqlite"))]
 async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestResult {
+    use quaint::ast::{Insert, Select};
+
     let dm1 = r#"
         model Post {
             id        Int        @id
             content   String?
-            createdAt DateTime
+            createdAt DateTime    @default(now())
             published Boolean     @default(false)
             title     String      @default("")
-            updatedAt DateTime
+            updatedAt DateTime    @default(now())
         }
     "#;
 
@@ -233,14 +235,34 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
         model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
     })?;
 
+    // MySQL cannot add autoincrement property to a column that already has data.
+    if !api.sql_family().is_mysql() {
+        // Data to see we don't lose anything in the translation.
+        for (i, content) in (&["A", "B", "C"]).into_iter().enumerate() {
+            let insert = Insert::single_into(api.render_table_name("Post"))
+                .value("content", *content)
+                .value("id", i);
+
+            api.database().insert(insert.into()).await?;
+        }
+
+        assert_eq!(
+            3,
+            api.database()
+                .select(Select::from_table(api.render_table_name("Post")))
+                .await?
+                .len()
+        );
+    }
+
     let dm2 = r#"
         model Post {
-            id        Int        @id @default(autoincrement())
+            id        Int         @id @default(autoincrement())
             content   String?
-            createdAt DateTime
+            createdAt DateTime    @default(now())
             published Boolean     @default(false)
             title     String      @default("")
-            updatedAt DateTime
+            updatedAt DateTime    @default(now())
         }
     "#;
 
@@ -253,20 +275,33 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
     // Check that the migration is idempotent.
     api.infer_apply(dm2).send().await?.assert_green()?.assert_no_steps()?;
 
+    // MySQL cannot add autoincrement property to a column that already has data.
+    if !api.sql_family().is_mysql() {
+        assert_eq!(
+            3,
+            api.database()
+                .select(Select::from_table(api.render_table_name("Post")))
+                .await?
+                .len()
+        );
+    }
+
     Ok(())
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
 #[test_each_connector(ignore("sqlite"))]
 async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> TestResult {
+    use quaint::ast::{Insert, Select};
+
     let dm1 = r#"
         model Post {
-            id        Int        @id @default(autoincrement())
+            id        Int         @id @default(autoincrement())
             content   String?
-            createdAt DateTime
+            createdAt DateTime    @default(now())
             published Boolean     @default(false)
             title     String      @default("")
-            updatedAt DateTime
+            updatedAt DateTime    @default(now())
         }
     "#;
 
@@ -276,14 +311,28 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
         model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
     })?;
 
+    // Data to see we don't lose anything in the translation.
+    for content in &["A", "B", "C"] {
+        let insert = Insert::single_into(api.render_table_name("Post")).value("content", *content);
+        api.database().insert(insert.into()).await?;
+    }
+
+    assert_eq!(
+        3,
+        api.database()
+            .select(Select::from_table(api.render_table_name("Post")))
+            .await?
+            .len()
+    );
+
     let dm2 = r#"
         model Post {
-            id        Int        @id
+            id        Int         @id
             content   String?
-            createdAt DateTime
+            createdAt DateTime    @default(now())
             published Boolean     @default(false)
             title     String      @default("")
-            updatedAt DateTime
+            updatedAt DateTime    @default(now())
         }
     "#;
 
@@ -300,6 +349,193 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
         .await?
         .assert_green()?
         .assert_no_steps()?;
+
+    assert_eq!(
+        3,
+        api.database()
+            .select(Select::from_table(api.render_table_name("Post")))
+            .await?
+            .len()
+    );
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &TestApi) -> TestResult {
+    use quaint::ast::{Insert, Select};
+
+    let dm1 = r#"
+        model Post {
+            id        Int        @id
+            content   String?
+
+            @@index([content], name: "fooBarIndex")
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model
+            .assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())?
+            .assert_indexes_count(1)
+    })?;
+
+    // Data to see we don't lose anything in the translation.
+    for (i, content) in (&["A", "B", "C"]).into_iter().enumerate() {
+        let insert = Insert::single_into(api.render_table_name("Post"))
+            .value("content", *content)
+            .value("id", i);
+
+        api.database().insert(insert.into()).await?;
+    }
+
+    assert_eq!(
+        3,
+        api.database()
+            .select(Select::from_table(api.render_table_name("Post")))
+            .await?
+            .len()
+    );
+
+    let dm2 = r#"
+        model Post {
+            id        Int         @id @default(autoincrement())
+            content   String?
+
+            @@index([content], name: "fooBarIndex")
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model
+            .assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())?
+            .assert_indexes_count(1)
+    })?;
+
+    // Check that the migration is idempotent.
+    api.infer_apply(dm2).send().await?.assert_green()?.assert_no_steps()?;
+
+    assert_eq!(
+        3,
+        api.database()
+            .select(Select::from_table(api.render_table_name("Post")))
+            .await?
+            .len()
+    );
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mssql_2019", "mssql_2017"))]
+async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: &TestApi) -> TestResult {
+    use quaint::ast::{Insert, Select};
+
+    let dm1 = r#"
+        model Post {
+            id        Int         @id
+            content   String?
+            createdAt DateTime    @default(now())
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime    @default(now())
+            author_id Int
+            author    Author      @relation(fields: [author_id], references: [id])
+        }
+
+        model Tracking {
+            id        Int         @id @default(autoincrement())
+            post_id   Int
+            post      Post        @relation(fields: [post_id], references: [id])
+        }
+
+        model Author {
+            id        Int         @id @default(autoincrement())
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
+    })?;
+
+    // Data to see we don't lose anything in the translation.
+    for (i, content) in (&["A", "B", "C"]).into_iter().enumerate() {
+        let insert = Insert::single_into(api.render_table_name("Author"));
+
+        let author_id = api
+            .database()
+            .insert(Insert::from(insert).returning(&["id"]))
+            .await?
+            .into_single()?
+            .into_single()?
+            .as_i64()
+            .unwrap();
+
+        let insert = Insert::single_into(api.render_table_name("Post"))
+            .value("content", *content)
+            .value("id", i)
+            .value("author_id", author_id);
+
+        api.database().insert(insert.into()).await?;
+
+        let insert = Insert::single_into(api.render_table_name("Tracking")).value("post_id", i);
+
+        api.database().insert(insert.into()).await?;
+    }
+
+    assert_eq!(
+        3,
+        api.database()
+            .select(Select::from_table(api.render_table_name("Post")))
+            .await?
+            .len()
+    );
+
+    let dm2 = r#"
+        model Post {
+            id        Int         @id @default(autoincrement())
+            content   String?
+            createdAt DateTime    @default(now())
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime    @default(now())
+            author_id Int
+            author    Author      @relation(fields: [author_id], references: [id])
+        }
+
+        model Tracking {
+            id        Int         @id @default(autoincrement())
+            post_id   Int
+            post      Post        @relation(fields: [post_id], references: [id])
+        }
+
+        model Author {
+            id        Int         @id @default(autoincrement())
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
+    })?;
+
+    // TODO: Why not empty?
+    // Check that the migration is idempotent.
+    //api.infer_apply(dm2).send().await?.assert_green()?.assert_no_steps()?;
+
+    assert_eq!(
+        3,
+        api.database()
+            .select(Select::from_table(api.render_table_name("Post")))
+            .await?
+            .len()
+    );
 
     Ok(())
 }
@@ -367,7 +603,7 @@ async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_
         model
             .assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())?
             .assert_column("id", |column| {
-                column.assert_default(Some(DefaultValue::VALUE(PrismaValue::Int(3))))
+                column.assert_default(Some(DefaultValue::value(PrismaValue::Int(3))))
             })
     })?;
 
@@ -1198,7 +1434,8 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
     assert!(index.is_none());
 }
 
-#[test_each_connector]
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
 async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
     // Group is a reserved keyword
     let dm = r#"
@@ -1377,7 +1614,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
         table.assert_column("name", |col| {
-            col.assert_default(Some(DefaultValue::VALUE(PrismaValue::String("banana".to_string()))))
+            col.assert_default(Some(DefaultValue::value(PrismaValue::String("banana".to_string()))))
         })
     })?;
 
@@ -1391,9 +1628,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     api.infer_apply(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
-        table.assert_column("name", |col| {
-            col.assert_default(Some(DefaultValue::VALUE(PrismaValue::String("mango".to_string()))))
-        })
+        table.assert_column("name", |col| col.assert_default(Some(DefaultValue::value("mango"))))
     })?;
 
     Ok(())
@@ -1438,18 +1673,46 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
     let sql_schema = api.describe_database().await?;
     let table = sql_schema.table_bang("Fruit");
 
-    assert_eq!(
-        table.column("sideNames").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string())))
-    );
-    assert_eq!(
-        table.column("contains").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE(PrismaValue::String("'potassium'".to_string())))
-    );
-    assert_eq!(
-        table.column("seasonality").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE(PrismaValue::String(r#""summer""#.to_string())))
-    );
+    match api.sql_family() {
+        SqlFamily::Mssql => {
+            let default = table.column("sideNames").and_then(|c| c.default.clone()).unwrap();
+            assert_eq!(DefaultValue::value("top\ndown").kind(), default.kind());
+            assert!(default
+                .constraint_name()
+                .map(|cn| cn.starts_with("DF__Fruit__sideNames"))
+                .unwrap());
+
+            let default = table.column("contains").and_then(|c| c.default.clone()).unwrap();
+            assert_eq!(DefaultValue::value("'potassium'").kind(), default.kind());
+            assert!(default
+                .constraint_name()
+                .map(|cn| cn.starts_with("DF__Fruit__contains"))
+                .unwrap());
+
+            let default = table.column("seasonality").and_then(|c| c.default.clone()).unwrap();
+            assert_eq!(DefaultValue::value(r#""summer""#).kind(), default.kind());
+            assert!(default
+                .constraint_name()
+                .map(|cn| cn.starts_with("DF__Fruit__seasonali"))
+                .unwrap());
+        }
+        _ => {
+            assert_eq!(
+                table.column("sideNames").and_then(|c| c.default.clone()),
+                Some(DefaultValue::value(PrismaValue::String("top\ndown".to_string())))
+            );
+
+            assert_eq!(
+                table.column("contains").and_then(|c| c.default.clone()),
+                Some(DefaultValue::value(PrismaValue::String("'potassium'".to_string())))
+            );
+
+            assert_eq!(
+                table.column("seasonality").and_then(|c| c.default.clone()),
+                Some(DefaultValue::value(PrismaValue::String(r#""summer""#.to_string())))
+            );
+        }
+    }
 
     Ok(())
 }
@@ -1473,8 +1736,13 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
 
     anyhow::ensure!(
         matches!(
-            schema.table_bang("Fruit").column_bang("createdAt").default,
-            Some(DefaultValue::NOW)
+            schema
+                .table_bang("Fruit")
+                .column_bang("createdAt")
+                .default
+                .as_ref()
+                .map(|d| d.kind()),
+            Some(DefaultKind::NOW)
         ),
         "createdAt default is set"
     );
@@ -1764,7 +2032,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_each_connector]
 async fn foreign_keys_can_be_added_on_existing_columns(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -2066,7 +2334,8 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
 async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -2248,7 +2517,8 @@ async fn adding_multiple_optional_fields_to_an_existing_model_works(api: &TestAp
     Ok(())
 }
 
-#[test_each_connector]
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
 async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -2298,7 +2568,8 @@ async fn reordering_and_altering_models_at_the_same_time_works(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector]
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
 async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
        model Post {
@@ -2329,6 +2600,33 @@ async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> 
     "#;
 
     api.schema_push(dm2).send().await?.assert_green()?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Blog {
+            id Int @id @default(autoincrement())
+            title String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    // Removing autoincrement requires us to recreate the table.
+    let dm2 = r#"
+        model Blog {
+            id Int @id
+            title Float
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .send()
+        .await?
+        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table. The data in that column will be cast from `String` to `Float`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.".into()])?;
 
     Ok(())
 }

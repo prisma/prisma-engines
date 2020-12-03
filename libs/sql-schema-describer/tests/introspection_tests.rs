@@ -6,7 +6,7 @@ use prisma_value::PrismaValue;
 use quaint::prelude::{Queryable, SqlFamily};
 use serde_json::Value;
 use sql_schema_describer::*;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 mod common;
 mod mssql;
@@ -198,7 +198,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
     );
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "quaint=info")]
 async fn multi_column_foreign_keys_must_work(api: &TestApi) {
     let sql_family = api.sql_family();
     let schema = api.schema_name().to_owned();
@@ -418,11 +418,11 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string(), "name".to_string()],
                 sequence: None,
-                constraint_name: if api.sql_family().is_postgres() {
-                    Some("User_pkey".into())
-                } else {
-                    None
-                },
+                constraint_name: match api.sql_family() {
+                    SqlFamily::Postgres => Some("User_pkey".into()),
+                    SqlFamily::Mssql => Some("PK_User".into()),
+                    _ => None,
+                }
             }),
             foreign_keys: vec![],
         }
@@ -443,7 +443,7 @@ async fn indices_must_work(api: &TestApi) {
     let result = api.describe().await.expect("describing");
     let user_table = result.get_table("User").expect("getting User table");
     let default = match api.sql_family() {
-        SqlFamily::Postgres => Some(DefaultValue::SEQUENCE(
+        SqlFamily::Postgres => Some(DefaultValue::sequence(
             "nextval(\'\"User_id_seq\"\'::regclass)".to_string(),
         )),
         _ => None,
@@ -487,28 +487,36 @@ async fn indices_must_work(api: &TestApi) {
         }),
         _ => None,
     };
+
+    assert_eq!("User", user_table.name);
+    assert_eq!(expected_columns, user_table.columns);
+
     assert_eq!(
-        user_table,
-        &Table {
-            name: "User".to_string(),
-            columns: expected_columns,
-            indices: vec![Index {
-                name: "count".to_string(),
-                columns: vec!["count".to_string()],
-                tpe: IndexType::Normal,
-            },],
-            primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string()],
-                sequence: pk_sequence,
-                constraint_name: if api.sql_family().is_postgres() {
-                    Some("User_pkey".into())
-                } else {
-                    None
-                },
-            }),
-            foreign_keys: vec![],
-        }
+        vec![Index {
+            name: "count".to_string(),
+            columns: vec!["count".to_string()],
+            tpe: IndexType::Normal,
+        }],
+        user_table.indices
     );
+
+    assert!(user_table.primary_key.is_some());
+    assert_eq!(Vec::<ForeignKey>::new(), user_table.foreign_keys);
+
+    let pk = user_table.primary_key.as_ref().unwrap();
+
+    assert_eq!(vec!["id".to_string()], pk.columns);
+    assert_eq!(pk_sequence, pk.sequence);
+
+    match api.sql_family() {
+        SqlFamily::Postgres => assert_eq!(Some("User_pkey".to_string()), pk.constraint_name),
+        SqlFamily::Mssql => assert!(pk
+            .constraint_name
+            .as_ref()
+            .map(|name| name.starts_with("PK__User__"))
+            .unwrap_or(false)),
+        _ => assert!(pk.constraint_name.is_none()),
+    }
 }
 
 #[test_each_connector]
@@ -643,30 +651,34 @@ async fn defaults_must_work(api: &TestApi) {
 
     let result = api.describe().await.expect("describing");
     let user_table = result.get_table("User").expect("getting User table");
-    let default = DefaultValue::VALUE(PrismaValue::Int(1));
-    let expected_columns = vec![Column {
-        name: "id".to_string(),
-        tpe: ColumnType {
-            data_type: int_data_type(api),
-            full_data_type: int_full_data_type(api),
-            character_maximum_length: None,
 
-            family: ColumnTypeFamily::Int,
-            arity: ColumnArity::Nullable,
-            native_type: int_native_type(api),
-        },
+    assert_eq!("User", &user_table.name);
+    assert_eq!(Vec::<Index>::new(), user_table.indices);
+    assert_eq!(Vec::<ForeignKey>::new(), user_table.foreign_keys);
+    assert_eq!(None, user_table.primary_key);
 
-        default: Some(default),
-        auto_increment: false,
-    }];
-    assert_eq!(
-        user_table,
-        &Table {
-            name: "User".to_string(),
-            columns: expected_columns,
-            indices: vec![],
-            primary_key: None,
-            foreign_keys: vec![],
-        }
-    );
+    let id = user_table.columns.first().unwrap();
+
+    assert_eq!("id", &id.name);
+    assert_eq!(false, id.auto_increment);
+
+    let expected_type = ColumnType {
+        data_type: int_data_type(api),
+        full_data_type: int_full_data_type(api),
+        character_maximum_length: None,
+
+        family: ColumnTypeFamily::Int,
+        arity: ColumnArity::Nullable,
+        native_type: int_native_type(api),
+    };
+
+    assert_eq!(expected_type, id.tpe);
+
+    let default = id.default.as_ref().unwrap();
+
+    if api.sql_family().is_mssql() {
+        assert!(default.constraint_name().unwrap().starts_with("DF__User__id__"));
+    }
+
+    assert_eq!(&DefaultKind::VALUE(PrismaValue::Int(1)), default.kind());
 }

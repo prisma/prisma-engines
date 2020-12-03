@@ -115,7 +115,6 @@ impl SqlMigrationConnector {
 
         for sql_string in render_raw_sql(&step, renderer, schemas) {
             tracing::debug!(index, %sql_string);
-
             self.conn().raw_cmd(&sql_string).await?;
         }
 
@@ -153,9 +152,17 @@ fn render_raw_sql(
                 .next()
                 .table_walker_at(add_foreign_key.table_index)
                 .foreign_key_at(add_foreign_key.foreign_key_index);
+
             vec![renderer.render_add_foreign_key(&foreign_key)]
         }
-        SqlMigrationStep::DropForeignKey(drop_foreign_key) => vec![renderer.render_drop_foreign_key(drop_foreign_key)],
+        SqlMigrationStep::DropForeignKey(drop_foreign_key) => {
+            let foreign_key = schemas
+                .previous()
+                .table_walker_at(drop_foreign_key.table_index)
+                .foreign_key_at(drop_foreign_key.foreign_key_index);
+
+            vec![renderer.render_drop_foreign_key(&foreign_key)]
+        }
         SqlMigrationStep::AlterTable(alter_table) => renderer.render_alter_table(alter_table, &schemas),
         SqlMigrationStep::CreateIndex(create_index) => vec![renderer.render_create_index(
             &schemas
@@ -163,7 +170,12 @@ fn render_raw_sql(
                 .table_walker_at(create_index.table_index)
                 .index_at(create_index.index_index),
         )],
-        SqlMigrationStep::DropIndex(drop_index) => vec![renderer.render_drop_index(drop_index)],
+        SqlMigrationStep::DropIndex(drop_index) => vec![renderer.render_drop_index(
+            &schemas
+                .previous()
+                .table_walker_at(drop_index.table_index)
+                .index_at(drop_index.index_index),
+        )],
         SqlMigrationStep::AlterIndex { table, index } => {
             renderer.render_alter_index(schemas.tables(table).indexes(index).as_ref())
         }

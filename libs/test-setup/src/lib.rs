@@ -70,7 +70,7 @@ pub fn postgres_9_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_9();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -79,7 +79,7 @@ pub fn pgbouncer_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_for_pgbouncer();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true&socket_timeout=60",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -88,7 +88,7 @@ pub fn postgres_10_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_10();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -97,7 +97,7 @@ pub fn postgres_11_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_11();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -106,7 +106,7 @@ pub fn postgres_12_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_12();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -115,7 +115,7 @@ pub fn postgres_13_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_13();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0&socket_timeout=60",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -124,7 +124,7 @@ pub fn mysql_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:3306/{db_name}?connect_timeout=20&socket_timeout=20",
+        "mysql://root:prisma@{host}:3306/{db_name}?connect_timeout=20&socket_timeout=60",
         host = db_host_mysql_5_7(),
         db_name = db_name,
     )
@@ -137,7 +137,7 @@ pub fn mysql_8_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=20",
+        "mysql://root:prisma@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=60",
         maybe_slash = if db_name.is_empty() { "" } else { "/" },
         host = host,
         port = port,
@@ -152,7 +152,7 @@ pub fn mysql_5_6_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=20",
+        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
         host = host,
         port = port,
         db_name = db_name,
@@ -166,7 +166,7 @@ pub fn mariadb_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=20",
+        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
         host = host,
         port = port,
         db_name = db_name,
@@ -177,7 +177,7 @@ pub fn mssql_2017_url(db_name: &str) -> String {
     let (host, port) = db_host_mssql_2017();
 
     format!(
-        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;sockettimeout=15;isolationLevel=READ UNCOMMITTED;encrypt=DANGER_PLAINTEXT",
+        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;encrypt=DANGER_PLAINTEXT;isolationLevel=READ UNCOMMITTED",
         db_name = db_name,
         host = host,
         port = port,
@@ -188,7 +188,7 @@ pub fn mssql_2019_url(db_name: &str) -> String {
     let (host, port) = db_host_mssql_2019();
 
     format!(
-        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;sockettimeout=15;isolationLevel=READ UNCOMMITTED;encrypt=DANGER_PLAINTEXT",
+        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;encrypt=DANGER_PLAINTEXT;isolationLevel=READ UNCOMMITTED",
         db_name = db_name,
         host = host,
         port = port,

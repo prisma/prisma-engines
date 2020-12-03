@@ -60,6 +60,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             .map(|m| m.parse_schema_ast())
             .unwrap_or_else(|| Ok(SchemaAst::empty()))
             .map_err(CoreError::InvalidPersistedDatamodel)?;
+
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;

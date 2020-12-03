@@ -68,6 +68,12 @@ pub(crate) trait SqlSchemaDifferFlavour {
         false
     }
 
+    /// Whether the primary key should be recreated if the column part of it is
+    /// recreated.
+    fn should_recreate_the_primary_key_on_column_recreate(&self) -> bool {
+        false
+    }
+
     fn table_names_match(&self, names: Pair<&str>) -> bool {
         names.previous() == names.next()
     }

@@ -101,28 +101,36 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn diff_internal(&self) -> SqlSchemaDiff {
         let tables_to_redefine = self.flavour.tables_to_redefine(&self);
         let mut alter_indexes = self.alter_indexes(&tables_to_redefine);
+
         let redefine_indexes = if self.flavour.can_alter_index() {
             Vec::new()
         } else {
             std::mem::replace(&mut alter_indexes, Vec::new())
         };
+
         let (drop_tables, mut drop_foreign_keys) = self.drop_tables();
         self.drop_foreign_keys(&mut drop_foreign_keys, &tables_to_redefine);
+
+        let drop_indexes = self.drop_indexes(&tables_to_redefine);
+        let create_indexes = self.create_indexes(&tables_to_redefine);
+
+        let redefine_tables = self.redefine_tables(&tables_to_redefine);
+        let alter_tables = self.alter_tables(&tables_to_redefine);
 
         SqlSchemaDiff {
             add_foreign_keys: self.add_foreign_keys(&tables_to_redefine),
             drop_foreign_keys,
             drop_tables,
             create_tables: self.create_tables(),
-            alter_tables: self.alter_tables(&tables_to_redefine),
-            create_indexes: self.create_indexes(&tables_to_redefine),
-            drop_indexes: self.drop_indexes(&tables_to_redefine),
+            alter_tables,
+            create_indexes,
+            drop_indexes,
             alter_indexes,
             redefine_indexes,
             create_enums: self.create_enums(),
             drop_enums: self.drop_enums(),
             alter_enums: self.alter_enums(),
-            redefine_tables: self.redefine_tables(&tables_to_redefine),
+            redefine_tables,
             tables_to_redefine,
         }
     }
@@ -141,6 +149,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         let (dropped_tables_count, dropped_fks_count) = self.dropped_tables().fold((0, 0), |(tables, fks), item| {
             (tables + 1, fks + item.foreign_key_count())
         });
+
         let mut dropped_tables = Vec::with_capacity(dropped_tables_count);
         let mut dropped_foreign_keys = Vec::with_capacity(dropped_fks_count);
 
@@ -282,16 +291,58 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn add_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
-        differ
+        let from_psl_change = differ
             .created_primary_key()
             .filter(|pk| !pk.columns.is_empty())
             .map(|pk| TableChange::AddPrimaryKey {
                 columns: pk.columns.clone(),
+            });
+
+        if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
+            from_psl_change.or_else(|| {
+                let from_recreate = Self::alter_columns(differ).any(|tc| match tc {
+                    TableChange::DropAndRecreateColumn { column_index, .. } => {
+                        let idx = *column_index.previous();
+                        differ.previous().column_at(idx).is_part_of_primary_key()
+                    }
+                    _ => false,
+                });
+
+                if from_recreate {
+                    Some(TableChange::AddPrimaryKey {
+                        columns: differ.previous().table().primary_key_columns(),
+                    })
+                } else {
+                    None
+                }
             })
+        } else {
+            from_psl_change
+        }
     }
 
     fn drop_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
-        differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey)
+        let from_psl_change = differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey);
+
+        if differ.flavour.should_recreate_the_primary_key_on_column_recreate() {
+            from_psl_change.or_else(|| {
+                let from_recreate = Self::alter_columns(differ).any(|tc| match tc {
+                    TableChange::DropAndRecreateColumn { column_index, .. } => {
+                        let idx = *column_index.previous();
+                        differ.previous().column_at(idx).is_part_of_primary_key()
+                    }
+                    _ => false,
+                });
+
+                if from_recreate {
+                    Some(TableChange::DropPrimaryKey)
+                } else {
+                    None
+                }
+            })
+        } else {
+            from_psl_change
+        }
     }
 
     fn create_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<CreateIndex> {
@@ -328,7 +379,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn drop_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<DropIndex> {
-        let mut drop_indexes = Vec::new();
+        let mut drop_indexes = HashSet::new();
 
         for tables in self.table_pairs() {
             for index in tables.dropped_indexes() {
@@ -338,25 +389,27 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     continue;
                 }
 
-                drop_indexes.push(DropIndex {
-                    table: tables.previous().name().to_owned(),
-                    name: index.name().to_owned(),
-                })
+                drop_indexes.insert(DropIndex {
+                    table_index: index.table().table_index(),
+                    index_index: index.index(),
+                });
             }
         }
 
         // On SQLite, we will recreate indexes in the RedefineTables step,
         // because they are needed for implementing new foreign key constraints.
         if !tables_to_redefine.is_empty() && self.flavour.should_drop_indexes_from_dropped_tables() {
-            drop_indexes.extend(self.dropped_tables().flat_map(|table| {
-                table.indexes().map(move |index| DropIndex {
-                    table: table.name().to_owned(),
-                    name: index.name().to_owned(),
-                })
-            }))
+            for table in self.dropped_tables() {
+                for index in table.indexes() {
+                    drop_indexes.insert(DropIndex {
+                        table_index: index.table().table_index(),
+                        index_index: index.index(),
+                    });
+                }
+            }
         }
 
-        drop_indexes
+        drop_indexes.into_iter().collect()
     }
 
     fn create_enums(&self) -> Vec<CreateEnum> {
@@ -393,9 +446,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                             type_change.map(|tc| match tc {
                                 ColumnTypeChange::SafeCast => sql_migration::ColumnTypeChange::SafeCast,
                                 ColumnTypeChange::RiskyCast => sql_migration::ColumnTypeChange::RiskyCast,
-                                ColumnTypeChange::NotCastable => {
-                                    unreachable!("ColumnTypeChange::NotCastable in redefine_tables")
-                                }
+                                ColumnTypeChange::NotCastable => sql_migration::ColumnTypeChange::NotCastable,
                             }),
                         )
                     })

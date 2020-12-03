@@ -96,16 +96,6 @@ pub(crate) fn render_on_delete(on_delete: &ForeignKeyAction) -> &'static str {
     }
 }
 
-pub(crate) fn render_on_update(on_update: &ForeignKeyAction) -> &'static str {
-    match on_update {
-        ForeignKeyAction::NoAction => "",
-        ForeignKeyAction::SetNull => "ON UPDATE SET NULL",
-        ForeignKeyAction::Cascade => "ON UPDATE CASCADE",
-        ForeignKeyAction::SetDefault => "ON UPDATE SET DEFAULT",
-        ForeignKeyAction::Restrict => "ON UPDATE RESTRICT",
-    }
-}
-
 pub(crate) fn format_hex(bytes: &[u8]) -> String {
     use std::fmt::Write as _;
 

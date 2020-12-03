@@ -1,6 +1,6 @@
 use barrel::types;
 use introspection_engine_tests::{test_api::*, BarrelMigrationExecutor};
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 #[test_each_connector(tags("mysql"))]
 async fn databases_for_mysql_should_work(api: &TestApi) -> crate::TestResult {

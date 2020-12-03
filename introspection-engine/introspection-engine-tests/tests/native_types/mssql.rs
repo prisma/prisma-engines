@@ -1,7 +1,7 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 const TYPES: &[(&str, &str)] = &[
     //fieldname, db datatype

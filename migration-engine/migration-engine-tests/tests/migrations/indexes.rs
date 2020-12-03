@@ -110,7 +110,8 @@ async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api:
     Ok(())
 }
 
-#[test_each_connector]
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
 async fn one_to_many_self_relations_do_not_create_a_unique_index(api: &TestApi) -> TestResult {
     let dm = r#"
         model Location {

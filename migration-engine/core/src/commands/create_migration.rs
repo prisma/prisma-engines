@@ -72,6 +72,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
             &input.migration_name,
         )
         .map_err(|_| CoreError::Generic(anyhow::anyhow!("Failed to create a new migration directory.")))?;
+
         directory
             .write_migration_script(&migration_script, D::FILE_EXTENSION)
             .map_err(|err| {

@@ -1,4 +1,5 @@
 use crate::*;
+use barrel::types;
 use pretty_assertions::assert_eq;
 
 #[test_each_connector]
@@ -297,9 +298,13 @@ async fn baselining_should_work(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
     let persistence = api.imperative_migration_persistence();
 
-    api.apply_script("Create Table test(id Integer Primary Key);")
-        .await
-        .unwrap();
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("test", move |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await?;
 
     // Create a first local migration that matches the db contents
     let baseline_migration_name = {

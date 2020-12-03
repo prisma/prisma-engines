@@ -10,7 +10,7 @@ impl GateKeeper {
     /// Creates a new instance, blocking features defined in the constructor.
     pub fn new(whitelist: Vec<String>) -> Self {
         Self {
-            blacklist: &["nativeTypes", "microsoftSqlServer"],
+            blacklist: &["nativeTypes"],
             whitelist,
         }
     }

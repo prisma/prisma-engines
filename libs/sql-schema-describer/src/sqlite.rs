@@ -167,43 +167,43 @@ impl SqlSchemaDescriber {
                         } else {
                             Some(match &tpe.family {
                                 ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
-                                    Some(int_value) => DefaultValue::VALUE(int_value),
-                                    None => DefaultValue::DBGENERATED(default_string),
+                                    Some(int_value) => DefaultValue::value(int_value),
+                                    None => DefaultValue::db_generated(default_string),
                                 },
                                 ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
-                                    Some(int_value) => DefaultValue::VALUE(int_value),
-                                    None => DefaultValue::DBGENERATED(default_string),
+                                    Some(int_value) => DefaultValue::value(int_value),
+                                    None => DefaultValue::db_generated(default_string),
                                 },
                                 ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
-                                    Some(float_value) => DefaultValue::VALUE(float_value),
-                                    None => DefaultValue::DBGENERATED(default_string),
+                                    Some(float_value) => DefaultValue::value(float_value),
+                                    None => DefaultValue::db_generated(default_string),
                                 },
                                 ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
-                                    Some(float_value) => DefaultValue::VALUE(float_value),
-                                    None => DefaultValue::DBGENERATED(default_string),
+                                    Some(float_value) => DefaultValue::value(float_value),
+                                    None => DefaultValue::db_generated(default_string),
                                 },
                                 ColumnTypeFamily::Boolean => match Self::parse_int(&default_string) {
-                                    Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
-                                    Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
+                                    Some(PrismaValue::Int(1)) => DefaultValue::value(true),
+                                    Some(PrismaValue::Int(0)) => DefaultValue::value(false),
                                     _ => match Self::parse_bool(&default_string) {
-                                        Some(bool_value) => DefaultValue::VALUE(bool_value),
-                                        None => DefaultValue::DBGENERATED(default_string),
+                                        Some(bool_value) => DefaultValue::value(bool_value),
+                                        None => DefaultValue::db_generated(default_string),
                                     },
                                 },
-                                ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(
-                                    unquote_sqlite_string_default(&default_string).into(),
-                                )),
+                                ColumnTypeFamily::String => {
+                                    DefaultValue::value(unquote_sqlite_string_default(&default_string).into_owned())
+                                }
                                 ColumnTypeFamily::DateTime => match default_string.to_lowercase().as_str() {
                                     "current_timestamp" | "datetime(\'now\')" | "datetime(\'now\', \'localtime\')" => {
-                                        DefaultValue::NOW
+                                        DefaultValue::now()
                                     }
-                                    _ => DefaultValue::DBGENERATED(default_string),
+                                    _ => DefaultValue::db_generated(default_string),
                                 },
-                                ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(default_string)),
-                                ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
+                                ColumnTypeFamily::Json => DefaultValue::db_generated(default_string),
+                                ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
+                                ColumnTypeFamily::Enum(_) => DefaultValue::value(PrismaValue::Enum(default_string)),
+                                ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
                             })
                         }
                     }

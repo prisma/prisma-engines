@@ -18,7 +18,7 @@ pub(crate) use common::IteratorJoin;
 
 use crate::{
     pair::Pair,
-    sql_migration::{AlterEnum, AlterTable, DropForeignKey, DropIndex, RedefineTable},
+    sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
 use common::{Quoted, QuotedWithSchema};
 use sql_schema_describer::{
@@ -70,10 +70,10 @@ pub(crate) trait SqlRenderer {
     fn render_drop_enum(&self, dropped_enum: &EnumWalker<'_>) -> Vec<String>;
 
     /// Render a `DropForeignKey` step.
-    fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String;
+    fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String;
 
     /// Render a `DropIndex` step.
-    fn render_drop_index(&self, drop_index: &DropIndex) -> String;
+    fn render_drop_index(&self, index: &IndexWalker<'_>) -> String;
 
     /// Render a `DropTable` step.
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {

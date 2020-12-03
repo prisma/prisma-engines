@@ -96,7 +96,7 @@ async fn enums_work_when_table_name_is_remapped(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(tags("mysql"))]
 async fn arity_of_enum_columns_can_be_changed(api: &TestApi) -> TestResult {
     let dm1 = r#"
         enum Color {
@@ -145,7 +145,7 @@ async fn arity_of_enum_columns_can_be_changed(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), log = "debug,sql_schema_describer=info")]
+#[test_each_connector(tags("mysql"))]
 async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
     let dm1 = r#"
         enum Color {
