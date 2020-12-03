@@ -65,10 +65,6 @@ impl OutputType {
         OutputType::Scalar(ScalarType::Bytes)
     }
 
-    pub fn null() -> OutputType {
-        OutputType::Scalar(ScalarType::Null)
-    }
-
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
     pub fn as_object_type(&self) -> Option<ObjectTypeStrongRef> {
@@ -120,6 +116,10 @@ impl ObjectType {
         &self.identifier
     }
 
+    pub fn add_field(&mut self, field: OutputField) {
+        self.fields.get_mut().unwrap().push(Arc::new(field));
+    }
+
     pub fn get_fields(&self) -> &Vec<OutputFieldRef> {
         self.fields.get().unwrap()
     }
@@ -141,13 +141,15 @@ impl ObjectType {
 #[derive(Debug)]
 pub struct OutputField {
     pub name: String,
-
-    /// Possible field types, represented as a union of output types, but only one can be provided at any time.
-    pub field_types: Vec<OutputType>,
+    pub field_type: OutputTypeRef,
 
     /// Arguments are input fields, but positioned in context of an output field
     /// instead of being attached to an input object.
     pub arguments: Vec<InputFieldRef>,
+
+    /// Indicates if the presence of the field on the higher output objects.
+    /// As opposed to input fields, optional output fields are also automatically nullable.
+    pub is_required: bool,
 
     /// Relevant for resolving top level queries.
     pub query_info: Option<QueryInfo>,
@@ -155,7 +157,7 @@ pub struct OutputField {
 
 impl OutputField {
     pub fn optional(mut self) -> Self {
-        self.field_types.push(OutputType::null());
+        self.is_required = false;
         self
     }
 

@@ -122,3 +122,15 @@ impl FieldRefEnumType {
         self.values.iter().map(|(name, _)| name.to_owned()).collect()
     }
 }
+
+impl From<EnumType> for OutputType {
+    fn from(e: EnumType) -> Self {
+        OutputType::Enum(Arc::new(e))
+    }
+}
+
+impl From<EnumType> for InputType {
+    fn from(e: EnumType) -> Self {
+        InputType::Enum(Arc::new(e))
+    }
+}
