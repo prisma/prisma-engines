@@ -365,12 +365,6 @@ checksum = "a4521f3e3d031370679b3b140beb36dfe4801b09ac77e30c61941f97df3ef28b"
 
 [[package]]
 name = "base64"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b41b7ea54a0c9d92199de89e20e58d49f02f8e699814ef3fdf266f6f748d15c7"
-
-[[package]]
-name = "base64"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3441f0f7b02788e948e47f457ca01f1d7e6d92c693bc132c22b087d3141c03ff"
@@ -2840,10 +2834,10 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#f506d85089a333ee750a6e6284613e8163f1c368"
+source = "git+https://github.com/prisma/quaint#6efc6f6fb48262b7d9e7e8c4b4a0f52402e1e432"
 dependencies = [
  "async-trait",
- "base64 0.11.0",
+ "base64 0.12.3",
  "bigdecimal 0.2.0",
  "bit-vec",
  "byteorder",
@@ -3246,7 +3240,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.11.1",
+ "parking_lot 0.10.2",
  "serial_test_derive",
 ]
 
