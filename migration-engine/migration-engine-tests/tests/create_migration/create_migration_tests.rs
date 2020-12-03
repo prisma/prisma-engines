@@ -205,6 +205,25 @@ async fn empty_migrations_should_not_be_created(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
+async fn migration_name_length_is_validated(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Cat {
+            id Int @id
+            name String
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?;
+
+    Ok(())
+}
+
+#[test_each_connector]
 async fn empty_migrations_should_be_created_with_the_draft_option(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {

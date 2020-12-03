@@ -1,6 +1,6 @@
 use migration_connector::{ConnectorError, ListMigrationsError};
 use std::{error::Error as StdError, fmt::Display};
-use user_facing_errors::KnownError;
+use user_facing_errors::{KnownError, UserFacingError};
 
 use crate::migration::datamodel_calculator::CalculatorError;
 
@@ -88,6 +88,11 @@ impl CoreError {
             }
             crate_error => user_facing_errors::Error::from_dyn_error(&crate_error),
         }
+    }
+
+    /// Construct a user facing CoreError
+    pub(crate) fn user_facing(error: impl UserFacingError) -> Self {
+        CoreError::UserFacing(KnownError::new(error))
     }
 }
 
