@@ -114,6 +114,13 @@ pub struct FoundFailedMigrations {
     pub details: String,
 }
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3010",
+    message = "The name of the migration is too long. It must not be longer than 200 characters (bytes)."
+)]
+pub struct MigrationNameTooLong;
+
 #[cfg(test)]
 mod tests {
     use super::*;
