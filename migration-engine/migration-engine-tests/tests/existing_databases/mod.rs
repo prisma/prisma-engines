@@ -326,7 +326,7 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
 async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
-            id Int @id
+            id Int @id @default(autoincrement())
             title String
         }
     "#;
@@ -353,7 +353,7 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
 
     let dm2 = r#"
         model Blog {
-            id Int @id
+            id Int @id @default(autoincrement())
             title Float @map(name: "new_title")
         }
     "#;

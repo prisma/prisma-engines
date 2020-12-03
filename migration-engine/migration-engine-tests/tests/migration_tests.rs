@@ -969,13 +969,11 @@ async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_t
             .assert_columns_count(2)?
             .assert_column("A", |col| col.assert_type_is_int())?
             .assert_column("B", |col| col.assert_type_is_string())?
-            .assert_fk_on_columns(&["A"], |fk| match api.sql_family() {
-                SqlFamily::Mssql => fk.assert_references("A", &["id"]),
-                _ => fk.assert_references("A", &["id"])?.assert_cascades_on_delete(),
+            .assert_fk_on_columns(&["A"], |fk| {
+                fk.assert_references("A", &["id"])?.assert_cascades_on_delete()
             })?
-            .assert_fk_on_columns(&["B"], |fk| match api.sql_family() {
-                SqlFamily::Mssql => fk.assert_references("B", &["id"]),
-                _ => fk.assert_references("B", &["id"])?.assert_cascades_on_delete(),
+            .assert_fk_on_columns(&["B"], |fk| {
+                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
             })
     })?;
 
@@ -2237,9 +2235,12 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
             .assert_has_column("human_lastName")?
             .assert_has_column("cat_id")?
             .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
-                fk.assert_references("Human", &["firstName", "lastName"])
+                fk.assert_references("Human", &["firstName", "lastName"])?
+                    .assert_cascades_on_delete()
             })?
-            .assert_fk_on_columns(&["cat_id"], |fk| fk.assert_references("Cat", &["id"]))?
+            .assert_fk_on_columns(&["cat_id"], |fk| {
+                fk.assert_references("Cat", &["id"])?.assert_cascades_on_delete()
+            })?
             .assert_indexes_count(2)?
             .assert_index_on_columns(&["cat_id", "human_firstName", "human_lastName"], |idx| {
                 idx.assert_is_unique()

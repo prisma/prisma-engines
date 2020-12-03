@@ -159,8 +159,6 @@ async fn diagnose_migration_history_without_opt_in_to_shadow_database_does_not_c
     Ok(())
 }
 
-// TODO: We originally ignored Postgres here too, and for some reason we get no
-// drift for SQL Server, even though the `SELECT YOLO;` fails...
 #[test_each_connector(ignore("postgres", "mssql_2017", "mssql_2019"))]
 async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migrations(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
