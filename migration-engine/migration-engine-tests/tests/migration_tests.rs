@@ -2603,3 +2603,30 @@ async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> 
 
     Ok(())
 }
+
+#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Blog {
+            id Int @id @default(autoincrement())
+            title String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    // Removing autoincrement requires us to recreate the table.
+    let dm2 = r#"
+        model Blog {
+            id Int @id
+            title Float
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .send()
+        .await?
+        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table. The data in that column will be cast from `String` to `Float`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.".into()])?;
+
+    Ok(())
+}
