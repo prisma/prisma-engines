@@ -133,7 +133,7 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
 }
 
 #[test_each_connector]
-async fn migrations_should_fail_to_apply_if_modified(api: &TestApi) -> TestResult {
+async fn migrations_should_not_reapply_modified_migrations(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
             id      Int @id
@@ -164,24 +164,10 @@ async fn migrations_should_fail_to_apply_if_modified(api: &TestApi) -> TestResul
         .send()
         .await?;
 
-    let err = api
-        .apply_migrations(&migrations_directory)
+    api.apply_migrations(&migrations_directory)
         .send()
-        .await
-        .unwrap_err()
-        .to_string();
-
-    assert!(
-        err.contains("The following migrations scripts are different from those that were applied to the database"),
-        err
-    );
-
-    let mut migrations = api.imperative_migration_persistence().list_migrations().await?.unwrap();
-
-    assert_eq!(migrations.len(), 1);
-    let migration = migrations.pop().unwrap();
-
-    migration.assert_migration_name("initial")?;
+        .await?
+        .assert_applied_migrations(&["second-migration"])?;
 
     Ok(())
 }

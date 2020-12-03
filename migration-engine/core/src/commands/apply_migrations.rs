@@ -3,6 +3,7 @@ use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
 use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
+use user_facing_errors::{migration_engine::FoundFailedMigrations, KnownError};
 
 /// The input to the `ApplyMigrations` command.
 #[derive(Deserialize, Debug)]
@@ -49,7 +50,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
             .await?
             .map_err(PersistenceNotInitializedError::into_connector_error)?;
 
-        diagnose_migration_history(&migrations_from_database, &migrations_from_filesystem)?;
+        detect_failed_migrations(&migrations_from_database)?;
 
         // We are now on the Happy Path™.
         tracing::debug!("Migration history is OK, applying unapplied migrations.");
@@ -98,11 +99,11 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
                 Err(err) => {
                     tracing::debug!("Failed to apply the script.");
 
-                    let logs = format!("script:\n{}\n\nerror:\n{}", script, err);
+                    let logs = err.to_string();
 
                     migration_persistence.record_failed_step(&migration_id, &logs).await?;
 
-                    return Err(err.into()); // todo: give more context
+                    return Err(err.into());
                 }
             }
         }
@@ -113,97 +114,34 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
     }
 }
 
-fn diagnose_migration_history(
-    migrations_from_database: &[MigrationRecord],
-    migrations_from_filesystem: &[MigrationDirectory],
-) -> CoreResult<()> {
-    tracing::debug!("Running diagnostics.");
+fn detect_failed_migrations(migrations_from_database: &[MigrationRecord]) -> CoreResult<()> {
+    use std::fmt::Write as _;
 
-    let mut history_problems = HistoryProblems::default();
+    tracing::debug!("Checking for failed migrations.");
 
     let mut failed_migrations = migrations_from_database
         .iter()
         .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none())
         .peekable();
 
-    if failed_migrations.peek().is_some() {
-        history_problems
-            .failed_migrations
-            .extend(failed_migrations.map(|failed_migration| {
-                format!(
-                    "The `{name}` migration started at {started_at} failed with the following logs:\n{logs}",
-                    name = failed_migration.migration_name,
-                    started_at = failed_migration.started_at,
-                    logs = failed_migration.logs
-                )
-            }))
+    if failed_migrations.peek().is_none() {
+        return Ok(());
     }
 
-    let mut edited_migrations = migrations_from_database
-        .iter()
-        .filter(|db_migration| db_migration.rolled_back_at.is_none())
-        .filter(|db_migration| {
-            migrations_from_filesystem
-                .iter()
-                .filter(|fs_migration| fs_migration.migration_name() == db_migration.migration_name)
-                .any(|fs_migration| {
-                    !fs_migration
-                        .matches_checksum(&db_migration.checksum)
-                        .expect("Failed to read migration script to match checksum.")
-                })
-        })
-        .peekable();
+    let mut details = String::new();
 
-    if edited_migrations.peek().is_some() {
-        let error_lines = edited_migrations.map(|db_migration| {
-            let diagnostic = match db_migration.finished_at {
-                Some(finished_at) => format!("and finished at {finished_at}.", finished_at = finished_at),
-                None => "but failed.".to_string(),
-            };
-
-            format!(
-                "- `{migration_name}, started at {started_at} {diagnostic}`",
-                started_at = db_migration.started_at,
-                migration_name = db_migration.migration_name,
-                diagnostic = diagnostic,
-            )
-        });
-
-        history_problems.edited_migrations = Some(format!(
-            "The following migrations scripts are different from those that were applied to the database:\n{:?}",
-            error_lines.collect::<Vec<String>>(),
-        ));
+    for failed_migration in failed_migrations {
+        writeln!(
+            details,
+            "The `{name}` migration started at {started_at} failed with the following logs:\n{logs}",
+            name = failed_migration.migration_name,
+            started_at = failed_migration.started_at,
+            logs = failed_migration.logs
+        )
+        .unwrap();
     }
 
-    history_problems.to_result()
-}
-
-#[derive(Default, Debug)]
-struct HistoryProblems {
-    failed_migrations: Vec<String>,
-    edited_migrations: Option<String>,
-}
-
-impl HistoryProblems {
-    fn to_result(&self) -> CoreResult<()> {
-        if self.failed_migrations.is_empty() && self.edited_migrations.is_none() {
-            return Ok(());
-        }
-
-        let mut error = String::with_capacity(
-            self.failed_migrations.iter().map(String::len).sum::<usize>()
-                + self.edited_migrations.as_ref().map(String::len).unwrap_or(0),
-        );
-
-        for failed_migration in &self.failed_migrations {
-            error.push_str(&failed_migration);
-            error.push('\n');
-        }
-
-        if let Some(edited_migrations) = &self.edited_migrations {
-            error.push_str(edited_migrations)
-        }
-
-        Err(CoreError::Generic(anyhow::Error::msg(error)))
-    }
+    Err(CoreError::UserFacing(KnownError::new(FoundFailedMigrations {
+        details,
+    })))
 }
