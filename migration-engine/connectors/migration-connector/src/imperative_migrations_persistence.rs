@@ -55,8 +55,8 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// `record_migration_started()` instead.
     async fn record_migration_started_impl(&self, migration_name: &str, checksum: &str) -> ConnectorResult<String>;
 
-    /// Increase the applied_steps_count counter, and append the given logs.
-    async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()>;
+    /// Increase the applied_steps_count counter.
+    async fn record_successful_step(&self, id: &str) -> ConnectorResult<()>;
 
     /// Report logs for a failed migration step. We assume the next steps in the
     /// migration will not be applied, and the error reported.
@@ -100,10 +100,7 @@ pub struct MigrationRecord {
     pub migration_name: String,
     /// The human-readable log of actions performed by the engine, up to and
     /// including the point where the migration failed, with the relevant error.
-    ///
-    /// Implementation detail note: a tracing collector with specific events in
-    /// the database applier.
-    pub logs: String,
+    pub logs: Option<String>,
     /// If the migration was rolled back, and when.
     pub rolled_back_at: Option<Timestamp>,
     /// The time the migration started being applied.

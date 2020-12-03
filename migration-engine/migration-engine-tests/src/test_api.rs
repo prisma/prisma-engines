@@ -505,7 +505,7 @@ impl MigrationsAssertions for MigrationRecord {
     }
 
     fn assert_logs(self, expected: &str) -> AssertionResult<Self> {
-        assert_eq!(self.logs, expected);
+        assert_eq!(self.logs.as_deref(), Some(expected));
 
         Ok(self)
     }

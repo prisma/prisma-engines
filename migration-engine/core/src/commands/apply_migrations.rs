@@ -90,9 +90,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
             match applier.apply_script(&script).await {
                 Ok(()) => {
                     tracing::debug!("Successfully applied the script.");
-                    migration_persistence
-                        .record_successful_step(&migration_id, &script)
-                        .await?;
+                    migration_persistence.record_successful_step(&migration_id).await?;
                     migration_persistence.record_migration_finished(&migration_id).await?;
                     applied_migration_names.push(unapplied_migration.migration_name().to_owned());
                 }
@@ -136,7 +134,11 @@ fn detect_failed_migrations(migrations_from_database: &[MigrationRecord]) -> Cor
             "The `{name}` migration started at {started_at} failed with the following logs:\n{logs}",
             name = failed_migration.migration_name,
             started_at = failed_migration.started_at,
-            logs = failed_migration.logs
+            logs = if let Some(logs) = &failed_migration.logs {
+                format!("with the following logs:\n{}", logs)
+            } else {
+                String::new()
+            }
         )
         .unwrap();
     }

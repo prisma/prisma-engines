@@ -78,8 +78,6 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .value("id", id.as_str())
             .value("checksum", checksum)
             .value("started_at", now)
-            // We need this line because MySQL can't default a text field to an empty string
-            .value("logs", "")
             .value("migration_name", migration_name);
 
         conn.execute(insert).await?;
@@ -87,7 +85,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         Ok(id)
     }
 
-    async fn record_successful_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
+    async fn record_successful_step(&self, id: &str) -> ConnectorResult<()> {
         use quaint::ast::*;
 
         let update = Update::table(IMPERATIVE_MIGRATIONS_TABLE_NAME)
@@ -95,8 +93,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
             .set(
                 "applied_steps_count",
                 Expression::from(Column::from("applied_steps_count")) + Expression::from(1),
-            )
-            .set("logs", logs);
+            );
 
         self.conn().execute(update).await?;
 
