@@ -20,7 +20,7 @@ pub(crate) fn get_field_filter_types(
                 ctx,
                 &sf.type_identifier,
                 sf.is_list,
-                sf.is_required,
+                !sf.is_required,
                 false,
             ))];
 
