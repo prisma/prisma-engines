@@ -140,9 +140,10 @@ pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: Qu
 
 pub fn group_by_aggregate(
     model: &ModelRef,
-    group_by: Vec<ScalarFieldRef>,
-    selections: &[AggregationSelection],
     args: QueryArguments,
+    selections: &[AggregationSelection],
+    group_by: Vec<ScalarFieldRef>,
+    having: Option<Filter>,
 ) -> Select<'static> {
     let base_query: Select = args.into_select(model);
 
@@ -178,9 +179,14 @@ pub fn group_by_aggregate(
             .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
     });
 
-    group_by
+    let grouped = group_by
         .into_iter()
-        .fold(select_query, |query, field| query.group_by(field.as_column()))
+        .fold(select_query, |query, field| query.group_by(field.as_column()));
+
+    match having {
+        Some(filter) => grouped.having(filter.aliased_cond(None)),
+        None => grouped,
+    }
 }
 
 fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec<Column<'static>> {

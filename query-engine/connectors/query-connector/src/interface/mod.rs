@@ -207,9 +207,10 @@ pub trait ReadOperations {
     async fn aggregate_records(
         &self,
         model: &ModelRef,
+        query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
-        query_arguments: QueryArguments,
+        having: Option<Filter>,
     ) -> crate::Result<Vec<AggregationRow>>;
 }
 
