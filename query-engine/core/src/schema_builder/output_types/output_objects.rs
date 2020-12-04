@@ -61,18 +61,22 @@ pub(crate) fn map_field(ctx: &mut BuilderContext, model_field: &ModelField) -> O
 
 pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputType {
     match model_field {
-        ModelField::Scalar(sf) => map_scalar_output_type(sf),
+        ModelField::Scalar(sf) => map_scalar_output_type_for_field(ctx, sf),
         ModelField::Relation(rf) => map_relation_output_type(ctx, rf),
     }
 }
 
-pub(crate) fn map_scalar_output_type(field: &ScalarFieldRef) -> OutputType {
-    let output_type = match field.type_identifier {
+pub(crate) fn map_scalar_output_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> OutputType {
+    map_scalar_output_type(ctx, &field.type_identifier, field.is_list)
+}
+
+pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> OutputType {
+    let output_type = match typ {
         TypeIdentifier::String => OutputType::string(),
         TypeIdentifier::Float => OutputType::float(),
         TypeIdentifier::Decimal => OutputType::decimal(),
         TypeIdentifier::Boolean => OutputType::boolean(),
-        TypeIdentifier::Enum(_) => map_enum_field(field).into(),
+        TypeIdentifier::Enum(e) => map_enum_type(ctx, &e).into(),
         TypeIdentifier::Json => OutputType::json(),
         TypeIdentifier::DateTime => OutputType::date_time(),
         TypeIdentifier::UUID => OutputType::uuid(),
@@ -82,7 +86,7 @@ pub(crate) fn map_scalar_output_type(field: &ScalarFieldRef) -> OutputType {
         TypeIdentifier::BigInt => OutputType::bigint(),
     };
 
-    if field.is_list {
+    if list {
         OutputType::list(output_type)
     } else {
         output_type
@@ -99,18 +103,13 @@ pub(crate) fn map_relation_output_type(ctx: &mut BuilderContext, field: &Relatio
     }
 }
 
-pub(crate) fn map_enum_field(scalar_field: &ScalarFieldRef) -> EnumType {
-    match scalar_field.type_identifier {
-        TypeIdentifier::Enum(_) => {
-            let internal_enum = scalar_field
-                .internal_enum
-                .as_ref()
-                .expect("Invariant violation: Enum fields are expected to have an internal_enum associated with them.");
+fn map_enum_type(ctx: &mut BuilderContext, enum_name: &str) -> EnumType {
+    let e = ctx
+        .internal_data_model
+        .find_enum(enum_name)
+        .expect("Enum references must always be valid.");
 
-            internal_enum.clone().into()
-        }
-        _ => panic!("Invariant violation: map_enum_field can only be called on scalar enum fields."),
-    }
+    e.clone().into()
 }
 
 pub(crate) fn batch_payload_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {

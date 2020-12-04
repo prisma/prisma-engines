@@ -58,8 +58,8 @@ fn checked_create_input_type(
         model.name.clone(),
         "Create",
         scalar_fields,
-        |_, f: ScalarFieldRef, default: Option<DefaultValue>| {
-            let typ = map_scalar_input_type(&f);
+        |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
+            let typ = map_scalar_input_type_for_field(ctx, &f);
 
             input_field(f.name.clone(), typ, default)
                 .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
@@ -193,8 +193,8 @@ fn unchecked_create_input_type(
         model.name.clone(),
         "Create",
         scalar_fields,
-        |_, f: ScalarFieldRef, default: Option<DefaultValue>| {
-            let typ = map_scalar_input_type(&f);
+        |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
+            let typ = map_scalar_input_type_for_field(ctx, &f);
 
             input_field(f.name.clone(), typ, default)
                 .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())

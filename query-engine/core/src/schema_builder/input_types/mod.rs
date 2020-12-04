@@ -33,8 +33,12 @@ pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -
     Arc::downgrade(&input_object)
 }
 
-fn map_scalar_input_type(field: &ScalarFieldRef) -> InputType {
-    let typ = match field.type_identifier {
+fn map_scalar_input_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
+    map_scalar_input_type(ctx, &field.type_identifier, field.is_list)
+}
+
+fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: bool) -> InputType {
+    let typ = match typ {
         TypeIdentifier::String => InputType::string(),
         TypeIdentifier::Int => InputType::int(),
         TypeIdentifier::Float => InputType::float(),
@@ -43,26 +47,27 @@ fn map_scalar_input_type(field: &ScalarFieldRef) -> InputType {
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
-        TypeIdentifier::Enum(_) => map_enum_input_type(&field),
+        TypeIdentifier::Enum(e) => map_enum_input_type(ctx, e),
         TypeIdentifier::Xml => InputType::xml(),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),
     };
 
-    if field.is_list {
+    if list {
         InputType::list(typ)
     } else {
         typ
     }
 }
 
-fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
-    let internal_enum = field
-        .internal_enum
-        .as_ref()
-        .expect("A field with TypeIdentifier Enum must always have an associated internal enum.");
+fn map_enum_input_type(ctx: &mut BuilderContext, enum_name: &str) -> InputType {
+    let e = ctx
+        .internal_data_model
+        .find_enum(enum_name)
+        .expect("Enum references must always be valid.");
 
-    let et: EnumType = internal_enum.clone().into();
+    let et: EnumType = e.clone().into();
+
     et.into()
 }
 
