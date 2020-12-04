@@ -227,7 +227,7 @@ fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = 
 
 fn scalar_filter_name(typ: &TypeIdentifier, list: bool, nullable: bool, nested: bool) -> String {
     let list = if list { "List" } else { "" };
-    let nullable = if nullable { "" } else { "Nullable" };
+    let nullable = if nullable { "Nullable" } else { "" };
     let nested = if nested { "Nested" } else { "" };
 
     match typ {
