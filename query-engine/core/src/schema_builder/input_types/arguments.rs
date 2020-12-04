@@ -145,6 +145,11 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
             vec![InputType::list(field_enum_type.clone()), field_enum_type],
             None,
         ),
+        input_field(
+            "having",
+            InputType::object(filter_objects::scalar_filter_object_type(ctx, model, true)),
+            None,
+        ),
         input_field("take", InputType::int(), None).optional(),
         input_field("skip", InputType::int(), None).optional(),
     ]

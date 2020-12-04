@@ -6,7 +6,7 @@ use prisma_models::{dml::DefaultValue, PrismaValue};
 pub(crate) fn get_field_filter_types(
     ctx: &mut BuilderContext,
     field: &ModelField,
-    _include_aggregates: bool,
+    include_aggregates: bool,
 ) -> Vec<InputType> {
     match field {
         ModelField::Relation(rf) => {
@@ -22,6 +22,7 @@ pub(crate) fn get_field_filter_types(
                 sf.is_list,
                 !sf.is_required,
                 false,
+                include_aggregates,
             ))];
 
             if sf.type_identifier != TypeIdentifier::Json {
@@ -91,7 +92,7 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
-        scalar_filter_name(&sf.type_identifier, true, !sf.is_required, false),
+        scalar_filter_name(&sf.type_identifier, true, !sf.is_required, false, false),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -112,8 +113,12 @@ fn full_scalar_filter_type(
     list: bool,
     nullable: bool,
     nested: bool,
+    include_aggregates: bool,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(scalar_filter_name(typ, list, nullable, nested), PRISMA_NAMESPACE);
+    let ident = Identifier::new(
+        scalar_filter_name(typ, list, nullable, nested, include_aggregates),
+        PRISMA_NAMESPACE,
+    );
     return_cached_input!(ctx, &ident);
 
     let object = Arc::new(init_input_object_type(ident.clone()));
@@ -148,20 +153,46 @@ fn full_scalar_filter_type(
     };
 
     // Shorthand `not equals` filter, skips the nested object filter.
-    let mut not_types = vec![mapped_scalar_type];
+    let mut not_types = vec![mapped_scalar_type.clone()];
 
     if typ != &TypeIdentifier::Json {
         // Full nested filter. Only available on non-JSON fields.
         not_types.push(InputType::object(full_scalar_filter_type(
-            ctx, typ, list, nullable, true,
+            ctx,
+            typ,
+            list,
+            nullable,
+            true,
+            include_aggregates,
         )));
     }
 
     let not_field = input_field("not", not_types, None).optional().nullable_if(nullable);
-
     fields.push(not_field);
-    object.set_fields(fields);
 
+    // WIP include aggregate
+    if include_aggregates {
+        fields.push(aggregate_filter_field(
+            ctx,
+            "count",
+            &TypeIdentifier::Int,
+            nullable,
+            list,
+        ));
+
+        if typ.is_numeric() {
+            let avg_type = map_avg_type_ident(typ.clone());
+            fields.push(aggregate_filter_field(ctx, "avg", &avg_type, nullable, list));
+            fields.push(aggregate_filter_field(ctx, "sum", typ, nullable, list));
+        }
+
+        if !list {
+            fields.push(aggregate_filter_field(ctx, "min", typ, nullable, list));
+            fields.push(aggregate_filter_field(ctx, "max", typ, nullable, list));
+        }
+    }
+
+    object.set_fields(fields);
     Arc::downgrade(&object)
 }
 
@@ -225,23 +256,48 @@ fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = 
     fields.into_iter()
 }
 
-fn scalar_filter_name(typ: &TypeIdentifier, list: bool, nullable: bool, nested: bool) -> String {
+fn scalar_filter_name(
+    typ: &TypeIdentifier,
+    list: bool,
+    nullable: bool,
+    nested: bool,
+    include_aggregates: bool,
+) -> String {
     let list = if list { "List" } else { "" };
     let nullable = if nullable { "Nullable" } else { "" };
     let nested = if nested { "Nested" } else { "" };
+    let aggregates = if include_aggregates { "WithAggregates" } else { "" };
 
     match typ {
-        TypeIdentifier::UUID => format!("{}Uuid{}{}Filter", nested, nullable, list),
-        TypeIdentifier::String => format!("{}String{}{}Filter", nested, nullable, list),
-        TypeIdentifier::Int => format!("{}Int{}{}Filter", nested, nullable, list),
-        TypeIdentifier::BigInt => format!("{}BigInt{}{}Filter", nested, nullable, list),
-        TypeIdentifier::Float => format!("{}Float{}{}Filter", nested, nullable, list),
-        TypeIdentifier::Decimal => format!("{}Decimal{}{}Filter", nested, nullable, list),
-        TypeIdentifier::Boolean => format!("{}Bool{}{}Filter", nested, nullable, list),
-        TypeIdentifier::DateTime => format!("{}DateTime{}{}Filter", nested, nullable, list),
-        TypeIdentifier::Json => format!("{}Json{}{}Filter", nested, nullable, list),
-        TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}Filter", nested, e, nullable, list),
-        TypeIdentifier::Xml => format!("{}Xml{}{}Filter", nested, nullable, list),
-        TypeIdentifier::Bytes => format!("{}Bytes{}{}Filter", nested, nullable, list),
+        TypeIdentifier::UUID => format!("{}Uuid{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::String => format!("{}String{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::Int => format!("{}Int{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::BigInt => format!("{}BigInt{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::Float => format!("{}Float{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::Decimal => format!("{}Decimal{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::Boolean => format!("{}Bool{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::DateTime => format!("{}DateTime{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::Json => format!("{}Json{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}{}Filter", nested, e, nullable, list, aggregates),
+        TypeIdentifier::Xml => format!("{}Xml{}{}{}Filter", nested, nullable, list, aggregates),
+        TypeIdentifier::Bytes => format!("{}Bytes{}{}{}Filter", nested, nullable, list, aggregates),
+    }
+}
+
+fn aggregate_filter_field(
+    ctx: &mut BuilderContext,
+    aggregation: &str,
+    typ: &TypeIdentifier,
+    nullable: bool,
+    list: bool,
+) -> InputField {
+    let filters = full_scalar_filter_type(ctx, typ, list, nullable, true, false);
+    input_field(aggregation, InputType::object(filters), None).optional()
+}
+
+fn map_avg_type_ident(typ: TypeIdentifier) -> TypeIdentifier {
+    match &typ {
+        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float => TypeIdentifier::Float,
+        _ => typ,
     }
 }

@@ -72,6 +72,15 @@ pub enum TypeIdentifier {
     Bytes,
 }
 
+impl TypeIdentifier {
+    pub fn is_numeric(&self) -> bool {
+        matches!(
+            self,
+            TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
+        )
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DateType {
     Date,

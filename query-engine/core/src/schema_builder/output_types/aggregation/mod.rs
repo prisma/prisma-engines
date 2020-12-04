@@ -22,15 +22,8 @@ fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
         .fields()
         .scalar()
         .into_iter()
-        .filter(|field| is_numeric(field))
+        .filter(|field| field.is_numeric())
         .collect()
-}
-
-fn is_numeric(field: &ScalarFieldRef) -> bool {
-    matches!(
-        field.type_identifier,
-        TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
-    )
 }
 
 /// Returns an aggregation field with given name if the passed fields contains any fields.
@@ -85,7 +78,7 @@ where
     let fields: Vec<OutputField> = fields
         .iter()
         .map(|sf| {
-            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).optional_if(!sf.is_required || !is_numeric(sf))
+            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).optional_if(!sf.is_required || !sf.is_numeric())
         })
         .collect();
 
