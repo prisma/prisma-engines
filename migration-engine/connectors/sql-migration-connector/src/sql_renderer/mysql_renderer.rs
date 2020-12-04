@@ -244,7 +244,7 @@ impl SqlRenderer for MysqlFlavour {
                         "{}INDEX {}({})",
                         tpe,
                         self.quote(&index_name),
-                        index.columns().map(|col| self.quote(col.name())).join(",\n")
+                        index.columns().map(|col| self.quote(col.name())).join(", ")
                     )
                 })
                 .join(",\n");
