@@ -149,7 +149,8 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
             "having",
             InputType::object(filter_objects::scalar_filter_object_type(ctx, model, true)),
             None,
-        ),
+        )
+        .optional(),
         input_field("take", InputType::int(), None).optional(),
         input_field("skip", InputType::int(), None).optional(),
     ]
