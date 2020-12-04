@@ -2,6 +2,7 @@ use std::convert::TryInto;
 
 use super::*;
 use crate::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
+use connector::Filter;
 use prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
 
 pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
@@ -11,6 +12,10 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
 
     let by_arg = field.arguments.lookup("by").unwrap().value;
     let group_by = extract_grouping(by_arg)?;
+    let having: Option<Filter> = match field.arguments.lookup("having") {
+        Some(having_arg) => Some(extract_filter(having_arg.value.try_into()?, &model)?),
+        None => None,
+    };
 
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let nested_fields = field.nested_fields.unwrap().fields;
@@ -31,6 +36,7 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         args,
         selectors,
         group_by,
+        having,
     }))
 }
 
