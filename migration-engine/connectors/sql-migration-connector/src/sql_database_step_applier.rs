@@ -85,6 +85,8 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
                     script.push_str(&statement);
                     script.push_str(";\n");
                 }
+
+                script.push('\n');
             }
         }
 
