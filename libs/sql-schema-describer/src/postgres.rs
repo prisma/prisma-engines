@@ -506,7 +506,7 @@ impl SqlSchemaDescriber {
 
     #[tracing::instrument]
     async fn get_sequences(&self, schema: &str) -> DescriberResult<Vec<Sequence>> {
-        let sql = "SELECT start_value, sequence_name
+        let sql = "SELECT sequence_name
                   FROM information_schema.sequences
                   WHERE sequence_schema = $1";
         let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
@@ -514,16 +514,7 @@ impl SqlSchemaDescriber {
             .into_iter()
             .map(|seq| {
                 trace!("Got sequence: {:?}", seq);
-                let initial_value = seq
-                    .get("start_value")
-                    .and_then(|x| x.to_string())
-                    .and_then(|x| x.parse::<u32>().ok())
-                    .expect("get start_value");
                 Sequence {
-                    // Not sure what allocation size refers to, but the TypeScript implementation
-                    // hardcodes this as 1
-                    allocation_size: 1,
-                    initial_value,
                     name: seq.get_expect_string("sequence_name"),
                 }
             })

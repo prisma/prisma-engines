@@ -108,9 +108,7 @@
   ],
   "sequences": [
     {
-      "name": "sequence1",
-      "initialValue": 1,
-      "allocationSize": 32
+      "name": "sequence1"
     }
   ]
 }

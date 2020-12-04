@@ -461,10 +461,6 @@ pub struct Enum {
 pub struct Sequence {
     /// Sequence name.
     pub name: String,
-    /// Sequence initial value.
-    pub initial_value: u32,
-    /// Sequence allocation size.
-    pub allocation_size: u32,
 }
 
 /// A DefaultValue

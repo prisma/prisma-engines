@@ -711,9 +711,7 @@ async fn all_postgres_column_types_must_work() {
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".into()],
                 sequence: Some(Sequence {
-                    name: "User_primary_col_seq".into(),
-                    initial_value: 1,
-                    allocation_size: 1,
+                    name: "User_primary_col_seq".into()
                 },),
                 constraint_name: Some("User_pkey".into()),
             }),
@@ -910,22 +908,28 @@ async fn postgres_enums_must_work() {
 #[tokio::test]
 async fn postgres_sequences_must_work() {
     let inspector = get_postgres_describer(
-        &format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA),
+        &format!(
+            "
+            CREATE SEQUENCE \"DatabaseInspector-Test\".\"test_sequence\";
+       
+            Create Table \"DatabaseInspector-Test\".\"Test\"(
+               first  BigInt Default nextval(\"DatabaseInspector-Test\".\"test_sequence\")
+            );
+
+            ",
+        ),
         "postgres_sequences_must_work",
     )
     .await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
-    let got_seq = schema.get_sequence("test").expect("get sequence");
 
-    assert_eq!(
-        got_seq,
-        &Sequence {
-            name: "test".into(),
-            initial_value: 1,
-            allocation_size: 1,
-        },
-    );
+    println!("{:?}", schema);
+    let test_seq = schema.get_sequence("test").expect("get sequence");
+    assert_eq!(test_seq, &Sequence { name: "test".into() },);
+
+    let test2_seq = schema.get_sequence("test2").expect("get sequence");
+    assert_eq!(test2_seq, &Sequence { name: "test2".into() },);
 }
 
 #[tokio::test]

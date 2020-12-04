@@ -482,8 +482,6 @@ async fn indices_must_work(api: &TestApi) {
     let pk_sequence = match api.sql_family() {
         SqlFamily::Postgres => Some(Sequence {
             name: "User_id_seq".to_string(),
-            allocation_size: 1,
-            initial_value: 1,
         }),
         _ => None,
     };

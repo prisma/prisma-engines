@@ -118,8 +118,6 @@ fn database_schema_is_serializable() {
         }],
         sequences: vec![Sequence {
             name: "sequence1".to_string(),
-            initial_value: 1,
-            allocation_size: 32,
         }],
     };
     let ref_schema_json = include_str!("./resources/schema.json");
