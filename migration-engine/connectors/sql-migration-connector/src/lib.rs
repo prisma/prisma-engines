@@ -26,7 +26,6 @@ use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
-use sql_database_migration_inferrer::*;
 use sql_schema_describer::SqlSchema;
 
 /// The top-level SQL migration connector.
