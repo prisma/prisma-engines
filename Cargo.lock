@@ -3445,6 +3445,7 @@ dependencies = [
  "async-trait",
  "barrel",
  "bigdecimal 0.2.0",
+ "enumflags2",
  "indoc 1.0.3",
  "native-types",
  "once_cell",
