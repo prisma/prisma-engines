@@ -15,7 +15,10 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         native_type_instance: &NativeTypeInstance,
     ) -> ColumnType {
         use MsSqlType::*;
-        let mssql_type: MsSqlType = native_type_instance.deserialize_native_type();
+        let mssql_type: MsSqlType = match native_type_instance.native_type {
+            NativeType::MsSQL(tpe) => tpe,
+            _ => unreachable!(),
+        };
 
         let data_type = match mssql_type {
             TinyInt => "tinyint".to_string(),
@@ -74,7 +77,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
                 FieldArity::Optional => ColumnArity::Nullable,
                 FieldArity::List => ColumnArity::List,
             },
-            native_type: Some(mssql_type.to_json()),
+            native_type: Some(native_type_instance.native_type.clone()),
         }
     }
 

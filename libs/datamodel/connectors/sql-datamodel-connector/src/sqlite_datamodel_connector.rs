@@ -4,6 +4,7 @@ use dml::field::Field;
 use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
+use native_types::NativeType;
 
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -47,7 +48,7 @@ impl Connector for SqliteDatamodelConnector {
         ))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+    fn introspect_native_type(&self, _native_type: NativeType) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
                 connector_name: "sqlite".to_string(),

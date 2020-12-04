@@ -7,7 +7,6 @@ use native_types::{NativeType, PostgresType};
 use quaint::connector::ResultRow;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;
-use serde_json::from_str;
 use std::{borrow::Cow, collections::HashMap, convert::TryInto};
 use tracing::trace;
 
@@ -222,7 +221,7 @@ impl SqlSchemaDescriber {
 
                     SINGLE_REGEX
                         .captures(formatted_type.as_str())
-                        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
+                        .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse().unwrap()))
                 }
 
                 fn get_dual(formatted_type: &String) -> (Option<u32>, Option<u32>) {
@@ -230,11 +229,11 @@ impl SqlSchemaDescriber {
                         Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
                     let first = DUAL_REGEX
                         .captures(formatted_type.as_str())
-                        .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+                        .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse().unwrap()));
 
                     let second = DUAL_REGEX
                         .captures(formatted_type.as_str())
-                        .and_then(|cap| cap.get(2).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
+                        .and_then(|cap| cap.get(2).map(|precision| precision.as_str().parse().unwrap()));
 
                     (first, second)
                 }
@@ -739,7 +738,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
         family,
         arity,
-        native_type: native_type.map(|x| x.to_json()),
+        native_type: native_type.map(|x| NativeType::Postgres(x)),
     }
 }
 

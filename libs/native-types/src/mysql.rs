@@ -1,7 +1,4 @@
-use serde::*;
-use serde_json::Value;
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum MySqlType {
     Int,
     UnsignedInt,
@@ -36,11 +33,4 @@ pub enum MySqlType {
     Timestamp(Option<u32>),
     Year,
     JSON,
-}
-
-impl super::NativeType for MySqlType {
-    fn to_json(&self) -> Value {
-        serde_json::to_value(&self)
-            .unwrap_or_else(|_| panic!("Serializing the native type to json failed: {:?}", &self))
-    }
 }

@@ -4,7 +4,6 @@ use crate::parsers::Parser;
 use bigdecimal::ToPrimitive;
 use native_types::{MySqlType, NativeType};
 use quaint::{prelude::Queryable, single::Quaint, Value};
-use serde_json::from_str;
 use std::{
     borrow::Cow,
     collections::{BTreeMap, HashMap, HashSet},
@@ -636,7 +635,7 @@ impl SqlSchemaDescriber {
             character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
             family: family.clone(),
             arity,
-            native_type: native_type.map(|x| x.to_json()),
+            native_type: native_type.map(|x| NativeType::MySQL(x)),
         };
 
         match &family {
@@ -654,7 +653,7 @@ impl SqlSchemaDescriber {
     fn extract_precision(input: &str) -> Option<u32> {
         static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([1-9])\)"#).unwrap());
         RE.captures(input)
-            .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
+            .and_then(|cap| cap.get(1).map(|precision| precision.as_str().parse().unwrap()))
     }
 
     fn extract_enum_values(full_data_type: &&str) -> Vec<String> {

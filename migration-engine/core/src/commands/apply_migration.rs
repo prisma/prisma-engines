@@ -135,13 +135,13 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         tracing::trace!(?database_steps_json_pretty);
 
-        let database_migration_json = database_migration.serialize();
+        // let database_migration_json = database_migration.serialize();
 
         let migration = Migration::new(NewMigration {
             name: self.input.migration_id.clone(),
             datamodel_steps: self.input.steps.clone(),
             datamodel_string: datamodel::render_schema_ast_to_string(&next_schema_ast),
-            database_migration: database_migration_json,
+            database_migration: serde_json::Value::Null,
         });
 
         let diagnostics = connector

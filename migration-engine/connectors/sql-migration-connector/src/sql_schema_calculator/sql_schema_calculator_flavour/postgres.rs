@@ -1,7 +1,7 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::PostgresFlavour;
 use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, ScalarType, WithDatabaseName};
-use native_types::PostgresType;
+use native_types::{NativeType, PostgresType};
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
@@ -21,8 +21,10 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
-        let postgres_type: PostgresType = native_type_instance.deserialize_native_type();
-
+        let postgres_type: PostgresType = match native_type_instance.native_type.clone() {
+            NativeType::Postgres(tpe) => tpe,
+            _ => unreachable!(),
+        };
         fn render(input: Option<u32>) -> String {
             match input {
                 None => "".to_string(),
@@ -75,7 +77,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
-            native_type: Some(native_type_instance.serialized_native_type.clone()),
+            native_type: Some(native_type_instance.native_type.clone()),
         }
     }
 

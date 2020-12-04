@@ -625,7 +625,7 @@ impl SqlSchemaDescriber {
             character_maximum_length,
             family,
             arity,
-            native_type: native_type.map(|x| x.to_json()),
+            native_type: native_type.map(|x| NativeType::MsSQL(x)),
         }
     }
 }

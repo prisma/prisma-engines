@@ -11,3 +11,5 @@ serde_json = { version = "1.0", features = ["float_roundtrip"] }
 dml = { path = "../dml" }
 thiserror = "1.0"
 itertools = "0.8"
+native-types = { path = "../../../native-types" }
+

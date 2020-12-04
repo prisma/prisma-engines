@@ -9,6 +9,7 @@ use dml::field::Field;
 use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
+use native_types::NativeType;
 
 pub trait Connector: Send + Sync {
     fn capabilities(&self) -> &Vec<ConnectorCapability>;
@@ -37,7 +38,7 @@ pub trait Connector: Send + Sync {
 
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
     /// powers IE
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
+    fn introspect_native_type(&self, native_type: NativeType) -> Result<NativeTypeInstance, ConnectorError>;
 
     fn supports_scalar_lists(&self) -> bool {
         self.has_capability(ConnectorCapability::ScalarLists)

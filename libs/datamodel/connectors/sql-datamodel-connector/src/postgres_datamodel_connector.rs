@@ -7,7 +7,7 @@ use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
-use native_types::PostgresType;
+use native_types::{NativeType, PostgresType};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -126,7 +126,10 @@ impl Connector for PostgresDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         if let FieldType::NativeType(_scalar_type, native_type_instance) = field.field_type() {
             let native_type_name = native_type_instance.name.as_str();
-            let native_type: PostgresType = native_type_instance.deserialize_native_type();
+            let native_type: PostgresType = match native_type_instance.native_type {
+                NativeType::Postgres(tpe) => tpe,
+                _ => unreachable!(),
+            };
 
             let precision_and_scale = match native_type {
                 PostgresType::Decimal(x) => x,
@@ -239,11 +242,18 @@ impl Connector for PostgresDatamodelConnector {
             _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
         };
 
-        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
+        Ok(NativeTypeInstance::new(
+            name,
+            cloned_args,
+            NativeType::Postgres(native_type),
+        ))
     }
 
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: PostgresType = serde_json::from_value(native_type).unwrap();
+    fn introspect_native_type(&self, native_type: NativeType) -> Result<NativeTypeInstance, ConnectorError> {
+        let native_type: PostgresType = match native_type {
+            NativeType::Postgres(tpe) => tpe,
+            _ => unreachable!(),
+        };
         let (constructor_name, args) = match native_type {
             PostgresType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             PostgresType::Integer => (INTEGER_TYPE_NAME, vec![]),
@@ -274,7 +284,11 @@ impl Connector for PostgresDatamodelConnector {
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
+            Ok(NativeTypeInstance::new(
+                constructor.name.as_str(),
+                args,
+                NativeType::Postgres(native_type),
+            ))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: constructor_name.parse().unwrap(),

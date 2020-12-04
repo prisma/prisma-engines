@@ -1,9 +1,6 @@
-use serde::*;
-use serde_json::Value;
-
 use std::fmt;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Copy)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum MsSqlTypeParameter {
     Number(u16),
     Max,
@@ -19,7 +16,7 @@ impl fmt::Display for MsSqlTypeParameter {
 }
 
 /// Representing a type in SQL Server database.
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MsSqlType {
     /// Maps to `i8` in Rust.
     TinyInt,
@@ -92,11 +89,4 @@ pub enum MsSqlType {
     /// GUID, which is UUID but Microsoft invented them so they have their own
     /// term for it.
     UniqueIdentifier,
-}
-
-impl super::NativeType for MsSqlType {
-    fn to_json(&self) -> Value {
-        serde_json::to_value(&self)
-            .unwrap_or_else(|_| panic!("Serializing the native type to json failed: {:?}", &self))
-    }
 }

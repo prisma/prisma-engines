@@ -6,7 +6,7 @@ use dml::model::{IndexType, Model};
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
-use native_types::MySqlType;
+use native_types::{MySqlType, NativeType};
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -158,7 +158,10 @@ impl Connector for MySqlDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         if let FieldType::NativeType(_, native_type_instance) = field.field_type() {
             let native_type_name = native_type_instance.name.as_str();
-            let native_type: MySqlType = native_type_instance.deserialize_native_type();
+            let native_type: MySqlType = match native_type_instance.native_type {
+                NativeType::MySQL(tpe) => tpe,
+                _ => unreachable!(),
+            };
 
             let precision_and_scale = match native_type {
                 MySqlType::Decimal(x) => x,
@@ -314,11 +317,19 @@ impl Connector for MySqlDatamodelConnector {
             )),
         };
 
-        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
+        Ok(NativeTypeInstance::new(
+            name,
+            cloned_args,
+            NativeType::MySQL(native_type),
+        ))
     }
 
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
+    fn introspect_native_type(&self, native_type: NativeType) -> Result<NativeTypeInstance, ConnectorError> {
+        let native_type: MySqlType = match native_type {
+            NativeType::MySQL(tpe) => tpe,
+            _ => unreachable!(),
+        };
+
         let (constructor_name, args) = match native_type {
             MySqlType::Int => (INT_TYPE_NAME, vec![]),
             MySqlType::UnsignedInt => (UNSIGNED_INT_TYPE_NAME, vec![]),
@@ -363,7 +374,11 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
+            Ok(NativeTypeInstance::new(
+                constructor.name.as_str(),
+                args,
+                NativeType::MySQL(native_type),
+            ))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: constructor_name.parse().unwrap(),

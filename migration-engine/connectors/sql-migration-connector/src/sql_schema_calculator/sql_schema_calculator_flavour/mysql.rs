@@ -4,7 +4,7 @@ use datamodel::{
     walkers::{walk_scalar_fields, ScalarFieldWalker},
     Datamodel, NativeTypeInstance, ScalarType,
 };
-use native_types::MySqlType;
+use native_types::{MySqlType, NativeType};
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
@@ -38,8 +38,10 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
-        let mysql_type: MySqlType = native_type_instance.deserialize_native_type();
-
+        let mysql_type: MySqlType = match native_type_instance.native_type.clone() {
+            NativeType::MySQL(tpe) => tpe,
+            _ => unreachable!(),
+        };
         fn render(input: Option<u32>) -> String {
             match input {
                 None => "".to_string(),
@@ -100,7 +102,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
                 datamodel::FieldArity::List => sql::ColumnArity::List,
             },
-            native_type: Some(native_type_instance.serialized_native_type.clone()),
+            native_type: Some(native_type_instance.native_type.clone()),
         }
     }
 

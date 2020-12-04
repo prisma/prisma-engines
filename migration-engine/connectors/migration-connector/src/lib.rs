@@ -95,7 +95,7 @@ pub trait DatabaseMigrationMarker: Debug + Send + Sync {
     const FILE_EXTENSION: &'static str;
 
     /// Render the migration as JSON.
-    fn serialize(&self) -> serde_json::Value;
+    // fn serialize(&self) -> serde_json::Value;
 
     /// Is the migration empty?
     fn is_empty(&self) -> bool;

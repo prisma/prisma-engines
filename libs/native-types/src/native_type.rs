@@ -1,3 +1,8 @@
-pub trait NativeType {
-    fn to_json(&self) -> serde_json::Value;
+use crate::{MsSqlType, MySqlType, PostgresType};
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum NativeType {
+    MySQL(MySqlType),
+    Postgres(PostgresType),
+    MsSQL(MsSqlType),
 }

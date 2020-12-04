@@ -898,6 +898,7 @@ version = "0.1.0"
 dependencies = [
  "dml",
  "itertools",
+ "native-types",
  "serde_json",
  "thiserror",
 ]
@@ -2272,10 +2273,6 @@ dependencies = [
 [[package]]
 name = "native-types"
 version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
 
 [[package]]
 name = "nb-connect"
@@ -3240,7 +3237,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.1",
  "serial_test_derive",
 ]
 
@@ -3448,7 +3445,6 @@ dependencies = [
  "async-trait",
  "barrel",
  "bigdecimal 0.2.0",
- "enumflags2",
  "indoc 1.0.3",
  "native-types",
  "once_cell",
@@ -3457,7 +3453,6 @@ dependencies = [
  "quaint",
  "regex",
  "serde",
- "serde_json",
  "test-macros",
  "test-setup",
  "tokio",

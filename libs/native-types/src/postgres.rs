@@ -1,7 +1,4 @@
-use serde::*;
-use serde_json::Value;
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum PostgresType {
     SmallInt,
     Integer,
@@ -29,11 +26,4 @@ pub enum PostgresType {
     Xml,
     JSON,
     JSONB,
-}
-
-impl super::NativeType for PostgresType {
-    fn to_json(&self) -> Value {
-        serde_json::to_value(&self)
-            .unwrap_or_else(|_| panic!("Serializing the native type to json failed: {:?}", &self))
-    }
 }
