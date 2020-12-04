@@ -6,8 +6,10 @@ use crate::{
     sql_renderer::{common::IteratorJoin, SqlRenderer},
     sql_schema_differ::ColumnChanges,
 };
-use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
-use sql_schema_describer::DefaultValue;
+use sql_schema_describer::{
+    walkers::{ColumnWalker, TableWalker},
+    DefaultValue,
+};
 use std::collections::BTreeSet;
 
 /// Creates a set of `ALTER TABLE` statements in a correct execution order.

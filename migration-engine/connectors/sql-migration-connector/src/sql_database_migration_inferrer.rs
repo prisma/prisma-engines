@@ -1,8 +1,6 @@
 use crate::{
-    flavour::SqlFlavour,
-    pair::Pair,
-    sql_migration::{SqlMigration, SqlMigrationStep},
-    sql_schema_calculator, sql_schema_differ, SqlMigrationConnector,
+    flavour::SqlFlavour, pair::Pair, sql_migration::SqlMigration, sql_schema_calculator, sql_schema_differ,
+    SqlMigrationConnector,
 };
 use datamodel::*;
 use migration_connector::{
@@ -111,11 +109,4 @@ fn infer(
         after: expected_database_schema,
         steps,
     }
-}
-
-pub(crate) fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
-where
-    F: Fn(T) -> SqlMigrationStep,
-{
-    steps.into_iter().map(wrap_fn)
 }
