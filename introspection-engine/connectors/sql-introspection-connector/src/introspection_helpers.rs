@@ -37,7 +37,6 @@ pub fn is_new_migration_table(table: &Table) -> bool {
         && table.columns.iter().any(|c| c.name == "rolled_back_at")
         && table.columns.iter().any(|c| c.name == "started_at")
         && table.columns.iter().any(|c| c.name == "applied_steps_count")
-        && table.columns.iter().any(|c| c.name == "script")
 }
 
 pub(crate) fn is_relay_table(table: &Table) -> bool {
