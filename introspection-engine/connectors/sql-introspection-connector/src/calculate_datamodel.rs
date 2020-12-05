@@ -467,7 +467,7 @@ mod tests {
                             character_maximum_length: None,
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                            native_type: Some(PostgresType::Integer.as_native_type()),
                         },
                         default: None,
                         auto_increment: true,
@@ -490,7 +490,7 @@ mod tests {
                             character_maximum_length: None,
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                            native_type: Some(PostgresType::Integer.as_native_type()),
                         },
                         default: None,
                         auto_increment: false,
@@ -514,7 +514,7 @@ mod tests {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                            native_type: Some(PostgresType::Integer.as_native_type()),
                         },
                         default: None,
                         auto_increment: true,
@@ -736,7 +736,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                                native_type: Some(PostgresType::Integer.as_native_type()),
                             },
                             default: None,
                             auto_increment: true,
@@ -750,7 +750,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::String,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Text)),
+                                native_type: Some(PostgresType::Text.as_native_type()),
                             },
                             default: None,
                             auto_increment: false,
@@ -776,7 +776,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                                native_type: Some(PostgresType::Integer.as_native_type()),
                             },
                             default: None,
                             auto_increment: true,
@@ -790,7 +790,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                                native_type: Some(PostgresType::Integer.as_native_type()),
                             },
                             default: None,
                             auto_increment: false,
@@ -804,7 +804,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::String,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Text)),
+                                native_type: Some(PostgresType::Text.as_native_type()),
                             },
                             default: None,
                             auto_increment: false,
@@ -894,7 +894,7 @@ mod tests {
 
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
-                            native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                            native_type: Some(PostgresType::Integer.as_native_type()),
                         },
                         default: None,
                         auto_increment: true,
@@ -908,7 +908,7 @@ mod tests {
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
-                            native_type: Some(NativeType::Postgres(PostgresType::Text)),
+                            native_type: Some(PostgresType::Text.as_native_type()),
                         },
                         default: None,
                         auto_increment: false,
@@ -922,7 +922,7 @@ mod tests {
 
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
-                            native_type: Some(NativeType::Postgres(PostgresType::Text)),
+                            native_type: Some(PostgresType::Text.as_native_type()),
                         },
                         default: None,
                         auto_increment: false,
@@ -1053,7 +1053,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                                native_type: Some(PostgresType::Integer.as_native_type()),
                             },
                             default: None,
                             auto_increment: true,
@@ -1067,7 +1067,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::String,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Text)),
+                                native_type: Some(PostgresType::Text.as_native_type()),
                             },
                             default: None,
                             auto_increment: false,
@@ -1093,7 +1093,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                                native_type: Some(PostgresType::Integer.as_native_type()),
                             },
                             default: None,
                             auto_increment: true,
@@ -1107,7 +1107,7 @@ mod tests {
 
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
-                                native_type: Some(NativeType::Postgres(PostgresType::Integer)),
+                                native_type: Some(PostgresType::Integer.as_native_type()),
                             },
                             default: None,
                             auto_increment: false,

@@ -99,10 +99,7 @@ impl Connector for MsSqlDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
-                let r#type: MsSqlType = match native_type.native_type {
-                    NativeType::MsSQL(tpe) => tpe,
-                    _ => unreachable!(),
-                };
+                let r#type: MsSqlType = native_type.native_type.get_mssql_type();
 
                 match r#type {
                     Decimal(Some(params)) | Numeric(Some(params)) => match params {
@@ -183,23 +180,20 @@ impl Connector for MsSqlDatamodelConnector {
 
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
-                    let r#type: MsSqlType = match native_type.native_type {
-                        NativeType::MsSQL(tpe) => tpe,
-                        _ => unreachable!(),
-                    };
+                    let r#type: MsSqlType = native_type.native_type.get_mssql_type();
 
                     if heap_allocated_types().contains(&r#type) {
-                        if index_definition.tpe == IndexType::Unique {
-                            return Err(ConnectorError::new_incompatible_native_type_with_unique(
+                        return if index_definition.tpe == IndexType::Unique {
+                            Err(ConnectorError::new_incompatible_native_type_with_unique(
                                 &native_type.render(),
                                 "SQL Server",
-                            ));
+                            ))
                         } else {
-                            return Err(ConnectorError::new_incompatible_native_type_with_index(
+                            Err(ConnectorError::new_incompatible_native_type_with_index(
                                 &native_type.render(),
                                 "SQL Server",
-                            ));
-                        }
+                            ))
+                        };
                     }
                 }
             }
@@ -209,10 +203,7 @@ impl Connector for MsSqlDatamodelConnector {
             let field = model.find_field(id_field).unwrap();
 
             if let FieldType::NativeType(_, native_type) = field.field_type() {
-                let r#type: MsSqlType = match native_type.native_type {
-                    NativeType::MsSQL(tpe) => tpe,
-                    _ => unreachable!(),
-                };
+                let r#type: MsSqlType = native_type.native_type.get_mssql_type();
 
                 if heap_allocated_types().contains(&r#type) {
                     return Err(ConnectorError::new_incompatible_native_type_with_id(
@@ -232,7 +223,7 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         let cloned_args = args.clone();
-        let native_type = match &name {
+        let mssql_type = match &name {
             &TINY_INT_TYPE_NAME => MsSqlType::TinyInt,
             &SMALL_INT_TYPE_NAME => MsSqlType::SmallInt,
             &INT_TYPE_NAME => MsSqlType::Int,
@@ -264,19 +255,13 @@ impl Connector for MsSqlDatamodelConnector {
             _ => panic!(),
         };
 
-        Ok(NativeTypeInstance::new(
-            name,
-            cloned_args,
-            NativeType::MsSQL(native_type),
-        ))
+        Ok(NativeTypeInstance::new(name, cloned_args, mssql_type.as_native_type()))
     }
 
     fn introspect_native_type(&self, native_type: NativeType) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: MsSqlType = match native_type {
-            NativeType::MsSQL(tpe) => tpe,
-            _ => unreachable!(),
-        };
-        let (constructor_name, args) = match native_type {
+        let mssql_type: MsSqlType = native_type.get_mssql_type();
+
+        let (constructor_name, args) = match mssql_type {
             MsSqlType::TinyInt => (TINY_INT_TYPE_NAME, vec![]),
             MsSqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             MsSqlType::Int => (INT_TYPE_NAME, vec![]),
@@ -312,7 +297,7 @@ impl Connector for MsSqlDatamodelConnector {
             Ok(NativeTypeInstance::new(
                 constructor.name.as_str(),
                 stringified_args,
-                NativeType::MsSQL(native_type),
+                native_type,
             ))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
