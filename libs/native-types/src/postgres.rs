@@ -1,3 +1,5 @@
+use crate::NativeType;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum PostgresType {
     SmallInt,
@@ -26,4 +28,10 @@ pub enum PostgresType {
     Xml,
     JSON,
     JSONB,
+}
+
+impl PostgresType {
+    pub fn as_native_type(self) -> NativeType {
+        NativeType::Postgres(self)
+    }
 }

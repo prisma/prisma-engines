@@ -1,3 +1,4 @@
+use crate::NativeType;
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Copy)]
@@ -89,4 +90,10 @@ pub enum MsSqlType {
     /// GUID, which is UUID but Microsoft invented them so they have their own
     /// term for it.
     UniqueIdentifier,
+}
+
+impl MsSqlType {
+    pub fn as_native_type(self) -> NativeType {
+        NativeType::MsSQL(self)
+    }
 }

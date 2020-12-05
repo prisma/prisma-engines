@@ -26,11 +26,11 @@ fn int_full_data_type(api: &TestApi) -> String {
 
 fn int_native_type(api: &TestApi) -> Option<NativeType> {
     match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => Some(NativeType::Postgres(PostgresType::Integer)),
+        (SqlFamily::Postgres, _) => Some(PostgresType::Integer.as_native_type()),
         (SqlFamily::Sqlite, _) => None,
-        (SqlFamily::Mysql, "mysql8") => Some(NativeType::MySQL(MySqlType::Int)),
-        (SqlFamily::Mysql, _) => Some(NativeType::MySQL(MySqlType::Int)),
-        (SqlFamily::Mssql, _) => Some(NativeType::MsSQL(MsSqlType::Int)),
+        (SqlFamily::Mysql, "mysql8") => Some(MySqlType::Int.as_native_type()),
+        (SqlFamily::Mysql, _) => Some(MySqlType::Int.as_native_type()),
+        (SqlFamily::Mssql, _) => Some(MsSqlType::Int.as_native_type()),
     }
 }
 
@@ -66,13 +66,13 @@ fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
 
 fn varchar_native_type(api: &TestApi, length: u32) -> Option<NativeType> {
     match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => Some(NativeType::Postgres(PostgresType::VarChar(Some(length)))),
+        (SqlFamily::Postgres, _) => Some(PostgresType::VarChar(Some(length)).as_native_type()),
         (SqlFamily::Sqlite, _) => None,
-        (SqlFamily::Mysql, "mysql8") => Some(NativeType::MySQL(MySqlType::VarChar(length))),
-        (SqlFamily::Mysql, _) => Some(NativeType::MySQL(MySqlType::VarChar(length))),
-        (SqlFamily::Mssql, _) => Some(NativeType::MsSQL(MsSqlType::VarChar(Some(MsSqlTypeParameter::Number(
-            length as u16,
-        ))))),
+        (SqlFamily::Mysql, "mysql8") => Some(MySqlType::VarChar(length).as_native_type()),
+        (SqlFamily::Mysql, _) => Some(MySqlType::VarChar(length).as_native_type()),
+        (SqlFamily::Mssql, _) => {
+            Some(MsSqlType::VarChar(Some(MsSqlTypeParameter::Number(length as u16))).as_native_type())
+        }
     }
 }
 

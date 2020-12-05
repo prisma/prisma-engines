@@ -1,3 +1,5 @@
+use crate::NativeType;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum MySqlType {
     Int,
@@ -33,4 +35,10 @@ pub enum MySqlType {
     Timestamp(Option<u32>),
     Year,
     JSON,
+}
+
+impl MySqlType {
+    pub fn as_native_type(self) -> NativeType {
+        NativeType::MySQL(self)
+    }
 }
