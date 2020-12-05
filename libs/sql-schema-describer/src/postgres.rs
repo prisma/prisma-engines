@@ -738,7 +738,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
         family,
         arity,
-        native_type: native_type.map(|x| NativeType::Postgres(x)),
+        native_type: native_type.map(|x| x.as_native_type()),
     }
 }
 

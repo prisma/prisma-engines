@@ -75,10 +75,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_autoincrement_attr
 
     let sft = user_model.assert_has_scalar_field("name").assert_native_type();
 
-    let postgres_type: PostgresType = match sft.native_type.clone() {
-        NativeType::Postgres(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let postgres_type: PostgresType = sft.native_type.get_postgres_type();
 
     assert_eq!(postgres_type, PostgresType::SmallInt);
 }
@@ -114,10 +111,7 @@ fn should_be_able_to_handle_native_type_combined_with_default_attribute() {
 
     let sft = user_model.assert_has_scalar_field("test").assert_native_type();
 
-    let mysql_type: MySqlType = match sft.native_type.clone() {
-        NativeType::MySQL(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let mysql_type: MySqlType = sft.native_type.get_mysql_type();
 
     assert_eq!(mysql_type, MySqlType::Decimal(Some((8, 2))));
 }
@@ -207,18 +201,13 @@ fn should_handle_type_specifications_on_postgres() {
     let user_model = datamodel.assert_has_model("Blog");
 
     let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
-    let postgres_type: PostgresType = match sft.native_type.clone() {
-        NativeType::Postgres(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let postgres_type: PostgresType = sft.native_type.get_postgres_type();
 
     assert_eq!(postgres_type, PostgresType::VarChar(Some(26)));
 
     let sft = user_model.assert_has_scalar_field("foobaz").assert_native_type();
-    let postgres_type: PostgresType = match sft.native_type.clone() {
-        NativeType::Postgres(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let postgres_type: PostgresType = sft.native_type.get_postgres_type();
+
     assert_eq!(postgres_type, PostgresType::VarChar(None));
 }
 
@@ -245,38 +234,21 @@ fn should_handle_type_specifications_on_mysql() {
     "#;
 
     let datamodel = parse(dml);
-
     let user_model = datamodel.assert_has_model("Blog");
 
     let sft = user_model.assert_has_scalar_field("smallInt").assert_native_type();
-
-    let mysql_type: MySqlType = match sft.native_type.clone() {
-        NativeType::MySQL(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let mysql_type: MySqlType = sft.native_type.get_mysql_type();
     assert_eq!(mysql_type, MySqlType::SmallInt);
 
     let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
-
-    let mysql_type: MySqlType = match sft.native_type.clone() {
-        NativeType::MySQL(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let mysql_type: MySqlType = sft.native_type.get_mysql_type();
     assert_eq!(mysql_type, MySqlType::DateTime(Some(6)));
 
     let sft = user_model.assert_has_scalar_field("fooBool").assert_native_type();
-
-    let mysql_type: MySqlType = match sft.native_type.clone() {
-        NativeType::MySQL(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let mysql_type: MySqlType = sft.native_type.get_mysql_type();
     assert_eq!(mysql_type, MySqlType::TinyInt);
 
     let sft = user_model.assert_has_scalar_field("fooInt").assert_native_type();
-
-    let mysql_type: MySqlType = match sft.native_type.clone() {
-        NativeType::MySQL(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let mysql_type: MySqlType = sft.native_type.get_mysql_type();
     assert_eq!(mysql_type, MySqlType::TinyInt);
 }

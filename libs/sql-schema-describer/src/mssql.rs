@@ -2,7 +2,6 @@ use super::*;
 use crate::getters::Getter;
 use crate::parsers::Parser;
 use indoc::indoc;
-use native_types::NativeType;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
@@ -625,7 +624,7 @@ impl SqlSchemaDescriber {
             character_maximum_length,
             family,
             arity,
-            native_type: native_type.map(|x| NativeType::MsSQL(x)),
+            native_type: native_type.map(|x| x.as_native_type()),
         }
     }
 }

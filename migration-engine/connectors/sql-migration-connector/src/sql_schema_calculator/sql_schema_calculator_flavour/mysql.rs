@@ -38,10 +38,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
-        let mysql_type: MySqlType = match native_type_instance.native_type.clone() {
-            NativeType::MySQL(tpe) => tpe,
-            _ => unreachable!(),
-        };
+        let mysql_type: MySqlType = native_type_instance.native_type.get_mysql_type();
         fn render(input: Option<u32>) -> String {
             match input {
                 None => "".to_string(),

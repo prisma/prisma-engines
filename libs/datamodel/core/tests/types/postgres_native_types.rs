@@ -1,7 +1,7 @@
 use crate::common::*;
 use crate::types::helper::{test_native_types_with_field_attribute_support, test_native_types_without_attributes};
 use datamodel::{ast, diagnostics::DatamodelError};
-use native_types::{NativeType, PostgresType};
+use native_types::PostgresType;
 
 #[test]
 fn should_fail_on_serial_data_types_with_number_default() {
@@ -140,11 +140,8 @@ fn xml_should_work_with_string_scalar_type() {
 
     let datamodel = parse(&dml);
     let user_model = datamodel.assert_has_model("Blog");
-    let sft = user_model.assert_has_scalar_field("dec").assert_native_type();
 
-    let postgres_tpe: PostgresType = match sft.native_type.clone() {
-        NativeType::Postgres(tpe) => tpe,
-        _ => unreachable!(),
-    };
+    let sft = user_model.assert_has_scalar_field("dec").assert_native_type();
+    let postgres_tpe: PostgresType = sft.native_type.get_postgres_type();
     assert_eq!(postgres_tpe, PostgresType::Xml);
 }

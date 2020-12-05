@@ -21,10 +21,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
-        let postgres_type: PostgresType = match native_type_instance.native_type.clone() {
-            NativeType::Postgres(tpe) => tpe,
-            _ => unreachable!(),
-        };
+        let postgres_type: PostgresType = native_type_instance.native_type.get_postgres_type();
         fn render(input: Option<u32>) -> String {
             match input {
                 None => "".to_string(),

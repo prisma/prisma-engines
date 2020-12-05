@@ -15,10 +15,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         native_type_instance: &NativeTypeInstance,
     ) -> ColumnType {
         use MsSqlType::*;
-        let mssql_type: MsSqlType = match native_type_instance.native_type {
-            NativeType::MsSQL(tpe) => tpe,
-            _ => unreachable!(),
-        };
+        let mssql_type: MsSqlType = native_type_instance.native_type.get_mssql_type();
 
         let data_type = match mssql_type {
             TinyInt => "tinyint".to_string(),

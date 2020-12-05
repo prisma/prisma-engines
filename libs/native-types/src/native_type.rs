@@ -8,24 +8,24 @@ pub enum NativeType {
 }
 
 impl NativeType {
-    pub fn get_mysql_type(self) -> MySqlType {
+    pub fn get_mysql_type(&self) -> MySqlType {
         match self {
-            NativeType::MySQL(tpe) => tpe,
-            _ => panic!("Should only be called on Mysql."),
+            NativeType::MySQL(tpe) => tpe.clone(),
+            _ => panic!("Should only be called on MySql."),
         }
     }
 
-    pub fn get_mssql_type(self) -> MsSqlType {
+    pub fn get_mssql_type(&self) -> MsSqlType {
         match self {
-            NativeType::MsSQL(tpe) => tpe,
-            _ => panic!("Should only be called on Mysql."),
+            NativeType::MsSQL(tpe) => tpe.clone(),
+            _ => panic!("Should only be called on MsSql."),
         }
     }
 
-    pub fn get_postgres_type(self) -> PostgresType {
+    pub fn get_postgres_type(&self) -> PostgresType {
         match self {
-            NativeType::Postgres(tpe) => tpe,
-            _ => panic!("Should only be called on Mysql."),
+            NativeType::Postgres(tpe) => tpe.clone(),
+            _ => panic!("Should only be called on Postgres."),
         }
     }
 }

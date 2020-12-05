@@ -2,7 +2,7 @@ use super::*;
 use crate::getters::Getter;
 use crate::parsers::Parser;
 use bigdecimal::ToPrimitive;
-use native_types::{MySqlType, NativeType};
+use native_types::MySqlType;
 use quaint::{prelude::Queryable, single::Quaint, Value};
 use std::{
     borrow::Cow,
@@ -635,7 +635,7 @@ impl SqlSchemaDescriber {
             character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
             family: family.clone(),
             arity,
-            native_type: native_type.map(|x| NativeType::MySQL(x)),
+            native_type: native_type.map(|x| x.as_native_type()),
         };
 
         match &family {

@@ -7,7 +7,7 @@ use crate::{
 };
 use datamodel::{ast, diagnostics::DatamodelError};
 use indoc::indoc;
-use native_types::{MsSqlType, MsSqlTypeParameter::*, NativeType};
+use native_types::{MsSqlType, MsSqlTypeParameter::*};
 
 const BLOB_TYPES: &[&'static str] = &["VarBinary(Max)", "Image"];
 const TEXT_TYPES: &[&'static str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)"];
@@ -253,10 +253,7 @@ macro_rules! test_type {
                         .unwrap()
                         .clone();
 
-                    let result: MsSqlType = match instance.native_type {
-                        NativeType::MsSQL(tpe) => tpe,
-                        _ =>unreachable!(),
-                    };
+                    let result: MsSqlType = instance.native_type.get_mssql_type();
 
                     assert_eq!($output, result);
                 )+
