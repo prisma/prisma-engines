@@ -3,7 +3,7 @@
 use super::*;
 use crate::getters::Getter;
 use crate::parsers::Parser;
-use native_types::{NativeType, PostgresType};
+use native_types::PostgresType;
 use quaint::connector::ResultRow;
 use quaint::{prelude::Queryable, single::Quaint};
 use regex::Regex;

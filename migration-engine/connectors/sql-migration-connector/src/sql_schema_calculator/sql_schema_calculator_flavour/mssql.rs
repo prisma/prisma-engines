@@ -4,7 +4,7 @@ use datamodel::{
     walkers::{ModelWalker, ScalarFieldWalker},
     FieldArity, NativeTypeInstance, ScalarType,
 };
-use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
+use native_types::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, ForeignKeyAction};
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {

@@ -62,7 +62,7 @@ mod tests {
         dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, Model,
         OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
     };
-    use native_types::{NativeType, PostgresType};
+    use native_types::PostgresType;
     use pretty_assertions::assert_eq;
     use prisma_value::PrismaValue;
     use quaint::connector::SqlFamily;

@@ -1,7 +1,7 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::PostgresFlavour;
 use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, ScalarType, WithDatabaseName};
-use native_types::{NativeType, PostgresType};
+use native_types::PostgresType;
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {

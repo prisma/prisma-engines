@@ -4,7 +4,7 @@ use datamodel::{
     walkers::{walk_scalar_fields, ScalarFieldWalker},
     Datamodel, NativeTypeInstance, ScalarType,
 };
-use native_types::{MySqlType, NativeType};
+use native_types::MySqlType;
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
