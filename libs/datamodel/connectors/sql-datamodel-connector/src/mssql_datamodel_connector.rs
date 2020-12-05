@@ -98,24 +98,27 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
-            FieldType::NativeType(_, native_type) => {
-                let r#type: MsSqlType = native_type.native_type.get_mssql_type();
+            FieldType::NativeType(_, native_type_instance) => {
+                let r#type: MsSqlType = native_type_instance.native_type.get_mssql_type();
 
                 match r#type {
                     Decimal(Some(params)) | Numeric(Some(params)) => match params {
-                        (precision, scale) if scale > precision => Err(
-                            ConnectorError::new_scale_larger_than_precision_error(&native_type.render(), "SQL Server"),
-                        ),
+                        (precision, scale) if scale > precision => {
+                            Err(ConnectorError::new_scale_larger_than_precision_error(
+                                &native_type_instance.render(),
+                                "SQL Server",
+                            ))
+                        }
                         (precision, _) if precision == 0 || precision > 38 => {
                             Err(ConnectorError::new_argument_m_out_of_range_error(
                                 "Precision can range from 1 to 38.",
-                                &native_type.render(),
+                                &native_type_instance.render(),
                                 "SQL Server",
                             ))
                         }
                         (_, scale) if scale > 38 => Err(ConnectorError::new_argument_m_out_of_range_error(
                             "Scale can range from 0 to 38.",
-                            &native_type.render(),
+                            &native_type_instance.render(),
                             "SQL Server",
                         )),
                         _ => Ok(()),
@@ -123,7 +126,7 @@ impl Connector for MsSqlDatamodelConnector {
                     Float(Some(bits)) => match bits {
                         bits if bits == 0 || bits > 53 => Err(ConnectorError::new_argument_m_out_of_range_error(
                             "Bits can range from 1 to 53.",
-                            &native_type.render(),
+                            &native_type_instance.render(),
                             "SQL Server",
                         )),
                         _ => Ok(()),
@@ -131,12 +134,12 @@ impl Connector for MsSqlDatamodelConnector {
                     typ if heap_allocated_types().contains(&typ) => {
                         if field.is_unique() {
                             Err(ConnectorError::new_incompatible_native_type_with_unique(
-                                &native_type.render(),
+                                &native_type_instance.render(),
                                 "SQL Server",
                             ))
                         } else if field.is_id() {
                             Err(ConnectorError::new_incompatible_native_type_with_id(
-                                &native_type.render(),
+                                &native_type_instance.render(),
                                 "SQL Server",
                             ))
                         } else {
@@ -145,25 +148,25 @@ impl Connector for MsSqlDatamodelConnector {
                     }
                     NVarChar(Some(Number(p))) if p > 2000 => Err(ConnectorError::new_argument_m_out_of_range_error(
                         "Length can range from 1 to 2000. For larger sizes, use the `Max` variant.",
-                        &native_type.render(),
+                        &native_type_instance.render(),
                         "SQL Server",
                     )),
                     VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 4000 => {
                         Err(ConnectorError::new_argument_m_out_of_range_error(
                             r#"Length can range from 1 to 4000. For larger sizes, use the `Max` variant."#,
-                            &native_type.render(),
+                            &native_type_instance.render(),
                             "SQL Server",
                         ))
                     }
                     NChar(Some(p)) if p > 2000 => Err(ConnectorError::new_argument_m_out_of_range_error(
                         "Length can range from 1 to 2000.",
-                        &native_type.render(),
+                        &native_type_instance.render(),
                         "SQL Server",
                     )),
                     Char(Some(p)) | Binary(Some(p)) if p > 4000 => {
                         Err(ConnectorError::new_argument_m_out_of_range_error(
                             "Length can range from 1 to 4000.",
-                            &native_type.render(),
+                            &native_type_instance.render(),
                             "SQL Server",
                         ))
                     }

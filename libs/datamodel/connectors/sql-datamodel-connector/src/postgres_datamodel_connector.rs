@@ -126,12 +126,9 @@ impl Connector for PostgresDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         if let FieldType::NativeType(_scalar_type, native_type_instance) = field.field_type() {
             let native_type_name = native_type_instance.name.as_str();
-            let native_type: PostgresType = match native_type_instance.native_type {
-                NativeType::Postgres(tpe) => tpe,
-                _ => unreachable!(),
-            };
+            let postgres_type: PostgresType = native_type_instance.native_type.get_postgres_type();
 
-            let precision_and_scale = match native_type {
+            let precision_and_scale = match postgres_type {
                 PostgresType::Decimal(x) => x,
                 PostgresType::Numeric(x) => x,
                 _ => None,
@@ -153,7 +150,7 @@ impl Connector for PostgresDatamodelConnector {
                 _ => {}
             }
 
-            let length = match native_type {
+            let length = match postgres_type {
                 PostgresType::Bit(l) => l,
                 PostgresType::VarBit(l) => l,
                 _ => None,
@@ -167,7 +164,7 @@ impl Connector for PostgresDatamodelConnector {
             }
 
             if matches!(
-                native_type,
+                postgres_type,
                 PostgresType::SmallSerial | PostgresType::Serial | PostgresType::BigSerial
             ) {
                 if let Some(DefaultValue::Single(_)) = field.default_value() {
@@ -180,7 +177,7 @@ impl Connector for PostgresDatamodelConnector {
                 }
             }
 
-            let time_precision = match native_type {
+            let time_precision = match postgres_type {
                 PostgresType::Timestamp(p) => p,
                 PostgresType::Timestamptz(p) => p,
                 PostgresType::Time(p) => p,
@@ -212,7 +209,7 @@ impl Connector for PostgresDatamodelConnector {
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         let cloned_args = args.clone();
 
-        let native_type = match name {
+        let postgres_type = match name {
             SMALL_INT_TYPE_NAME => PostgresType::SmallInt,
             INTEGER_TYPE_NAME => PostgresType::Integer,
             BIG_INT_TYPE_NAME => PostgresType::BigInt,
@@ -245,16 +242,13 @@ impl Connector for PostgresDatamodelConnector {
         Ok(NativeTypeInstance::new(
             name,
             cloned_args,
-            NativeType::Postgres(native_type),
+            postgres_type.as_native_type(),
         ))
     }
 
     fn introspect_native_type(&self, native_type: NativeType) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: PostgresType = match native_type {
-            NativeType::Postgres(tpe) => tpe,
-            _ => unreachable!(),
-        };
-        let (constructor_name, args) = match native_type {
+        let postgres_type: PostgresType = native_type.get_postgres_type();
+        let (constructor_name, args) = match postgres_type {
             PostgresType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             PostgresType::Integer => (INTEGER_TYPE_NAME, vec![]),
             PostgresType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
@@ -284,11 +278,7 @@ impl Connector for PostgresDatamodelConnector {
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            Ok(NativeTypeInstance::new(
-                constructor.name.as_str(),
-                args,
-                NativeType::Postgres(native_type),
-            ))
+            Ok(NativeTypeInstance::new(constructor.name.as_str(), args, native_type))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: constructor_name.parse().unwrap(),

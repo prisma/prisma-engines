@@ -158,12 +158,9 @@ impl Connector for MySqlDatamodelConnector {
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         if let FieldType::NativeType(_, native_type_instance) = field.field_type() {
             let native_type_name = native_type_instance.name.as_str();
-            let native_type: MySqlType = match native_type_instance.native_type {
-                NativeType::MySQL(tpe) => tpe,
-                _ => unreachable!(),
-            };
+            let mysql_type: MySqlType = native_type_instance.native_type.get_mysql_type();
 
-            let precision_and_scale = match native_type {
+            let precision_and_scale = match mysql_type {
                 MySqlType::Decimal(x) => x,
                 MySqlType::Numeric(x) => x,
                 _ => None,
@@ -192,7 +189,7 @@ impl Connector for MySqlDatamodelConnector {
                 _ => {}
             }
 
-            match native_type {
+            match mysql_type {
                 MySqlType::Bit(length) if length == 0 || length > 64 => {
                     return Err(ConnectorError::new_argument_m_out_of_range_error(
                         "M can range from 1 to 64.",
@@ -277,7 +274,7 @@ impl Connector for MySqlDatamodelConnector {
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         let cloned_args = args.clone();
 
-        let native_type = match name {
+        let mysql_type = match name {
             INT_TYPE_NAME => MySqlType::Int,
             UNSIGNED_INT_TYPE_NAME => MySqlType::UnsignedInt,
             SMALL_INT_TYPE_NAME => MySqlType::SmallInt,
@@ -317,20 +314,13 @@ impl Connector for MySqlDatamodelConnector {
             )),
         };
 
-        Ok(NativeTypeInstance::new(
-            name,
-            cloned_args,
-            NativeType::MySQL(native_type),
-        ))
+        Ok(NativeTypeInstance::new(name, cloned_args, mysql_type.as_native_type()))
     }
 
     fn introspect_native_type(&self, native_type: NativeType) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: MySqlType = match native_type {
-            NativeType::MySQL(tpe) => tpe,
-            _ => unreachable!(),
-        };
+        let mysql_type: MySqlType = native_type.get_mysql_type();
 
-        let (constructor_name, args) = match native_type {
+        let (constructor_name, args) = match mysql_type {
             MySqlType::Int => (INT_TYPE_NAME, vec![]),
             MySqlType::UnsignedInt => (UNSIGNED_INT_TYPE_NAME, vec![]),
             MySqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
@@ -374,11 +364,7 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            Ok(NativeTypeInstance::new(
-                constructor.name.as_str(),
-                args,
-                NativeType::MySQL(native_type),
-            ))
+            Ok(NativeTypeInstance::new(constructor.name.as_str(), args, native_type))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: constructor_name.parse().unwrap(),
