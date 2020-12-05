@@ -3453,7 +3453,6 @@ dependencies = [
  "prisma-value",
  "quaint",
  "regex",
- "serde",
  "test-macros",
  "test-setup",
  "tokio",

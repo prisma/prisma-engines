@@ -7,7 +7,6 @@ use std::fmt::{self, Debug};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
-use serde::Deserialize;
 use tracing::debug;
 
 pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
