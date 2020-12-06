@@ -143,7 +143,5 @@ fn detect_failed_migrations(migrations_from_database: &[MigrationRecord]) -> Cor
         .unwrap();
     }
 
-    Err(CoreError::UserFacing(KnownError::new(FoundFailedMigrations {
-        details,
-    })))
+    Err(CoreError::user_facing(FoundFailedMigrations { details }))
 }
