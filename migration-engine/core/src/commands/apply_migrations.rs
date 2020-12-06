@@ -3,7 +3,7 @@ use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
 use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use user_facing_errors::{migration_engine::FoundFailedMigrations, KnownError};
+use user_facing_errors::migration_engine::FoundFailedMigrations;
 
 /// The input to the `ApplyMigrations` command.
 #[derive(Deserialize, Debug)]
