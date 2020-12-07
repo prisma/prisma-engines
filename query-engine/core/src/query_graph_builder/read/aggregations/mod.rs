@@ -8,12 +8,39 @@ pub use group_by::*;
 
 use crate::FieldPair;
 use connector::AggregationSelection;
+use itertools::Itertools;
 use prisma_models::{ModelRef, ScalarFieldRef};
 
 /// Resolves the given field as a aggregation query.
-fn resolve_query(field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<AggregationSelection> {
+fn resolve_query(mut field: FieldPair, model: &ModelRef) -> QueryGraphBuilderResult<AggregationSelection> {
     let query = match field.parsed_field.name.as_str() {
-        "count" => AggregationSelection::Count(resolve_fields(model, field)),
+        "count" => {
+            let nested_fields = field
+                .parsed_field
+                .nested_fields
+                .as_mut()
+                .expect("Expected at least one selection for aggregate");
+
+            let all_position = nested_fields
+                .fields
+                .iter()
+                .find_position(|f| f.parsed_field.name == "_all");
+
+            match all_position {
+                Some((pos, _)) => {
+                    nested_fields.fields.remove(pos);
+
+                    AggregationSelection::Count {
+                        all: true,
+                        fields: resolve_fields(model, field),
+                    }
+                }
+                None => AggregationSelection::Count {
+                    all: false,
+                    fields: resolve_fields(model, field),
+                },
+            }
+        }
         "avg" => AggregationSelection::Average(resolve_fields(model, field)),
         "sum" => AggregationSelection::Sum(resolve_fields(model, field)),
         "min" => AggregationSelection::Min(resolve_fields(model, field)),

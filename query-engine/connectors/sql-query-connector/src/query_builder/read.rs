@@ -108,13 +108,15 @@ pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: Qu
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
             AggregationSelection::Field(field) => select.column(Column::from(field.db_name().to_owned())),
 
-            AggregationSelection::Count(fields) => {
-                if fields.is_empty() {
+            AggregationSelection::Count { all, fields } => {
+                let select = fields.iter().fold(select, |select, next_field| {
+                    select.value(count(Column::from(next_field.db_name().to_owned())))
+                });
+
+                if *all {
                     select.value(count(asterisk()))
                 } else {
-                    fields.iter().fold(select, |select, next_field| {
-                        select.value(count(Column::from(next_field.db_name().to_owned())))
-                    })
+                    select
                 }
             }
 
@@ -147,13 +149,15 @@ pub fn group_by_aggregate(
     let select_query = selections.iter().fold(base_query, |select, next_op| match next_op {
         AggregationSelection::Field(field) => select.column(field.as_column()),
 
-        AggregationSelection::Count(fields) => {
-            if fields.is_empty() {
+        AggregationSelection::Count { all, fields } => {
+            let select = fields
+                .iter()
+                .fold(select, |select, next_field| select.value(count(next_field.as_column())));
+
+            if *all {
                 select.value(count(asterisk()))
             } else {
-                fields
-                    .iter()
-                    .fold(select, |select, next_field| select.value(count(next_field.as_column())))
+                select
             }
         }
 
@@ -184,7 +188,7 @@ fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec
         .iter()
         .flat_map(|selection| match selection {
             AggregationSelection::Field(field) => vec![field.clone()],
-            AggregationSelection::Count(fields) => {
+            AggregationSelection::Count { all: _, fields } => {
                 if fields.is_empty() {
                     model.primary_identifier().scalar_fields().collect()
                 } else {
