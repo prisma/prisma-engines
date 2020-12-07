@@ -190,11 +190,14 @@ impl SqlFlavour for MssqlFlavour {
 
             // We go through the whole process without early return, then clean up
             // the temporary database, and only then return the result. This avoids
-            // leaving shadow databases behind in case of e.g. faulty migrations.
+            // leaving shadow databases behind in case of e.g. faulty
+            // migrations.
 
-            let create_schema = format!("CREATE SCHEMA [{schema}]", schema = self.schema_name());
+            if self.schema_name() != "dbo" {
+                let create_schema = format!("CREATE SCHEMA [{schema}]", schema = self.schema_name());
 
-            temp_database.raw_cmd(&create_schema).await?;
+                temp_database.raw_cmd(&create_schema).await?;
+            }
 
             (|| async {
                 for migration in migrations {
