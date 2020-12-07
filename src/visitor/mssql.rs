@@ -3,11 +3,16 @@ use crate::error::{Error, ErrorKind};
 use crate::prelude::Aliasable;
 use crate::prelude::Query;
 use crate::{
-    ast::{Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Values},
+    ast::{
+        Column, Comparable, Expression, ExpressionKind, Insert, IntoRaw, Join, JoinData, Joinable, Merge, OnConflict,
+        Order, Ordering, Row, Table, TypeFamily, Values,
+    },
     prelude::Average,
     visitor, Value,
 };
 use std::{convert::TryFrom, fmt::Write, iter};
+
+static GENERATED_KEYS: &str = "@generated_keys";
 
 /// A visitor to generate queries for the SQL Server database.
 ///
@@ -20,6 +25,7 @@ pub struct Mssql<'a> {
 }
 
 impl<'a> Mssql<'a> {
+    // TODO: figure out that merge shit
     fn visit_returning(&mut self, columns: Vec<Column<'a>>) -> visitor::Result {
         let cols: Vec<_> = columns.into_iter().map(|c| c.table("Inserted")).collect();
 
@@ -33,6 +39,83 @@ impl<'a> Mssql<'a> {
                 self.write(",")?;
             }
         }
+
+        self.write(" INTO ")?;
+        self.write(GENERATED_KEYS)?;
+
+        Ok(())
+    }
+
+    fn visit_type_family(&mut self, type_family: TypeFamily) -> visitor::Result {
+        match type_family {
+            TypeFamily::Text => self.write("NVARCHAR(2000)"),
+            TypeFamily::Int => self.write("BIGINT"),
+            TypeFamily::Float => self.write("FLOAT(24)"),
+            TypeFamily::Double => self.write("FLOAT(53)"),
+            TypeFamily::Decimal => self.write("DECIMAL(32,16)"),
+            TypeFamily::Boolean => self.write("BIT"),
+            TypeFamily::Uuid => self.write("UNIQUEIDENTIFIER"),
+            TypeFamily::DateTime => self.write("DATETIMEOFFSET"),
+            TypeFamily::Bytes => self.write("VARBYTES(4000)"),
+        }
+    }
+
+    fn create_generated_keys(&mut self, columns: Vec<Column<'a>>) -> visitor::Result {
+        self.write("DECLARE ")?;
+        self.write(GENERATED_KEYS)?;
+        self.write(" table")?;
+
+        self.surround_with("(", ")", move |this| {
+            let columns_len = columns.len();
+
+            for (i, column) in columns.into_iter().enumerate() {
+                this.visit_column(Column::from(column.name.into_owned()))?;
+                this.write(" ")?;
+
+                match column.type_family {
+                    Some(type_family) => this.visit_type_family(type_family)?,
+                    None => this.write("NVARCHAR(255)")?,
+                }
+
+                if i < (columns_len - 1) {
+                    this.write(",")?;
+                }
+            }
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+
+    fn select_generated_keys(&mut self, columns: Vec<Column<'a>>, target_table: Table<'a>) -> visitor::Result {
+        let col_len = columns.len();
+
+        let join = columns
+            .iter()
+            .fold(JoinData::from(target_table.alias("t")), |acc, col| {
+                let left = Column::from(("t", col.name.to_string()));
+                let right = Column::from(("g", col.name.to_string()));
+
+                acc.on((left).equals(right))
+            });
+
+        self.write("SELECT ")?;
+
+        for (i, col) in columns.into_iter().enumerate() {
+            self.visit_column(Column::from(col.name.into_owned()).table("t"))?;
+
+            if i < (col_len - 1) {
+                self.write(",")?;
+            }
+        }
+
+        self.write(" FROM ")?;
+        self.write(GENERATED_KEYS)?;
+        self.write(" AS g")?;
+        self.visit_joins(vec![Join::Inner(join)])?;
+
+        self.write(" WHERE @@ROWCOUNT > 0")?;
 
         Ok(())
     }
@@ -273,11 +356,16 @@ impl<'a> Visitor<'a> for Mssql<'a> {
     }
 
     fn visit_insert(&mut self, insert: Insert<'a>) -> visitor::Result {
+        if let Some(returning) = insert.returning.as_ref().map(|r| r.clone()) {
+            self.create_generated_keys(returning)?;
+            self.write(" ")?;
+        }
+
         self.write("INSERT")?;
 
-        if let Some(table) = insert.table {
+        if let Some(ref table) = insert.table {
             self.write(" INTO ")?;
-            self.visit_table(table, true)?;
+            self.visit_table(table.clone(), true)?;
         }
 
         match insert.values {
@@ -286,8 +374,8 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 ..
             } => {
                 if row.values.is_empty() {
-                    if let Some(returning) = insert.returning {
-                        self.visit_returning(returning)?;
+                    if let Some(ref returning) = insert.returning {
+                        self.visit_returning(returning.clone())?;
                     }
 
                     self.write(" DEFAULT VALUES")?;
@@ -295,8 +383,8 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                     self.write(" ")?;
                     self.visit_row(Row::from(insert.columns))?;
 
-                    if let Some(returning) = insert.returning {
-                        self.visit_returning(returning)?;
+                    if let Some(ref returning) = insert.returning {
+                        self.visit_returning(returning.clone())?;
                     }
 
                     self.write(" VALUES ")?;
@@ -310,8 +398,8 @@ impl<'a> Visitor<'a> for Mssql<'a> {
                 self.write(" ")?;
                 self.visit_row(Row::from(insert.columns))?;
 
-                if let Some(returning) = insert.returning {
-                    self.visit_returning(returning)?;
+                if let Some(ref returning) = insert.returning {
+                    self.visit_returning(returning.clone())?;
                 }
 
                 self.write(" VALUES ")?;
@@ -328,12 +416,23 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             expr => self.surround_with("(", ")", |ref mut s| s.visit_expression(expr))?,
         }
 
+        if let Some(returning) = insert.returning {
+            let table = insert.table.unwrap();
+            self.write(" ")?;
+            self.select_generated_keys(returning, table)?;
+        }
+
         Ok(())
     }
 
     fn visit_merge(&mut self, merge: Merge<'a>) -> visitor::Result {
+        if let Some(returning) = merge.returning.as_ref().map(|r| r.clone()) {
+            self.create_generated_keys(returning)?;
+            self.write(" ")?;
+        }
+
         self.write("MERGE INTO ")?;
-        self.visit_table(merge.table, true)?;
+        self.visit_table(merge.table.clone(), true)?;
 
         self.write(" USING ")?;
 
@@ -354,10 +453,12 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         }
 
         if let Some(columns) = merge.returning {
-            self.visit_returning(columns)?;
+            self.visit_returning(columns.clone())?;
+            self.write("; ")?;
+            self.select_generated_keys(columns, merge.table)?;
+        } else {
+            self.write(";")?;
         }
-
-        self.write(";")?;
 
         Ok(())
     }
@@ -1065,7 +1166,7 @@ mod tests {
         let insert = Insert::single_into("foo").value("bar", "lol");
         let (sql, params) = Mssql::build(Insert::from(insert).returning(vec!["bar"])).unwrap();
 
-        assert_eq!("INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] VALUES (@P1)", sql);
+        assert_eq!("DECLARE @generated_keys table([bar] NVARCHAR(255)) INSERT INTO [foo] ([bar]) OUTPUT [Inserted].[bar] INTO @generated_keys VALUES (@P1) SELECT [t].[bar] FROM @generated_keys AS g INNER JOIN [foo] AS [t] ON [t].[bar] = [g].[bar] WHERE @@ROWCOUNT > 0", sql);
 
         assert_eq!(vec![Value::from("lol")], params);
     }
@@ -1156,12 +1257,17 @@ mod tests {
 
         let expected_sql = indoc!(
             "
+            DECLARE @generated_keys table([bar] NVARCHAR(255),[wtf] NVARCHAR(255))
             MERGE INTO [foo]
             USING (SELECT @P1 AS [bar], @P2 AS [wtf]) AS [dual] ([bar],[wtf])
             ON [dual].[bar] = [foo].[bar]
             WHEN NOT MATCHED THEN
             INSERT ([bar],[wtf]) VALUES ([dual].[bar],[dual].[wtf])
-            OUTPUT [Inserted].[bar],[Inserted].[wtf];
+            OUTPUT [Inserted].[bar],[Inserted].[wtf] INTO @generated_keys;
+            SELECT [t].[bar],[t].[wtf] FROM @generated_keys AS g
+            INNER JOIN [foo] AS [t]
+            ON ([t].[bar] = [g].[bar] AND [t].[wtf] = [g].[wtf])
+            WHERE @@ROWCOUNT > 0
         "
         );
 

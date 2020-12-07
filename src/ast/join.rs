@@ -76,3 +76,20 @@ where
         }
     }
 }
+
+impl<'a> Joinable<'a> for JoinData<'a> {
+    fn on<T>(self, conditions: T) -> JoinData<'a>
+    where
+        T: Into<ConditionTree<'a>>,
+    {
+        let conditions = match self.conditions {
+            ConditionTree::NoCondition => conditions.into(),
+            cond => cond.and(conditions.into()),
+        };
+
+        JoinData {
+            table: self.table,
+            conditions,
+        }
+    }
+}

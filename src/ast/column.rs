@@ -5,6 +5,19 @@ use crate::{
 };
 use std::borrow::Cow;
 
+#[derive(Debug, Clone, Copy)]
+pub enum TypeFamily {
+    Text,
+    Int,
+    Float,
+    Double,
+    Boolean,
+    Uuid,
+    DateTime,
+    Decimal,
+    Bytes,
+}
+
 /// A column definition.
 #[derive(Clone, Debug, Default)]
 pub struct Column<'a> {
@@ -12,6 +25,7 @@ pub struct Column<'a> {
     pub(crate) table: Option<Table<'a>>,
     pub(crate) alias: Option<Cow<'a, str>>,
     pub(crate) default: Option<DefaultValue<'a>>,
+    pub(crate) type_family: Option<TypeFamily>,
 }
 
 /// Defines a default value for a `Column`.
@@ -50,9 +64,7 @@ impl<'a> Column<'a> {
     pub(crate) fn into_bare(self) -> Self {
         Self {
             name: self.name,
-            table: None,
-            alias: None,
-            default: None,
+            ..Default::default()
         }
     }
 
@@ -62,6 +74,12 @@ impl<'a> Column<'a> {
         V: Into<DefaultValue<'a>>,
     {
         self.default = Some(value.into());
+        self
+    }
+
+    /// Sets a type family, used mainly for SQL Server `OUTPUT` hack.
+    pub fn type_family(mut self, type_family: TypeFamily) -> Self {
+        self.type_family = Some(type_family);
         self
     }
 
