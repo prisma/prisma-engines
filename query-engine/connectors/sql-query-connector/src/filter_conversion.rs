@@ -125,6 +125,7 @@ impl AliasedCondition for Filter {
                     ConditionTree::NegativeCondition
                 }
             }
+            Filter::Aggregation(filter) => filter.aliased_cond(alias),
             Filter::Empty => ConditionTree::NoCondition,
             _ => unimplemented!(),
         }
@@ -292,6 +293,59 @@ impl AliasedCondition for OneRelationIsNullFilter {
         };
 
         ConditionTree::single(condition)
+    }
+}
+
+impl AliasedCondition for AggregationFilter {
+    /// Conversion from an `AggregationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
+    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+        match self {
+            AggregationFilter::Count(scalar_filter) => transform(scalar_filter, alias, |x| count(x).into()),
+            AggregationFilter::Average(scalar_filter) => transform(scalar_filter, alias, |x| avg(x).into()),
+            AggregationFilter::Sum(scalar_filter) => transform(scalar_filter, alias, |x| sum(x).into()),
+            AggregationFilter::Min(scalar_filter) => transform(scalar_filter, alias, |x| min(x).into()),
+            AggregationFilter::Max(scalar_filter) => transform(scalar_filter, alias, |x| max(x).into()),
+        }
+    }
+}
+
+fn transform<T>(filter: ScalarFilter, alias: Option<Alias>, field_transformer: T) -> ConditionTree<'static>
+where
+    T: Fn(Expression) -> Expression,
+{
+    match (alias, filter.projection) {
+        (Some(alias), ScalarProjection::Single(field)) => {
+            let comparable: Expression = match filter.mode {
+                QueryMode::Default => field_transformer(field.as_column().table(alias.to_string(None)).into()),
+                QueryMode::Insensitive => {
+                    field_transformer(lower(field.as_column().table(alias.to_string(None))).into())
+                }
+            };
+
+            convert_scalar_filter(comparable, filter.condition, filter.mode, &[field])
+        }
+        (Some(alias), ScalarProjection::Compound(fields)) => {
+            let columns: Vec<Column<'static>> = fields
+                .clone()
+                .into_iter()
+                .map(|field| field.as_column().table(alias.to_string(None)))
+                .collect();
+
+            convert_scalar_filter(Row::from(columns), filter.condition, filter.mode, &fields)
+        }
+        (None, ScalarProjection::Single(field)) => {
+            let comparable: Expression = match filter.mode {
+                QueryMode::Default => field_transformer(field.as_column().into()),
+                QueryMode::Insensitive => field_transformer(lower(field.as_column()).into()),
+            };
+
+            convert_scalar_filter(comparable, filter.condition, filter.mode, &[field])
+        }
+        (None, ScalarProjection::Compound(fields)) => {
+            let columns: Vec<Column<'static>> = fields.clone().into_iter().map(|field| field.as_column()).collect();
+
+            convert_scalar_filter(Row::from(columns), filter.condition, filter.mode, &fields)
+        }
     }
 }
 

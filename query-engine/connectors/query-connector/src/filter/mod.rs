@@ -25,7 +25,17 @@ pub enum Filter {
     Relation(RelationFilter),
     NodeSubscription,
     BoolFilter(bool),
+    Aggregation(AggregationFilter),
     Empty,
+}
+
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
+pub enum AggregationFilter {
+    Count(ScalarFilter),
+    Average(ScalarFilter),
+    Sum(ScalarFilter),
+    Min(ScalarFilter),
+    Max(ScalarFilter),
 }
 
 impl Filter {
@@ -131,6 +141,7 @@ impl Filter {
             Filter::Relation(_) => {}
             Filter::NodeSubscription => {}
             Filter::BoolFilter(_) => {}
+            Filter::Aggregation(_) => {}
             Filter::Empty => {}
         }
     }
