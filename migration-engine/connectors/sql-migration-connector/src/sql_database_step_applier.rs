@@ -69,6 +69,11 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
             script.push_str("\n*/\n")
         }
 
+        // Whether we are on the first *rendered* step, to avoid printing a
+        // newline before it. This can't be `enumerate()` on the loop because
+        // some steps don't render anything.
+        let mut is_first_step = true;
+
         for step in &database_migration.steps {
             let statements: Vec<String> = render_raw_sql(
                 step,
@@ -77,11 +82,17 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
             );
 
             if !statements.is_empty() {
+                if is_first_step {
+                    is_first_step = false;
+                } else {
+                    script.push('\n');
+                }
+
                 // We print a newline *before* migration steps and not after,
                 // because we do not want two newlines at the end of the file:
                 // many editors will remove trailing newlines, and automatically
                 // edit the migration.
-                script.push_str("\n-- ");
+                script.push_str("-- ");
                 script.push_str(step.description());
                 script.push('\n');
 

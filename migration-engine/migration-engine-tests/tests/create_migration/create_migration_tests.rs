@@ -22,7 +22,6 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                 SqlFamily::Postgres => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
@@ -36,7 +35,6 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                 SqlFamily::Mysql => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE `Cat` (
                             `id` INT NOT NULL,
@@ -50,7 +48,6 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                 SqlFamily::Sqlite => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -62,7 +59,6 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                 SqlFamily::Mssql => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE [basic_create_migration_works].[Cat] (
                             [id] INT NOT NULL,
@@ -117,7 +113,6 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                 SqlFamily::Postgres => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE "Dog" (
                             "id" INTEGER NOT NULL,
@@ -131,7 +126,6 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                 SqlFamily::Mysql => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE `Dog` (
                             `id` INT NOT NULL,
@@ -145,7 +139,6 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                 SqlFamily::Sqlite => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE "Dog" (
                             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -157,7 +150,6 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                 SqlFamily::Mssql => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
                             [id] INT NOT NULL,
@@ -325,7 +317,6 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                 SqlFamily::Postgres => {
                     indoc! {
                         r#"
-
                         -- CreateEnum
                         CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
@@ -342,7 +333,6 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                 SqlFamily::Mysql => {
                     indoc! {
                         r#"
-
                         -- CreateTable
                         CREATE TABLE `Cat` (
                             `id` INT NOT NULL,
