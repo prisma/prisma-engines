@@ -200,7 +200,8 @@ fn finalize_arguments(mut args: QueryArguments, model: &ModelRef) -> QueryArgume
     // An implicit ordering is convenient for deterministic results for take and skip, for cursor it's _required_
     // as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.
     let add_implicit_ordering =
-        (args.skip.is_some() || args.cursor.is_some() || args.take.is_some()) && args.order_by.is_empty();
+        (args.skip.as_ref().map(|skip| *skip > 0).unwrap_or(false) || args.cursor.is_some() || args.take.is_some())
+            && args.order_by.is_empty();
 
     if add_implicit_ordering {
         let primary_identifier = model.primary_identifier();
