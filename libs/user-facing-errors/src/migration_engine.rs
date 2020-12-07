@@ -121,6 +121,26 @@ pub struct FoundFailedMigrations {
 )]
 pub struct MigrationNameTooLong;
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3011",
+    message = "Migration `{migration_name}` cannot be rolled back because it was never applied to the database."
+)]
+pub struct CannotRollBackUnappliedMigration {
+    /// The name of the migration.
+    pub migration_name: String,
+}
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3012",
+    message = "Migration `{migration_name}` cannot be rolled back because it is not in a failed state."
+)]
+pub struct CannotRollBackSucceededMigration {
+    /// The name of the migration.
+    pub migration_name: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
