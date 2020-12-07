@@ -29,7 +29,6 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
 
                             PRIMARY KEY ("id")
                         );
-
                         "#
                     }
                 }
@@ -43,7 +42,6 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
 
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
                         "#
                     }
                 }
@@ -55,7 +53,6 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                             "name" TEXT NOT NULL
                         );
-
                         "#
                     }
                 }
@@ -68,7 +65,6 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                             [name] NVARCHAR(1000) NOT NULL,
                             CONSTRAINT [PK_Cat_id] PRIMARY KEY ([id])
                         );
-
                         "#
                     }
                 }
@@ -124,7 +120,6 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
 
                             PRIMARY KEY ("id")
                         );
-
                         "#
                     }
                 }
@@ -138,7 +133,6 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
 
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
                         "#
                     }
                 }
@@ -150,7 +144,6 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                             "name" TEXT NOT NULL
                         );
-
                         "#
                     }
                 }
@@ -163,7 +156,6 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                             [name] NVARCHAR(1000) NOT NULL,
                             CONSTRAINT [PK_Dog_id] PRIMARY KEY ([id])
                         );
-
                         "#
                     }
                 }
@@ -335,7 +327,6 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
 
                             PRIMARY KEY ("id")
                         );
-
                         "#
                     }
                 }
@@ -349,16 +340,10 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
 
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
                         "#
                     }
                 }
-                SqlFamily::Sqlite => unreachable!("no enums -.-"),
-                SqlFamily::Mssql => {
-                    indoc! {
-                        r#"say hi to Musti and Nauki"#
-                    }
-                }
+                SqlFamily::Sqlite | SqlFamily::Mssql => unreachable!("no enums -.-"),
             };
 
             migration.assert_contents(expected_script)
