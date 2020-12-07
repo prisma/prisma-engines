@@ -77,7 +77,11 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
             );
 
             if !statements.is_empty() {
-                script.push_str("-- ");
+                // We print a newline *before* migration steps and not after,
+                // because we do not want two newlines at the end of the file:
+                // many editors will remove trailing newlines, and automatically
+                // edit the migration.
+                script.push_str("\n-- ");
                 script.push_str(step.description());
                 script.push('\n');
 
@@ -85,8 +89,6 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
                     script.push_str(&statement);
                     script.push_str(";\n");
                 }
-
-                script.push('\n');
             }
         }
 

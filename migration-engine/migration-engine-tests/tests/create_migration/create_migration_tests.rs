@@ -22,6 +22,7 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                 SqlFamily::Postgres => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
@@ -29,13 +30,13 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
 
                             PRIMARY KEY ("id")
                         );
-
                         "#
                     }
                 }
                 SqlFamily::Mysql => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE `Cat` (
                             `id` INT NOT NULL,
@@ -43,32 +44,31 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
 
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
                         "#
                     }
                 }
                 SqlFamily::Sqlite => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                             "name" TEXT NOT NULL
                         );
-
                         "#
                     }
                 }
                 SqlFamily::Mssql => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE [basic_create_migration_works].[Cat] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
                             CONSTRAINT [PK_Cat_id] PRIMARY KEY ([id])
                         );
-
                         "#
                     }
                 }
@@ -117,6 +117,7 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                 SqlFamily::Postgres => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE "Dog" (
                             "id" INTEGER NOT NULL,
@@ -124,13 +125,13 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
 
                             PRIMARY KEY ("id")
                         );
-
                         "#
                     }
                 }
                 SqlFamily::Mysql => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE `Dog` (
                             `id` INT NOT NULL,
@@ -138,32 +139,31 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
 
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
                         "#
                     }
                 }
                 SqlFamily::Sqlite => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE "Dog" (
                             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                             "name" TEXT NOT NULL
                         );
-
                         "#
                     }
                 }
                 SqlFamily::Mssql => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
                             CONSTRAINT [PK_Dog_id] PRIMARY KEY ([id])
                         );
-
                         "#
                     }
                 }
@@ -325,6 +325,7 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                 SqlFamily::Postgres => {
                     indoc! {
                         r#"
+
                         -- CreateEnum
                         CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
@@ -335,13 +336,13 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
 
                             PRIMARY KEY ("id")
                         );
-
                         "#
                     }
                 }
                 SqlFamily::Mysql => {
                     indoc! {
                         r#"
+
                         -- CreateTable
                         CREATE TABLE `Cat` (
                             `id` INT NOT NULL,
@@ -349,16 +350,10 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
 
                             PRIMARY KEY (`id`)
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
                         "#
                     }
                 }
-                SqlFamily::Sqlite => unreachable!("no enums -.-"),
-                SqlFamily::Mssql => {
-                    indoc! {
-                        r#"say hi to Musti and Nauki"#
-                    }
-                }
+                SqlFamily::Sqlite | SqlFamily::Mssql => unreachable!("no enums -.-"),
             };
 
             migration.assert_contents(expected_script)
