@@ -170,7 +170,6 @@ fn full_scalar_filter_type(
     let not_field = input_field("not", not_types, None).optional().nullable_if(nullable);
     fields.push(not_field);
 
-    // WIP include aggregate
     if include_aggregates {
         fields.push(aggregate_filter_field(
             ctx,

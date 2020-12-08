@@ -111,10 +111,27 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                         }
                     }
                     Err(_) => {
-                        let filters = match model.fields().find_from_all(&key)? {
-                            Field::Relation(rf) => extract_relation_filters(rf, value),
-                            Field::Scalar(sf) => extract_scalar_filters(sf, value),
-                        }?;
+                        let filters = match key.as_ref() {
+                            "count" => todo!(),
+                            "avg" => {
+                                let map: ParsedInputMap = value.try_into()?;
+                                // let mut filters = vec![];
+                                for (k, v) in map {
+                                    let field = model.fields().find_from_scalar(&key).unwrap();
+
+                                    // filters.extend(extract_scalar_filters(&field, v)?.into_iter().map(||));
+                                }
+
+                                todo!()
+                            }
+                            "sum" => todo!(),
+                            "min" => todo!(),
+                            "max" => todo!(),
+                            key => match model.fields().find_from_all(&key)? {
+                                Field::Relation(rf) => extract_relation_filters(rf, value),
+                                Field::Scalar(sf) => extract_scalar_filters(sf, value),
+                            }?,
+                        };
 
                         // strip empty filters
                         let filters = filters
@@ -140,6 +157,10 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
         }
     }
     extract_filter(value_map, model, 0)
+}
+
+fn extract_aggregation_filter() -> QueryGraphBuilderResult<Vec<Filter>> {
+    todo!()
 }
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
