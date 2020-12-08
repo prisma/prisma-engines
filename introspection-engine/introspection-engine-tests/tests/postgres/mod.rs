@@ -13,9 +13,9 @@ async fn sequences_should_work(api: &TestApi) -> crate::TestResult {
             migration.create_table("Test", move |t| {
                 t.inject_custom("id Integer Primary Key");
                 t.inject_custom("serial  Serial");
-                t.inject_custom("first   BigInt Default nextval('\"first_Sequence\"'::regclass)");
+                t.inject_custom("first   BigInt Not Null Default nextval('\"first_Sequence\"'::regclass)");
                 t.inject_custom("second  BigInt Default nextval('\"second_sequence\"')");
-                t.inject_custom("third  BigInt Default nextval('third_Sequence'::text)");
+                t.inject_custom("third  BigInt Not Null Default nextval('third_Sequence'::text)");
             });
         })
         .await?;
@@ -31,11 +31,11 @@ async fn sequences_should_work(api: &TestApi) -> crate::TestResult {
         }
 
         model Test {
-          id     Int @id
-          serial Int @default(autoincrement())
-          first  Int @default(autoincrement())
-          second Int @default(autoincrement())
-          third  Int @default(autoincrement())
+          id     Int  @id
+          serial Int  @default(autoincrement())
+          first  Int  @default(autoincrement())
+          second Int? @default(autoincrement())
+          third  Int  @default(autoincrement())
         }
     "#}
     .to_string();
