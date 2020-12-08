@@ -135,6 +135,7 @@ pub(crate) struct AlterColumn {
 pub(crate) enum ColumnTypeChange {
     RiskyCast,
     SafeCast,
+    NotCastable,
 }
 
 #[derive(Debug)]
@@ -160,10 +161,10 @@ pub(crate) struct CreateIndex {
     pub caused_by_create_table: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) struct DropIndex {
-    pub table: String,
-    pub name: String,
+    pub table_index: usize,
+    pub index_index: usize,
 }
 
 #[derive(Debug)]

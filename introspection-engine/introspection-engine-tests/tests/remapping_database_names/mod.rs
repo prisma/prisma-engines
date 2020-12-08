@@ -2,7 +2,7 @@ use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
 use quaint::prelude::Queryable;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 #[test_each_connector]
 async fn remapping_fields_with_invalid_characters(api: &TestApi) -> crate::TestResult {

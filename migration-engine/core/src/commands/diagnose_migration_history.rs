@@ -82,6 +82,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
         // Load the migrations.
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
+
         let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
             Ok(migrations) => (migrations, true),
             Err(PersistenceNotInitializedError {}) => (vec![], false),

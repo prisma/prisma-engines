@@ -201,7 +201,8 @@ impl SqlSchemaDescriber {
             let tpe = get_column_type(&col, enums);
             let default = Self::get_default_value(&col, &tpe, sequences);
 
-            let auto_increment = is_identity || matches!(default, Some(DefaultValue::SEQUENCE(_)));
+            let auto_increment =
+                is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(_)));
 
             let col = Column {
                 name,
@@ -572,68 +573,68 @@ impl SqlSchemaDescriber {
                 Some(default_string) => {
                     Some(match &tpe.family {
                         ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
-                            Some(int_value) => DefaultValue::VALUE(int_value),
+                            Some(int_value) => DefaultValue::value(int_value),
                             None => match is_autoincrement(&default_string, sequences) {
-                                Some(seq) => DefaultValue::SEQUENCE(seq),
-                                None => DefaultValue::DBGENERATED(default_string),
+                                Some(seq) => DefaultValue::sequence(seq),
+                                None => DefaultValue::db_generated(default_string),
                             },
                         },
                         ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
-                            Some(int_value) => DefaultValue::VALUE(int_value),
+                            Some(int_value) => DefaultValue::value(int_value),
                             None => match is_autoincrement(&default_string, sequences) {
-                                Some(seq) => DefaultValue::SEQUENCE(seq),
-                                None => DefaultValue::DBGENERATED(default_string),
+                                Some(seq) => DefaultValue::sequence(seq),
+                                None => DefaultValue::db_generated(default_string),
                             },
                         },
                         ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
-                            Some(float_value) => DefaultValue::VALUE(float_value),
-                            None => DefaultValue::DBGENERATED(default_string),
+                            Some(float_value) => DefaultValue::value(float_value),
+                            None => DefaultValue::db_generated(default_string),
                         },
                         ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
-                            Some(float_value) => DefaultValue::VALUE(float_value),
-                            None => DefaultValue::DBGENERATED(default_string),
+                            Some(float_value) => DefaultValue::value(float_value),
+                            None => DefaultValue::db_generated(default_string),
                         },
                         ColumnTypeFamily::Boolean => match Self::parse_bool(&default_string) {
-                            Some(bool_value) => DefaultValue::VALUE(bool_value),
-                            None => DefaultValue::DBGENERATED(default_string),
+                            Some(bool_value) => DefaultValue::value(bool_value),
+                            None => DefaultValue::db_generated(default_string),
                         },
                         ColumnTypeFamily::String => {
                             match unsuffix_default_literal(&default_string, &tpe.data_type, &tpe.full_data_type) {
-                                Some(default_literal) => DefaultValue::VALUE(PrismaValue::String(
-                                    process_string_literal(default_literal.as_ref()).into(),
-                                )),
-                                None => DefaultValue::DBGENERATED(default_string),
+                                Some(default_literal) => {
+                                    DefaultValue::value(process_string_literal(default_literal.as_ref()).into_owned())
+                                }
+                                None => DefaultValue::db_generated(default_string),
                             }
                         }
                         ColumnTypeFamily::DateTime => {
                             match default_string.to_lowercase().as_str() {
-                                "now()" | "current_timestamp" => DefaultValue::NOW,
-                                _ => DefaultValue::DBGENERATED(default_string), //todo parse values
+                                "now()" | "current_timestamp" => DefaultValue::now(),
+                                _ => DefaultValue::db_generated(default_string), //todo parse values
                             }
                         }
-                        ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Binary => DefaultValue::db_generated(default_string),
                         // JSON/JSONB defaults come in the '{}'::jsonb form.
                         ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
                             .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
-                            .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
-                            .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
-                        ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                            .map(|default| DefaultValue::value(PrismaValue::Json(unquote_string(&default))))
+                            .unwrap_or_else(move || DefaultValue::db_generated(default_string)),
+                        ColumnTypeFamily::Uuid => DefaultValue::db_generated(default_string),
                         ColumnTypeFamily::Enum(enum_name) => {
                             let enum_suffix_without_quotes = format!("::{}", enum_name);
                             let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
                             if default_string.ends_with(&enum_suffix_with_quotes) {
-                                DefaultValue::VALUE(PrismaValue::Enum(Self::unquote_string(
+                                DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
                                     &default_string.replace(&enum_suffix_with_quotes, ""),
                                 )))
                             } else if default_string.ends_with(&enum_suffix_without_quotes) {
-                                DefaultValue::VALUE(PrismaValue::Enum(Self::unquote_string(
+                                DefaultValue::value(PrismaValue::Enum(Self::unquote_string(
                                     &default_string.replace(&enum_suffix_without_quotes, ""),
                                 )))
                             } else {
-                                DefaultValue::DBGENERATED(default_string)
+                                DefaultValue::db_generated(default_string)
                             }
                         }
-                        ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Unsupported(_) => DefaultValue::db_generated(default_string),
                     })
                 }
             },
@@ -743,12 +744,8 @@ static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
         .expect("compile autoincrement regex")
 });
 
-/// Returns whether a particular sequence (`value`) matches the provided column info.
-/// todo this only seems to work on sequence names autogenerated by barrel???
-/// the names for manually created and named sequences wont match
+/// Returns the name of the sequence in the schema that the defaultvalue matches if it is drawn from one of them
 fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
-    println!("{}", value);
-    println!("{:?}", sequences);
     AUTOINCREMENT_REGEX.captures(value).and_then(|captures| {
         let sequence_name = captures.name("sequence").or(captures.name("sequence2"));
         println!("{:?}", sequence_name);

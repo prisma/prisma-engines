@@ -260,7 +260,7 @@ async fn all_postgres_column_types_must_work() {
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Integer.to_json()),
             },
-            default: Some(DefaultValue::SEQUENCE(format!(
+            default: Some(DefaultValue::sequence(format!(
                 "nextval('\"{}\".\"User_primary_col_seq\"'::regclass)",
                 SCHEMA
             ))),
@@ -315,7 +315,7 @@ async fn all_postgres_column_types_must_work() {
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::BigInt.to_json()),
             },
-            default: Some(DefaultValue::SEQUENCE(format!(
+            default: Some(DefaultValue::sequence(format!(
                 "nextval('\"{}\".\"User_bigserial_col_seq\"'::regclass)",
                 SCHEMA
             ))),
@@ -431,7 +431,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "timestamp without time zone".into(),
                 full_data_type: "timestamp".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Timestamp(Some(6)).to_json()),
@@ -540,7 +539,7 @@ async fn all_postgres_column_types_must_work() {
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::SmallInt.to_json()),
             },
-            default: Some(DefaultValue::SEQUENCE(format!(
+            default: Some(DefaultValue::sequence(format!(
                 "nextval('\"{}\".\"User_smallserial_col_seq\"'::regclass)",
                 SCHEMA
             ))),
@@ -556,7 +555,7 @@ async fn all_postgres_column_types_must_work() {
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Integer.to_json()),
             },
-            default: Some(DefaultValue::SEQUENCE(format!(
+            default: Some(DefaultValue::sequence(format!(
                 "nextval('\"{}\".\"User_serial_col_seq\"'::regclass)",
                 SCHEMA
             ))),
@@ -633,6 +632,7 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "uuid".into(),
                 full_data_type: "uuid".into(),
                 character_maximum_length: None,
+
                 family: ColumnTypeFamily::Uuid,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::UUID.to_json()),
@@ -656,7 +656,7 @@ async fn all_postgres_column_types_must_work() {
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".into()],
                 sequence: Some(Sequence {
-                    name: "User_primary_col_seq".into()
+                    name: "User_primary_col_seq".into(),
                 },),
                 constraint_name: Some("User_pkey".into()),
             }),
@@ -697,10 +697,12 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                         native_type: Some(PostgresType::Integer.to_json()),
                     },
+
                     default: None,
                     auto_increment: false,
                 },
@@ -710,6 +712,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -723,6 +726,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -736,6 +740,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -749,6 +754,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -762,6 +768,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -845,52 +852,16 @@ async fn postgres_enums_must_work() {
 
 #[tokio::test]
 async fn postgres_sequences_must_work() {
-    let sql = format!(
-        "
-            CREATE SEQUENCE \"{0}\".\"first_sequence\";
-            CREATE SEQUENCE \"{0}\".\"second_sequence\";
-
-            Create Table \"{0}\".\"Test\"(
-               first   BigInt Default nextval('\"{0}\".\"first_sequence\"'::regclass),
-               second  BigInt Default nextval('\"{0}\".\"second_sequence\"')
-            );
-            ",
-        SCHEMA
-    );
-
-    println!("{}", sql);
-
-    let inspector = get_postgres_describer(&sql, "postgres_sequences_must_work").await;
+    let inspector = get_postgres_describer(
+        &format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA),
+        "postgres_sequences_must_work",
+    )
+    .await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
+    let got_seq = schema.get_sequence("test").expect("get sequence");
 
-    println!("{:?}", schema);
-    let first_seq = schema.get_sequence("first_sequence").expect("get sequence");
-    assert_eq!(
-        first_seq,
-        &Sequence {
-            name: "first_sequence".into()
-        },
-    );
-
-    let second_seq = schema.get_sequence("second_sequence").expect("get sequence");
-    assert_eq!(
-        second_seq,
-        &Sequence {
-            name: "second_sequence".into()
-        },
-    );
-
-    println!(
-        "{:?}",
-        schema.get_table("Test").unwrap().column("first").unwrap().default
-    );
-    println!(
-        "{:?}",
-        schema.get_table("Test").unwrap().column("second").unwrap().default
-    );
-
-    assert!(false);
+    assert_eq!(got_seq, &Sequence { name: "test".into() },);
 }
 
 #[tokio::test]

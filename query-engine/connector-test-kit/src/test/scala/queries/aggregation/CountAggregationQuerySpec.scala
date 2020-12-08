@@ -39,7 +39,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     val result = server.query(
       s"""{
          |  aggregateItem {
-             count { _all }
+         |    count { _all }
          |  }
          |}""".stripMargin,
       project
@@ -48,20 +48,20 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     result.pathAsLong("data.aggregateItem.count._all") should be(0)
   }
 
-  "Counting with 2 records in the database" should "return 2" in {
-    createItem()
-    createItem()
-
+  "Counting on multiple fields" should "return the correct counts" in {
     val result = server.query(
       s"""{
          |  aggregateItem {
-         |    count { _all }
+         |    count { 
+         |      _all
+         |       
+         |    }
          |  }
          |}""".stripMargin,
       project
     )
 
-    result.pathAsLong("data.aggregateItem.count._all") should be(2)
+    result.pathAsLong("data.aggregateItem.count._all") should be(0)
   }
 
   "Counting fields that contain null" should "only return the count of these fields that don't have null" in {
@@ -72,6 +72,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
       s"""{
          |  aggregateItem {
          |    count {
+         |      _all
          |      s1
          |      s2
          |    }
@@ -80,6 +81,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
       project
     )
 
+    result.pathAsLong("data.aggregateItem.count._all") should be(2)
     result.pathAsLong("data.aggregateItem.count.s1") should be(1)
     result.pathAsLong("data.aggregateItem.count.s2") should be(1)
   }

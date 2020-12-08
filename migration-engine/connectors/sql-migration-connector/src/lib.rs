@@ -26,8 +26,8 @@ use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
-use sql_database_migration_inferrer::*;
 use sql_schema_describer::SqlSchema;
+use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
@@ -147,8 +147,10 @@ impl MigrationConnector for SqlMigrationConnector {
 }
 
 async fn connect(database_str: &str) -> ConnectorResult<Connection> {
-    let connection_info =
-        ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+    let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
+        let details = user_facing_errors::quaint::invalid_url_description(database_str, &err.to_string());
+        KnownError::new(InvalidDatabaseString { details })
+    })?;
 
     let connection = Quaint::new(database_str)
         .await

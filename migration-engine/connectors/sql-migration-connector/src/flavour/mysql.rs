@@ -6,6 +6,7 @@ use crate::{
 };
 use datamodel::{walkers::walk_scalar_fields, Datamodel};
 use enumflags2::BitFlags;
+use indoc::indoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
 use once_cell::sync::Lazy;
 use quaint::{connector::MysqlUrl, prelude::SqlFamily};
@@ -91,7 +92,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 
     async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
+        let sql = indoc! {r#"
             CREATE TABLE _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
@@ -102,7 +103,7 @@ impl SqlFlavour for MysqlFlavour {
                 started_at              DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
                 applied_steps_count     INTEGER UNSIGNED NOT NULL DEFAULT 0
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-        "#;
+        "#};
 
         Ok(connection.raw_cmd(sql).await?)
     }
@@ -219,10 +220,8 @@ impl SqlFlavour for MysqlFlavour {
         connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
         let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
-        let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
         let create_database = format!("CREATE DATABASE `{}`", database_name);
 
-        connection.raw_cmd(&drop_database).await?;
         connection.raw_cmd(&create_database).await?;
 
         let mut temporary_database_url = self.url.url().clone();
@@ -259,6 +258,7 @@ impl SqlFlavour for MysqlFlavour {
         })()
         .await;
 
+        let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
         connection.raw_cmd(&drop_database).await?;
 
         sql_schema_result

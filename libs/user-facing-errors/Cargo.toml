@@ -12,6 +12,7 @@ serde_json = { version = "1.0", features = ["float_roundtrip"] }
 serde = { version = "1.0.102", features = ["derive"] }
 backtrace = "0.3.40"
 tracing = "0.1"
+indoc = "1"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"

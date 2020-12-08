@@ -30,6 +30,14 @@ impl ConnectorError {
                     column: column.clone(),
                 }))
             }
+            ErrorKind::InvalidDatabaseUrl { details, url } => {
+                let details = user_facing_errors::quaint::invalid_url_description(url, details);
+
+                Some(KnownError::new(user_facing_errors::common::InvalidDatabaseString {
+                    details,
+                }))
+            }
+
             _ => None,
         };
 
@@ -125,6 +133,9 @@ pub enum ErrorKind {
 
     #[error("Database error. error code: {}, error message: {}", code, message)]
     RawError { code: String, message: String },
+
+    #[error("{}", details)]
+    InvalidDatabaseUrl { details: String, url: String },
 }
 
 impl From<DomainError> for ConnectorError {

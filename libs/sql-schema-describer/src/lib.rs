@@ -3,7 +3,7 @@
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 
-use std::fmt;
+use std::fmt::{self, Debug};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -47,7 +47,7 @@ pub struct SQLMetadata {
 }
 
 /// The result of describing a database schema.
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct SqlSchema {
     /// The schema's tables.
@@ -398,7 +398,7 @@ impl ColumnArity {
 }
 
 /// Foreign key action types (for ON DELETE|ON UPDATE).
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ForeignKeyAction {
     /// Produce an error indicating that the deletion or update would create a foreign key
@@ -463,9 +463,33 @@ pub struct Sequence {
     pub name: String,
 }
 
+#[derive(PartialEq, Debug, Clone)]
+pub struct DefaultValue {
+    kind: DefaultKind,
+    constraint_name: Option<String>,
+}
+
+impl Serialize for DefaultValue {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.kind.serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for DefaultValue {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        Ok(Self::new(DefaultKind::deserialize(deserializer)?))
+    }
+}
+
 /// A DefaultValue
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-pub enum DefaultValue {
+pub enum DefaultKind {
     /// A constant value, parsed as String
     VALUE(PrismaValue),
     /// An expression generating a current timestamp.
@@ -477,11 +501,62 @@ pub enum DefaultValue {
 }
 
 impl DefaultValue {
+    pub fn db_generated(val: impl ToString) -> Self {
+        Self::new(DefaultKind::DBGENERATED(val.to_string()))
+    }
+
+    pub fn now() -> Self {
+        Self::new(DefaultKind::NOW)
+    }
+
+    pub fn value(val: impl Into<PrismaValue>) -> Self {
+        Self::new(DefaultKind::VALUE(val.into()))
+    }
+
+    pub fn sequence(val: impl ToString) -> Self {
+        Self::new(DefaultKind::SEQUENCE(val.to_string()))
+    }
+
+    pub fn new(kind: DefaultKind) -> Self {
+        Self {
+            kind,
+            constraint_name: None,
+        }
+    }
+
+    pub fn kind(&self) -> &DefaultKind {
+        &self.kind
+    }
+
+    pub fn set_constraint_name(&mut self, name: impl ToString) {
+        self.constraint_name = Some(name.to_string())
+    }
+
+    pub fn constraint_name(&self) -> Option<&str> {
+        self.constraint_name.as_ref().map(|s| s.as_str())
+    }
+
     pub fn as_value(&self) -> Option<&PrismaValue> {
-        match self {
-            DefaultValue::VALUE(v) => Some(v),
+        match self.kind {
+            DefaultKind::VALUE(ref v) => Some(v),
             _ => None,
         }
+    }
+
+    pub fn is_value(&self) -> bool {
+        matches!(self.kind, DefaultKind::VALUE(_))
+    }
+
+    pub fn is_now(&self) -> bool {
+        matches!(self.kind, DefaultKind::NOW)
+    }
+
+    pub fn is_sequence(&self) -> bool {
+        matches!(self.kind, DefaultKind::SEQUENCE(_))
+    }
+
+    pub fn is_db_generated(&self) -> bool {
+        matches!(self.kind, DefaultKind::DBGENERATED(_))
     }
 }
 

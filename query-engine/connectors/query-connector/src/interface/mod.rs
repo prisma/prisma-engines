@@ -90,8 +90,10 @@ pub enum AggregationSelection {
     Field(ScalarFieldRef),
 
     /// Counts records of the model that match the query.
-    /// If fields are provided, counts based on these fields instead of rows (e.g. * in SQL).
-    Count(Vec<ScalarFieldRef>),
+    /// `all` indicates that an all-records selection has been made (e.g. SQL *).
+    /// `fields` are specific fields to count on. By convention, if `all` is true,
+    /// it will always be the last of the count results.
+    Count { all: bool, fields: Vec<ScalarFieldRef> },
 
     /// Compute average for each field contained.
     Average(Vec<ScalarFieldRef>),
@@ -110,12 +112,14 @@ impl AggregationSelection {
     pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
         match self {
             AggregationSelection::Field(field) => vec![(field.type_identifier.clone(), FieldArity::Required)],
-            AggregationSelection::Count(fields) => {
-                if fields.is_empty() {
-                    vec![(TypeIdentifier::Int, FieldArity::Required)]
-                } else {
-                    Self::map_field_types(&fields, Some(TypeIdentifier::Int))
+            AggregationSelection::Count { all, fields } => {
+                let mut mapped = Self::map_field_types(&fields, Some(TypeIdentifier::Int));
+
+                if *all {
+                    mapped.push((TypeIdentifier::Int, FieldArity::Required));
                 }
+
+                mapped
             }
             AggregationSelection::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
             AggregationSelection::Sum(fields) => Self::map_field_types(&fields, None),

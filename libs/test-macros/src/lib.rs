@@ -7,14 +7,7 @@ use syn::ItemFn;
 
 #[proc_macro_attribute]
 pub fn test_each_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
-    test_each_connector::test_each_connector_impl(attr, input, false)
-}
-
-// This will be here to allow us gradually enable MSSQL support in tests. Should
-// be taken away when we're done!
-#[proc_macro_attribute]
-pub fn test_each_connector_mssql(attr: TokenStream, input: TokenStream) -> TokenStream {
-    test_each_connector::test_each_connector_impl(attr, input, true)
+    test_each_connector::test_each_connector_impl(attr, input)
 }
 
 fn function_returns_result(func: &ItemFn) -> bool {

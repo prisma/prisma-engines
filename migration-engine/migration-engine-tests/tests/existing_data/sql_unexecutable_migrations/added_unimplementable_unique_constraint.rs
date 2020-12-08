@@ -1,6 +1,6 @@
 use migration_engine_tests::sql::*;
 
-#[test_each_connector(tags("sql"), log = "debug")]
+#[test_each_connector(tags("sql"))]
 async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -61,7 +61,7 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql", "postgres"), log = "debug")]
+#[test_each_connector(tags("mysql", "postgres"))]
 async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {

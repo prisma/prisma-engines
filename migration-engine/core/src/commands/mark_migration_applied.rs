@@ -58,11 +58,9 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
             .iter()
             .any(|migration| migration.finished_at.is_some())
         {
-            return Err(CoreError::UserFacing(user_facing_errors::KnownError::new(
-                MigrationAlreadyApplied {
-                    migration_name: input.migration_name.clone(),
-                },
-            )));
+            return Err(CoreError::user_facing(MigrationAlreadyApplied {
+                migration_name: input.migration_name.clone(),
+            }));
         }
 
         let migrations_to_mark_rolled_back = relevant_migrations

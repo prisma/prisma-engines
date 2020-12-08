@@ -2,7 +2,7 @@ use crate::{exec_loader, PrismaError, PrismaResult};
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
 use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
-use std::sync::Arc;
+use std::{fmt, sync::Arc};
 
 /// Prisma request context containing all immutable state of the process.
 /// There is usually only one context initialized per process.
@@ -13,6 +13,12 @@ pub struct PrismaContext {
     dm: Datamodel,
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
+}
+
+impl fmt::Debug for PrismaContext {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("PrismaContext { .. }")
+    }
 }
 
 pub struct ContextBuilder {

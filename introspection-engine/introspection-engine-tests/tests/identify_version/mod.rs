@@ -2,7 +2,7 @@ use barrel::types;
 use introspection_connector::Version;
 use introspection_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 //Sqlite
 #[test_each_connector(tags("sqlite"))]

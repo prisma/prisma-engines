@@ -17,6 +17,7 @@ tracing = "0.1"
 enumflags2 = "0.6.0"
 tracing-futures = "0.2.4"
 tracing-error = "0.1.2"
+indoc = "1"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"

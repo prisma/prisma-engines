@@ -18,8 +18,14 @@ pub struct Mysql {
 #[async_trait]
 impl FromSource for Mysql {
     async fn from_source(source: &Datasource) -> connector_interface::Result<Self> {
-        let connection_info = ConnectionInfo::from_url(&source.url().value)
-            .map_err(|err| ConnectorError::from_kind(ErrorKind::ConnectionError(err.into())))?;
+        let database_str = &source.url().value;
+
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
+            ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
+                details: err.to_string(),
+                url: database_str.to_string(),
+            })
+        })?;
 
         let mut builder = Quaint::builder(&source.url().value)
             .map_err(SqlError::from)

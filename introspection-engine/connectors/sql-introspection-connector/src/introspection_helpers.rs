@@ -7,9 +7,8 @@ use datamodel::{
 use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
 use sql_datamodel_connector::SqlDatamodelConnectors;
-use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
-};
+use sql_schema_describer::DefaultKind;
+use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 use tracing::debug;
 
 //checks
@@ -38,7 +37,6 @@ pub fn is_new_migration_table(table: &Table) -> bool {
         && table.columns.iter().any(|c| c.name == "rolled_back_at")
         && table.columns.iter().any(|c| c.name == "started_at")
         && table.columns.iter().any(|c| c.name == "applied_steps_count")
-        && table.columns.iter().any(|c| c.name == "script")
 }
 
 pub(crate) fn is_relay_table(table: &Table) -> bool {
@@ -277,7 +275,7 @@ pub(crate) fn calculate_default(
     column: &Column,
     arity: &FieldArity,
 ) -> (Option<DMLDef>, Option<String>) {
-    match (&column.default, &column.tpe.family) {
+    match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => (None, None),
         (_, ColumnTypeFamily::Int) if column.auto_increment => {
             (Some(DMLDef::Expression(VG::new_autoincrement())), None)
@@ -291,13 +289,13 @@ pub(crate) fn calculate_default(
         (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
             (Some(DMLDef::Expression(VG::new_autoincrement())), None)
         }
-        (Some(SQLDef::SEQUENCE(_)), _) => (Some(DMLDef::Expression(VG::new_autoincrement())), None),
-        (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => (Some(DMLDef::Expression(VG::new_now())), None),
-        (Some(SQLDef::DBGENERATED(default_string)), _) => (
+        (Some(DefaultKind::SEQUENCE(_)), _) => (Some(DMLDef::Expression(VG::new_autoincrement())), None),
+        (Some(DefaultKind::NOW), ColumnTypeFamily::DateTime) => (Some(DMLDef::Expression(VG::new_now())), None),
+        (Some(DefaultKind::DBGENERATED(default_string)), _) => (
             Some(DMLDef::Expression(VG::new_dbgenerated())),
             Some(default_string.clone()),
         ),
-        (Some(SQLDef::VALUE(val)), _) => (Some(DMLDef::Single(val.clone())), None),
+        (Some(DefaultKind::VALUE(val)), _) => (Some(DMLDef::Single(val.clone())), None),
         _ => (None, None),
     }
 }

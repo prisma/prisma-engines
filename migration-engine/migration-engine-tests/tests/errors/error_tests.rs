@@ -1,8 +1,10 @@
+use indoc::formatdoc;
 use migration_connector::steps::{DeleteModel, MigrationStep};
 use migration_core::{api::RpcApi, GateKeeper};
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
+use quaint::prelude::SqlFamily;
 use serde_json::json;
 use url::Url;
 
@@ -389,7 +391,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         .values(("apple",))
         .values(("banana",));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await?;
 
     let dm2 = r#"
         model Fruit {
@@ -405,27 +407,26 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         .await?
         .datamodel_steps;
 
-    let error = api
+    let res = api
         .apply()
         .steps(Some(steps))
         .force(Some(true))
         .migration_id(Some("the-migration"))
         .send_user_facing()
-        .await
-        .unwrap_err();
+        .await;
 
-    let json_error = serde_json::to_value(&error).unwrap();
+    let json_error = serde_json::to_value(&res.unwrap_err()).unwrap();
 
-    let expected_msg = if api.sql_family().is_mysql() {
-        "Unique constraint failed on the constraint: `name_unique`"
-    } else {
-        "Unique constraint failed on the fields: (`name`)"
+    let expected_msg = match api.sql_family() {
+        SqlFamily::Mysql => "Unique constraint failed on the constraint: `name_unique`",
+        SqlFamily::Mssql => "Unique constraint failed on the constraint: `Fruit_name_unique`",
+        _ => "Unique constraint failed on the fields: (`name`)",
     };
 
-    let expected_target = if api.sql_family().is_mysql() {
-        json!("name_unique")
-    } else {
-        json!(["name"])
+    let expected_target = match api.sql_family() {
+        SqlFamily::Mysql => json!("name_unique"),
+        SqlFamily::Mssql => json!("Fruit_name_unique"),
+        _ => json!(["name"]),
     };
 
     let expected_json = json!({
@@ -477,44 +478,6 @@ async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
 }
 
 #[tokio::test]
-async fn microsoft_sql_server_is_not_allowed_in_migration_engine() {
-    let url = mssql_2019_url("master");
-
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "sqlserver"
-              url = "{}"
-            }}
-
-            generator js {{
-              provider = "prisma-client-js"
-              previewFeatures = ["microsoftSqlServer"]
-            }}
-        "#,
-        url
-    );
-
-    let error = RpcApi::new(&dm, vec![String::from("nativeTypes")])
-        .await
-        .map(|_| ())
-        .unwrap_err();
-
-    let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
-
-    let expected = json!({
-        "is_panic": false,
-        "message": "Some of the requested preview features are not yet allowed in migration engine. Please remove them from your data model before using migrations. (blocked: `microsoftSqlServer`)",
-        "meta": {
-            "features": ["microsoftSqlServer"]
-        },
-        "error_code": "P3007"
-    });
-
-    assert_eq!(expected, json_error);
-}
-
-#[tokio::test]
 async fn native_types_are_not_allowed_in_migration_engine() {
     let url = mysql_5_6_url("master");
 
@@ -553,53 +516,64 @@ async fn native_types_are_not_allowed_in_migration_engine() {
 }
 
 #[tokio::test]
-async fn one_can_allow_all_preview_features() {
-    let url = mssql_2019_url("master");
+async fn connection_string_problems_give_a_nice_error() {
+    let providers = &[
+        ("mysql", "mysql://root:password-with-#@localhost:3306/database"),
+        (
+            "postgresql",
+            "postgresql://root:password-with-#@localhost:5432/postgres",
+        ),
+        ("sqlserver", "sqlserver://root:password-with-#@localhost:5432/postgres"),
+    ];
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "sqlserver"
-              url = "{}"
-            }}
-
-            generator js {{
-              provider = "prisma-client-js"
-              previewFeatures = ["microsoftSqlServer", "nativeTypes"]
-            }}
+    for provider in providers {
+        let dm = formatdoc!(
+            r#"
+                datasource db {{
+                  provider = "{}"
+                  url = "{}"
+                }}
         "#,
-        url
-    );
+            provider.0,
+            provider.1
+        );
 
-    assert!(RpcApi::new(&dm, GateKeeper::allow_all_whitelist())
-        .await
-        .map(|_| ())
-        .is_ok());
-}
+        let error = RpcApi::new(&dm, vec![]).await.map(|_| ()).unwrap_err();
 
-#[tokio::test]
-async fn one_can_allow_microsoft_sql_server() {
-    let url = mssql_2019_url("master");
+        let json_error = serde_json::to_value(&error.render_user_facing()).unwrap();
 
-    let dm = format!(
-        r#"
-            datasource db {{
-              provider = "sqlserver"
-              url = "{}"
-            }}
+        let details = match provider.0 {
+            "sqlserver" => {
+                formatdoc!(
+                    "Error parsing connection string: Conversion error: invalid digit found in string in `{connection_string}`.
+                    Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
+                    for constructing a correct connection string. In some cases, certain characters must be escaped.
+                    Please check the string for any illegal characters.",
+                    connection_string = provider.1
+                ).replace('\n', " ")
+            },
+            _ => {
+                formatdoc!(
+                    "Error parsing connection string: invalid port number in `{connection_string}`.
+                    Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
+                    for constructing a correct connection string. In some cases, certain characters must be escaped.
+                    Please check the string for any illegal characters.",
+                    connection_string = provider.1
+                ).replace('\n', " ")
+            }
+        };
 
-            generator js {{
-              provider = "prisma-client-js"
-              previewFeatures = ["microsoftSqlServer"]
-            }}
-        "#,
-        url
-    );
+        let expected = json!({
+            "is_panic": false,
+            "message": format!("The provided database string is invalid. {}", &details),
+            "meta": {
+                "details": &details,
+            },
+            "error_code": "P1013"
+        });
 
-    assert!(RpcApi::new(&dm, vec![String::from("microsoftSqlServer")])
-        .await
-        .map(|_| ())
-        .is_ok());
+        assert_eq!(expected, json_error);
+    }
 }
 
 #[tokio::test]

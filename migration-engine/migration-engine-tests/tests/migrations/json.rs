@@ -28,7 +28,7 @@ async fn database_level_json_defaults_can_be_defined(api: &TestApi) -> TestResul
                     ColumnTypeFamily::Json
                 })?
                 .assert_default(match api.sql_family() {
-                    SqlFamily::Postgres => Some(DefaultValue::VALUE(PrismaValue::Json(
+                    SqlFamily::Postgres => Some(DefaultValue::value(PrismaValue::Json(
                         "[\"sticks\", \"chimken\", 100, \"dog park\"]".into(),
                     ))),
                     SqlFamily::Mysql => None,

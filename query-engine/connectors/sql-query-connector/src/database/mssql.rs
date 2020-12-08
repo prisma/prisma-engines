@@ -18,10 +18,16 @@ pub struct Mssql {
 #[async_trait]
 impl FromSource for Mssql {
     async fn from_source(source: &Datasource) -> connector_interface::Result<Self> {
-        let connection_info = ConnectionInfo::from_url(&source.url().value)
-            .map_err(|err| ConnectorError::from_kind(ErrorKind::ConnectionError(err.into())))?;
+        let database_str = &source.url().value;
 
-        let mut builder = Quaint::builder(&source.url().value)
+        let connection_info = ConnectionInfo::from_url(database_str).map_err(|err| {
+            ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
+                details: err.to_string(),
+                url: database_str.to_string(),
+            })
+        })?;
+
+        let mut builder = Quaint::builder(database_str)
             .map_err(SqlError::from)
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 

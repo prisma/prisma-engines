@@ -1,5 +1,6 @@
 use crate::{common, query_engine, KnownError};
 use common::ModelKind;
+use indoc::formatdoc;
 use quaint::{error::ErrorKind, prelude::ConnectionInfo};
 
 impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
@@ -20,6 +21,17 @@ impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseCo
             quaint::error::DatabaseConstraint::ForeignKey => Self::ForeignKey,
         }
     }
+}
+
+pub fn invalid_url_description(database_str: &str, error_details: &str) -> String {
+    let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
+
+    let details = formatdoc! {r#"
+            {} in `{}`. Please refer to the documentation in {} for constructing a correct
+            connection string. In some cases, certain characters must be escaped. Please
+            check the string for any illegal characters."#, error_details, database_str, docs};
+
+    details.replace('\n', " ")
 }
 
 pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -> Option<KnownError> {

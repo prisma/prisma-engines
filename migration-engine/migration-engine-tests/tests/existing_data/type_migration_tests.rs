@@ -322,7 +322,7 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
 
     match api.sql_family() {
         // Not executable
-        SqlFamily::Postgres => {
+        SqlFamily::Postgres | SqlFamily::Mssql => {
             api.schema_push(dm2)
                 .force(true)
                 .send()
@@ -346,7 +346,6 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
                 .await?
                 .assert_single_row(|row| row.assert_int_value("tag", 20))?;
         }
-        SqlFamily::Mssql => todo!(),
     }
 
     Ok(())

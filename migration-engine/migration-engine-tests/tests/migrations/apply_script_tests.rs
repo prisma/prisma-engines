@@ -23,7 +23,12 @@ async fn apply_script_applies_the_script_without_touching_migrations_persistence
 
     api.apply_migrations(&dir).send().await?;
 
-    api.apply_script("DROP TABLE test2").await?;
+    let sql = match api.sql_family() {
+        SqlFamily::Mssql => format!("DROP TABLE [{}].[test2]", api.schema_name()),
+        _ => String::from("DROP TABLE test2"),
+    };
+
+    api.apply_script(sql).await?;
 
     // There is no new migration in the folder.
     out.assert_migration_directories_count(1)?;

@@ -2,7 +2,7 @@ use barrel::{functions, types};
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
 use quaint::prelude::Queryable;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 #[test_each_connector]
 async fn a_simple_table_with_gql_types(api: &TestApi) -> crate::TestResult {
@@ -75,7 +75,6 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult 
                     t.add_column("rolled_back_at", types::text());
                     t.add_column("started_at", types::text());
                     t.add_column("applied_steps_count", types::text());
-                    t.add_column("script", types::text());
                 });
             },
             api.schema_name(),
@@ -83,7 +82,7 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult 
         .await?;
 
     let dm = indoc! {r##"
-        model Blog {      
+        model Blog {
             id      Int @id @default(autoincrement())
         }
     "##};
@@ -465,7 +464,7 @@ async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: 
             id       Int     @id
             parentId Int?
             name     String?
-        }      
+        }
     "#};
 
     assert_eq_datamodels!(dm, &api.introspect().await?);

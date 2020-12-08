@@ -1,5 +1,4 @@
 use migration_engine_tests::sql::*;
-use prisma_value::PrismaValue;
 use quaint::{prelude::Insert, prelude::Queryable, Value};
 use sql_schema_describer::DefaultValue;
 
@@ -33,7 +32,7 @@ async fn changing_a_column_from_optional_to_required_with_a_default_is_safe(api:
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("age", |column| {
             column
-                .assert_default(Some(DefaultValue::VALUE(PrismaValue::Int(30))))?
+                .assert_default(Some(DefaultValue::value(30)))?
                 .assert_is_required()
         })
     })?;

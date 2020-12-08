@@ -18,6 +18,19 @@ pub struct Datasource {
     pub preview_features: Vec<String>,
 }
 
+impl std::fmt::Debug for Datasource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Datasource")
+            .field("name", &self.name)
+            .field("provider", &self.provider)
+            .field("active_provider", &self.active_provider)
+            .field("url", &self.url)
+            .field("documentation", &self.documentation)
+            .field("active_connector", &&"...")
+            .finish()
+    }
+}
+
 impl Datasource {
     pub fn url(&self) -> &StringFromEnvVar {
         &self.url
