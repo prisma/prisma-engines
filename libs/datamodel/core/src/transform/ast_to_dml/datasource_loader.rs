@@ -4,10 +4,12 @@ use super::{
     builtin_datasource_providers::{MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider},
     datasource_provider::DatasourceProvider,
 };
-use crate::ast::Span;
-use crate::configuration::StringFromEnvVar;
-use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics, ValidatedDatasource, ValidatedDatasources};
-use crate::{ast, Datasource};
+use crate::diagnostics::{DatamodelError, Diagnostics, ValidatedDatasource, ValidatedDatasources};
+use crate::{
+    ast::{self, Span},
+    configuration::StringFromEnvVar,
+    Datasource,
+};
 use datamodel_connector::{CombinedConnector, Connector};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
@@ -103,7 +105,7 @@ impl DatasourceLoader {
 
         let providers = provider_arg.as_array().to_str_vec()?;
         if provider_arg.is_array() {
-            diagnostics.push_warning(DatamodelWarning::new_deprecated_provider_array_warning(
+            diagnostics.push_error(DatamodelError::new_deprecated_provider_array_warning(
                 provider_arg.span(),
             ))
         }

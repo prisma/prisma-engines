@@ -1,6 +1,6 @@
 use crate::common::*;
-use datamodel::ast::Span;
 use datamodel::diagnostics::DatamodelWarning;
+use datamodel::{ast::Span, diagnostics::DatamodelError};
 
 #[test]
 fn nice_warning_for_deprecated_generator_preview_feature() {
@@ -28,12 +28,12 @@ fn nice_warning_for_provider_array_deprecation() {
 }
 "#;
 
-    let res = parse_with_diagnostics(schema);
+    let res = parse_error(schema);
 
-    res.warnings
-        .assert_is(DatamodelWarning::new_deprecated_provider_array_warning(Span::new(
-            29, 51,
-        )));
+    assert_eq!(
+        res.errors,
+        &[DatamodelError::new_deprecated_provider_array_warning(Span::new(29, 51))]
+    );
 }
 
 #[test]
@@ -44,10 +44,10 @@ fn nice_warning_for_provider_array_deprecation_on_single_element_in_array() {
 }
 "#;
 
-    let res = parse_with_diagnostics(schema);
+    let res = parse_error(schema);
 
-    res.warnings
-        .assert_is(DatamodelWarning::new_deprecated_provider_array_warning(Span::new(
-            29, 41,
-        )));
+    assert_eq!(
+        &res.errors,
+        &[DatamodelError::new_deprecated_provider_array_warning(Span::new(29, 41))]
+    )
 }

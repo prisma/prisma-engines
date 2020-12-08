@@ -118,6 +118,9 @@ pub enum DatamodelError {
 
   #[error("Error validating: {}", message)]
   ValidationError { message: String, span: Span },
+
+  #[error("Using multiple providers is now deprecated. You should use a single provider instead. Read more at https://pris.ly/multi-provider-deprecation")]
+  DeprecatedProviderArray { span: Span },
 }
 
 #[rustfmt::skip]
@@ -361,6 +364,12 @@ impl DatamodelError {
     }
   }
 
+  pub fn new_deprecated_provider_array_warning(span: Span) -> DatamodelError {
+    DatamodelError::DeprecatedProviderArray {
+    span,
+    }
+  }
+
   pub fn span(&self) -> Span {
     match self {
       DatamodelError::ArgumentNotFound { span, .. } => *span,
@@ -399,8 +408,10 @@ impl DatamodelError {
       DatamodelError::EnumValidationError {span, ..} => *span,
       DatamodelError::ConnectorError { span, .. } => *span,
       DatamodelError::PreviewFeatureNotKnownError {span, ..} => *span,
+      DatamodelError::DeprecatedProviderArray { span, .. } => *span,
     }
   }
+
   pub fn description(&self) -> String {
     format!("{}", self)
   }
