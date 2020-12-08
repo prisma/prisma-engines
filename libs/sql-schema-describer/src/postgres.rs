@@ -748,7 +748,6 @@ static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
 fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
     AUTOINCREMENT_REGEX.captures(value).and_then(|captures| {
         let sequence_name = captures.name("sequence").or(captures.name("sequence2"));
-        println!("{:?}", sequence_name);
 
         sequence_name.and_then(|name| {
             sequences
