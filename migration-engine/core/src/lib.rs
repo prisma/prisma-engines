@@ -29,7 +29,7 @@ use migration_connector::ConnectorError;
 use migration_engine::MigrationEngine;
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
-use user_facing_errors::{common::InvalidDatabaseString, KnownError};
+use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
 
 /// Top-level constructor for the migration engine API.
 pub async fn migration_api(
@@ -43,7 +43,12 @@ pub async fn migration_api(
     let source = config
         .datasources
         .first()
-        .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
+        .map(|source| match source.provider.as_slice() {
+            [_] => Ok(source),
+            [] => Err(CoreError::Generic(anyhow!("There is no provider in the datasource."))),
+            _ => Err(CoreError::user_facing(DeprecatedProviderArray)),
+        })
+        .unwrap_or_else(|| Err(CoreError::Generic(anyhow!("There is no datasource in the schema."))))?;
 
     let connector = match &source.active_provider {
         #[cfg(feature = "sql")]
@@ -187,4 +192,29 @@ pub(crate) fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
     datamodel::parse_datamodel(&datamodel)
         .map(|d| d.subject)
         .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use user_facing_errors::UserFacingError;
+
+    #[tokio::test]
+    async fn migration_api_with_a_provider_array_returns_a_user_facing_error() {
+        let datamodel = r#"
+            datasource dbs {
+                provider = ["sqlite", "mysql"]
+                url = "file:dev.db"
+            }
+        "#;
+
+        let err = migration_api(datamodel, Vec::new())
+            .await
+            .map(drop)
+            .unwrap_err()
+            .render_user_facing()
+            .unwrap_known();
+
+        assert_eq!(err.error_code, DeprecatedProviderArray::ERROR_CODE);
+    }
 }
