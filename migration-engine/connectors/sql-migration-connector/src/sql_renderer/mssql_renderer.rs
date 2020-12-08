@@ -358,6 +358,14 @@ impl SqlRenderer for MssqlFlavour {
 
         if let Some(constraint_name) = foreign_key.constraint_name() {
             write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
+        } else {
+            write!(
+                add_constraint,
+                "CONSTRAINT [FK__{}__{}] ",
+                foreign_key.table().name(),
+                foreign_key.constrained_column_names().join("__"),
+            )
+            .unwrap();
         }
 
         write!(
