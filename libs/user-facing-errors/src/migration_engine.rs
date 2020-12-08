@@ -141,6 +141,13 @@ pub struct CannotRollBackSucceededMigration {
     pub migration_name: String,
 }
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3013",
+    message = "Datasource provider arrays are no longer supported in migrate. Please change your datasource to use a single provider. Read more at https://pris.ly/multi-provider-deprecation"
+)]
+pub struct DeprecatedProviderArray;
+
 #[cfg(test)]
 mod tests {
     use super::*;

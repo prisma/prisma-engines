@@ -80,6 +80,7 @@ impl CoreError {
     pub fn render_user_facing(self) -> user_facing_errors::Error {
         match self {
             CoreError::ConnectorError(err) => err.to_user_facing(),
+            CoreError::UserFacing(err) => err.into(),
             CoreError::ReceivedBadDatamodel(full_error) => {
                 KnownError::new(user_facing_errors::common::SchemaParserError { full_error }).into()
             }
