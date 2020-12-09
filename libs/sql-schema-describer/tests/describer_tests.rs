@@ -443,9 +443,7 @@ async fn indices_must_work(api: &TestApi) {
     let result = api.describe().await.expect("describing");
     let user_table = result.get_table("User").expect("getting User table");
     let default = match api.sql_family() {
-        SqlFamily::Postgres => Some(DefaultValue::sequence(
-            "nextval(\'\"User_id_seq\"\'::regclass)".to_string(),
-        )),
+        SqlFamily::Postgres => Some(DefaultValue::sequence("User_id_seq".to_string())),
         _ => None,
     };
     let expected_columns = vec![
