@@ -50,8 +50,11 @@ impl SqlRenderer for MssqlFlavour {
             .default()
             .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
             .map(|default| {
+                let constraint_name = format!("DF__{}__{}", column.table().name(), column.name());
+
                 format!(
-                    " DEFAULT {}",
+                    " CONSTRAINT {} DEFAULT {}",
+                    self.quote(&constraint_name),
                     self.render_default(default, &column.column_type_family())
                 )
             })
@@ -150,7 +153,7 @@ impl SqlRenderer for MssqlFlavour {
         let primary_columns = table.primary_key_column_names();
 
         let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
-            let index_name = format!("PK_{}_{}", table.name(), primary_columns.iter().join("_"));
+            let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
 
             format!(
@@ -358,6 +361,14 @@ impl SqlRenderer for MssqlFlavour {
 
         if let Some(constraint_name) = foreign_key.constraint_name() {
             write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
+        } else {
+            write!(
+                add_constraint,
+                "CONSTRAINT [FK__{}__{}] ",
+                foreign_key.table().name(),
+                foreign_key.constrained_column_names().join("__"),
+            )
+            .unwrap();
         }
 
         write!(

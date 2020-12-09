@@ -63,7 +63,7 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                         CREATE TABLE [basic_create_migration_works].[Cat] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
-                            CONSTRAINT [PK_Cat_id] PRIMARY KEY ([id])
+                            CONSTRAINT [PK__Cat__id] PRIMARY KEY ([id])
                         );
                         "#
                     }
@@ -154,7 +154,7 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                         CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
                             [id] INT NOT NULL,
                             [name] NVARCHAR(1000) NOT NULL,
-                            CONSTRAINT [PK_Dog_id] PRIMARY KEY ([id])
+                            CONSTRAINT [PK__Dog__id] PRIMARY KEY ([id])
                         );
                         "#
                     }

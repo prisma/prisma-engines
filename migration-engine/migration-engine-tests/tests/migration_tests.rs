@@ -2630,3 +2630,79 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn a_model_can_be_removed(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model User {
+            id   Int     @id @default(autoincrement())
+            name String?
+            Post Post[]
+        }
+
+        model Post {
+            id     Int    @id @default(autoincrement())
+            title  String
+            User   User   @relation(fields: [userId], references: [id])
+            userId Int
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    let dm2 = r#"
+        model User {
+            id   Int     @id @default(autoincrement())
+            name String?
+        }
+    "#;
+
+    api.create_migration("second-migration", dm2, &directory).send().await?;
+
+    api.apply_migrations(&directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["initial", "second-migration"])?;
+
+    let output = api.diagnose_migration_history(&directory).send().await?.into_output();
+
+    assert!(output.is_empty());
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn a_default_can_be_dropped(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model User {
+            id   Int     @id @default(autoincrement())
+            name String  @default("Musti")
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    let dm2 = r#"
+        model User {
+            id   Int     @id @default(autoincrement())
+            name String?
+        }
+    "#;
+
+    api.create_migration("second-migration", dm2, &directory).send().await?;
+
+    api.apply_migrations(&directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["initial", "second-migration"])?;
+
+    let output = api.diagnose_migration_history(&directory).send().await?.into_output();
+
+    assert!(output.is_empty());
+
+    Ok(())
+}
