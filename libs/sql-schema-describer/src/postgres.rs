@@ -805,63 +805,46 @@ fn chain_replaces<'a>(s: &'a str, replaces: &[(&Lazy<Regex>, &str)]) -> Cow<'a, 
     out
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     #[test]
-// fn postgres_is_autoincrement_works() {
-//     let schema_name = "prisma";
-//     let table_name = "Test";
-//     let col_name = "id";
-//
-//     let non_autoincrement = "_seq";
-//     assert!(!is_autoincrement(non_autoincrement, schema_name, table_name, col_name));
-//
-//     let autoincrement = format!(
-//         r#"nextval('"{}"."{}_{}_seq"'::regclass)"#,
-//         schema_name, table_name, col_name
-//     );
-//     assert!(is_autoincrement(&autoincrement, schema_name, table_name, col_name));
-//
-//     let autoincrement_with_number = format!(
-//         r#"nextval('"{}"."{}_{}_seq1"'::regclass)"#,
-//         schema_name, table_name, col_name
-//     );
-//     assert!(is_autoincrement(
-//         &autoincrement_with_number,
-//         schema_name,
-//         table_name,
-//         col_name
-//     ));
-//
-//     let autoincrement_without_schema = format!(r#"nextval('"{}_{}_seq1"'::regclass)"#, table_name, col_name);
-//     assert!(is_autoincrement(
-//         &autoincrement_without_schema,
-//         schema_name,
-//         table_name,
-//         col_name
-//     ));
-//
-//     // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
-//     let autoincrement_with_ambiguous_table_and_column_names =
-//         r#"nextval('"compound_table_compound_column_name_seq"'::regclass)"#;
-//     assert!(is_autoincrement(
-//         &autoincrement_with_ambiguous_table_and_column_names,
-//         "<ignored>",
-//         "compound_table",
-//         "compound_column_name",
-//     ));
-//
-//     // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
-//     // But this one has extra text between table and column names, so it should not match.
-//     let autoincrement_with_ambiguous_table_and_column_names =
-//         r#"nextval('"compound_table_something_compound_column_name_seq"'::regclass)"#;
-//     assert!(!is_autoincrement(
-//         &autoincrement_with_ambiguous_table_and_column_names,
-//         "<ignored>",
-//         "compound_table",
-//         "compound_column_name",
-//     ));
-// }
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn postgres_is_autoincrement_works() {
+        let sequences = vec![
+            Sequence {
+                name: "first_sequence".to_string(),
+            },
+            Sequence {
+                name: "second_sequence".to_string(),
+            },
+            Sequence {
+                name: "third_Sequence".to_string(),
+            },
+            Sequence {
+                name: "fourth_Sequence".to_string(),
+            },
+            Sequence {
+                name: "fifth_sequence".to_string(),
+            },
+        ];
+
+        let first_autoincrement = r#"nextval('first_sequence'::regclass)"#;
+        assert!(is_autoincrement(first_autoincrement, &sequences).is_some());
+
+        let second_autoincrement = r#"nextval('schema_name.second_sequence'::regclass)"#;
+        assert!(is_autoincrement(second_autoincrement, &sequences).is_some());
+
+        let third_autoincrement = r#"nextval('"third_Sequence"'::regclass)"#;
+        assert!(is_autoincrement(third_autoincrement, &sequences).is_some());
+
+        let fourth_autoincrement = r#"nextval('"schema_Name"."fourth_Sequence"'::regclass)"#;
+        assert!(is_autoincrement(fourth_autoincrement, &sequences).is_some());
+
+        let fifth_autoincrement = r#"nextval(('fifth_sequence'::text)::regclass)"#;
+        assert!(is_autoincrement(fifth_autoincrement, &sequences).is_some());
+
+        let non_autoincrement = r#"string_default_named_seq"#;
+        assert!(is_autoincrement(non_autoincrement, &sequences).is_none());
+    }
+}
