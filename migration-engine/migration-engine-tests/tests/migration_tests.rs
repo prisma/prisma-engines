@@ -204,10 +204,7 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
         SqlFamily::Postgres => {
             let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
             let default = column.default.as_ref().expect("Must have nextval default");
-            assert_eq!(
-                DefaultValue::sequence(format!("nextval('\"{}\"'::regclass)", sequence.name)),
-                *default
-            );
+            assert_eq!(DefaultValue::sequence(sequence.name.clone()), *default);
         }
         _ => assert_eq!(column.auto_increment, true),
     }
