@@ -2,7 +2,7 @@ use crate::{
     Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField, ScalarFieldExt, TypeIdentifier,
 };
 use itertools::Itertools;
-use quaint::ast::{Column, Row};
+use quaint::ast::{Column, Row, TypeFamily};
 use std::convert::AsRef;
 
 pub struct ColumnIterator {
@@ -155,21 +155,7 @@ where
         let table = sf.model().db_name().to_string();
         let col = sf.db_name().to_string();
 
-        let type_family = quaint::ast::TypeFamily::from(&sf.type_identifier);
-        let column = Column::from(((db, table), col)).type_family(type_family);
-
-        match sf.default_value.as_ref().and_then(|d| d.get()) {
-            Some(default) => column.default(sf.value(default)),
-            None => column.default(quaint::ast::DefaultValue::Generated),
-        }
-    }
-}
-
-impl From<&TypeIdentifier> for quaint::ast::TypeFamily {
-    fn from(ti: &TypeIdentifier) -> Self {
-        use quaint::ast::TypeFamily;
-
-        match ti {
+        let type_family = match sf.type_identifier {
             TypeIdentifier::String => TypeFamily::Text,
             TypeIdentifier::Int => TypeFamily::Int,
             TypeIdentifier::BigInt => TypeFamily::Int,
@@ -182,6 +168,13 @@ impl From<&TypeIdentifier> for quaint::ast::TypeFamily {
             TypeIdentifier::Xml => TypeFamily::Text,
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Bytes,
+        };
+
+        let column = Column::from(((db, table), col)).type_family(type_family);
+
+        match sf.default_value.as_ref().and_then(|d| d.get()) {
+            Some(default) => column.default(sf.value(default)),
+            None => column.default(quaint::ast::DefaultValue::Generated),
         }
     }
 }
