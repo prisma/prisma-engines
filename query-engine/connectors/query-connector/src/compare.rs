@@ -1,61 +1,61 @@
-use crate::filter::Filter;
+use crate::{filter::Filter, ScalarFilter};
 use prisma_models::PrismaValue;
 
 /// Comparing methods for scalar fields.
 pub trait ScalarCompare {
-    fn is_in<T>(&self, val: Vec<T>) -> Filter
+    fn is_in<T>(&self, val: Vec<T>) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn not_in<T>(&self, val: Vec<T>) -> Filter
+    fn not_in<T>(&self, val: Vec<T>) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn equals<T>(&self, val: T) -> Filter
+    fn equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn not_equals<T>(&self, val: T) -> Filter
+    fn not_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn contains<T>(&self, val: T) -> Filter
+    fn contains<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn not_contains<T>(&self, val: T) -> Filter
+    fn not_contains<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn starts_with<T>(&self, val: T) -> Filter
+    fn starts_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn not_starts_with<T>(&self, val: T) -> Filter
+    fn not_starts_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn ends_with<T>(&self, val: T) -> Filter
+    fn ends_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn not_ends_with<T>(&self, val: T) -> Filter
+    fn not_ends_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn less_than<T>(&self, val: T) -> Filter
+    fn less_than<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn less_than_or_equals<T>(&self, val: T) -> Filter
+    fn less_than_or_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn greater_than<T>(&self, val: T) -> Filter
+    fn greater_than<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 
-    fn greater_than_or_equals<T>(&self, val: T) -> Filter
+    fn greater_than_or_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>;
 }

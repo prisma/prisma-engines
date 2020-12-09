@@ -1,5 +1,5 @@
 use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
-use connector::{Filter, ScalarCompare};
+use connector::{ScalarCompare, ScalarFilter};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 
@@ -8,28 +8,32 @@ pub fn parse(
     field: &ScalarFieldRef,
     input: ParsedInputValue,
     reverse: bool,
-) -> QueryGraphBuilderResult<Filter> {
+) -> QueryGraphBuilderResult<Vec<ScalarFilter>> {
     let filter = match filter_key {
         "not" => {
             match input {
                 // Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: <value> } }`
-                ParsedInputValue::Single(value) => field.not_equals(value),
+                ParsedInputValue::Single(value) => vec![field.not_equals(value)],
                 _ => {
                     let inner_object: ParsedInputMap = input.try_into()?;
 
-                    let filters = inner_object
+                    let filters: Vec<ScalarFilter> = inner_object
                         .into_iter()
                         .map(|(k, v)| parse(&k, field, v, !reverse))
-                        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+                        .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
+                        .into_iter()
+                        .flatten()
+                        .collect();
 
-                    Filter::and(filters)
+                    // Filter::and(filters)
+                    filters
                 }
             }
         }
 
         "in" => {
             let value: PrismaValue = input.try_into()?;
-            match value {
+            vec![match value {
                 PrismaValue::Null if reverse => field.not_equals(value),
                 PrismaValue::List(values) if reverse => field.not_in(values),
 
@@ -37,13 +41,13 @@ pub fn parse(
                 PrismaValue::List(values) => field.is_in(values),
 
                 _ => unreachable!(), // Validation guarantees this.
-            }
+            }]
         }
 
         "notIn" => {
             // Legacy operation
             let value: PrismaValue = input.try_into()?;
-            match value {
+            vec![match value {
                 PrismaValue::Null if reverse => field.equals(value), // not not in null => in null
                 PrismaValue::List(values) if reverse => field.is_in(values), // not not in values => in values
 
@@ -51,28 +55,28 @@ pub fn parse(
                 PrismaValue::List(values) => field.not_in(values),
 
                 _ => unreachable!(), // Validation guarantees this.
-            }
+            }]
         }
 
-        "equals" if reverse => field.not_equals(as_prisma_value(input)?),
-        "contains" if reverse => field.not_contains(as_prisma_value(input)?),
-        "startsWith" if reverse => field.not_starts_with(as_prisma_value(input)?),
-        "endsWith" if reverse => field.not_ends_with(as_prisma_value(input)?),
+        "equals" if reverse => vec![field.not_equals(as_prisma_value(input)?)],
+        "contains" if reverse => vec![field.not_contains(as_prisma_value(input)?)],
+        "startsWith" if reverse => vec![field.not_starts_with(as_prisma_value(input)?)],
+        "endsWith" if reverse => vec![field.not_ends_with(as_prisma_value(input)?)],
 
-        "equals" => field.equals(as_prisma_value(input)?),
-        "contains" => field.contains(as_prisma_value(input)?),
-        "startsWith" => field.starts_with(as_prisma_value(input)?),
-        "endsWith" => field.ends_with(as_prisma_value(input)?),
+        "equals" => vec![field.equals(as_prisma_value(input)?)],
+        "contains" => vec![field.contains(as_prisma_value(input)?)],
+        "startsWith" => vec![field.starts_with(as_prisma_value(input)?)],
+        "endsWith" => vec![field.ends_with(as_prisma_value(input)?)],
 
-        "lt" if reverse => field.greater_than_or_equals(as_prisma_value(input)?),
-        "gt" if reverse => field.less_than_or_equals(as_prisma_value(input)?),
-        "lte" if reverse => field.greater_than(as_prisma_value(input)?),
-        "gte" if reverse => field.less_than(as_prisma_value(input)?),
+        "lt" if reverse => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
+        "gt" if reverse => vec![field.less_than_or_equals(as_prisma_value(input)?)],
+        "lte" if reverse => vec![field.greater_than(as_prisma_value(input)?)],
+        "gte" if reverse => vec![field.less_than(as_prisma_value(input)?)],
 
-        "lt" => field.less_than(as_prisma_value(input)?),
-        "gt" => field.greater_than(as_prisma_value(input)?),
-        "lte" => field.less_than_or_equals(as_prisma_value(input)?),
-        "gte" => field.greater_than_or_equals(as_prisma_value(input)?),
+        "lt" => vec![field.less_than(as_prisma_value(input)?)],
+        "gt" => vec![field.greater_than(as_prisma_value(input)?)],
+        "lte" => vec![field.less_than_or_equals(as_prisma_value(input)?)],
+        "gte" => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
 
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(

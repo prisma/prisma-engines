@@ -1,4 +1,3 @@
-use super::Filter;
 use crate::compare::ScalarCompare;
 use once_cell::sync::Lazy;
 use prisma_models::{ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
@@ -42,6 +41,10 @@ static BATCH_SIZE: Lazy<usize> = Lazy::new(|| match env::var("QUERY_BATCH_SIZE")
 });
 
 impl ScalarFilter {
+    pub fn set_mode(&mut self, mode: QueryMode) {
+        self.mode = mode;
+    }
+
     /// The number of values in the filter. `IN` and `NOT IN` may contain more
     /// than one.
     pub fn len(&self) -> usize {
@@ -130,340 +133,340 @@ pub enum ScalarCondition {
 
 impl ScalarCompare for ScalarFieldRef {
     /// Field is in a given value
-    fn is_in<T>(&self, values: Vec<T>) -> Filter
+    fn is_in<T>(&self, values: Vec<T>) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is not in a given value
-    fn not_in<T>(&self, values: Vec<T>) -> Filter
+    fn not_in<T>(&self, values: Vec<T>) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field equals the given value.
-    fn equals<T>(&self, val: T) -> Filter
+    fn equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::Equals(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field does not equal the given value.
-    fn not_equals<T>(&self, val: T) -> Filter
+    fn not_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotEquals(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field contains the given value.
-    fn contains<T>(&self, val: T) -> Filter
+    fn contains<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::Contains(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field does not contain the given value.
-    fn not_contains<T>(&self, val: T) -> Filter
+    fn not_contains<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotContains(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field starts with the given value.
-    fn starts_with<T>(&self, val: T) -> Filter
+    fn starts_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::StartsWith(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field does not start with the given value.
-    fn not_starts_with<T>(&self, val: T) -> Filter
+    fn not_starts_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotStartsWith(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field ends with the given value.
-    fn ends_with<T>(&self, val: T) -> Filter
+    fn ends_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::EndsWith(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field does not end with the given value.
-    fn not_ends_with<T>(&self, val: T) -> Filter
+    fn not_ends_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotEndsWith(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is less than the given value.
-    fn less_than<T>(&self, val: T) -> Filter
+    fn less_than<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::LessThan(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is less than or equals the given value.
-    fn less_than_or_equals<T>(&self, val: T) -> Filter
+    fn less_than_or_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::LessThanOrEquals(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is greater than the given value.
-    fn greater_than<T>(&self, val: T) -> Filter
+    fn greater_than<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::GreaterThan(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is greater than or equals the given value.
-    fn greater_than_or_equals<T>(&self, val: T) -> Filter
+    fn greater_than_or_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 }
 
 impl ScalarCompare for ModelProjection {
     /// Field is in a given value
-    fn is_in<T>(&self, values: Vec<T>) -> Filter
+    fn is_in<T>(&self, values: Vec<T>) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is not in a given value
-    fn not_in<T>(&self, values: Vec<T>) -> Filter
+    fn not_in<T>(&self, values: Vec<T>) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field equals the given value.
-    fn equals<T>(&self, val: T) -> Filter
+    fn equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::Equals(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field does not equal the given value.
-    fn not_equals<T>(&self, val: T) -> Filter
+    fn not_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotEquals(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field contains the given value.
-    fn contains<T>(&self, val: T) -> Filter
+    fn contains<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::Contains(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field does not contain the given value.
-    fn not_contains<T>(&self, val: T) -> Filter
+    fn not_contains<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotContains(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field starts with the given value.
-    fn starts_with<T>(&self, val: T) -> Filter
+    fn starts_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::StartsWith(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field does not start with the given value.
-    fn not_starts_with<T>(&self, val: T) -> Filter
+    fn not_starts_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotStartsWith(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field ends with the given value.
-    fn ends_with<T>(&self, val: T) -> Filter
+    fn ends_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::EndsWith(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field does not end with the given value.
-    fn not_ends_with<T>(&self, val: T) -> Filter
+    fn not_ends_with<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotEndsWith(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is less than the given value.
-    fn less_than<T>(&self, val: T) -> Filter
+    fn less_than<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::LessThan(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is less than or equals the given value.
-    fn less_than_or_equals<T>(&self, val: T) -> Filter
+    fn less_than_or_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::LessThanOrEquals(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is greater than the given value.
-    fn greater_than<T>(&self, val: T) -> Filter
+    fn greater_than<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThan(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 
     /// Field is greater than or equals the given value.
-    fn greater_than_or_equals<T>(&self, val: T) -> Filter
+    fn greater_than_or_equals<T>(&self, val: T) -> ScalarFilter
     where
         T: Into<PrismaValue>,
     {
-        Filter::from(ScalarFilter {
+        ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
             mode: QueryMode::Default,
-        })
+        }
     }
 }
