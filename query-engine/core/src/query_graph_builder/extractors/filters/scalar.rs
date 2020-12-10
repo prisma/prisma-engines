@@ -13,7 +13,9 @@ pub fn parse(
         "not" => {
             match input {
                 // Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: <value> } }`
-                ParsedInputValue::Single(value) => vec![field.not_equals(value)],
+                ParsedInputValue::Single(value) => {
+                    vec![field.not_equals(value)]
+                }
                 _ => {
                     let inner_object: ParsedInputMap = input.try_into()?;
 
@@ -85,8 +87,9 @@ pub fn parse(
             let inner_object: ParsedInputMap = input.try_into()?;
             let mut results = vec![];
 
-            for (_, v) in inner_object {
-                let filters = super::extract_scalar_filters(field, v)?;
+            for (k, v) in inner_object {
+                // let filters = super::extract_scalar_filters(field, v)?;
+                let filters = parse(&k, field, v, reverse)?;
                 results.extend(filters);
             }
 

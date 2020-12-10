@@ -142,10 +142,6 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
     extract_filter(value_map, model, 0)
 }
 
-fn extract_aggregation_filter() -> QueryGraphBuilderResult<Vec<Filter>> {
-    todo!()
-}
-
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
 /// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
 fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
