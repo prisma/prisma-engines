@@ -7,7 +7,7 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare, ScalarFilter};
+use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare};
 use filter_grouping::*;
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
 use std::{convert::TryInto, str::FromStr};
@@ -21,7 +21,7 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
             match model.fields().find_from_scalar(&field_name) {
                 Ok(field) => {
                     let value: PrismaValue = value.try_into()?;
-                    Ok(field.equals(value).into())
+                    Ok(field.equals(value))
                 }
                 Err(_) => utils::resolve_compound_field(&field_name, &model)
                     .ok_or(QueryGraphBuilderError::AssertionError(format!(
@@ -43,7 +43,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
         .into_iter()
         .map(|sf| {
             let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
-            Ok(sf.equals(pv).into())
+            Ok(sf.equals(pv))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
@@ -129,10 +129,7 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                             "max" => todo!(),
                             key => match model.fields().find_from_all(&key)? {
                                 Field::Relation(rf) => extract_relation_filters(rf, value),
-                                Field::Scalar(sf) => {
-                                    let filters: Vec<ScalarFilter> = extract_scalar_filters(sf, value)?;
-                                    Ok(filters.into_iter().map(Into::into).collect())
-                                }
+                                Field::Scalar(sf) => extract_scalar_filters(sf, value),
                             }?,
                         };
 
@@ -168,10 +165,7 @@ fn extract_aggregation_filter() -> QueryGraphBuilderResult<Vec<Filter>> {
 
 /// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
 /// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
-fn extract_scalar_filters(
-    field: &ScalarFieldRef,
-    value: ParsedInputValue,
-) -> QueryGraphBuilderResult<Vec<ScalarFilter>> {
+fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Filter>> {
     match value {
         ParsedInputValue::Single(pv) => Ok(vec![field.equals(pv)]),
         ParsedInputValue::Map(mut filter_map) => {
@@ -180,15 +174,13 @@ fn extract_scalar_filters(
                 None => QueryMode::Default,
             };
 
-            let mut filters: Vec<ScalarFilter> = filter_map
+            let mut filters = filter_map
                 .into_iter()
                 .map(|(k, v)| scalar::parse(&k, field, v, false))
-                .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
-                .into_iter()
-                .flatten()
-                .collect();
+                .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
+
             Ok(filters)
         }
         x => Err(QueryGraphBuilderError::InputError(format!(

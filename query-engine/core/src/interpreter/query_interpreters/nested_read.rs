@@ -48,7 +48,7 @@ pub async fn m2m<'a, 'b>(
         ManyRecords::from_projection(child_ids, &query.selected_fields)
     } else {
         let mut args = query.args.clone();
-        let filter = child_link_id.is_in(child_ids).into();
+        let filter = child_link_id.is_in(child_ids);
 
         args.filter = match args.filter {
             Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -168,7 +168,7 @@ pub async fn one2m<'a, 'b>(
     let mut scalars = if query_args.do_nothing() && &child_link_id == selected_fields {
         ManyRecords::from_projection(uniq_projections, selected_fields)
     } else {
-        let filter = child_link_id.is_in(uniq_projections).into();
+        let filter = child_link_id.is_in(uniq_projections);
         let mut args = query_args;
 
         args.filter = match args.filter {

@@ -11,7 +11,7 @@ impl IdFilter for RecordProjection {
         let filters: Vec<Filter> = self
             .pairs
             .into_iter()
-            .map(|(field, value)| field.equals(value).into())
+            .map(|(field, value)| field.equals(value))
             .collect();
 
         Filter::and(filters)
