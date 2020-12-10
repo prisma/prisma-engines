@@ -107,7 +107,7 @@ fn aggregation_filter<F>(
     field: &ScalarFieldRef,
     input: ParsedInputValue,
     reverse: bool,
-    f: F,
+    func: F,
 ) -> QueryGraphBuilderResult<Vec<Filter>>
 where
     F: Fn(Filter) -> Filter,
@@ -121,5 +121,5 @@ where
         results.extend(filters);
     }
 
-    Ok(results.into_iter().map(|f| Filter::average(f)).collect())
+    Ok(results.into_iter().map(|filter| func(filter)).collect())
 }
