@@ -155,8 +155,24 @@ impl Filter {
         }
     }
 
+    pub fn count(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Count(Box::new(condition)))
+    }
+
     pub fn average(condition: Filter) -> Self {
         Self::Aggregation(AggregationFilter::Average(Box::new(condition)))
+    }
+
+    pub fn sum(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Sum(Box::new(condition)))
+    }
+
+    pub fn min(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Min(Box::new(condition)))
+    }
+
+    pub fn max(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Max(Box::new(condition)))
     }
 }
 

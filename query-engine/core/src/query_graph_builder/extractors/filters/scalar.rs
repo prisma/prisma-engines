@@ -82,22 +82,11 @@ pub fn parse(
         "gte" => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
 
         // Aggregation filters
-        "count" => todo!(),
-        "avg" => {
-            let inner_object: ParsedInputMap = input.try_into()?;
-            let mut results = vec![];
-
-            for (k, v) in inner_object {
-                // let filters = super::extract_scalar_filters(field, v)?;
-                let filters = parse(&k, field, v, reverse)?;
-                results.extend(filters);
-            }
-
-            results.into_iter().map(|f| Filter::average(f)).collect()
-        }
-        "sum" => todo!(),
-        "min" => todo!(),
-        "max" => todo!(),
+        "count" => aggregation_filter(field, input, reverse, Filter::count)?,
+        "avg" => aggregation_filter(field, input, reverse, Filter::average)?,
+        "sum" => aggregation_filter(field, input, reverse, Filter::sum)?,
+        "min" => aggregation_filter(field, input, reverse, Filter::min)?,
+        "max" => aggregation_filter(field, input, reverse, Filter::max)?,
 
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(
@@ -112,4 +101,25 @@ pub fn parse(
 
 fn as_prisma_value(input: ParsedInputValue) -> QueryGraphBuilderResult<PrismaValue> {
     Ok(input.try_into()?)
+}
+
+fn aggregation_filter<F>(
+    field: &ScalarFieldRef,
+    input: ParsedInputValue,
+    reverse: bool,
+    f: F,
+) -> QueryGraphBuilderResult<Vec<Filter>>
+where
+    F: Fn(Filter) -> Filter,
+{
+    let inner_object: ParsedInputMap = input.try_into()?;
+    let mut results = vec![];
+
+    for (k, v) in inner_object {
+        // let filters = super::extract_scalar_filters(field, v)?;
+        let filters = parse(&k, field, v, reverse)?;
+        results.extend(filters);
+    }
+
+    Ok(results.into_iter().map(|f| Filter::average(f)).collect())
 }
