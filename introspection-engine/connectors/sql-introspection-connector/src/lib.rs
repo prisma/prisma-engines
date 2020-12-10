@@ -17,7 +17,7 @@ use introspection_connector::{
 };
 use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::future::Future;
+use std::{fmt, future::Future};
 use tracing_futures::Instrument;
 
 pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
@@ -25,6 +25,15 @@ pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 pub struct SqlIntrospectionConnector {
     connection_info: ConnectionInfo,
     describer: Box<dyn SqlSchemaDescriberBackend>,
+}
+
+impl fmt::Debug for SqlIntrospectionConnector {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("SqlIntrospectionConnector")
+            .field("connection_info", &self.connection_info)
+            .field("describer", &"Box<dyn SqlSchemaDescriberBackend>")
+            .finish()
+    }
 }
 
 impl SqlIntrospectionConnector {

@@ -11,7 +11,6 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 
-structopt = "0.3"
 serde = "1.0"
 anyhow = "1.0.26"
 thiserror = "1.0.9"

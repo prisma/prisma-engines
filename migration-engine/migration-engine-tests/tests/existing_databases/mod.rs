@@ -103,6 +103,7 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
             });
         })
         .await?;
+
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::Int);
     assert_eq!(initial_column.is_required(), false);
@@ -113,12 +114,16 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
                 title String @unique
             }
         "#;
+
     let result = api.infer_and_apply_forcefully(&dm).await.sql_schema;
     let table = result.table_bang("Blog");
     let column = table.column_bang("title");
+
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
     assert!(column.is_required());
+
     let index = table.indices.iter().find(|i| i.columns == &["title"]);
+
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
@@ -321,7 +326,7 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
 async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
-            id Int @id
+            id Int @id @default(autoincrement())
             title String
         }
     "#;
@@ -343,11 +348,12 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
             });
         })
         .await?;
+
     assert!(result.table_bang("Blog").column("new_title").is_some());
 
     let dm2 = r#"
         model Blog {
-            id Int @id
+            id Int @id @default(autoincrement())
             title Float @map(name: "new_title")
         }
     "#;
@@ -355,7 +361,6 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
     api.infer_apply(&dm2).send().await?.assert_green()?;
 
     let final_result = api.assert_schema().await?.into_schema();
-
     let final_column = final_result.table_bang("Blog").column_bang("new_title");
 
     assert_eq!(final_column.tpe.family, ColumnTypeFamily::Decimal);

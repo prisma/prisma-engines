@@ -2,6 +2,8 @@
 
 #![deny(missing_docs)]
 
+use std::fmt;
+
 use crate::{
     Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
     IndexType, PrimaryKey, SqlSchema, Table,
@@ -19,7 +21,7 @@ pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWal
 }
 
 /// Traverse a table column.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct ColumnWalker<'a> {
     /// The schema the column is contained in.
     schema: &'a SqlSchema,
@@ -27,6 +29,15 @@ pub struct ColumnWalker<'a> {
     column_index: usize,
     /// The index of the table in the schema.
     table_index: usize,
+}
+
+impl<'a> fmt::Debug for ColumnWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ColumnWalker")
+            .field("column_index", &self.column_index)
+            .field("table_index", &self.table_index)
+            .finish()
+    }
 }
 
 impl<'a> ColumnWalker<'a> {
@@ -80,6 +91,16 @@ impl<'a> ColumnWalker<'a> {
         self.column().auto_increment
     }
 
+    /// Is this column a part of the table's primary key?
+    pub fn is_part_of_primary_key(&self) -> bool {
+        self.table().table().is_part_of_primary_key(self.name())
+    }
+
+    /// Is this column a part of the table's primary key?
+    pub fn is_part_of_foreign_key(&self) -> bool {
+        self.table().table().is_part_of_foreign_key(self.name())
+    }
+
     /// Returns whether two columns are named the same and belong to the same table.
     pub fn is_same_column(&self, other: &ColumnWalker<'_>) -> bool {
         self.name() == other.name() && self.table().name() == other.table().name()
@@ -114,6 +135,14 @@ pub struct TableWalker<'a> {
     schema: &'a SqlSchema,
     /// The index of the table in the schema.
     table_index: usize,
+}
+
+impl<'a> fmt::Debug for TableWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("TableWalker")
+            .field("table_index", &self.table_index)
+            .finish()
+    }
 }
 
 impl<'a> TableWalker<'a> {
@@ -186,6 +215,17 @@ impl<'a> TableWalker<'a> {
         })
     }
 
+    /// Traverse foreign keys from other tables, referencing current table.
+    pub fn referencing_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyWalker<'a>> {
+        let table_index = self.table_index;
+
+        self.schema
+            .table_walkers()
+            .filter(move |t| t.table_index() != table_index)
+            .flat_map(|t| t.foreign_keys())
+            .filter(move |fk| fk.referenced_table().table_index() == table_index)
+    }
+
     /// Get a foreign key by index.
     pub fn foreign_key_at(&self, index: usize) -> ForeignKeyWalker<'a> {
         ForeignKeyWalker {
@@ -228,12 +268,22 @@ impl<'a> TableWalker<'a> {
 }
 
 /// Traverse a foreign key.
+#[derive(Clone, Copy)]
 pub struct ForeignKeyWalker<'schema> {
     /// The index of the foreign key in the table.
     foreign_key_index: usize,
     /// The index of the table in the schema.
     table_index: usize,
     schema: &'schema SqlSchema,
+}
+
+impl<'a> fmt::Debug for ForeignKeyWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ForeignKeyWalker")
+            .field("foreign_key_index", &self.foreign_key_index)
+            .field("table_index", &self.table_index)
+            .finish()
+    }
 }
 
 impl<'schema> ForeignKeyWalker<'schema> {
@@ -311,15 +361,30 @@ impl<'schema> ForeignKeyWalker<'schema> {
             table_index: self.table_index,
         }
     }
+
+    /// True if relation is back to the same table.
+    pub fn is_self_relation(&self) -> bool {
+        self.table().name() == self.referenced_table().name()
+    }
 }
 
 /// Traverse an index.
+#[derive(Clone, Copy)]
 pub struct IndexWalker<'a> {
     schema: &'a SqlSchema,
     /// The index of the table in the schema.
     table_index: usize,
     /// The index of the database index in the table.
     index_index: usize,
+}
+
+impl<'a> fmt::Debug for IndexWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("IndexWalker")
+            .field("index_index", &self.index_index)
+            .field("table_index", &self.table_index)
+            .finish()
+    }
 }
 
 impl<'a> IndexWalker<'a> {
@@ -335,6 +400,11 @@ impl<'a> IndexWalker<'a> {
                 .column(column_name)
                 .expect("Failed to find column referenced in index")
         })
+    }
+
+    /// True if index contains the given column.
+    pub fn contains_column(&self, column_name: &str) -> bool {
+        self.get().columns.iter().any(|column| column == column_name)
     }
 
     fn get(&self) -> &'a Index {
@@ -366,9 +436,18 @@ impl<'a> IndexWalker<'a> {
 }
 
 /// Traverse an enum.
+#[derive(Clone, Copy)]
 pub struct EnumWalker<'a> {
     pub(crate) schema: &'a SqlSchema,
     pub(crate) enum_index: usize,
+}
+
+impl<'a> fmt::Debug for EnumWalker<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("EnumWalker")
+            .field("enum_index", &self.enum_index)
+            .finish()
+    }
 }
 
 impl<'a> EnumWalker<'a> {

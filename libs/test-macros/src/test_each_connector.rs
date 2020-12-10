@@ -6,7 +6,7 @@ use proc_macro2::Span;
 use quote::quote;
 use std::str::FromStr;
 use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
-use test_setup::connectors::{Capabilities, Connector, Tags, CONNECTORS, CONNECTORS_MSSQL};
+use test_setup::connectors::{Capabilities, Connector, Tags, CONNECTORS};
 
 static TAGS_FILTER: Lazy<BitFlags<Tags>> = Lazy::new(|| {
     let tags_str = std::env::var("TEST_EACH_CONNECTOR_TAGS").ok();
@@ -112,10 +112,8 @@ impl darling::FromMeta for TagsWrapper {
 }
 
 impl TestEachConnectorArgs {
-    fn connectors_to_test(&self, with_mssql: bool) -> impl Iterator<Item = &Connector> {
-        let connectors = if with_mssql { &*CONNECTORS_MSSQL } else { &*CONNECTORS };
-
-        connectors
+    fn connectors_to_test(&self) -> impl Iterator<Item = &Connector> {
+        CONNECTORS
             .all()
             .filter(move |connector| connector.capabilities.contains(self.capabilities.0))
             .filter(move |connector| TAGS_FILTER.is_empty() || connector.tags.contains(*TAGS_FILTER))
@@ -124,7 +122,7 @@ impl TestEachConnectorArgs {
     }
 }
 
-pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream, with_mssql: bool) -> TokenStream {
+pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream) -> TokenStream {
     let attributes_meta: syn::AttributeArgs = parse_macro_input!(attr as AttributeArgs);
     let args = TestEachConnectorArgs::from_list(&attributes_meta);
 
@@ -137,7 +135,7 @@ pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream, with_mssq
         Err(err) => return err.write_errors().into(),
     };
 
-    let tests = test_each_connector_async_wrapper_functions(&args, &test_function, with_mssql);
+    let tests = test_each_connector_async_wrapper_functions(&args, &test_function);
 
     let optional_logging_import = args.log.as_ref().map(|_| {
         quote!(
@@ -183,12 +181,11 @@ pub fn test_each_connector_impl(attr: TokenStream, input: TokenStream, with_mssq
 fn test_each_connector_async_wrapper_functions(
     args: &TestEachConnectorArgs,
     test_function: &ItemFn,
-    with_mssql: bool,
 ) -> Vec<proc_macro2::TokenStream> {
     let mut tests = Vec::with_capacity(CONNECTORS.len());
     let test_fn_name_str = test_function.sig.ident.to_string();
 
-    for connector in args.connectors_to_test(with_mssql) {
+    for connector in args.connectors_to_test() {
         let connector_test_fn_name = Ident::new(connector.name(), Span::call_site());
         let connector_api_factory = Ident::new(connector.test_api(), Span::call_site());
         let tags = connector.tags.bits();

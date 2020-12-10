@@ -19,7 +19,10 @@ use crate::{
 };
 use datamodel::Datamodel;
 use migration_connector::{ConnectorResult, MigrationDirectory};
-use quaint::{connector::ConnectionInfo, prelude::SqlFamily};
+use quaint::{
+    connector::ConnectionInfo,
+    prelude::{SqlFamily, Table},
+};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
 
@@ -88,4 +91,14 @@ pub(crate) trait SqlFlavour:
         migrations: &[MigrationDirectory],
         connection: &Connection,
     ) -> ConnectorResult<SqlSchema>;
+
+    /// Table to store applied migrations, the name part.
+    fn imperative_migrations_table_name(&self) -> &'static str {
+        "_prisma_migrations"
+    }
+
+    /// Table to store applied migrations.
+    fn imperative_migrations_table<'a>(&'a self) -> Table<'a> {
+        self.imperative_migrations_table_name().into()
+    }
 }

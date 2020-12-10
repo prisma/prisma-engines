@@ -188,6 +188,7 @@ impl PrismaValue {
     pub fn into_string(self) -> Option<String> {
         match self {
             PrismaValue::String(s) => Some(s),
+            PrismaValue::Enum(ev) => Some(ev),
             _ => None,
         }
     }

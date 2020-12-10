@@ -2,6 +2,7 @@ use super::MigrationCommand;
 use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
 use serde::Deserialize;
 use std::collections::HashMap;
+use user_facing_errors::migration_engine::{CannotRollBackSucceededMigration, CannotRollBackUnappliedMigration};
 
 /// The input to the `markMigrationRolledBack` command.
 #[derive(Debug, Deserialize)]
@@ -43,20 +44,18 @@ impl MigrationCommand for MarkMigrationRolledBackCommand {
             .collect();
 
         if relevant_migrations.is_empty() {
-            return Err(CoreError::Generic(anyhow::anyhow!(
-                "Migration `{}` cannot be rolled back because it was never applied to the database.",
-                &input.migration_name
-            )));
+            return Err(CoreError::user_facing(CannotRollBackUnappliedMigration {
+                migration_name: input.migration_name.clone(),
+            }));
         }
 
         if relevant_migrations
             .iter()
             .all(|migration| migration.finished_at.is_some())
         {
-            return Err(CoreError::Generic(anyhow::anyhow!(
-                "Migration `{}` cannot be rolled back because it is not in a failed state.",
-                &input.migration_name
-            )));
+            return Err(CoreError::user_facing(CannotRollBackSucceededMigration {
+                migration_name: input.migration_name.clone(),
+            }));
         }
 
         let migrations_to_roll_back = relevant_migrations

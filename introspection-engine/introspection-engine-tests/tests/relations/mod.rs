@@ -2,7 +2,7 @@ use barrel::types;
 use indoc::indoc;
 use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
 use quaint::prelude::SqlFamily;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 #[test_each_connector]
 async fn one_to_one_req_relation(api: &TestApi) -> crate::TestResult {

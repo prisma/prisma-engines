@@ -92,9 +92,10 @@ impl<'a> SqlSchemaCalculator<'a> {
                 constraint_name: None,
             }).filter(|pk| !pk.columns.is_empty());
 
+            // TODO: HERE
             let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f| {
                 sql::Index {
-                    name: format!("{}.{}_unique", &model.db_name(), &f.db_name()),
+                    name: self.flavour.single_field_index_name(model.db_name(), f.db_name()),
                     columns: vec![f.db_name().to_owned()],
                     tpe: sql::IndexType::Unique,
                 }
@@ -267,22 +268,22 @@ fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_descr
             _ => s.clone(),
         },
         datamodel::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
-            return Some(sql_schema_describer::DefaultValue::NOW)
+            return Some(sql_schema_describer::DefaultValue::now())
         }
         datamodel::DefaultValue::Expression(expression)
             if expression.name == "dbgenerated" && expression.args.is_empty() =>
         {
-            return Some(sql_schema_describer::DefaultValue::DBGENERATED(String::new()))
+            return Some(sql_schema_describer::DefaultValue::db_generated(String::new()))
         }
         datamodel::DefaultValue::Expression(expression)
             if expression.name == "autoincrement" && expression.args.is_empty() =>
         {
-            return Some(sql_schema_describer::DefaultValue::SEQUENCE(String::new()))
+            return Some(sql_schema_describer::DefaultValue::sequence(String::new()))
         }
         datamodel::DefaultValue::Expression(_) => return None,
     };
 
-    Some(sql_schema_describer::DefaultValue::VALUE(value))
+    Some(sql_schema_describer::DefaultValue::value(value))
 }
 
 fn column_type(field: &ScalarFieldWalker<'_>) -> sql::ColumnType {

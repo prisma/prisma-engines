@@ -28,10 +28,12 @@ impl Sqlite {
 #[async_trait]
 impl FromSource for Sqlite {
     async fn from_source(source: &Datasource) -> connector_interface::Result<Sqlite> {
-        let connection_info = ConnectionInfo::from_url(&source.url().value)
+        let database_str = &source.url().value;
+
+        let connection_info = ConnectionInfo::from_url(database_str)
             .map_err(|err| ConnectorError::from_kind(ErrorKind::ConnectionError(err.into())))?;
 
-        let params = SqliteParams::try_from(source.url().value.as_str())
+        let params = SqliteParams::try_from(database_str.as_str())
             .map_err(SqlError::from)
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 
@@ -44,7 +46,7 @@ impl FromSource for Sqlite {
                 .ok_or_else(|| invalid_file_path_error(&file_path, &connection_info))?
                 .to_owned();
 
-            let mut splitted = source.url().value.split('?');
+            let mut splitted = database_str.split('?');
             let url = splitted.next().unwrap();
             let params = splitted.next();
 

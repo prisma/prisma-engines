@@ -56,6 +56,14 @@ impl QueryArguments {
             && self.distinct.is_none()
     }
 
+    /// We can't execute all operations on the DB level reliably.
+    /// This is a marker that generally expresses whether or not a set of records can be
+    /// retrieved by the connector or if it requires the query engine to fetch a raw set
+    /// of records and perform certain operations itself, in-memory.
+    pub fn requires_inmemory_processing(&self) -> bool {
+        self.distinct.is_some() || self.contains_unstable_cursor() || self.contains_null_cursor()
+    }
+
     /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.
     pub fn contains_unstable_cursor(&self) -> bool {
         self.cursor.is_some() && !self.is_stable_ordering()

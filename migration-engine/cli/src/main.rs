@@ -83,7 +83,7 @@ async fn start_engine(datamodel_location: &str, enabled_preview_features: Vec<St
 
                     (user_facing_errors::Error::from(error), 1)
                 }
-                _ => (err.render_user_facing(), 255),
+                _ => (err.render_user_facing(), 250),
             };
 
             serde_json::to_writer(std::io::stdout().lock(), &error).expect("failed to write to stdout");

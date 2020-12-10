@@ -22,7 +22,7 @@ async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |table| {
         table
@@ -46,7 +46,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
@@ -66,8 +66,8 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2)
-        .force(Some(true))
+    api.schema_push(dm2)
+        .force(true)
         .send()
         .await?
         .assert_warnings(&["The migration will add a unique constraint covering the columns `[name,followersCount]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;
@@ -101,7 +101,7 @@ async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api:
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -110,7 +110,8 @@ async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api:
     Ok(())
 }
 
-#[test_each_connector]
+// TODO: Enable SQL Server when cascading rules are in PSL.
+#[test_each_connector(ignore("mssql_2019", "mssql_2017"))]
 async fn one_to_many_self_relations_do_not_create_a_unique_index(api: &TestApi) -> TestResult {
     let dm = r#"
         model Location {
@@ -121,7 +122,7 @@ async fn one_to_many_self_relations_do_not_create_a_unique_index(api: &TestApi) 
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     if api.is_mysql() {
         // MySQL creates an index for the FK.
@@ -168,7 +169,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
     }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
     api.assert_schema()
         .await?
         .assert_table("Like", |table| table.assert_indexes_count(3))?;
@@ -188,7 +189,7 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let result = api.assert_schema().await?.into_schema();
 
@@ -201,14 +202,14 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) -> TestResul
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
     let dm2 = r#"
-            model A {
-                id    Int    @id
-                field String
-                secondField Int
-            }
-        "#;
+        model A {
+            id    Int    @id
+            field String
+            secondField Int
+        }
+    "#;
 
-    api.infer_apply(&dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
     let result = api.assert_schema().await?.into_schema();
     let index = result
         .table_bang("A")

@@ -1,16 +1,17 @@
+mod alter_table;
+
+use super::common::render_on_delete;
 use super::{common, IteratorJoin, Quoted, QuotedWithSchema, SqlRenderer};
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
-    sql_migration::{
-        AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
-        TableChange,
-    },
+    sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
+use indoc::formatdoc;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
     walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
-    ColumnTypeFamily, DefaultValue, IndexType, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SqlSchema,
 };
 use std::{borrow::Cow, fmt::Write};
 
@@ -30,49 +31,9 @@ impl SqlRenderer for MssqlFlavour {
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
         let AlterTable { table_index, changes } = alter_table;
-
         let tables = schemas.tables(table_index);
 
-        let mut lines = Vec::new();
-
-        for change in changes {
-            match change {
-                TableChange::DropPrimaryKey => {
-                    let constraint = tables
-                        .previous()
-                        .primary_key()
-                        .and_then(|pk| pk.constraint_name.as_ref())
-                        .expect("Missing constraint name in DropPrimaryKey on MSSQL");
-                    lines.push(format!("DROP CONSTRAINT {}", self.quote(constraint)));
-                }
-                TableChange::AddPrimaryKey { columns } => {
-                    let columns = columns.iter().map(|colname| self.quote(colname)).join(", ");
-                    lines.push(format!("ADD PRIMARY KEY ({})", columns));
-                }
-                TableChange::AddColumn(AddColumn { column_index }) => {
-                    let column = tables.next().column_at(*column_index);
-                    let col_sql = self.render_column(&column);
-
-                    lines.push(format!("ADD COLUMN {}", col_sql));
-                }
-                TableChange::DropColumn(DropColumn { index }) => {
-                    let name = self.quote(tables.previous().column_at(*index).name());
-                    lines.push(format!("DROP COLUMN {}", name));
-                }
-                TableChange::DropAndRecreateColumn { .. } => todo!("DropAndRecreateColumn on MSSQL"),
-                TableChange::AlterColumn(AlterColumn { .. }) => todo!("We must handle altering columns in MSSQL"),
-            };
-        }
-
-        if lines.is_empty() {
-            return Vec::new();
-        }
-
-        vec![format!(
-            "ALTER TABLE {} {}",
-            self.quote_with_schema(tables.previous().name()),
-            lines.join(",\n")
-        )]
+        alter_table::create_statements(&self, tables, changes)
     }
 
     fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
@@ -82,36 +43,27 @@ impl SqlRenderer for MssqlFlavour {
     fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
 
-        let r#type = if !column.column_type().full_data_type.is_empty() {
-            column.column_type().full_data_type.as_str()
-        } else {
-            match &column.column_type().family {
-                ColumnTypeFamily::Boolean => "bit",
-                ColumnTypeFamily::DateTime => "datetime2",
-                ColumnTypeFamily::Float => "decimal(32,16)",
-                ColumnTypeFamily::Decimal => "decimal(32,16)",
-                ColumnTypeFamily::Int => "int",
-                ColumnTypeFamily::BigInt => "bigint",
-                ColumnTypeFamily::String | ColumnTypeFamily::Json => "nvarchar(1000)",
-                ColumnTypeFamily::Binary => "varbinary(max)",
-                ColumnTypeFamily::Enum(_) => unimplemented!("Enum not handled yet"),
-                ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
-                ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
-            }
-        };
-
+        let r#type = render_column_type(column);
         let nullability = common::render_nullability(&column);
 
         let default = column
             .default()
-            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
-            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column_type_family())))
+            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
+            .map(|default| {
+                let constraint_name = format!("DF__{}__{}", column.table().name(), column.name());
+
+                format!(
+                    " CONSTRAINT {} DEFAULT {}",
+                    self.quote(&constraint_name),
+                    self.render_default(default, &column.column_type_family())
+                )
+            })
             .unwrap_or_else(String::new);
 
         if column.is_autoincrement() {
-            format!("{} int IDENTITY(1,1)", column_name)
+            format!("{} INT IDENTITY(1,1)", column_name)
         } else {
-            format!("{} {} {} {}", column_name, r#type, nullability, default)
+            format!("{} {}{}{}", column_name, r#type, nullability, default)
         }
     }
 
@@ -121,60 +73,49 @@ impl SqlRenderer for MssqlFlavour {
             .iter()
             .map(Quoted::mssql_ident)
             .join(",");
-        let is_self_relation = foreign_key.table().name() == foreign_key.referenced_table().name();
-
-        let (on_delete, on_update) = if is_self_relation {
-            ("ON DELETE NO ACTION", "ON UPDATE NO ACTION")
-        } else {
-            let on_delete = common::render_on_delete(&foreign_key.on_delete_action());
-            let on_update = common::render_on_update(&foreign_key.on_update_action());
-
-            (on_delete, on_update)
-        };
 
         format!(
-            " REFERENCES {}({}) {} {}",
+            " REFERENCES {}({}) {} ON UPDATE CASCADE",
             self.quote_with_schema(&foreign_key.referenced_table().name()),
             cols,
-            on_delete,
-            on_update
+            render_on_delete(&foreign_key.on_delete_action()),
         )
     }
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-        match (default, family) {
-            (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+        match (default.kind(), family) {
+            (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
+            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
+            | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
                 format!("'{}'", escape_string_literal(&val)).into()
             }
-            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+            (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
                 format!("0x{}", common::format_hex(b)).into()
             }
-            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
-            (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
-            (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
-            (DefaultValue::VALUE(PrismaValue::Boolean(val)), ColumnTypeFamily::Boolean) => {
+            (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+            (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
+            (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
+            (DefaultKind::VALUE(PrismaValue::Boolean(val)), ColumnTypeFamily::Boolean) => {
                 Cow::from(if *val { "1" } else { "0" })
             }
-            (DefaultValue::VALUE(val), _) => val.to_string().into(),
-            (DefaultValue::SEQUENCE(_), _) => "".into(),
+            (DefaultKind::VALUE(val), _) => val.to_string().into(),
+            (DefaultKind::SEQUENCE(_), _) => "".into(),
         }
     }
 
     fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
-        let index_with_table = Quoted::Single(format!(
+        let index_with_table = format!(
             "{}.{}.{}",
             self.schema_name(),
             indexes.previous().table().name(),
             indexes.previous().name()
-        ));
+        );
 
         vec![format!(
-            "EXEC SP_RENAME N{index_with_table}, N{index_new_name}, N'INDEX'",
-            index_with_table = Quoted::Single(index_with_table),
-            index_new_name = Quoted::Single(indexes.next().name()),
+            "EXEC SP_RENAME N'{index_with_table}', N'{index_new_name}', N'INDEX'",
+            index_with_table = index_with_table,
+            index_new_name = indexes.next().name(),
         )]
     }
 
@@ -204,15 +145,22 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
+        let columns: String = table
+            .columns()
+            .map(|column| self.render_column(&column))
+            .join(",\n    ");
 
         let primary_columns = table.primary_key_column_names();
 
         let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
-            let index_name = format!("PK_{}_{}", table.name(), primary_columns.iter().join("_"));
+            let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
 
-            format!(",\nCONSTRAINT {} PRIMARY KEY ({})", index_name, column_names)
+            format!(
+                ",\n    CONSTRAINT {} PRIMARY KEY ({})",
+                self.quote(&index_name),
+                column_names
+            )
         } else {
             String::new()
         };
@@ -229,17 +177,20 @@ impl SqlRenderer for MssqlFlavour {
                     let name = index.name().replace('.', "_");
                     let columns = index.columns().map(|col| self.quote(col.name()));
 
-                    format!("CONSTRAINT {} UNIQUE ({})", name, columns.join(","))
+                    format!("CONSTRAINT {} UNIQUE ({})", self.quote(&name), columns.join(","))
                 })
-                .join(",\n");
+                .join(",\n    ");
 
-            format!(",\n{}", constraints)
+            format!(",\n    {}", constraints)
         } else {
             String::new()
         };
 
-        format!(
-            "CREATE TABLE {} ({columns}{primary_key}{constraints})",
+        formatdoc!(
+            r#"
+            CREATE TABLE {table_name} (
+                {columns}{primary_key}{constraints}
+            )"#,
             table_name = self.quote_with_schema(table_name),
             columns = columns,
             primary_key = primary_key,
@@ -251,24 +202,141 @@ impl SqlRenderer for MssqlFlavour {
         unreachable!("render_drop_enum on MSSQL")
     }
 
-    fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
+    fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-            table = self.quote_with_schema(&drop_foreign_key.table),
-            constraint_name = Quoted::mssql_ident(&drop_foreign_key.constraint_name),
+            table = self.quote_with_schema(foreign_key.table().name()),
+            constraint_name = Quoted::mssql_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
-    fn render_drop_index(&self, drop_index: &DropIndex) -> String {
-        format!(
-            "DROP INDEX {} ON {}",
-            self.quote_with_schema(&drop_index.name),
-            self.quote_with_schema(&drop_index.table)
-        )
+    fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
+        match index.index_type() {
+            IndexType::Normal => format!(
+                "DROP INDEX {} ON {}",
+                self.quote(index.name()),
+                self.quote_with_schema(index.table().name())
+            ),
+            IndexType::Unique => format!(
+                "ALTER TABLE {} DROP CONSTRAINT {}",
+                self.quote_with_schema(index.table().name()),
+                self.quote(index.name()),
+            ),
+        }
     }
 
-    fn render_redefine_tables(&self, _tables: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        unreachable!("render_redefine_table on MSSQL")
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        let mut result = Vec::new();
+
+        // All needs to be inside a transaction.
+        result.push("BEGIN TRANSACTION".to_string());
+
+        for redefine_table in tables {
+            let tables = schemas.tables(&redefine_table.table_index);
+            // This is a copy of our new modified table.
+            let temporary_table_name = format!("_prisma_new_{}", &tables.next().name());
+
+            // If any of the columns is an identity, we should know about it.
+            let needs_autoincrement = redefine_table
+                .column_pairs
+                .iter()
+                .any(|(column_indexes, _, _)| tables.columns(column_indexes).next().is_autoincrement());
+
+            // Let's make the [columns] nicely rendered.
+            let columns: Vec<_> = redefine_table
+                .column_pairs
+                .iter()
+                .map(|(column_indexes, _, _)| tables.columns(column_indexes).next().name())
+                .map(|c| self.quote(c))
+                .map(|c| format!("{}", c))
+                .collect();
+
+            let keys = tables.previous().referencing_foreign_keys().filter(|prev| {
+                tables
+                    .next()
+                    .referencing_foreign_keys()
+                    .any(|next| prev.foreign_key() == next.foreign_key())
+            });
+
+            // We must drop foreign keys pointing to this table before removing
+            // any of the table constraints.
+            for fk in keys {
+                result.push(self.render_drop_foreign_key(&fk));
+            }
+
+            // Then the indices...
+            for index in tables.previous().indexes() {
+                result.push(self.render_drop_index(&index));
+            }
+
+            // Remove all constraints from our original table. This will allow
+            // us to reuse the same constraint names when creating the temporary
+            // table.
+            result.push(formatdoc! {r#"
+                DECLARE @SQL NVARCHAR(MAX) = N''
+                SELECT @SQL += N'ALTER TABLE '
+                    + QUOTENAME(OBJECT_SCHEMA_NAME(PARENT_OBJECT_ID))
+                    + '.'
+                    + QUOTENAME(OBJECT_NAME(PARENT_OBJECT_ID))
+                    + ' DROP CONSTRAINT '
+                    + OBJECT_NAME(OBJECT_ID) + ';'
+                FROM SYS.OBJECTS
+                WHERE TYPE_DESC LIKE '%CONSTRAINT'
+                    AND OBJECT_NAME(PARENT_OBJECT_ID) = '{table}'
+                    AND SCHEMA_NAME(SCHEMA_ID) = '{schema}'
+                EXEC sp_executesql @SQL
+            "#, table = tables.previous().name(), schema = self.schema_name()});
+
+            // Create the new table.
+            result.push(self.render_create_table_as(tables.next(), &temporary_table_name));
+
+            // We cannot insert into autoincrement columns by default. If we
+            // have `IDENTITY` in any of the columns, we'll allow inserting
+            // momentarily.
+            if needs_autoincrement {
+                result.push(format!(
+                    r#"SET IDENTITY_INSERT {} ON"#,
+                    self.quote_with_schema(&temporary_table_name)
+                ));
+            }
+
+            // Now we copy everything from the old table to the newly created.
+            result.push(formatdoc! {r#"
+                IF EXISTS(SELECT * FROM {table})
+                    EXEC('INSERT INTO {tmp_table} ({columns}) SELECT {columns} FROM {table} WITH (holdlock tablockx)')"#,
+                columns = columns.join(","),
+                table = self.quote_with_schema(tables.previous().name()),
+                tmp_table = self.quote_with_schema(&temporary_table_name),
+            });
+
+            // When done copying, disallow identity inserts again if needed.
+            if needs_autoincrement {
+                result.push(format!(
+                    r#"SET IDENTITY_INSERT {} OFF"#,
+                    self.quote_with_schema(&temporary_table_name)
+                ));
+            }
+
+            // Drop the old, now empty table.
+            result.extend(self.render_drop_table(tables.previous().name()));
+
+            // Rename the temporary table with the name defined in the migration.
+            result.push(self.render_rename_table(&temporary_table_name, tables.next().name()));
+
+            // Recreating all foreign keys pointing to this table
+            for fk in tables.next().referencing_foreign_keys() {
+                result.push(self.render_add_foreign_key(&fk));
+            }
+
+            // Then the indices...
+            for index in tables.next().indexes().filter(|i| !i.index_type().is_unique()) {
+                result.push(self.render_create_index(&index));
+            }
+        }
+
+        result.push("COMMIT".to_string());
+
+        result
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
@@ -293,6 +361,14 @@ impl SqlRenderer for MssqlFlavour {
 
         if let Some(constraint_name) = foreign_key.constraint_name() {
             write!(add_constraint, "CONSTRAINT {} ", self.quote(constraint_name)).unwrap();
+        } else {
+            write!(
+                add_constraint,
+                "CONSTRAINT [FK__{}__{}] ",
+                foreign_key.table().name(),
+                foreign_key.constrained_column_names().join("__"),
+            )
+            .unwrap();
         }
 
         write!(
@@ -316,6 +392,28 @@ impl SqlRenderer for MssqlFlavour {
     }
 }
 
+fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
+    if !column.column_type().full_data_type.is_empty() {
+        return column.column_type().full_data_type.clone().into();
+    }
+
+    let r#type = match &column.column_type().family {
+        ColumnTypeFamily::Boolean => "BIT",
+        ColumnTypeFamily::DateTime => "DATETIME2",
+        ColumnTypeFamily::Float => "DECIMAL(32,16)",
+        ColumnTypeFamily::Decimal => "DECIMAL(32,16)",
+        ColumnTypeFamily::Int => "INT",
+        ColumnTypeFamily::BigInt => "BIGINT",
+        ColumnTypeFamily::String | ColumnTypeFamily::Json => "NVARCHAR(1000)",
+        ColumnTypeFamily::Binary => "VARBINARY(max)",
+        ColumnTypeFamily::Enum(_) => unimplemented!("Enums not supported in SQL Server."),
+        ColumnTypeFamily::Uuid => "UNIQUEIDENTIFIER",
+        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
+    };
+
+    r#type.into()
+}
+
 fn escape_string_literal(s: &str) -> String {
-    s.replace('\'', "''")
+    s.replace('\'', r#"''"#)
 }

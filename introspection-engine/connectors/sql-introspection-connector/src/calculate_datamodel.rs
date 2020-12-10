@@ -336,25 +336,25 @@ mod tests {
                     Column {
                         name: "int_default".to_string(),
                         tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
-                        default: Some(DefaultValue::VALUE(PrismaValue::Int(1))),
+                        default: Some(DefaultValue::value(PrismaValue::Int(1))),
                         auto_increment: false,
                     },
                     Column {
                         name: "bool_default".to_string(),
                         tpe: ColumnType::pure(ColumnTypeFamily::Boolean, ColumnArity::Nullable),
-                        default: Some(DefaultValue::VALUE(PrismaValue::Boolean(true))),
+                        default: Some(DefaultValue::value(PrismaValue::Boolean(true))),
                         auto_increment: false,
                     },
                     Column {
                         name: "float_default".to_string(),
                         tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Nullable),
-                        default: Some(DefaultValue::VALUE(PrismaValue::new_float(1.0))),
+                        default: Some(DefaultValue::value(PrismaValue::new_float(1.0))),
                         auto_increment: false,
                     },
                     Column {
                         name: "string_default".to_string(),
                         tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Nullable),
-                        default: Some(DefaultValue::VALUE(PrismaValue::String("default".to_string()))),
+                        default: Some(DefaultValue::value(PrismaValue::String("default".to_string()))),
                         auto_increment: false,
                     },
                 ],
@@ -511,7 +511,6 @@ mod tests {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
                             character_maximum_length: None,
-
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                             native_type: Some(PostgresType::Integer.to_json()),
@@ -524,8 +523,6 @@ mod tests {
                         columns: vec!["primary".to_string()],
                         sequence: Some(Sequence {
                             name: "sequence".to_string(),
-                            initial_value: 1,
-                            allocation_size: 1,
                         }),
                         constraint_name: None,
                     }),

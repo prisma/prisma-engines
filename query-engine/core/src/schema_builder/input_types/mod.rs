@@ -89,3 +89,15 @@ fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) 
         field_names.join("")
     })
 }
+
+fn model_field_enum(model: &ModelRef) -> EnumTypeRef {
+    Arc::new(EnumType::FieldRef(FieldRefEnumType {
+        name: format!("{}ScalarFieldEnum", capitalize(&model.name)),
+        values: model
+            .fields()
+            .scalar()
+            .into_iter()
+            .map(|field| (field.name.clone(), field))
+            .collect(),
+    }))
+}

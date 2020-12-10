@@ -58,7 +58,14 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                 }
                 SqlFamily::Mssql => {
                     indoc! {
-                        r#"say hi to Musti and Nauki"#
+                        r#"
+                        -- CreateTable
+                        CREATE TABLE [basic_create_migration_works].[Cat] (
+                            [id] INT NOT NULL,
+                            [name] NVARCHAR(1000) NOT NULL,
+                            CONSTRAINT [PK__Cat__id] PRIMARY KEY ([id])
+                        );
+                        "#
                     }
                 }
             };
@@ -142,7 +149,14 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                 }
                 SqlFamily::Mssql => {
                     indoc! {
-                        r#"say hi to Musti and Nauki"#
+                        r#"
+                        -- CreateTable
+                        CREATE TABLE [creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline].[Dog] (
+                            [id] INT NOT NULL,
+                            [name] NVARCHAR(1000) NOT NULL,
+                            CONSTRAINT [PK__Dog__id] PRIMARY KEY ([id])
+                        );
+                        "#
                     }
                 }
             };
@@ -197,6 +211,25 @@ async fn empty_migrations_should_not_be_created(api: &TestApi) -> TestResult {
         .assert_migration_directories_count(1)?;
 
     api.create_migration("create-cats-again", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn migration_name_length_is_validated(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Cat {
+            id Int @id
+            name String
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long-a-migration-with-a-name-that-is-way-too-long", dm, &dir)
         .send()
         .await?
         .assert_migration_directories_count(1)?;
@@ -286,6 +319,7 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                         r#"
                         -- CreateEnum
                         CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
@@ -309,12 +343,7 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                         "#
                     }
                 }
-                SqlFamily::Sqlite => unreachable!("no enums -.-"),
-                SqlFamily::Mssql => {
-                    indoc! {
-                        r#"say hi to Musti and Nauki"#
-                    }
-                }
+                SqlFamily::Sqlite | SqlFamily::Mssql => unreachable!("no enums -.-"),
             };
 
             migration.assert_contents(expected_script)

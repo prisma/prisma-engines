@@ -1,7 +1,7 @@
 use barrel::types;
 use introspection_engine_tests::{test_api::*, BarrelMigrationExecutor};
 use pretty_assertions::assert_eq;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 #[test_each_connector(tags("mysql"))]
 async fn metadata_for_mysql_should_work(api: &TestApi) -> crate::TestResult {

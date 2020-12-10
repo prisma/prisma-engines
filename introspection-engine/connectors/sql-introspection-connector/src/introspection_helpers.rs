@@ -7,9 +7,8 @@ use datamodel::{
 use datamodel_connector::Connector;
 use quaint::connector::SqlFamily;
 use sql_datamodel_connector::SqlDatamodelConnectors;
-use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
-};
+use sql_schema_describer::DefaultKind;
+use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
 use tracing::debug;
 
 //checks
@@ -38,7 +37,6 @@ pub fn is_new_migration_table(table: &Table) -> bool {
         && table.columns.iter().any(|c| c.name == "rolled_back_at")
         && table.columns.iter().any(|c| c.name == "started_at")
         && table.columns.iter().any(|c| c.name == "applied_steps_count")
-        && table.columns.iter().any(|c| c.name == "script")
 }
 
 pub(crate) fn is_relay_table(table: &Table) -> bool {
@@ -149,8 +147,9 @@ pub(crate) fn calculate_scalar_field(
     } else {
         calculate_scalar_field_type(column, family)
     };
+    let is_id = is_id(&column, &table);
     let arity = match column.tpe.arity {
-        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => FieldArity::Required,
+        _ if is_id && column.auto_increment => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
@@ -180,7 +179,6 @@ pub(crate) fn calculate_scalar_field(
         _ => (false, None),
     };
 
-    let is_id = is_id(&column, &table);
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
     ScalarField {
@@ -277,7 +275,7 @@ pub(crate) fn calculate_default(
     column: &Column,
     arity: &FieldArity,
 ) -> (Option<DMLDef>, Option<String>) {
-    match (&column.default, &column.tpe.family) {
+    match (column.default.as_ref().map(|d| d.kind()), &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => (None, None),
         (_, ColumnTypeFamily::Int) if column.auto_increment => {
             (Some(DMLDef::Expression(VG::new_autoincrement())), None)
@@ -291,13 +289,13 @@ pub(crate) fn calculate_default(
         (_, ColumnTypeFamily::BigInt) if is_sequence(column, table) => {
             (Some(DMLDef::Expression(VG::new_autoincrement())), None)
         }
-        (Some(SQLDef::SEQUENCE(_)), _) => (Some(DMLDef::Expression(VG::new_autoincrement())), None),
-        (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => (Some(DMLDef::Expression(VG::new_now())), None),
-        (Some(SQLDef::DBGENERATED(default_string)), _) => (
+        (Some(DefaultKind::SEQUENCE(_)), _) => (Some(DMLDef::Expression(VG::new_autoincrement())), None),
+        (Some(DefaultKind::NOW), ColumnTypeFamily::DateTime) => (Some(DMLDef::Expression(VG::new_now())), None),
+        (Some(DefaultKind::DBGENERATED(default_string)), _) => (
             Some(DMLDef::Expression(VG::new_dbgenerated())),
             Some(default_string.clone()),
         ),
-        (Some(SQLDef::VALUE(val)), _) => (Some(DMLDef::Single(val.clone())), None),
+        (Some(DefaultKind::VALUE(val)), _) => (Some(DMLDef::Single(val.clone())), None),
         _ => (None, None),
     }
 }

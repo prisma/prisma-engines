@@ -84,7 +84,7 @@ pub(crate) fn many_records_field_arguments(ctx: &mut BuilderContext, field: &Mod
     match field {
         ModelField::Scalar(_) => vec![],
         ModelField::Relation(rf) if rf.is_list && !rf.related_model().is_embedded => {
-            many_records_arguments(ctx, &rf.related_model())
+            many_records_arguments(ctx, &rf.related_model(), true)
         }
         ModelField::Relation(rf) if rf.is_list && rf.related_model().is_embedded => vec![],
         ModelField::Relation(rf) if !rf.is_list => vec![],
@@ -93,7 +93,11 @@ pub(crate) fn many_records_field_arguments(ctx: &mut BuilderContext, field: &Mod
 }
 
 /// Builds "many records where" arguments solely based on the given model.
-pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
+pub(crate) fn many_records_arguments(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    include_distinct: bool,
+) -> Vec<InputField> {
     let unique_input_type = InputType::object(filter_objects::where_unique_object_type(ctx, model));
 
     let mut args = vec![
@@ -104,17 +108,17 @@ pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef)
         input_field("skip", InputType::int(), None).optional(),
     ];
 
-    let enum_type = Arc::new(EnumType::FieldRef(FieldRefEnumType {
-        name: format!("{}DistinctFieldEnum", capitalize(&model.name)),
-        values: model
-            .fields()
-            .scalar()
-            .into_iter()
-            .map(|field| (field.name.clone(), field))
-            .collect(),
-    }));
+    if include_distinct {
+        args.push(
+            input_field(
+                "distinct",
+                InputType::list(InputType::Enum(model_field_enum(model))),
+                None,
+            )
+            .optional(),
+        );
+    }
 
-    args.push(input_field("distinct", InputType::list(InputType::Enum(enum_type)), None).optional());
     args
 }
 
@@ -128,4 +132,20 @@ pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> I
         None,
     )
     .optional()
+}
+
+pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
+    let field_enum_type = InputType::Enum(model_field_enum(model));
+
+    vec![
+        where_argument(ctx, &model),
+        order_by_argument(ctx, &model),
+        input_field(
+            "by",
+            vec![InputType::list(field_enum_type.clone()), field_enum_type],
+            None,
+        ),
+        input_field("take", InputType::int(), None).optional(),
+        input_field("skip", InputType::int(), None).optional(),
+    ]
 }

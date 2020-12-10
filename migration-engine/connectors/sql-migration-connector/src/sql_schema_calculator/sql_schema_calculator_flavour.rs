@@ -34,4 +34,9 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn supports_foreign_key_restrict_constraint(&self) -> bool {
         true
     }
+
+    // TODO: Maybe we should rethink this a bit?
+    fn single_field_index_name(&self, model_name: &str, field_name: &str) -> String {
+        format!("{}.{}_unique", model_name, field_name)
+    }
 }

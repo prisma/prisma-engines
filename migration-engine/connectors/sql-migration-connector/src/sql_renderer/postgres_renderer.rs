@@ -2,10 +2,7 @@ use super::{common::*, SqlRenderer};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
-    sql_migration::{
-        AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, DropForeignKey, DropIndex, RedefineTable,
-        TableChange,
-    },
+    sql_migration::{AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, RedefineTable, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
 use once_cell::sync::Lazy;
@@ -228,7 +225,7 @@ impl SqlRenderer for PostgresFlavour {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
-            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
+            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
             .map(|default| format!(" DEFAULT {}", self.render_default(default, column.column_type_family())))
             .unwrap_or_else(String::new);
         let is_serial = column.is_autoincrement();
@@ -259,21 +256,21 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-        match (default, family) {
-            (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+        match (default.kind(), family) {
+            (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
+            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
+            | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
                 format!("E'{}'", escape_string_literal(&val)).into()
             }
-            (DefaultValue::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
+            (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => {
                 format!("'{}'", format_hex(b)).into()
             }
-            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
-            (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
-            (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
-            (DefaultValue::VALUE(val), _) => val.to_string().into(),
-            (DefaultValue::SEQUENCE(_), _) => "".into(),
+            (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+            (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
+            (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+            (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
+            (DefaultKind::VALUE(val), _) => val.to_string().into(),
+            (DefaultKind::SEQUENCE(_), _) => "".into(),
         }
     }
 
@@ -341,16 +338,16 @@ impl SqlRenderer for PostgresFlavour {
         vec![sql]
     }
 
-    fn render_drop_foreign_key(&self, drop_foreign_key: &DropForeignKey) -> String {
+    fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
         format!(
             "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
-            table = self.quote(&drop_foreign_key.table),
-            constraint_name = Quoted::postgres_ident(&drop_foreign_key.constraint_name),
+            table = self.quote(foreign_key.table().name()),
+            constraint_name = Quoted::postgres_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
-    fn render_drop_index(&self, drop_index: &DropIndex) -> String {
-        format!("DROP INDEX {}", self.quote(&drop_index.name))
+    fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
+        format!("DROP INDEX {}", self.quote(index.name()))
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
@@ -410,10 +407,6 @@ fn render_alter_column(
     clauses: &mut Vec<String>,
     after_statements: &mut Vec<String>,
 ) {
-    // Matches the sequence name from inside an autoincrement default expression.
-    static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
-
     let steps = expand_alter_column(columns, column_changes);
     let table_name = Quoted::postgres_ident(columns.previous().table().name());
     let column_name = Quoted::postgres_ident(columns.previous().name());
@@ -426,14 +419,8 @@ fn render_alter_column(
                 clauses.push(format!("{} DROP DEFAULT", &alter_column_prefix));
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
-                if let Some(DefaultValue::SEQUENCE(sequence_expression)) = columns.previous().default() {
-                    let sequence_name = SEQUENCE_DEFAULT_RE
-                        .captures(sequence_expression)
-                        .and_then(|captures| captures.get(1))
-                        .map(|capture| capture.as_str())
-                        .unwrap_or_else(|| panic!("Failed to extract sequence name from `{}`", sequence_expression));
-
-                    let sequence_is_still_used = walk_columns(columns.next().schema()).any(|column| matches!(column.default(), Some(DefaultValue::SEQUENCE(other_sequence)) if other_sequence == sequence_expression) && !column.is_same_column(columns.next()));
+                if let Some(DefaultKind::SEQUENCE(sequence_name)) = columns.previous().default().map(|d| d.kind()) {
+                    let sequence_is_still_used = walk_columns(columns.next().schema()).any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next()));
 
                     if !sequence_is_still_used {
                         after_statements.push(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));

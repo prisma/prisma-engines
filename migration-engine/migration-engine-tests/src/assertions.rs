@@ -1,7 +1,7 @@
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{
-    Column, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey,
-    SqlSchema, Table,
+    Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
+    PrimaryKey, SqlSchema, Table,
 };
 
 pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
@@ -313,10 +313,10 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_default(self, expected: Option<DefaultValue>) -> AssertionResult<Self> {
-        let found = &self.0.default;
+        let found = &self.0.default.as_ref().map(|d| d.kind());
 
         anyhow::ensure!(
-            found == &expected,
+            found == &expected.as_ref().map(|d| d.kind()),
             "Assertion failed. Expected default: {:?}, but found {:?}",
             expected,
             found
@@ -346,8 +346,8 @@ impl<'a> ColumnAssertion<'a> {
     pub fn assert_default_value(self, expected: &prisma_value::PrismaValue) -> AssertionResult<Self> {
         let found = &self.0.default;
 
-        match found {
-            Some(DefaultValue::VALUE(val)) => anyhow::ensure!(
+        match found.as_ref().map(|d| d.kind()) {
+            Some(DefaultKind::VALUE(val)) => anyhow::ensure!(
                 val == expected,
                 "Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`",
                 self.0.name,

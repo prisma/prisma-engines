@@ -3,7 +3,7 @@ use indoc::indoc;
 use introspection_engine_tests::{assert_eq_json, test_api::*};
 use pretty_assertions::assert_eq;
 use serde_json::json;
-use test_macros::test_each_connector_mssql as test_each_connector;
+use test_macros::test_each_connector;
 
 #[test_each_connector]
 async fn a_table_without_uniques(api: &TestApi) -> crate::TestResult {

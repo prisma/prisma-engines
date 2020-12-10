@@ -159,7 +159,7 @@ async fn diagnose_migration_history_without_opt_in_to_shadow_database_does_not_c
     Ok(())
 }
 
-#[test_each_connector(ignore("postgres"))]
+#[test_each_connector(ignore("postgres", "mssql_2017", "mssql_2019"))]
 async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migrations(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -632,7 +632,11 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
         .await
         .unwrap_err()
         .to_string();
-    assert!(err.contains("syntax"), err);
+
+    match api.sql_family() {
+        SqlFamily::Mssql => assert!(err.contains("Could not find stored procedure"), err),
+        _ => assert!(&err.contains("syntax"), err),
+    }
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -743,6 +747,47 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
         error_in_unapplied_migration.unwrap_known().error_code,
         user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly::ERROR_CODE,
     );
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    api.apply_script("CREATE TABLE \"Cat\" (\nid SERIAL PRIMARY KEY\n);")
+        .await?;
+
+    let dm1 = r#"
+        model Cat {
+            id      Int @id @default(autoincrement())
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    let DiagnoseMigrationHistoryOutput {
+        drift,
+        history,
+        edited_migration_names,
+        failed_migration_names,
+        has_migrations_table,
+        error_in_unapplied_migration,
+    } = api
+        .diagnose_migration_history(&directory)
+        .opt_in_to_shadow_database(true)
+        .send()
+        .await?
+        .into_output();
+
+    assert!(matches!(drift, Some(DriftDiagnostic::DriftDetected { rollback: _ })));
+    assert!(
+        matches!(history, Some(HistoryDiagnostic::DatabaseIsBehind { unapplied_migration_names: migs }) if migs.len() == 1)
+    );
+    assert!(failed_migration_names.is_empty());
+    assert!(edited_migration_names.is_empty());
+    assert!(!has_migrations_table);
+    assert!(error_in_unapplied_migration.is_none());
 
     Ok(())
 }

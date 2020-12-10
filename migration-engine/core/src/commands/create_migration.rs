@@ -2,6 +2,7 @@ use super::MigrationCommand;
 use crate::{migration_engine::MigrationEngine, parse_datamodel, CoreError, CoreResult};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
+use user_facing_errors::migration_engine::MigrationNameTooLong;
 
 /// Create and potentially apply a new migration.
 pub struct CreateMigrationCommand;
@@ -43,6 +44,10 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
         let applier = engine.connector().database_migration_step_applier();
         let checker = engine.connector().destructive_change_checker();
 
+        if input.migration_name.len() > 200 {
+            return Err(CoreError::user_facing(MigrationNameTooLong));
+        }
+
         // Infer the migration.
         let previous_migrations = migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
         let target_schema = parse_datamodel(&input.prisma_schema)?;
@@ -67,6 +72,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
             &input.migration_name,
         )
         .map_err(|_| CoreError::Generic(anyhow::anyhow!("Failed to create a new migration directory.")))?;
+
         directory
             .write_migration_script(&migration_script, D::FILE_EXTENSION)
             .map_err(|err| {

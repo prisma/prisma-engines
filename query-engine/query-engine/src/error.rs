@@ -46,26 +46,33 @@ pub enum PrismaError {
     FeatureError(String),
 }
 
-impl PrismaError {
-    pub(crate) fn render_as_json(self) -> Result<(), anyhow::Error> {
+impl From<PrismaError> for user_facing_errors::Error {
+    fn from(err: PrismaError) -> Self {
         use std::fmt::Write as _;
-        use std::io::Write as _;
 
-        let error: user_facing_errors::Error = match self {
+        match err {
             PrismaError::ConnectorError(ConnectorError {
                 user_facing_error: Some(err),
                 ..
             }) => err.into(),
             PrismaError::ConversionError(errors, dml_string) => {
                 let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
-                write!(full_error, "\nValidation Error Count: {}", errors.errors.len())?;
+                write!(full_error, "\nValidation Error Count: {}", errors.errors.len()).unwrap();
 
                 user_facing_errors::Error::from(user_facing_errors::KnownError::new(
                     user_facing_errors::common::SchemaParserError { full_error },
                 ))
             }
             other => user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string()),
-        };
+        }
+    }
+}
+
+impl PrismaError {
+    pub(crate) fn render_as_json(self) -> Result<(), anyhow::Error> {
+        use std::io::Write as _;
+
+        let error = user_facing_errors::Error::from(self);
 
         // Because of how the node frontend works (stderr.on('data', ...)), we want to emit one clean JSON message on a single line at once.
         let stderr = std::io::stderr();

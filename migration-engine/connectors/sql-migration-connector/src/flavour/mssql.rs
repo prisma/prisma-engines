@@ -1,7 +1,11 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
 use connection_string::JdbcString;
+use indoc::formatdoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
-use quaint::{connector::MssqlUrl, prelude::SqlFamily};
+use quaint::{
+    connector::MssqlUrl,
+    prelude::{SqlFamily, Table},
+};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::str::FromStr;
 
@@ -26,6 +30,10 @@ impl MssqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MssqlFlavour {
+    fn imperative_migrations_table<'a>(&'a self) -> Table<'a> {
+        (self.schema_name(), self.imperative_migrations_table_name()).into()
+    }
+
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
         let (db_name, master_uri) = Self::master_url(jdbc_string)?;
         let conn = connect(&master_uri.to_string()).await?;
@@ -35,28 +43,28 @@ impl SqlFlavour for MssqlFlavour {
 
         let conn = connect(jdbc_string).await?;
 
-        let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name());
+        let query = format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),);
+
         conn.raw_cmd(&query).await?;
 
         Ok(db_name)
     }
 
     async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
-        let sql = r#"
-            CREATE TABLE [_prisma_migrations] (
+        let sql = formatdoc! { r#"
+            CREATE TABLE [{}].[{}] (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
                 finished_at             DATETIMEOFFSET,
-                migration_name          NVARCHAR(MAX) NOT NULL,
-                logs                    NVARCHAR(MAX) NOT NULL,
+                migration_name          NVARCHAR(250) NOT NULL,
+                logs                    NVARCHAR(MAX) NULL,
                 rolled_back_at          DATETIMEOFFSET,
                 started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                applied_steps_count     INT NOT NULL DEFAULT 0,
-                script                  NVARCHAR(MAX) NOT NULL
+                applied_steps_count     INT NOT NULL DEFAULT 0
             );
-        "#;
+        "#, self.schema_name(), self.imperative_migrations_table_name()};
 
-        Ok(connection.raw_cmd(sql).await?)
+        Ok(connection.raw_cmd(&sql).await?)
     }
 
     async fn describe_schema<'a>(&'a self, connection: &Connection) -> ConnectorResult<SqlSchema> {
@@ -140,7 +148,7 @@ impl SqlFlavour for MssqlFlavour {
         ))
         .await?;
 
-        conn.raw_cmd(&format!("CREATE SCHEMA {}", conn.connection_info().schema_name()))
+        conn.raw_cmd(&format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),))
             .await
             .unwrap();
 
@@ -159,9 +167,64 @@ impl SqlFlavour for MssqlFlavour {
 
     async fn sql_schema_from_migration_history(
         &self,
-        _: &[MigrationDirectory],
-        _: &Connection,
+        migrations: &[MigrationDirectory],
+        connection: &Connection,
     ) -> ConnectorResult<SqlSchema> {
-        todo!("Needs the connection string crate, so leaving it unimplemented for now")
+        let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
+        let create_database = format!("CREATE DATABASE [{}]", database_name);
+
+        connection.raw_cmd(&create_database).await?;
+
+        let mut jdbc_string: JdbcString = self.0.connection_string().parse().unwrap();
+        jdbc_string
+            .properties_mut()
+            .insert("database".into(), database_name.clone());
+        let temporary_database_url = jdbc_string.to_string();
+
+        tracing::debug!("Connecting to temporary database at `{}`", temporary_database_url);
+
+        // We must create a connection in a block, closing it before dropping
+        // the database.
+        let sql_schema_result = {
+            let temp_database = crate::connect(&temporary_database_url).await?;
+
+            // We go through the whole process without early return, then clean up
+            // the temporary database, and only then return the result. This avoids
+            // leaving shadow databases behind in case of e.g. faulty
+            // migrations.
+
+            if self.schema_name() != "dbo" {
+                let create_schema = format!("CREATE SCHEMA [{schema}]", schema = self.schema_name());
+
+                temp_database.raw_cmd(&create_schema).await?;
+            }
+
+            (|| async {
+                for migration in migrations {
+                    let script = migration.read_migration_script()?;
+
+                    tracing::debug!(
+                        "Applying migration `{}` to temporary database.",
+                        migration.migration_name()
+                    );
+
+                    temp_database
+                        .raw_cmd(&script)
+                        .await
+                        .map_err(ConnectorError::from)
+                        .map_err(|connector_error| {
+                            connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
+                        })?;
+                }
+
+                self.describe_schema(&temp_database).await
+            })()
+            .await
+        };
+
+        let drop_database = format!("DROP DATABASE [{}]", database = database_name);
+        connection.raw_cmd(&drop_database).await?;
+
+        sql_schema_result
     }
 }

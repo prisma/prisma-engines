@@ -61,15 +61,16 @@ async fn sqlite(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecu
 async fn postgres(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading Postgres connector...");
 
-    let url = Url::parse(&source.url().value)?;
+    let database_str = &source.url().value;
+    let psql = PostgreSql::from_source(source).await?;
+
+    let url = Url::parse(database_str)?;
     let params: HashMap<String, String> = url.query_pairs().into_owned().collect();
 
     let db_name = params
         .get("schema")
         .map(ToString::to_string)
         .unwrap_or_else(|| String::from("public"));
-
-    let psql = PostgreSql::from_source(source).await?;
 
     let force_transactions = params
         .get("pgbouncer")
@@ -85,7 +86,9 @@ async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
     trace!("Loading MySQL connector...");
 
     let mysql = Mysql::from_source(source).await?;
-    let url = Url::parse(&source.url().value)?;
+    let database_str = &source.url().value;
+
+    let url = Url::parse(database_str)?;
     let err_str = "No database found in connection string";
 
     let mut db_name = url

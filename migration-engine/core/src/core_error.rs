@@ -1,6 +1,6 @@
 use migration_connector::{ConnectorError, ListMigrationsError};
 use std::{error::Error as StdError, fmt::Display};
-use user_facing_errors::KnownError;
+use user_facing_errors::{KnownError, UserFacingError};
 
 use crate::migration::datamodel_calculator::CalculatorError;
 
@@ -18,9 +18,6 @@ pub enum CoreError {
 
     /// When a saved datamodel from a migration in the migrations table is no longer valid.
     InvalidPersistedDatamodel(String),
-
-    /// Failed to render a prisma schema to a string.
-    DatamodelRenderingError(datamodel::diagnostics::Diagnostics),
 
     /// Errors from the connector.
     ConnectorError(ConnectorError),
@@ -50,7 +47,6 @@ impl Display for CoreError {
             CoreError::InvalidPersistedDatamodel(err) => {
                 write!(f, "The migration contains an invalid schema.\n{}", err)
             }
-            CoreError::DatamodelRenderingError(err) => write!(f, "Failed to render the schema to a string ({:?})", err),
             CoreError::ConnectorError(err) => write!(f, "Connector error: {:#}", err),
             CoreError::GatedPreviewFeatures(features) => {
                 let feats: Vec<_> = features.iter().map(|f| format!("`{}`", f)).collect();
@@ -70,7 +66,6 @@ impl StdError for CoreError {
             CoreError::ReceivedBadDatamodel(_) => None,
             CoreError::ProducedBadDatamodel(_) => None,
             CoreError::InvalidPersistedDatamodel(_) => None,
-            CoreError::DatamodelRenderingError(_) => None,
             CoreError::GatedPreviewFeatures(_) => None,
             CoreError::UserFacing(_) => None,
             CoreError::ConnectorError(err) => Some(err),
@@ -85,6 +80,7 @@ impl CoreError {
     pub fn render_user_facing(self) -> user_facing_errors::Error {
         match self {
             CoreError::ConnectorError(err) => err.to_user_facing(),
+            CoreError::UserFacing(err) => err.into(),
             CoreError::ReceivedBadDatamodel(full_error) => {
                 KnownError::new(user_facing_errors::common::SchemaParserError { full_error }).into()
             }
@@ -93,6 +89,11 @@ impl CoreError {
             }
             crate_error => user_facing_errors::Error::from_dyn_error(&crate_error),
         }
+    }
+
+    /// Construct a user facing CoreError
+    pub(crate) fn user_facing(error: impl UserFacingError) -> Self {
+        CoreError::UserFacing(KnownError::new(error))
     }
 }
 

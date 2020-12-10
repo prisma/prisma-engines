@@ -55,6 +55,7 @@ async fn main() -> Result<(), AnyError> {
                 server::listen(opts).await?;
             }
         }
+
         Ok(())
     }
 }

@@ -50,7 +50,7 @@ fn database_schema_is_serializable() {
                             arity: ColumnArity::Nullable,
                             native_type: Some(PostgresType::VarChar(Some(255)).to_json()),
                         },
-                        default: Some(DefaultValue::VALUE(PrismaValue::String("default value".to_string()))),
+                        default: Some(DefaultValue::value("default value".to_string())),
                         auto_increment: false,
                     },
                     Column {
@@ -118,8 +118,6 @@ fn database_schema_is_serializable() {
         }],
         sequences: vec![Sequence {
             name: "sequence1".to_string(),
-            initial_value: 1,
-            allocation_size: 32,
         }],
     };
     let ref_schema_json = include_str!("./resources/schema.json");

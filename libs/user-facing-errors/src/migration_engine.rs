@@ -104,6 +104,50 @@ pub struct MigrationAlreadyApplied {
     pub migration_name: String,
 }
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3009",
+    message = "migrate found failed migrations in the target database, new migrations will not be applied. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n{details}"
+)]
+pub struct FoundFailedMigrations {
+    /// The details about each failed migration.
+    pub details: String,
+}
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3010",
+    message = "The name of the migration is too long. It must not be longer than 200 characters (bytes)."
+)]
+pub struct MigrationNameTooLong;
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3011",
+    message = "Migration `{migration_name}` cannot be rolled back because it was never applied to the database."
+)]
+pub struct CannotRollBackUnappliedMigration {
+    /// The name of the migration.
+    pub migration_name: String,
+}
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3012",
+    message = "Migration `{migration_name}` cannot be rolled back because it is not in a failed state."
+)]
+pub struct CannotRollBackSucceededMigration {
+    /// The name of the migration.
+    pub migration_name: String,
+}
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3013",
+    message = "Datasource provider arrays are no longer supported in migrate. Please change your datasource to use a single provider. Read more at https://pris.ly/multi-provider-deprecation"
+)]
+pub struct DeprecatedProviderArray;
+
 #[cfg(test)]
 mod tests {
     use super::*;
