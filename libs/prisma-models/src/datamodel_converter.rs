@@ -210,24 +210,24 @@ impl<'a> DatamodelConverter<'a> {
                 };
 
                 let manifestation = match (field_a.is_list(), field_b.is_list()) {
-                        (true, true) => TempManifestationHolder::Table,
-                        (false, true) => inline_on_model_a,
-                        (true, false) => inline_on_model_b,
-                        (false, false) => match (references.first(), &related_field_info.references.first()) {
-                            (Some(_), None) => inline_on_this_model,
-                            (None, Some(_)) => inline_on_related_model,
-                            (None, None) => {
-                                if model_a.name < model_b.name {
-                                    inline_on_model_a
-                                } else {
-                                    inline_on_model_b
-                                }
+                    (true, true) => TempManifestationHolder::Table,
+                    (false, true) => inline_on_model_a,
+                    (true, false) => inline_on_model_b,
+                    (false, false) => match (references.first(), &related_field_info.references.first()) {
+                        (Some(_), None) => inline_on_this_model,
+                        (None, Some(_)) => inline_on_related_model,
+                        (None, None) => {
+                            if model_a.name < model_b.name {
+                                inline_on_model_a
+                            } else {
+                                inline_on_model_b
                             }
-                            (Some(_), Some(_)) => {
-                                panic!("It's not allowed that both sides of a relation specify the inline policy. The field was {} on model {}. The related field was {} on model {}.", field.name, model.name, related_field.name, related_model.name)
-                            }
-                        },
-                    };
+                        }
+                        (Some(_), Some(_)) => {
+                            panic!("It's not allowed that both sides of a relation specify the inline policy. The field was {} on model {}. The related field was {} on model {}.", field.name, model.name, related_field.name, related_model.name)
+                        }
+                    },
+                };
 
                 result.push(TempRelationHolder {
                     name: name.clone(),
