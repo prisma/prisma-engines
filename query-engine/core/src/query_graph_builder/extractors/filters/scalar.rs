@@ -25,7 +25,6 @@ pub fn parse(
                         .flatten()
                         .collect();
 
-                    // Filter::and(filters)
                     filters
                 }
             }
@@ -44,8 +43,8 @@ pub fn parse(
             }]
         }
 
+        // Legacy operation
         "notIn" => {
-            // Legacy operation
             let value: PrismaValue = input.try_into()?;
             vec![match value {
                 PrismaValue::Null if reverse => field.equals(value), // not not in null => in null
@@ -77,6 +76,36 @@ pub fn parse(
         "gt" => vec![field.greater_than(as_prisma_value(input)?)],
         "lte" => vec![field.less_than_or_equals(as_prisma_value(input)?)],
         "gte" => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
+
+        // Aggregation filters
+        "count" => todo!(),
+        "avg" => {
+            let inner_object: ParsedInputMap = input.try_into()?;
+
+            let filters: Vec<ScalarFilter> = inner_object
+                .into_iter()
+                .map(|(k, v)| parse(&k, field, v, reverse))
+                .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
+                .into_iter()
+                .flatten()
+                .collect();
+
+            // let map: ParsedInputMap = value.try_into()?;
+            // // let mut filters = vec![];
+            // for (k, v) in map {
+            //     let field = model.fields().find_from_scalar(&key).unwrap();
+
+            //     // filters.extend(extract_scalar_filters(&field, v)?.into_iter().map(||));
+            // }
+
+
+            filters.into_iter().map(|f| )
+
+            todo!()
+        }
+        "sum" => todo!(),
+        "min" => todo!(),
+        "max" => todo!(),
 
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(
