@@ -112,7 +112,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         }
     "#;
 
-    api.infer_apply(&dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into(api.render_table_name("Test"), vec!["id", "age"])
@@ -333,7 +333,7 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
         }
     "#;
 
-    api.infer_apply(&dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
@@ -350,14 +350,13 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
         }
     "#;
 
-    api.infer_apply(&dm2)
+    api.schema_push(dm2)
         .send()
         .await?
         .assert_no_warning()?
         .assert_unexecutable(&[
             "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
-        ])?
-        .assert_no_error()?;
+        ])?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
@@ -392,7 +391,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -419,7 +418,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
         }
     "#;
 
-    api.infer_apply(dm2).force(Some(true)).send().await?.into_inner();
+    api.schema_push(dm2).force(true).send().await?;
     let sql_schema = api.describe_database().await.unwrap();
 
     assert!(sql_schema.table("Category").is_err());
@@ -441,7 +440,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let insert = Insert::single_into(api.render_table_name("User"))
         .value("id", "the-id")
@@ -495,7 +494,7 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let dm2 = r#"
         model User {
@@ -505,16 +504,13 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
         }
     "#;
 
-    let response = api.infer_apply(dm2).send().await?.assert_green()?.into_inner();
+    api.schema_push(dm2).send().await?.assert_green()?;
 
-    assert!(response.warnings.is_empty());
+    api.assert_schema().await?.assert_table("User", |table| {
+        table.assert_column("dogs", |col| col.assert_type_is_string()?.assert_is_required())
+    })?;
 
-    api.assert_schema()
-        .await?
-        .assert_table("User", |table| {
-            table.assert_column("dogs", |col| col.assert_type_is_string()?.assert_is_required())
-        })
-        .map(drop)
+    Ok(())
 }
 
 #[test_each_connector]
@@ -527,7 +523,7 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let dm2 = r#"
         model User {
@@ -537,16 +533,13 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
         }
     "#;
 
-    let response = api.infer_apply(dm2).send().await?.assert_green()?.into_inner();
+    api.schema_push(dm2).send().await?.assert_green()?;
 
-    assert!(response.warnings.is_empty());
+    api.assert_schema().await?.assert_table("User", |table| {
+        table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
+    })?;
 
-    api.assert_schema()
-        .await?
-        .assert_table("User", |table| {
-            table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
-        })
-        .map(drop)
+    Ok(())
 }
 
 #[test_each_connector(capabilities("enums"))]
@@ -777,7 +770,7 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let conn = api.database();
     let insert = Insert::single_into(api.render_table_name("User")).value("id", 5).value(
@@ -793,12 +786,12 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
         }
     "#;
 
-    api.infer_apply(dm2)
-        .force(Some(true))
+    api.schema_push(dm2)
+        .force(true)
         .send()
         .await?
         .assert_executable()?
-        .assert_warnings(&[])?;
+        .assert_no_warning()?;
 
     api.assert_schema().await?.assert_table("User", |table| {
         table.assert_column("created_at", |column| column.assert_default(Some(DefaultValue::now())))

@@ -216,7 +216,7 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
@@ -247,7 +247,7 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
         }
     "##;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
