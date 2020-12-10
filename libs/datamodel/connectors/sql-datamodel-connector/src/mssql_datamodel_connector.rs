@@ -308,6 +308,12 @@ impl Connector for MsSqlDatamodelConnector {
     }
 }
 
+impl Default for MsSqlDatamodelConnector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
     vec![
         MsSqlType::Text,
