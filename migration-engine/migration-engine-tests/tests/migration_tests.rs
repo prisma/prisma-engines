@@ -78,7 +78,7 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
@@ -111,7 +111,7 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
         api.datasource()
     );
 
-    api.infer_apply(&dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("javaScriptObjectNotation", |c| {
@@ -124,7 +124,7 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
         })
     })?;
 
-    api.infer(&dm).send_assert().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }
@@ -557,11 +557,11 @@ async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm_with).send().await?.assert_green()?;
-    api.infer_apply(dm_without).send().await?.assert_green()?;
-    api.infer_apply(dm_with).send().await?.assert_green()?;
-    api.infer_apply(dm_without).send().await?.assert_green()?;
-    api.infer_apply(dm_with).send().await?.assert_green()?;
+    api.schema_push(dm_with).send().await?.assert_green()?;
+    api.schema_push(dm_without).send().await?.assert_green()?;
+    api.schema_push(dm_with).send().await?.assert_green()?;
+    api.schema_push(dm_without).send().await?.assert_green()?;
+    api.schema_push(dm_with).send().await?.assert_green()?;
 
     Ok(())
 }
