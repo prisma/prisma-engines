@@ -527,6 +527,15 @@ impl<'a> ForeignKeyAssertion<'a> {
 
         Ok(self)
     }
+
+    pub fn assert_restrict_on_delete(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.on_delete_action == ForeignKeyAction::Restrict,
+            "Assertion failed: expected foreign key to restrict on delete."
+        );
+
+        Ok(self)
+    }
 }
 
 pub struct IndexAssertion<'a>(&'a Index);
