@@ -167,7 +167,14 @@ impl<'a> SqlSchemaCalculator<'a> {
                     referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
                     on_update_action: sql::ForeignKeyAction::Cascade,
                     on_delete_action: match column_arity(relation_field.arity()) {
-                        ColumnArity::Required => sql::ForeignKeyAction::Restrict,
+                        ColumnArity::Required => {
+                            // some databases like SQL Server don't support the RESTRICT constraint. In those cases NO ACTION is what we want.
+                            if self.flavour.supports_foreign_key_restrict_constraint() {
+                                sql::ForeignKeyAction::Restrict
+                            } else {
+                                sql::ForeignKeyAction::NoAction
+                            }
+                        }
                         _ => sql::ForeignKeyAction::SetNull,
                     },
                 };

@@ -29,4 +29,9 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn m2m_foreign_key_action(&self, _model_a: &ModelWalker<'_>, _model_b: &ModelWalker<'_>) -> sql::ForeignKeyAction {
         sql::ForeignKeyAction::Cascade
     }
+
+    /// returns whether the underlying databasae supports the RESTRICT setting for ON DELETE + ON UPDATE
+    fn supports_foreign_key_restrict_constraint(&self) -> bool {
+        true
+    }
 }

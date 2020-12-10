@@ -86,4 +86,8 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
             ForeignKeyAction::Cascade
         }
     }
+
+    fn supports_foreign_key_restrict_constraint(&self) -> bool {
+        false
+    }
 }
