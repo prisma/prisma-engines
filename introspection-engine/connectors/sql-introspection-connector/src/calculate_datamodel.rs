@@ -511,7 +511,6 @@ mod tests {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
                             character_maximum_length: None,
-
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                             native_type: Some(PostgresType::Integer.to_json()),
@@ -524,8 +523,6 @@ mod tests {
                         columns: vec!["primary".to_string()],
                         sequence: Some(Sequence {
                             name: "sequence".to_string(),
-                            initial_value: 1,
-                            allocation_size: 1,
                         }),
                         constraint_name: None,
                     }),

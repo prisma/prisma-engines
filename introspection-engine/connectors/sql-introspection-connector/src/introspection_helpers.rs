@@ -147,8 +147,9 @@ pub(crate) fn calculate_scalar_field(
     } else {
         calculate_scalar_field_type(column, family)
     };
+    let is_id = is_id(&column, &table);
     let arity = match column.tpe.arity {
-        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => FieldArity::Required,
+        _ if is_id && column.auto_increment => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
@@ -178,7 +179,6 @@ pub(crate) fn calculate_scalar_field(
         _ => (false, None),
     };
 
-    let is_id = is_id(&column, &table);
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
     ScalarField {
