@@ -25,18 +25,27 @@ pub enum Filter {
     Relation(RelationFilter),
     NodeSubscription,
     BoolFilter(bool),
-    Aggregation(Box<AggregationFilter>),
+    Aggregation(AggregationFilter),
     Empty,
 }
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub enum AggregationFilter {
-    Count(Filter),
-    Average(Filter),
-    Sum(Filter),
-    Min(Filter),
-    Max(Filter),
+    Count(Box<Filter>),
+    Average(Box<Filter>),
+    Sum(Box<Filter>),
+    Min(Box<Filter>),
+    Max(Box<Filter>),
 }
+
+// #[derive(Debug, Clone, Eq, Hash, PartialEq)]
+// pub enum AggregationFilterType {
+//     Count,
+//     Average,
+//     Sum,
+//     Min,
+//     Max,
+// }
 
 impl Filter {
     pub fn and(filters: Vec<Filter>) -> Self {
@@ -144,6 +153,10 @@ impl Filter {
             Filter::Aggregation(_) => {}
             Filter::Empty => {}
         }
+    }
+
+    pub fn average(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Average(Box::new(condition)))
     }
 }
 
