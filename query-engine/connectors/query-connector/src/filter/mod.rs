@@ -38,15 +38,6 @@ pub enum AggregationFilter {
     Max(Box<Filter>),
 }
 
-// #[derive(Debug, Clone, Eq, Hash, PartialEq)]
-// pub enum AggregationFilterType {
-//     Count,
-//     Average,
-//     Sum,
-//     Min,
-//     Max,
-// }
-
 impl Filter {
     pub fn and(filters: Vec<Filter>) -> Self {
         Filter::And(filters)

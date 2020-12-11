@@ -26,7 +26,9 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         .map(|field| resolve_query(field, &model))
         .collect::<QueryGraphBuilderResult<_>>()?;
 
-    verify_selections(&selectors, &group_by).and_then(|_| verify_orderings(&args.order_by, &group_by))?;
+    verify_selections(&selectors, &group_by)
+        .and_then(|_| verify_orderings(&args.order_by, &group_by))
+        .and_then(|_| verify_having(having.as_ref(), &selectors))?;
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
         name,
@@ -83,6 +85,53 @@ fn verify_orderings(orderings: &[OrderBy], group_by: &[ScalarFieldRef]) -> Query
             "Every field used for orderBy must be included in the by-arguments of the query. Missing fields: {}",
             missing_fields.join(", ")
         )))
+    }
+}
+
+/// Cross checks that every scalar field used in `having` is either an aggregate or contained in the selectors.
+fn verify_having(having: Option<&Filter>, selectors: &[AggregationSelection]) -> QueryGraphBuilderResult<()> {
+    if let Some(filter) = having {
+        let having_fields: Vec<&ScalarFieldRef> = collect_scalar_fields(filter);
+        let selector_fields: Vec<&ScalarFieldRef> = selectors
+            .into_iter()
+            .filter_map(|selector| match selector {
+                AggregationSelection::Field(field) => Some(field),
+                _ => None,
+            })
+            .collect();
+
+        let missing_fields: Vec<String> = having_fields
+            .into_iter()
+            .filter_map(|field| {
+                if selector_fields.contains(&field) {
+                    None
+                } else {
+                    Some(field.name.clone())
+                }
+            })
+            .collect();
+
+        if missing_fields.is_empty() {
+            Ok(())
+        } else {
+            Err(QueryGraphBuilderError::InputError(format!(
+                    "Every field used in `having` filters must either be an aggregation filter or be included in the selection of the query. Missing fields: {}",
+                    missing_fields.join(", ")
+                )))
+        }
+    } else {
+        Ok(())
+    }
+}
+
+/// Collects all flat scalar fields that are used in the having filter.
+fn collect_scalar_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
+    match filter {
+        Filter::And(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::Or(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::Not(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::Scalar(sf) => sf.projection.scalar_fields(),
+        _ => unreachable!(), // Only scalar filters are allowed.
     }
 }
 

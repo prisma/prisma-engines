@@ -10,6 +10,15 @@ pub enum ScalarProjection {
     Compound(Vec<ScalarFieldRef>),
 }
 
+impl ScalarProjection {
+    pub fn scalar_fields(&self) -> Vec<&ScalarFieldRef> {
+        match self {
+            ScalarProjection::Single(sf) => vec![sf],
+            ScalarProjection::Compound(sfs) => sfs.iter().map(|sf| sf).collect(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Filtering with a scalar value. From a GraphQL point of view this is in the
 /// head of the query:
