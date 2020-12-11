@@ -165,7 +165,7 @@ impl RpcImpl {
 
         // 3. Render the datamodel and then parse it. This makes sure the validations & standardisations have been run.
         let rendered_datamodel = datamodel::render_datamodel_and_config_to_string(&dm_that_needs_fixing, &config);
-        datamodel::parse_datamodel(&rendered_datamodel)
+        let final_dm = datamodel::parse_datamodel(&rendered_datamodel)
             .map(|d| d.subject)
             .map_err(|err| {
                 Error::from(CommandError::ReceivedBadDatamodel(
@@ -173,7 +173,7 @@ impl RpcImpl {
                 ))
             })?;
 
-        Ok(dm_that_needs_fixing)
+        Ok(final_dm)
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {
