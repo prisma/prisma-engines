@@ -42,9 +42,8 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
     }))
 }
 
-/// Cross checks that the selections of the request are valid with regard to the requested group bys.
-/// Rules:
-/// - Every plain scalar field in the selectors must be present in the group by as well.
+/// Cross checks that the selections of the request are valid with regard to the requested group bys:
+/// Every plain scalar field in the selectors must be present in the group by as well.
 fn verify_selections(selectors: &[AggregationSelection], group_by: &[ScalarFieldRef]) -> QueryGraphBuilderResult<()> {
     let mut missing_fields = vec![];
 
@@ -139,15 +138,18 @@ fn extract_grouping(value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Scal
     match value {
         ParsedInputValue::ScalarField(field) => Ok(vec![field]),
 
-        ParsedInputValue::List(list) => list
+        ParsedInputValue::List(list) if list.len() > 0 => list
             .into_iter()
             .map(|item| Ok(item.try_into()?))
             .collect::<QueryGraphBuilderResult<Vec<ScalarFieldRef>>>(),
 
-        _ => {
-            return Err(QueryGraphBuilderError::InputError(
-                "Expected parsing to guarantee either a single enum or list a list of enums is provided for group by `by` arg.".to_owned(),
-            ))
-        }
+        ParsedInputValue::List(list) if list.len() == 0 => Err(QueryGraphBuilderError::InputError(
+            "At least one selection is required for the `by` argument.".to_owned(),
+        )),
+
+        _ => Err(QueryGraphBuilderError::InputError(
+            "Expected parsing to guarantee either a single enum or a list of enums is provided for group by `by` arg."
+                .to_owned(),
+        )),
     }
 }
