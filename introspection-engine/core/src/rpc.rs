@@ -137,7 +137,7 @@ impl RpcImpl {
     /// In this processes it applies a patch to turn virtual relation fields that are required into optional instead.
     /// The reason for this is that we introduced a breaking change to disallow required virtual relation fields.
     /// With this patch we can tell users to simply run `prisma introspect` to fix their schema.
-    fn parse_datamodel(schema: &str, config: &Configuration) -> RpcResult<Datamodel> {
+    pub fn parse_datamodel(schema: &str, config: &Configuration) -> RpcResult<Datamodel> {
         // 1. Parse the schema without any validations & standardisations. A required virtual relation field would fail validation as it is forbidden.
         let mut dm_that_needs_fixing = datamodel::parse_datamodel_without_validation(&schema).map_err(|err| {
             Error::from(CommandError::ReceivedBadDatamodel(

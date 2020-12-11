@@ -1626,9 +1626,7 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
 
     let result = api.re_introspect(input_dm).await?;
 
-    println!("{}", result);
     assert_eq_datamodels!(final_dm, &result);
-    assert!(false, "false");
 
     Ok(())
 }
