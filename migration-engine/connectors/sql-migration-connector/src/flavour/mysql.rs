@@ -62,7 +62,7 @@ impl SqlFlavour for MysqlFlavour {
             for error in &errors {
                 errors_string.push_str("- ");
                 errors_string.push_str(error);
-                errors_string.push_str("\n");
+                errors_string.push('\n');
             }
 
             Some(user_facing_errors::common::DatabaseVersionIncompatibility {

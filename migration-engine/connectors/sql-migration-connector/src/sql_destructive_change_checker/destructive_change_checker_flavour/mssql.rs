@@ -90,24 +90,22 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
                 },
                 step_index,
             )
+        } else if columns.next().arity().is_required() && columns.next().default().is_none() {
+            plan.push_unexecutable(
+                UnexecutableStepCheck::DropAndRecreateRequiredColumn {
+                    column: columns.previous().name().to_owned(),
+                    table: columns.previous().table().name().to_owned(),
+                },
+                step_index,
+            )
         } else {
-            if columns.next().arity().is_required() && columns.next().default().is_none() {
-                plan.push_unexecutable(
-                    UnexecutableStepCheck::DropAndRecreateRequiredColumn {
-                        column: columns.previous().name().to_owned(),
-                        table: columns.previous().table().name().to_owned(),
-                    },
-                    step_index,
-                )
-            } else {
-                plan.push_warning(
-                    SqlMigrationWarningCheck::DropAndRecreateColumn {
-                        column: columns.previous().name().to_owned(),
-                        table: columns.previous().table().name().to_owned(),
-                    },
-                    step_index,
-                )
-            }
+            plan.push_warning(
+                SqlMigrationWarningCheck::DropAndRecreateColumn {
+                    column: columns.previous().name().to_owned(),
+                    table: columns.previous().table().name().to_owned(),
+                },
+                step_index,
+            )
         }
     }
 }

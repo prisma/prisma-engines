@@ -312,7 +312,7 @@ impl SqlRenderer for PostgresFlavour {
         let primary_columns = table.primary_key_column_names();
         let pk_column_names = primary_columns
             .into_iter()
-            .flat_map(|cols| cols.into_iter())
+            .flat_map(|cols| cols.iter())
             .map(|col| self.quote(col))
             .join(",");
         let pk = if !pk_column_names.is_empty() {

@@ -98,7 +98,7 @@ pub(crate) trait SqlFlavour:
     }
 
     /// Table to store applied migrations.
-    fn imperative_migrations_table<'a>(&'a self) -> Table<'a> {
+    fn imperative_migrations_table(&self) -> Table<'_> {
         self.imperative_migrations_table_name().into()
     }
 }

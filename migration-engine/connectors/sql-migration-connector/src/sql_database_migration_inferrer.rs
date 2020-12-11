@@ -74,7 +74,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
         let migration = SqlMigration {
             before: actual_schema,
             after: expected_schema,
-            steps: steps,
+            steps,
         };
 
         let diagnostics = self.destructive_change_checker().pure_check(&migration);

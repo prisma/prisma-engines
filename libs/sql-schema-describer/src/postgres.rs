@@ -136,7 +136,7 @@ impl SqlSchemaDescriber {
     ) -> Table {
         let (indices, primary_key) = indices.remove(name).unwrap_or_else(|| (Vec::new(), None));
         let foreign_keys = foreign_keys.remove(name).unwrap_or_else(Vec::new);
-        let columns = columns.remove(name).unwrap_or(vec![]);
+        let columns = columns.remove(name).unwrap_or_default();
         Table {
             name: name.to_string(),
             columns,
@@ -168,18 +168,18 @@ impl SqlSchemaDescriber {
                 info.column_default,
                 info.is_nullable,
                 info.is_identity,
-                info.data_type, 
+                info.data_type,
                 info.character_maximum_length
             FROM information_schema.columns info
             JOIN pg_attribute  att on att.attname = info.column_name
             And att.attrelid = (
-            	SELECT pg_class.oid 
-            	FROM pg_class 
+            	SELECT pg_class.oid
+            	FROM pg_class
             	JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
             	WHERE relname = info.table_name
             	AND pg_namespace.nspname = $1
             	)
-            WHERE table_schema = $1	
+            WHERE table_schema = $1
             ORDER BY ordinal_position;
         "#;
 
@@ -222,23 +222,23 @@ impl SqlSchemaDescriber {
     fn get_precision(col: &ResultRow) -> Precision {
         let (character_maximum_length, numeric_precision, numeric_scale, time_precision) =
             if matches!(col.get_expect_string("data_type").as_str(), "ARRAY") {
-                fn get_single(formatted_type: &String) -> Option<u32> {
+                fn get_single(formatted_type: &str) -> Option<u32> {
                     static SINGLE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#".*\(([0-9]*)\).*\[\]$"#).unwrap());
 
                     SINGLE_REGEX
-                        .captures(formatted_type.as_str())
+                        .captures(formatted_type)
                         .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()))
                 }
 
-                fn get_dual(formatted_type: &String) -> (Option<u32>, Option<u32>) {
+                fn get_dual(formatted_type: &str) -> (Option<u32>, Option<u32>) {
                     static DUAL_REGEX: Lazy<Regex> =
                         Lazy::new(|| Regex::new(r#"numeric\(([0-9]*),([0-9]*)\)\[\]$"#).unwrap());
                     let first = DUAL_REGEX
-                        .captures(formatted_type.as_str())
+                        .captures(formatted_type)
                         .and_then(|cap| cap.get(1).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
 
                     let second = DUAL_REGEX
-                        .captures(formatted_type.as_str())
+                        .captures(formatted_type)
                         .and_then(|cap| cap.get(2).map(|precision| from_str::<u32>(precision.as_str()).unwrap()));
 
                     (first, second)
@@ -728,8 +728,8 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     };
 
     ColumnType {
-        data_type: data_type.to_owned(),
-        full_data_type: full_data_type.to_owned(),
+        data_type,
+        full_data_type,
         character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
         family,
         arity,
@@ -747,7 +747,7 @@ static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
 /// Returns the name of the sequence in the schema that the defaultvalue matches if it is drawn from one of them
 fn is_autoincrement(value: &str, sequences: &[Sequence]) -> Option<String> {
     AUTOINCREMENT_REGEX.captures(value).and_then(|captures| {
-        let sequence_name = captures.name("sequence").or(captures.name("sequence2"));
+        let sequence_name = captures.name("sequence").or_else(|| captures.name("sequence2"));
 
         sequence_name.and_then(|name| {
             sequences

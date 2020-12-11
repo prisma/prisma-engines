@@ -10,7 +10,7 @@ use crate::{
 };
 
 /// Traverse all the columns in the schema.
-pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWalker<'a>> + 'a {
+pub fn walk_columns(schema: &SqlSchema) -> impl Iterator<Item = ColumnWalker<'_>> {
     schema.tables.iter().enumerate().flat_map(move |(table_index, table)| {
         (0..table.columns.len()).map(move |column_index| ColumnWalker {
             schema,
@@ -474,7 +474,7 @@ impl<'a> EnumWalker<'a> {
 /// Extension methods for the traversal of a SqlSchema.
 pub trait SqlSchemaExt {
     /// Find an enum by index.
-    fn enum_walker_at<'a>(&'a self, index: usize) -> EnumWalker<'a>;
+    fn enum_walker_at(&self, index: usize) -> EnumWalker<'_>;
 
     /// Find a table by name.
     fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
@@ -484,7 +484,7 @@ pub trait SqlSchemaExt {
 }
 
 impl SqlSchemaExt for SqlSchema {
-    fn enum_walker_at<'a>(&'a self, index: usize) -> EnumWalker<'a> {
+    fn enum_walker_at(&self, index: usize) -> EnumWalker<'_> {
         EnumWalker {
             schema: self,
             enum_index: index,

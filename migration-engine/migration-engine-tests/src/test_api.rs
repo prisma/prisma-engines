@@ -244,7 +244,7 @@ impl TestApi {
         MarkMigrationApplied::new(&self.api, migration_name.into(), migrations_directory)
     }
 
-    pub fn mark_migration_rolled_back<'a>(&'a self, migration_name: impl Into<String>) -> MarkMigrationRolledBack<'a> {
+    pub fn mark_migration_rolled_back(&self, migration_name: impl Into<String>) -> MarkMigrationRolledBack<'_> {
         MarkMigrationRolledBack::new(&self.api, migration_name.into())
     }
 
