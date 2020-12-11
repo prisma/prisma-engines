@@ -9,6 +9,7 @@ mod initialization;
 mod list_migration_directories;
 mod migration_persistence;
 mod migrations;
+mod native_types;
 mod reset;
 mod schema_push;
 

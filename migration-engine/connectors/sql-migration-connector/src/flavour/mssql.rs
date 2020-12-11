@@ -1,7 +1,8 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
 use connection_string::JdbcString;
+use enumflags2::BitFlags;
 use indoc::formatdoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
 use quaint::{
     connector::MssqlUrl,
     prelude::{SqlFamily, Table},
@@ -10,11 +11,18 @@ use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBack
 use std::str::FromStr;
 
 #[derive(Debug)]
-pub(crate) struct MssqlFlavour(pub(crate) MssqlUrl);
+pub(crate) struct MssqlFlavour {
+    pub(crate) url: MssqlUrl,
+    features: BitFlags<MigrationFeature>,
+}
 
 impl MssqlFlavour {
+    pub fn new(url: MssqlUrl, features: BitFlags<MigrationFeature>) -> Self {
+        Self { url, features }
+    }
+
     pub(crate) fn schema_name(&self) -> &str {
-        self.0.schema()
+        self.url.schema()
     }
 
     /// Get the url as a JDBC string, extract the database name, and re-encode the string.
@@ -179,7 +187,7 @@ impl SqlFlavour for MssqlFlavour {
             .map_err(ConnectorError::from)
             .map_err(|err| err.into_shadow_db_creation_error())?;
 
-        let mut jdbc_string: JdbcString = self.0.connection_string().parse().unwrap();
+        let mut jdbc_string: JdbcString = self.url.connection_string().parse().unwrap();
         jdbc_string
             .properties_mut()
             .insert("database".into(), database_name.clone());
@@ -230,5 +238,9 @@ impl SqlFlavour for MssqlFlavour {
         connection.raw_cmd(&drop_database).await?;
 
         sql_schema_result
+    }
+
+    fn features(&self) -> BitFlags<MigrationFeature> {
+        self.features
     }
 }

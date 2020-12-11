@@ -1,47 +1,37 @@
 use crate::{CoreError, CoreResult};
+use enumflags2::BitFlags;
+use migration_connector::MigrationFeature;
 
 /// A tool to prevent using unfinished features from the Migration Engine.
+#[derive(Clone, Copy, Debug)]
 pub struct GateKeeper {
-    blacklist: &'static [&'static str],
-    whitelist: Vec<String>,
+    blacklist: BitFlags<MigrationFeature>,
+    whitelist: BitFlags<MigrationFeature>,
 }
 
 impl GateKeeper {
     /// Creates a new instance, blocking features defined in the constructor.
-    pub fn new(whitelist: Vec<String>) -> Self {
+    pub fn new(whitelist: BitFlags<MigrationFeature>) -> Self {
         Self {
-            blacklist: &["nativeTypes"],
+            blacklist: BitFlags::from(MigrationFeature::NativeTypes),
             whitelist,
         }
     }
 
     /// Returns an error if any of the given features are blocked.
-    pub fn any_blocked<'a, I>(&'a self, features: I) -> CoreResult<()>
-    where
-        I: Iterator<Item = &'a str>,
-    {
-        if self.whitelist.iter().any(|s| s == "all") {
+    pub fn any_blocked(&self, features: BitFlags<MigrationFeature>) -> CoreResult<()> {
+        if self.whitelist.contains(features) {
             return Ok(());
         }
 
-        let blacklist = self.blacklist;
-        let whitelist = &self.whitelist;
+        let blocked = !self.whitelist & self.blacklist & features;
 
-        let mut blocked = features
-            .filter(move |s| !whitelist.iter().any(|w| s == w) && blacklist.contains(s))
-            .peekable();
-
-        if blocked.peek().is_some() {
-            Err(CoreError::GatedPreviewFeatures(
-                blocked.map(ToString::to_string).collect(),
-            ))
-        } else {
+        if blocked.is_empty() {
             Ok(())
+        } else {
+            Err(CoreError::GatedPreviewFeatures(
+                blocked.iter().map(|feat| format!("{}", feat)).collect(),
+            ))
         }
-    }
-
-    /// Returns a whitelist vector allowing all gated features.
-    pub fn allow_all_whitelist() -> Vec<String> {
-        vec![String::from("all")]
     }
 }
