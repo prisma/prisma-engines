@@ -147,6 +147,7 @@ impl ColumnChanges {
         !self.changes.is_empty()
     }
 
+    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
     pub(crate) fn iter<'a>(&'a self) -> impl Iterator<Item = ColumnChange> + 'a {
         self.changes.iter()
     }

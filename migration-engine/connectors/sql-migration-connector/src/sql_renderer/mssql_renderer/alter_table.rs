@@ -127,7 +127,7 @@ impl<'a> AlterTableConstructor<'a> {
     }
 
     fn add_primary_key(&mut self, columns: &[String]) {
-        let non_quoted_columns = columns.iter().map(|colname| colname);
+        let non_quoted_columns = columns.iter();
         let mut quoted_columns = Vec::with_capacity(columns.len());
 
         for colname in columns {

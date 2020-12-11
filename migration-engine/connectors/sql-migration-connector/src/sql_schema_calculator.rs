@@ -178,6 +178,7 @@ impl<'a> SqlSchemaCalculator<'a> {
         }
     }
 
+    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
     fn calculate_relation_tables<'b>(&'b self) -> impl Iterator<Item = sql::Table> + 'b {
         walk_relations(self.data_model)
             .filter_map(|relation| relation.as_m2m())

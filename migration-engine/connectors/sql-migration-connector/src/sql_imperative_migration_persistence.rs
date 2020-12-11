@@ -27,7 +27,7 @@ impl ImperativeMigrationsPersistence for SqlMigrationConnector {
         if !schema.is_empty() {
             return Err(ConnectorError::user_facing_error(
                 user_facing_errors::migration_engine::DatabaseSchemaNotEmpty {
-                    database_name: self.connection.connection_info().database_location().to_owned(),
+                    database_name: self.connection.connection_info().database_location(),
                 },
             ));
         }

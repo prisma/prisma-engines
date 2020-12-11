@@ -30,7 +30,7 @@ impl MssqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MssqlFlavour {
-    fn imperative_migrations_table<'a>(&'a self) -> Table<'a> {
+    fn imperative_migrations_table(&self) -> Table<'_> {
         (self.schema_name(), self.imperative_migrations_table_name()).into()
     }
 
