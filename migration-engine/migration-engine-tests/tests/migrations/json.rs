@@ -17,7 +17,7 @@ async fn database_level_json_defaults_can_be_defined(api: &TestApi) -> TestResul
         datasource = api.datasource()
     );
 
-    api.infer_apply(&dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Dog", |table| {
         table.assert_column("favouriteThings", |column| {
@@ -38,7 +38,7 @@ async fn database_level_json_defaults_can_be_defined(api: &TestApi) -> TestResul
     })?;
 
     // Check that the migration is idempotent.
-    api.infer_apply(&dm).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }

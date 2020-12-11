@@ -11,7 +11,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let insert = quaint::ast::Insert::single_into(api.render_table_name("User"))
         .value("id", "abc")
@@ -28,7 +28,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_warnings(&[
+    api.schema_push(dm2).send().await?.assert_warnings(&[
         "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `Int` to `Boolean`.".into()
     ])?;
 
@@ -102,7 +102,7 @@ async fn changing_a_string_array_column_to_scalar_is_fine(api: &TestApi) -> Test
         datasource_block = datasource_block,
     );
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(&dm1).send().await?.assert_green()?;
 
     api.insert("Film")
         .value("id", "film1")
@@ -161,7 +161,7 @@ async fn changing_an_int_array_column_to_scalar_is_not_possible(api: &TestApi) -
         datasource_block = datasource_block,
     );
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(&dm1).send().await?.assert_green()?;
 
     api.insert("Film")
         .value("id", "film1")
@@ -221,7 +221,7 @@ async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> 
         datasource_block = datasource_block,
     );
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(&dm1).send().await?.assert_green()?;
 
     api.insert("Film")
         .value("id", "film1")

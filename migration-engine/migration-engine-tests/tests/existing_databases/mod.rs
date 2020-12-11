@@ -83,7 +83,7 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
         }
     "#;
 
-    api.infer_apply(&dm).force(Some(true)).send().await?.assert_green()?;
+    api.schema_push(dm).force(true).send().await?.assert_green()?;
 
     let final_schema = api.describe_database().await?;
 
@@ -208,7 +208,8 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
             }
         "#;
 
-    api.infer_apply(&dm1).send().await?.into_inner();
+    api.schema_push(dm1).send().await?;
+
     let initial_result = api.describe_database().await?;
     assert!(initial_result.table_bang("Blog").column("title").is_some());
 
@@ -222,6 +223,7 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
             });
         })
         .await?;
+
     assert!(result.table_bang("Blog").column("title").is_none());
 
     let dm2 = r#"
@@ -249,7 +251,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
             }
         "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let result = api
         .barrel()
@@ -271,7 +273,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
             }
         "#;
 
-    api.infer_apply(&dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_equals(&result)?;
 
@@ -358,7 +360,7 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
         }
     "#;
 
-    api.infer_apply(&dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     let final_result = api.assert_schema().await?.into_schema();
     let final_column = final_result.table_bang("Blog").column_bang("new_title");
