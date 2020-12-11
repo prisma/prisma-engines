@@ -24,7 +24,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
 
     let dm = "";
 
-    api.infer_apply(&dm)
+    api.schema_push(dm)
         .send()
         .await?
         .assert_warnings(&["You are about to drop the `Test` table, which is not empty (1 rows).".into()])?;
@@ -60,7 +60,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
             }
         "#;
 
-    api.infer_apply(&dm).send().await?.assert_warnings(&[
+    api.schema_push(dm).send().await?.assert_warnings(&[
         "You are about to drop the column `puppiesCount` on the `Test` table, which still contains 2 non-null values."
             .into(),
     ])?;
@@ -128,7 +128,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         }
     "#;
 
-    api.infer_apply(&dm2).send().await?.assert_warnings(&[
+    api.schema_push(dm2).send().await?.assert_warnings(&[
         "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `Int` to `Float`."
             .into(),
     ])?;
@@ -176,7 +176,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     .unwrap_or_else(String::new)
             );
 
-            api.infer_apply(&dm1).force(Some(true)).send().await?;
+            api.schema_push(dm1).force(true).send().await?;
 
             api.assert_schema().await?.assert_table(model_name, |table| {
                 table.assert_column("name", |column| {
@@ -238,7 +238,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     .unwrap_or_else(String::new)
             );
 
-            api.infer_apply(&dm2).send().await?.assert_green()?;
+            api.schema_push(dm2).send().await?.assert_green()?;
         }
 
         // Check that the data is still there
@@ -283,7 +283,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
         }
     "#;
 
-    api.infer_apply(&dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "age"])
@@ -299,13 +299,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
         }
     "#;
 
-    let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
-
-    anyhow::ensure!(
-        migration_output.warnings.is_empty(),
-        "Migration warnings should be empty. Got {:#?}",
-        migration_output.warnings
-    );
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_ne(&original_database_schema)?;
 
@@ -460,9 +454,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         }
     "#;
 
-    let output = api.infer_apply(dm2).send().await?.assert_green()?.into_inner();
-
-    assert!(output.warnings.is_empty());
+    api.schema_push(dm2).send().await?.assert_green()?.assert_green()?;
 
     // Check that the string values are still there.
     let select = Select::from_table(api.render_table_name("User"))
@@ -561,7 +553,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         }
     "#;
 
-    api.infer_apply(dm1)
+    api.schema_push(dm1)
         .migration_id(Some("initial-setup"))
         .send()
         .await?
@@ -593,7 +585,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         }
     "#;
 
-    api.infer_apply(dm2)
+    api.schema_push(dm2)
         .migration_id(Some("add-absolutely-fabulous-variant"))
         .send()
         .await?
@@ -670,7 +662,7 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.infer_apply(dm1)
+    api.schema_push(dm1)
         .migration_id(Some("initial-setup"))
         .send()
         .await?
@@ -702,9 +694,9 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
     "#;
 
     let res = api
-        .infer_apply(dm2)
+        .schema_push(dm2)
         .migration_id(Some("add-absolutely-fabulous-variant"))
-        .force(Some(true))
+        .force(true)
         .send()
         .await?;
 
@@ -900,7 +892,7 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
         }
     "#;
 
-    api.infer_apply(dm1)
+    api.schema_push(dm1)
         .migration_id(Some("initial-setup"))
         .send()
         .await?
@@ -926,9 +918,9 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
     "#;
 
     let res = api
-        .infer_apply(dm2)
+        .schema_push(dm2)
         .migration_id(Some("remove-used-variant"))
-        .force(Some(true))
+        .force(true)
         .send()
         .await;
 
