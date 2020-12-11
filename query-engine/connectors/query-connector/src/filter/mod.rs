@@ -145,13 +145,7 @@ impl Filter {
             Filter::Or(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
             Filter::Not(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
             Filter::Scalar(sf) => sf.mode = mode,
-            Filter::ScalarList(_) => {}
-            Filter::OneRelationIsNull(_) => {}
-            Filter::Relation(_) => {}
-            Filter::NodeSubscription => {}
-            Filter::BoolFilter(_) => {}
-            Filter::Aggregation(_) => {}
-            Filter::Empty => {}
+            _ => {}
         }
     }
 
