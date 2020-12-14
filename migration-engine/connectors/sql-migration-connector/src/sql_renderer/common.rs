@@ -13,15 +13,6 @@ pub(crate) enum Quoted<T> {
 }
 
 impl<T> Quoted<T> {
-    fn quote_that_too<U>(&self, u: U) -> Quoted<U> {
-        match self {
-            Quoted::Double(_) => Quoted::Double(u),
-            Quoted::Single(_) => Quoted::Single(u),
-            Quoted::Backticks(_) => Quoted::Backticks(u),
-            Quoted::SquareBrackets(_) => Quoted::SquareBrackets(u),
-        }
-    }
-
     pub(crate) fn mysql_string(contents: T) -> Quoted<T> {
         Quoted::Single(contents)
     }
@@ -58,23 +49,6 @@ where
             Quoted::Backticks(inner) => write!(f, "`{}`", inner),
             Quoted::SquareBrackets(inner) => write!(f, "[{}]", inner),
         }
-    }
-}
-
-#[derive(Debug)]
-pub(crate) struct QuotedWithSchema<'a, T> {
-    pub(crate) schema_name: &'a str,
-    pub(crate) name: Quoted<T>,
-}
-
-impl<'a, T> Display for QuotedWithSchema<'a, T>
-where
-    T: Display,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let quoted_schema = self.name.quote_that_too(self.schema_name);
-
-        write!(f, "{}.{}", quoted_schema, self.name)
     }
 }
 

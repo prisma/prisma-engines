@@ -318,7 +318,7 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                     indoc! {
                         r#"
                         -- CreateEnum
-                        CREATE TYPE "prisma-tests"."Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
 
                         -- CreateTable
                         CREATE TABLE "Cat" (
@@ -344,6 +344,58 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                     }
                 }
                 SqlFamily::Sqlite | SqlFamily::Mssql => unreachable!("no enums -.-"),
+            };
+
+            migration.assert_contents(expected_script)
+        })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
+    let dm = r#"
+        datasource test {
+          provider = "postgresql"
+          url = "postgresql://unreachable:unreachable@example.com/unreachable"
+        }
+
+        model Cat {
+            id      Int @id
+            mood    Mood
+        }
+
+        enum Mood{
+            HUNGRY
+            SLEEPY
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("create-cats", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .assert_migration("create-cats", |migration| {
+            let expected_script = match api.sql_family() {
+                SqlFamily::Postgres => {
+                    indoc! {
+                        r#"
+                        -- CreateEnum
+                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                            "id" INTEGER NOT NULL,
+                            "mood" "Mood" NOT NULL,
+
+                            PRIMARY KEY ("id")
+                        );
+                        "#
+                    }
+                }
+                _ => unreachable!(),
             };
 
             migration.assert_contents(expected_script)
