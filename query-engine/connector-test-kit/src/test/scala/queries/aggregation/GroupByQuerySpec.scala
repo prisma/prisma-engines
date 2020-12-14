@@ -313,4 +313,17 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       errorContains = "Every field used for orderBy must be included in the by-arguments of the query. Missing fields: s"
     )
   }
+
+  "Using a groupBy with an empty aggregation selection" should "throw an appropriate error" in {
+    server.queryThatMustFail(
+      s"""{
+         |  groupByModel(by: [s]) {
+         |    sum
+         |  }
+         |}""".stripMargin,
+      project,
+      errorCode = 2009,
+      errorContains = "Expected a minimum of 1 fields to be present, got 0."
+    )
+  }
 }
