@@ -1567,3 +1567,66 @@ async fn schemas_with_required_virtual_relation_fields_must_be_handlded_graceful
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn custom_repro(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("tag", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("name", types::text().unique(true));
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("tag_id", types::integer().nullable(false));
+                t.add_foreign_key(&["tag_id"], "tag", &["id"]);
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await?;
+
+    let input_dm = indoc! {r#"
+        model Post{
+          id        Int       @id @default(autoincrement())
+          tag_id    Int
+          tag       Tag       @relation("post_to_tag", fields:[tag_id])
+        }
+               
+        model Tag {
+          id        Int       @id @default(autoincrement())
+          name      String    @unique
+          posts     Post[]    @relation("post_to_tag")  
+          @@map("tag")
+        }
+    "#};
+
+    let final_dm = indoc! {r#"
+        model Post{
+          id        Int       @id @default(autoincrement())
+          tag_id    Int
+          tag       Tag       @relation("post_to_tag", fields:[tag_id])
+        }
+               
+        model Tag {
+          id        Int       @id @default(autoincrement())
+          name      String    @unique
+          posts     Post[]    @relation("post_to_tag")  
+          @@map("tag")
+        }
+
+        model Unrelated {
+          id        Int      @id @default(autoincrement())
+        }
+
+    "#};
+
+    let result = api.re_introspect(input_dm).await?;
+
+    assert_eq_datamodels!(final_dm, &result);
+
+    Ok(())
+}
