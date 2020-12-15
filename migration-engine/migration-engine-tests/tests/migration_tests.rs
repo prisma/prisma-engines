@@ -1,22 +1,16 @@
-mod apply_migration;
 mod apply_migrations;
-mod calculate_database_steps;
 mod create_migration;
-mod datamodel_calculator;
-mod datamodel_steps_inferrer;
 mod diagnose_migration_history;
 mod errors;
 mod evaluate_data_loss;
 mod existing_data;
 mod existing_databases;
-mod infer_migration_steps;
 mod initialization;
 mod list_migration_directories;
 mod migration_persistence;
 mod migrations;
 mod reset;
 mod schema_push;
-mod unapply_migration;
 
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
@@ -894,7 +888,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
 }
 
 #[test_each_connector]
-async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
+async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
@@ -921,7 +915,16 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
             a  A?
         }
     "#;
-    let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
+
+    api.schema_push(dm2)
+        .force(true)
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_has_executed_steps()?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("A");
     let column = result.table_bang("A").column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -941,6 +944,8 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
             on_update_action: ForeignKeyAction::NoAction,
         }]
     );
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1769,7 +1774,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    let infer_output = api.infer(dm1.to_owned()).send().await?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let dm2 = r#"
         datasource db2 {
@@ -1782,11 +1787,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer(dm2.to_owned())
-        .assume_to_be_applied(Some(infer_output.datamodel_steps))
-        .migration_id(Some("mig02".to_owned()))
-        .send()
-        .await?;
+    api.schema_push(dm2).migration_id(Some("mig02")).send().await?;
 
     Ok(())
 }
