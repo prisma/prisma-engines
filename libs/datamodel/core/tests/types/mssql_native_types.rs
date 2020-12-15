@@ -38,7 +38,7 @@ fn text_and_blob_data_types_can_not_be_unique() {
 
     for tpe in BLOB_TYPES {
         test_native_types_with_field_attribute_support(tpe, "Bytes", "unique", &error_msg(tpe), MSSQL_SOURCE);
-        test_block_attribute_support(tpe, "Bytes", "unique", dbg!(&error_msg(tpe)));
+        test_block_attribute_support(tpe, "Bytes", "unique", &error_msg(tpe));
     }
 
     for tpe in TEXT_TYPES {

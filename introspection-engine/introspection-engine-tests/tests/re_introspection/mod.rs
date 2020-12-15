@@ -1562,7 +1562,7 @@ async fn schemas_with_required_virtual_relation_fields_must_be_handlded_graceful
         }
     "#};
 
-    let introspection_result = dbg!(RpcImpl::introspect_internal(input_dm.to_string(), false).await)?;
+    let introspection_result = RpcImpl::introspect_internal(input_dm.to_string(), false).await?;
     assert_eq_datamodels!(final_dm, introspection_result.datamodel.as_ref());
 
     Ok(())

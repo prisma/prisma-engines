@@ -180,7 +180,6 @@ fn multi_field_unique_with_1_field_must_be_transformed_to_is_unique_on_field() {
     );
 
     let model = datamodel.assert_model("Test");
-    dbg!(&model);
     model
         .assert_indexes_length(2)
         .assert_index(&["a", "b"], IndexType::Unique)
