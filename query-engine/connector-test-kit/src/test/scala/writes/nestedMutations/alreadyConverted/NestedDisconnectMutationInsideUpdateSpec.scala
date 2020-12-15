@@ -92,7 +92,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
       val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
-      val res = server.query(
+      server.query(
         s"""
          |mutation {
          |  updateParent(
@@ -310,6 +310,50 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       res.toString should be("""{"data":{"updateParent":{"childOpt":null}}}""")
 
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be("""{"data":{"children":[{"c":"c1","parentsOpt":[]}]}}""")
+
+    }
+  }
+
+  "a P1 to CM relation with the parent not having a connected child" should "be disconnectable through a nested mutation by unique" in {
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
+      database.setup(project)
+
+      val parentResult = server.query(
+        s"""mutation {
+           |  createParent(data: {
+           |    p: "p1", p_1: "p", p_2: "1"
+           |  }){
+           |    ${t.parent.selection}
+           |    childOpt{
+           |       ${t.child.selection}
+           |    }
+           |  }
+           |}""",
+        project
+      )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
+
+      val res = server.query(
+        s"""
+           |mutation {
+           |  updateParent(
+           |    where: $parentIdentifier
+           |    data:{
+           |    childOpt: {disconnect: true}
+           |  }){
+           |    childOpt{
+           |      c
+           |    }
+           |  }
+           |}
+      """,
+        project
+      )
+
+      res.toString should be("""{"data":{"updateParent":{"childOpt":null}}}""")
 
     }
   }

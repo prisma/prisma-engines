@@ -216,9 +216,6 @@ fn handle_one_to_x(
     };
 
     let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), model_to_update);
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_name = parent_relation_field.model().name.clone();
-    let child_name = parent_relation_field.related_model().name.clone();
 
     // Edge to inject the correct data into the update (either from the parent or child).
     graph.create_edge(
@@ -227,39 +224,11 @@ fn handle_one_to_x(
         QueryGraphDependency::ParentProjection(
             extractor_model_id,
             Box::new(move |mut update_node, links| {
-                //                if links.is_empty() {
-                //                    return Err(QueryGraphBuilderError::RecordsNotConnected {
-                //                        relation_name,
-                //                        parent_name,
-                //                        child_name,
-                //                    });
-                //                }
-
                 // Handle filter & arg injection
                 if let Node::Query(Query::Write(ref mut wq @ WriteQuery::UpdateManyRecords(_))) = update_node {
                     wq.set_filter(links.filter());
                     wq.inject_projection_into_args(null_record_id);
                 };
-
-                Ok(update_node)
-            }),
-        ),
-    )?;
-
-    // Edge to check that IDs have been returned.
-    graph.create_edge(
-        node_to_check,
-        &update_node,
-        QueryGraphDependency::ParentProjection(
-            check_model_id,
-            Box::new(move |update_node, ids| {
-                if ids.len() != expected_disconnects {
-                    return Err(QueryGraphBuilderError::RecordsNotConnected {
-                        relation_name,
-                        parent_name,
-                        child_name,
-                    });
-                }
 
                 Ok(update_node)
             }),
