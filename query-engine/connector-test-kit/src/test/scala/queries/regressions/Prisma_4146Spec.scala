@@ -33,13 +33,9 @@ class Prisma_4146Spec extends FlatSpec with Matchers with ApiSpecBase with Schem
     database.setup(project)
 
     server.query(
-      s"""mutation createAccount{
+      s"""mutation {
          |createOneAccount(data: {
          |    id: 1
-         |    tokens: { create: [
-         |      { id: 1, name: "a" },
-         |      { id: 2, name: "b" },
-         |    ]}
          |})
          |{id}
          |}
@@ -48,23 +44,33 @@ class Prisma_4146Spec extends FlatSpec with Matchers with ApiSpecBase with Schem
       legacy = false,
     )
 
-    var res = server.query(s"""query {tokens { id, name, updatedAt }}""", project)
-    println(res)
-
-    server.query(
-      s"""mutation createAccount{
-         |updateOneAccount(where: {
-         |    id: 1
-         |}, data: { account {
-         |    token: { connect: {
-         |      id: 1, name: "c",
-         |    }}
-         |}})
-         |{id}
-         |}
+    val updatedAt = server.query(
+      s"""mutation {
+      |  createOneToken(data: { id: 2, name: "test" }) {
+      |    updatedAt
+      |  }
+      |}
       """.stripMargin,
       project,
       legacy = false,
-    )
+    ).pathAsString("data.createOneToken.updatedAt")
+
+    val tokens = server.query(
+      s"""mutation {
+        updateOneAccount(
+          where: { id: 1 }
+          data: { tokens: { connect: { id: 2 } } }
+        ) {
+          tokens {
+            updatedAt
+          }
+        }
+      }
+      """.stripMargin,
+      project,
+      legacy = false,
+   ).pathAsSeq("data.updateOneAccount.tokens")
+
+   tokens(0).pathAsString("updatedAt") should not equal updatedAt
   }
 }
