@@ -227,13 +227,13 @@ fn handle_one_to_x(
         QueryGraphDependency::ParentProjection(
             extractor_model_id,
             Box::new(move |mut update_node, links| {
-                if links.is_empty() {
-                    return Err(QueryGraphBuilderError::RecordsNotConnected {
-                        relation_name,
-                        parent_name,
-                        child_name,
-                    });
-                }
+                //                if links.is_empty() {
+                //                    return Err(QueryGraphBuilderError::RecordsNotConnected {
+                //                        relation_name,
+                //                        parent_name,
+                //                        child_name,
+                //                    });
+                //                }
 
                 // Handle filter & arg injection
                 if let Node::Query(Query::Write(ref mut wq @ WriteQuery::UpdateManyRecords(_))) = update_node {
@@ -245,10 +245,6 @@ fn handle_one_to_x(
             }),
         ),
     )?;
-
-    let relation_name = parent_relation_field.relation().name.clone();
-    let parent_name = parent_relation_field.model().name.clone();
-    let child_name = parent_relation_field.related_model().name.clone();
 
     // Edge to check that IDs have been returned.
     graph.create_edge(

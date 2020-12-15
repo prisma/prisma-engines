@@ -58,7 +58,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     }
   }
 
-  "a P1 to C1  relation with the child and the parent without a relation" should "not be disconnectable through a nested mutation by id" in {
+  "a P1 to C1 relation with the child and the parent without a relation" should "be disconnectable through a nested mutation by id" in {
     schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
@@ -92,7 +92,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
       val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
-      val res = server.queryThatMustFail(
+      val res = server.query(
         s"""
          |mutation {
          |  updateParent(
@@ -108,8 +108,6 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 2017,
-        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."""
       )
 
     }
