@@ -9,7 +9,7 @@ use crate::relation_info::RelationInfo;
 /// string, only introspection and the lowering of the datamodel to the ast care about these flags.
 /// The FieldType: Unsupported behaves in the same way.
 /// Both of these are never converted into the internal datamodel.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Default)]
 pub struct Datamodel {
     pub enums: Vec<Enum>,
     pub models: Vec<Model>,
@@ -17,10 +17,7 @@ pub struct Datamodel {
 
 impl Datamodel {
     pub fn new() -> Datamodel {
-        Datamodel {
-            enums: Vec::new(),
-            models: Vec::new(),
-        }
+        Datamodel { ..Default::default() }
     }
 
     /// Checks if a datamodel contains neither enums nor models.

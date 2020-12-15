@@ -33,7 +33,7 @@ impl NativeTypeInstance {
     }
 
     pub fn render(&self) -> String {
-        if self.args.len() == 0 {
+        if self.args.is_empty() {
             self.name.to_string()
         } else {
             let args_as_strings: Vec<String> = self.args.iter().map(|a| a.to_string()).collect();

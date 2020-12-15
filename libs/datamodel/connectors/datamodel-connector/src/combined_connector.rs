@@ -10,7 +10,7 @@ pub struct CombinedConnector {
 
 impl CombinedConnector {
     // returns a connector representing the intersection of all provided connectors
-    pub fn new(connectors: Vec<Box<dyn Connector>>) -> Box<dyn Connector> {
+    pub fn new(connectors: Vec<Box<dyn Connector>>) -> Self {
         // the standard library does not seem to offer an elegant way to do this. Don't want to pull in a dependency for this.
         let mut combined_capabilities = vec![];
         for connector in &connectors {
@@ -23,9 +23,9 @@ impl CombinedConnector {
             }
         }
 
-        Box::new(CombinedConnector {
+        CombinedConnector {
             capabilities: combined_capabilities,
-        })
+        }
     }
 }
 

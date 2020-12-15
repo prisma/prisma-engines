@@ -372,3 +372,9 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 }
+
+impl Default for MySqlDatamodelConnector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
