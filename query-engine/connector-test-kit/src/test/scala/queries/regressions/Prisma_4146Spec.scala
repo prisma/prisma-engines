@@ -34,11 +34,10 @@ class Prisma_4146Spec extends FlatSpec with Matchers with ApiSpecBase with Schem
 
     server.query(
       s"""mutation {
-         |createOneAccount(data: {
-         |    id: 1
-         |})
-         |{id}
-         |}
+      |  createOneAccount(data: { id: 1 }) {
+      |    id
+      |  }
+      |}
       """.stripMargin,
       project,
       legacy = false,
