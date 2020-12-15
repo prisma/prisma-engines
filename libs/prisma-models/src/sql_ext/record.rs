@@ -11,7 +11,7 @@ impl TryFrom<(&ModelProjection, ResultSet)> for RecordProjection {
         let columns: Vec<String> = result_set.columns().iter().map(|c| c.to_string()).collect();
         let mut record_projection = RecordProjection::default();
 
-        for row in result_set.into_iter() {
+        if let Some(row) = result_set.into_iter().next() {
             for (i, val) in row.into_iter().enumerate() {
                 match model_projection.map_db_name(columns[i].as_str()) {
                     Some(field) => {
@@ -25,8 +25,6 @@ impl TryFrom<(&ModelProjection, ResultSet)> for RecordProjection {
                     }
                 }
             }
-
-            break;
         }
 
         if model_projection.scalar_length() == record_projection.len() {

@@ -52,6 +52,11 @@ impl ScalarFilter {
         }
     }
 
+    /// Returns `true` if the number of values in the filter is 0.
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// If `true`, the filter can be split into smaller filters executed in
     /// separate queries.
     pub fn can_batch(&self) -> bool {

@@ -52,5 +52,5 @@ pub fn validate_preview_features(
             ));
         }
     }
-    return result;
+    result
 }
