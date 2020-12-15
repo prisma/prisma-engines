@@ -1,5 +1,5 @@
 use super::ModelProjection;
-use crate::{DomainError, PrismaValue, ScalarFieldRef};
+use crate::{DomainError, ModelRef, PrismaValue, ScalarFieldRef};
 use std::{collections::HashMap, convert::TryFrom};
 
 /// Represents a (sub)set of fields to value pairs from a single record.
@@ -15,6 +15,10 @@ impl RecordProjection {
 
     pub fn add(&mut self, pair: (ScalarFieldRef, PrismaValue)) {
         self.pairs.push(pair);
+    }
+
+    pub fn model(&self) -> Option<ModelRef> {
+        self.fields().next().map(|field| field.model())
     }
 
     pub fn fields(&self) -> impl Iterator<Item = ScalarFieldRef> + '_ {
