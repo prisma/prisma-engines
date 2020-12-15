@@ -62,7 +62,7 @@ impl EnumAndValue {
     }
 }
 
-pub fn warning_models_without_identifier(affected: &Vec<Model>) -> Warning {
+pub fn warning_models_without_identifier(affected: &[Model]) -> Warning {
     Warning {
         code: 1,
         message: "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by Prisma.".into(),
@@ -70,7 +70,7 @@ pub fn warning_models_without_identifier(affected: &Vec<Model>) -> Warning {
     }
 }
 
-pub fn warning_fields_with_empty_names(affected: &Vec<ModelAndField>) -> Warning {
+pub fn warning_fields_with_empty_names(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 2,
         message: "These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
@@ -79,7 +79,7 @@ pub fn warning_fields_with_empty_names(affected: &Vec<ModelAndField>) -> Warning
     }
 }
 
-pub fn warning_unsupported_types(affected: &Vec<ModelAndFieldAndType>) -> Warning {
+pub fn warning_unsupported_types(affected: &[ModelAndFieldAndType]) -> Warning {
     Warning {
         code: 3,
         message: "These fields were commented out because Prisma currently does not support their types.".into(),
@@ -87,7 +87,7 @@ pub fn warning_unsupported_types(affected: &Vec<ModelAndFieldAndType>) -> Warnin
     }
 }
 
-pub fn warning_enum_values_with_empty_names(affected: &Vec<EnumAndValue>) -> Warning {
+pub fn warning_enum_values_with_empty_names(affected: &[EnumAndValue]) -> Warning {
     Warning {
         code: 4,
         message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute."
@@ -96,7 +96,7 @@ pub fn warning_enum_values_with_empty_names(affected: &Vec<EnumAndValue>) -> War
     }
 }
 
-pub fn warning_default_cuid_warning(affected: &Vec<ModelAndField>) -> Warning {
+pub fn warning_default_cuid_warning(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 5,
         message:
@@ -106,7 +106,7 @@ pub fn warning_default_cuid_warning(affected: &Vec<ModelAndField>) -> Warning {
     }
 }
 
-pub fn warning_default_uuid_warning(affected: &Vec<ModelAndField>) -> Warning {
+pub fn warning_default_uuid_warning(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 6,
         message:
@@ -116,7 +116,7 @@ pub fn warning_default_uuid_warning(affected: &Vec<ModelAndField>) -> Warning {
     }
 }
 
-pub fn warning_enriched_with_map_on_model(affected: &Vec<Model>) -> Warning {
+pub fn warning_enriched_with_map_on_model(affected: &[Model]) -> Warning {
     Warning {
         code: 7,
         message: "These models were enriched with `@@map` information taken from the previous Prisma schema.".into(),
@@ -124,7 +124,7 @@ pub fn warning_enriched_with_map_on_model(affected: &Vec<Model>) -> Warning {
     }
 }
 
-pub fn warning_enriched_with_map_on_field(affected: &Vec<ModelAndField>) -> Warning {
+pub fn warning_enriched_with_map_on_field(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 8,
         message: "These fields were enriched with `@map` information taken from the previous Prisma schema.".into(),
@@ -132,7 +132,7 @@ pub fn warning_enriched_with_map_on_field(affected: &Vec<ModelAndField>) -> Warn
     }
 }
 
-pub fn warning_enriched_with_map_on_enum(affected: &Vec<Enum>) -> Warning {
+pub fn warning_enriched_with_map_on_enum(affected: &[Enum]) -> Warning {
     Warning {
         code: 9,
         message: "These enums were enriched with `@@map` information taken from the previous Prisma schema.".into(),
@@ -140,7 +140,7 @@ pub fn warning_enriched_with_map_on_enum(affected: &Vec<Enum>) -> Warning {
     }
 }
 
-pub fn warning_enriched_with_map_on_enum_value(affected: &Vec<EnumAndValue>) -> Warning {
+pub fn warning_enriched_with_map_on_enum_value(affected: &[EnumAndValue]) -> Warning {
     Warning {
         code: 10,
         message: "These enum values were enriched with `@map` information taken from the previous Prisma schema."
@@ -149,7 +149,7 @@ pub fn warning_enriched_with_map_on_enum_value(affected: &Vec<EnumAndValue>) -> 
     }
 }
 
-pub fn warning_enriched_with_cuid(affected: &Vec<ModelAndField>) -> Warning {
+pub fn warning_enriched_with_cuid(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 11,
         message:
@@ -159,7 +159,7 @@ pub fn warning_enriched_with_cuid(affected: &Vec<ModelAndField>) -> Warning {
     }
 }
 
-pub fn warning_enriched_with_uuid(affected: &Vec<ModelAndField>) -> Warning {
+pub fn warning_enriched_with_uuid(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 12,
         message:
@@ -169,7 +169,7 @@ pub fn warning_enriched_with_uuid(affected: &Vec<ModelAndField>) -> Warning {
     }
 }
 
-pub fn warning_enriched_with_updated_at(affected: &Vec<ModelAndField>) -> Warning {
+pub fn warning_enriched_with_updated_at(affected: &[ModelAndField]) -> Warning {
     Warning {
         code: 13,
         message:
@@ -179,7 +179,7 @@ pub fn warning_enriched_with_updated_at(affected: &Vec<ModelAndField>) -> Warnin
     }
 }
 
-pub fn warning_models_without_columns(affected: &Vec<Model>) -> Warning {
+pub fn warning_models_without_columns(affected: &[Model]) -> Warning {
     Warning {
         code: 14,
         message: "The following models were commented out as we could not retrieve columns for them. Please check your privileges.".into(),

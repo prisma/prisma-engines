@@ -113,7 +113,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
-                        let relation_info_partial_eq = &old_field.relation_info == &field.relation_info
+                        let relation_info_partial_eq = old_field.relation_info == field.relation_info
                             && old_related_field.relation_info == related_field.relation_info;
                         let many_to_many = old_field.is_list() && old_related_field.is_list();
 
@@ -153,7 +153,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
 
-                        let relation_info_partial_eq = &old_field.relation_info == &field.relation_info
+                        let relation_info_partial_eq = old_field.relation_info == field.relation_info
                             && old_related_field.relation_info == related_field.relation_info;
                         let many_to_many = old_field.is_list() && old_related_field.is_list();
 
@@ -256,18 +256,17 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                         if let Some(old_field) = old_model.find_field(field_name) {
                             if let FieldType::Enum(old_enum_name) = old_field.field_type() {
                                 let old_enum = old_data_model.find_enum(&old_enum_name).unwrap();
-                                if enm.values == old_enum.values {
-                                    if old_enum_name != enm.name
-                                        && !changed_mysql_enum_names
-                                            .iter()
-                                            .any(|x: &(String, String, ModelAndField)| x.1 == old_enum_name)
-                                    {
-                                        changed_mysql_enum_names.push((
-                                            enm.name.clone(),
-                                            old_enum.name.clone(),
-                                            ModelAndField::new(model_name, field_name),
-                                        ))
-                                    }
+                                if enm.values == old_enum.values
+                                    && old_enum_name != enm.name
+                                    && !changed_mysql_enum_names
+                                        .iter()
+                                        .any(|x: &(String, String, ModelAndField)| x.1 == old_enum_name)
+                                {
+                                    changed_mysql_enum_names.push((
+                                        enm.name.clone(),
+                                        old_enum.name.clone(),
+                                        ModelAndField::new(model_name, field_name),
+                                    ))
                                 }
                             }
                         }
@@ -424,12 +423,12 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     //warnings
 
     if !changed_model_names.is_empty() {
-        let models = changed_model_names.iter().map(|c| c.1.clone()).collect();
+        let models: Vec<_> = changed_model_names.iter().map(|c| c.1.clone()).collect();
         warnings.push(warning_enriched_with_map_on_model(&models));
     }
 
     if !changed_scalar_field_names.is_empty() {
-        let models_and_fields = changed_scalar_field_names
+        let models_and_fields: Vec<_> = changed_scalar_field_names
             .iter()
             .map(|c| ModelAndField::new(&c.0.model, &c.1))
             .collect();
@@ -437,12 +436,12 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
     }
 
     if !changed_enum_names.is_empty() {
-        let enums = changed_enum_names.iter().map(|c| Enum::new(&c.1)).collect();
+        let enums: Vec<_> = changed_enum_names.iter().map(|c| Enum::new(&c.1)).collect();
         warnings.push(warning_enriched_with_map_on_enum(&enums));
     }
 
     if !changed_enum_values.is_empty() {
-        let enums_and_values = changed_enum_values
+        let enums_and_values: Vec<_> = changed_enum_values
             .iter()
             .map(|c| EnumAndValue::new(&c.0.enm, &c.1))
             .collect();

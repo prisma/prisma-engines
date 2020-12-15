@@ -14,11 +14,7 @@ async fn main() {
 
     if arguments.len() == 2 && arguments.iter().any(|i| i == "--version" || i == "-v") {
         println!("introspection-core {}", env!("GIT_HASH"));
-    } else if arguments.len() == 2 && arguments.iter().any(|i| i == "--help" || i == "-h") {
-        println!("Usage");
-        println!("Version       --version or -v");
-        println!("Help          --help    or -h");
-    } else if arguments.len() > 1 {
+    } else if arguments.len() >= 2 || arguments.iter().any(|i| i == "--help" || i == "-h") {
         println!("Usage");
         println!("Version       --version or -v");
         println!("Help          --help    or -h");

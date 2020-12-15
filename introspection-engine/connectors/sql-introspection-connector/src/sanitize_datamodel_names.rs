@@ -115,7 +115,7 @@ fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (Str
         }
 
         for enum_value in enm.values_mut() {
-            if &enum_value.name == EMPTY_STRING {
+            if enum_value.name == EMPTY_STRING {
                 enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
                 enum_value.database_name = Some(EMPTY_STRING.to_string());
             } else {
