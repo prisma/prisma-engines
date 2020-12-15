@@ -160,8 +160,6 @@ fn handle_one_to_x(
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
 ) -> QueryGraphBuilderResult<()> {
-    let filter_size = filter.size();
-
     // Fetches the children to be disconnected.
     let find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
@@ -175,45 +173,25 @@ fn handle_one_to_x(
     }
 
     // Depending on where the relation is inlined, we update the parent or the child and check the other one for ID presence.
-    let (
-        node_to_attach,
-        node_to_check,
-        model_to_update,
-        expected_disconnects,
-        extractor_model_id,
-        null_record_id,
-        check_model_id,
-    ) = if parent_relation_field.is_inlined_on_enclosing_model() {
-        let parent_model = parent_relation_field.model();
-        let extractor_model_id = parent_model.primary_identifier();
-        let null_record_id = parent_relation_field.linking_fields().empty_record_projection();
-        let check_model_id = child_relation_field.model().primary_identifier();
+    let (node_to_attach, model_to_update, extractor_model_id, null_record_id) =
+        if parent_relation_field.is_inlined_on_enclosing_model() {
+            let parent_model = parent_relation_field.model();
+            let extractor_model_id = parent_model.primary_identifier();
+            let null_record_id = parent_relation_field.linking_fields().empty_record_projection();
 
-        (
-            parent_node,
-            &find_child_records_node,
-            parent_model,
-            std::cmp::max(filter_size, 1),
-            extractor_model_id,
-            null_record_id,
-            check_model_id,
-        )
-    } else {
-        let child_model = child_relation_field.model();
-        let extractor_model_id = child_model.primary_identifier();
-        let null_record_id = child_relation_field.linking_fields().empty_record_projection();
-        let check_model_id = parent_relation_field.model().primary_identifier();
+            (parent_node, parent_model, extractor_model_id, null_record_id)
+        } else {
+            let child_model = child_relation_field.model();
+            let extractor_model_id = child_model.primary_identifier();
+            let null_record_id = child_relation_field.linking_fields().empty_record_projection();
 
-        (
-            &find_child_records_node,
-            parent_node,
-            child_model,
-            1,
-            extractor_model_id,
-            null_record_id,
-            check_model_id,
-        )
-    };
+            (
+                &find_child_records_node,
+                child_model,
+                extractor_model_id,
+                null_record_id,
+            )
+        };
 
     let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), model_to_update);
 
