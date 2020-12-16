@@ -32,7 +32,7 @@ pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
                     "Microsoft SQL Server (experimental feature, needs to be enabled)".into(),
                 );
 
-                return Err(PrismaError::CoreError(error));
+                return Err(error.into());
             }
 
             mssql(source).await

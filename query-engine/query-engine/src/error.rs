@@ -12,7 +12,7 @@ pub enum PrismaError {
     SerializationError(String),
 
     #[error("{}", _0)]
-    CoreError(CoreError),
+    CoreError(Box<CoreError>),
 
     #[error("{}", _0)]
     JsonDecodeError(anyhow::Error),
@@ -88,7 +88,7 @@ impl PrismaError {
 
 impl From<CoreError> for PrismaError {
     fn from(e: CoreError) -> Self {
-        PrismaError::CoreError(e)
+        PrismaError::CoreError(Box::new(e))
     }
 }
 

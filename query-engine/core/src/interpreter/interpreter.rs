@@ -202,7 +202,7 @@ where
 
             Expression::Query { query } => {
                 let fut = async move {
-                    match query {
+                    match *query {
                         Query::Read(read) => {
                             self.log_line(level, || format!("READ {}", read));
                             Ok(read::execute(&self.conn, read, None)

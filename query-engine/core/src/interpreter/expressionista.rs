@@ -1,7 +1,7 @@
 use super::{
     expression::*, ComputationResult, DiffResult, Env, ExpressionResult, InterpretationResult, InterpreterError,
 };
-use crate::{query_graph::*, Query};
+use crate::query_graph::*;
 use prisma_models::RecordProjection;
 use std::{collections::VecDeque, convert::TryInto};
 
@@ -56,10 +56,7 @@ impl Expressionista {
         let is_result = graph.is_result_node(&node);
         let node_id = node.id();
         let node = graph.pluck_node(&node);
-        let into_expr = Box::new(|node: Node| {
-            let query: Query = node.try_into()?;
-            Ok(Expression::Query { query })
-        });
+        let into_expr = Box::new(|node: Node| Ok(Expression::from_query(node.try_into()?)));
 
         let expr = Self::transform_node(graph, parent_edges, node, into_expr)?;
 

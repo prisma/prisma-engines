@@ -11,7 +11,7 @@ pub enum Expression {
     },
 
     Query {
-        query: Query,
+        query: Box<Query>,
     },
 
     Let {
@@ -41,4 +41,11 @@ pub enum Expression {
 pub struct Binding {
     pub name: String,
     pub expr: Expression,
+}
+
+impl Expression {
+    /// Construct a new instance from a `Query`.
+    pub fn from_query(query: Query) -> Self {
+        Self::Query { query: Box::new(query) }
+    }
 }
