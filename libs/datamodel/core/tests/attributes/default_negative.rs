@@ -160,7 +160,7 @@ fn must_error_if_using_non_id_auto_increment_on_sqlite() {
         provider = "sqlite"
         url = "file://test.db"
     }
-    
+
     model Model {
         id      Int @id
         non_id  Int @default(autoincrement()) @unique
@@ -172,7 +172,7 @@ fn must_error_if_using_non_id_auto_increment_on_sqlite() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.",
         "default",
-        Span::new(142, 188),
+        Span::new(138, 184),
     ));
 }
 
@@ -183,7 +183,7 @@ fn must_error_if_using_multiple_auto_increment_on_mysql() {
         provider = "mysql"
         url = "mysql://"
     }
-    
+
     model Model {
         id      Int @id
         non_id  Int @default(autoincrement()) @unique
@@ -196,7 +196,7 @@ fn must_error_if_using_multiple_auto_increment_on_mysql() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.",
         "default",
-        Span::new(89, 241),
+        Span::new(85, 237),
     ));
 }
 
@@ -207,7 +207,7 @@ fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
         provider = "mysql"
         url = "mysql://"
     }
-    
+
     model Model {
         id      Int @id
         non_id  Int @default(autoincrement())
@@ -219,6 +219,6 @@ fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.",
         "default",
-        Span::new(135, 173),
+        Span::new(131, 169),
     ));
 }

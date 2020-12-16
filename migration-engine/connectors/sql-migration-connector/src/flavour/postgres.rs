@@ -18,6 +18,7 @@ impl PostgresFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
+    #[tracing::instrument(skip(database_str))]
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
         let db_name = self.0.dbname();
@@ -98,6 +99,7 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    #[tracing::instrument]
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         let schema_name = connection.connection_info().schema_name();
         let schema_exists_result = connection
@@ -179,7 +181,11 @@ impl SqlFlavour for PostgresFlavour {
         let create_database = format!("CREATE DATABASE \"{}\"", database_name);
         let create_schema = format!("CREATE SCHEMA IF NOT EXISTS \"{}\"", self.schema_name());
 
-        connection.raw_cmd(&create_database).await?;
+        connection
+            .raw_cmd(&create_database)
+            .await
+            .map_err(ConnectorError::from)
+            .map_err(|err| err.into_shadow_db_creation_error())?;
 
         let mut temporary_database_url = self.0.url().clone();
         temporary_database_url.set_path(&format!("/{}", database_name));

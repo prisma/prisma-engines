@@ -222,7 +222,11 @@ impl SqlFlavour for MysqlFlavour {
         let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
         let create_database = format!("CREATE DATABASE `{}`", database_name);
 
-        connection.raw_cmd(&create_database).await?;
+        connection
+            .raw_cmd(&create_database)
+            .await
+            .map_err(ConnectorError::from)
+            .map_err(|err| err.into_shadow_db_creation_error())?;
 
         let mut temporary_database_url = self.url.url().clone();
         temporary_database_url.set_path(&format!("/{}", database_name));

@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 use std::error::Error as StdError;
 
 #[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
-#[repr(u8)]
+#[repr(u16)]
 pub enum Tags {
     Mysql = 0b0001,
     Mariadb = 0b0010,
@@ -11,8 +11,9 @@ pub enum Tags {
     Sqlite = 0b1000,
     Mysql8 = 0b00010000,
     Mysql56 = 0b00100000,
-    Mssql2017 = 0b10000000,
-    Mssql2019 = 0b01000000,
+    Mssql2017 = 0b01000000,
+    Mssql2019 = 0b10000000,
+    Postgres12 = 0b100000000,
 }
 
 impl Tags {
@@ -52,6 +53,7 @@ static TAG_NAMES: Lazy<Vec<(&str, BitFlags<Tags>)>> = Lazy::new(|| {
         ("mysql_5_6", Tags::Mysql56.into()),
         ("mysql_8", Tags::Mysql8.into()),
         ("postgres", Tags::Postgres.into()),
+        ("postgres_12", Tags::Postgres12.into()),
         ("sql", Tags::Mysql | Tags::Postgres | Tags::Sqlite),
         ("sqlite", Tags::Sqlite.into()),
     ]

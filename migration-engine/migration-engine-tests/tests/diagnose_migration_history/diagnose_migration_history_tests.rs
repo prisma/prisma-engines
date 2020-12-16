@@ -1,9 +1,13 @@
 use crate::*;
-use migration_core::commands::{
-    CreateMigrationOutput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic,
+use migration_core::{
+    commands::{
+        CreateMigrationOutput, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
+        HistoryDiagnostic,
+    },
+    migration_api,
 };
 use pretty_assertions::assert_eq;
-use user_facing_errors::UserFacingError;
+use user_facing_errors::{migration_engine::ShadowDbCreationError, UserFacingError};
 
 #[test_each_connector]
 async fn diagnose_migrations_history_on_an_empty_database_without_migration_returns_nothing(
@@ -788,6 +792,167 @@ async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestRe
     assert!(edited_migration_names.is_empty());
     assert!(!has_migrations_table);
     assert!(error_in_unapplied_migration.is_none());
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql_8"))]
+async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id      Int @id @default(autoincrement())
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    api.database()
+        .raw_cmd(&format!(
+            "
+            DROP USER IF EXISTS 'prismashadowdbtestuser';
+            CREATE USER 'prismashadowdbtestuser' IDENTIFIED by '1234batman';
+            GRANT ALL PRIVILEGES ON {}.* TO 'prismashadowdbtestuser';
+            ",
+            api.connection_info().dbname().unwrap(),
+        ))
+        .await?;
+
+    let (host, port) = db_host_and_port_mysql_8_0();
+
+    let datamodel = format!(
+        r#"
+        datasource db {{
+            provider = "mysql"
+            url = "mysql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
+        }}
+        "#,
+        dbhost = host,
+        dbname = api.connection_info().dbname().unwrap(),
+        dbport = port,
+    );
+
+    let migration_api = migration_api(&datamodel, Vec::new()).await?;
+
+    let output = migration_api
+        .diagnose_migration_history(&DiagnoseMigrationHistoryInput {
+            migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+            opt_in_to_shadow_database: true,
+        })
+        .await?;
+
+    assert!(
+        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
+    );
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres_12"), log = "debug")]
+async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id      Int @id @default(autoincrement())
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    api.database()
+        .raw_cmd(
+            "
+            DROP USER IF EXISTS prismashadowdbtestuser;
+            CREATE USER prismashadowdbtestuser PASSWORD '1234batman' LOGIN;
+            ",
+        )
+        .await?;
+
+    let (host, port) = db_host_and_port_postgres_12();
+
+    let datamodel = format!(
+        r#"
+        datasource db {{
+            provider = "postgresql"
+            url = "postgresql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
+        }}
+        "#,
+        dbhost = host,
+        dbname = api.connection_info().dbname().unwrap(),
+        dbport = port,
+    );
+
+    let migration_api = migration_api(&datamodel, Vec::new()).await?;
+
+    let output = migration_api
+        .diagnose_migration_history(&DiagnoseMigrationHistoryInput {
+            migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+            opt_in_to_shadow_database: true,
+        })
+        .await?;
+
+    assert!(
+        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
+    );
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mssql_2019"))]
+async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model Cat {
+            id      Int @id @default(autoincrement())
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser;").await.ok();
+
+    api.database()
+        .raw_cmd(
+            "
+            DROP USER IF EXISTS prismashadowdbtestuser;
+
+            CREATE LOGIN prismashadowdbtestuser
+                WITH PASSWORD = '1234batmanZ';
+
+            CREATE USER prismashadowdbtestuser FOR LOGIN prismashadowdbtestuser;
+            ",
+        )
+        .await?;
+
+    let (host, port) = db_host_and_port_mssql_2019();
+
+    let datamodel = format!(
+        r#"
+        datasource db {{
+            provider = "sqlserver"
+            url = "sqlserver://{dbhost}:{dbport};database={dbname};user=prismashadowdbtestuser;password=1234batmanZ;encrypt=DANGER_PLAINTEXT"
+        }}
+        "#,
+        dbhost = host,
+        dbname = api.connection_info().dbname().unwrap(),
+        dbport = port,
+    );
+
+    let migration_api = migration_api(&datamodel, Vec::new()).await?;
+
+    let output = migration_api
+        .diagnose_migration_history(&DiagnoseMigrationHistoryInput {
+            migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+            opt_in_to_shadow_database: true,
+        })
+        .await?;
+
+    assert!(
+        matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
+    );
 
     Ok(())
 }
