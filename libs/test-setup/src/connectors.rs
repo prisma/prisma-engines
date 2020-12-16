@@ -1,8 +1,10 @@
 mod capabilities;
+mod features;
 pub mod mssql;
 mod tags;
 
 pub use capabilities::*;
+pub use features::*;
 pub use tags::*;
 
 use enumflags2::BitFlags;

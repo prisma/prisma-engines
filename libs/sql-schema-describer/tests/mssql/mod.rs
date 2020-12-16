@@ -1,15 +1,20 @@
-use super::test_api::mssql_2019_test_api;
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
 use sql_schema_describer::*;
-use test_setup::TestAPIArgs;
+use test_setup::mssql_2019_url;
 use tracing::debug;
 
 #[allow(dead_code)]
 pub async fn get_mssql_describer_for_schema(sql: &str, schema: &'static str) -> mssql::SqlSchemaDescriber {
-    let api = mssql_2019_test_api(TestAPIArgs::new(schema, 0b01000000)).await;
+    let connection_string = format!("{};schema={}", mssql_2019_url("master"), schema);
+    let conn = Quaint::new(&connection_string).await.unwrap();
+
+    test_setup::connectors::mssql::reset_schema(&conn, schema)
+        .await
+        .unwrap();
+
     debug!("Executing SQL Server migrations: {}", sql);
 
-    api.database().raw_cmd(sql).await.unwrap();
+    conn.raw_cmd(sql).await.unwrap();
 
-    mssql::SqlSchemaDescriber::new(api.database().clone())
+    mssql::SqlSchemaDescriber::new(conn)
 }

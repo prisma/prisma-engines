@@ -6,7 +6,7 @@ use proc_macro2::Span;
 use quote::quote;
 use std::str::FromStr;
 use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
-use test_setup::connectors::{Capabilities, Connector, Tags, CONNECTORS};
+use test_setup::connectors::{Capabilities, Connector, Features, Tags, CONNECTORS};
 
 static TAGS_FILTER: Lazy<BitFlags<Tags>> = Lazy::new(|| {
     let tags_str = std::env::var("TEST_EACH_CONNECTOR_TAGS").ok();
@@ -41,6 +41,10 @@ struct TestEachConnectorArgs {
     /// Optional list of tags to ignore.
     #[darling(default)]
     ignore: TagsWrapper,
+
+    /// Enabled preview features to this test.
+    #[darling(default)]
+    features: FeaturesWrapper,
 }
 
 #[derive(Debug)]
@@ -108,6 +112,40 @@ impl darling::FromMeta for TagsWrapper {
         }
 
         Ok(TagsWrapper(tags))
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+struct FeaturesWrapper(BitFlags<Features>);
+
+impl Default for FeaturesWrapper {
+    fn default() -> Self {
+        Self(BitFlags::empty())
+    }
+}
+
+impl darling::FromMeta for FeaturesWrapper {
+    fn from_list(items: &[syn::NestedMeta]) -> Result<Self, darling::Error> {
+        let mut features = Features::empty();
+
+        for item in items {
+            match item {
+                syn::NestedMeta::Lit(syn::Lit::Str(s)) => {
+                    let s = s.value();
+                    let feature = Features::from_name(&s)
+                        .map_err(|err| darling::Error::unknown_value(&err.to_string()).with_span(&item.span()))?;
+                    features.insert(feature);
+                }
+                syn::NestedMeta::Lit(other) => {
+                    return Err(darling::Error::unexpected_lit_type(other).with_span(&other.span()))
+                }
+                syn::NestedMeta::Meta(meta) => {
+                    return Err(darling::Error::unsupported_shape("Expected string literal").with_span(&meta.span()))
+                }
+            }
+        }
+
+        Ok(FeaturesWrapper(features))
     }
 }
 
@@ -189,11 +227,12 @@ fn test_each_connector_async_wrapper_functions(
         let connector_test_fn_name = Ident::new(connector.name(), Span::call_site());
         let connector_api_factory = Ident::new(connector.test_api(), Span::call_site());
         let tags = connector.tags.bits();
+        let features = args.features.0.bits();
 
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
-                let test_api_args = test_setup::TestAPIArgs::new(#test_fn_name_str, #tags);
+                let test_api_args = test_setup::TestAPIArgs::new(#test_fn_name_str, #tags, #features);
                 run(Box::pin(super::#connector_api_factory(test_api_args)))
             }
         };
