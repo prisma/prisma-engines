@@ -1,7 +1,7 @@
 mod alter_table;
 
 use super::common::render_on_delete;
-use super::{common, IteratorJoin, Quoted, QuotedWithSchema, SqlRenderer};
+use super::{common, IteratorJoin, Quoted, SqlRenderer};
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
@@ -13,13 +13,28 @@ use sql_schema_describer::{
     walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
     ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SqlSchema,
 };
-use std::{borrow::Cow, fmt::Write};
+use std::{
+    borrow::Cow,
+    fmt::{Display, Write},
+};
+
+#[derive(Debug)]
+struct QuotedWithSchema<'a> {
+    schema_name: &'a str,
+    name: &'a str,
+}
+
+impl<'a> Display for QuotedWithSchema<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}].[{}]", self.schema_name, self.name)
+    }
+}
 
 impl MssqlFlavour {
-    fn quote_with_schema<'a, 'b>(&'a self, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
+    fn quote_with_schema<'a>(&'a self, name: &'a str) -> QuotedWithSchema<'a> {
         QuotedWithSchema {
             schema_name: self.schema_name(),
-            name: self.quote(name),
+            name,
         }
     }
 }

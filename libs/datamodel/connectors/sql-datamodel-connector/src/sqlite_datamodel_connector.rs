@@ -55,3 +55,9 @@ impl Connector for SqliteDatamodelConnector {
         ))
     }
 }
+
+impl Default for SqliteDatamodelConnector {
+    fn default() -> Self {
+        Self::new()
+    }
+}

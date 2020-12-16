@@ -107,7 +107,7 @@ async fn drop_database(database_str: &str) -> Result<String, CliError> {
     let datamodel = datasource_from_database_str(database_str)?;
     migration_core::drop_database(&datamodel).await?;
 
-    Ok(format!("The database was successfully dropped."))
+    Ok("The database was successfully dropped.".to_string())
 }
 
 async fn qe_setup(prisma_schema: &str) -> Result<(), CliError> {

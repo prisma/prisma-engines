@@ -276,11 +276,8 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
         let sql = format!(
-            r#"CREATE TYPE {enum_name} AS ENUM ({variants})"#,
-            enum_name = QuotedWithSchema {
-                schema_name: &self.0.schema(),
-                name: Quoted::postgres_ident(enm.name())
-            },
+            r#"CREATE TYPE "{enum_name}" AS ENUM ({variants})"#,
+            enum_name = enm.name(),
             variants = enm.values().iter().map(Quoted::postgres_string).join(", "),
         );
 
@@ -312,7 +309,7 @@ impl SqlRenderer for PostgresFlavour {
         let primary_columns = table.primary_key_column_names();
         let pk_column_names = primary_columns
             .into_iter()
-            .flat_map(|cols| cols.into_iter())
+            .flat_map(|cols| cols.iter())
             .map(|col| self.quote(col))
             .join(",");
         let pk = if !pk_column_names.is_empty() {

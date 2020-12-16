@@ -177,7 +177,7 @@ impl SqlSchemaDescriber {
         indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
         foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
     ) -> Table {
-        let columns = columns.remove(name).unwrap_or(vec![]);
+        let columns = columns.remove(name).unwrap_or_default();
         let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
 
         let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
@@ -260,7 +260,8 @@ impl SqlSchemaDescriber {
                             .or_else(|| DEFAULT_STRING.captures_iter(&default_string).next())
                             .or_else(|| DEFAULT_DB_GEN.captures_iter(&default_string).next())
                             .map(|cap| cap[1].to_string())
-                            .expect(&format!("Couldn't parse default value: `{}`", default_string));
+                            .ok_or_else(|| format!("Couldn't parse default value: `{}`", default_string))
+                            .unwrap();
 
                         let mut default = match tpe.family {
                             ColumnTypeFamily::Int => match Self::parse_int(&default_string) {

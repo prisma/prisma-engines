@@ -12,10 +12,12 @@ impl<'a> TryFrom<Value<'a>> for PrismaValue {
             Value::Integer(i) => i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
 
             Value::Float(Some(f)) => match f {
-                f if f.is_nan() => Err(crate::ConversionFailure {
-                    from: "NaN",
-                    to: "BigDecimal",
-                })?,
+                f if f.is_nan() => {
+                    return Err(crate::ConversionFailure {
+                        from: "NaN",
+                        to: "BigDecimal",
+                    })
+                }
                 f if f.is_infinite() => Err(crate::ConversionFailure {
                     from: "Infinity",
                     to: "BigDecimal",

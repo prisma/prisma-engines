@@ -4,6 +4,7 @@ use datamodel::{preview_features::PreviewFeatures, Datamodel};
 use enumflags2::BitFlags;
 use eyre::{Report, Result};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
+use introspection_core::rpc::RpcImpl;
 use quaint::{
     prelude::{ConnectionInfo, SqlFamily},
     single::Quaint,
@@ -78,8 +79,8 @@ impl TestApi {
     }
 
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
-        let data_model = parse_datamodel(data_model_string)?;
         let config = parse_configuration(data_model_string)?;
+        let data_model = parse_datamodel(data_model_string, &config)?;
         let native_types = config.generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
 
         let introspection_result = self
@@ -93,7 +94,8 @@ impl TestApi {
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
-        let data_model = parse_datamodel(data_model_string)?;
+        let config = parse_configuration(data_model_string)?;
+        let data_model = parse_datamodel(data_model_string, &config)?;
         let introspection_result = self.introspection_connector.introspect(&data_model, false).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
@@ -155,10 +157,10 @@ impl TestApi {
     }
 }
 
-fn parse_datamodel(dm: &str) -> Result<Datamodel> {
-    match datamodel::parse_datamodel(dm) {
-        Ok(dm) => Ok(dm.subject),
-        Err(e) => Err(Report::msg(e.to_pretty_string("schema.prisma", dm))),
+fn parse_datamodel(dm: &str, config: &Configuration) -> Result<Datamodel> {
+    match RpcImpl::parse_datamodel(dm, config) {
+        Ok(dm) => Ok(dm),
+        Err(e) => Err(Report::msg(e.message)),
     }
 }
 

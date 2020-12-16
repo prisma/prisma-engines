@@ -108,7 +108,7 @@ impl Field {
         }
     }
 
-    pub fn as_scalar(self) -> Option<ScalarFieldRef> {
+    pub fn try_into_scalar(self) -> Option<ScalarFieldRef> {
         match self {
             Field::Scalar(scalar) => Some(scalar),
             _ => None,

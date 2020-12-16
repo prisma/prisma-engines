@@ -152,7 +152,7 @@ impl VersionChecker {
         }
     }
 
-    fn is_prisma_2(&self, warnings: &Vec<Warning>) -> bool {
+    fn is_prisma_2(&self, warnings: &[Warning]) -> bool {
         !self.has_relay_table
             && !self.uses_on_delete
             && !self.uses_non_prisma_types
@@ -160,7 +160,7 @@ impl VersionChecker {
             && warnings.is_empty()
     }
 
-    fn is_prisma_1_1(&self, warnings: &Vec<Warning>) -> bool {
+    fn is_prisma_1_1(&self, warnings: &[Warning]) -> bool {
         !self.has_migration_table
             && !self.has_relay_table
             && !self.uses_on_delete
@@ -171,7 +171,7 @@ impl VersionChecker {
             && warnings.is_empty()
     }
 
-    fn is_prisma_1(&self, warnings: &Vec<Warning>) -> bool {
+    fn is_prisma_1(&self, warnings: &[Warning]) -> bool {
         !self.has_migration_table
             && !self.uses_on_delete
             && !self.uses_default_values
@@ -184,7 +184,7 @@ impl VersionChecker {
             && warnings.is_empty()
     }
 
-    pub fn version(&self, warnings: &Vec<Warning>, data_model: &Datamodel) -> Version {
+    pub fn version(&self, warnings: &[Warning], data_model: &Datamodel) -> Version {
         debug!("{:?}", &self);
         match self.sql_family {
             _ if data_model.is_empty() => Version::NonPrisma,

@@ -156,7 +156,7 @@ impl SqlRenderer for SqliteFlavour {
             String::new()
         };
 
-        let foreign_keys = if !table.foreign_keys().next().is_none() {
+        let foreign_keys = if table.foreign_keys().next().is_some() {
             let mut fks = table.foreign_keys().peekable();
             let mut rendered_fks = String::new();
 

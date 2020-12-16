@@ -325,7 +325,8 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
+
     api.assert_schema().await?.assert_table("A", |table| {
         table
             .assert_indexes_count(1)?
@@ -421,8 +422,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
-    let dm2 = "";
-    api.infer_apply(&dm2).send().await?.assert_green()?;
+    api.schema_push("").send().await?.assert_green()?;
 
     Ok(())
 }

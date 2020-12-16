@@ -186,7 +186,7 @@ impl ValueValidator {
 
     /// Checks if the wrapped value is an array
     pub fn is_array(&self) -> bool {
-        return self.value.is_array();
+        self.value.is_array()
     }
 
     pub fn as_default_value_for_scalar_type(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {

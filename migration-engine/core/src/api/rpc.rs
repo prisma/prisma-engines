@@ -134,7 +134,7 @@ impl RpcApi {
         params: Params,
     ) -> Result<serde_json::Value, RunCommandError> {
         tracing::debug!(?cmd, "running the command");
-        match cmd {
+        Ok(match cmd {
             RpcCommand::ApplyScript => render(executor.apply_script(&params.parse()?).await?),
             RpcCommand::ApplyMigrations => render(executor.apply_migrations(&params.parse()?).await?),
             RpcCommand::CreateMigration => render(executor.create_migration(&params.parse()?).await?),
@@ -160,12 +160,12 @@ impl RpcApi {
             RpcCommand::Reset => render(executor.reset(&()).await?),
             RpcCommand::SchemaPush => render(executor.schema_push(&params.parse()?).await?),
             RpcCommand::UnapplyMigration => render(executor.unapply_migration(&params.parse()?).await?),
-        }
+        })
     }
 }
 
-fn render(result: impl serde::Serialize) -> Result<serde_json::Value, RunCommandError> {
-    Ok(serde_json::to_value(result).expect("Rendering of RPC response failed"))
+fn render(result: impl serde::Serialize) -> serde_json::Value {
+    serde_json::to_value(result).expect("Rendering of RPC response failed")
 }
 
 #[derive(Debug)]
