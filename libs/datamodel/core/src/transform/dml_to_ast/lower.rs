@@ -7,12 +7,12 @@ use crate::{ast, dml, Datasource, Generator};
 pub struct LowerDmlToAst<'a> {
     attributes: AllAttributes,
     datasource: Option<&'a Datasource>,
-    generators: &'a Vec<Generator>,
+    generators: &'a [Generator],
 }
 
 impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(datasource: Option<&'a Datasource>, generators: &'a Vec<Generator>) -> Self {
+    pub fn new(datasource: Option<&'a Datasource>, generators: &'a [Generator]) -> Self {
         Self {
             attributes: AllAttributes::new(),
             datasource,

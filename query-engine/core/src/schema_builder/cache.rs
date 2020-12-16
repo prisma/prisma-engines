@@ -71,8 +71,8 @@ impl<T> From<Vec<(Identifier, Arc<T>)>> for TypeRefCache<T> {
 macro_rules! return_cached_input {
     ($ctx:expr, $ident:expr) => {
         let existing_type = $ctx.get_input_type($ident);
-        if existing_type.is_some() {
-            return existing_type.unwrap();
+        if let Some(ty) = existing_type {
+            return ty;
         }
     };
 }
@@ -81,8 +81,8 @@ macro_rules! return_cached_input {
 macro_rules! return_cached_output {
     ($ctx:ident, $name:expr) => {
         let existing_type = $ctx.get_output_type($name);
-        if existing_type.is_some() {
-            return existing_type.unwrap();
+        if let Some(ty) = existing_type {
+            return ty;
         }
     };
 }

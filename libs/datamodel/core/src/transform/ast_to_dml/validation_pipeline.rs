@@ -12,7 +12,7 @@ pub struct ValidationPipeline<'a, 'b> {
 impl<'a, 'b> ValidationPipeline<'a, 'b> {
     pub fn new(
         sources: &'a [configuration::Datasource],
-        generators: &'b Vec<configuration::Generator>,
+        generators: &'b [configuration::Generator],
     ) -> ValidationPipeline<'a, 'b> {
         let source = sources.first();
         ValidationPipeline {

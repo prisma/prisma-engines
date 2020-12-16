@@ -279,7 +279,7 @@ pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
 
 /// Renders as a string into the stream.
 pub fn render_datamodel_to(stream: &mut dyn std::io::Write, datamodel: &dml::Datamodel) {
-    let lowered = LowerDmlToAst::new(None, &vec![]).lower(datamodel);
+    let lowered = LowerDmlToAst::new(None, &[]).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 

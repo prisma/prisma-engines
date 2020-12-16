@@ -250,14 +250,10 @@ impl QueryGraph {
     /// Checks if the subgraph starting at the given node contains the node designated as the overall result.
     pub fn subgraph_contains_result(&self, node: &NodeRef) -> bool {
         self.is_result_node(node)
-            || self
-                .outgoing_edges(node)
-                .into_iter()
-                .find(|edge| {
-                    let child_node = self.edge_target(edge);
-                    self.subgraph_contains_result(&child_node)
-                })
-                .is_some()
+            || self.outgoing_edges(node).into_iter().any(|edge| {
+                let child_node = self.edge_target(&edge);
+                self.subgraph_contains_result(&child_node)
+            })
     }
 
     /// Returns all root nodes of the graph.
