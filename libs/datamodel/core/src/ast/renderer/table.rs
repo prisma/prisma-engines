@@ -258,3 +258,9 @@ impl<'a> LineWriteable for ColumnLockedWriter<'a> {
         }
     }
 }
+
+impl Default for TableFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}

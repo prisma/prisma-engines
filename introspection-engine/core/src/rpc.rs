@@ -66,9 +66,7 @@ impl RpcImpl {
         RpcImpl
     }
 
-    async fn load_connector(
-        schema: &String,
-    ) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
+    async fn load_connector(schema: &str) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
         let config = datamodel::parse_configuration(&schema)?;
 
         let url = config
@@ -210,4 +208,10 @@ pub struct IntrospectionInput {
 
 fn default_false() -> bool {
     false
+}
+
+impl Default for RpcImpl {
+    fn default() -> Self {
+        Self::new()
+    }
 }

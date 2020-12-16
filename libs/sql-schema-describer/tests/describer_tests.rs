@@ -61,7 +61,7 @@ fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
         (SqlFamily::Sqlite, _) => format!("VARCHAR({})", length),
         (SqlFamily::Mysql, "mysql8") => format!("varchar({})", length),
         (SqlFamily::Mysql, _) => format!("varchar({})", length),
-        (SqlFamily::Mssql, _) => format!("varchar({})", length).into(),
+        (SqlFamily::Mssql, _) => format!("varchar({})", length),
     }
 }
 

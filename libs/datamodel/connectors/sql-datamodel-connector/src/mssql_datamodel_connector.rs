@@ -223,35 +223,35 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         let cloned_args = args.clone();
-        let native_type = match &name {
-            &TINY_INT_TYPE_NAME => MsSqlType::TinyInt,
-            &SMALL_INT_TYPE_NAME => MsSqlType::SmallInt,
-            &INT_TYPE_NAME => MsSqlType::Int,
-            &BIG_INT_TYPE_NAME => MsSqlType::BigInt,
-            &DECIMAL_TYPE_NAME => MsSqlType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
-            &NUMERIC_TYPE_NAME => MsSqlType::Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
-            &MONEY_TYPE_NAME => MsSqlType::Money,
-            &SMALL_MONEY_TYPE_NAME => MsSqlType::SmallMoney,
-            &BIT_TYPE_NAME => MsSqlType::Bit,
-            &FLOAT_TYPE_NAME => MsSqlType::Float(parse_one_opt_u32(args, FLOAT_TYPE_NAME)?),
-            &REAL_TYPE_NAME => MsSqlType::Real,
-            &DATE_TYPE_NAME => MsSqlType::Date,
-            &TIME_TYPE_NAME => MsSqlType::Time,
-            &DATETIME_TYPE_NAME => MsSqlType::DateTime,
-            &DATETIME2_TYPE_NAME => MsSqlType::DateTime2,
-            &DATETIME_OFFSET_TYPE_NAME => MsSqlType::DateTimeOffset,
-            &SMALL_DATETIME_TYPE_NAME => MsSqlType::SmallDateTime,
-            &CHAR_TYPE_NAME => MsSqlType::Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
-            &NCHAR_TYPE_NAME => MsSqlType::NChar(parse_one_opt_u32(args, NCHAR_TYPE_NAME)?),
-            &VARCHAR_TYPE_NAME => MsSqlType::VarChar(parse_mssql_type_parameter(args)),
-            &TEXT_TYPE_NAME => MsSqlType::Text,
-            &NVARCHAR_TYPE_NAME => MsSqlType::NVarChar(parse_mssql_type_parameter(args)),
-            &NTEXT_TYPE_NAME => MsSqlType::NText,
-            &BINARY_TYPE_NAME => MsSqlType::Binary(parse_one_opt_u32(args, BINARY_TYPE_NAME)?),
-            &VAR_BINARY_TYPE_NAME => MsSqlType::VarBinary(parse_mssql_type_parameter(args)),
-            &IMAGE_TYPE_NAME => MsSqlType::Image,
-            &XML_TYPE_NAME => MsSqlType::Xml,
-            &UNIQUE_IDENTIFIER_TYPE_NAME => MsSqlType::UniqueIdentifier,
+        let native_type = match name {
+            TINY_INT_TYPE_NAME => MsSqlType::TinyInt,
+            SMALL_INT_TYPE_NAME => MsSqlType::SmallInt,
+            INT_TYPE_NAME => MsSqlType::Int,
+            BIG_INT_TYPE_NAME => MsSqlType::BigInt,
+            DECIMAL_TYPE_NAME => MsSqlType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            NUMERIC_TYPE_NAME => MsSqlType::Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
+            MONEY_TYPE_NAME => MsSqlType::Money,
+            SMALL_MONEY_TYPE_NAME => MsSqlType::SmallMoney,
+            BIT_TYPE_NAME => MsSqlType::Bit,
+            FLOAT_TYPE_NAME => MsSqlType::Float(parse_one_opt_u32(args, FLOAT_TYPE_NAME)?),
+            REAL_TYPE_NAME => MsSqlType::Real,
+            DATE_TYPE_NAME => MsSqlType::Date,
+            TIME_TYPE_NAME => MsSqlType::Time,
+            DATETIME_TYPE_NAME => MsSqlType::DateTime,
+            DATETIME2_TYPE_NAME => MsSqlType::DateTime2,
+            DATETIME_OFFSET_TYPE_NAME => MsSqlType::DateTimeOffset,
+            SMALL_DATETIME_TYPE_NAME => MsSqlType::SmallDateTime,
+            CHAR_TYPE_NAME => MsSqlType::Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
+            NCHAR_TYPE_NAME => MsSqlType::NChar(parse_one_opt_u32(args, NCHAR_TYPE_NAME)?),
+            VARCHAR_TYPE_NAME => MsSqlType::VarChar(parse_mssql_type_parameter(args)),
+            TEXT_TYPE_NAME => MsSqlType::Text,
+            NVARCHAR_TYPE_NAME => MsSqlType::NVarChar(parse_mssql_type_parameter(args)),
+            NTEXT_TYPE_NAME => MsSqlType::NText,
+            BINARY_TYPE_NAME => MsSqlType::Binary(parse_one_opt_u32(args, BINARY_TYPE_NAME)?),
+            VAR_BINARY_TYPE_NAME => MsSqlType::VarBinary(parse_mssql_type_parameter(args)),
+            IMAGE_TYPE_NAME => MsSqlType::Image,
+            XML_TYPE_NAME => MsSqlType::Xml,
+            UNIQUE_IDENTIFIER_TYPE_NAME => MsSqlType::UniqueIdentifier,
             _ => panic!(),
         };
 
@@ -339,7 +339,7 @@ fn parse_mssql_type_parameter(args: Vec<String>) -> Option<MsSqlTypeParameter> {
 
     args.first().map(|arg| {
         let is_max = arg
-            .split(",")
+            .split(',')
             .map(|s| s.trim())
             .any(|s| matches!(s, "max" | "MAX" | "Max" | "MaX" | "maX" | "mAx"));
 

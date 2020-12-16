@@ -96,7 +96,7 @@ impl Standardiser {
 
                             for underlying_field in underlying_fields {
                                 let t = missing_field_names_to_field_names
-                                    .entry(String::from(underlying_field.clone().name))
+                                    .entry(underlying_field.clone().name)
                                     .or_insert(vec![]);
 
                                 t.push(field.name.clone());
