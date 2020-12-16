@@ -17,7 +17,7 @@ use itertools::Itertools;
 pub struct LiftAstToDml<'a, 'b> {
     attributes: AllAttributes,
     source: Option<&'a configuration::Datasource>,
-    generators: &'b Vec<configuration::Generator>,
+    generators: &'b [configuration::Generator],
 }
 
 impl<'a, 'b> LiftAstToDml<'a, 'b> {
@@ -27,7 +27,7 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
     /// The attributes defined by the given sources will be namespaced.
     pub fn new(
         source: Option<&'a configuration::Datasource>,
-        generators: &'b Vec<configuration::Generator>,
+        generators: &'b [configuration::Generator],
     ) -> LiftAstToDml<'a, 'b> {
         LiftAstToDml {
             attributes: AllAttributes::new(),

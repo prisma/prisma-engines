@@ -1,10 +1,11 @@
+#[derive(Debug, Default)]
 pub struct WritableString {
     inner: String,
 }
 
 impl WritableString {
     pub fn new() -> WritableString {
-        WritableString { inner: "".to_string() }
+        Default::default()
     }
 
     pub fn into(self) -> String {
