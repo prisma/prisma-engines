@@ -114,3 +114,9 @@ impl From<DatamodelWarning> for Diagnostics {
         col
     }
 }
+
+impl Default for Diagnostics {
+    fn default() -> Self {
+        Self::new()
+    }
+}

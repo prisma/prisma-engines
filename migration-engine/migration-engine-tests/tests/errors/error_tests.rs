@@ -259,7 +259,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 
     let expected = json!({
         "is_panic": false,
-        "message": err_message.clone(),
+        "message": err_message,
         "meta": {
             "full_error": err_message,
         },

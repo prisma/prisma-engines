@@ -5,8 +5,8 @@ use crate::types::helper::{
 };
 use datamodel::{ast, diagnostics::DatamodelError};
 
-const BLOB_TYPES: &[&'static str] = &["Blob", "LongBlob", "MediumBlob", "TinyBlob"];
-const TEXT_TYPES: &[&'static str] = &["Text", "LongText", "MediumText", "TinyText"];
+const BLOB_TYPES: &[&str] = &["Blob", "LongBlob", "MediumBlob", "TinyBlob"];
+const TEXT_TYPES: &[&str] = &["Text", "LongText", "MediumText", "TinyText"];
 
 #[test]
 fn text_and_blob_data_types_should_fail_on_index() {
