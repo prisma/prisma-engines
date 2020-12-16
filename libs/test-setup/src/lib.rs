@@ -31,7 +31,7 @@ pub struct TestAPIArgs {
 }
 
 impl TestAPIArgs {
-    pub fn new(name: &'static str, tags: u8) -> Self {
+    pub fn new(name: &'static str, tags: u16) -> Self {
         let tags: BitFlags<Tags> = BitFlags::from_bits(tags).unwrap();
         TestAPIArgs {
             test_function_name: name,
@@ -122,10 +122,12 @@ pub fn postgres_13_url(db_name: &str) -> String {
 
 pub fn mysql_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
+    let (host, port) = db_host_and_port_mysql_5_7();
 
     format!(
-        "mysql://root:prisma@{host}:3306/{db_name}?connect_timeout=20&socket_timeout=60",
-        host = db_host_mysql_5_7(),
+        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=60",
+        host = host,
+        port = port,
         db_name = db_name,
     )
 }
@@ -185,7 +187,7 @@ pub fn mssql_2017_url(db_name: &str) -> String {
 }
 
 pub fn mssql_2019_url(db_name: &str) -> String {
-    let (host, port) = db_host_mssql_2019();
+    let (host, port) = db_host_and_port_mssql_2019();
 
     format!(
         "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;encrypt=DANGER_PLAINTEXT;isolationLevel=READ UNCOMMITTED",
@@ -223,7 +225,7 @@ fn db_host_and_port_postgres_11() -> (&'static str, usize) {
     }
 }
 
-fn db_host_and_port_postgres_12() -> (&'static str, usize) {
+pub fn db_host_and_port_postgres_12() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-postgres-12", 5432),
         Err(_) => ("127.0.0.1", 5434),
@@ -237,7 +239,7 @@ fn db_host_and_port_postgres_13() -> (&'static str, usize) {
     }
 }
 
-fn db_host_and_port_mysql_8_0() -> (&'static str, usize) {
+pub fn db_host_and_port_mysql_8_0() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-mysql-8-0", 3306),
         Err(_) => ("127.0.0.1", 3307),
@@ -251,10 +253,10 @@ fn db_host_and_port_mysql_5_6() -> (&'static str, usize) {
     }
 }
 
-fn db_host_mysql_5_7() -> &'static str {
+pub fn db_host_and_port_mysql_5_7() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
-        Ok(_) => "test-db-mysql-5-7",
-        Err(_) => "127.0.0.1",
+        Ok(_) => ("test-db-mysql-5-7", 3306),
+        Err(_) => ("127.0.0.1", 3306),
     }
 }
 
@@ -272,7 +274,7 @@ fn db_host_mssql_2017() -> (&'static str, usize) {
     }
 }
 
-fn db_host_mssql_2019() -> (&'static str, usize) {
+pub fn db_host_and_port_mssql_2019() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-mssql-2019", 1433),
         Err(_) => ("127.0.0.1", 1433),

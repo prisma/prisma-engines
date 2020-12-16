@@ -148,6 +148,32 @@ pub struct CannotRollBackSucceededMigration {
 )]
 pub struct DeprecatedProviderArray;
 
+#[derive(Debug, Serialize)]
+pub struct ShadowDbCreationError {
+    pub inner_error: crate::Error,
+}
+
+impl crate::UserFacingError for ShadowDbCreationError {
+    const ERROR_CODE: &'static str = "P3014";
+
+    fn message(&self) -> String {
+        let error_code = match &self.inner_error.inner {
+            crate::ErrorType::Known(crate::KnownError {
+                message: _,
+                meta: _,
+                error_code,
+            }) => format!("Error code: {}\n", &error_code),
+            crate::ErrorType::Unknown(_) => String::new(),
+        };
+
+        format!(
+            "Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases.  More info: https://pris.ly/d/migrate-shadow. Original error: {error_code}\n{inner_error}",
+            inner_error = self.inner_error.message(),
+            error_code = error_code
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

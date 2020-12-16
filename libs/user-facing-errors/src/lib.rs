@@ -57,6 +57,14 @@ enum ErrorType {
 }
 
 impl Error {
+    /// Try to interpret the error as a known error.
+    pub fn as_known(&self) -> Option<&KnownError> {
+        match &self.inner {
+            ErrorType::Known(err) => Some(err),
+            ErrorType::Unknown(_) => None,
+        }
+    }
+
     pub fn message(&self) -> &str {
         match &self.inner {
             ErrorType::Known(err) => &err.message,
