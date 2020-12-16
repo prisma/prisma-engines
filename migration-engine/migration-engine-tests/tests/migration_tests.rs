@@ -247,7 +247,7 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
     // MySQL cannot add autoincrement property to a column that already has data.
     if !api.sql_family().is_mysql() {
         // Data to see we don't lose anything in the translation.
-        for (i, content) in (&["A", "B", "C"]).into_iter().enumerate() {
+        for (i, content) in (&["A", "B", "C"]).iter().enumerate() {
             let insert = Insert::single_into(api.render_table_name("Post"))
                 .value("content", *content)
                 .value("id", i);
@@ -392,7 +392,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &Test
     })?;
 
     // Data to see we don't lose anything in the translation.
-    for (i, content) in (&["A", "B", "C"]).into_iter().enumerate() {
+    for (i, content) in (&["A", "B", "C"]).iter().enumerate() {
         let insert = Insert::single_into(api.render_table_name("Post"))
             .value("content", *content)
             .value("id", i);
@@ -1397,8 +1397,7 @@ async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) 
         .table_bang("A")
         .indices
         .iter()
-        .find(|i| i.columns == &["custom_field_name"]);
-
+        .find(|i| i.columns == ["custom_field_name"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
@@ -1425,7 +1424,7 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
         .table_bang("A")
         .indices
         .iter()
-        .find(|i| i.columns == &["custom_field_name", "second_custom_field_name"]);
+        .find(|i| i.columns == ["custom_field_name", "second_custom_field_name"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
@@ -1526,7 +1525,7 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
 
     let result = api.describe_database().await?;
 
-    let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
+    let index = result.table_bang("A").indices.iter().find(|i| i.columns == ["field"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
@@ -1541,7 +1540,7 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
 
     let result = api.describe_database().await?;
 
-    let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
+    let index = result.table_bang("A").indices.iter().find(|i| i.columns == ["field"]);
     assert!(index.is_none());
 
     Ok(())
