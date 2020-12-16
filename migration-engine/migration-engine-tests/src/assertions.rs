@@ -528,10 +528,11 @@ impl<'a> ForeignKeyAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_restrict_on_delete(self) -> AssertionResult<Self> {
+    pub fn assert_restrict_on_delete_or_no_action(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.on_delete_action == ForeignKeyAction::Restrict,
-            "Assertion failed: expected foreign key to restrict on delete."
+            self.0.on_delete_action == ForeignKeyAction::Restrict
+                || self.0.on_delete_action == ForeignKeyAction::NoAction,
+            "Assertion failed: expected foreign key with action RESTRICT or NO ACTION for on delete."
         );
 
         Ok(self)

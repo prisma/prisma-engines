@@ -2233,10 +2233,11 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
             .assert_has_column("cat_id")?
             .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
                 fk.assert_references("Human", &["firstName", "lastName"])?
-                    .assert_restrict_on_delete()
+                    .assert_restrict_on_delete_or_no_action()
             })?
             .assert_fk_on_columns(&["cat_id"], |fk| {
-                fk.assert_references("Cat", &["id"])?.assert_restrict_on_delete()
+                fk.assert_references("Cat", &["id"])?
+                    .assert_restrict_on_delete_or_no_action()
             })?
             .assert_indexes_count(2)?
             .assert_index_on_columns(&["cat_id", "human_firstName", "human_lastName"], |idx| {
