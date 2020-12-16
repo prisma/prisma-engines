@@ -88,7 +88,7 @@ impl From<CoreError> for GQLError {
 impl From<PrismaError> for GQLError {
     fn from(other: PrismaError) -> Self {
         match other {
-            PrismaError::CoreError(core_error) => GQLError::from(core_error),
+            PrismaError::CoreError(core_error) => GQLError::from(*core_error),
             err => GQLError::from(user_facing_errors::Error::from_dyn_error(&err)),
         }
     }

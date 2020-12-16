@@ -261,7 +261,7 @@ where
 
             Expression::Return { result } => async move {
                 self.log_line(level, || "RETURN");
-                Ok(result)
+                Ok(*result)
             }
             .boxed(),
         }

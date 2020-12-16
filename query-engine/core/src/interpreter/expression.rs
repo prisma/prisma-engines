@@ -34,7 +34,7 @@ pub enum Expression {
     },
 
     Return {
-        result: ExpressionResult,
+        result: Box<ExpressionResult>,
     },
 }
 
@@ -47,5 +47,10 @@ impl Expression {
     /// Construct a new instance from a `Query`.
     pub fn from_query(query: Query) -> Self {
         Self::Query { query: Box::new(query) }
+    }
+
+    /// Construct a new instance from an `ExpressionResult`.
+    pub fn from_expression_result(res: ExpressionResult) -> Self {
+        Self::Return { result: Box::new(res) }
     }
 }

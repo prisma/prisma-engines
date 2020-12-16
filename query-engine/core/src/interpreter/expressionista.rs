@@ -168,12 +168,12 @@ impl Expressionista {
                         let left_diff: Vec<&RecordProjection> = left.difference(&right).collect();
                         let right_diff: Vec<&RecordProjection> = right.difference(&left).collect();
 
-                        Ok(Expression::Return {
-                            result: ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
+                        Ok(Expression::from_expression_result(ExpressionResult::Computation(
+                            ComputationResult::Diff(DiffResult {
                                 left: left_diff.into_iter().map(Clone::clone).collect(),
                                 right: right_diff.into_iter().map(Clone::clone).collect(),
-                            })),
-                        })
+                            }),
+                        )))
                     }
                     _ => unreachable!(),
                 }),
@@ -290,8 +290,7 @@ impl Expressionista {
                     Some(r) => ExpressionResult::RawProjections(r),
                     None => ExpressionResult::Empty,
                 };
-
-                Ok(Expression::Return { result })
+                Ok(Expression::from_expression_result(result))
             } else {
                 unreachable!()
             }
