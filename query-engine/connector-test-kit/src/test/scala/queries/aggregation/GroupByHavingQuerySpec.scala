@@ -3,19 +3,30 @@ package queries.aggregation
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, HashMap}
 
 class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
-  case class FieldDef(name: String, mappingType: MappingType, numeric: Boolean)
+  case class FieldDef(name: String, mappingType: TypeMapping, numeric: Boolean)
 
-  trait MappingType {
-    val prismaType: String
+  case class TypeMapping(prismaType: String) {
+    def serialize(value: Option[Double]): String = {
+      value match {
+        case Some(v) =>
+          prismaType match {
+            case "Int"     => s"${v.toInt}"
+            case "BigInt"  => s""""${v.toInt}""""
+            case "Float"   => v.toString
+            case "Decimal" => s""""${v.toString}""""
+            case _         => s""""${v.toString}""""
+          }
+
+        case None => "null"
+      }
+    }
   }
 
-  case class StringMappingType(prismaType: String) extends MappingType
-  case class NumberMappingType(prismaType: String) extends MappingType
-
-  case class Group(id: Int, rows: ArrayBuffer[ArrayBuffer[Double]], aggregations: HashMap[String, HashMap[String, Double]])
+  case class Group(id: Int, rows: ArrayBuffer[ArrayBuffer[Option[Double]]], groupAggregations: HashMap[String, HashMap[String, Option[Double]]])
 
   trait AggregationOperation {
     val op: String
@@ -42,11 +53,11 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   // If something fails, print all info for reproduction.
   def generateAndExecuteTestMatrix(): Unit = {
     val modelFields = Seq(
-      FieldDef("float", NumberMappingType("Float"), numeric = true),
-      FieldDef("int", NumberMappingType("Int"), numeric = true),
-      FieldDef("dec", StringMappingType("Decimal"), numeric = true),
-      FieldDef("bigInt", StringMappingType("BigInt"), numeric = true),
-      FieldDef("str", StringMappingType("String"), numeric = false)
+      FieldDef("float", TypeMapping("Float"), numeric = true),
+      FieldDef("int", TypeMapping("Int"), numeric = true),
+      FieldDef("dec", TypeMapping("Decimal"), numeric = true),
+      FieldDef("bigInt", TypeMapping("BigInt"), numeric = true),
+      FieldDef("str", TypeMapping("String"), numeric = false)
     )
 
     val datamodelString = generateDatamodel(modelFields)
@@ -56,7 +67,8 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     database.truncateProjectTables(project)
 
     for (field <- modelFields) yield {
-      generateGroups(project, field, modelFields)
+      val groups = generateGroups(project, field, modelFields)
+      report(groups, field, modelFields)
       executeFieldTests(field)
     }
   }
@@ -75,7 +87,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   // The `on` field passed acts as the group ID storage.
-  def generateGroups(project: Project, on: FieldDef, fields: Seq[FieldDef]): Unit = {
+  def generateGroups(project: Project, on: FieldDef, fields: Seq[FieldDef]): Seq[Group] = {
     val random = scala.util.Random
 
     // In-memory aggregations for the generated groups.
@@ -114,7 +126,6 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
             if (fieldValue < 100) {
               row.append(Some(fieldValue))
             } else {
-              println(">>>>>>>>>>>>>>>>>>>>> INSERTING NULL")
               row.append(None)
             }
           } else {
@@ -148,8 +159,9 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
                 map.put(op, Some(values.length))
 
               case Average(op) =>
-                val map = groupAggregationMap(field.name)
-                map.put(op, Some(values.sum / values.length))
+                val map   = groupAggregationMap(field.name)
+                val value = BigDecimal(values.sum / values.length).setScale(4, BigDecimal.RoundingMode.HALF_UP).toDouble
+                map.put(op, Some(value))
 
               case Sum(op) =>
                 val map = groupAggregationMap(field.name)
@@ -167,8 +179,9 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
         }
       }
 
-      // Create rows in DB
+      // Create rows in the DB and return group
       createRows(project, rows, fields)
+      Group(groupId, rows, groupAggregationMap)
     }
   }
 
@@ -186,12 +199,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       val zipped: Seq[(FieldDef, Option[Double])] = fields.zip(row)
 
       val values = zipped.map {
-        case (field, value) =>
-          field.mappingType match {
-            case StringMappingType(_) if value.isDefined => s"""${field.name}: "${value.get}""""
-            case _ if value.isEmpty                      => s"""${field.name}: null"""
-            case _                                       => s"${field.name}: ${value.get}"
-          }
+        case (field, value) => s"""${field.name}: ${field.mappingType.serialize(value)}"""
       }
 
       server.query(
@@ -226,6 +234,49 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""".stripMargin,
       project
     )
+  }
+
+  def report(groups: Seq[Group], on: FieldDef, fields: Seq[FieldDef]): Unit = {
+    val builder         = new mutable.StringBuilder()
+    val tableCellLength = 10
+
+    builder.append(s"""\n------- Testing groups on field `${on.name}` -------\n""".stripMargin)
+    for (group <- groups) yield {
+      builder.append(s"""
+           |## Group ${group.id}
+           |Rows:\n""".stripMargin)
+
+      builder.append(fields.map(field => pad(field.name, tableCellLength)).mkString)
+      builder.append("\n")
+
+      for (row <- group.rows) yield {
+        for ((value, field) <- row.zip(fields)) yield {
+          builder.append(pad(field.mappingType.serialize(value), tableCellLength))
+        }
+
+        builder.append("\n")
+      }
+
+      builder.append(s"\nAggregations for group ${group.id}:\n")
+      builder.append(pad("", tableCellLength))
+      builder.append(fields.map(field => pad(field.name, tableCellLength)).mkString)
+      builder.append("\n")
+
+      for (aggregation <- possibleAggregations) yield {
+        builder.append(pad(aggregation.op, tableCellLength))
+
+        for (field <- fields) yield {
+          builder.append(pad(group.groupAggregations(field.name)(aggregation.op).map(_.toString).getOrElse("null"), tableCellLength))
+        }
+        builder.append("\n")
+      }
+    }
+
+    println(builder.toString())
+  }
+
+  def pad(s: String, totalLength: Int): String = {
+    s.padTo(totalLength, " ").mkString
   }
 
   // This is just basic confirmation that scalar filters are applied correctly.
