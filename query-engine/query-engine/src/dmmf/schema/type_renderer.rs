@@ -67,14 +67,12 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
                 ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 
-            let type_reference = DmmfTypeReference {
+            DmmfTypeReference {
                 typ: stringified.into(),
                 namespace: None,
                 location: TypeLocation::Scalar,
                 is_list: false,
-            };
-
-            type_reference
+            }
         }
     }
 }
@@ -151,14 +149,12 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
                 ScalarType::Enum(_) => unreachable!(), // Handled separately above.
             };
 
-            let type_reference = DmmfTypeReference {
+            DmmfTypeReference {
                 typ: stringified.into(),
                 namespace: None,
                 location: TypeLocation::Scalar,
                 is_list: false,
-            };
-
-            type_reference
+            }
         }
     }
 }
