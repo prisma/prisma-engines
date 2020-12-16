@@ -14,6 +14,7 @@ pub mod runtime;
 /// The built-in connectors database.
 pub mod connectors;
 
+pub use crate::connectors::Features;
 use crate::connectors::Tags;
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
@@ -28,14 +29,18 @@ const SCHEMA_NAME: &str = "prisma-tests";
 pub struct TestAPIArgs {
     pub test_function_name: &'static str,
     pub test_tag: BitFlags<Tags>,
+    pub test_features: BitFlags<Features>,
 }
 
 impl TestAPIArgs {
-    pub fn new(name: &'static str, tags: u16) -> Self {
+    pub fn new(name: &'static str, tags: u16, features: u8) -> Self {
         let tags: BitFlags<Tags> = BitFlags::from_bits(tags).unwrap();
+        let features: BitFlags<Features> = BitFlags::from_bits(features).unwrap();
+
         TestAPIArgs {
             test_function_name: name,
             test_tag: tags,
+            test_features: features,
         }
     }
 }
