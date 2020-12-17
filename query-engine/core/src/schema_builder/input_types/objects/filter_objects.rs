@@ -102,7 +102,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
         .unique_indexes()
         .into_iter()
         .map(|index| {
-            let typ = compound_field_unique_object_type(ctx, index.name.as_ref(), index.fields());
+            let typ = compound_field_unique_object_type(ctx, model, index.name.as_ref(), index.fields());
             let name = compound_index_field_name(index);
 
             input_field(name, InputType::object(typ), None).optional()
@@ -114,7 +114,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let compound_id_field: Option<InputField> = if id_fields.as_ref().map(|f| f.len() > 1).unwrap_or(false) {
         id_fields.map(|fields| {
             let name = compound_id_field_name(&fields.iter().map(|f| f.name.as_ref()).collect::<Vec<&str>>());
-            let typ = compound_field_unique_object_type(ctx, None, fields);
+            let typ = compound_field_unique_object_type(ctx, model, None, fields);
 
             input_field(name, InputType::object(typ), None).optional()
         })
@@ -133,11 +133,12 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
 /// Generates and caches an input object type for a compound field.
 fn compound_field_unique_object_type(
     ctx: &mut BuilderContext,
+    model: &ModelRef,
     alias: Option<&String>,
     from_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
-        format!("{}CompoundUniqueInput", compound_object_name(alias, &from_fields)),
+        format!("{}{}CompoundUniqueInput", model.name, compound_object_name(alias, &from_fields)),
         PRISMA_NAMESPACE,
     );
 

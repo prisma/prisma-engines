@@ -1132,4 +1132,86 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
 
     res12.toString() should be("{\"data\":{\"updateChild\":{\"id\":3,\"parents\":[]}}}")
   }
+
+  "Using compounds uniques that use the same field names in different models" should "work" in {
+    val project = ProjectDsl.fromString {
+      s"""
+         |model ModelA {
+         |  id       Int    @id @default(autoincrement())
+         |  fieldA  String
+         |  fieldB  String
+         |  @@unique([fieldA, fieldB])
+         |}
+         |
+         |model ModelB {
+         |  id      Int     @id @default(autoincrement())
+         |  fieldA  Int
+         |  fieldB  Int
+         |
+         |  @@unique([fieldA, fieldB])
+         |}
+       """
+    }
+    database.setup(project)
+
+    server.query(
+      """
+        | mutation {
+        |   createOneModelA(data: { fieldA: "a", fieldB: "b" }) { id }
+        | }
+        |
+      """,
+      project,
+      "",
+      false
+    )
+
+    server.query(
+      """
+        | mutation {
+        |   createOneModelB(data: { fieldA: 1, fieldB: 2 }) { id }
+        | }
+        |
+      """,
+      project,
+      "",
+      false
+    )
+
+    val res1 = server.query(
+      """
+        |{
+        | findOneModelA(where: {
+        |   fieldA_fieldB: {
+        |     fieldA: "a",
+        |     fieldB: "b"
+        |   }
+        | }) { fieldA fieldB }
+        |}
+      """,
+      project,
+      "",
+      false
+    )
+
+    res1.toString() should be("{\"data\":{\"findOneModelA\":{\"fieldA\":\"a\",\"fieldB\":\"b\"}}}")
+
+    val res2 = server.query(
+      """
+        |{
+        | findOneModelB(where: {
+        |   fieldA_fieldB: {
+        |     fieldA: 1,
+        |     fieldB: 2
+        |   }
+        | }) { fieldA fieldB }
+        |}
+      """,
+      project,
+      "",
+      false
+    )
+
+    res2.toString() should be("{\"data\":{\"findOneModelB\":{\"fieldA\":1,\"fieldB\":2}}}")
+  }
 }
