@@ -236,6 +236,78 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   // *** Sum ***
   // ***********
 
+  "Using a groupBy with a `having` sum scalar filters" should "work" in {
+    // Do some combination testing here for good measure.
+    // Float, int, dec, s, id
+    create(Some(10), Some(10), Some("10"), "group1", Some("1"))
+    create(Some(6), Some(6), Some("6"), "group1", Some("2"))
+    create(Some(5), Some(5), Some("5"), "group2", Some("3"))
+    create(None, None, None, "group2", Some("4"))
+    create(None, None, None, "group3", Some("5"))
+    create(None, None, None, "group3", Some("6"))
+
+    // Group 1 has 16, 2 has 6, 3 has 0
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { sum: { equals: 16 }}
+         |    int: { sum: { equals: 16 }}
+         |    dec: { sum: { equals: "16" }}
+         |  }) {
+         |    s
+         |    sum {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","sum":{"float":16,"int":16,"dec":"16"}}]}}""")
+
+    // Group 2 (3 is null)
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { sum: { not: { equals: 16 }}}
+         |    int: { sum: { not: { equals: 16 }}}
+         |    dec: { sum: { not: { equals: "16" }}}
+         |  }) {
+         |    s
+         |    sum {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","sum":{"float":5,"int":5,"dec":"5"}}]}}""")
+
+    // Group 1 and 2 returned
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { sum: { in: [16, 5] }}
+         |    int: { sum: { in: [16, 5] }}
+         |    dec: { sum: { in: ["16", "5"] }}
+         |  }) {
+         |    s
+         |    sum {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group1","sum":{"float":16,"int":16,"dec":"16"}},{"s":"group2","sum":{"float":5,"int":5,"dec":"5"}}]}}""")
+  }
+
   // ***********
   // *** Min ***
   // ***********
