@@ -237,7 +237,6 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   // ***********
 
   "Using a groupBy with a `having` sum scalar filters" should "work" in {
-    // Do some combination testing here for good measure.
     // Float, int, dec, s, id
     create(Some(10), Some(10), Some("10"), "group1", Some("1"))
     create(Some(6), Some(6), Some("6"), "group1", Some("2"))
@@ -312,9 +311,153 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   // *** Min ***
   // ***********
 
+  "Using a groupBy with a `having` min scalar filters" should "work" in {
+    // Float, int, dec, s, id
+    create(Some(10), Some(10), Some("10"), "group1", Some("1"))
+    create(Some(0), Some(0), Some("0"), "group1", Some("2"))
+    create(Some(0), Some(0), Some("0"), "group2", Some("3"))
+    create(None, None, None, "group2", Some("4"))
+    create(None, None, None, "group3", Some("5"))
+    create(None, None, None, "group3", Some("6"))
+
+    // Group 1 and 2 returned
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { min: { equals: 0 }}
+         |    int: { min: { equals: 0 }}
+         |    dec: { min: { equals: "0" }}
+         |  }) {
+         |    s
+         |    min {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group1","min":{"float":0,"int":0,"dec":"0"}},{"s":"group2","min":{"float":0,"int":0,"dec":"0"}}]}}""")
+
+    // Empty
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { min: { not: { equals: 0 }}}
+         |    int: { min: { not: { equals: 0 }}}
+         |    dec: { min: { not: { equals: "0" }}}
+         |  }) {
+         |    s
+         |    min {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be("""{"data":{"groupByModel":[]}}""")
+
+    // Group 1 and 2 returned
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { min: { in: [0] }}
+         |    int: { min: { in: [0] }}
+         |    dec: { min: { in: ["0"] }}
+         |  }) {
+         |    s
+         |    min {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group1","min":{"float":0,"int":0,"dec":"0"}},{"s":"group2","min":{"float":0,"int":0,"dec":"0"}}]}}""")
+  }
+
   // ***********
   // *** Max ***
   // ***********
+
+  "Using a groupBy with a `having` max scalar filters" should "work" in {
+    // Float, int, dec, s, id
+    create(Some(10), Some(10), Some("10"), "group1", Some("1"))
+    create(Some(0), Some(0), Some("0"), "group1", Some("2"))
+    create(Some(10), Some(10), Some("10"), "group2", Some("3"))
+    create(None, None, None, "group2", Some("4"))
+    create(None, None, None, "group3", Some("5"))
+    create(None, None, None, "group3", Some("6"))
+
+    // Group 1 returned
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { max: { equals: 10 }}
+         |    int: { max: { equals: 10 }}
+         |    dec: { max: { equals: "10" }}
+         |  }) {
+         |    s
+         |    max {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group1","max":{"float":10,"int":10,"dec":"10"}},{"s":"group2","max":{"float":10,"int":10,"dec":"10"}}]}}""")
+
+    // Empty
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { max: { not: { equals: 10 }}}
+         |    int: { max: { not: { equals: 10 }}}
+         |    dec: { max: { not: { equals: "10" }}}
+         |  }) {
+         |    s
+         |    max {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be("""{"data":{"groupByModel":[]}}""")
+
+    // Group 1 and 2 returned
+    result = server.query(
+      s"""{
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    float: { max: { in: [10] }}
+         |    int: { max: { in: [10] }}
+         |    dec: { max: { in: ["10"] }}
+         |  }) {
+         |    s
+         |    max {
+         |      float
+         |      int
+         |      dec
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be(
+      """{"data":{"groupByModel":[{"s":"group1","max":{"float":10,"int":10,"dec":"10"}},{"s":"group2","max":{"float":10,"int":10,"dec":"10"}}]}}""")
+  }
 
   // *******************
   // *** Error cases ***
