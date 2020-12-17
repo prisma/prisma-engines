@@ -66,9 +66,7 @@ impl RpcImpl {
         RpcImpl
     }
 
-    async fn load_connector(
-        schema: &String,
-    ) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
+    async fn load_connector(schema: &str) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
         let config = datamodel::parse_configuration(&schema)?;
 
         let url = config
@@ -137,7 +135,7 @@ impl RpcImpl {
     /// In this processes it applies a patch to turn virtual relation fields that are required into optional instead.
     /// The reason for this is that we introduced a breaking change to disallow required virtual relation fields.
     /// With this patch we can tell users to simply run `prisma introspect` to fix their schema.
-    fn parse_datamodel(schema: &str, config: &Configuration) -> RpcResult<Datamodel> {
+    pub fn parse_datamodel(schema: &str, config: &Configuration) -> RpcResult<Datamodel> {
         // 1. Parse the schema without any validations & standardisations. A required virtual relation field would fail validation as it is forbidden.
         let mut dm_that_needs_fixing = datamodel::parse_datamodel_without_validation(&schema).map_err(|err| {
             Error::from(CommandError::ReceivedBadDatamodel(
@@ -165,7 +163,7 @@ impl RpcImpl {
 
         // 3. Render the datamodel and then parse it. This makes sure the validations & standardisations have been run.
         let rendered_datamodel = datamodel::render_datamodel_and_config_to_string(&dm_that_needs_fixing, &config);
-        datamodel::parse_datamodel(&rendered_datamodel)
+        let final_dm = datamodel::parse_datamodel(&rendered_datamodel)
             .map(|d| d.subject)
             .map_err(|err| {
                 Error::from(CommandError::ReceivedBadDatamodel(
@@ -173,7 +171,7 @@ impl RpcImpl {
                 ))
             })?;
 
-        Ok(dm_that_needs_fixing)
+        Ok(final_dm)
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {
@@ -210,4 +208,10 @@ pub struct IntrospectionInput {
 
 fn default_false() -> bool {
     false
+}
+
+impl Default for RpcImpl {
+    fn default() -> Self {
+        Self::new()
+    }
 }

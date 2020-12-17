@@ -14,7 +14,7 @@ async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestRes
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Pair", |table| {
         table
@@ -44,7 +44,7 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -76,7 +76,7 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -104,7 +104,7 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm)
+    api.schema_push(dm)
         .migration_id(Some("initial"))
         .send()
         .await?
@@ -133,12 +133,12 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
     "##;
 
     if api.is_mysql() {
-        api.infer_apply(dm).force(Some(true)).send().await?.assert_warnings(&["The migration will remove the values [hongry] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail.".into()])?;
+        api.schema_push(dm).force(true).send().await?.assert_warnings(&["The migration will remove the values [hongry] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail.".into()])?;
         api.assert_schema()
             .await?
             .assert_enum("Cat_mood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
     } else {
-        api.infer_apply(dm).force(Some(true)).send().await?.assert_warnings(&["The migration will remove the values [hongry] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()])?;
+        api.schema_push(dm).force(true).send().await?.assert_warnings(&["The migration will remove the values [hongry] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()])?;
         api.assert_schema()
             .await?
             .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
@@ -170,7 +170,7 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm)
+    api.schema_push(dm)
         .migration_id(Some("initial"))
         .send()
         .await?
@@ -216,7 +216,7 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
@@ -247,7 +247,7 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
         }
     "##;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
@@ -279,7 +279,7 @@ async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) ->
         }
     "##;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
@@ -313,7 +313,7 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
         }
     "##;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Parent", |table| {
         table.assert_index_on_columns(&["chiid", "chic"], |idx| idx.assert_is_unique())
@@ -343,7 +343,7 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("SpamList", |table| {
         table.assert_index_on_columns(&["ufn", "uln"], |idx| idx.assert_is_not_unique())
@@ -381,10 +381,10 @@ async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult
 
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
     api.assert_schema().await?.assert_tables_count(3)?;
 
-    api.infer_apply("").send().await?.assert_green()?;
+    api.schema_push("").send().await?.assert_green()?;
     api.assert_schema().await?.assert_tables_count(0)?;
 
     Ok(())

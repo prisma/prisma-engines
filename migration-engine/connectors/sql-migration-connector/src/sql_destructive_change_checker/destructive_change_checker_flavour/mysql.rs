@@ -27,7 +27,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
 
         // If only the default changed, the migration is safe.
         if changes.only_default_changed() {
-            return ();
+            return;
         }
 
         // Otherwise, case by case.

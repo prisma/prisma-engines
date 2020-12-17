@@ -103,7 +103,7 @@ impl SchemaAssertion {
     }
 
     pub fn debug_print(self) -> Self {
-        dbg!(&self.0);
+        println!("{:?}", &self.0);
 
         self
     }
@@ -270,7 +270,7 @@ impl<'a> TableAssertion<'a> {
     }
 
     pub fn debug_print(self) -> AssertionResult<Self> {
-        dbg!(&self.0);
+        println!("{:?}", self.0);
         Ok(self)
     }
 }
@@ -498,7 +498,7 @@ impl<'a> PrimaryKeyAssertion<'a> {
     }
 
     pub fn debug_print(self) -> AssertionResult<Self> {
-        dbg!(&self.pk);
+        println!("{:?}", &self.pk);
         Ok(self)
     }
 }

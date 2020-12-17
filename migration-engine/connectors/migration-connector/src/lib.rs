@@ -65,7 +65,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     }
 
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
-    fn migration_persistence<'a>(&'a self) -> &dyn MigrationPersistence;
+    fn migration_persistence(&self) -> &dyn MigrationPersistence;
 
     /// See [ImperativeMigrationPersistence](trait.ImperativeMigrationPersistence.html).
     fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence;

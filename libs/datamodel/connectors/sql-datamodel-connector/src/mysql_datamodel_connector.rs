@@ -42,7 +42,7 @@ const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const YEAR_TYPE_NAME: &str = "Year";
 const JSON_TYPE_NAME: &str = "JSON";
 
-const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&'static str] = &[
+const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&str] = &[
     TEXT_TYPE_NAME,
     LONG_TEXT_TYPE_NAME,
     MEDIUM_TEXT_TYPE_NAME,
@@ -370,5 +370,11 @@ impl Connector for MySqlDatamodelConnector {
                 connector_name: "Mysql".parse().unwrap(),
             }))
         }
+    }
+}
+
+impl Default for MySqlDatamodelConnector {
+    fn default() -> Self {
+        Self::new()
     }
 }

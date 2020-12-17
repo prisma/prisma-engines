@@ -105,11 +105,11 @@ impl SqlSchema {
         }
     }
 
-    pub fn table_walkers<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> {
+    pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
         (0..self.tables.len()).map(move |table_index| TableWalker::new(self, table_index))
     }
 
-    pub fn enum_walkers<'a>(&'a self) -> impl Iterator<Item = EnumWalker<'a>> {
+    pub fn enum_walkers(&self) -> impl Iterator<Item = EnumWalker<'_>> {
         (0..self.enums.len()).map(move |enum_index| EnumWalker {
             schema: self,
             enum_index,
@@ -461,10 +461,6 @@ pub struct Enum {
 pub struct Sequence {
     /// Sequence name.
     pub name: String,
-    /// Sequence initial value.
-    pub initial_value: u32,
-    /// Sequence allocation size.
-    pub allocation_size: u32,
 }
 
 #[derive(PartialEq, Debug, Clone)]
@@ -537,7 +533,7 @@ impl DefaultValue {
     }
 
     pub fn constraint_name(&self) -> Option<&str> {
-        self.constraint_name.as_ref().map(|s| s.as_str())
+        self.constraint_name.as_deref()
     }
 
     pub fn as_value(&self) -> Option<&PrismaValue> {

@@ -1,22 +1,16 @@
-mod apply_migration;
 mod apply_migrations;
-mod calculate_database_steps;
 mod create_migration;
-mod datamodel_calculator;
-mod datamodel_steps_inferrer;
 mod diagnose_migration_history;
 mod errors;
 mod evaluate_data_loss;
 mod existing_data;
 mod existing_databases;
-mod infer_migration_steps;
 mod initialization;
 mod list_migration_directories;
 mod migration_persistence;
 mod migrations;
 mod reset;
 mod schema_push;
-mod unapply_migration;
 
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
@@ -37,7 +31,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
@@ -78,7 +72,7 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
@@ -111,7 +105,7 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
         api.datasource()
     );
 
-    api.infer_apply(&dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("javaScriptObjectNotation", |c| {
@@ -124,7 +118,7 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
         })
     })?;
 
-    api.infer(&dm).send_assert().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }
@@ -204,10 +198,7 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
         SqlFamily::Postgres => {
             let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
             let default = column.default.as_ref().expect("Must have nextval default");
-            assert_eq!(
-                DefaultValue::sequence(format!("nextval('\"{}\"'::regclass)", sequence.name)),
-                *default
-            );
+            assert_eq!(DefaultValue::sequence(sequence.name.clone()), *default);
         }
         _ => assert_eq!(column.auto_increment, true),
     }
@@ -229,7 +220,7 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
@@ -266,14 +257,14 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
     })?;
 
     // Check that the migration is idempotent.
-    api.infer_apply(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
 
     // MySQL cannot add autoincrement property to a column that already has data.
     if !api.sql_family().is_mysql() {
@@ -305,7 +296,7 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
@@ -336,14 +327,14 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
     })?;
 
     // Check that the migration is idempotent.
-    api.infer_apply(dm2)
+    api.schema_push(dm2)
         .migration_id(Some("idempotency-check"))
         .send()
         .await?
@@ -408,7 +399,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &Test
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model
@@ -417,7 +408,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_indices(api: &Test
     })?;
 
     // Check that the migration is idempotent.
-    api.infer_apply(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
 
     assert_eq!(
         3,
@@ -457,7 +448,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
@@ -519,7 +510,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
         model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
@@ -527,7 +518,7 @@ async fn making_an_existing_id_field_autoincrement_works_with_foreign_keys(api: 
 
     // TODO: Why not empty?
     // Check that the migration is idempotent.
-    //api.infer_apply(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    //api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
 
     assert_eq!(
         3,
@@ -557,11 +548,11 @@ async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm_with).send().await?.assert_green()?;
-    api.infer_apply(dm_without).send().await?.assert_green()?;
-    api.infer_apply(dm_with).send().await?.assert_green()?;
-    api.infer_apply(dm_without).send().await?.assert_green()?;
-    api.infer_apply(dm_with).send().await?.assert_green()?;
+    api.schema_push(dm_with).send().await?.assert_green()?;
+    api.schema_push(dm_without).send().await?.assert_green()?;
+    api.schema_push(dm_with).send().await?.assert_green()?;
+    api.schema_push(dm_without).send().await?.assert_green()?;
+    api.schema_push(dm_with).send().await?.assert_green()?;
 
     Ok(())
 }
@@ -576,7 +567,7 @@ async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_
         }
     "#;
 
-    api.infer_apply(dm1)
+    api.schema_push(dm1)
         .migration_id(Some("apply_dm1"))
         .send()
         .await?
@@ -593,7 +584,7 @@ async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_
         }
     "#;
 
-    api.infer_apply(dm2)
+    api.schema_push(dm2)
         .migration_id(Some("apply_dm2"))
         .send()
         .await?
@@ -608,7 +599,7 @@ async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_
     })?;
 
     // Now re-apply the sequence.
-    api.infer_apply(dm1)
+    api.schema_push(dm1)
         .migration_id(Some("apply_dm1_again"))
         .send()
         .await?
@@ -885,9 +876,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
         }
     "#;
 
-    let result = api.infer_apply(dm2).send().await?.into_inner();
-
-    anyhow::ensure!(result.warnings.is_empty(), "Warnings should be empty");
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
@@ -899,7 +888,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
 }
 
 #[test_each_connector]
-async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
+async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
@@ -926,7 +915,16 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
             a  A?
         }
     "#;
-    let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
+
+    api.schema_push(dm2)
+        .force(true)
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_has_executed_steps()?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("A");
     let column = result.table_bang("A").column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -946,6 +944,8 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
             on_update_action: ForeignKeyAction::NoAction,
         }]
     );
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -993,7 +993,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("_my_relation", |table| {
         table
@@ -1159,7 +1159,8 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
             }
         "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
+
     api.assert_schema()
         .await?
         .assert_table("A", |table| table.assert_has_column("b_id"))?;
@@ -1174,7 +1175,7 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
             }
         "#;
 
-    api.infer_apply(dm2).send().await?.into_inner();
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         table
@@ -1447,7 +1448,7 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Group", |table| {
         table.assert_fk_on_columns(&["parent_id"], |fk| fk.assert_references("Group", &["id"]))
@@ -1532,7 +1533,8 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm_1).send().await?.assert_green()?;
+    api.schema_push(dm_1).send().await?.assert_green()?;
+
     api.assert_schema()
         .await?
         .assert_table("User", |table| table.assert_has_column("address_name"))?;
@@ -1548,7 +1550,7 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm_2).send().await?.assert_green()?;
+    api.schema_push(dm_2).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -1568,7 +1570,7 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     Ok(())
 }
@@ -1610,7 +1612,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
         table.assert_column("name", |col| {
@@ -1625,7 +1627,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
         table.assert_column("name", |col| col.assert_default(Some(DefaultValue::value("mango"))))
@@ -1648,12 +1650,11 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         }
     "#;
 
-    api.infer_apply(dm1)
+    api.schema_push(dm1)
         .migration_id(Some("first migration"))
         .send()
         .await?
-        .assert_green()?
-        .into_inner();
+        .assert_green()?;
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
@@ -1663,7 +1664,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 
     api.database().query(insert.into()).await?;
 
-    api.infer_apply(dm1)
+    api.schema_push(dm1)
         .migration_id(Some("second migration"))
         .send()
         .await?
@@ -1773,7 +1774,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    let infer_output = api.infer(dm1.to_owned()).send().await?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let dm2 = r#"
         datasource db2 {
@@ -1786,11 +1787,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer(dm2.to_owned())
-        .assume_to_be_applied(Some(infer_output.datamodel_steps))
-        .migration_id(Some("mig02".to_owned()))
-        .send()
-        .await?;
+    api.schema_push(dm2).migration_id(Some("mig02")).send().await?;
 
     Ok(())
 }
@@ -1810,7 +1807,7 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     let schema = api.describe_database().await?;
 
@@ -1909,7 +1906,7 @@ async fn a_relation_with_mappings_on_both_sides_can_reference_multiple_fields(ap
         }
     "#;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Account", |table| {
         table
@@ -2627,6 +2624,82 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
         .send()
         .await?
         .assert_warnings(&["You are about to alter the column `title` on the `Blog` table. The data in that column will be cast from `String` to `Float`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.".into()])?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn a_model_can_be_removed(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model User {
+            id   Int     @id @default(autoincrement())
+            name String?
+            Post Post[]
+        }
+
+        model Post {
+            id     Int    @id @default(autoincrement())
+            title  String
+            User   User   @relation(fields: [userId], references: [id])
+            userId Int
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    let dm2 = r#"
+        model User {
+            id   Int     @id @default(autoincrement())
+            name String?
+        }
+    "#;
+
+    api.create_migration("second-migration", dm2, &directory).send().await?;
+
+    api.apply_migrations(&directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["initial", "second-migration"])?;
+
+    let output = api.diagnose_migration_history(&directory).send().await?.into_output();
+
+    assert!(output.is_empty());
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn a_default_can_be_dropped(api: &TestApi) -> TestResult {
+    let directory = api.create_migrations_directory()?;
+
+    let dm1 = r#"
+        model User {
+            id   Int     @id @default(autoincrement())
+            name String  @default("Musti")
+        }
+    "#;
+
+    api.create_migration("initial", dm1, &directory).send().await?;
+
+    let dm2 = r#"
+        model User {
+            id   Int     @id @default(autoincrement())
+            name String?
+        }
+    "#;
+
+    api.create_migration("second-migration", dm2, &directory).send().await?;
+
+    api.apply_migrations(&directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["initial", "second-migration"])?;
+
+    let output = api.diagnose_migration_history(&directory).send().await?.into_output();
+
+    assert!(output.is_empty());
 
     Ok(())
 }

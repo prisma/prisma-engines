@@ -9,7 +9,7 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     {
         api.insert("Test")
@@ -32,8 +32,8 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm2)
-        .force(Some(false))
+    api.schema_push(dm2)
+        .force(false)
         .send()
         .await?
         .assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;
@@ -68,16 +68,16 @@ async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
             id String @id
             name Test_name
         }
-        
+
         enum Test_name{
             george
             paul
-            ringo 
+            ringo
             john
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     {
         api.insert("Test")
@@ -98,16 +98,16 @@ async fn dropping_enum_values_should_warn(api: &TestApi) -> TestResult {
             id String @id
             name Test_name
         }
-        
+
         enum Test_name{
             paul
-            ringo 
+            ringo
             john
         }
     "#;
 
-    api.infer_apply(&dm2)
-        .force(Some(false))
+    api.schema_push(dm2)
+        .force(false)
         .send()
         .await?
         .assert_warnings(&["The migration will remove the values [george] on the enum `Test_name`. If these variants are still used in the database, the migration will fail.".into()])?;
@@ -144,7 +144,7 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.insert("Test")
         .value("id", "abc")
@@ -165,8 +165,8 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
         }
     "#;
 
-    api.infer_apply(&dm2)
-        .force(Some(true))
+    api.schema_push(dm2)
+        .force(true)
         .send()
         .await?
         .assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;

@@ -95,6 +95,7 @@ pub(crate) struct SqlSchemaDiffer<'a> {
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
+    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
     fn create_tables<'a>(&'a self) -> impl Iterator<Item = CreateTable> + 'a {
         self.created_tables().map(|created_table| CreateTable {
             table_index: created_table.table_index(),
@@ -372,12 +373,14 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         drop_indexes.into_iter().collect()
     }
 
+    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
     fn create_enums<'a>(&'a self) -> impl Iterator<Item = CreateEnum> + 'a {
         self.created_enums().map(|r#enum| CreateEnum {
             enum_index: r#enum.enum_index(),
         })
     }
 
+    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
     fn drop_enums<'a>(&'a self) -> impl Iterator<Item = DropEnum> + 'a {
         self.dropped_enums().map(|r#enum| DropEnum {
             enum_index: r#enum.enum_index(),
@@ -398,7 +401,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                         let (changes, type_change) = columns.all_changes();
                         (
                             Pair::new(columns.previous.column_index(), columns.next.column_index()),
-                            changes.clone(),
+                            changes,
                             type_change.map(|tc| match tc {
                                 ColumnTypeChange::SafeCast => sql_migration::ColumnTypeChange::SafeCast,
                                 ColumnTypeChange::RiskyCast => sql_migration::ColumnTypeChange::RiskyCast,
@@ -460,7 +463,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         steps
     }
 
-    fn created_tables<'a>(&'a self) -> impl Iterator<Item = TableWalker<'a>> + 'a {
+    fn created_tables(&self) -> impl Iterator<Item = TableWalker<'_>> {
         self.next_tables().filter(move |next_table| {
             !self.previous_tables().any(|previous_table| {
                 self.flavour

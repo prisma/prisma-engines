@@ -276,11 +276,8 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
         let sql = format!(
-            r#"CREATE TYPE {enum_name} AS ENUM ({variants})"#,
-            enum_name = QuotedWithSchema {
-                schema_name: &self.0.schema(),
-                name: Quoted::postgres_ident(enm.name())
-            },
+            r#"CREATE TYPE "{enum_name}" AS ENUM ({variants})"#,
+            enum_name = enm.name(),
             variants = enm.values().iter().map(Quoted::postgres_string).join(", "),
         );
 
@@ -312,7 +309,7 @@ impl SqlRenderer for PostgresFlavour {
         let primary_columns = table.primary_key_column_names();
         let pk_column_names = primary_columns
             .into_iter()
-            .flat_map(|cols| cols.into_iter())
+            .flat_map(|cols| cols.iter())
             .map(|col| self.quote(col))
             .join(",");
         let pk = if !pk_column_names.is_empty() {
@@ -407,10 +404,6 @@ fn render_alter_column(
     clauses: &mut Vec<String>,
     after_statements: &mut Vec<String>,
 ) {
-    // Matches the sequence name from inside an autoincrement default expression.
-    static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
-
     let steps = expand_alter_column(columns, column_changes);
     let table_name = Quoted::postgres_ident(columns.previous().table().name());
     let column_name = Quoted::postgres_ident(columns.previous().name());
@@ -423,15 +416,8 @@ fn render_alter_column(
                 clauses.push(format!("{} DROP DEFAULT", &alter_column_prefix));
 
                 // We also need to drop the sequence, in case it isn't used by any other column.
-                if let Some(DefaultKind::SEQUENCE(sequence_expression)) = columns.previous().default().map(|d| d.kind())
-                {
-                    let sequence_name = SEQUENCE_DEFAULT_RE
-                        .captures(sequence_expression)
-                        .and_then(|captures| captures.get(1))
-                        .map(|capture| capture.as_str())
-                        .unwrap_or_else(|| panic!("Failed to extract sequence name from `{}`", sequence_expression));
-
-                    let sequence_is_still_used = walk_columns(columns.next().schema()).any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(other_sequence)) if other_sequence == sequence_expression) && !column.is_same_column(columns.next()));
+                if let Some(DefaultKind::SEQUENCE(sequence_name)) = columns.previous().default().map(|d| d.kind()) {
+                    let sequence_is_still_used = walk_columns(columns.next().schema()).any(|column| matches!(column.default().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(other_sequence)) if other_sequence == sequence_name) && !column.is_same_column(columns.next()));
 
                     if !sequence_is_still_used {
                         after_statements.push(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));

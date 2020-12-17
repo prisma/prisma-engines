@@ -26,7 +26,7 @@ impl SqlFlavour for SqliteFlavour {
         if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
             std::fs::create_dir_all(dir)
                 .context("Creating SQLite database parent directory.")
-                .map_err(|io_err| ConnectorError::generic(io_err))?;
+                .map_err(ConnectorError::generic)?;
         }
 
         connect(database_str).await?;

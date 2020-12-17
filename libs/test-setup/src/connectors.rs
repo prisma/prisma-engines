@@ -1,8 +1,10 @@
 mod capabilities;
+mod features;
 pub mod mssql;
 mod tags;
 
 pub use capabilities::*;
+pub use features::*;
 pub use tags::*;
 
 use enumflags2::BitFlags;
@@ -18,7 +20,7 @@ fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
         ("postgres9", Tags::Postgres.into()),
         ("postgres", Tags::Postgres.into()),
         ("postgres11", Tags::Postgres.into()),
-        ("postgres12", Tags::Postgres.into()),
+        ("postgres12", Tags::Postgres | Tags::Postgres12),
         ("postgres13", Tags::Postgres.into()),
         ("mysql_mariadb", Tags::Mysql | Tags::Mariadb),
         ("sqlite", Tags::Sqlite.into()),

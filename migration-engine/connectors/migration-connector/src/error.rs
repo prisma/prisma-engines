@@ -53,11 +53,21 @@ impl ConnectorError {
         let context = self.context.clone();
         let user_facing_error = user_facing_errors::migration_engine::MigrationDoesNotApplyCleanly {
             migration_name,
-            inner_error: self
-                .user_facing_error
-                .clone()
-                .map(user_facing_errors::Error::new_known)
-                .unwrap_or_else(|| user_facing_errors::Error::new_non_panic_with_current_backtrace(self.to_string())),
+            inner_error: self.to_user_facing(),
+        };
+
+        ConnectorError {
+            user_facing_error: Some(KnownError::new(user_facing_error)),
+            report: self.into(),
+            context,
+        }
+    }
+
+    /// Turn the error into a nested, user-facing ShadowDbCreationError.
+    pub fn into_shadow_db_creation_error(self) -> Self {
+        let context = self.context.clone();
+        let user_facing_error = user_facing_errors::migration_engine::ShadowDbCreationError {
+            inner_error: self.to_user_facing(),
         };
 
         ConnectorError {

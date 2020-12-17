@@ -78,10 +78,7 @@ impl Expression {
     }
 
     pub fn is_array(&self) -> bool {
-        match self {
-            Expression::Array(_, _) => true,
-            _ => false,
-        }
+        matches!(self, Expression::Array(_, _))
     }
 }
 

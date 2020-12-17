@@ -20,7 +20,7 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
-use common::{Quoted, QuotedWithSchema};
+use common::Quoted;
 use sql_schema_describer::{
     walkers::EnumWalker,
     walkers::ForeignKeyWalker,

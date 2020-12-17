@@ -33,3 +33,9 @@ impl LineWriteable for StringBuilder {
         self.buffer.is_empty()
     }
 }
+
+impl Default for StringBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}

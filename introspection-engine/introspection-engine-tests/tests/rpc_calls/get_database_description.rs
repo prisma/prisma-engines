@@ -149,7 +149,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> crate::
                             "nativeType": "Integer"
                         },
                         "default": {
-                            "SEQUENCE": "nextval('\"Blog_id_seq\"'::regclass)"
+                            "SEQUENCE": "Blog_id_seq"
                         },
                         "autoIncrement": true
                     },
@@ -173,9 +173,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> crate::
                         "id"
                     ],
                     "sequence": {
-                        "name": "Blog_id_seq",
-                        "initialValue": 1,
-                        "allocationSize": 1
+                        "name": "Blog_id_seq"
                     },
                     "constraintName": "Blog_pkey"
                 },
@@ -185,9 +183,7 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> crate::
         "enums": [],
         "sequences": [
             {
-                "name": "Blog_id_seq",
-                "initialValue": 1,
-                "allocationSize": 1
+                "name": "Blog_id_seq"
             }
         ]
     });

@@ -54,7 +54,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
     }
     "#;
 
-    let schema = dbg!(parse(dml));
+    let schema = parse(dml);
 
     let user_model = schema.assert_has_model("User");
     user_model
@@ -98,7 +98,7 @@ model Post {
 
     let schema = parse(dml);
 
-    let rendered = dbg!(render_datamodel_to_string(&schema));
+    let rendered = render_datamodel_to_string(&schema);
 
     assert_eq!(rendered, expected);
 }
@@ -168,7 +168,7 @@ fn must_add_referenced_fields_correctly_for_one_to_one_relations() {
     }
     "#;
 
-    let schema = dbg!(parse(dml));
+    let schema = parse(dml);
 
     schema
         .assert_has_model("User")
@@ -627,7 +627,6 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
     let schema = parse(dml);
     let post = schema.assert_has_model("Post");
     let blog_id_fields: Vec<&ScalarField> = post.scalar_fields().filter(|f| &f.name == "blogId").collect();
-    dbg!(&post.fields);
     assert_eq!(blog_id_fields.len(), 1);
 
     post.assert_has_relation_field("Blog")
@@ -650,8 +649,6 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
 
     let schema = parse(dml);
     let post = schema.assert_has_model("Post");
-
-    dbg!(&post.fields);
 
     let underlying_field = post.find_field("blogId_BlogToPost").unwrap();
     assert!(underlying_field.arity().is_optional());

@@ -61,7 +61,7 @@ fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
         (SqlFamily::Sqlite, _) => format!("VARCHAR({})", length),
         (SqlFamily::Mysql, "mysql8") => format!("varchar({})", length),
         (SqlFamily::Mysql, _) => format!("varchar({})", length),
-        (SqlFamily::Mssql, _) => format!("varchar({})", length).into(),
+        (SqlFamily::Mssql, _) => format!("varchar({})", length),
     }
 }
 
@@ -443,9 +443,7 @@ async fn indices_must_work(api: &TestApi) {
     let result = api.describe().await.expect("describing");
     let user_table = result.get_table("User").expect("getting User table");
     let default = match api.sql_family() {
-        SqlFamily::Postgres => Some(DefaultValue::sequence(
-            "nextval(\'\"User_id_seq\"\'::regclass)".to_string(),
-        )),
+        SqlFamily::Postgres => Some(DefaultValue::sequence("User_id_seq".to_string())),
         _ => None,
     };
     let expected_columns = vec![
@@ -482,8 +480,6 @@ async fn indices_must_work(api: &TestApi) {
     let pk_sequence = match api.sql_family() {
         SqlFamily::Postgres => Some(Sequence {
             name: "User_id_seq".to_string(),
-            allocation_size: 1,
-            initial_value: 1,
         }),
         _ => None,
     };

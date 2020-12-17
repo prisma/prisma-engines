@@ -14,11 +14,11 @@ const AGGREGATE_API: &str = "aggregateApi";
 const MIDDLEWARES: &str = "middlewares";
 const DISTINCT: &str = "distinct";
 
-pub const DATASOURCE_PREVIEW_FEATURES: &[&'static str] = &[];
+pub const DATASOURCE_PREVIEW_FEATURES: &[&str] = &[];
 
-pub const GENERATOR_PREVIEW_FEATURES: &[&'static str] = &[NATIVE_TYPES, SQL_SERVER, UNCHECKED_SCALAR_INPUTS, GROUP_BY];
+pub const GENERATOR_PREVIEW_FEATURES: &[&str] = &[NATIVE_TYPES, SQL_SERVER, UNCHECKED_SCALAR_INPUTS, GROUP_BY];
 
-pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&'static str] = &[
+pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&str] = &[
     ATOMIC_NUMBER_OPERATIONS,
     AGGREGATE_API,
     MIDDLEWARES,
@@ -27,4 +27,4 @@ pub const DEPRECATED_GENERATOR_PREVIEW_FEATURES: &[&'static str] = &[
     TRANSACTION_API,
 ];
 
-pub const DEPRECATED_DATASOURCE_PREVIEW_FEATURES: &[&'static str] = &[];
+pub const DEPRECATED_DATASOURCE_PREVIEW_FEATURES: &[&str] = &[];

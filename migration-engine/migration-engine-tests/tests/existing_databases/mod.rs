@@ -83,7 +83,7 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
         }
     "#;
 
-    api.infer_apply(&dm).force(Some(true)).send().await?.assert_green()?;
+    api.schema_push(dm).force(true).send().await?.assert_green()?;
 
     let final_schema = api.describe_database().await?;
 
@@ -115,7 +115,10 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
             }
         "#;
 
-    let result = api.infer_and_apply_forcefully(&dm).await.sql_schema;
+    api.schema_push(dm).force(true).send().await?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("Blog");
     let column = table.column_bang("title");
 
@@ -208,7 +211,8 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
             }
         "#;
 
-    api.infer_apply(&dm1).send().await?.into_inner();
+    api.schema_push(dm1).send().await?;
+
     let initial_result = api.describe_database().await?;
     assert!(initial_result.table_bang("Blog").column("title").is_some());
 
@@ -222,6 +226,7 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
             });
         })
         .await?;
+
     assert!(result.table_bang("Blog").column("title").is_none());
 
     let dm2 = r#"
@@ -249,7 +254,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
             }
         "#;
 
-    api.infer_apply(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     let result = api
         .barrel()
@@ -271,14 +276,14 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
             }
         "#;
 
-    api.infer_apply(&dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_equals(&result)?;
 
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql-schema-describer=info", tags("sql"))]
+#[test_each_connector(tags("sql"))]
 async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
@@ -303,12 +308,15 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
     assert!(result.table_bang("Blog").column("title").is_none());
 
     let dm2 = r#"
-            model Blog {
-                id Int @id
-                title Int @unique
-            }
-        "#;
-    let final_result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
+        model Blog {
+            id Int @id
+            title Int @unique
+        }
+    "#;
+
+    api.schema_push(dm2).force(true).send().await?;
+
+    let final_result = api.describe_database().await?;
     let final_column = final_result.table_bang("Blog").column_bang("title");
     assert_eq!(final_column.tpe.family, ColumnTypeFamily::Int);
     let index = final_result
@@ -358,7 +366,7 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
         }
     "#;
 
-    api.infer_apply(&dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
 
     let final_result = api.assert_schema().await?.into_schema();
     let final_column = final_result.table_bang("Blog").column_bang("new_title");

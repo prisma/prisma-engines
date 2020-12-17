@@ -6,6 +6,7 @@ mod identify_version;
 mod lists;
 mod model_renames;
 mod native_types;
+mod postgres;
 mod re_introspection;
 mod relations;
 mod relations_with_compound_fk;

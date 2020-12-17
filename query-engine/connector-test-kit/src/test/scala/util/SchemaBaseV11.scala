@@ -132,37 +132,39 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     def optionalSuffix: String = if (field.endsWith("?")) "?" else ""
   }
   final case object ParentList extends RelationField {
-    override def field: String   = "parentsOpt   Parent[]"
-    override def isList: Boolean = true
+    override def field: String       = "parentsOpt   Parent[]"
+    override def isList: Boolean     = true
     override def isRequired: Boolean = false
   }
   final case object ChildList extends RelationField {
-    override def field: String   = "childrenOpt  Child[]"
-    override def isList: Boolean = true
+    override def field: String       = "childrenOpt  Child[]"
+    override def isList: Boolean     = true
     override def isRequired: Boolean = false
   }
   final case object ParentOpt extends RelationField {
-    override def field: String = "parentOpt     Parent?"
-    override def isList: Boolean = false
+    override def field: String       = "parentOpt     Parent?"
+    override def isList: Boolean     = false
     override def isRequired: Boolean = false
   }
   final case object ParentReq extends RelationField {
-    override def field: String = "parentReq     Parent"
-    override def isList: Boolean = false
+    override def field: String       = "parentReq     Parent"
+    override def isList: Boolean     = false
     override def isRequired: Boolean = true
   }
   final case object ChildOpt extends RelationField {
-    override def field: String = "childOpt      Child?"
-    override def isList: Boolean = false
+    override def field: String       = "childOpt      Child?"
+    override def isList: Boolean     = false
     override def isRequired: Boolean = false
   }
   final case object ChildReq extends RelationField {
-    override def field: String = "childReq      Child"
-    override def isList: Boolean = false
+    override def field: String       = "childReq      Child"
+    override def isList: Boolean     = false
     override def isRequired: Boolean = true
   }
 
   def schemaWithRelation(onParent: RelationField, onChild: RelationField, withoutParams: Boolean = false) = {
+    val isRequiredOneToOne = onParent.isRequired && onChild.isRequired
+    require(!isRequiredOneToOne, "required 1:1 relations must be rejected by the parser already")
     //Query Params
     val idParams = QueryParams(
       selection = "id",
@@ -225,11 +227,12 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                     childId <- idOptions;
 
                                     // Based on Id and relation fields
-                                    childReferenceToParent  <- childReferences(simple, parentId, onParent, onChild);
+                                    childReferenceToParent <- childReferences(simple, parentId, onParent, onChild);
                                     parentReferenceToChild <- parentReferences(simple, childId, childReferenceToParent, onParent, onChild);
 
-                                    // skip required virtual relation fields as those are not allowed
-                                    if onParent.isRequired && parentReferenceToChild != noRef;
+                                    // skip required virtual relation fields as those are disallowed in a Prisma Schema
+                                    isVirtualRequiredRelationField = onParent.isRequired && parentReferenceToChild == noRef
+                                    if !isVirtualRequiredRelationField;
 
                                     // Only based on id
                                     parentParams <- if (withoutParams) {

@@ -229,7 +229,7 @@ impl SqlRenderer for MysqlFlavour {
             String::new()
         };
 
-        let indexes = if !table.indexes().next().is_none() {
+        let indexes = if table.indexes().next().is_some() {
             let indices: String = table
                 .indexes()
                 .map(|index| {
@@ -427,7 +427,7 @@ impl MysqlAlterColumn {
         };
 
         MysqlAlterColumn::Modify {
-            changes: changes.clone(),
+            changes: *changes,
             new_default,
         }
     }

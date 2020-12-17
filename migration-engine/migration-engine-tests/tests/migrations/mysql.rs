@@ -20,7 +20,7 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
         }
     "#;
 
-    api.infer_apply(schema).send().await?;
+    api.schema_push(schema).send().await?;
 
     let sql_schema = api
         .assert_schema()
@@ -35,8 +35,8 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
         .into_schema();
 
     // Test that after introspection, we do not migrate further.
-    api.infer_apply(schema)
-        .force(Some(true))
+    api.schema_push(schema)
+        .force(true)
         .send()
         .await?
         .assert_green()?
@@ -67,9 +67,9 @@ async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
-    api.infer_apply(dm1).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm1).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }
@@ -91,7 +91,7 @@ async fn enums_work_when_table_name_is_remapped(api: &TestApi) -> TestResult {
     }
     "#;
 
-    api.infer_apply(schema).send().await?.assert_green()?;
+    api.schema_push(schema).send().await?.assert_green()?;
 
     Ok(())
 }

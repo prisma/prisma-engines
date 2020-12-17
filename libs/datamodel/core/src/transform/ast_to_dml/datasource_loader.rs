@@ -203,7 +203,7 @@ impl DatasourceLoader {
 
         let combined_connector: Box<dyn Connector> = {
             let connectors = all_datasource_providers.iter().map(|sd| sd.connector()).collect();
-            CombinedConnector::new(connectors)
+            Box::new(CombinedConnector::new(connectors))
         };
 
         // The first provider that can handle the URL is used to construct the Datasource.

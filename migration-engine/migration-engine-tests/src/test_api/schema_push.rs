@@ -2,13 +2,17 @@ use super::super::assertions::AssertionResult;
 use migration_core::{
     api::GenericApi,
     commands::{SchemaPushInput, SchemaPushOutput},
+    CoreResult,
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, fmt::Debug};
+use tracing_futures::Instrument;
 
 pub struct SchemaPush<'a> {
     api: &'a dyn GenericApi,
     schema: String,
     force: bool,
+    /// Purely for logging diagnostics.
+    migration_id: Option<&'a str>,
 }
 
 impl<'a> SchemaPush<'a> {
@@ -17,6 +21,7 @@ impl<'a> SchemaPush<'a> {
             api,
             schema,
             force: false,
+            migration_id: None,
         }
     }
 
@@ -25,14 +30,23 @@ impl<'a> SchemaPush<'a> {
         self
     }
 
-    pub async fn send(self) -> anyhow::Result<SchemaPushAssertion<'a>> {
+    pub fn migration_id(mut self, migration_id: Option<&'a str>) -> Self {
+        self.migration_id = migration_id;
+        self
+    }
+
+    pub async fn send(self) -> CoreResult<SchemaPushAssertion<'a>> {
         let input = SchemaPushInput {
             schema: self.schema,
             force: self.force,
             assume_empty: false,
         };
 
-        let output = self.api.schema_push(&input).await?;
+        let output = self
+            .api
+            .schema_push(&input)
+            .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id))
+            .await?;
 
         Ok(SchemaPushAssertion {
             result: output,
@@ -44,6 +58,12 @@ impl<'a> SchemaPush<'a> {
 pub struct SchemaPushAssertion<'a> {
     pub(super) result: SchemaPushOutput,
     pub(super) _api: &'a dyn GenericApi,
+}
+
+impl Debug for SchemaPushAssertion<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.result.fmt(f)
+    }
 }
 
 impl<'a> SchemaPushAssertion<'a> {

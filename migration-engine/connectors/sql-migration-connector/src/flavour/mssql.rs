@@ -30,7 +30,7 @@ impl MssqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MssqlFlavour {
-    fn imperative_migrations_table<'a>(&'a self) -> Table<'a> {
+    fn imperative_migrations_table(&self) -> Table<'_> {
         (self.schema_name(), self.imperative_migrations_table_name()).into()
     }
 
@@ -173,7 +173,11 @@ impl SqlFlavour for MssqlFlavour {
         let database_name = format!("prisma_shadow_db{}", uuid::Uuid::new_v4());
         let create_database = format!("CREATE DATABASE [{}]", database_name);
 
-        connection.raw_cmd(&create_database).await?;
+        connection
+            .raw_cmd(&create_database)
+            .await
+            .map_err(ConnectorError::from)
+            .map_err(|err| err.into_shadow_db_creation_error())?;
 
         let mut jdbc_string: JdbcString = self.0.connection_string().parse().unwrap();
         jdbc_string

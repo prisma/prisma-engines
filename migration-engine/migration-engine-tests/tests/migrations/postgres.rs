@@ -19,7 +19,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
     api.assert_schema()
         .await?
         .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "HUNGRY", "CUDDLY"]))?;
@@ -31,7 +31,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).send().await?.assert_green()?;
     api.assert_schema().await?.assert_has_no_enum("CatMood")?;
 
     Ok(())
@@ -85,7 +85,7 @@ async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResu
 
     let schema = "";
 
-    api.infer_apply(schema)
+    api.schema_push(schema)
         .send()
         .await?
         .assert_green()?

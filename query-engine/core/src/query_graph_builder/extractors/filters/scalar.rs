@@ -116,7 +116,6 @@ where
     let mut results = vec![];
 
     for (k, v) in inner_object {
-        // let filters = super::extract_scalar_filters(field, v)?;
         let filters = parse(&k, field, v, reverse)?;
         results.extend(filters);
     }

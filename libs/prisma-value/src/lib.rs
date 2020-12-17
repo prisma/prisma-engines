@@ -86,7 +86,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                     let date = DateTime::parse_from_rfc3339(value)
                         .map_err(|_| ConversionFailure::new("JSON date object", "PrismaValue"))?;
 
-                    Ok(PrismaValue::DateTime(date.into()))
+                    Ok(PrismaValue::DateTime(date))
                 }
                 _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
             },

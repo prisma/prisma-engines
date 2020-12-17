@@ -136,7 +136,7 @@ impl AggregationSelection {
             .iter()
             .map(|f| {
                 (
-                    fixed_type.clone().unwrap_or(f.type_identifier.clone()),
+                    fixed_type.clone().unwrap_or_else(|| f.type_identifier.clone()),
                     FieldArity::Required,
                 )
             })
