@@ -130,7 +130,8 @@ fn collect_scalar_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
         Filter::Or(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
         Filter::Not(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
         Filter::Scalar(sf) => sf.projection.scalar_fields(),
-        _ => unreachable!(), // Only scalar filters are allowed.
+        Filter::Aggregation(_) => vec![], // Aggregations have no effect here.
+        _ => unreachable!(),
     }
 }
 
