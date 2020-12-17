@@ -1,43 +1,33 @@
-mod apply;
 mod apply_migrations;
 mod calculate_database_steps;
 mod create_migration;
 mod diagnose_migration_history;
 mod evaluate_data_loss;
-mod infer;
 mod infer_apply;
 mod list_migration_directories;
 mod mark_migration_applied;
 mod mark_migration_rolled_back;
 mod reset;
 mod schema_push;
-mod unapply_migration;
 
-pub use apply::Apply;
 pub use apply_migrations::ApplyMigrations;
 pub use calculate_database_steps::CalculateDatabaseSteps;
 pub use create_migration::CreateMigration;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
 pub use evaluate_data_loss::EvaluateDataLoss;
-pub use infer::Infer;
 pub use infer_apply::InferApply;
 pub use mark_migration_applied::MarkMigrationApplied;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
-pub use unapply_migration::UnapplyMigration;
-
-use crate::AssertionResult;
 
 use self::mark_migration_rolled_back::MarkMigrationRolledBack;
-
-use super::assertions::SchemaAssertion;
 use super::{
+    assertions::SchemaAssertion,
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
     sql::barrel_migration_executor::BarrelMigrationExecutor,
     InferAndApplyOutput,
 };
-use crate::connectors::Tags;
-use crate::test_api::list_migration_directories::ListMigrationDirectories;
+use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
 use enumflags2::BitFlags;
 use migration_connector::{
     ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord, MigrationStep,
@@ -185,23 +175,8 @@ impl TestApi {
         DiagnoseMigrationHistory::new(&self.api, migrations_directory)
     }
 
-    pub fn infer_apply<'a>(&'a self, schema: &'a str) -> InferApply<'a> {
+    fn infer_apply<'a>(&'a self, schema: &'a str) -> InferApply<'a> {
         InferApply::new(&self.api, schema)
-    }
-
-    pub async fn infer_and_apply_forcefully(&self, schema: &str) -> InferAndApplyOutput {
-        let migration_output = self
-            .infer_apply(schema)
-            .force(Some(true))
-            .send()
-            .await
-            .unwrap()
-            .into_inner();
-
-        InferAndApplyOutput {
-            migration_output,
-            sql_schema: self.describe_database().await.unwrap(),
-        }
     }
 
     pub async fn infer_and_apply(&self, schema: &str) -> InferAndApplyOutput {
@@ -210,21 +185,6 @@ impl TestApi {
         InferAndApplyOutput {
             migration_output,
             sql_schema: self.describe_database().await.unwrap(),
-        }
-    }
-
-    pub fn infer(&self, dm: impl Into<String>) -> Infer<'_> {
-        Infer::new(&self.api, dm)
-    }
-
-    pub fn apply(&self) -> Apply<'_> {
-        Apply::new(&self.api)
-    }
-
-    pub fn unapply_migration(&self) -> UnapplyMigration<'_> {
-        UnapplyMigration {
-            api: &self.api,
-            force: None,
         }
     }
 

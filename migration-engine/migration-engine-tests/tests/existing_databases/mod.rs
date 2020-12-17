@@ -115,7 +115,10 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
             }
         "#;
 
-    let result = api.infer_and_apply_forcefully(&dm).await.sql_schema;
+    api.schema_push(dm).force(true).send().await?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("Blog");
     let column = table.column_bang("title");
 
@@ -280,7 +283,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
     Ok(())
 }
 
-#[test_each_connector(log = "debug,sql-schema-describer=info", tags("sql"))]
+#[test_each_connector(tags("sql"))]
 async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
@@ -305,12 +308,15 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
     assert!(result.table_bang("Blog").column("title").is_none());
 
     let dm2 = r#"
-            model Blog {
-                id Int @id
-                title Int @unique
-            }
-        "#;
-    let final_result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
+        model Blog {
+            id Int @id
+            title Int @unique
+        }
+    "#;
+
+    api.schema_push(dm2).force(true).send().await?;
+
+    let final_result = api.describe_database().await?;
     let final_column = final_result.table_bang("Blog").column_bang("title");
     assert_eq!(final_column.tpe.family, ColumnTypeFamily::Int);
     let index = final_result

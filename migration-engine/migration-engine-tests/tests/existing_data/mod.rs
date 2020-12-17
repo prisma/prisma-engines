@@ -15,7 +15,10 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
             id String @id @default(cuid())
         }
     "#;
-    let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    let original_database_schema = api.assert_schema().await?.into_schema();
 
     let conn = api.database();
     let insert = Insert::single_into(api.render_table_name("Test")).value("id", "test");

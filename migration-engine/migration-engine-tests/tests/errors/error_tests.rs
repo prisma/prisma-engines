@@ -1,5 +1,4 @@
 use indoc::formatdoc;
-use migration_connector::steps::{DeleteModel, MigrationStep};
 use migration_core::{api::RpcApi, GateKeeper};
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
@@ -329,29 +328,6 @@ async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> Tes
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
-    let steps = vec![MigrationStep::DeleteModel(DeleteModel {
-        model: "abcd".to_owned(),
-    })];
-
-    let error = api
-        .apply()
-        .migration_id(Some("the-migration"))
-        .steps(Some(steps))
-        .force(Some(true))
-        .send_user_facing()
-        .await
-        .unwrap_err();
-
-    let expected_error = user_facing_errors::Error::from(user_facing_errors::UnknownError {
-        message: "Datamodel diffing failed (steps.json): The model abcd does not exist in this Datamodel. It is not possible to delete it.".to_owned(),
-        backtrace: None,
-    });
-
-    assert_eq!(error, expected_error);
-}
-
-#[test_each_connector(tags("sqlite"))]
 async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) {
     let bad_dm = r#"
         model Test {
@@ -384,7 +360,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         }
     "#;
 
-    api.infer_and_apply(dm).await;
+    api.schema_push(dm).send().await?.assert_green()?;
 
     let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
         .values(("banana",))
@@ -400,22 +376,16 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
         }
     "#;
 
-    let steps = api
-        .infer(dm2)
+    let res = api
+        .schema_push(dm2)
+        .force(true)
         .migration_id(Some("the-migration"))
         .send()
-        .await?
-        .datamodel_steps;
+        .await
+        .unwrap_err()
+        .render_user_facing();
 
-    let res = api
-        .apply()
-        .steps(Some(steps))
-        .force(Some(true))
-        .migration_id(Some("the-migration"))
-        .send_user_facing()
-        .await;
-
-    let json_error = serde_json::to_value(&res.unwrap_err()).unwrap();
+    let json_error = serde_json::to_value(&res).unwrap();
 
     let expected_msg = match api.sql_family() {
         SqlFamily::Mysql => "Unique constraint failed on the constraint: `name_unique`",
@@ -459,7 +429,7 @@ async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
     );
 
     let result = api
-        .infer(dm)
+        .schema_push(dm)
         .send()
         .await
         .unwrap_err()

@@ -357,7 +357,7 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
 }
 
 #[test_each_connector]
-async fn index_updates_with_rename_must_work(api: &TestApi) {
+async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -377,29 +377,27 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, id], name: "customNameA")
-            }
-        "#;
-    let result = api.infer_and_apply_forcefully(&dm2).await;
+            @@unique([field, id], name: "customNameA")
+        }
+    "#;
+
+    api.schema_push(dm2).force(true).send().await?.assert_executable()?;
+
+    let result = api.describe_database().await?;
+
     let indexes = result
-        .sql_schema
         .table_bang("A")
         .indices
         .iter()
         .filter(|i| i.columns == &["field", "id"] && i.name == "customNameA");
     assert_eq!(indexes.count(), 1);
 
-    // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
-    if !api.is_sqlite() {
-        let expected_steps = &["DropIndex", "CreateIndex"];
-        let actual_steps = result.migration_output.describe_steps();
-        assert_eq!(actual_steps, expected_steps);
-    }
+    Ok(())
 }
 
 #[test_each_connector]
@@ -414,11 +412,13 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
         }
     "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
+
     let index = result
         .table_bang("A")
         .indices
         .iter()
         .find(|i| i.name == "customName" && i.columns == &["field", "secondField"]);
+
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
