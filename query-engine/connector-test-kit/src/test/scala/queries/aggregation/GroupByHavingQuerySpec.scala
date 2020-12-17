@@ -32,7 +32,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |    $idString
          |    float: ${float.getOrElse("null")}
          |    int: ${int.getOrElse("null")}
-         |    dec: ${dec.map(d => s""""$dec"""").getOrElse("null")}
+         |    dec: ${dec.map(d => s""""$d"""").getOrElse("null")}
          |    s: "$s"
          |  }) {
          |    id
@@ -101,7 +101,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // Group 1 has 2, 2 has 1, 3 has 0
     var result = server.query(
       s"""{
-         |  groupByModel(by: [s], having: {
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    int: {
          |      count: {
          |        equals: 2
@@ -121,7 +121,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // Group 2 and 3 returned
     result = server.query(
       s"""{
-         |  groupByModel(by: [s], having: {
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    int: {
          |      count: {
          |        not: { equals: 2 }
@@ -141,7 +141,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     // Group 1 and 3 returned
     result = server.query(
       s"""{
-         |  groupByModel(by: [s], having: {
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
          |    int: {
          |      count: {
          |        in: [0, 2]
@@ -156,81 +156,80 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group3","count":{"int":0}},{"s":"group1","count":{"int":2}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","count":{"int":2}},{"s":"group3","count":{"int":0}}]}}""")
   }
 
   // ***************
   // *** Average ***
   // ***************
 
-  "Using a groupBy with a `having` count scalar filters" should "work" in {
+  "Using a groupBy with a `having` average scalar filters" should "work" in {
     // Float, int, dec, s, id
-    create(None, Some(1), None, "group1", Some("1"))
-    create(None, Some(2), None, "group1", Some("2"))
-    create(None, Some(3), None, "group2", Some("3"))
+    create(None, Some(10), Some("10"), "group1", Some("1"))
+    create(None, Some(6), Some("6"), "group1", Some("2"))
+    create(None, Some(3), Some("5"), "group2", Some("3"))
     create(None, None, None, "group2", Some("4"))
     create(None, None, None, "group3", Some("5"))
     create(None, None, None, "group3", Some("6"))
 
-    // Group 1 has 2, 2 has 1, 3 has 0
+    // Group 1 has 8, 2 has 5, 3 has 0
     var result = server.query(
       s"""{
-         |  groupByModel(by: [s], having: {
-         |    int: {
-         |      count: {
-         |        equals: 2
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    dec: {
+         |      avg: {
+         |        equals: "8.0"
          |      }
          |    }
          |  }) {
          |    s
-         |    count {
-         |      int
+         |    avg {
+         |      dec
          |    }
          |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","count":{"int":2}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","avg":{"dec":"8"}}]}}""")
 
-    // Group 2 and 3 returned
+    // Group 2 and 3 returned (3 is null)
     result = server.query(
       s"""{
-         |  groupByModel(by: [s], having: {
-         |    int: {
-         |      count: {
-         |        not: { equals: 2 }
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    OR: [
+         |      { dec: { avg: { not: { equals: "8.0" }}}},
+         |      { dec: { avg: { equals: null }}}
+         |    ]}
+         |  ) {
+         |      s
+         |      avg {
+         |        dec
          |      }
          |    }
-         |  }) {
-         |    s
-         |    count {
-         |      int
-         |    }
-         |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","count":{"int":1}},{"s":"group3","count":{"int":0}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group2","avg":{"dec":"5"}},{"s":"group3","avg":{"dec":"0"}}]}}""")
 
-    // Group 1 and 3 returned
+    // Group 1 and 2 returned
     result = server.query(
       s"""{
-         |  groupByModel(by: [s], having: {
-         |    int: {
-         |      count: {
-         |        in: [0, 2]
+         |  groupByModel(by: [s], orderBy: { s: asc }, having: {
+         |    dec: {
+         |      avg: {
+         |        in: ["8", "5"]
          |      }
          |    }
          |  }) {
          |    s
-         |    count {
-         |      int
+         |    avg {
+         |      dec
          |    }
          |  }
          |}""".stripMargin,
       project
     )
-    result.toString should be("""{"data":{"groupByModel":[{"s":"group3","count":{"int":0}},{"s":"group1","count":{"int":2}}]}}""")
+    result.toString should be("""{"data":{"groupByModel":[{"s":"group1","avg":{"dec":"8"}},{"s":"group2","avg":{"dec":"5"}}]}}""")
   }
 
   // ***********
