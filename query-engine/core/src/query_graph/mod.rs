@@ -263,7 +263,7 @@ impl QueryGraph {
 
         graph
             .node_indices()
-            .filter(|ix| graph.edges_directed(*ix, Direction::Incoming).next().is_some())
+            .filter(|ix| !graph.edges_directed(*ix, Direction::Incoming).next().is_some())
             .map(|node_ix: NodeIndex| NodeRef { node_ix })
             .collect()
     }
