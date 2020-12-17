@@ -46,7 +46,7 @@ fn strings_with_quotes_roundtrip() {
     let dml = datamodel::parse_datamodel(input).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
-    assert_eq!(input, rendered);
+    assert_eq!(rendered, input);
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn strings_with_newlines_roundtrip() {
     let dml = datamodel::parse_datamodel(input).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
-    assert_eq!(input, rendered);
+    assert_eq!(rendered, input);
 }
 
 #[test]
@@ -111,7 +111,7 @@ fn strings_with_backslashes_roundtrip() {
     let dml = datamodel::parse_datamodel(input).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
-    assert_eq!(input, rendered);
+    assert_eq!(rendered, input);
 }
 
 #[test]
@@ -128,7 +128,7 @@ fn strings_with_multiple_escaped_characters_roundtrip() {
     let dml = datamodel::parse_datamodel(dm).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
-    assert_eq!(dm, rendered);
+    assert_eq!(rendered, dm);
 }
 
 #[test]
@@ -158,5 +158,5 @@ fn internal_escaped_values_are_rendered_correctly() {
 
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
-    assert_eq!(expected_dm, rendered);
+    assert_eq!(rendered, expected_dm);
 }
