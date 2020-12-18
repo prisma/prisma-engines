@@ -3,6 +3,12 @@ package queries.aggregation
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// Testing assumptions
+// - Grouping on fields itself works (as tested in the GroupBySpec).
+// - The above means we also don't need to test combinations except for what is required by the rules to make it work.
+// - It also means we don't need to test the selection of aggregates extensively beyond the need to sanity check the group filter.
+// - We don't need to check every single filter operation, as it's ultimately the same code path just with different
+//   operators applied. For a good confidence, we choose `equals`, `in`, `not equals`, `endsWith` (where applicable).
 class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model Model {
@@ -78,12 +84,43 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"groupByModel":[{"s":"group1","int":5,"count":{"_all":1},"sum":{"int":5}},{"s":"group2","int":5,"count":{"_all":1},"sum":{"int":5}}]}}""")
   }
 
-  // WIP assumptions
-  // - Grouping on fields itself works (as tested in the GroupBySpec).
-  // - The above means we also don't need to test combinations except for what is required by the rules to make it work.
-  // - It also means we don't need to test the selection of aggregates extensively beyond the need to sanity check the group filter.
-  // - We don't need to check every single filter operation, as it's ultimately the same code path just with different
-  //   operators applied. For a good confidence, we choose `equals`, `in`, `not equals`, `endsWith` (where applicable).
+  "Using a groupBy with a `having` scalar filters on list fields" should "work" in {
+    val project = SchemaDsl.fromStringV11() {
+      """model Model {
+        |  id   Int   @id @default(autoincrement())
+        |  ints Int[]
+        |}
+      """.stripMargin
+    }
+    database.setup(project)
+
+    server.query(
+      """mutation {
+        |  createOneModel(data: { ints: [1, 2, 3] }) {
+        |    id
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+
+    // Group 1 and 2 returned
+    var result = server.query(
+      s"""{
+         |  groupByModel(by: [ints], having: {
+         |    ints: { equals: [1, 2, 3] }
+         |  }) {
+         |    ints
+         |    count {
+         |      ints
+         |    }
+         |  }
+         |}""".stripMargin,
+      project
+    )
+    result.toString should be("""{"data":{"groupByModel":[{"ints":[1,2,3],"count":{"ints":1}}]}}""")
+  }
 
   // *************
   // *** Count ***
