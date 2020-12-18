@@ -1,3 +1,4 @@
+use dml::native_type_instance::NativeTypeInstance;
 use thiserror::Error;
 
 #[derive(Debug, Error, Clone)]
@@ -5,6 +6,105 @@ use thiserror::Error;
 pub struct ConnectorError {
     /// The error information for internal use.
     pub kind: ErrorKind,
+}
+
+pub struct ConnectorErrorFactory {
+    pub native_type: NativeTypeInstance,
+    pub connector: String,
+}
+
+impl ConnectorErrorFactory {
+    pub fn new(tpe: NativeTypeInstance, connector: &str) -> Self {
+        ConnectorErrorFactory {
+            native_type: tpe,
+            connector: connector.to_string(),
+        }
+    }
+
+    pub fn new_argument_count_mismatch_error(
+        &self,
+        required_count: usize,
+        given_count: usize,
+    ) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+            native_type: self.native_type.render(),
+            required_count,
+            given_count,
+        }))
+    }
+
+    pub fn new_optional_argument_count_mismatch_error(
+        &self,
+        optional_count: usize,
+        given_count: usize,
+    ) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::OptionalArgumentCountMismatchError {
+                native_type: self.native_type.render(),
+                optional_count,
+                given_count,
+            },
+        ))
+    }
+
+    pub fn new_scale_larger_than_precision_error(&self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(ErrorKind::ScaleLargerThanPrecisionError {
+            native_type: self.native_type.render(),
+            connector_name: self.connector.to_string(),
+        }))
+    }
+
+    pub fn new_incompatible_native_type_with_unique(&self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::IncompatibleNativeTypeWithUniqueAttribute {
+                native_type: self.native_type.render(),
+                connector_name: self.connector.to_string(),
+            },
+        ))
+    }
+
+    pub fn new_incompatible_native_type_with_id(&self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::IncompatibleNativeTypeWithIdAttribute {
+                native_type: self.native_type.render(),
+                connector_name: self.connector.to_string(),
+            },
+        ))
+    }
+
+    pub fn new_incompatible_native_type_with_index(&self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::IncompatibleNativeTypeWithIndexAttribute {
+                native_type: self.native_type.render(),
+                connector_name: self.connector.to_string(),
+            },
+        ))
+    }
+
+    pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(ErrorKind::ValueParserError {
+            expected_type: String::from(expected_type),
+            parser_error: String::from(parser_error),
+            raw: String::from(raw),
+        }))
+    }
+
+    pub fn new_incompatible_sequential_type_with_static_default_value_error(&self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::IncompatibleSequentialTypeWithStaticDefaultValue {
+                native_type: self.native_type.render(),
+                connector_name: self.connector.to_string(),
+            },
+        ))
+    }
+
+    pub fn new_argument_m_out_of_range_error(&self, message: &str) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(ErrorKind::ArgumentOutOfRangeError {
+            native_type: self.native_type.render(),
+            connector_name: self.connector.to_string(),
+            message: String::from(message),
+        }))
+    }
 }
 
 impl ConnectorError {
@@ -36,9 +136,12 @@ impl ConnectorError {
         })
     }
 
-    pub fn new_scale_larger_than_precision_error(native_type: &str, connector_name: &str) -> ConnectorError {
+    pub fn new_scale_larger_than_precision_error(
+        native_type: &NativeTypeInstance,
+        connector_name: &str,
+    ) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::ScaleLargerThanPrecisionError {
-            native_type: String::from(native_type),
+            native_type: native_type.render(),
             connector_name: String::from(connector_name),
         })
     }

@@ -1,4 +1,4 @@
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
@@ -100,72 +100,40 @@ impl Connector for MsSqlDatamodelConnector {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
+                let error = ConnectorErrorFactory::new(native_type, "SQL Server");
 
                 match r#type {
                     Decimal(Some(params)) | Numeric(Some(params)) => match params {
-                        (precision, scale) if scale > precision => Err(
-                            ConnectorError::new_scale_larger_than_precision_error(&native_type.render(), "SQL Server"),
-                        ),
+                        (precision, scale) if scale > precision => error.new_scale_larger_than_precision_error(),
                         (precision, _) if precision == 0 || precision > 38 => {
-                            Err(ConnectorError::new_argument_m_out_of_range_error(
-                                "Precision can range from 1 to 38.",
-                                &native_type.render(),
-                                "SQL Server",
-                            ))
+                            error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.")
                         }
-                        (_, scale) if scale > 38 => Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Scale can range from 0 to 38.",
-                            &native_type.render(),
-                            "SQL Server",
-                        )),
+                        (_, scale) if scale > 38 => {
+                            error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.")
+                        }
                         _ => Ok(()),
                     },
-                    Float(Some(bits)) => match bits {
-                        bits if bits == 0 || bits > 53 => Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Bits can range from 1 to 53.",
-                            &native_type.render(),
-                            "SQL Server",
-                        )),
-                        _ => Ok(()),
-                    },
-                    typ if heap_allocated_types().contains(&typ) => {
-                        if field.is_unique() {
-                            Err(ConnectorError::new_incompatible_native_type_with_unique(
-                                &native_type.render(),
-                                "SQL Server",
-                            ))
-                        } else if field.is_id() {
-                            Err(ConnectorError::new_incompatible_native_type_with_id(
-                                &native_type.render(),
-                                "SQL Server",
-                            ))
-                        } else {
-                            Ok(())
-                        }
+                    Float(Some(bits)) if bits == 0 || bits > 53 => {
+                        error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.")
                     }
-                    NVarChar(Some(Number(p))) if p > 2000 => Err(ConnectorError::new_argument_m_out_of_range_error(
+                    typ if heap_allocated_types().contains(&typ) && field.is_unique() => {
+                        error.new_incompatible_native_type_with_unique()
+                    }
+                    typ if heap_allocated_types().contains(&typ) && field.is_id() => {
+                        error.new_incompatible_native_type_with_id()
+                    }
+                    NVarChar(Some(Number(p))) if p > 2000 => error.new_argument_m_out_of_range_error(
                         "Length can range from 1 to 2000. For larger sizes, use the `Max` variant.",
-                        &native_type.render(),
-                        "SQL Server",
-                    )),
-                    VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 4000 => {
-                        Err(ConnectorError::new_argument_m_out_of_range_error(
+                    ),
+                    VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 4000 => error
+                        .new_argument_m_out_of_range_error(
                             r#"Length can range from 1 to 4000. For larger sizes, use the `Max` variant."#,
-                            &native_type.render(),
-                            "SQL Server",
-                        ))
+                        ),
+                    NChar(Some(p)) if p > 2000 => {
+                        error.new_argument_m_out_of_range_error("Length can range from 1 to 2000.")
                     }
-                    NChar(Some(p)) if p > 2000 => Err(ConnectorError::new_argument_m_out_of_range_error(
-                        "Length can range from 1 to 2000.",
-                        &native_type.render(),
-                        "SQL Server",
-                    )),
                     Char(Some(p)) | Binary(Some(p)) if p > 4000 => {
-                        Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Length can range from 1 to 4000.",
-                            &native_type.render(),
-                            "SQL Server",
-                        ))
+                        error.new_argument_m_out_of_range_error("Length can range from 1 to 4000.")
                     }
                     _ => Ok(()),
                 }

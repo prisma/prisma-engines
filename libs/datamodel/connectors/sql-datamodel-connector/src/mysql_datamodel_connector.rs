@@ -1,4 +1,4 @@
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use datamodel_connector::helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
@@ -7,6 +7,7 @@ use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
 use dml::scalars::ScalarType;
 use native_types::MySqlType;
+use native_types::MySqlType::*;
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -159,72 +160,42 @@ impl Connector for MySqlDatamodelConnector {
         if let FieldType::NativeType(_, native_type_instance) = field.field_type() {
             let native_type_name = native_type_instance.name.as_str();
             let native_type: MySqlType = native_type_instance.deserialize_native_type();
+            let error = ConnectorErrorFactory::new(native_type_instance.clone(), "MySQL");
 
             let precision_and_scale = match native_type {
-                MySqlType::Decimal(x) => x,
-                MySqlType::Numeric(x) => x,
+                Decimal(x) => x,
+                Numeric(x) => x,
                 _ => None,
             };
             match precision_and_scale {
-                Some((precision, scale)) if scale > precision => {
-                    return Err(ConnectorError::new_scale_larger_than_precision_error(
-                        native_type_name,
-                        "MySQL",
-                    ))
-                }
+                Some((precision, scale)) if scale > precision => return error.new_scale_larger_than_precision_error(),
                 Some((precision, _)) if precision > 65 => {
-                    return Err(ConnectorError::new_argument_m_out_of_range_error(
-                        "Precision can range from 1 to 65.",
-                        native_type_name,
-                        "MySQL",
-                    ))
+                    return error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.")
                 }
                 Some((_, scale)) if scale > 30 => {
-                    return Err(ConnectorError::new_argument_m_out_of_range_error(
-                        "Scale can range from 0 to 30.",
-                        native_type_name,
-                        "MySQL",
-                    ))
+                    return error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.")
                 }
                 _ => {}
             }
 
             match native_type {
-                MySqlType::Bit(length) if length == 0 || length > 64 => {
-                    return Err(ConnectorError::new_argument_m_out_of_range_error(
-                        "M can range from 1 to 64.",
-                        native_type_name,
-                        "MySQL",
-                    ))
+                Bit(length) if length == 0 || length > 64 => {
+                    return error.new_argument_m_out_of_range_error("M can range from 1 to 64.")
                 }
-                MySqlType::Char(length) if length > 255 => {
-                    return Err(ConnectorError::new_argument_m_out_of_range_error(
-                        "M can range from 0 to 255.",
-                        native_type_name,
-                        "MySQL",
-                    ))
+                Char(length) if length > 255 => {
+                    return error.new_argument_m_out_of_range_error("M can range from 0 to 255.")
                 }
-                MySqlType::VarChar(length) if length > 65535 => {
-                    return Err(ConnectorError::new_argument_m_out_of_range_error(
-                        "M can range from 0 to 65,535.",
-                        native_type_name,
-                        "MySQL",
-                    ))
+                VarChar(length) if length > 65535 => {
+                    return error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.")
                 }
                 _ => {}
             }
 
             if field.is_unique() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                return Err(ConnectorError::new_incompatible_native_type_with_unique(
-                    native_type_name,
-                    "MySQL",
-                ));
+                return error.new_incompatible_native_type_with_unique();
             }
             if field.is_id() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                return Err(ConnectorError::new_incompatible_native_type_with_id(
-                    native_type_name,
-                    "MySQL",
-                ));
+                return error.new_incompatible_native_type_with_id();
             }
         }
         Ok(())
@@ -275,39 +246,39 @@ impl Connector for MySqlDatamodelConnector {
         let cloned_args = args.clone();
 
         let native_type = match name {
-            INT_TYPE_NAME => MySqlType::Int,
-            UNSIGNED_INT_TYPE_NAME => MySqlType::UnsignedInt,
-            SMALL_INT_TYPE_NAME => MySqlType::SmallInt,
-            UNSIGNED_SMALL_INT_TYPE_NAME => MySqlType::UnsignedSmallInt,
-            TINY_INT_TYPE_NAME => MySqlType::TinyInt,
-            UNSIGNED_TINY_INT_TYPE_NAME => MySqlType::UnsignedTinyInt,
-            MEDIUM_INT_TYPE_NAME => MySqlType::MediumInt,
-            UNSIGNED_MEDIUM_INT_TYPE_NAME => MySqlType::UnsignedMediumInt,
-            BIG_INT_TYPE_NAME => MySqlType::BigInt,
-            UNSIGNED_BIG_INT_TYPE_NAME => MySqlType::UnsignedBigInt,
-            DECIMAL_TYPE_NAME => MySqlType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
-            NUMERIC_TYPE_NAME => MySqlType::Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
-            FLOAT_TYPE_NAME => MySqlType::Float,
-            DOUBLE_TYPE_NAME => MySqlType::Double,
-            BIT_TYPE_NAME => MySqlType::Bit(parse_one_u32(args, BIT_TYPE_NAME)?),
-            CHAR_TYPE_NAME => MySqlType::Char(parse_one_u32(args, CHAR_TYPE_NAME)?),
-            VAR_CHAR_TYPE_NAME => MySqlType::VarChar(parse_one_u32(args, VAR_CHAR_TYPE_NAME)?),
-            BINARY_TYPE_NAME => MySqlType::Binary(parse_one_u32(args, BINARY_TYPE_NAME)?),
-            VAR_BINARY_TYPE_NAME => MySqlType::VarBinary(parse_one_u32(args, VAR_BINARY_TYPE_NAME)?),
-            TINY_BLOB_TYPE_NAME => MySqlType::TinyBlob,
-            BLOB_TYPE_NAME => MySqlType::Blob,
-            MEDIUM_BLOB_TYPE_NAME => MySqlType::MediumBlob,
-            LONG_BLOB_TYPE_NAME => MySqlType::LongBlob,
-            TINY_TEXT_TYPE_NAME => MySqlType::TinyText,
-            TEXT_TYPE_NAME => MySqlType::Text,
-            MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
-            LONG_TEXT_TYPE_NAME => MySqlType::LongText,
-            DATE_TYPE_NAME => MySqlType::Date,
-            TIME_TYPE_NAME => MySqlType::Time(parse_one_opt_u32(args, TIME_TYPE_NAME)?),
-            DATETIME_TYPE_NAME => MySqlType::DateTime(parse_one_opt_u32(args, DATETIME_TYPE_NAME)?),
-            TIMESTAMP_TYPE_NAME => MySqlType::Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
-            YEAR_TYPE_NAME => MySqlType::Year,
-            JSON_TYPE_NAME => MySqlType::JSON,
+            INT_TYPE_NAME => Int,
+            UNSIGNED_INT_TYPE_NAME => UnsignedInt,
+            SMALL_INT_TYPE_NAME => SmallInt,
+            UNSIGNED_SMALL_INT_TYPE_NAME => UnsignedSmallInt,
+            TINY_INT_TYPE_NAME => TinyInt,
+            UNSIGNED_TINY_INT_TYPE_NAME => UnsignedTinyInt,
+            MEDIUM_INT_TYPE_NAME => MediumInt,
+            UNSIGNED_MEDIUM_INT_TYPE_NAME => UnsignedMediumInt,
+            BIG_INT_TYPE_NAME => BigInt,
+            UNSIGNED_BIG_INT_TYPE_NAME => UnsignedBigInt,
+            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            NUMERIC_TYPE_NAME => Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
+            FLOAT_TYPE_NAME => Float,
+            DOUBLE_TYPE_NAME => Double,
+            BIT_TYPE_NAME => Bit(parse_one_u32(args, BIT_TYPE_NAME)?),
+            CHAR_TYPE_NAME => Char(parse_one_u32(args, CHAR_TYPE_NAME)?),
+            VAR_CHAR_TYPE_NAME => VarChar(parse_one_u32(args, VAR_CHAR_TYPE_NAME)?),
+            BINARY_TYPE_NAME => Binary(parse_one_u32(args, BINARY_TYPE_NAME)?),
+            VAR_BINARY_TYPE_NAME => VarBinary(parse_one_u32(args, VAR_BINARY_TYPE_NAME)?),
+            TINY_BLOB_TYPE_NAME => TinyBlob,
+            BLOB_TYPE_NAME => Blob,
+            MEDIUM_BLOB_TYPE_NAME => MediumBlob,
+            LONG_BLOB_TYPE_NAME => LongBlob,
+            TINY_TEXT_TYPE_NAME => TinyText,
+            TEXT_TYPE_NAME => Text,
+            MEDIUM_TEXT_TYPE_NAME => MediumText,
+            LONG_TEXT_TYPE_NAME => LongText,
+            DATE_TYPE_NAME => Date,
+            TIME_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TYPE_NAME)?),
+            DATETIME_TYPE_NAME => DateTime(parse_one_opt_u32(args, DATETIME_TYPE_NAME)?),
+            TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
+            YEAR_TYPE_NAME => Year,
+            JSON_TYPE_NAME => JSON,
             x => unreachable!(format!(
                 "This code is unreachable as the core must guarantee to just call with known names. {}",
                 x
@@ -320,39 +291,39 @@ impl Connector for MySqlDatamodelConnector {
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
         let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
-            MySqlType::Int => (INT_TYPE_NAME, vec![]),
-            MySqlType::UnsignedInt => (UNSIGNED_INT_TYPE_NAME, vec![]),
-            MySqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
-            MySqlType::UnsignedSmallInt => (UNSIGNED_SMALL_INT_TYPE_NAME, vec![]),
-            MySqlType::TinyInt => (TINY_INT_TYPE_NAME, vec![]),
-            MySqlType::UnsignedTinyInt => (UNSIGNED_TINY_INT_TYPE_NAME, vec![]),
-            MySqlType::MediumInt => (MEDIUM_INT_TYPE_NAME, vec![]),
-            MySqlType::UnsignedMediumInt => (UNSIGNED_MEDIUM_INT_TYPE_NAME, vec![]),
-            MySqlType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
-            MySqlType::UnsignedBigInt => (UNSIGNED_BIG_INT_TYPE_NAME, vec![]),
-            MySqlType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
-            MySqlType::Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
-            MySqlType::Float => (FLOAT_TYPE_NAME, vec![]),
-            MySqlType::Double => (DOUBLE_TYPE_NAME, vec![]),
-            MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x.to_string()]),
-            MySqlType::Char(x) => (CHAR_TYPE_NAME, vec![x.to_string()]),
-            MySqlType::VarChar(x) => (VAR_CHAR_TYPE_NAME, vec![x.to_string()]),
-            MySqlType::Binary(x) => (BINARY_TYPE_NAME, vec![x.to_string()]),
-            MySqlType::VarBinary(x) => (VAR_BINARY_TYPE_NAME, vec![x.to_string()]),
-            MySqlType::TinyBlob => (TINY_BLOB_TYPE_NAME, vec![]),
-            MySqlType::Blob => (BLOB_TYPE_NAME, vec![]),
-            MySqlType::MediumBlob => (MEDIUM_BLOB_TYPE_NAME, vec![]),
-            MySqlType::LongBlob => (LONG_BLOB_TYPE_NAME, vec![]),
-            MySqlType::TinyText => (TINY_TEXT_TYPE_NAME, vec![]),
-            MySqlType::Text => (TEXT_TYPE_NAME, vec![]),
-            MySqlType::MediumText => (MEDIUM_TEXT_TYPE_NAME, vec![]),
-            MySqlType::LongText => (LONG_TEXT_TYPE_NAME, vec![]),
-            MySqlType::Date => (DATE_TYPE_NAME, vec![]),
-            MySqlType::Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
-            MySqlType::DateTime(x) => (DATETIME_TYPE_NAME, arg_vec_from_opt(x)),
-            MySqlType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
-            MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
-            MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
+            Int => (INT_TYPE_NAME, vec![]),
+            UnsignedInt => (UNSIGNED_INT_TYPE_NAME, vec![]),
+            SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
+            UnsignedSmallInt => (UNSIGNED_SMALL_INT_TYPE_NAME, vec![]),
+            TinyInt => (TINY_INT_TYPE_NAME, vec![]),
+            UnsignedTinyInt => (UNSIGNED_TINY_INT_TYPE_NAME, vec![]),
+            MediumInt => (MEDIUM_INT_TYPE_NAME, vec![]),
+            UnsignedMediumInt => (UNSIGNED_MEDIUM_INT_TYPE_NAME, vec![]),
+            BigInt => (BIG_INT_TYPE_NAME, vec![]),
+            UnsignedBigInt => (UNSIGNED_BIG_INT_TYPE_NAME, vec![]),
+            Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
+            Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
+            Float => (FLOAT_TYPE_NAME, vec![]),
+            Double => (DOUBLE_TYPE_NAME, vec![]),
+            Bit(x) => (BIT_TYPE_NAME, vec![x.to_string()]),
+            Char(x) => (CHAR_TYPE_NAME, vec![x.to_string()]),
+            VarChar(x) => (VAR_CHAR_TYPE_NAME, vec![x.to_string()]),
+            Binary(x) => (BINARY_TYPE_NAME, vec![x.to_string()]),
+            VarBinary(x) => (VAR_BINARY_TYPE_NAME, vec![x.to_string()]),
+            TinyBlob => (TINY_BLOB_TYPE_NAME, vec![]),
+            Blob => (BLOB_TYPE_NAME, vec![]),
+            MediumBlob => (MEDIUM_BLOB_TYPE_NAME, vec![]),
+            LongBlob => (LONG_BLOB_TYPE_NAME, vec![]),
+            TinyText => (TINY_TEXT_TYPE_NAME, vec![]),
+            Text => (TEXT_TYPE_NAME, vec![]),
+            MediumText => (MEDIUM_TEXT_TYPE_NAME, vec![]),
+            LongText => (LONG_TEXT_TYPE_NAME, vec![]),
+            Date => (DATE_TYPE_NAME, vec![]),
+            Time(x) => (TIME_TYPE_NAME, arg_vec_from_opt(x)),
+            DateTime(x) => (DATETIME_TYPE_NAME, arg_vec_from_opt(x)),
+            Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
+            Year => (YEAR_TYPE_NAME, vec![]),
+            JSON => (JSON_TYPE_NAME, vec![]),
         };
 
         fn arg_vec_from_opt(input: Option<u32>) -> Vec<String> {
