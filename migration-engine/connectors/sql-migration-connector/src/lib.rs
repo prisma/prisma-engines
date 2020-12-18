@@ -12,13 +12,10 @@ mod sql_database_step_applier;
 mod sql_destructive_change_checker;
 mod sql_imperative_migration_persistence;
 mod sql_migration;
-mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
-
 pub use sql_migration::SqlMigration;
-pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use connection_wrapper::Connection;
 use datamodel::Datamodel;
@@ -123,10 +120,6 @@ impl MigrationConnector for SqlMigrationConnector {
         datamodel: &Datamodel,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         self.flavour.check_database_version_compatibility(datamodel)
-    }
-
-    fn migration_persistence(&self) -> &dyn MigrationPersistence {
-        self
     }
 
     fn database_migration_inferrer(&self) -> &dyn DatabaseMigrationInferrer<SqlMigration> {

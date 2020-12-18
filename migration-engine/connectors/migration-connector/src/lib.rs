@@ -7,10 +7,6 @@ mod database_migration_step_applier;
 mod destructive_change_checker;
 mod error;
 mod imperative_migrations_persistence;
-#[allow(missing_docs)]
-mod migration_applier;
-#[allow(missing_docs)]
-mod migration_persistence;
 
 #[allow(missing_docs)]
 pub mod steps;
@@ -24,8 +20,6 @@ pub use error::*;
 pub use imperative_migrations_persistence::{
     ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp,
 };
-pub use migration_applier::*;
-pub use migration_persistence::*;
 pub use migrations_directory::{create_migration_directory, list_migrations, ListMigrationsError, MigrationDirectory};
 pub use steps::MigrationStep;
 
@@ -64,9 +58,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
         None
     }
 
-    /// See [MigrationPersistence](trait.MigrationPersistence.html).
-    fn migration_persistence(&self) -> &dyn MigrationPersistence;
-
     /// See [ImperativeMigrationPersistence](trait.ImperativeMigrationPersistence.html).
     fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence;
 
@@ -78,15 +69,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
     fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker<Self::DatabaseMigration>;
-
-    /// See [MigrationStepApplier](trait.MigrationStepApplier.html).
-    fn migration_applier<'a>(&'a self) -> Box<dyn MigrationApplier<Self::DatabaseMigration> + Send + Sync + 'a> {
-        let applier = MigrationApplierImpl {
-            migration_persistence: self.migration_persistence(),
-            step_applier: self.database_migration_step_applier(),
-        };
-        Box::new(applier)
-    }
 }
 
 /// Marker for the associated migration type for a connector.
