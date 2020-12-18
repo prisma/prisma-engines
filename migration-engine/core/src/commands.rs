@@ -6,8 +6,6 @@
 mod apply_migrations;
 mod apply_script;
 #[allow(missing_docs)]
-mod calculate_database_steps;
-#[allow(missing_docs)]
 mod calculate_datamodel;
 mod command;
 mod create_migration;
@@ -31,7 +29,6 @@ mod unapply_migration;
 
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
 pub use apply_script::{ApplyScriptCommand, ApplyScriptInput, ApplyScriptOutput};
-pub use calculate_database_steps::*;
 pub use calculate_datamodel::*;
 pub use command::MigrationCommand;
 pub use create_migration::{CreateMigrationCommand, CreateMigrationInput, CreateMigrationOutput};
