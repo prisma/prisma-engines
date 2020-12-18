@@ -57,7 +57,6 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput>;
     async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> CoreResult<MigrationStepsResultOutput>;
     async fn initialize(&self, input: &InitializeInput) -> CoreResult<InitializeOutput>;
-    async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>>;
     async fn list_migration_directories(
         &self,
         input: &ListMigrationDirectoriesInput,
@@ -160,12 +159,6 @@ where
                 "Initialize",
                 migrations_directory_path = input.migrations_directory_path.as_str()
             ))
-            .await
-    }
-
-    async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>> {
-        self.handle_command::<ListMigrationsCommand>(input)
-            .instrument(tracing::info_span!("ListMigrations"))
             .await
     }
 

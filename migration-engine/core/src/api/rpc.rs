@@ -24,7 +24,6 @@ enum RpcCommand {
     InferMigrationSteps,
     Initialize,
     ListMigrationDirectories,
-    ListMigrations,
     MarkMigrationApplied,
     MarkMigrationRolledBack,
     MigrationProgress,
@@ -49,7 +48,6 @@ impl RpcCommand {
             RpcCommand::InferMigrationSteps => "inferMigrationSteps",
             RpcCommand::Initialize => "initialize",
             RpcCommand::ListMigrationDirectories => "listMigrationDirectories",
-            RpcCommand::ListMigrations => "listMigrations",
             RpcCommand::MarkMigrationApplied => "markMigrationApplied",
             RpcCommand::MarkMigrationRolledBack => "markMigrationRolledBack",
             RpcCommand::MigrationProgress => "migrationProgress",
@@ -74,7 +72,6 @@ const AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::InferMigrationSteps,
     RpcCommand::Initialize,
     RpcCommand::ListMigrationDirectories,
-    RpcCommand::ListMigrations,
     RpcCommand::MarkMigrationApplied,
     RpcCommand::MigrationProgress,
     RpcCommand::MarkMigrationRolledBack,
@@ -148,7 +145,6 @@ impl RpcApi {
             RpcCommand::ListMigrationDirectories => {
                 render(executor.list_migration_directories(&params.parse()?).await?)
             }
-            RpcCommand::ListMigrations => render(executor.list_migrations(&serde_json::Value::Null).await?),
             RpcCommand::MarkMigrationApplied => render(executor.mark_migration_applied(&params.parse()?).await?),
             RpcCommand::MarkMigrationRolledBack => render(executor.mark_migration_rolled_back(&params.parse()?).await?),
             RpcCommand::MigrationProgress => render(executor.migration_progress(&params.parse()?).await?),
