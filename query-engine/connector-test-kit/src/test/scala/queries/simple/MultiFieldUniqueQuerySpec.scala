@@ -192,7 +192,7 @@ class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
                                  |}""".stripMargin,
       project,
       errorCode = 2012,
-      errorContains = """Missing a required value at `Query.user.where.UserWhereUniqueInput.FirstName_LastName.FirstNameLastNameCompoundUniqueInput.LastName""",
+      errorContains = """Missing a required value at `Query.user.where.UserWhereUniqueInput.FirstName_LastName.UserFirstNameLastNameCompoundUniqueInput.LastName""",
     )
   }
 

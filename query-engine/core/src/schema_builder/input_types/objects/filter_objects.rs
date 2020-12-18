@@ -138,7 +138,11 @@ fn compound_field_unique_object_type(
     from_fields: Vec<ScalarFieldRef>,
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(
-        format!("{}{}CompoundUniqueInput", model.name, compound_object_name(alias, &from_fields)),
+        format!(
+            "{}{}CompoundUniqueInput",
+            model.name,
+            compound_object_name(alias, &from_fields)
+        ),
         PRISMA_NAMESPACE,
     );
 
