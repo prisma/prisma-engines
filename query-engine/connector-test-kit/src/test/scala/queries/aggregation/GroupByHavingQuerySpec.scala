@@ -84,7 +84,7 @@ class GroupByHavingQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"groupByModel":[{"s":"group1","int":5,"count":{"_all":1},"sum":{"int":5}},{"s":"group2","int":5,"count":{"_all":1},"sum":{"int":5}}]}}""")
   }
 
-  "Using a groupBy with a `having` scalar filters on list fields" should "work" taggedAs (IgnoreMySql, IgnoreSQLite, IgnoreMsSql) {
+  "Using a groupBy with a `having` scalar filters on list fields" should "work" taggedAs (IgnoreMySql, IgnoreSQLite, IgnoreMsSql) in {
     val project = SchemaDsl.fromStringV11() {
       """model Model {
         |  id   Int   @id @default(autoincrement())
