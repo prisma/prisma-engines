@@ -440,6 +440,21 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         ("Image", Value::bytes(vec![1, 2, 3]), &["VarBinary(Max)"]),
         ("Xml", Value::text("<jamon>iberico</jamon>"), &["NVarChar(Max)"]),
+        (
+            "UniqueIdentifier",
+            Value::text("75bf0037-a8b8-4512-beea-5a186f8abf1e"),
+            &[
+                "Char(36)",
+                "NChar(36)",
+                "VarChar(36)",
+                "VarChar(Max)",
+                "NVarChar(36)",
+                "NVarChar(Max)",
+                "Binary(16)",
+                "VarBinary(16)",
+                "VarBinary(Max)",
+            ],
+        ),
     ]
 });
 
@@ -924,6 +939,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "DateTime2",
                 "DateTimeOffset",
                 "SmallDateTime",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -958,6 +974,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "VarChar(9)",
                 "NVarChar",
                 "NVarChar(9)",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -991,6 +1008,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "VarChar(10)",
                 "VarChar(Max)",
                 "Text",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1027,6 +1045,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "NChar(9)",
                 "NVarChar(9)",
                 "Text",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1054,6 +1073,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "DateTime2",
                 "DateTimeOffset",
                 "SmallDateTime",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1089,6 +1109,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "VarChar(9)",
                 "NVarChar",
                 "NVarChar(9)",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1126,6 +1147,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "NVarChar(9)",
                 "NVarChar(Max)",
                 "NText",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1159,6 +1181,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "VarChar(10)",
                 "VarChar(Max)",
                 "Text",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1195,6 +1218,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "NChar(9)",
                 "NVarChar(9)",
                 "Text",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1228,6 +1252,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "VarChar(10)",
                 "VarChar(Max)",
                 "Text",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1269,6 +1294,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "NChar",
                 "NChar(9)",
                 "Text",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1306,6 +1332,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "NVarChar",
                 "NVarChar(9)",
                 "Text",
+                "UniqueIdentifier",
             ],
         ),
         (
@@ -1802,21 +1829,9 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "UniqueIdentifier",
             ],
         ),
-        (
-            "Char",
-            Value::text("f"),
-            &["Binary", "VarBinary", "Image", "Xml", "UniqueIdentifier"],
-        ),
-        (
-            "NChar",
-            Value::text("f"),
-            &["Binary", "VarBinary", "Image", "Xml", "UniqueIdentifier"],
-        ),
-        (
-            "VarChar",
-            Value::text("f"),
-            &["Binary", "VarBinary", "Image", "Xml", "UniqueIdentifier"],
-        ),
+        ("Char", Value::text("f"), &["Binary", "VarBinary", "Image", "Xml"]),
+        ("NChar", Value::text("f"), &["Binary", "VarBinary", "Image", "Xml"]),
+        ("VarChar", Value::text("f"), &["Binary", "VarBinary", "Image", "Xml"]),
         (
             "Text",
             Value::text("foo"),
@@ -1979,14 +1994,8 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "DateTime2",
                 "DateTimeOffset",
                 "SmallDateTime",
-                "Char",
-                "NChar",
-                "VarChar",
                 "Text",
-                "NVarChar",
                 "NText",
-                "Binary",
-                "VarBinary",
                 "Image",
                 "Xml",
             ],
@@ -2065,11 +2074,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
                 from,
             ));
 
-            api.schema_push(&dm1)
-                .send()
-                .await?
-                .assert_green()?
-                .assert_no_warning()?;
+            api.schema_push(&dm1).send().await?.assert_green()?;
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.database().insert(insert.into()).await?;
@@ -2094,11 +2099,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
                 to
             ));
 
-            api.schema_push(&dm2)
-                .send()
-                .await?
-                .assert_green()?
-                .assert_no_warning()?;
+            api.schema_push(&dm2).send().await?.assert_green()?;
 
             api.assert_schema().await?.assert_table("A", |table| {
                 table.assert_columns_count(2)?.assert_column("x", |c| {
@@ -2135,11 +2136,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
                 from,
             ));
 
-            api.schema_push(&dm1)
-                .send()
-                .await?
-                .assert_green()?
-                .assert_no_warning()?;
+            api.schema_push(&dm1).send().await?.assert_green()?;
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.database().insert(insert.into()).await?;
@@ -2194,7 +2191,10 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
         for to in *casts {
             println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
 
-            let kind = from.split("(").next().unwrap();
+            let kind = match from.split("(").next() {
+                Some(a) => a,
+                _ => unreachable!(),
+            };
 
             let dm1 = api.native_types_datamodel(format!(
                 r#"
@@ -2207,11 +2207,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
                 from,
             ));
 
-            api.schema_push(&dm1)
-                .send()
-                .await?
-                .assert_green()?
-                .assert_no_warning()?;
+            api.schema_push(&dm1).send().await?.assert_green()?;
 
             let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
             api.database().insert(insert.into()).await?;

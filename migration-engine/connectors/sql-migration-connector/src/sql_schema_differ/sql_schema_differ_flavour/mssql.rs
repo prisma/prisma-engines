@@ -82,8 +82,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnT
     use ColumnTypeChange::*;
     use MsSqlTypeParameter::*;
 
-    println!("{:?} -> {:?}", previous, next);
-
     match previous {
         // Bit, as in booleans. 1 or 0.
         MsSqlType::Bit => match next {
@@ -727,6 +725,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnT
             },
             MsSqlType::Text => SafeCast,
             MsSqlType::NText => SafeCast,
+            MsSqlType::UniqueIdentifier => RiskyCast,
             _ => NotCastable,
         },
 
@@ -768,6 +767,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnT
             },
             MsSqlType::Text => RiskyCast,
             MsSqlType::NText => SafeCast,
+            MsSqlType::UniqueIdentifier => RiskyCast,
             _ => NotCastable,
         },
 
@@ -818,6 +818,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnT
                 Some(Max) => RiskyCast,
                 _ => SafeCast,
             },
+            MsSqlType::UniqueIdentifier => RiskyCast,
             _ => NotCastable,
         },
 
@@ -863,6 +864,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnT
             },
             MsSqlType::Text => RiskyCast,
             MsSqlType::NText => SafeCast,
+            MsSqlType::UniqueIdentifier => RiskyCast,
             _ => NotCastable,
         },
 
@@ -1100,6 +1102,26 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnT
         },
 
         // GUID. The rest of the world calls this UUID.
-        MsSqlType::UniqueIdentifier => NotCastable,
+        MsSqlType::UniqueIdentifier => match next {
+            MsSqlType::Char(param) | MsSqlType::NChar(param) => match param {
+                Some(length) if length >= 36 => SafeCast,
+                _ => RiskyCast,
+            },
+            MsSqlType::VarChar(param) | MsSqlType::NVarChar(param) => match param {
+                Some(Number(length)) if length >= 36 => SafeCast,
+                Some(Max) => SafeCast,
+                _ => RiskyCast,
+            },
+            MsSqlType::Binary(param) => match param {
+                Some(length) if length >= 16 => SafeCast,
+                _ => RiskyCast,
+            },
+            MsSqlType::VarBinary(param) => match param {
+                Some(Number(length)) if length >= 16 => SafeCast,
+                Some(Max) => SafeCast,
+                _ => RiskyCast,
+            },
+            _ => NotCastable,
+        },
     }
 }
