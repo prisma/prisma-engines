@@ -3,7 +3,6 @@
 //! The commands exposed by the migration engine core are defined in this
 //! module.
 
-#[allow(missing_docs)]
 mod apply_migrations;
 mod apply_script;
 #[allow(missing_docs)]
@@ -20,8 +19,6 @@ mod get_database_version;
 mod infer_migration_steps;
 mod initialize;
 mod list_migration_directories;
-#[allow(missing_docs)]
-mod list_migrations;
 mod mark_migration_applied;
 mod mark_migration_rolled_back;
 #[allow(missing_docs)]
@@ -48,7 +45,6 @@ pub use get_database_version::*;
 pub use infer_migration_steps::*;
 pub use initialize::{InitializeCommand, InitializeInput, InitializeOutput};
 pub use list_migration_directories::*;
-pub use list_migrations::*;
 pub use mark_migration_applied::{MarkMigrationAppliedCommand, MarkMigrationAppliedInput, MarkMigrationAppliedOutput};
 pub use mark_migration_rolled_back::{
     MarkMigrationRolledBackCommand, MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput,
