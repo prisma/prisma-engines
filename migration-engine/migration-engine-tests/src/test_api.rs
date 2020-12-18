@@ -27,10 +27,7 @@ use super::{
 use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
 use enumflags2::BitFlags;
 use indoc::formatdoc;
-use migration_connector::{
-    ImperativeMigrationsPersistence, MigrationConnector, MigrationFeature, MigrationPersistence, MigrationRecord,
-    MigrationStep,
-};
+use migration_connector::{ImperativeMigrationsPersistence, MigrationFeature, MigrationRecord};
 
 use migration_core::{
     api::{GenericApi, MigrationApi},
@@ -40,7 +37,7 @@ use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
-use sql_migration_connector::{SqlMigration, SqlMigrationConnector, MIGRATION_TABLE_NAME};
+use sql_migration_connector::{SqlMigration, SqlMigrationConnector};
 use sql_schema_describer::*;
 use tempfile::TempDir;
 use test_setup::*;
@@ -76,14 +73,6 @@ impl TestApi {
 
     pub fn is_mariadb(&self) -> bool {
         self.tags.contains(Tags::Mariadb)
-    }
-
-    pub async fn migration_persistence(&self) -> &dyn MigrationPersistence {
-        let persistence = self.api.connector().migration_persistence();
-
-        persistence.init().await.unwrap();
-
-        persistence
     }
 
     pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
@@ -193,22 +182,7 @@ impl TestApi {
     }
 
     pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
-        let mut result = self.api.connector().describe_schema().await?;
-
-        // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
-        result.tables = result
-            .tables
-            .into_iter()
-            .filter(|t| t.name != MIGRATION_TABLE_NAME)
-            .collect();
-
-        // Also the sequences of the _Migration table
-        result.sequences = result
-            .sequences
-            .into_iter()
-            .filter(|seq| !seq.name.contains("_Migration"))
-            .collect();
-
+        let result = self.api.connector().describe_schema().await?;
         Ok(result)
     }
 

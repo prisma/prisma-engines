@@ -7,7 +7,6 @@ mod existing_data;
 mod existing_databases;
 mod initialization;
 mod list_migration_directories;
-mod migration_persistence;
 mod migrations;
 mod native_types;
 mod reset;
@@ -2436,7 +2435,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
     api.schema_push(dm1).send().await?.assert_green()?;
 
     // Drop the existing migrations.
-    api.migration_persistence().await.reset().await?;
+    api.reset().send().await?;
 
     let dm2 = r#"
         datasource db {
