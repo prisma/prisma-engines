@@ -21,7 +21,6 @@ enum RpcCommand {
     DiagnoseMigrationHistory,
     EvaluateDataLoss,
     GetDatabaseVersion,
-    InferMigrationSteps,
     Initialize,
     ListMigrationDirectories,
     MarkMigrationApplied,
@@ -43,7 +42,6 @@ impl RpcCommand {
             RpcCommand::DiagnoseMigrationHistory => "diagnoseMigrationHistory",
             RpcCommand::EvaluateDataLoss => "evaluateDataLoss",
             RpcCommand::GetDatabaseVersion => "getDatabaseVersion",
-            RpcCommand::InferMigrationSteps => "inferMigrationSteps",
             RpcCommand::Initialize => "initialize",
             RpcCommand::ListMigrationDirectories => "listMigrationDirectories",
             RpcCommand::MarkMigrationApplied => "markMigrationApplied",
@@ -65,7 +63,6 @@ const AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::DiagnoseMigrationHistory,
     RpcCommand::EvaluateDataLoss,
     RpcCommand::GetDatabaseVersion,
-    RpcCommand::InferMigrationSteps,
     RpcCommand::Initialize,
     RpcCommand::ListMigrationDirectories,
     RpcCommand::MarkMigrationApplied,
@@ -134,7 +131,6 @@ impl RpcApi {
             }
             RpcCommand::EvaluateDataLoss => render(executor.evaluate_data_loss(&params.parse()?).await?),
             RpcCommand::GetDatabaseVersion => render(executor.version(&serde_json::Value::Null).await?),
-            RpcCommand::InferMigrationSteps => render(executor.infer_migration_steps(&params.parse()?).await?),
             RpcCommand::Initialize => render(executor.initialize(&params.parse()?).await?),
             RpcCommand::ListMigrationDirectories => {
                 render(executor.list_migration_directories(&params.parse()?).await?)
