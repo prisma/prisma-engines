@@ -14,7 +14,6 @@ pub struct RpcApi {
 enum RpcCommand {
     ApplyMigrations,
     ApplyScript,
-    CalculateDatamodel,
     CreateMigration,
     DebugPanic,
     DiagnoseMigrationHistory,
@@ -37,7 +36,6 @@ impl RpcCommand {
         match self {
             RpcCommand::ApplyMigrations => "applyMigrations",
             RpcCommand::ApplyScript => "applyScript",
-            RpcCommand::CalculateDatamodel => "calculateDatamodel",
             RpcCommand::CreateMigration => "createMigration",
             RpcCommand::DebugPanic => "debugPanic",
             RpcCommand::DiagnoseMigrationHistory => "diagnoseMigrationHistory",
@@ -60,7 +58,6 @@ impl RpcCommand {
 const AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::ApplyMigrations,
     RpcCommand::ApplyScript,
-    RpcCommand::CalculateDatamodel,
     RpcCommand::CreateMigration,
     RpcCommand::DebugPanic,
     RpcCommand::DiagnoseMigrationHistory,
@@ -130,7 +127,6 @@ impl RpcApi {
             RpcCommand::ApplyMigrations => render(executor.apply_migrations(&params.parse()?).await?),
             RpcCommand::CreateMigration => render(executor.create_migration(&params.parse()?).await?),
             RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),
-            RpcCommand::CalculateDatamodel => render(executor.calculate_datamodel(&params.parse()?).await?),
             RpcCommand::DiagnoseMigrationHistory => {
                 render(executor.diagnose_migration_history(&params.parse()?).await?)
             }
