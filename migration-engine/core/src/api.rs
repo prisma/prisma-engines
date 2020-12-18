@@ -61,7 +61,6 @@ pub trait GenericApi: Send + Sync + 'static {
         &self,
         input: &MarkMigrationRolledBackInput,
     ) -> CoreResult<MarkMigrationRolledBackOutput>;
-    async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput>;
     async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
     async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
@@ -161,15 +160,6 @@ where
             .instrument(tracing::info_span!(
                 "MarkMigrationRolledBack",
                 migration_name = input.migration_name.as_str()
-            ))
-            .await
-    }
-
-    async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput> {
-        self.handle_command::<MigrationProgressCommand>(input)
-            .instrument(tracing::info_span!(
-                "MigrationProgress",
-                migration_id = input.migration_id.as_str()
             ))
             .await
     }

@@ -15,8 +15,6 @@ mod initialize;
 mod list_migration_directories;
 mod mark_migration_applied;
 mod mark_migration_rolled_back;
-#[allow(missing_docs)]
-mod migration_progress;
 mod plan_migration;
 mod reset;
 mod schema_push;
@@ -40,7 +38,6 @@ pub use mark_migration_applied::{MarkMigrationAppliedCommand, MarkMigrationAppli
 pub use mark_migration_rolled_back::{
     MarkMigrationRolledBackCommand, MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput,
 };
-pub use migration_progress::*;
 pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigrationOutput};
 pub use reset::ResetCommand;
 pub use schema_push::{SchemaPushCommand, SchemaPushInput, SchemaPushOutput};
