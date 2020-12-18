@@ -5,6 +5,16 @@ use eyre::Result;
 use quaint::{prelude::Queryable, single::Quaint};
 
 #[macro_export]
+macro_rules! assert_eq_schema {
+    ($left:expr, $right:expr) => {
+        let no_whitespace_expected = $left.replace(' ', "").replace('\n', "");
+        let no_whitespace_result = $right.replace(' ', "").replace('\n', "");
+
+        pretty_assertions::assert_eq!(no_whitespace_result, no_whitespace_expected);
+    };
+}
+
+#[macro_export]
 macro_rules! assert_eq_datamodels {
     ($left:expr, $right:expr) => {
         let parsed_expected = datamodel::parse_datamodel($left).unwrap().subject;

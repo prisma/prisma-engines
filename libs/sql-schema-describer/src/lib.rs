@@ -2,12 +2,9 @@
 #![allow(clippy::match_bool)] // we respectfully disagree that it makes the code less readable.
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
-
-use std::fmt::{self, Debug};
-
 use once_cell::sync::Lazy;
 use regex::Regex;
-use serde::{Deserialize, Serialize};
+use std::fmt::{self, Debug};
 use tracing::debug;
 
 pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
@@ -40,15 +37,13 @@ pub trait SqlSchemaDescriberBackend: Send + Sync + 'static {
     async fn version(&self, schema: &str) -> DescriberResult<Option<String>>;
 }
 
-#[derive(Serialize, Deserialize)]
 pub struct SQLMetadata {
     pub table_count: usize,
     pub size_in_bytes: usize,
 }
 
 /// The result of describing a database schema.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SqlSchema {
     /// The schema's tables.
     pub tables: Vec<Table>,
@@ -118,8 +113,7 @@ impl SqlSchema {
 }
 
 /// A table found in a schema.
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Table {
     /// The table's name.
     pub name: String,
@@ -187,8 +181,7 @@ impl Table {
     }
 }
 /// The type of an index.
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone)]
 pub enum IndexType {
     /// Unique type.
     Unique,
@@ -203,8 +196,7 @@ impl IndexType {
 }
 
 /// An index of a table.
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Index {
     /// Index name.
     pub name: String,
@@ -221,8 +213,7 @@ impl Index {
 }
 
 /// The primary key of a table.
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone)]
 pub struct PrimaryKey {
     /// Columns.
     pub columns: Vec<String>,
@@ -239,8 +230,7 @@ impl PrimaryKey {
 }
 
 /// A column of a table.
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Clone, Debug)]
 pub struct Column {
     /// Column name.
     pub name: String,
@@ -259,8 +249,7 @@ impl Column {
 }
 
 /// The type of a column.
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Clone, Debug)]
 pub struct ColumnType {
     /// The SQL data type.
     pub data_type: String,
@@ -301,8 +290,7 @@ impl ColumnType {
 }
 
 /// Enumeration of column type families.
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Clone, Debug)]
 // TODO: this name feels weird.
 pub enum ColumnTypeFamily {
     /// Integer types.
@@ -369,8 +357,7 @@ impl fmt::Display for ColumnTypeFamily {
 }
 
 /// A column's arity.
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Clone, Debug)]
 pub enum ColumnArity {
     /// Required column.
     Required,
@@ -398,8 +385,7 @@ impl ColumnArity {
 }
 
 /// Foreign key action types (for ON DELETE|ON UPDATE).
-#[derive(PartialEq, Debug, Clone, Copy, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum ForeignKeyAction {
     /// Produce an error indicating that the deletion or update would create a foreign key
     /// constraint violation. If the constraint is deferred, this error will be produced at
@@ -420,8 +406,7 @@ pub enum ForeignKeyAction {
 }
 
 /// A foreign key.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone)]
 pub struct ForeignKey {
     /// The database name of the foreign key constraint, when available.
     pub constraint_name: Option<String>,
@@ -446,8 +431,7 @@ impl PartialEq for ForeignKey {
 }
 
 /// A SQL enum.
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Enum {
     /// Enum name.
     pub name: String,
@@ -456,8 +440,7 @@ pub struct Enum {
 }
 
 /// A SQL sequence.
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Sequence {
     /// Sequence name.
     pub name: String,
@@ -469,26 +452,8 @@ pub struct DefaultValue {
     constraint_name: Option<String>,
 }
 
-impl Serialize for DefaultValue {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        self.kind.serialize(serializer)
-    }
-}
-
-impl<'de> Deserialize<'de> for DefaultValue {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        Ok(Self::new(DefaultKind::deserialize(deserializer)?))
-    }
-}
-
 /// A DefaultValue
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum DefaultKind {
     /// A constant value, parsed as String
     VALUE(PrismaValue),

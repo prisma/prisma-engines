@@ -135,7 +135,7 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         tracing::trace!(?database_steps_json_pretty);
 
-        let database_migration_json = database_migration.serialize();
+        let database_migration_json = serde_json::Value::Null;
 
         let migration = Migration::new(NewMigration {
             name: self.input.migration_id.clone(),

@@ -4,7 +4,7 @@ use serde::{Serialize, Serializer};
 use sql_schema_describer::SqlSchema;
 
 /// The database migration type for SqlMigrationConnector.
-#[derive(Debug, Serialize)]
+#[derive(Debug)]
 pub struct SqlMigration {
     pub(crate) before: SqlSchema,
     pub(crate) after: SqlSchema,
@@ -19,10 +19,6 @@ impl SqlMigration {
 
 impl DatabaseMigrationMarker for SqlMigration {
     const FILE_EXTENSION: &'static str = "sql";
-
-    fn serialize(&self) -> serde_json::Value {
-        serde_json::to_value(self).unwrap()
-    }
 
     fn is_empty(&self) -> bool {
         self.steps.is_empty()
@@ -197,47 +193,4 @@ pub(crate) struct RedefineTable {
     pub dropped_primary_key: bool,
     pub column_pairs: Vec<(Pair<usize>, ColumnChanges, Option<ColumnTypeChange>)>,
     pub table_index: Pair<usize>,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn sql_migration_serializes_as_expected() {
-        let migration = SqlMigration {
-            before: SqlSchema::empty(),
-            after: SqlSchema::empty(),
-            steps: vec![
-                SqlMigrationStep::AddForeignKey(AddForeignKey {
-                    table_index: 0,
-                    foreign_key_index: 0,
-                }),
-                SqlMigrationStep::RedefineTables(vec![]),
-                SqlMigrationStep::DropTable(DropTable { table_index: 9 }),
-            ],
-        };
-
-        let expected = serde_json::json!({
-            "before": {
-                "tables": [],
-                "enums": [],
-                "sequences": [],
-            },
-            "after": {
-                "tables": [],
-                "enums": [],
-                "sequences": [],
-            },
-            "steps": [
-                { "AddForeignKey": {} },
-                { "RedefineTables": {} },
-                { "DropTable": {} },
-            ],
-        });
-
-        let actual = serde_json::to_value(migration).unwrap();
-
-        assert_eq!(actual, expected);
-    }
 }
