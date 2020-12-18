@@ -12,7 +12,6 @@ pub struct RpcApi {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum RpcCommand {
-    ApplyMigration,
     ApplyMigrations,
     ApplyScript,
     CalculateDatabaseSteps,
@@ -38,7 +37,6 @@ enum RpcCommand {
 impl RpcCommand {
     fn name(&self) -> &'static str {
         match self {
-            RpcCommand::ApplyMigration => "applyMigration",
             RpcCommand::ApplyMigrations => "applyMigrations",
             RpcCommand::ApplyScript => "applyScript",
             RpcCommand::CalculateDatabaseSteps => "calculateDatabaseSteps",
@@ -64,7 +62,6 @@ impl RpcCommand {
 }
 
 const AVAILABLE_COMMANDS: &[RpcCommand] = &[
-    RpcCommand::ApplyMigration,
     RpcCommand::ApplyMigrations,
     RpcCommand::ApplyScript,
     RpcCommand::CalculateDatabaseSteps,
@@ -139,7 +136,6 @@ impl RpcApi {
             RpcCommand::ApplyMigrations => render(executor.apply_migrations(&params.parse()?).await?),
             RpcCommand::CreateMigration => render(executor.create_migration(&params.parse()?).await?),
             RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),
-            RpcCommand::ApplyMigration => render(executor.apply_migration(&params.parse()?).await?),
             RpcCommand::CalculateDatabaseSteps => render(executor.calculate_database_steps(&params.parse()?).await?),
             RpcCommand::CalculateDatamodel => render(executor.calculate_datamodel(&params.parse()?).await?),
             RpcCommand::DiagnoseMigrationHistory => {

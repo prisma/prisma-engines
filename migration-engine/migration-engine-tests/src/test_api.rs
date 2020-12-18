@@ -21,16 +21,13 @@ use super::{
     assertions::SchemaAssertion,
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector, test_api},
     sql::barrel_migration_executor::BarrelMigrationExecutor,
-    InferAndApplyOutput,
 };
 use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
 use enumflags2::BitFlags;
-use migration_connector::{
-    ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord, MigrationStep,
-};
+use migration_connector::{ImperativeMigrationsPersistence, MigrationConnector, MigrationPersistence, MigrationRecord};
 use migration_core::{
     api::{GenericApi, MigrationApi},
-    commands::{ApplyMigrationInput, ApplyScriptInput},
+    commands::ApplyScriptInput,
 };
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -115,29 +112,6 @@ impl TestApi {
     /// Create a temporary directory to serve as a test migrations directory.
     pub fn create_migrations_directory(&self) -> anyhow::Result<TempDir> {
         Ok(tempfile::tempdir()?)
-    }
-
-    pub async fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
-        let input = ApplyMigrationInput {
-            migration_id: migration_id.into(),
-            steps,
-            force: None,
-        };
-
-        let migration_output = self.api.apply_migration(&input).await.expect("ApplyMigration failed");
-
-        assert!(
-            migration_output.general_errors.is_empty(),
-            format!(
-                "ApplyMigration returned unexpected errors: {:?}",
-                migration_output.general_errors
-            )
-        );
-
-        InferAndApplyOutput {
-            sql_schema: self.describe_database().await.unwrap(),
-            migration_output,
-        }
     }
 
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {

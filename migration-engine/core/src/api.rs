@@ -41,7 +41,6 @@ where
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
     async fn version(&self, input: &serde_json::Value) -> CoreResult<String>;
-    async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput>;
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
     async fn apply_script(&self, input: &ApplyScriptInput) -> CoreResult<ApplyScriptOutput>;
     async fn calculate_database_steps(
@@ -85,15 +84,6 @@ where
     async fn version(&self, input: &serde_json::Value) -> CoreResult<String> {
         self.handle_command::<VersionCommand>(input)
             .instrument(tracing::info_span!("Version"))
-            .await
-    }
-
-    async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput> {
-        self.handle_command::<ApplyMigrationCommand<'_>>(input)
-            .instrument(tracing::info_span!(
-                "ApplyMigration",
-                migration_id = input.migration_id.as_str()
-            ))
             .await
     }
 
