@@ -15,7 +15,7 @@ mod gate_keeper;
 
 use anyhow::anyhow;
 pub use api::GenericApi;
-pub use commands::{InferMigrationStepsInput, MigrationStepsResultOutput, SchemaPushInput};
+pub use commands::{MigrationStepsResultOutput, SchemaPushInput};
 pub use core_error::{CoreError, CoreResult};
 pub use gate_keeper::GateKeeper;
 
