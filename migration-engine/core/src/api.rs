@@ -50,7 +50,6 @@ pub trait GenericApi: Send + Sync + 'static {
         input: &DiagnoseMigrationHistoryInput,
     ) -> CoreResult<DiagnoseMigrationHistoryOutput>;
     async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput>;
-    async fn initialize(&self, input: &InitializeInput) -> CoreResult<InitializeOutput>;
     async fn list_migration_directories(
         &self,
         input: &ListMigrationDirectoriesInput,
@@ -118,15 +117,6 @@ where
     async fn evaluate_data_loss(&self, input: &EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput> {
         self.handle_command::<EvaluateDataLoss>(input)
             .instrument(tracing::info_span!("EvaluateDataLoss"))
-            .await
-    }
-
-    async fn initialize(&self, input: &InitializeInput) -> CoreResult<InitializeOutput> {
-        self.handle_command::<InitializeCommand>(input)
-            .instrument(tracing::info_span!(
-                "Initialize",
-                migrations_directory_path = input.migrations_directory_path.as_str()
-            ))
             .await
     }
 
