@@ -42,13 +42,15 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) -> TestResult {
 #[test_each_connector]
 async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> TestResult {
     let dm = r#"
-            model Test {
-                id String @id @default(cuid())
-                puppiesCount Int?
-            }
-        "#;
+        model Test {
+            id String @id @default(cuid())
+            puppiesCount Int?
+        }
+    "#;
 
-    let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id", "puppiesCount"])
         .values(("a", 7))
@@ -76,7 +78,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
 }
 
 #[test_each_connector]
-async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
+async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -84,7 +86,9 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
         }
     "#;
 
-    let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into(api.render_table_name("Test"), &["id"])
         .values(("a",))
@@ -99,11 +103,11 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await;
-    let final_database_schema = &result.sql_schema;
+    api.schema_push(dm2).send().await?.assert_warnings(&[])?;
 
-    assert_ne!(&original_database_schema, final_database_schema);
-    assert!(result.migration_output.warnings.is_empty());
+    api.assert_schema().await?.assert_ne(&original_database_schema)?;
+
+    Ok(())
 }
 
 #[test_each_connector]

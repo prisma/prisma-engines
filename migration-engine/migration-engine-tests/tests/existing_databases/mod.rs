@@ -16,13 +16,14 @@ async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestRe
         .await?;
 
     let dm = r#"
-            model Blog {
-                id Int @id @default(autoincrement())
-            }
-        "#;
-    let result = api.infer_and_apply(&dm).await.sql_schema;
+        model Blog {
+            id Int @id @default(autoincrement())
+        }
+    "#;
 
-    assert_eq!(initial_result, result);
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_equals(&initial_result)?;
 
     Ok(())
 }
@@ -30,15 +31,18 @@ async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestRe
 #[test_each_connector]
 async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model Blog {
-                id Int @id
-            }
+        model Blog {
+            id Int @id
+        }
 
-            model Post {
-                id Int @id
-            }
-        "#;
-    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
+        model Post {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+    let initial_result = api.describe_database().await?;
+
     assert!(initial_result.get_table("Post").is_some());
 
     let result = api
@@ -51,12 +55,14 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
     assert!(!result.get_table("Post").is_some());
 
     let dm2 = r#"
-            model Blog {
-                id Int @id
-            }
-        "#;
-    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
-    assert_eq!(result, final_result);
+        model Blog {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?;
+
+    api.assert_schema().await?.assert_equals(&result)?;
 
     Ok(())
 }
@@ -148,14 +154,18 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
     assert_eq!(initial_column.is_required(), true);
 
     let dm = r#"
-            model Blog {
-                id Int @id
-                title String?
-            }
-        "#;
-    let result = api.infer_and_apply(&dm).await.sql_schema;
+        model Blog {
+            id Int @id
+            title String?
+        }
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column = result.table_bang("Blog").column_bang("title");
-    assert_eq!(column.is_required(), false);
+    assert!(!column.is_required());
 
     Ok(())
 }
@@ -163,16 +173,20 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
 #[test_each_connector(capabilities("scalar_lists"))]
 async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            datasource pg {
-              provider = "postgres"
-              url = "postgres://localhost:5432"
-            }
+        datasource pg {
+            provider = "postgres"
+            url = "postgres://localhost:5432"
+        }
 
-            model Blog {
-                id Int @id
-            }
-        "#;
-    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
+        model Blog {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let initial_result = api.describe_database().await?;
+
     assert!(!initial_result.get_table("Blog_tags").is_some());
 
     let result = api
@@ -186,18 +200,20 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
         .await?;
 
     let dm2 = r#"
-            datasource pg {
-              provider = "postgres"
-              url = "postgres://localhost:5432"
-            }
+        datasource pg {
+            provider = "postgres"
+            url = "postgres://localhost:5432"
+        }
 
-            model Blog {
-                id Int @id
-                tags String[]
-            }
-        "#;
-    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
-    assert_eq!(result, final_result);
+        model Blog {
+            id Int @id
+            tags String[]
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_equals(&result)?;
 
     Ok(())
 }
@@ -230,12 +246,14 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
     assert!(result.table_bang("Blog").column("title").is_none());
 
     let dm2 = r#"
-            model Blog {
-                id Int @id @default(autoincrement())
-            }
-        "#;
-    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
-    assert_eq!(result, final_result);
+        model Blog {
+            id Int @id @default(autoincrement())
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_equals(&result)?;
 
     Ok(())
 }
@@ -286,12 +304,16 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
 #[test_each_connector(tags("sql"))]
 async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model Blog {
-                id Int @id
-                title String
-            }
-        "#;
-    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
+        model Blog {
+            id Int @id
+            title String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let initial_result = api.describe_database().await?;
+
     let initial_column = initial_result.table_bang("Blog").column_bang("title");
     assert_eq!(initial_column.tpe.family, ColumnTypeFamily::String);
 
