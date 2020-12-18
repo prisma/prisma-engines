@@ -453,16 +453,14 @@ impl SqlSchemaDescriber {
 
         let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
 
-        for index in rows {
-            trace!("Got index: {:?}", index);
-            let IndexRow {
-                column_name,
-                is_primary_key,
-                is_unique,
-                name,
-                sequence_name,
-                table_name,
-            } = quaint::serde::from_row::<IndexRow>(index).unwrap();
+        for row in rows {
+            trace!("Got index: {:?}", row);
+            let name = row.get_expect_string("name");
+            let column_name = row.get_expect_string("column_name");
+            let is_unique = row.get_expect_bool("is_unique");
+            let is_primary_key = row.get_expect_bool("is_primary_key");
+            let table_name = row.get_expect_string("table_name");
+            let sequence_name = row.get_string("sequence_name");
 
             if is_primary_key {
                 let entry: &mut (Vec<_>, Option<PrimaryKey>) =
@@ -640,16 +638,6 @@ impl SqlSchemaDescriber {
             },
         }
     }
-}
-
-#[derive(Deserialize)]
-struct IndexRow {
-    name: String,
-    column_name: String,
-    is_unique: bool,
-    is_primary_key: bool,
-    table_name: String,
-    sequence_name: Option<String>,
 }
 
 fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
