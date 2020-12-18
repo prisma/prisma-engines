@@ -28,7 +28,6 @@ enum RpcCommand {
     PlanMigration,
     Reset,
     SchemaPush,
-    UnapplyMigration,
 }
 
 impl RpcCommand {
@@ -48,7 +47,6 @@ impl RpcCommand {
             RpcCommand::PlanMigration => "planMigration",
             RpcCommand::Reset => "reset",
             RpcCommand::SchemaPush => "schemaPush",
-            RpcCommand::UnapplyMigration => "unapplyMigration",
         }
     }
 }
@@ -68,7 +66,6 @@ const AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::PlanMigration,
     RpcCommand::Reset,
     RpcCommand::SchemaPush,
-    RpcCommand::UnapplyMigration,
 ];
 
 impl RpcApi {
@@ -137,7 +134,6 @@ impl RpcApi {
             RpcCommand::PlanMigration => render(executor.plan_migration(&params.parse()?).await?),
             RpcCommand::Reset => render(executor.reset(&()).await?),
             RpcCommand::SchemaPush => render(executor.schema_push(&params.parse()?).await?),
-            RpcCommand::UnapplyMigration => render(executor.unapply_migration(&params.parse()?).await?),
         })
     }
 }

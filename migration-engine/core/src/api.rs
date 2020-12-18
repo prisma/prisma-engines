@@ -64,7 +64,6 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
     async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
-    async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
 }
 
 #[async_trait::async_trait]
@@ -179,12 +178,6 @@ where
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput> {
         self.handle_command::<SchemaPushCommand>(input)
             .instrument(tracing::info_span!("SchemaPush"))
-            .await
-    }
-
-    async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput> {
-        self.handle_command::<UnapplyMigrationCommand<'_>>(input)
-            .instrument(tracing::info_span!("UnapplyMigration"))
             .await
     }
 }
