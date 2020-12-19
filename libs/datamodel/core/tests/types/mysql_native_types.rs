@@ -89,23 +89,26 @@ fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_bit_type() {
-    let error_msg = "Argument M is out of range for Native type Bit of MySQL: M can range from 1 to 64.";
-
     for tpe in &["Bit(0)", "Bit(65)"] {
-        test_native_types_without_attributes(tpe, "Bytes", error_msg, MYSQL_SOURCE);
+        let error_msg = format!(
+            "Argument M is out of range for Native type {} of MySQL: M can range from 1 to 64.",
+            &tpe
+        );
+        test_native_types_without_attributes(tpe, "Bytes", &error_msg, MYSQL_SOURCE);
     }
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_char_type() {
-    let error_msg = "Argument M is out of range for Native type Char of MySQL: M can range from 0 to 255.";
+    let error_msg = "Argument M is out of range for Native type Char(256) of MySQL: M can range from 0 to 255.";
 
     test_native_types_without_attributes("Char(256)", "String", error_msg, MYSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_varchar_type() {
-    let error_msg = "Argument M is out of range for Native type VarChar of MySQL: M can range from 0 to 65,535.";
+    let error_msg =
+        "Argument M is out of range for Native type VarChar(655350) of MySQL: M can range from 0 to 65,535.";
 
     test_native_types_without_attributes("VarChar(655350)", "String", error_msg, MYSQL_SOURCE);
 }
@@ -120,16 +123,20 @@ fn should_fail_on_argument_out_of_range_for_decimal_and_numeric_type() {
     };
 
     for tpe in &["Numeric", "Decimal"] {
+        let native_type = &format!("{}(66,20)", tpe);
+
         test_native_types_without_attributes(
-            &format!("{}(66, 20)", tpe),
+            native_type,
             "Decimal",
-            &error_msg(tpe, "Precision", "1 to 65"),
+            &error_msg(native_type, "Precision", "1 to 65"),
             MYSQL_SOURCE,
         );
+        let native_type = &format!("{}(44,33)", tpe);
+
         test_native_types_without_attributes(
-            &format!("{}(44, 33)", tpe),
+            native_type,
             "Decimal",
-            &error_msg(tpe, "Scale", "0 to 30"),
+            &error_msg(native_type, "Scale", "0 to 30"),
             MYSQL_SOURCE,
         );
     }
@@ -157,7 +164,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Decimal native type in MySQL.",
+        "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.",
         ast::Span::new(281, 311),
     ));
 }
@@ -184,7 +191,7 @@ fn should_fail_on_native_type_numeric_when_scale_is_bigger_than_precision() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Numeric native type in MySQL.",
+        "The scale must not be larger than the precision for the Numeric(2,4) native type in MySQL.",
         ast::Span::new(281, 311),
     ));
 }
