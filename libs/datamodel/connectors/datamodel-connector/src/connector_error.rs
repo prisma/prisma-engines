@@ -21,13 +21,6 @@ impl ConnectorErrorFactory {
         }
     }
 
-    pub fn from_str(tpe: &str, connector: &str) -> Self {
-        ConnectorErrorFactory {
-            native_type: tpe.to_string(),
-            connector: connector.to_string(),
-        }
-    }
-
     pub fn new_scale_larger_than_precision_error(self) -> Result<(), ConnectorError> {
         Err(ConnectorError::from_kind(ErrorKind::ScaleLargerThanPrecisionError {
             native_type: self.native_type,
@@ -81,11 +74,11 @@ impl ConnectorErrorFactory {
 }
 
 impl ConnectorError {
+    //how to get rid of the rest here?
     pub fn from_kind(kind: ErrorKind) -> Self {
         ConnectorError { kind }
     }
 
-    // move these to the native type errors
     pub fn new_argument_count_mismatch_error(
         native_type: &str,
         required_count: usize,
@@ -94,18 +87,6 @@ impl ConnectorError {
         ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
             native_type: String::from(native_type),
             required_count,
-            given_count,
-        })
-    }
-
-    pub fn new_optional_argument_count_mismatch_error(
-        native_type: &str,
-        optional_count: usize,
-        given_count: usize,
-    ) -> ConnectorError {
-        ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
-            native_type: String::from(native_type),
-            optional_count,
             given_count,
         })
     }
