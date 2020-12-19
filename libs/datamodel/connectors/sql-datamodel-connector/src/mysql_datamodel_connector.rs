@@ -162,6 +162,8 @@ impl Connector for MySqlDatamodelConnector {
                 let native_type_name = native_type_instance.name.as_str();
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
                 let error = ConnectorErrorFactory::new(native_type_instance.clone(), "MySQL");
+                let incompatible_with_key =
+                    NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name);
 
                 match native_type {
                     Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
@@ -182,16 +184,12 @@ impl Connector for MySqlDatamodelConnector {
                     VarChar(length) if length > 65535 => {
                         error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.")
                     }
-                    _ if field.is_unique() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                        return error.new_incompatible_native_type_with_unique();
-                    }
-                    _ if field.is_id() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                        return error.new_incompatible_native_type_with_id();
-                    }
-                    _ => OK(()),
+                    _ if field.is_unique() && incompatible_with_key => error.new_incompatible_native_type_with_unique(),
+                    _ if field.is_id() && incompatible_with_key => error.new_incompatible_native_type_with_id(),
+                    _ => Ok(()),
                 }
             }
-            _ => Ok(())
+            _ => Ok(()),
         }
     }
 
@@ -201,17 +199,13 @@ impl Connector for MySqlDatamodelConnector {
             for f in fields {
                 if let FieldType::NativeType(_, native_type) = f.field_type() {
                     let native_type_name = native_type.name.as_str();
+                    let error = ConnectorErrorFactory::new(native_type.clone(), "MySQL");
+
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
                         return if index_definition.tpe == IndexType::Unique {
-                            Err(ConnectorError::new_incompatible_native_type_with_unique(
-                                native_type_name,
-                                "MySQL",
-                            ))
+                            error.new_incompatible_native_type_with_unique()
                         } else {
-                            Err(ConnectorError::new_incompatible_native_type_with_index(
-                                native_type_name,
-                                "MySQL",
-                            ))
+                            error.new_incompatible_native_type_with_index()
                         };
                     }
                 }
@@ -221,11 +215,9 @@ impl Connector for MySqlDatamodelConnector {
             let field = model.find_field(id_field).unwrap();
             if let FieldType::NativeType(_, native_type) = field.field_type() {
                 let native_type_name = native_type.name.as_str();
+                let error = ConnectorErrorFactory::new(native_type.clone(), "MySQL");
                 if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                    return Err(ConnectorError::new_incompatible_native_type_with_id(
-                        native_type_name,
-                        "MySQL",
-                    ));
+                    return error.new_incompatible_native_type_with_id();
                 }
             }
         }

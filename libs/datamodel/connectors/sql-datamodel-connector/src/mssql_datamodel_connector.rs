@@ -149,19 +149,14 @@ impl Connector for MsSqlDatamodelConnector {
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
                     let r#type: MsSqlType = native_type.deserialize_native_type();
+                    let error = ConnectorErrorFactory::new(native_type, "SQL Server");
 
                     if heap_allocated_types().contains(&r#type) {
-                        if index_definition.tpe == IndexType::Unique {
-                            return Err(ConnectorError::new_incompatible_native_type_with_unique(
-                                &native_type.render(),
-                                "SQL Server",
-                            ));
+                        return if index_definition.tpe == IndexType::Unique {
+                            error.new_incompatible_native_type_with_unique()
                         } else {
-                            return Err(ConnectorError::new_incompatible_native_type_with_index(
-                                &native_type.render(),
-                                "SQL Server",
-                            ));
-                        }
+                            error.new_incompatible_native_type_with_index()
+                        };
                     }
                 }
             }
@@ -172,12 +167,10 @@ impl Connector for MsSqlDatamodelConnector {
 
             if let FieldType::NativeType(_, native_type) = field.field_type() {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
+                let error = ConnectorErrorFactory::new(native_type, "SQL Server");
 
                 if heap_allocated_types().contains(&r#type) {
-                    return Err(ConnectorError::new_incompatible_native_type_with_id(
-                        &native_type.render(),
-                        "SQL Server",
-                    ));
+                    return error.new_incompatible_native_type_with_id();
                 }
             }
         }
