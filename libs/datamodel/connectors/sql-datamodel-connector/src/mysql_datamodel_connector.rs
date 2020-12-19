@@ -157,48 +157,42 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
-        if let FieldType::NativeType(_, native_type_instance) = field.field_type() {
-            let native_type_name = native_type_instance.name.as_str();
-            let native_type: MySqlType = native_type_instance.deserialize_native_type();
-            let error = ConnectorErrorFactory::new(native_type_instance.clone(), "MySQL");
+        match field.field_type() {
+            FieldType::NativeType(_, native_type_instance) => {
+                let native_type_name = native_type_instance.name.as_str();
+                let native_type: MySqlType = native_type_instance.deserialize_native_type();
+                let error = ConnectorErrorFactory::new(native_type_instance.clone(), "MySQL");
 
-            let precision_and_scale = match native_type {
-                Decimal(x) => x,
-                Numeric(x) => x,
-                _ => None,
-            };
-            match precision_and_scale {
-                Some((precision, scale)) if scale > precision => return error.new_scale_larger_than_precision_error(),
-                Some((precision, _)) if precision > 65 => {
-                    return error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.")
+                match native_type {
+                    Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
+                        error.new_scale_larger_than_precision_error()
+                    }
+                    Decimal(Some((precision, _))) | Numeric(Some((precision, _))) if precision > 65 => {
+                        error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.")
+                    }
+                    Decimal(Some((_, scale))) | Numeric(Some((_, scale))) if scale > 30 => {
+                        error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.")
+                    }
+                    Bit(length) if length == 0 || length > 64 => {
+                        error.new_argument_m_out_of_range_error("M can range from 1 to 64.")
+                    }
+                    Char(length) if length > 255 => {
+                        error.new_argument_m_out_of_range_error("M can range from 0 to 255.")
+                    }
+                    VarChar(length) if length > 65535 => {
+                        error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.")
+                    }
+                    _ if field.is_unique() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                        return error.new_incompatible_native_type_with_unique();
+                    }
+                    _ if field.is_id() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+                        return error.new_incompatible_native_type_with_id();
+                    }
+                    _ => OK(()),
                 }
-                Some((_, scale)) if scale > 30 => {
-                    return error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.")
-                }
-                _ => {}
             }
-
-            match native_type {
-                Bit(length) if length == 0 || length > 64 => {
-                    return error.new_argument_m_out_of_range_error("M can range from 1 to 64.")
-                }
-                Char(length) if length > 255 => {
-                    return error.new_argument_m_out_of_range_error("M can range from 0 to 255.")
-                }
-                VarChar(length) if length > 65535 => {
-                    return error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.")
-                }
-                _ => {}
-            }
-
-            if field.is_unique() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                return error.new_incompatible_native_type_with_unique();
-            }
-            if field.is_id() && NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                return error.new_incompatible_native_type_with_id();
-            }
+            _ => Ok(())
         }
-        Ok(())
     }
 
     fn validate_model(&self, model: &Model) -> Result<(), ConnectorError> {
