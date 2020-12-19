@@ -92,6 +92,10 @@ impl MsSqlDatamodelConnector {
 }
 
 impl Connector for MsSqlDatamodelConnector {
+    fn name(&self) -> String {
+        "SQL Server".to_string()
+    }
+
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
     }
@@ -100,7 +104,7 @@ impl Connector for MsSqlDatamodelConnector {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
-                let error = ConnectorErrorFactory::new(native_type, "SQL Server");
+                let error = ConnectorErrorFactory::from_instance(native_type, self.name());
 
                 match r#type {
                     Decimal(Some(params)) | Numeric(Some(params)) => match params {
@@ -149,7 +153,7 @@ impl Connector for MsSqlDatamodelConnector {
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
                     let r#type: MsSqlType = native_type.deserialize_native_type();
-                    let error = ConnectorErrorFactory::new(native_type, "SQL Server");
+                    let error = ConnectorErrorFactory::from_instance(native_type, self.name());
 
                     if heap_allocated_types().contains(&r#type) {
                         return if index_definition.tpe == IndexType::Unique {
@@ -167,7 +171,7 @@ impl Connector for MsSqlDatamodelConnector {
 
             if let FieldType::NativeType(_, native_type) = field.field_type() {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
-                let error = ConnectorErrorFactory::new(native_type, "SQL Server");
+                let error = ConnectorErrorFactory::from_instance(native_type, self.name());
 
                 if heap_allocated_types().contains(&r#type) {
                     return error.new_incompatible_native_type_with_id();
@@ -262,8 +266,8 @@ impl Connector for MsSqlDatamodelConnector {
             ))
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                native_type: constructor_name.parse().unwrap(),
-                connector_name: "Postgres".parse().unwrap(),
+                native_type: constructor_name.to_string(),
+                connector_name: self.name(),
             }))
         }
     }

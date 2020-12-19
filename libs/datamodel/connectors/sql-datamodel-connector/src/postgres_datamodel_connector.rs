@@ -120,6 +120,10 @@ impl PostgresDatamodelConnector {
 }
 
 impl Connector for PostgresDatamodelConnector {
+    fn name(&self) -> String {
+        "Postgres".to_string()
+    }
+
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
     }
@@ -128,7 +132,7 @@ impl Connector for PostgresDatamodelConnector {
         match field.field_type() {
             FieldType::NativeType(_scalar_type, native_type_instance) => {
                 let native_type: PostgresType = native_type_instance.deserialize_native_type();
-                let error = ConnectorErrorFactory::new(native_type_instance, "Postgres");
+                let error = ConnectorErrorFactory::from_instance(native_type_instance, self.name());
 
                 match native_type {
                     SmallSerial | Serial | BigSerial
@@ -234,7 +238,7 @@ impl Connector for PostgresDatamodelConnector {
         } else {
             Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                 native_type: constructor_name.parse().unwrap(),
-                connector_name: "Postgres".parse().unwrap(),
+                connector_name: self.name(),
             }))
         }
     }

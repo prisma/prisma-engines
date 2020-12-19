@@ -23,6 +23,9 @@ impl SqliteDatamodelConnector {
 }
 
 impl Connector for SqliteDatamodelConnector {
+    fn name(&self) -> String {
+        "sqlite".to_string()
+    }
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
     }
@@ -42,7 +45,7 @@ impl Connector for SqliteDatamodelConnector {
     fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
-                connector_name: "sqlite".to_string(),
+                connector_name: self.name(),
             },
         ))
     }
@@ -50,7 +53,7 @@ impl Connector for SqliteDatamodelConnector {
     fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::from_kind(
             ErrorKind::ConnectorNotSupportedForNativeTypes {
-                connector_name: "sqlite".to_string(),
+                connector_name: self.name(),
             },
         ))
     }
