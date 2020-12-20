@@ -2,14 +2,13 @@
 #![deny(unsafe_code)]
 
 mod assertions;
-mod command_helpers;
 mod misc_helpers;
 pub mod sql;
 mod test_api;
 
 pub use assertions::*;
-pub use command_helpers::*;
 pub use misc_helpers::TestResult;
+pub use misc_helpers::*;
 pub use test_api::*;
 pub use test_macros::test_each_connector;
 pub use test_setup::*;

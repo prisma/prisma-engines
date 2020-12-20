@@ -4,8 +4,8 @@ use datamodel::ast;
 use serde::{Deserialize, Serialize};
 
 /// An atomic change to a [Datamodel AST](datamodel/ast/struct.Datamodel.html).
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(tag = "tag", deny_unknown_fields)]
+// #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+// #[serde(tag = "tag", deny_unknown_fields)]
 pub enum MigrationStep {
     CreateModel(CreateModel),
     UpdateModel(UpdateModel),
