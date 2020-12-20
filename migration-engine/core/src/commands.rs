@@ -37,19 +37,3 @@ pub use mark_migration_rolled_back::{
 pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigrationOutput};
 pub use reset::ResetCommand;
 pub use schema_push::{SchemaPushCommand, SchemaPushInput, SchemaPushOutput};
-
-use migration_connector::{MigrationStep, MigrationWarning, PrettyDatabaseMigrationStep, UnexecutableMigration};
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[allow(missing_docs)]
-pub struct MigrationStepsResultOutput {
-    pub datamodel: String,
-    pub datamodel_steps: Vec<MigrationStep>,
-    pub database_steps: Vec<PrettyDatabaseMigrationStep>,
-    pub warnings: Vec<MigrationWarning>,
-    pub errors: [(); 0],
-    pub general_errors: [(); 0],
-    pub unexecutable_migrations: Vec<UnexecutableMigration>,
-}
