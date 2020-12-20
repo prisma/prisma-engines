@@ -14,7 +14,7 @@ pub struct ConnectorErrorFactory {
 }
 
 impl ConnectorErrorFactory {
-    pub fn from_instance(tpe: NativeTypeInstance, connector: String) -> Self {
+    pub fn new(tpe: NativeTypeInstance, connector: String) -> Self {
         ConnectorErrorFactory {
             native_type: tpe.render(),
             connector,
@@ -24,7 +24,7 @@ impl ConnectorErrorFactory {
     pub fn new_scale_larger_than_precision_error(self) -> Result<(), ConnectorError> {
         Err(ConnectorError::from_kind(ErrorKind::ScaleLargerThanPrecisionError {
             native_type: self.native_type,
-            connector_name: self.connector.to_string(),
+            connector_name: self.connector,
         }))
     }
 
@@ -32,7 +32,7 @@ impl ConnectorErrorFactory {
         Err(ConnectorError::from_kind(
             ErrorKind::IncompatibleNativeTypeWithIndexAttribute {
                 native_type: self.native_type,
-                connector_name: self.connector.to_string(),
+                connector_name: self.connector,
             },
         ))
     }
@@ -74,7 +74,6 @@ impl ConnectorErrorFactory {
 }
 
 impl ConnectorError {
-    //how to get rid of the rest here?
     pub fn from_kind(kind: ErrorKind) -> Self {
         ConnectorError { kind }
     }

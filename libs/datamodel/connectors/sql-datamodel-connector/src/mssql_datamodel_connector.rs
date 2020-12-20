@@ -104,19 +104,18 @@ impl Connector for MsSqlDatamodelConnector {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
-                let error = ConnectorErrorFactory::from_instance(native_type, self.name());
+                let error = ConnectorErrorFactory::new(native_type, self.name());
 
                 match r#type {
-                    Decimal(Some(params)) | Numeric(Some(params)) => match params {
-                        (precision, scale) if scale > precision => error.new_scale_larger_than_precision_error(),
-                        (precision, _) if precision == 0 || precision > 38 => {
-                            error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.")
-                        }
-                        (_, scale) if scale > 38 => {
-                            error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.")
-                        }
-                        _ => Ok(()),
-                    },
+                    Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
+                        error.new_scale_larger_than_precision_error()
+                    }
+                    Decimal(Some((prec, _))) | Numeric(Some((prec, _))) if prec == 0 || prec > 38 => {
+                        error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.")
+                    }
+                    Decimal(Some((_, scale))) | Numeric(Some((_, scale))) if scale > 38 => {
+                        error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.")
+                    }
                     Float(Some(bits)) if bits == 0 || bits > 53 => {
                         error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.")
                     }
@@ -153,7 +152,7 @@ impl Connector for MsSqlDatamodelConnector {
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
                     let r#type: MsSqlType = native_type.deserialize_native_type();
-                    let error = ConnectorErrorFactory::from_instance(native_type, self.name());
+                    let error = ConnectorErrorFactory::new(native_type, self.name());
 
                     if heap_allocated_types().contains(&r#type) {
                         return if index_definition.tpe == IndexType::Unique {
@@ -171,7 +170,7 @@ impl Connector for MsSqlDatamodelConnector {
 
             if let FieldType::NativeType(_, native_type) = field.field_type() {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
-                let error = ConnectorErrorFactory::from_instance(native_type, self.name());
+                let error = ConnectorErrorFactory::new(native_type, self.name());
 
                 if heap_allocated_types().contains(&r#type) {
                     return error.new_incompatible_native_type_with_id();

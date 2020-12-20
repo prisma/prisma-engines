@@ -132,7 +132,7 @@ impl Connector for PostgresDatamodelConnector {
         match field.field_type() {
             FieldType::NativeType(_scalar_type, native_type_instance) => {
                 let native_type: PostgresType = native_type_instance.deserialize_native_type();
-                let error = ConnectorErrorFactory::from_instance(native_type_instance, self.name());
+                let error = ConnectorErrorFactory::new(native_type_instance, self.name());
 
                 match native_type {
                     SmallSerial | Serial | BigSerial
@@ -140,10 +140,10 @@ impl Connector for PostgresDatamodelConnector {
                     {
                         error.new_incompatible_sequential_type_with_static_default_value_error()
                     }
-                    Decimal(Some((p, s))) | Numeric(Some((p, s))) if s > p => {
+                    Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
                         error.new_scale_larger_than_precision_error()
                     }
-                    Decimal(Some((p, _))) | Numeric(Some((p, _))) if p > 1000 || p == 0 => error
+                    Decimal(Some((prec, _))) | Numeric(Some((prec, _))) if prec > 1000 || prec == 0 => error
                         .new_argument_m_out_of_range_error("Precision must be positive with a maximum value of 1000."),
                     Bit(Some(0)) | VarBit(Some(0)) => {
                         error.new_argument_m_out_of_range_error("M must be a positive integer.")
