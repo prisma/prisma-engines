@@ -1,11 +1,9 @@
 //! Datamodel migration steps.
 
 use datamodel::ast;
-use serde::{Deserialize, Serialize};
 
 /// An atomic change to a [Datamodel AST](datamodel/ast/struct.Datamodel.html).
-// #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-// #[serde(tag = "tag", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum MigrationStep {
     CreateModel(CreateModel),
     UpdateModel(UpdateModel),
@@ -28,18 +26,14 @@ pub enum MigrationStep {
     DeleteSource(DeleteSource),
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash, Eq)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct CreateModel {
     pub model: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash, Eq)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct UpdateModel {
     pub model: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub new_name: Option<String>,
 }
 
@@ -49,39 +43,25 @@ impl UpdateModel {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DeleteModel {
     pub model: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CreateField {
     pub model: String,
-
     pub field: String,
-
-    #[serde(rename = "type")]
     pub tpe: String,
-
     pub arity: FieldArity,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct UpdateField {
     pub model: String,
-
     pub field: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub new_name: Option<String>,
-
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
     pub tpe: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub arity: Option<FieldArity>,
 }
 
@@ -91,32 +71,23 @@ impl UpdateField {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DeleteField {
     pub model: String,
     pub field: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CreateEnum {
     pub r#enum: String,
     pub values: Vec<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct UpdateEnum {
     pub r#enum: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub new_name: Option<String>,
-
-    #[serde(skip_serializing_if = "Vec::is_empty", default = "Vec::new")]
     pub created_values: Vec<String>,
-
-    #[serde(skip_serializing_if = "Vec::is_empty", default = "Vec::new")]
     pub deleted_values: Vec<String>,
 }
 
@@ -126,26 +97,22 @@ impl UpdateEnum {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DeleteEnum {
     pub r#enum: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CreateDirective {
     pub location: DirectiveLocation,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DeleteDirective {
     pub location: DirectiveLocation,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Argument {
     pub name: String,
     pub value: MigrationExpression,
@@ -176,15 +143,13 @@ impl Into<ast::Argument> for &Argument {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(tag = "tag", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ArgumentLocation {
     Directive(DirectiveLocation),
     Source(SourceLocation),
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DirectiveLocation {
     pub path: DirectivePath,
     pub directive: String,
@@ -219,8 +184,7 @@ impl DirectiveLocation {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SourceLocation {
     pub source: String,
 }
@@ -231,8 +195,7 @@ impl SourceLocation {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(tag = "tag", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DirectivePath {
     Field {
         model: String,
@@ -240,7 +203,6 @@ pub enum DirectivePath {
     },
     Model {
         model: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
         arguments: Option<Vec<Argument>>,
     },
     Enum {
@@ -251,7 +213,6 @@ pub enum DirectivePath {
         value: String,
     },
     TypeAlias {
-        #[serde(rename = "typeAlias")]
         type_alias: String,
     },
 }
@@ -275,30 +236,27 @@ impl DirectivePath {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CreateArgument {
     pub location: ArgumentLocation,
     pub argument: String,
     pub value: MigrationExpression,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DeleteArgument {
     pub location: ArgumentLocation,
     pub argument: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct UpdateArgument {
     pub location: ArgumentLocation,
     pub argument: String,
     pub new_value: MigrationExpression,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct MigrationExpression(pub String);
 
 impl MigrationExpression {
@@ -311,21 +269,16 @@ impl MigrationExpression {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CreateTypeAlias {
     pub type_alias: String,
-
     pub r#type: String,
     pub arity: FieldArity,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct UpdateTypeAlias {
     pub type_alias: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<String>,
 }
 
@@ -335,26 +288,22 @@ impl UpdateTypeAlias {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DeleteTypeAlias {
     pub type_alias: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CreateSource {
     pub source: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DeleteSource {
     pub source: String,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum FieldArity {
     Required,
     Optional,
@@ -390,44 +339,5 @@ impl Into<ast::FieldArity> for &FieldArity {
             FieldArity::Optional => ast::FieldArity::Optional,
             FieldArity::List => ast::FieldArity::List,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-
-    #[test]
-    fn directive_location_serialization_gives_expected_json_shape() {
-        let create_directive = CreateDirective {
-            location: DirectiveLocation {
-                path: DirectivePath::Field {
-                    model: "Cat".to_owned(),
-                    field: "owner".to_owned(),
-                },
-                directive: "status".to_owned(),
-            },
-        };
-
-        let serialized_step = serde_json::to_value(&create_directive).unwrap();
-
-        let expected_json = json!({
-            "location": {
-                "path": {
-                    "tag": "Field",
-                    "model": "Cat",
-                    "field": "owner",
-                },
-                "directive": "status"
-            }
-        });
-
-        println!("{}\n{}", serialized_step, expected_json);
-
-        assert_eq!(serialized_step, expected_json);
-
-        let deserialized_step: CreateDirective = serde_json::from_value(expected_json).unwrap();
-        assert_eq!(create_directive, deserialized_step);
     }
 }
