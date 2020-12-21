@@ -6,6 +6,7 @@ mod database_migration_inferrer;
 mod database_migration_step_applier;
 mod destructive_change_checker;
 mod error;
+pub mod features;
 mod imperative_migrations_persistence;
 
 #[allow(missing_docs)]
@@ -17,6 +18,7 @@ pub use database_migration_inferrer::*;
 pub use database_migration_step_applier::*;
 pub use destructive_change_checker::*;
 pub use error::*;
+pub use features::MigrationFeature;
 pub use imperative_migrations_persistence::{
     ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp,
 };
