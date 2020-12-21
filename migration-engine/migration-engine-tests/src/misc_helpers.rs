@@ -1,7 +1,6 @@
 use datamodel::ast::{parser, SchemaAst};
 use enumflags2::BitFlags;
 use migration_connector::*;
-use migration_core::api::MigrationApi;
 use sql_migration_connector::SqlMigrationConnector;
 use test_setup::*;
 
@@ -34,12 +33,4 @@ pub(super) async fn sqlite_migration_connector(
     let database_url = sqlite_test_url(db_name);
 
     SqlMigrationConnector::new(&database_url, features).await.unwrap()
-}
-
-pub async fn test_api<C, D>(connector: C) -> MigrationApi<C, D>
-where
-    C: MigrationConnector<DatabaseMigration = D>,
-    D: DatabaseMigrationMarker + Send + Sync + 'static,
-{
-    MigrationApi::new(connector).await.unwrap()
 }
