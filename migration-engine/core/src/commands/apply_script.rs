@@ -25,10 +25,9 @@ impl MigrationCommand for ApplyScriptCommand {
 
     type Output = ApplyScriptOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
+    async fn execute<C>(input: &Self::Input, engine: &MigrationEngine<C>) -> CoreResult<Self::Output>
     where
-        C: migration_connector::MigrationConnector<DatabaseMigration = D>,
-        D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
+        C: migration_connector::MigrationConnector,
     {
         let applier = engine.connector().database_migration_step_applier();
 

@@ -37,7 +37,7 @@ use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
-use sql_migration_connector::{SqlMigration, SqlMigrationConnector};
+use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::*;
 use tempfile::TempDir;
 use test_setup::*;
@@ -46,7 +46,7 @@ use test_setup::*;
 /// connectors.
 pub struct TestApi {
     database: Quaint,
-    api: MigrationApi<SqlMigrationConnector, SqlMigration>,
+    api: MigrationApi<SqlMigrationConnector>,
     tags: BitFlags<Tags>,
 }
 
@@ -291,7 +291,7 @@ pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -304,7 +304,7 @@ pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -317,7 +317,7 @@ pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -330,7 +330,7 @@ pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -343,7 +343,7 @@ pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -356,7 +356,7 @@ pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -369,7 +369,7 @@ pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -381,7 +381,7 @@ pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -393,7 +393,7 @@ pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -405,7 +405,7 @@ pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }
@@ -429,7 +429,7 @@ async fn mssql_test_api(connection_string: String, args: TestAPIArgs) -> TestApi
 
     TestApi {
         database: connector.quaint().clone(),
-        api: MigrationApi::new(connector).await.unwrap(),
+        api: MigrationApi::new(connector),
         tags: args.test_tag,
     }
 }

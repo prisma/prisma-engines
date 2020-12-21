@@ -15,7 +15,6 @@ mod sql_migration;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
-pub use sql_migration::SqlMigration;
 
 use connection_wrapper::Connection;
 use datamodel::Datamodel;
@@ -24,6 +23,7 @@ use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
+use sql_migration::SqlMigration;
 use sql_schema_describer::SqlSchema;
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 

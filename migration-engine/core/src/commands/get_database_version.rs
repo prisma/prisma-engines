@@ -10,11 +10,10 @@ impl MigrationCommand for VersionCommand {
     type Input = serde_json::Value;
     type Output = String;
 
-    async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
-    where
-        C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + Send + Sync + 'static,
-    {
+    async fn execute<C: MigrationConnector>(
+        _input: &Self::Input,
+        engine: &MigrationEngine<C>,
+    ) -> CoreResult<Self::Output> {
         let connector = engine.connector();
         Ok(connector.version().await?)
     }

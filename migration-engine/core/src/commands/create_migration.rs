@@ -1,5 +1,6 @@
 use super::MigrationCommand;
 use crate::{migration_engine::MigrationEngine, parse_datamodel, CoreError, CoreResult};
+use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use user_facing_errors::migration_engine::MigrationNameTooLong;
@@ -35,11 +36,10 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
 
     type Output = CreateMigrationOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
-    where
-        C: migration_connector::MigrationConnector<DatabaseMigration = D>,
-        D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
-    {
+    async fn execute<C: MigrationConnector>(
+        input: &Self::Input,
+        engine: &MigrationEngine<C>,
+    ) -> CoreResult<Self::Output> {
         let database_migration_inferrer = engine.connector().database_migration_inferrer();
         let applier = engine.connector().database_migration_step_applier();
         let checker = engine.connector().destructive_change_checker();
@@ -74,7 +74,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
         .map_err(|_| CoreError::Generic(anyhow::anyhow!("Failed to create a new migration directory.")))?;
 
         directory
-            .write_migration_script(&migration_script, D::FILE_EXTENSION)
+            .write_migration_script(&migration_script, C::DatabaseMigration::FILE_EXTENSION)
             .map_err(|err| {
                 CoreError::Generic(anyhow::Error::new(err).context(format!(
                     "Failed to write the migration script to `{:?}`",

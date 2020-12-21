@@ -11,8 +11,8 @@ pub trait MigrationCommand {
     type Output: Serialize + 'static;
 
     /// Handle the input, producing the response or an error.
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
-    where
-        C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + Send + Sync + 'static;
+    async fn execute<C: MigrationConnector>(
+        input: &Self::Input,
+        engine: &MigrationEngine<C>,
+    ) -> CoreResult<Self::Output>;
 }

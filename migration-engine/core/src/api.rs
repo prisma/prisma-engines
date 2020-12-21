@@ -4,26 +4,21 @@ mod rpc;
 pub use rpc::*;
 
 use crate::{commands::*, migration_engine::MigrationEngine, CoreResult};
-use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
+use migration_connector::MigrationConnector;
 use tracing_futures::Instrument;
 
-pub struct MigrationApi<C, D>
+pub struct MigrationApi<C>
 where
-    C: MigrationConnector<DatabaseMigration = D>,
-    D: DatabaseMigrationMarker + 'static,
+    C: MigrationConnector,
 {
-    engine: MigrationEngine<C, D>,
+    engine: MigrationEngine<C>,
 }
 
-impl<C, D> MigrationApi<C, D>
-where
-    C: MigrationConnector<DatabaseMigration = D>,
-    D: DatabaseMigrationMarker + Send + Sync + 'static,
-{
-    pub async fn new(connector: C) -> CoreResult<Self> {
-        let engine = MigrationEngine::new(connector).await?;
-
-        Ok(Self { engine })
+impl<C: MigrationConnector> MigrationApi<C> {
+    pub fn new(connector: C) -> Self {
+        MigrationApi {
+            engine: MigrationEngine::new(connector),
+        }
     }
 
     pub async fn handle_command<'a, E>(&'a self, input: &'a E::Input) -> CoreResult<E::Output>
@@ -66,11 +61,7 @@ pub trait GenericApi: Send + Sync + 'static {
 }
 
 #[async_trait::async_trait]
-impl<C, D> GenericApi for MigrationApi<C, D>
-where
-    C: MigrationConnector<DatabaseMigration = D>,
-    D: DatabaseMigrationMarker + Send + Sync + 'static,
-{
+impl<C: MigrationConnector> GenericApi for MigrationApi<C> {
     async fn version(&self, input: &serde_json::Value) -> CoreResult<String> {
         self.handle_command::<VersionCommand>(input)
             .instrument(tracing::info_span!("Version"))

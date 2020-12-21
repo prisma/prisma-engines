@@ -1,5 +1,6 @@
 use super::MigrationCommand;
 use crate::{migration_engine::MigrationEngine, CoreResult};
+use migration_connector::MigrationConnector;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -25,14 +26,12 @@ pub struct ListMigrationDirectoriesCommand;
 #[async_trait::async_trait]
 impl<'a> MigrationCommand for ListMigrationDirectoriesCommand {
     type Input = ListMigrationDirectoriesInput;
-
     type Output = ListMigrationDirectoriesOutput;
 
-    async fn execute<C, D>(input: &Self::Input, _engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
-    where
-        C: migration_connector::MigrationConnector<DatabaseMigration = D>,
-        D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
-    {
+    async fn execute<C: MigrationConnector>(
+        input: &Self::Input,
+        _engine: &MigrationEngine<C>,
+    ) -> CoreResult<Self::Output> {
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
 

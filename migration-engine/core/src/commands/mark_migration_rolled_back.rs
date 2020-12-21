@@ -1,5 +1,6 @@
 use super::MigrationCommand;
 use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
+use migration_connector::MigrationConnector;
 use serde::Deserialize;
 use std::collections::HashMap;
 use user_facing_errors::migration_engine::{CannotRollBackSucceededMigration, CannotRollBackUnappliedMigration};
@@ -23,11 +24,10 @@ impl MigrationCommand for MarkMigrationRolledBackCommand {
     type Input = MarkMigrationRolledBackInput;
     type Output = MarkMigrationRolledBackOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
-    where
-        C: migration_connector::MigrationConnector<DatabaseMigration = D>,
-        D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
-    {
+    async fn execute<C: MigrationConnector>(
+        input: &Self::Input,
+        engine: &MigrationEngine<C>,
+    ) -> CoreResult<Self::Output> {
         // We should take a lock on the migrations table.
 
         let persistence = engine.connector().new_migration_persistence();
