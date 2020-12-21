@@ -1,6 +1,8 @@
 use crate::{CoreError, CoreResult, GenericApi};
+use enumflags2::BitFlags;
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
+use migration_connector::MigrationFeature;
 use std::sync::Arc;
 
 use super::error_rendering::render_jsonrpc_error;
@@ -88,7 +90,7 @@ const AVAILABLE_COMMANDS: &[RpcCommand] = &[
 ];
 
 impl RpcApi {
-    pub async fn new(datamodel: &str, enabled_preview_features: Vec<String>) -> CoreResult<Self> {
+    pub async fn new(datamodel: &str, enabled_preview_features: BitFlags<MigrationFeature>) -> CoreResult<Self> {
         let mut rpc_api = Self {
             io_handler: IoHandler::default(),
             executor: crate::migration_api(datamodel, enabled_preview_features).await?,

@@ -3,6 +3,7 @@ use crate::{
     request_handlers::{graphql, GraphQlBody, SingleQuery},
     PrismaResponse,
 };
+use enumflags2::BitFlags;
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::SchemaPushInput,
@@ -289,19 +290,21 @@ pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
 
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
-    SqlMigrationConnector::new(url_str).await.unwrap()
+    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
 }
 
 pub(super) async fn mssql_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_mssql_database(url_str).await.unwrap();
-    SqlMigrationConnector::new(url_str).await.unwrap()
+    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
 }
 
 pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_postgres_database(&url_str.parse().unwrap()).await.unwrap();
-    SqlMigrationConnector::new(url_str).await.unwrap()
+    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
 }
 
 pub(super) async fn sqlite_migration_connector(db_name: &str) -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_url(db_name)).await.unwrap()
+    SqlMigrationConnector::new(&sqlite_test_url(db_name), BitFlags::all())
+        .await
+        .unwrap()
 }

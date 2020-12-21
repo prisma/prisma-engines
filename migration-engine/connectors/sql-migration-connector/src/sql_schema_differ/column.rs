@@ -1,5 +1,6 @@
 use crate::flavour::SqlFlavour;
 use enumflags2::BitFlags;
+use migration_connector::MigrationFeature;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultKind};
 
@@ -47,15 +48,19 @@ impl<'a> ColumnDiffer<'a> {
     }
 
     fn column_type_change(&self) -> Option<ColumnTypeChange> {
-        match (self.previous.column_type_family(), self.next.column_type_family()) {
-            (_, _) if self.arity_changed() => self.flavour.column_type_change(self),
-            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal) => None,
-            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float) => None,
-            (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal) => None,
-            (ColumnTypeFamily::Float, ColumnTypeFamily::Float) => None,
-            (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => None,
-            (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => None,
-            (_, _) => self.flavour.column_type_change(self),
+        if self.flavour.features().contains(MigrationFeature::NativeTypes) {
+            self.flavour.column_type_change(self)
+        } else {
+            match (self.previous.column_type_family(), self.next.column_type_family()) {
+                (_, _) if self.arity_changed() => self.flavour.column_type_change(self),
+                (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal) => None,
+                (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float) => None,
+                (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal) => None,
+                (ColumnTypeFamily::Float, ColumnTypeFamily::Float) => None,
+                (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => None,
+                (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => None,
+                (_, _) => self.flavour.column_type_change(self),
+            }
         }
     }
 

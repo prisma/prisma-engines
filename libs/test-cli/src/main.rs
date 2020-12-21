@@ -1,6 +1,7 @@
 use anyhow::Context;
 use colored::Colorize;
-use migration_core::{commands::SchemaPushInput, GateKeeper};
+use enumflags2::BitFlags;
+use migration_core::commands::SchemaPushInput;
 use std::{fs::File, io::Read};
 use structopt::*;
 
@@ -161,7 +162,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 
 async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(&schema, GateKeeper::allow_all_whitelist()).await?;
+    let api = migration_core::migration_api(&schema, BitFlags::all()).await?;
 
     let response = api
         .schema_push(&SchemaPushInput {
