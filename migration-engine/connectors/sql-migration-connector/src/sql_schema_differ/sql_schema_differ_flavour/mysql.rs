@@ -51,6 +51,10 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
         None
     }
 
+    //split into enum changes
+    //family changes
+    //native type changes
+
     fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
         let (previous_name, next_name) = indexes.as_ref().map(|idx| idx.name()).into_tuple();

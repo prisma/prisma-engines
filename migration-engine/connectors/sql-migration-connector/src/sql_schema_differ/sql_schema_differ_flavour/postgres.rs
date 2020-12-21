@@ -36,31 +36,22 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
-        // List to scalar
-        if differ.previous.arity().is_list() && !differ.next.arity().is_list() {
-            return match (differ.previous.column_type_family(), differ.next.column_type_family()) {
-                (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
-                (_, _) => Some(ColumnTypeChange::NotCastable),
-            };
-        }
-
-        // Scalar to list
-        if !differ.previous.arity().is_list() && differ.next.arity().is_list() {
-            match (differ.previous.column_type_family(), differ.next.column_type_family()) {
-                (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal)
-                | (ColumnTypeFamily::Float, ColumnTypeFamily::Float)
-                | (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float)
-                | (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal)
-                | (ColumnTypeFamily::Binary, ColumnTypeFamily::Binary) => return Some(ColumnTypeChange::NotCastable),
-                _ => (),
-            }
-        }
-
-        if differ.previous.column_type_family() == differ.next.column_type_family() {
-            return None;
-        }
+        let from_list_to_scalar = differ.previous.arity().is_list() && !differ.next.arity().is_list();
+        let from_scalar_to_list = !differ.previous.arity().is_list() && differ.next.arity().is_list();
 
         match (differ.previous.column_type_family(), differ.next.column_type_family()) {
+            (_, ColumnTypeFamily::String) if from_list_to_scalar => Some(ColumnTypeChange::SafeCast),
+            (_, _) if from_list_to_scalar => Some(ColumnTypeChange::NotCastable),
+            (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal)
+            | (ColumnTypeFamily::Float, ColumnTypeFamily::Float)
+            | (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float)
+            | (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal)
+            | (ColumnTypeFamily::Binary, ColumnTypeFamily::Binary)
+                if from_scalar_to_list =>
+            {
+                Some(ColumnTypeChange::NotCastable)
+            }
+            (previous, next) if previous == next => None,
             (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
             (ColumnTypeFamily::String, ColumnTypeFamily::Int)
             | (ColumnTypeFamily::DateTime, ColumnTypeFamily::Float)
@@ -68,6 +59,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             (_, _) => Some(ColumnTypeChange::RiskyCast),
         }
     }
+
+    // split into list changes
+    // family changes
+    // native type changes?
 
     fn index_should_be_renamed(&self, pair: &Pair<IndexWalker<'_>>) -> bool {
         // Implements correct comparison for truncated index names.
