@@ -1,5 +1,6 @@
 mod apply_migrations;
 mod create_migration;
+mod dev_diagnostic;
 mod diagnose_migration_history;
 mod evaluate_data_loss;
 mod list_migration_directories;
@@ -18,7 +19,7 @@ pub use mark_migration_applied::MarkMigrationApplied;
 pub use reset::Reset;
 pub use schema_push::SchemaPush;
 
-use self::mark_migration_rolled_back::MarkMigrationRolledBack;
+use self::{dev_diagnostic::DevDiagnostic, mark_migration_rolled_back::MarkMigrationRolledBack};
 use super::{
     assertions::SchemaAssertion,
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector},
@@ -26,9 +27,8 @@ use super::{
 };
 use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
 use enumflags2::BitFlags;
-use migration_connector::{ImperativeMigrationsPersistence, MigrationFeature, MigrationRecord};
-
 use indoc::formatdoc;
+use migration_connector::{ImperativeMigrationsPersistence, MigrationFeature, MigrationRecord};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyScriptInput,
@@ -134,6 +134,11 @@ impl TestApi {
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
         CreateMigration::new(&self.api, name, prisma_schema, migrations_directory)
+    }
+
+    /// Builder and assertions to call the `devDiagnostic` command.
+    pub fn dev_diagnostic<'a>(&'a self, migrations_directory: &'a TempDir) -> DevDiagnostic<'a> {
+        DevDiagnostic::new(&self.api, migrations_directory)
     }
 
     /// Builder and assertions to call the DiagnoseMigrationHistory command.

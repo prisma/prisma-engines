@@ -15,7 +15,7 @@ pub enum CoreError {
     ConnectorError(ConnectorError),
 
     /// User facing errors
-    UserFacing(user_facing_errors::KnownError),
+    UserFacing(user_facing_errors::Error),
 
     /// Using gated preview features.
     GatedPreviewFeatures(Vec<String>),
@@ -35,7 +35,7 @@ impl Display for CoreError {
                 write!(f, "Blocked preview features: {}", feats.join(", "))
             }
             CoreError::Generic(src) => write!(f, "{}", src),
-            CoreError::UserFacing(src) => write!(f, "{}", src.message),
+            CoreError::UserFacing(src) => write!(f, "{}", src.message()),
         }
     }
 }
@@ -70,7 +70,7 @@ impl CoreError {
 
     /// Construct a user facing CoreError
     pub(crate) fn user_facing(error: impl UserFacingError) -> Self {
-        CoreError::UserFacing(KnownError::new(error))
+        CoreError::UserFacing(KnownError::new(error).into())
     }
 }
 
