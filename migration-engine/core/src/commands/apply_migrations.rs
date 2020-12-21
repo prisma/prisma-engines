@@ -1,4 +1,4 @@
-use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
+use crate::{api::MigrationApi, CoreError, CoreResult};
 use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -32,7 +32,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
     type Input = ApplyMigrationsInput;
     type Output = ApplyMigrationsOutput;
 
-    async fn execute<C>(input: &Self::Input, engine: &MigrationEngine<C>) -> CoreResult<Self::Output>
+    async fn execute<C>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector,
     {

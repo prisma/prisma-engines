@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{migration_engine::MigrationEngine, CoreResult};
+use crate::{api::MigrationApi, CoreResult};
 use migration_connector::MigrationConnector;
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +29,7 @@ impl<'a> MigrationCommand for PlanMigrationCommand {
 
     async fn execute<C: MigrationConnector>(
         _input: &Self::Input,
-        _engine: &MigrationEngine<C>,
+        _engine: &MigrationApi<C>,
     ) -> CoreResult<Self::Output> {
         unreachable!("PlanMigration command")
     }

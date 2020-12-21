@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{migration_engine::MigrationEngine, CoreResult};
+use crate::{api::MigrationApi, CoreResult};
 use migration_connector::MigrationConnector;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -30,7 +30,7 @@ impl<'a> MigrationCommand for ListMigrationDirectoriesCommand {
 
     async fn execute<C: MigrationConnector>(
         input: &Self::Input,
-        _engine: &MigrationEngine<C>,
+        _engine: &MigrationApi<C>,
     ) -> CoreResult<Self::Output> {
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;

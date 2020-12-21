@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{migration_engine::MigrationEngine, parse_datamodel, CoreError, CoreResult};
+use crate::{api::MigrationApi, parse_datamodel, CoreError, CoreResult};
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -36,10 +36,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
 
     type Output = CreateMigrationOutput;
 
-    async fn execute<C: MigrationConnector>(
-        input: &Self::Input,
-        engine: &MigrationEngine<C>,
-    ) -> CoreResult<Self::Output> {
+    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
         let database_migration_inferrer = engine.connector().database_migration_inferrer();
         let applier = engine.connector().database_migration_step_applier();
         let checker = engine.connector().destructive_change_checker();

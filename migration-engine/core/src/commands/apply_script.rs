@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{migration_engine::MigrationEngine, CoreResult};
+use crate::{api::MigrationApi, CoreResult};
 use serde::Deserialize;
 use std::collections::HashMap;
 
@@ -25,7 +25,7 @@ impl MigrationCommand for ApplyScriptCommand {
 
     type Output = ApplyScriptOutput;
 
-    async fn execute<C>(input: &Self::Input, engine: &MigrationEngine<C>) -> CoreResult<Self::Output>
+    async fn execute<C>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output>
     where
         C: migration_connector::MigrationConnector,
     {

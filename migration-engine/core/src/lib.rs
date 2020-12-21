@@ -5,14 +5,13 @@
 #[allow(missing_docs)]
 pub mod api;
 pub mod commands;
-#[allow(missing_docs)]
-pub mod migration_engine;
 
 mod core_error;
 mod gate_keeper;
 
 use anyhow::anyhow;
 pub use api::GenericApi;
+use api::MigrationApi;
 pub use commands::SchemaPushInput;
 pub use core_error::{CoreError, CoreResult};
 use enumflags2::BitFlags;
@@ -25,7 +24,6 @@ use datamodel::{
     Configuration,
 };
 use migration_connector::{features, ConnectorError, MigrationFeature};
-use migration_engine::MigrationEngine;
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
@@ -170,7 +168,8 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
-    let engine = MigrationEngine::new(connector);
+
+    let engine = MigrationApi::new(connector);
 
     // 2. create the database schema for given Prisma schema
     let schema_push_input = SchemaPushInput {
@@ -178,6 +177,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         assume_empty: true,
         force: true,
     };
+
     SchemaPushCommand::execute(&schema_push_input, &engine).await?;
 
     Ok(())

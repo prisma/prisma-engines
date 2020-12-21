@@ -1,4 +1,4 @@
-use crate::{migration_engine::MigrationEngine, CoreResult};
+use crate::{api::MigrationApi, CoreResult};
 use migration_connector::*;
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -11,8 +11,5 @@ pub trait MigrationCommand {
     type Output: Serialize + 'static;
 
     /// Handle the input, producing the response or an error.
-    async fn execute<C: MigrationConnector>(
-        input: &Self::Input,
-        engine: &MigrationEngine<C>,
-    ) -> CoreResult<Self::Output>;
+    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output>;
 }

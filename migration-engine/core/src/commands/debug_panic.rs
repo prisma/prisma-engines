@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{core_error::CoreResult, migration_engine::MigrationEngine};
+use crate::{api::MigrationApi, core_error::CoreResult};
 use migration_connector::MigrationConnector;
 
 /// Make the migration engine crash. This is useful only for debugging error handling in clients.
@@ -12,7 +12,7 @@ impl<'a> MigrationCommand for DebugPanicCommand {
 
     async fn execute<C: MigrationConnector>(
         _input: &Self::Input,
-        _engine: &MigrationEngine<C>,
+        _engine: &MigrationApi<C>,
     ) -> CoreResult<Self::Output> {
         panic!("This is the debugPanic artificial panic")
     }

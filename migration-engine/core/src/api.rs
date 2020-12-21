@@ -1,9 +1,9 @@
 mod error_rendering;
 mod rpc;
 
-pub use rpc::*;
+pub use rpc::RpcApi;
 
-use crate::{commands::*, migration_engine::MigrationEngine, CoreResult};
+use crate::{commands::*, CoreResult};
 use migration_connector::MigrationConnector;
 use tracing_futures::Instrument;
 
@@ -11,25 +11,23 @@ pub struct MigrationApi<C>
 where
     C: MigrationConnector,
 {
-    engine: MigrationEngine<C>,
+    connector: C,
 }
 
 impl<C: MigrationConnector> MigrationApi<C> {
     pub fn new(connector: C) -> Self {
-        MigrationApi {
-            engine: MigrationEngine::new(connector),
-        }
+        MigrationApi { connector }
     }
 
     pub async fn handle_command<'a, E>(&'a self, input: &'a E::Input) -> CoreResult<E::Output>
     where
         E: MigrationCommand,
     {
-        Ok(E::execute(input, &self.engine).await?)
+        Ok(E::execute(input, self).await?)
     }
 
     pub fn connector(&self) -> &C {
-        self.engine.connector()
+        &self.connector
     }
 }
 
@@ -40,6 +38,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn apply_script(&self, input: &ApplyScriptInput) -> CoreResult<ApplyScriptOutput>;
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput>;
     async fn debug_panic(&self, input: &()) -> CoreResult<()>;
+    async fn dev_diagnostic(&self, input: &DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput>;
     async fn diagnose_migration_history(
         &self,
         input: &DiagnoseMigrationHistoryInput,
@@ -93,6 +92,12 @@ impl<C: MigrationConnector> GenericApi for MigrationApi<C> {
     async fn debug_panic(&self, input: &()) -> CoreResult<()> {
         self.handle_command::<DebugPanicCommand>(input)
             .instrument(tracing::info_span!("DebugPanic"))
+            .await
+    }
+
+    async fn dev_diagnostic(&self, input: &DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput> {
+        self.handle_command::<DevDiagnosticCommand>(input)
+            .instrument(tracing::info_span!("DevDiagnostic"))
             .await
     }
 

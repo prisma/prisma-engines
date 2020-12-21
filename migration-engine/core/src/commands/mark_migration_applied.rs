@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
+use crate::{api::MigrationApi, CoreError, CoreResult};
 use migration_connector::{MigrationConnector, MigrationDirectory};
 use serde::Deserialize;
 use std::{collections::HashMap, path::Path};
@@ -26,10 +26,7 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
     type Input = MarkMigrationAppliedInput;
     type Output = MarkMigrationAppliedOutput;
 
-    async fn execute<C: MigrationConnector>(
-        input: &Self::Input,
-        engine: &MigrationEngine<C>,
-    ) -> CoreResult<Self::Output> {
+    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
         // We should take a lock on the migrations table.
 
         let persistence = engine.connector().new_migration_persistence();
