@@ -46,6 +46,11 @@ impl MysqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
+    async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        // https://dev.mysql.com/doc/refman/8.0/en/locking-functions.html
+        Ok(connection.raw_cmd("SELECT GET_LOCK('prisma_migrate', 60)").await?)
+    }
+
     fn check_database_version_compatibility(
         &self,
         datamodel: &Datamodel,

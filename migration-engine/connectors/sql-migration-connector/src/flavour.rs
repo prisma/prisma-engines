@@ -57,6 +57,8 @@ pub(crate) fn from_connection_info(
 pub(crate) trait SqlFlavour:
     DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + SqlSchemaCalculatorFlavour + Debug
 {
+    async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()>;
+
     fn check_database_version_compatibility(
         &self,
         _datamodel: &Datamodel,

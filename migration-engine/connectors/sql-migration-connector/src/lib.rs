@@ -98,6 +98,10 @@ impl MigrationConnector for SqlMigrationConnector {
         self.connection.connection_info().sql_family().as_str()
     }
 
+    async fn acquire_lock(&self) -> ConnectorResult<()> {
+        self.flavour().acquire_lock(self.conn()).await
+    }
+
     async fn version(&self) -> ConnectorResult<String> {
         Ok(self
             .connection

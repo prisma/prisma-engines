@@ -15,6 +15,10 @@ pub(crate) struct SqliteFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for SqliteFlavour {
+    async fn acquire_lock(&self, _connection: &Connection) -> ConnectorResult<()> {
+        Ok(())
+    }
+
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         use anyhow::Context;
 

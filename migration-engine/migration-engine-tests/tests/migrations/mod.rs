@@ -1,3 +1,4 @@
+mod advisory_locking;
 mod apply_script_tests;
 mod dev_diagnostic_tests;
 mod enums;
