@@ -2434,9 +2434,6 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    // Drop the existing migrations.
-    api.reset().send().await?;
-
     let dm2 = r#"
         datasource db {
             provider = "sqlite"
@@ -2449,7 +2446,11 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2)
+        .migration_id(Some("mig2"))
+        .send()
+        .await?
+        .assert_green()?;
 
     Ok(())
 }
