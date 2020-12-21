@@ -3,7 +3,7 @@
 use datamodel::ast;
 
 /// An atomic change to a [Datamodel AST](datamodel/ast/struct.Datamodel.html).
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum MigrationStep {
     CreateModel(CreateModel),
     UpdateModel(UpdateModel),
@@ -26,12 +26,12 @@ pub enum MigrationStep {
     DeleteSource(DeleteSource),
 }
 
-#[derive(Debug, Clone, PartialEq, Hash, Eq)]
+#[derive(Debug, Clone)]
 pub struct CreateModel {
     pub model: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Hash, Eq)]
+#[derive(Debug, Clone)]
 pub struct UpdateModel {
     pub model: String,
     pub new_name: Option<String>,
@@ -43,12 +43,12 @@ impl UpdateModel {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DeleteModel {
     pub model: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct CreateField {
     pub model: String,
     pub field: String,
@@ -56,7 +56,7 @@ pub struct CreateField {
     pub arity: FieldArity,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct UpdateField {
     pub model: String,
     pub field: String,
@@ -71,19 +71,19 @@ impl UpdateField {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DeleteField {
     pub model: String,
     pub field: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct CreateEnum {
     pub r#enum: String,
     pub values: Vec<String>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct UpdateEnum {
     pub r#enum: String,
     pub new_name: Option<String>,
@@ -97,17 +97,17 @@ impl UpdateEnum {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DeleteEnum {
     pub r#enum: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct CreateDirective {
     pub location: DirectiveLocation,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DeleteDirective {
     pub location: DirectiveLocation,
 }
@@ -143,13 +143,13 @@ impl Into<ast::Argument> for &Argument {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum ArgumentLocation {
     Directive(DirectiveLocation),
     Source(SourceLocation),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DirectiveLocation {
     pub path: DirectivePath,
     pub directive: String,
@@ -184,7 +184,7 @@ impl DirectiveLocation {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct SourceLocation {
     pub source: String,
 }
@@ -195,7 +195,7 @@ impl SourceLocation {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum DirectivePath {
     Field {
         model: String,
@@ -236,20 +236,20 @@ impl DirectivePath {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct CreateArgument {
     pub location: ArgumentLocation,
     pub argument: String,
     pub value: MigrationExpression,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DeleteArgument {
     pub location: ArgumentLocation,
     pub argument: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct UpdateArgument {
     pub location: ArgumentLocation,
     pub argument: String,
@@ -269,14 +269,14 @@ impl MigrationExpression {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct CreateTypeAlias {
     pub type_alias: String,
     pub r#type: String,
     pub arity: FieldArity,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct UpdateTypeAlias {
     pub type_alias: String,
     pub r#type: Option<String>,
@@ -288,22 +288,22 @@ impl UpdateTypeAlias {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DeleteTypeAlias {
     pub type_alias: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct CreateSource {
     pub source: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct DeleteSource {
     pub source: String,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 pub enum FieldArity {
     Required,
     Optional,
