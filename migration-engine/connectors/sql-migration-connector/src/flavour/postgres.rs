@@ -1,6 +1,7 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, SqlFlavour};
+use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
 use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind, prelude::SqlFamily};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
@@ -8,11 +9,18 @@ use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, migration_engine, UserFacingError};
 
 #[derive(Debug)]
-pub(crate) struct PostgresFlavour(pub(crate) PostgresUrl);
+pub(crate) struct PostgresFlavour {
+    pub(crate) url: PostgresUrl,
+    features: BitFlags<MigrationFeature>,
+}
 
 impl PostgresFlavour {
+    pub fn new(url: PostgresUrl, features: BitFlags<MigrationFeature>) -> Self {
+        Self { url, features }
+    }
+
     pub(crate) fn schema_name(&self) -> &str {
-        self.0.schema()
+        self.url.schema()
     }
 }
 
@@ -21,7 +29,7 @@ impl SqlFlavour for PostgresFlavour {
     #[tracing::instrument(skip(database_str))]
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let db_name = self.0.dbname();
+        let db_name = self.url.dbname();
 
         strip_schema_param_from_url(&mut url);
 
@@ -133,8 +141,8 @@ impl SqlFlavour for PostgresFlavour {
 
         strip_schema_param_from_url(&mut url);
         let conn = create_postgres_admin_conn(url.clone()).await?;
-        let schema = self.0.schema();
-        let db_name = self.0.dbname();
+        let schema = self.url.schema();
+        let db_name = self.url.dbname();
 
         let query = format!("CREATE DATABASE \"{}\"", db_name);
         conn.raw_cmd(&query).await.ok();
@@ -187,7 +195,7 @@ impl SqlFlavour for PostgresFlavour {
             .map_err(ConnectorError::from)
             .map_err(|err| err.into_shadow_db_creation_error())?;
 
-        let mut temporary_database_url = self.0.url().clone();
+        let mut temporary_database_url = self.url.url().clone();
         temporary_database_url.set_path(&format!("/{}", database_name));
         let temporary_database_url = temporary_database_url.to_string();
 
@@ -231,6 +239,10 @@ impl SqlFlavour for PostgresFlavour {
         connection.raw_cmd(&drop_database).await?;
 
         sql_schema_result
+    }
+
+    fn features(&self) -> BitFlags<MigrationFeature> {
+        self.features
     }
 }
 

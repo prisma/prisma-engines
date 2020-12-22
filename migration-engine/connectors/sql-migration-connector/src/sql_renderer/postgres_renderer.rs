@@ -457,9 +457,10 @@ fn render_alter_column(
                 ));
 
                 after_statements.push(format!(
+                    //todo we should probably get rid of the schema here?
                     "ALTER SEQUENCE {sequence_name} OWNED BY {schema_name}.{table_name}.{column_name}",
                     sequence_name = Quoted::postgres_ident(sequence_name),
-                    schema_name = Quoted::postgres_ident(renderer.0.schema()),
+                    schema_name = Quoted::postgres_ident(renderer.url.schema()),
                     table_name = table_name,
                     column_name = column_name,
                 ));
