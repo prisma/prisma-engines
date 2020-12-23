@@ -13,7 +13,7 @@ use crate::{
         self, AddColumn, AddForeignKey, AlterColumn, AlterEnum, AlterTable, CreateEnum, CreateIndex, CreateTable,
         DropColumn, DropEnum, DropForeignKey, DropIndex, DropTable, RedefineTable, SqlMigrationStep, TableChange,
     },
-    SqlFlavour, SqlSchema, MIGRATION_TABLE_NAME,
+    SqlFlavour, SqlSchema,
 };
 use column::ColumnTypeChange;
 use enums::EnumDiffer;
@@ -496,9 +496,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn table_is_ignored(&self, table_name: &str) -> bool {
-        table_name == MIGRATION_TABLE_NAME
-            || table_name == "_prisma_migrations"
-            || self.flavour.table_should_be_ignored(&table_name)
+        table_name == "_prisma_migrations" || self.flavour.table_should_be_ignored(&table_name)
     }
 
     fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {

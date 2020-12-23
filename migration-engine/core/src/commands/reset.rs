@@ -15,6 +15,8 @@ impl<'a> MigrationCommand for ResetCommand {
         C: MigrationConnector<DatabaseMigration = D>,
         D: DatabaseMigrationMarker + 'static,
     {
+        tracing::debug!("Resetting the database.");
+
         engine.connector().reset().await?;
 
         Ok(())
