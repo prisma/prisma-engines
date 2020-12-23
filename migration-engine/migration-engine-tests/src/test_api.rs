@@ -26,9 +26,14 @@ use super::{
 };
 use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
 use enumflags2::BitFlags;
-use indoc::formatdoc;
 use migration_connector::{ImperativeMigrationsPersistence, MigrationFeature, MigrationRecord};
 
+use indoc::formatdoc;
+<<<<<<< HEAD
+use migration_connector::{ImperativeMigrationsPersistence, MigrationFeature, MigrationRecord};
+
+=======
+>>>>>>> 4fc193ad56716e0251e8e9a8b307a56f494ab16c
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyScriptInput,
