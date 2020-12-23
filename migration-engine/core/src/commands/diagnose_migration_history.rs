@@ -1,8 +1,8 @@
 use std::path::Path;
 
 use super::MigrationCommand;
-use crate::{migration_engine::MigrationEngine, CoreResult};
-use migration_connector::{MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
+use crate::{api::MigrationApi, CoreResult};
+use migration_connector::{MigrationConnector, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
 use serde::{Deserialize, Serialize};
 
 /// The input to the `DiagnoseMigrationHistory` command.
@@ -65,14 +65,9 @@ pub struct DiagnoseMigrationHistoryCommand;
 #[async_trait::async_trait]
 impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
     type Input = DiagnoseMigrationHistoryInput;
-
     type Output = DiagnoseMigrationHistoryOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
-    where
-        C: migration_connector::MigrationConnector<DatabaseMigration = D>,
-        D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
-    {
+    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
         let connector = engine.connector();
         let migration_persistence = connector.new_migration_persistence();
         let migration_inferrer = connector.database_migration_inferrer();

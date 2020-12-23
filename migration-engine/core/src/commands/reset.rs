@@ -1,6 +1,5 @@
-use crate::migration_engine::MigrationEngine;
-use crate::{commands::command::MigrationCommand, CoreResult};
-use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
+use crate::{api::MigrationApi, commands::command::MigrationCommand, CoreResult};
+use migration_connector::MigrationConnector;
 
 /// The `reset` command.
 pub struct ResetCommand;
@@ -10,11 +9,10 @@ impl<'a> MigrationCommand for ResetCommand {
     type Input = ();
     type Output = ();
 
-    async fn execute<C, D>(_input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
-    where
-        C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + 'static,
-    {
+    async fn execute<C: MigrationConnector>(
+        _input: &Self::Input,
+        engine: &MigrationApi<C>,
+    ) -> CoreResult<Self::Output> {
         tracing::debug!("Resetting the database.");
 
         engine.connector().reset().await?;
