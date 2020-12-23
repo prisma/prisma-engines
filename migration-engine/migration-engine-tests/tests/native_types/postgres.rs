@@ -20,8 +20,6 @@ static ALL: &[&'static str] = &[
     "Numeric(32,16)",
     "Real",
     "DoublePrecision",
-    // "SmallSerial", todo you cannot use this in alter column -.- have to do smallint autoincrement????
-    // "BigSerial",  todo same here
     "VarChar(53)",
     "Char(53)",
     "Text",
@@ -53,8 +51,6 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Numeric(32,16)",
                 "Real",
                 "DoublePrecision",
-                // "SmallSerial", todo you cannot use this in alter column -.- have to do smallint autoincrement????
-                // "BigSerial",  todo same here
                 "VarChar(53)",
                 "Char(53)",
                 "Text",
@@ -79,9 +75,6 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ("Numeric(11,4)", Value::numeric(BigDecimal::from_str("1").unwrap()), ALL),
         ("Real", Value::float(5.3), ALL),
         ("DoublePrecision", Value::float(7.5), ALL),
-        ("SmallSerial", Value::integer(10), ALL),
-        ("Serial", Value::integer(15), ALL),
-        ("BigSerial", Value::integer(i64::MAX), ALL),
         ("VarChar(5)", Value::text("true"), ALL),
         ("Char(5)", Value::text("true"), ALL),
         ("Text", Value::text("true"), ALL),
@@ -111,8 +104,6 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps.insert("Numeric", "Decimal");
     maps.insert("Real", "Float");
     maps.insert("DoublePrecision", "Float");
-    maps.insert("SmallSerial", "Int");
-    maps.insert("BigSerial", "Int");
     maps.insert("VarChar", "String");
     maps.insert("Char", "String");
     maps.insert("Text", "String");
