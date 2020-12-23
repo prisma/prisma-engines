@@ -116,6 +116,7 @@ fn with_default_params(r#type: &str) -> &str {
         "Char" => "Char(1)",
         "NChar" => "NChar(1)",
         "SmallInt" => "int2",
+        "Integer" => "int4",
         _ => r#type,
     }
 }
@@ -175,7 +176,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
             })?;
 
             api.database()
-                .raw_cmd(&format!("DROP TABLE [{}].[A]", api.schema_name()))
+                .raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()))
                 .await?;
         }
     }
