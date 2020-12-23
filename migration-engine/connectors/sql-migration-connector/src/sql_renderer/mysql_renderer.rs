@@ -12,9 +12,10 @@ use crate::{
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
+use sql_ddl::mysql as ddl;
 use sql_schema_describer::{
     walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker},
-    ColumnTypeFamily, DefaultKind, DefaultValue, IndexType, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -26,24 +27,39 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
-        let constraint_clause = foreign_key
-            .constraint_name()
-            .map(|constraint_name| format!("CONSTRAINT {} ", self.quote(constraint_name)))
-            .unwrap_or_else(String::new);
-
-        let columns = foreign_key
-            .constrained_column_names()
-            .iter()
-            .map(|col| self.quote(col))
-            .join(", ");
-
-        format!(
-            "ALTER TABLE `{table}` ADD {constraint_clause}FOREIGN KEY ({columns}){references}",
-            table = foreign_key.table().name(),
-            constraint_clause = constraint_clause,
-            columns = columns,
-            references = self.render_references(foreign_key),
-        )
+        ddl::AlterTable {
+            table_name: foreign_key.table().name().into(),
+            changes: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
+                constraint_name: foreign_key.constraint_name().map(From::from),
+                constrained_columns: foreign_key
+                    .constrained_column_names()
+                    .iter()
+                    .map(|c| Cow::Borrowed(c.as_str()))
+                    .collect(),
+                referenced_table: foreign_key.referenced_table().name().into(),
+                referenced_columns: foreign_key
+                    .referenced_column_names()
+                    .iter()
+                    .map(String::as_str)
+                    .map(Cow::Borrowed)
+                    .collect(),
+                on_delete: Some(match foreign_key.on_delete_action() {
+                    ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
+                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::DoNothing,
+                    ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
+                    ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
+                    ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
+                }),
+                on_update: Some(match foreign_key.on_update_action() {
+                    ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
+                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::DoNothing,
+                    ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
+                    ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
+                    ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
+                }),
+            })],
+        }
+        .to_string()
     }
 
     fn render_alter_enum(&self, _alter_enum: &AlterEnum, _differ: &Pair<&SqlSchema>) -> Vec<String> {
@@ -51,12 +67,14 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
-        vec![format!(
-            "ALTER TABLE {table_name} RENAME INDEX {index_name} TO {index_new_name}",
-            table_name = self.quote(indexes.previous().table().name()),
-            index_name = self.quote(indexes.previous().name()),
-            index_new_name = self.quote(indexes.next().name())
-        )]
+        vec![ddl::AlterTable {
+            table_name: indexes.previous().table().name().into(),
+            changes: vec![sql_ddl::mysql::AlterTableClause::RenameIndex {
+                previous_name: indexes.previous().name().into(),
+                next_name: indexes.next().name().into(),
+            }],
+        }
+        .to_string()]
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -68,7 +86,7 @@ impl SqlRenderer for MysqlFlavour {
 
         for change in changes {
             match change {
-                TableChange::DropPrimaryKey => lines.push("DROP PRIMARY KEY".to_owned()),
+                TableChange::DropPrimaryKey => lines.push(sql_ddl::mysql::AlterTableClause::DropPrimaryKey.to_string()),
                 TableChange::AddPrimaryKey { columns } => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
                     columns.iter().map(|colname| self.quote(colname)).join(", ")
@@ -79,10 +97,12 @@ impl SqlRenderer for MysqlFlavour {
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn(DropColumn { index }) => {
-                    let name = self.quote(tables.previous().column_at(*index).name());
-                    lines.push(format!("DROP COLUMN {}", name));
-                }
+                TableChange::DropColumn(DropColumn { index }) => lines.push(
+                    sql_ddl::mysql::AlterTableClause::DropColumn {
+                        column_name: tables.previous().column_at(*index).name().into(),
+                    }
+                    .to_string(),
+                ),
                 TableChange::AlterColumn(AlterColumn {
                     changes,
                     column_index,
@@ -199,22 +219,16 @@ impl SqlRenderer for MysqlFlavour {
         } else {
             &name
         };
-        let index_type = match index.index_type() {
-            IndexType::Unique => "UNIQUE ",
-            IndexType::Normal => "",
-        };
-        let index_name = self.quote(&name);
-        let table_reference = self.quote(&index.table().name());
 
-        let columns = index.columns().map(|c| self.quote(c.name()));
-
-        format!(
-            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
-            index_type = index_type,
-            index_name = index_name,
-            table_reference = table_reference,
-            columns = columns.join(", ")
-        )
+        ddl::CreateIndex {
+            unique: index.index_type().is_unique(),
+            index_name: name.into(),
+            on: (
+                index.table().name().into(),
+                index.columns().map(|c| c.name().into()).collect(),
+            ),
+        }
+        .to_string()
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
@@ -267,7 +281,11 @@ impl SqlRenderer for MysqlFlavour {
         // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
         vec![
             self.render_create_index(indexes.next()),
-            mysql_drop_index(indexes.previous().table().name(), indexes.previous().name()),
+            sql_ddl::mysql::DropIndex {
+                index_name: indexes.previous().name().into(),
+                table_name: indexes.previous().table().name().into(),
+            }
+            .to_string(),
         ]
     }
 
@@ -284,11 +302,18 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_drop_index(&self, index: &IndexWalker<'_>) -> String {
-        mysql_drop_index(&index.table().name(), &index.name())
+        sql_ddl::mysql::DropIndex {
+            table_name: index.table().name().into(),
+            index_name: index.name().into(),
+        }
+        .to_string()
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote(&table_name))]
+        vec![sql_ddl::mysql::DropTable {
+            table_name: table_name.into(),
+        }
+        .to_string()]
     }
 
     fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -296,11 +321,17 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {
-        format!(
-            "ALTER TABLE {} RENAME TO {}",
-            self.quote(name),
-            new_name = self.quote(new_name),
-        )
+        sql_ddl::mysql::AlterTable {
+            table_name: name.into(),
+            changes: vec![sql_ddl::mysql::AlterTableClause::RenameTo {
+                next_name: new_name.into(),
+            }],
+        }
+        .to_string()
+    }
+
+    fn render_create_table(&self, table: &TableWalker<'_>) -> String {
+        self.render_create_table_as(table, table.name())
     }
 }
 
@@ -345,7 +376,7 @@ fn render_mysql_modify(
     )
 }
 
-pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
     if !column.column_type().full_data_type.is_empty() {
         return column.column_type().full_data_type.clone().into();
     }
@@ -383,16 +414,12 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }
 
-fn mysql_drop_index(table_name: &str, index_name: &str) -> String {
-    format!("DROP INDEX `{}` ON `{}`", index_name, table_name)
-}
-
 /// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html
 ///
 /// We don't use SET DEFAULT because it can't be used to set the default to an expression on most
 /// MySQL versions. We use MODIFY for default changes instead.
 #[derive(Debug)]
-pub(crate) enum MysqlAlterColumn {
+enum MysqlAlterColumn {
     DropDefault,
     Modify {
         new_default: Option<DefaultValue>,

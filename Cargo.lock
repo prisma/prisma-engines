@@ -3400,6 +3400,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "sql-ddl"
+version = "0.1.0"
+dependencies = [
+ "indoc 1.0.3",
+]
+
+[[package]]
 name = "sql-introspection-connector"
 version = "0.1.0"
 dependencies = [
@@ -3447,6 +3454,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "sql-ddl",
  "sql-schema-describer",
  "tokio",
  "tracing",

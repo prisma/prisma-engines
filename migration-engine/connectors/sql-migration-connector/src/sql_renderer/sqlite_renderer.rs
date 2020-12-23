@@ -7,6 +7,7 @@ use crate::{
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
+use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
 
@@ -38,29 +39,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_column(&self, column: &ColumnWalker<'_>) -> String {
-        let column_name = self.quote(column.name());
-        let tpe_str = render_column_type(column.column_type());
-        let nullability_str = render_nullability(&column);
-        let default_str = column
-            .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_) | DefaultKind::SEQUENCE(_)))
-            .map(|default| format!(" DEFAULT {}", self.render_default(default, column.column_type_family())))
-            .unwrap_or_else(String::new);
-        let auto_increment_str = if column.is_autoincrement() && column.is_single_primary_key() {
-            " PRIMARY KEY AUTOINCREMENT"
-        } else {
-            ""
-        };
-
-        format!(
-            "{indentation}{column_name} {tpe_str}{nullability_str}{default_str}{auto_increment}",
-            indentation = SQL_INDENTATION,
-            column_name = column_name,
-            tpe_str = tpe_str,
-            nullability_str = nullability_str,
-            default_str = default_str,
-            auto_increment = auto_increment_str
-        )
+        render_column(column).to_string()
     }
 
     fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
@@ -138,60 +117,38 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
-        use std::fmt::Write;
-
-        let columns: String = table.columns().map(|column| self.render_column(&column)).join(",\n");
-
-        let primary_key_is_already_set = columns.contains("PRIMARY KEY");
-        let primary_columns = table.primary_key_column_names().unwrap_or(&[]);
-
-        let primary_key = if !primary_columns.is_empty() && !primary_key_is_already_set {
-            let column_names = primary_columns.iter().map(Quoted::sqlite_ident).join(",");
-            format!(
-                ",\n{indentation}PRIMARY KEY ({column_names})",
-                indentation = SQL_INDENTATION,
-                column_names = column_names
-            )
-        } else {
-            String::new()
+        let mut create_table = sql_ddl::sqlite::CreateTable {
+            table_name: table_name.into(),
+            columns: table.columns().map(|col| render_column(&col)).collect(),
+            primary_key: None,
+            foreign_keys: table
+                .foreign_keys()
+                .map(move |fk| sql_ddl::sqlite::ForeignKey {
+                    constrains: fk.constrained_column_names().iter().map(|name| name.into()).collect(),
+                    references: (
+                        fk.referenced_table().name().into(),
+                        fk.referenced_column_names().iter().map(|name| name.into()).collect(),
+                    ),
+                    constraint_name: fk.constraint_name().map(From::from),
+                    on_delete: Some(match fk.on_delete_action() {
+                        ForeignKeyAction::NoAction => sql_ddl::sqlite::ForeignKeyAction::NoAction,
+                        ForeignKeyAction::Restrict => sql_ddl::sqlite::ForeignKeyAction::Restrict,
+                        ForeignKeyAction::Cascade => sql_ddl::sqlite::ForeignKeyAction::Cascade,
+                        ForeignKeyAction::SetNull => sql_ddl::sqlite::ForeignKeyAction::SetNull,
+                        ForeignKeyAction::SetDefault => sql_ddl::sqlite::ForeignKeyAction::SetDefault,
+                    }),
+                    on_update: Some(sql_ddl::sqlite::ForeignKeyAction::Cascade),
+                })
+                .collect(),
         };
 
-        let foreign_keys = if table.foreign_keys().next().is_some() {
-            let mut fks = table.foreign_keys().peekable();
-            let mut rendered_fks = String::new();
+        if !table.columns().any(|col| col.is_single_primary_key()) {
+            create_table.primary_key = table
+                .primary_key_column_names()
+                .map(|slice| slice.iter().map(|name| name.into()).collect());
+        }
 
-            while let Some(fk) = fks.next() {
-                write!(
-                    rendered_fks,
-                    "{indentation}{constraint_clause}FOREIGN KEY ({constrained_columns}) {references}{comma}",
-                    constraint_clause = fk
-                        .constraint_name()
-                        .map(|name| format!("CONSTRAINT {} ", name))
-                        .unwrap_or_default(),
-                    indentation = SQL_INDENTATION,
-                    constrained_columns = fk
-                        .constrained_column_names()
-                        .iter()
-                        .map(|col| format!(r#""{}""#, col))
-                        .join(","),
-                    references = self.render_references(&fk),
-                    comma = if fks.peek().is_some() { ",\n" } else { "" },
-                )
-                .expect("Error formatting to string buffer.");
-            }
-
-            format!(",\n\n{fks}", fks = rendered_fks)
-        } else {
-            String::new()
-        };
-
-        format!(
-            "CREATE TABLE {table_name} (\n{columns}{foreign_keys}{primary_key}\n)",
-            table_name = self.quote(table_name),
-            columns = columns,
-            foreign_keys = foreign_keys,
-            primary_key = primary_key,
-        )
+        create_table.to_string()
     }
 
     fn render_drop_enum(&self, _: &EnumWalker<'_>) -> Vec<String> {
@@ -332,4 +289,34 @@ fn copy_current_table_into_new_table(
     );
 
     steps.push(query)
+}
+
+fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
+    sql_ddl::sqlite::Column {
+        autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
+        default: column
+            .default()
+            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_) | DefaultKind::SEQUENCE(_)))
+            .map(|default| render_default(default, column.column_type_family())),
+        name: column.name().into(),
+        not_null: !column.arity().is_nullable(),
+        primary_key: column.is_single_primary_key(),
+        r#type: render_column_type(column.column_type()).into(),
+    }
+}
+
+fn render_default<'a>(default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
+    match (default.kind(), family) {
+        (DefaultKind::DBGENERATED(val), _) => val.as_str().into(),
+        (DefaultKind::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
+        | (DefaultKind::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+            format!("'{}'", escape_quotes(&val)).into()
+        }
+        (DefaultKind::VALUE(PrismaValue::Bytes(b)), ColumnTypeFamily::Binary) => format!("'{}'", format_hex(b)).into(),
+        (DefaultKind::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+        (DefaultKind::NOW, _) => unreachable!("NOW default on non-datetime column"),
+        (DefaultKind::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+        (DefaultKind::VALUE(val), _) => format!("{}", val).into(),
+        (DefaultKind::SEQUENCE(_), _) => "".into(),
+    }
 }

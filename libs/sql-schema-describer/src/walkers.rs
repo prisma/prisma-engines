@@ -300,7 +300,7 @@ impl<'a> fmt::Debug for ForeignKeyWalker<'a> {
 
 impl<'schema> ForeignKeyWalker<'schema> {
     /// The names of the foreign key columns on the referencing table.
-    pub fn constrained_column_names(&self) -> &[String] {
+    pub fn constrained_column_names(&self) -> &'schema [String] {
         &self.foreign_key().columns
     }
 
@@ -345,7 +345,7 @@ impl<'schema> ForeignKeyWalker<'schema> {
     }
 
     /// The names of the columns referenced by the foreign key on the referenced table.
-    pub fn referenced_column_names(&self) -> &[String] {
+    pub fn referenced_column_names(&self) -> &'schema [String] {
         &self.foreign_key().referenced_columns
     }
 
