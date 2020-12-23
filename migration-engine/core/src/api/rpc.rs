@@ -14,79 +14,55 @@ pub struct RpcApi {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum RpcCommand {
-    ApplyMigration,
     ApplyMigrations,
     ApplyScript,
-    CalculateDatabaseSteps,
-    CalculateDatamodel,
     CreateMigration,
     DebugPanic,
     DiagnoseMigrationHistory,
     EvaluateDataLoss,
     GetDatabaseVersion,
-    InferMigrationSteps,
-    Initialize,
     ListMigrationDirectories,
-    ListMigrations,
     MarkMigrationApplied,
     MarkMigrationRolledBack,
-    MigrationProgress,
     PlanMigration,
     Reset,
     SchemaPush,
-    UnapplyMigration,
 }
 
 impl RpcCommand {
     fn name(&self) -> &'static str {
         match self {
-            RpcCommand::ApplyMigration => "applyMigration",
             RpcCommand::ApplyMigrations => "applyMigrations",
             RpcCommand::ApplyScript => "applyScript",
-            RpcCommand::CalculateDatabaseSteps => "calculateDatabaseSteps",
-            RpcCommand::CalculateDatamodel => "calculateDatamodel",
             RpcCommand::CreateMigration => "createMigration",
             RpcCommand::DebugPanic => "debugPanic",
             RpcCommand::DiagnoseMigrationHistory => "diagnoseMigrationHistory",
             RpcCommand::EvaluateDataLoss => "evaluateDataLoss",
             RpcCommand::GetDatabaseVersion => "getDatabaseVersion",
-            RpcCommand::InferMigrationSteps => "inferMigrationSteps",
-            RpcCommand::Initialize => "initialize",
             RpcCommand::ListMigrationDirectories => "listMigrationDirectories",
-            RpcCommand::ListMigrations => "listMigrations",
             RpcCommand::MarkMigrationApplied => "markMigrationApplied",
             RpcCommand::MarkMigrationRolledBack => "markMigrationRolledBack",
-            RpcCommand::MigrationProgress => "migrationProgress",
             RpcCommand::PlanMigration => "planMigration",
             RpcCommand::Reset => "reset",
             RpcCommand::SchemaPush => "schemaPush",
-            RpcCommand::UnapplyMigration => "unapplyMigration",
         }
     }
 }
 
 const AVAILABLE_COMMANDS: &[RpcCommand] = &[
-    RpcCommand::ApplyMigration,
     RpcCommand::ApplyMigrations,
     RpcCommand::ApplyScript,
-    RpcCommand::CalculateDatabaseSteps,
-    RpcCommand::CalculateDatamodel,
     RpcCommand::CreateMigration,
     RpcCommand::DebugPanic,
     RpcCommand::DiagnoseMigrationHistory,
     RpcCommand::EvaluateDataLoss,
     RpcCommand::GetDatabaseVersion,
-    RpcCommand::InferMigrationSteps,
-    RpcCommand::Initialize,
     RpcCommand::ListMigrationDirectories,
-    RpcCommand::ListMigrations,
     RpcCommand::MarkMigrationApplied,
-    RpcCommand::MigrationProgress,
     RpcCommand::MarkMigrationRolledBack,
     RpcCommand::PlanMigration,
     RpcCommand::Reset,
     RpcCommand::SchemaPush,
-    RpcCommand::UnapplyMigration,
 ];
 
 impl RpcApi {
@@ -141,27 +117,19 @@ impl RpcApi {
             RpcCommand::ApplyMigrations => render(executor.apply_migrations(&params.parse()?).await?),
             RpcCommand::CreateMigration => render(executor.create_migration(&params.parse()?).await?),
             RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),
-            RpcCommand::ApplyMigration => render(executor.apply_migration(&params.parse()?).await?),
-            RpcCommand::CalculateDatabaseSteps => render(executor.calculate_database_steps(&params.parse()?).await?),
-            RpcCommand::CalculateDatamodel => render(executor.calculate_datamodel(&params.parse()?).await?),
             RpcCommand::DiagnoseMigrationHistory => {
                 render(executor.diagnose_migration_history(&params.parse()?).await?)
             }
             RpcCommand::EvaluateDataLoss => render(executor.evaluate_data_loss(&params.parse()?).await?),
             RpcCommand::GetDatabaseVersion => render(executor.version(&serde_json::Value::Null).await?),
-            RpcCommand::InferMigrationSteps => render(executor.infer_migration_steps(&params.parse()?).await?),
-            RpcCommand::Initialize => render(executor.initialize(&params.parse()?).await?),
             RpcCommand::ListMigrationDirectories => {
                 render(executor.list_migration_directories(&params.parse()?).await?)
             }
-            RpcCommand::ListMigrations => render(executor.list_migrations(&serde_json::Value::Null).await?),
             RpcCommand::MarkMigrationApplied => render(executor.mark_migration_applied(&params.parse()?).await?),
             RpcCommand::MarkMigrationRolledBack => render(executor.mark_migration_rolled_back(&params.parse()?).await?),
-            RpcCommand::MigrationProgress => render(executor.migration_progress(&params.parse()?).await?),
             RpcCommand::PlanMigration => render(executor.plan_migration(&params.parse()?).await?),
             RpcCommand::Reset => render(executor.reset(&()).await?),
             RpcCommand::SchemaPush => render(executor.schema_push(&params.parse()?).await?),
-            RpcCommand::UnapplyMigration => render(executor.unapply_migration(&params.parse()?).await?),
         })
     }
 }

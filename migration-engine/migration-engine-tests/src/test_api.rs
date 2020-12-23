@@ -23,24 +23,21 @@ use super::{
     assertions::SchemaAssertion,
     misc_helpers::{mysql_migration_connector, postgres_migration_connector, sqlite_migration_connector},
     sql::barrel_migration_executor::BarrelMigrationExecutor,
-    InferAndApplyOutput,
 };
 use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
 use enumflags2::BitFlags;
+use migration_connector::{ImperativeMigrationsPersistence, MigrationFeature, MigrationRecord};
+
 use indoc::formatdoc;
-use migration_connector::{
-    ImperativeMigrationsPersistence, MigrationConnector, MigrationFeature, MigrationPersistence, MigrationRecord,
-    MigrationStep,
-};
 use migration_core::{
     api::{GenericApi, MigrationApi},
-    commands::{ApplyMigrationInput, ApplyScriptInput},
+    commands::ApplyScriptInput,
 };
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
-use sql_migration_connector::{SqlMigration, SqlMigrationConnector, MIGRATION_TABLE_NAME};
+use sql_migration_connector::{SqlMigration, SqlMigrationConnector};
 use sql_schema_describer::*;
 use tempfile::TempDir;
 use test_setup::*;
@@ -78,14 +75,6 @@ impl TestApi {
         self.tags.contains(Tags::Mariadb)
     }
 
-    pub async fn migration_persistence(&self) -> &dyn MigrationPersistence {
-        let persistence = self.api.connector().migration_persistence();
-
-        persistence.init().await.unwrap();
-
-        persistence
-    }
-
     pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
         self.api.connector()
     }
@@ -119,29 +108,6 @@ impl TestApi {
     /// Create a temporary directory to serve as a test migrations directory.
     pub fn create_migrations_directory(&self) -> anyhow::Result<TempDir> {
         Ok(tempfile::tempdir()?)
-    }
-
-    pub async fn apply_migration(&self, steps: Vec<MigrationStep>, migration_id: &str) -> InferAndApplyOutput {
-        let input = ApplyMigrationInput {
-            migration_id: migration_id.into(),
-            steps,
-            force: None,
-        };
-
-        let migration_output = self.api.apply_migration(&input).await.expect("ApplyMigration failed");
-
-        assert!(
-            migration_output.general_errors.is_empty(),
-            format!(
-                "ApplyMigration returned unexpected errors: {:?}",
-                migration_output.general_errors
-            )
-        );
-
-        InferAndApplyOutput {
-            sql_schema: self.describe_database().await.unwrap(),
-            migration_output,
-        }
     }
 
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
@@ -216,22 +182,7 @@ impl TestApi {
     }
 
     pub async fn describe_database(&self) -> Result<SqlSchema, anyhow::Error> {
-        let mut result = self.api.connector().describe_schema().await?;
-
-        // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
-        result.tables = result
-            .tables
-            .into_iter()
-            .filter(|t| t.name != MIGRATION_TABLE_NAME)
-            .collect();
-
-        // Also the sequences of the _Migration table
-        result.sequences = result
-            .sequences
-            .into_iter()
-            .filter(|seq| !seq.name.contains("_Migration"))
-            .collect();
-
+        let result = self.api.connector().describe_schema().await?;
         Ok(result)
     }
 
