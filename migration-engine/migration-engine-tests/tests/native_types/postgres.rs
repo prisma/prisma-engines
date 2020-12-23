@@ -20,8 +20,8 @@ static ALL: &[&'static str] = &[
     "Numeric(32,16)",
     "Real",
     "DoublePrecision",
-    "SmallSerial",
-    "BigSerial",
+    // "SmallSerial", todo you cannot use this in alter column -.- have to do smallint autoincrement????
+    // "BigSerial",  todo same here
     "VarChar(53)",
     "Char(53)",
     "Text",
@@ -42,7 +42,37 @@ static ALL: &[&'static str] = &[
 
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
-        ("SmallInt", Value::integer(u8::MAX), ALL),
+        (
+            "SmallInt",
+            Value::integer(u8::MAX),
+            &[
+                "SmallInt",
+                "Integer",
+                "BigInt",
+                "Decimal(32,16)",
+                "Numeric(32,16)",
+                "Real",
+                "DoublePrecision",
+                // "SmallSerial", todo you cannot use this in alter column -.- have to do smallint autoincrement????
+                // "BigSerial",  todo same here
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                // "ByteA",
+                // "Timestamp(3)",
+                // "Timestamptz(3)",
+                // "Date",
+                // "Time(3)",
+                "Timetz(3)",
+                "Boolean",
+                "Bit(10)",
+                "VarBit(10)",
+                "UUID",
+                "Xml",
+                "JSON",
+                "JSONB",
+            ],
+        ),
         ("Integer", Value::integer(i32::MAX), ALL),
         ("BigInt", Value::integer(i64::MAX), ALL),
         ("Decimal(10,2)", Value::numeric(BigDecimal::from_str("1").unwrap()), ALL),
@@ -83,10 +113,10 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps.insert("DoublePrecision", "Float");
     maps.insert("SmallSerial", "Int");
     maps.insert("BigSerial", "Int");
-    maps.insert("Varchar", "String");
+    maps.insert("VarChar", "String");
     maps.insert("Char", "String");
     maps.insert("Text", "String");
-    maps.insert("BytesA", "Bytes");
+    maps.insert("ByteA", "Bytes");
     maps.insert("Timestamp", "DateTime");
     maps.insert("Timestamptz", "DateTime");
     maps.insert("Date", "DateTime");
@@ -104,19 +134,21 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
 });
 
 fn with_default_params(r#type: &str) -> &str {
+    println!("{}", r#type);
     match r#type {
-        "Decimal" => "Decimal(18,0)",
-        "Numeric" => "Numeric(18,0)",
-        "Float(24)" => "Real",
-        "Float" => "Float(53)",
-        "Binary" => "Binary(1)",
+        "SmallInt" => "int2",
+        "Integer" => "int4",
+        "BigInt" => "int8",
+        "Decimal(32,16)" => "numeric",
+        "Numeric(32,16)" => "numeric",
+        "Real" => "float4",
+        "DoublePrecision" => "float8",
+        "VarChar(53)" => "varchar",
+        "Char(53)" => "bpchar",
         "VarBinary" => "VarBinary(1)",
-        "VarChar" => "VarChar(1)",
         "NVarChar" => "NVarChar(1)",
         "Char" => "Char(1)",
         "NChar" => "NChar(1)",
-        "SmallInt" => "int2",
-        "Integer" => "int4",
         _ => r#type,
     }
 }
