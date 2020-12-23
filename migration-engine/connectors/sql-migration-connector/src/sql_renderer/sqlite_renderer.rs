@@ -137,6 +137,7 @@ impl SqlRenderer for SqliteFlavour {
                         ForeignKeyAction::SetNull => sql_ddl::sqlite::ForeignKeyAction::SetNull,
                         ForeignKeyAction::SetDefault => sql_ddl::sqlite::ForeignKeyAction::SetDefault,
                     }),
+                    on_update: Some(sql_ddl::sqlite::ForeignKeyAction::Cascade),
                 })
                 .collect(),
         };

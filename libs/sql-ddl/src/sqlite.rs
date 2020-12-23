@@ -1,4 +1,4 @@
-use crate::common::{IteratorJoin, SQL_INDENTATION};
+use crate::common::{Indented, IteratorJoin, SQL_INDENTATION};
 use std::{borrow::Cow, fmt::Display};
 
 struct SqliteIdentifier<T>(T);
@@ -21,28 +21,14 @@ impl Display for CreateTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "CREATE TABLE \"{}\" (\n", self.table_name)?;
 
-        let mut columns = self.columns.iter().peekable();
-
-        while let Some(column) = columns.next() {
-            write!(
-                f,
-                "{indentation}{column}",
-                indentation = SQL_INDENTATION,
-                column = column
-            )?;
-
-            if columns.peek().is_some() {
-                f.write_str(",\n")?;
-            }
-        }
+        self.columns.iter().map(Indented).join(",\n", f)?;
 
         if let Some(primary_key) = &self.primary_key {
-            write!(
-                f,
-                ",\n\n{indentation}PRIMARY KEY ({columns})",
-                indentation = SQL_INDENTATION,
-                columns = primary_key.iter().map(SqliteIdentifier).join(", ")
-            )?;
+            f.write_str(",\n\n")?;
+            f.write_str(SQL_INDENTATION)?;
+            f.write_str("PRIMARY KEY (")?;
+            primary_key.iter().map(SqliteIdentifier).join(", ", f)?;
+            f.write_str(")")?;
         }
 
         for foreign_key in &self.foreign_keys {
@@ -64,6 +50,7 @@ pub struct ForeignKey<'a> {
     pub references: (Cow<'a, str>, Vec<Cow<'a, str>>),
     pub constraint_name: Option<Cow<'a, str>>,
     pub on_delete: Option<ForeignKeyAction>,
+    pub on_update: Option<ForeignKeyAction>,
 }
 
 /// Foreign key action types (for ON DELETE|ON UPDATE).
@@ -87,6 +74,20 @@ pub enum ForeignKeyAction {
     SetDefault,
 }
 
+impl Display for ForeignKeyAction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let action_s = match self {
+            ForeignKeyAction::NoAction => "NO ACTION",
+            ForeignKeyAction::Restrict => "RESTRICT",
+            ForeignKeyAction::Cascade => "CASCADE",
+            ForeignKeyAction::SetNull => "SET NULL",
+            ForeignKeyAction::SetDefault => "SET DEFAULT",
+        };
+
+        f.write_str(action_s)
+    }
+}
+
 impl Display for ForeignKey<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(constraint_name) = &self.constraint_name {
@@ -95,15 +96,7 @@ impl Display for ForeignKey<'_> {
 
         f.write_str("FOREIGN KEY (")?;
 
-        let mut constrained_columns = self.constrains.iter().peekable();
-
-        while let Some(constrained_column) = constrained_columns.next() {
-            write!(f, "{}", SqliteIdentifier(constrained_column))?;
-
-            if constrained_columns.peek().is_some() {
-                f.write_str(", ")?;
-            }
-        }
+        self.constrains.iter().map(|s| SqliteIdentifier(s)).join(", ", f)?;
 
         write!(
             f,
@@ -111,26 +104,18 @@ impl Display for ForeignKey<'_> {
             referenced_table = self.references.0,
         )?;
 
-        let mut referenced_columns = self.references.1.iter().peekable();
-
-        while let Some(referenced_column) = referenced_columns.next() {
-            write!(f, "{}", SqliteIdentifier(referenced_column))?;
-
-            if referenced_columns.peek().is_some() {
-                f.write_str(", ")?;
-            }
-        }
+        self.references.1.iter().map(|s| SqliteIdentifier(s)).join(", ", f)?;
 
         f.write_str(")")?;
 
         if let Some(action) = &self.on_delete {
-            match action {
-                ForeignKeyAction::NoAction => (),
-                ForeignKeyAction::Restrict => f.write_str(" ON DELETE RESTRICT")?,
-                ForeignKeyAction::Cascade => f.write_str(" ON DELETE CASCADE")?,
-                ForeignKeyAction::SetNull => f.write_str(" ON DELETE SET NULL")?,
-                ForeignKeyAction::SetDefault => f.write_str(" ON DELETE SET DEFAULT")?,
-            }
+            f.write_str(" ON DELETE ")?;
+            action.fmt(f)?;
+        }
+
+        if let Some(action) = &self.on_update {
+            f.write_str(" ON UPDATE ")?;
+            action.fmt(f)?;
         }
 
         Ok(())
@@ -161,7 +146,8 @@ impl Display for Column<'_> {
         )?;
 
         if let Some(default) = &self.default {
-            write!(f, " DEFAULT {}", default)?;
+            f.write_str(" DEFAULT ")?;
+            f.write_str(default)?;
         }
 
         Ok(())

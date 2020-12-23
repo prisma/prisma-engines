@@ -1,5 +1,16 @@
 use std::{borrow::Cow, fmt::Display};
 
+use crate::common::IteratorJoin;
+
+struct Ident<'a>(&'a str);
+
+impl Display for Ident<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "`{}`", self.0)?;
+        Ok(())
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct AlterTable<'a> {
     pub table_name: Cow<'a, str>,
@@ -73,27 +84,11 @@ impl<'a> Display for ForeignKey<'a> {
 
         f.write_str("FOREIGN KEY (")?;
 
-        let mut constrained_columns = self.constrained_columns.iter().peekable();
-
-        while let Some(column) = constrained_columns.next() {
-            write!(f, "`{}`", column)?;
-
-            if constrained_columns.peek().is_some() {
-                f.write_str(", ")?;
-            }
-        }
+        self.constrained_columns.iter().map(|s| Ident(s)).join(", ", f)?;
 
         write!(f, ") REFERENCES `{}`(", self.referenced_table)?;
 
-        let mut referenced_columns = self.referenced_columns.iter().peekable();
-
-        while let Some(column) = referenced_columns.next() {
-            write!(f, "`{}`", column)?;
-
-            if referenced_columns.peek().is_some() {
-                f.write_str(", ")?;
-            }
-        }
+        self.referenced_columns.iter().map(|s| Ident(s)).join(", ", f)?;
 
         f.write_str(")")?;
 
@@ -151,15 +146,7 @@ impl Display for CreateIndex<'_> {
             table_name = self.on.0,
         )?;
 
-        let mut columns = self.on.1.iter().peekable();
-
-        while let Some(column_name) = columns.next() {
-            write!(f, "`{}`", column_name)?;
-
-            if columns.peek().is_some() {
-                f.write_str(", ")?;
-            }
-        }
+        self.on.1.iter().map(|s| Ident(s)).join(", ", f)?;
 
         write!(f, ")")
     }

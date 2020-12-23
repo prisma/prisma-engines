@@ -1,5 +1,7 @@
 use std::{borrow::Cow, fmt::Display};
 
+use crate::common::IteratorJoin;
+
 pub enum PostgresIdentifier<'a> {
     Simple(Cow<'a, str>),
     WithSchema(Cow<'a, str>, Cow<'a, str>),
@@ -8,6 +10,24 @@ pub enum PostgresIdentifier<'a> {
 impl<'a> From<&'a str> for PostgresIdentifier<'a> {
     fn from(s: &'a str) -> Self {
         PostgresIdentifier::Simple(Cow::Borrowed(s))
+    }
+}
+
+struct StrLit<'a>(&'a str);
+
+impl Display for StrLit<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "'{}'", self.0)?;
+        Ok(())
+    }
+}
+
+struct Ident<'a>(&'a str);
+
+impl Display for Ident<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "\"{}\"", self.0)?;
+        Ok(())
     }
 }
 
@@ -34,18 +54,8 @@ pub struct CreateEnum<'a> {
 impl<'a> Display for CreateEnum<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "CREATE TYPE {enum_name} AS ENUM (", enum_name = self.enum_name)?;
-
-        let mut variants = self.variants.iter().peekable();
-
-        while let Some(variant) = variants.next() {
-            write!(f, "'{variant}'", variant = variant)?;
-
-            if variants.peek().is_some() {
-                write!(f, ", ")?;
-            }
-        }
-
-        write!(f, ")")
+        self.variants.iter().map(|s| StrLit(s)).join(", ", f)?;
+        f.write_str(")")
     }
 }
 
@@ -66,17 +76,9 @@ impl<'a> Display for CreateIndex<'a> {
             table_reference = self.table_reference,
         )?;
 
-        let mut columns = self.columns.iter().peekable();
+        self.columns.iter().map(|s| Ident(s)).join(", ", f)?;
 
-        while let Some(column) = columns.next() {
-            write!(f, "\"{}\"", column)?;
-
-            if columns.peek().is_some() {
-                write!(f, ", ")?;
-            }
-        }
-
-        write!(f, ")")
+        f.write_str(")")
     }
 }
 
