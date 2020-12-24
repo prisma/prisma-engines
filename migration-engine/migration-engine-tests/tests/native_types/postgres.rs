@@ -32,10 +32,10 @@ static ALL: &[&'static str] = &[
     "Boolean",
     "Bit(10)",
     "VarBit(10)",
-    "UUID",
+    "Uuid",
     "Xml",
-    "JSON",
-    "JSONB",
+    "Json",
+    "JsonB",
 ];
 
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
@@ -59,18 +59,74 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 // "Timestamptz(3)",
                 // "Date",
                 // "Time(3)",
-                "Timetz(3)",
-                "Boolean",
-                "Bit(10)",
-                "VarBit(10)",
-                "UUID",
-                "Xml",
-                "JSON",
-                "JSONB",
+                // "Timetz(3)",
+                // "Boolean",
+                // "Bit(10)",
+                // "VarBit(10)",
+                // "Uuid",
+                // "Xml",
+                // "Json",
+                // "JsonB",
             ],
         ),
-        ("Integer", Value::integer(i32::MAX), ALL),
-        ("BigInt", Value::integer(i64::MAX), ALL),
+        (
+            "Integer",
+            Value::integer(i32::MAX),
+            &[
+                // "SmallInt", // todo risky
+                "Integer",
+                "BigInt",
+                "Decimal(32,16)",
+                "Numeric(32,16)",
+                "Real",
+                "DoublePrecision",
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                // "ByteA",
+                // "Timestamp(3)",
+                // "Timestamptz(3)",
+                // "Date",
+                // "Time(3)",
+                // "Timetz(3)",
+                // "Boolean",
+                // "Bit(10)",
+                // "VarBit(10)",
+                // "Uuid",
+                // "Xml",
+                // "Json",
+                // "JsonB",
+            ],
+        ),
+        (
+            "BigInt",
+            Value::integer(i64::MAX),
+            &[
+                // "SmallInt", // todo risky
+                // "Integer", // todo risky
+                "BigInt",
+                "Decimal(32,16)",
+                "Numeric(32,16)",
+                "Real",
+                "DoublePrecision",
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                // "ByteA",
+                // "Timestamp(3)",
+                // "Timestamptz(3)",
+                // "Date",
+                // "Time(3)",
+                // "Timetz(3)",
+                // "Boolean",
+                // "Bit(10)",
+                // "VarBit(10)",
+                // "Uuid",
+                // "Xml",
+                // "Json",
+                // "JsonB",
+            ],
+        ),
         ("Decimal(10,2)", Value::numeric(BigDecimal::from_str("1").unwrap()), ALL),
         ("Numeric(11,4)", Value::numeric(BigDecimal::from_str("1").unwrap()), ALL),
         ("Real", Value::float(5.3), ALL),
@@ -87,10 +143,10 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ("Boolean", Value::boolean(true), ALL),
         ("Bit(10)", Value::bytes(vec![1]), ALL),
         ("VarBit(5)", Value::bytes(vec![1]), ALL),
-        ("UUID", Value::text("75bf0037-a8b8-4512-beea-5a186f8abf1e"), ALL),
+        ("Uuid", Value::text("75bf0037-a8b8-4512-beea-5a186f8abf1e"), ALL),
         ("Xml", Value::boolean(true), ALL),
-        ("JSON", Value::boolean(true), ALL),
-        ("JSONB", Value::boolean(true), ALL),
+        ("Json", Value::boolean(true), ALL),
+        ("JsonB", Value::boolean(true), ALL),
     ]
 });
 
@@ -114,12 +170,12 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps.insert("Time", "DateTime");
     maps.insert("Timetz", "DateTime");
     maps.insert("Boolean", "Boolean");
-    maps.insert("Bit", "Bytes");
-    maps.insert("VarBit", "Bytes");
-    maps.insert("UUID", "String");
+    maps.insert("Bit", "String");
+    maps.insert("VarBit", "String");
+    maps.insert("Uuid", "String");
     maps.insert("Xml", "String");
-    maps.insert("JSON", "Json");
-    maps.insert("JSONB", "Json");
+    maps.insert("Json", "Json");
+    maps.insert("JsonB", "Json");
 
     maps
 });
