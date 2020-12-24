@@ -1,4 +1,4 @@
-use futures::compat::*;
+use futures::compat::Future01CompatExt;
 use jsonrpc_core::IoHandler;
 use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt};
 

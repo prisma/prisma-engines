@@ -1,6 +1,6 @@
 use super::MigrationCommand;
-use crate::{migration_engine::MigrationEngine, parse_datamodel, CoreResult};
-use migration_connector::list_migrations;
+use crate::{api::MigrationApi, parse_datamodel, CoreResult};
+use migration_connector::{list_migrations, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
 /// Development command for migrations. Evaluate the data loss induced by the
@@ -50,11 +50,7 @@ impl MigrationCommand for EvaluateDataLoss {
     type Input = EvaluateDataLossInput;
     type Output = EvaluateDataLossOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
-    where
-        C: migration_connector::MigrationConnector<DatabaseMigration = D>,
-        D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
-    {
+    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
         let connector = engine.connector();
         let inferrer = connector.database_migration_inferrer();
         let applier = connector.database_migration_step_applier();

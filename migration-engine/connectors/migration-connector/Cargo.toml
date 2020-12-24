@@ -16,3 +16,4 @@ serde_json = { version = "1.0", features = ["float_roundtrip"] }
 sha2 = "0.9.1"
 tracing = "0.1.19"
 tracing-error = "0.1.2"
+enumflags2 = "0.6"

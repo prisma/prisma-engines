@@ -2043,6 +2043,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "datamodel",
+ "enumflags2",
  "serde",
  "serde_json",
  "sha2 0.9.2",
@@ -2059,6 +2060,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "datamodel",
+ "enumflags2",
  "futures 0.3.8",
  "jsonrpc-core",
  "migration-connector",
@@ -2077,6 +2079,7 @@ name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
  "base64 0.13.0",
+ "enumflags2",
  "futures 0.3.8",
  "json-rpc-stdio",
  "migration-connector",
@@ -2107,6 +2110,7 @@ dependencies = [
  "indoc 1.0.3",
  "migration-connector",
  "migration-core",
+ "once_cell",
  "pretty_assertions",
  "prisma-value",
  "quaint",
@@ -2953,6 +2957,7 @@ dependencies = [
  "connection-string",
  "datamodel",
  "datamodel-connector",
+ "enumflags2",
  "feature-flags",
  "futures 0.3.8",
  "graphql-parser",
@@ -3395,6 +3400,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "sql-ddl"
+version = "0.1.0"
+dependencies = [
+ "indoc 1.0.3",
+]
+
+[[package]]
 name = "sql-introspection-connector"
 version = "0.1.0"
 dependencies = [
@@ -3442,6 +3454,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "sql-ddl",
  "sql-schema-describer",
  "tokio",
  "tracing",
@@ -3492,6 +3505,7 @@ dependencies = [
  "prisma-value",
  "quaint",
  "regex",
+ "serde",
  "serde_json",
  "test-macros",
  "test-setup",
@@ -3666,6 +3680,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "colored",
+ "enumflags2",
  "introspection-core",
  "migration-core",
  "serde_json",

@@ -205,3 +205,37 @@ async fn migrations_should_fail_on_an_uninitialized_nonempty_database(api: &Test
 
     Ok(())
 }
+
+// Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
+#[test_each_connector(tags("postgres"))]
+async fn migrations_should_succeed_on_an_uninitialized_nonempty_database_with_postgis_tables(
+    api: &TestApi,
+) -> TestResult {
+    let dm = r#"
+        model Cat {
+            id      Int @id
+            name    String
+        }
+    "#;
+
+    let create_spatial_ref_sys_table = "CREATE TABLE IF NOT EXISTS \"spatial_ref_sys\" ( id SERIAL PRIMARY KEY )";
+    // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
+    let create_geometry_columns_table = "CREATE TABLE IF NOT EXiSTS \"Geometry_columns\" ( id SERIAL PRIMARY KEY )";
+
+    api.database().raw_cmd(create_spatial_ref_sys_table).await?;
+    api.database().raw_cmd(create_geometry_columns_table).await?;
+
+    let directory = api.create_migrations_directory()?;
+
+    api.create_migration("01-init", dm, &directory)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?;
+
+    api.apply_migrations(&directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["01-init"])?;
+
+    Ok(())
+}

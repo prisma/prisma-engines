@@ -321,7 +321,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
