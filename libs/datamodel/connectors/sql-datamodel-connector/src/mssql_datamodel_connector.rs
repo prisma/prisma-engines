@@ -1,4 +1,4 @@
-use datamodel_connector::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+use datamodel_connector::connector_error::ConnectorError;
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
@@ -104,7 +104,7 @@ impl Connector for MsSqlDatamodelConnector {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
-                let error = ConnectorErrorFactory::new(native_type, self.name());
+                let error = self.native_instance_error(native_type);
 
                 match r#type {
                     Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
@@ -152,7 +152,7 @@ impl Connector for MsSqlDatamodelConnector {
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
                     let r#type: MsSqlType = native_type.deserialize_native_type();
-                    let error = ConnectorErrorFactory::new(native_type, self.name());
+                    let error = self.native_instance_error(native_type);
 
                     if heap_allocated_types().contains(&r#type) {
                         return if index_definition.tpe == IndexType::Unique {
@@ -170,10 +170,11 @@ impl Connector for MsSqlDatamodelConnector {
 
             if let FieldType::NativeType(_, native_type) = field.field_type() {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
-                let error = ConnectorErrorFactory::new(native_type, self.name());
 
                 if heap_allocated_types().contains(&r#type) {
-                    return error.new_incompatible_native_type_with_id();
+                    return self
+                        .native_instance_error(native_type)
+                        .new_incompatible_native_type_with_id();
                 }
             }
         }
@@ -264,10 +265,7 @@ impl Connector for MsSqlDatamodelConnector {
                 &native_type,
             ))
         } else {
-            Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                native_type: constructor_name.to_string(),
-                connector_name: self.name(),
-            }))
+            self.native_str_error(constructor_name).native_type_name_unknown()
         }
     }
 }

@@ -1,4 +1,4 @@
-use datamodel_connector::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+use datamodel_connector::connector_error::ConnectorError;
 use datamodel_connector::helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
@@ -165,7 +165,7 @@ impl Connector for MySqlDatamodelConnector {
             FieldType::NativeType(_, native_type_instance) => {
                 let native_type_name = native_type_instance.name.as_str();
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
-                let error = ConnectorErrorFactory::new(native_type_instance.clone(), self.name());
+                let error = self.native_instance_error(native_type_instance.clone());
                 let incompatible_with_key =
                     NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name);
 
@@ -203,13 +203,14 @@ impl Connector for MySqlDatamodelConnector {
             for f in fields {
                 if let FieldType::NativeType(_, native_type) = f.field_type() {
                     let native_type_name = native_type.name.as_str();
-                    let error = ConnectorErrorFactory::new(native_type.clone(), self.name());
 
                     if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
                         return if index_definition.tpe == IndexType::Unique {
-                            error.new_incompatible_native_type_with_unique()
+                            self.native_instance_error(native_type.clone())
+                                .new_incompatible_native_type_with_unique()
                         } else {
-                            error.new_incompatible_native_type_with_index()
+                            self.native_instance_error(native_type.clone())
+                                .new_incompatible_native_type_with_index()
                         };
                     }
                 }
@@ -219,9 +220,10 @@ impl Connector for MySqlDatamodelConnector {
             let field = model.find_field(id_field).unwrap();
             if let FieldType::NativeType(_, native_type) = field.field_type() {
                 let native_type_name = native_type.name.as_str();
-                let error = ConnectorErrorFactory::new(native_type.clone(), self.name());
                 if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
-                    return error.new_incompatible_native_type_with_id();
+                    return self
+                        .native_instance_error(native_type.clone())
+                        .new_incompatible_native_type_with_id();
                 }
             }
         }
@@ -326,10 +328,7 @@ impl Connector for MySqlDatamodelConnector {
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {
-            Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                native_type: constructor_name.to_string(),
-                connector_name: self.name(),
-            }))
+            self.native_str_error(constructor_name).native_type_name_unknown()
         }
     }
 }

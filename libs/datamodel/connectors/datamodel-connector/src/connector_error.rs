@@ -71,6 +71,13 @@ impl ConnectorErrorFactory {
             message: String::from(message),
         }))
     }
+
+    pub fn native_type_name_unknown(self) -> Result<NativeTypeInstance, ConnectorError> {
+        Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+            native_type: self.native_type,
+            connector_name: self.connector,
+        }))
+    }
 }
 
 impl ConnectorError {

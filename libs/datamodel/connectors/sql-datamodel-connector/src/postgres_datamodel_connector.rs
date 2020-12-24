@@ -1,4 +1,4 @@
-use datamodel_connector::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+use datamodel_connector::connector_error::ConnectorError;
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::default_value::DefaultValue;
@@ -132,7 +132,7 @@ impl Connector for PostgresDatamodelConnector {
         match field.field_type() {
             FieldType::NativeType(_scalar_type, native_type_instance) => {
                 let native_type: PostgresType = native_type_instance.deserialize_native_type();
-                let error = ConnectorErrorFactory::new(native_type_instance, self.name());
+                let error = self.native_instance_error(native_type_instance);
 
                 match native_type {
                     SmallSerial | Serial | BigSerial
@@ -236,10 +236,7 @@ impl Connector for PostgresDatamodelConnector {
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {
-            Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                native_type: constructor_name.parse().unwrap(),
-                connector_name: self.name(),
-            }))
+            self.native_str_error(constructor_name).native_type_name_unknown()
         }
     }
 }
