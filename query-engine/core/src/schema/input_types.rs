@@ -127,11 +127,16 @@ impl InputField {
         self
     }
 
-    pub fn deprecate(mut self, reason: String, since_version: String, planned_removal_version: Option<String>) -> Self {
+    pub fn deprecate<T, S, U>(mut self, reason: T, since_version: S, planned_removal_version: Option<U>) -> Self
+    where
+        T: Into<String>,
+        S: Into<String>,
+        U: Into<String>,
+    {
         self.deprecation = Some(Deprecation {
-            reason,
-            since_version,
-            planned_removal_version,
+            reason: reason.into(),
+            since_version: since_version.into(),
+            planned_removal_version: planned_removal_version.map(Into::into),
         });
 
         self

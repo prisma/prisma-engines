@@ -90,8 +90,10 @@ pub struct DmmfEnum {
 #[serde(rename_all = "camelCase")]
 pub struct DmmfDeprecation {
     pub since_version: String,
-    pub planned_removal_version: Option<String>,
     pub reason: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub planned_removal_version: Option<String>,
 }
 
 impl From<&Deprecation> for DmmfDeprecation {

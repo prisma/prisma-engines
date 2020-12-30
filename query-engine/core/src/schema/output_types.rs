@@ -170,10 +170,14 @@ impl OutputField {
         }
     }
 
-    pub fn deprecate(mut self, reason: String, since_version: String, planned_removal_version: Option<String>) -> Self {
+    pub fn deprecate<T, S>(mut self, reason: T, since_version: S, planned_removal_version: Option<String>) -> Self
+    where
+        T: Into<String>,
+        S: Into<String>,
+    {
         self.deprecation = Some(Deprecation {
-            reason,
-            since_version,
+            reason: reason.into(),
+            since_version: since_version.into(),
             planned_removal_version,
         });
 
