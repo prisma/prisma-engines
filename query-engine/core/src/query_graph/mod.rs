@@ -601,7 +601,7 @@ impl QueryGraph {
 
                 for parent_edge in parents {
                     let parent = self.edge_source(&parent_edge);
-                    let siblings = self.direct_child_pairs(&parent);
+                    let siblings = self.child_pairs(&parent);
 
                     for (_, sibling) in siblings {
                         if sibling != node && !matches!(self.node_content(&sibling).unwrap(), Node::Flow(_)) {
