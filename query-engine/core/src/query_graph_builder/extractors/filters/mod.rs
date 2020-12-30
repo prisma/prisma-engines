@@ -153,13 +153,15 @@ fn extract_scalar_filters(field: &ScalarFieldRef, value: ParsedInputValue) -> Qu
                 None => QueryMode::Default,
             };
 
-            let mut filters = filter_map
+            let mut filters: Vec<Filter> = filter_map
                 .into_iter()
                 .map(|(k, v)| scalar::parse(&k, field, v, false))
-                .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+                .collect::<QueryGraphBuilderResult<Vec<Vec<_>>>>()?
+                .into_iter()
+                .flatten()
+                .collect();
 
             filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
-
             Ok(filters)
         }
         x => Err(QueryGraphBuilderError::InputError(format!(

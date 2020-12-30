@@ -1,5 +1,5 @@
 use super::*;
-use prisma_models::{InternalEnum, PrismaValue, ScalarFieldRef};
+use prisma_models::{InternalEnumRef, PrismaValue, ScalarFieldRef};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum EnumType {
@@ -57,8 +57,8 @@ impl StringEnumType {
     }
 }
 
-impl From<InternalEnum> for EnumType {
-    fn from(internal_enum: InternalEnum) -> EnumType {
+impl From<InternalEnumRef> for EnumType {
+    fn from(internal_enum: InternalEnumRef) -> EnumType {
         EnumType::Database(DatabaseEnumType {
             name: internal_enum.name.clone(),
             internal_enum,
@@ -69,7 +69,7 @@ impl From<InternalEnum> for EnumType {
 #[derive(Debug, Clone, PartialEq)]
 pub struct DatabaseEnumType {
     pub name: String,
-    pub internal_enum: InternalEnum,
+    pub internal_enum: InternalEnumRef,
 }
 
 impl DatabaseEnumType {

@@ -33,5 +33,6 @@ pub fn aggregate(field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult
         args,
         selectors,
         group_by: vec![],
+        having: None,
     }))
 }
