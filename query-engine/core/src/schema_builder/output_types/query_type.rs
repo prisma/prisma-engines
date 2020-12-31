@@ -47,7 +47,7 @@ fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputFi
         .deprecate(
             "The `findOne` query has been deprecated and replaced with `findUnique`.",
             "2.14",
-            None,
+            Some("2.15".to_owned()),
         )
     })
 }
