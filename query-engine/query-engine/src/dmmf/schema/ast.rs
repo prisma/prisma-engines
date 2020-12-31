@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use query_core::Deprecation;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -18,6 +19,9 @@ pub struct DmmfOutputField {
     pub is_required: bool,
     pub is_nullable: bool,
     pub output_type: DmmfTypeReference,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deprecation: Option<DmmfDeprecation>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -49,6 +53,9 @@ pub struct DmmfInputField {
     pub is_required: bool,
     pub is_nullable: bool,
     pub input_types: Vec<DmmfTypeReference>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deprecation: Option<DmmfDeprecation>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -77,4 +84,24 @@ pub enum TypeLocation {
 pub struct DmmfEnum {
     pub name: String,
     pub values: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DmmfDeprecation {
+    pub since_version: String,
+    pub reason: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub planned_removal_version: Option<String>,
+}
+
+impl From<&Deprecation> for DmmfDeprecation {
+    fn from(deprecation: &Deprecation) -> Self {
+        Self {
+            since_version: deprecation.since_version.clone(),
+            planned_removal_version: deprecation.planned_removal_version.clone(),
+            reason: deprecation.reason.clone(),
+        }
+    }
 }
