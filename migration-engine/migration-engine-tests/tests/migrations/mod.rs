@@ -1,4 +1,5 @@
 mod apply_script_tests;
+mod dev_diagnostic_tests;
 mod enums;
 mod indexes;
 mod json;

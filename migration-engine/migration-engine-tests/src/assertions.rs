@@ -364,6 +364,20 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_native_type(self, expected: &str) -> AssertionResult<Self> {
+        let found = &self.0.tpe.full_data_type;
+
+        anyhow::ensure!(
+            found == &expected,
+            "Assertion failed. Expected the column native type for `{}` to be `{:?}`, found `{:?}`",
+            self.0.name,
+            expected,
+            found,
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_type_family(self, expected: ColumnTypeFamily) -> AssertionResult<Self> {
         let found = &self.0.tpe.family;
 

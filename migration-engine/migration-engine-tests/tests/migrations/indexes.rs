@@ -274,19 +274,22 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
+async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "customName")
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await;
+            @@unique([field, secondField], name: "customName")
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let index = result
-        .sql_schema
         .table_bang("A")
         .indices
         .iter()
@@ -303,17 +306,22 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
             @@unique([field, secondField])
         }
     "#;
-    let result = api.infer_and_apply(&dm2).await;
-    let indexes = result
-        .sql_schema
+
+    api.schema_push(dm2).send().await?;
+
+    let sql_schema = api.describe_database().await?;
+
+    let indexes = sql_schema
         .table_bang("A")
         .indices
         .iter()
         .filter(|i| i.columns == &["field", "secondField"] && i.name == "A.field_secondField_unique");
     assert_eq!(indexes.count(), 1);
+
+    Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -359,16 +367,20 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
 #[test_each_connector]
 async fn index_updates_with_rename_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField Int
+        model A {
+            id Int @id
+            field String
+            secondField Int
 
-                @@unique([field, secondField], name: "customName")
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let index = result
+            @@unique([field, secondField], name: "customName")
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let sql_schema = api.describe_database().await?;
+
+    let index = sql_schema
         .table_bang("A")
         .indices
         .iter()
@@ -411,7 +423,10 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
             @@unique([field, secondField], name: "customName")
         }
     "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
 
     let index = result
         .table_bang("A")

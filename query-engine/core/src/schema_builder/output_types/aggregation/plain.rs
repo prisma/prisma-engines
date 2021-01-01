@@ -20,7 +20,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             "count",
             &model,
             model.fields().scalar(),
-            |_| OutputType::int(),
+            |_, _| OutputType::int(),
             |mut obj| {
                 obj.add_field(field("_all", vec![], OutputType::int(), None));
                 obj
@@ -47,7 +47,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             "sum",
             &model,
             numeric_fields.clone(),
-            map_scalar_output_type,
+            map_scalar_output_type_for_field,
             identity,
         ),
     );
@@ -59,14 +59,21 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             "min",
             &model,
             non_list_fields.clone(),
-            map_scalar_output_type,
+            map_scalar_output_type_for_field,
             identity,
         ),
     );
 
     append_opt(
         &mut object_fields,
-        aggregation_field(ctx, "max", &model, non_list_fields, map_scalar_output_type, identity),
+        aggregation_field(
+            ctx,
+            "max",
+            &model,
+            non_list_fields,
+            map_scalar_output_type_for_field,
+            identity,
+        ),
     );
 
     object.set_fields(object_fields);

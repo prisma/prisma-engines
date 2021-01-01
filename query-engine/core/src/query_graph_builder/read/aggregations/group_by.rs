@@ -2,6 +2,7 @@ use std::convert::TryInto;
 
 use super::*;
 use crate::{query_document::ParsedField, AggregateRecordsQuery, ArgumentListLookup, ParsedInputValue, ReadQuery};
+use connector::Filter;
 use prisma_models::{ModelRef, OrderBy, ScalarFieldRef};
 
 pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderResult<ReadQuery> {
@@ -11,6 +12,10 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
 
     let by_arg = field.arguments.lookup("by").unwrap().value;
     let group_by = extract_grouping(by_arg)?;
+    let having: Option<Filter> = match field.arguments.lookup("having") {
+        Some(having_arg) => Some(extract_filter(having_arg.value.try_into()?, &model)?),
+        None => None,
+    };
 
     let args = extractors::extract_query_args(field.arguments, &model)?;
     let nested_fields = field.nested_fields.unwrap().fields;
@@ -21,7 +26,9 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         .map(|field| resolve_query(field, &model))
         .collect::<QueryGraphBuilderResult<_>>()?;
 
-    verify_selections(&selectors, &group_by).and_then(|_| verify_orderings(&args.order_by, &group_by))?;
+    verify_selections(&selectors, &group_by)
+        .and_then(|_| verify_orderings(&args.order_by, &group_by))
+        .and_then(|_| verify_having(having.as_ref(), &selectors))?;
 
     Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
         name,
@@ -31,12 +38,12 @@ pub fn group_by(mut field: ParsedField, model: ModelRef) -> QueryGraphBuilderRes
         args,
         selectors,
         group_by,
+        having,
     }))
 }
 
-/// Cross checks that the selections of the request are valid with regard to the requested group bys.
-/// Rules:
-/// - Every plain scalar field in the selectors must be present in the group by as well.
+/// Cross checks that the selections of the request are valid with regard to the requested group bys:
+/// Every plain scalar field in the selectors must be present in the group by as well.
 fn verify_selections(selectors: &[AggregationSelection], group_by: &[ScalarFieldRef]) -> QueryGraphBuilderResult<()> {
     let mut missing_fields = vec![];
 
@@ -80,19 +87,70 @@ fn verify_orderings(orderings: &[OrderBy], group_by: &[ScalarFieldRef]) -> Query
     }
 }
 
+/// Cross checks that every scalar field used in `having` is either an aggregate or contained in the selectors.
+fn verify_having(having: Option<&Filter>, selectors: &[AggregationSelection]) -> QueryGraphBuilderResult<()> {
+    if let Some(filter) = having {
+        let having_fields: Vec<&ScalarFieldRef> = collect_scalar_fields(filter);
+        let selector_fields: Vec<&ScalarFieldRef> = selectors
+            .into_iter()
+            .filter_map(|selector| match selector {
+                AggregationSelection::Field(field) => Some(field),
+                _ => None,
+            })
+            .collect();
+
+        let missing_fields: Vec<String> = having_fields
+            .into_iter()
+            .filter_map(|field| {
+                if selector_fields.contains(&field) {
+                    None
+                } else {
+                    Some(field.name.clone())
+                }
+            })
+            .collect();
+
+        if missing_fields.is_empty() {
+            Ok(())
+        } else {
+            Err(QueryGraphBuilderError::InputError(format!(
+                    "Every field used in `having` filters must either be an aggregation filter or be included in the selection of the query. Missing fields: {}",
+                    missing_fields.join(", ")
+                )))
+        }
+    } else {
+        Ok(())
+    }
+}
+
+/// Collects all flat scalar fields that are used in the having filter.
+fn collect_scalar_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
+    match filter {
+        Filter::And(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::Or(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::Not(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::Scalar(sf) => sf.projection.scalar_fields(),
+        Filter::Aggregation(_) => vec![], // Aggregations have no effect here.
+        _ => unreachable!(),
+    }
+}
+
 fn extract_grouping(value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<ScalarFieldRef>> {
     match value {
         ParsedInputValue::ScalarField(field) => Ok(vec![field]),
 
-        ParsedInputValue::List(list) => list
+        ParsedInputValue::List(list) if list.len() > 0 => list
             .into_iter()
             .map(|item| Ok(item.try_into()?))
             .collect::<QueryGraphBuilderResult<Vec<ScalarFieldRef>>>(),
 
-        _ => {
-            return Err(QueryGraphBuilderError::InputError(
-                "Expected parsing to guarantee either a single enum or list a list of enums is provided for group by `by` arg.".to_owned(),
-            ))
-        }
+        ParsedInputValue::List(list) if list.len() == 0 => Err(QueryGraphBuilderError::InputError(
+            "At least one selection is required for the `by` argument.".to_owned(),
+        )),
+
+        _ => Err(QueryGraphBuilderError::InputError(
+            "Expected parsing to guarantee either a single enum or a list of enums is provided for group by `by` arg."
+                .to_owned(),
+        )),
     }
 }

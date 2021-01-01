@@ -1,6 +1,6 @@
 use super::MigrationCommand;
-use crate::{parse_datamodel, CoreResult};
-use migration_connector::{ConnectorError, DatabaseMigrationMarker, MigrationConnector};
+use crate::{api::MigrationApi, parse_datamodel, CoreResult};
+use migration_connector::{ConnectorError, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
 /// Command to bring the local database in sync with the prisma schema, without
@@ -12,14 +12,7 @@ impl MigrationCommand for SchemaPushCommand {
     type Input = SchemaPushInput;
     type Output = SchemaPushOutput;
 
-    async fn execute<C, D>(
-        input: &Self::Input,
-        engine: &crate::migration_engine::MigrationEngine<C, D>,
-    ) -> CoreResult<Self::Output>
-    where
-        C: MigrationConnector<DatabaseMigration = D>,
-        D: DatabaseMigrationMarker + Send + Sync + 'static,
-    {
+    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
         let connector = engine.connector();
         let schema = parse_datamodel(&input.schema)?;
         let inferrer = connector.database_migration_inferrer();

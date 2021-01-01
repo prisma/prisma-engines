@@ -1,4 +1,5 @@
 use crate::*;
+use enumflags2::BitFlags;
 use migration_core::{
     commands::{
         CreateMigrationOutput, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
@@ -833,7 +834,7 @@ async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) ->
         dbport = port,
     );
 
-    let migration_api = migration_api(&datamodel, Vec::new()).await?;
+    let migration_api = migration_api(&datamodel, BitFlags::empty()).await?;
 
     let output = migration_api
         .diagnose_migration_history(&DiagnoseMigrationHistoryInput {
@@ -884,7 +885,7 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
         dbport = port,
     );
 
-    let migration_api = migration_api(&datamodel, Vec::new()).await?;
+    let migration_api = migration_api(&datamodel, BitFlags::empty()).await?;
 
     let output = migration_api
         .diagnose_migration_history(&DiagnoseMigrationHistoryInput {
@@ -941,7 +942,7 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
         dbport = port,
     );
 
-    let migration_api = migration_api(&datamodel, Vec::new()).await?;
+    let migration_api = migration_api(&datamodel, BitFlags::empty()).await?;
 
     let output = migration_api
         .diagnose_migration_history(&DiagnoseMigrationHistoryInput {

@@ -148,14 +148,15 @@ pub async fn get_related_m2m_record_ids(
 pub async fn aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
+    query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
-    query_arguments: QueryArguments,
+    having: Option<Filter>,
 ) -> crate::Result<Vec<AggregationRow>> {
     if group_by.len() > 0 {
-        group_by_aggregate(conn, model, selections, group_by, query_arguments).await
+        group_by_aggregate(conn, model, query_arguments, selections, group_by, having).await
     } else {
-        plain_aggregate(conn, model, selections, query_arguments)
+        plain_aggregate(conn, model, query_arguments, selections)
             .await
             .map(|v| vec![v])
     }
@@ -164,8 +165,8 @@ pub async fn aggregate(
 async fn plain_aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
-    selections: Vec<AggregationSelection>,
     query_arguments: QueryArguments,
+    selections: Vec<AggregationSelection>,
 ) -> crate::Result<Vec<AggregationResult>> {
     let query = read::aggregate(model, &selections, query_arguments);
 
@@ -185,11 +186,12 @@ async fn plain_aggregate(
 async fn group_by_aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
+    query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
-    query_arguments: QueryArguments,
+    having: Option<Filter>,
 ) -> crate::Result<Vec<AggregationRow>> {
-    let query = read::group_by_aggregate(model, group_by, &selections, query_arguments);
+    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having);
 
     let idents: Vec<_> = selections
         .iter()

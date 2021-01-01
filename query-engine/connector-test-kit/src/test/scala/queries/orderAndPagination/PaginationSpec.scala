@@ -73,8 +73,6 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A cursor (on ID) query with a descending order on a non-unique field" should "return all records after and including the cursor" in {
-    // This test checks that the result is implicitly ordered by ID ASC to guarantee a stable ordering of results, because a non-unique field
-    // can't guarantee a stable ordering in itself.
     val data = server
       .query(
         """
@@ -96,8 +94,6 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A cursor (on ID) query with an ascending order on a non-unique field" should "return all records after and including the cursor" in {
-    // This test checks that the result is implicitly ordered by ID ASC to guarantee a stable ordering of results, because a non-unique field
-    // can't guarantee a stable ordering in itself.
     val data = server
       .query(
         """
@@ -752,7 +748,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
         legacy = false
       )
 
-    // Ordered: desc, ASC, ASC, DESC
+    // Ordered: DESC, ASC, ASC, DESC
     // The order is at the discretion of the db, possible result options:
     // - 3 and 5 are included in the result: (3, 5, 2) | (5, 3, 2)
     // - Only 3 or only 5 are included in the result: (3, 2, 1) | (5, 2, 1)
@@ -789,7 +785,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
         legacy = false
       )
 
-    // Ordered (reverse from test #1): asc, DESC, DESC, ASC
+    // Ordered (reverse from test #1): ASC, DESC, DESC, ASC
     // The order is at the discretion of the db, possible result options (cursor on 4):
     // - 3 and 5 are included in the result: (3, 5, 6) | (5, 3, 6)
     // - Only 3 or only 5 are included in the result: (3, 6) | (5, 6)

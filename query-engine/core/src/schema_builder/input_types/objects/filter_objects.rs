@@ -1,8 +1,13 @@
 use super::*;
 use std::sync::Arc;
 
-pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}ScalarWhereInput", model.name), PRISMA_NAMESPACE);
+pub(crate) fn scalar_filter_object_type(
+    ctx: &mut BuilderContext,
+    model: &ModelRef,
+    include_aggregates: bool,
+) -> InputObjectTypeWeakRef {
+    let aggregate = if include_aggregates { "WithAggregates" } else { "" };
+    let ident = Identifier::new(format!("{}ScalarWhere{}Input", model.name, aggregate), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
     let input_object = Arc::new(init_input_object_type(ident.clone()));
@@ -28,7 +33,7 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
     ];
 
     input_fields.extend(model.fields().all.iter().filter_map(|f| match f {
-        ModelField::Scalar(_) => Some(input_fields::filter_input_field(ctx, f)),
+        ModelField::Scalar(_) => Some(input_fields::filter_input_field(ctx, f, include_aggregates)),
         ModelField::Relation(_) => None,
     }));
 
@@ -67,7 +72,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
             .fields()
             .all
             .iter()
-            .map(|f| input_fields::filter_input_field(ctx, f)),
+            .map(|f| input_fields::filter_input_field(ctx, f, false)),
     );
 
     input_object.set_fields(fields);
@@ -91,7 +96,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
         .into_iter()
         .map(|sf| {
             let name = sf.name.clone();
-            let typ = map_scalar_input_type(&sf);
+            let typ = map_scalar_input_type_for_field(ctx, &sf);
 
             input_field(name, typ, None).optional()
         })
@@ -155,7 +160,7 @@ fn compound_field_unique_object_type(
         .into_iter()
         .map(|field| {
             let name = field.name.clone();
-            let typ = map_scalar_input_type(&field);
+            let typ = map_scalar_input_type_for_field(ctx, &field);
 
             input_field(name, typ, None)
         })

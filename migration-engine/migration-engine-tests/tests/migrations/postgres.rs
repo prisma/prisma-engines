@@ -38,7 +38,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(capabilities("scalar_lists"))]
-async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestApi) {
+async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource pg {
             provider = "postgres"
@@ -56,7 +56,10 @@ async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestA
             ERROR
         }
     "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
 
     let table_for_a = result.table_bang("A");
     let string_column = table_for_a.column_bang("strings");
@@ -66,6 +69,8 @@ async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestA
     let enum_column = table_for_a.column_bang("enums");
     assert_eq!(enum_column.tpe.family, ColumnTypeFamily::Enum("Status".to_owned()));
     assert_eq!(enum_column.tpe.arity, ColumnArity::List);
+
+    Ok(())
 }
 
 // Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599

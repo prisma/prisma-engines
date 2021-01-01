@@ -2,12 +2,12 @@
 
 #![deny(missing_docs)]
 
-use std::fmt;
-
 use crate::{
     Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index,
     IndexType, PrimaryKey, SqlSchema, Table,
 };
+use serde::de::DeserializeOwned;
+use std::fmt;
 
 /// Traverse all the columns in the schema.
 pub fn walk_columns(schema: &SqlSchema) -> impl Iterator<Item = ColumnWalker<'_>> {
@@ -84,6 +84,18 @@ impl<'a> ColumnWalker<'a> {
     /// The full column type.
     pub fn column_type(&self) -> &'a ColumnType {
         &self.column().tpe
+    }
+
+    /// The column native type.
+    pub fn column_native_type<T>(&self) -> Option<T>
+    where
+        T: DeserializeOwned,
+    {
+        self.column()
+            .tpe
+            .native_type
+            .as_ref()
+            .map(|val| serde_json::from_value(val.clone()).unwrap())
     }
 
     /// Is this column an auto-incrementing integer?
@@ -288,7 +300,7 @@ impl<'a> fmt::Debug for ForeignKeyWalker<'a> {
 
 impl<'schema> ForeignKeyWalker<'schema> {
     /// The names of the foreign key columns on the referencing table.
-    pub fn constrained_column_names(&self) -> &[String] {
+    pub fn constrained_column_names(&self) -> &'schema [String] {
         &self.foreign_key().columns
     }
 
@@ -333,7 +345,7 @@ impl<'schema> ForeignKeyWalker<'schema> {
     }
 
     /// The names of the columns referenced by the foreign key on the referenced table.
-    pub fn referenced_column_names(&self) -> &[String] {
+    pub fn referenced_column_names(&self) -> &'schema [String] {
         &self.foreign_key().referenced_columns
     }
 

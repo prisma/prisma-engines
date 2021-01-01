@@ -5,18 +5,16 @@
 #[allow(missing_docs)]
 pub mod api;
 pub mod commands;
-#[allow(missing_docs)]
-pub mod migration;
-#[allow(missing_docs)]
-pub mod migration_engine;
 
 mod core_error;
 mod gate_keeper;
 
 use anyhow::anyhow;
 pub use api::GenericApi;
-pub use commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput, SchemaPushInput};
+use api::MigrationApi;
+pub use commands::SchemaPushInput;
 pub use core_error::{CoreError, CoreResult};
+use enumflags2::BitFlags;
 pub use gate_keeper::GateKeeper;
 
 use commands::{MigrationCommand, SchemaPushCommand};
@@ -25,8 +23,7 @@ use datamodel::{
     dml::Datamodel,
     Configuration,
 };
-use migration_connector::ConnectorError;
-use migration_engine::MigrationEngine;
+use migration_connector::{features, ConnectorError, MigrationFeature};
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
@@ -34,11 +31,12 @@ use user_facing_errors::{common::InvalidDatabaseString, migration_engine::Deprec
 /// Top-level constructor for the migration engine API.
 pub async fn migration_api(
     datamodel: &str,
-    enabled_preview_features: Vec<String>,
+    enabled_preview_features: BitFlags<MigrationFeature>,
 ) -> CoreResult<Arc<dyn api::GenericApi>> {
     let config = parse_configuration(datamodel)?;
+    let features = features::from_config(&config);
 
-    GateKeeper::new(enabled_preview_features).any_blocked(config.preview_features())?;
+    GateKeeper::new(enabled_preview_features).any_blocked(features)?;
 
     let source = config
         .datasources
@@ -80,16 +78,16 @@ pub async fn migration_api(
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            SqlMigrationConnector::new(u.as_str()).await?
+            SqlMigrationConnector::new(u.as_str(), features).await?
         }
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
-            SqlMigrationConnector::new(&source.url().value).await?
+            SqlMigrationConnector::new(&source.url().value, features).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
 
-    let api = api::MigrationApi::new(connector).await?;
+    let api = api::MigrationApi::new(connector);
 
     Ok(Arc::new(api))
 }
@@ -147,6 +145,7 @@ pub async fn drop_database(schema: &str) -> CoreResult<()> {
 /// Database setup for connector-test-kit.
 pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
     let config = parse_configuration(prisma_schema)?;
+    let features = features::from_config(&config);
 
     let source = config
         .datasources
@@ -165,11 +164,12 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
-            SqlMigrationConnector::new(&source.url().value).await?
+            SqlMigrationConnector::new(&source.url().value, features).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
-    let engine = MigrationEngine::new(connector).await?;
+
+    let engine = MigrationApi::new(connector);
 
     // 2. create the database schema for given Prisma schema
     let schema_push_input = SchemaPushInput {
@@ -177,6 +177,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         assume_empty: true,
         force: true,
     };
+
     SchemaPushCommand::execute(&schema_push_input, &engine).await?;
 
     Ok(())
@@ -188,7 +189,7 @@ fn parse_configuration(datamodel: &str) -> CoreResult<Configuration> {
         .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
 }
 
-pub(crate) fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
+fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
     datamodel::parse_datamodel(&datamodel)
         .map(|d| d.subject)
         .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
@@ -208,7 +209,7 @@ mod tests {
             }
         "#;
 
-        let err = migration_api(datamodel, Vec::new())
+        let err = migration_api(datamodel, BitFlags::empty())
             .await
             .map(drop)
             .unwrap_err()

@@ -58,6 +58,7 @@ serial_test = "*"
 sql-migration-connector = {path = "../../migration-engine/connectors/sql-migration-connector"}
 test-macros = {path = "../../libs/test-macros"}
 test-setup = {path = "../../libs/test-setup"}
+enumflags2 = "0.6"
 
 [dev-dependencies.quaint]
 git = "https://github.com/prisma/quaint"

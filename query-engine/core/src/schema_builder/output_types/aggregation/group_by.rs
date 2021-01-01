@@ -1,4 +1,3 @@
-use super::output_objects::map_scalar_output_type;
 use super::*;
 use std::convert::identity;
 
@@ -13,7 +12,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
     let object = Arc::new(ObjectType::new(ident.clone(), Some(ModelRef::clone(model))));
 
     // Model fields that can be grouped by value.
-    let mut object_fields = scalar_fields(model);
+    let mut object_fields = scalar_fields(ctx, model);
 
     // Fields used in aggregations
     let non_list_fields = collect_non_list_fields(model);
@@ -27,7 +26,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             "count",
             &model,
             model.fields().scalar(),
-            |_| OutputType::int(),
+            |_, _| OutputType::int(),
             |mut obj| {
                 obj.add_field(field("_all", vec![], OutputType::int(), None));
                 obj
@@ -54,7 +53,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             "sum",
             &model,
             numeric_fields.clone(),
-            map_scalar_output_type,
+            map_scalar_output_type_for_field,
             identity,
         ),
     );
@@ -66,14 +65,21 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             "min",
             &model,
             non_list_fields.clone(),
-            map_scalar_output_type,
+            map_scalar_output_type_for_field,
             identity,
         ),
     );
 
     append_opt(
         &mut object_fields,
-        aggregation_field(ctx, "max", &model, non_list_fields, map_scalar_output_type, identity),
+        aggregation_field(
+            ctx,
+            "max",
+            &model,
+            non_list_fields,
+            map_scalar_output_type_for_field,
+            identity,
+        ),
     );
 
     object.set_fields(object_fields);
@@ -82,11 +88,11 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
     ObjectTypeStrongRef::downgrade(&object)
 }
 
-fn scalar_fields(model: &ModelRef) -> Vec<OutputField> {
+fn scalar_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
     let fields = model.fields().scalar();
 
     fields
         .into_iter()
-        .map(|f| field(f.name.clone(), vec![], map_scalar_output_type(&f), None).optional())
+        .map(|f| field(f.name.clone(), vec![], map_scalar_output_type_for_field(ctx, &f), None).optional())
         .collect()
 }

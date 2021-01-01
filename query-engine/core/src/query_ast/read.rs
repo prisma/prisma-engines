@@ -138,6 +138,7 @@ pub struct AggregateRecordsQuery {
     pub args: QueryArguments,
     pub selectors: Vec<AggregationSelection>,
     pub group_by: Vec<ScalarFieldRef>,
+    pub having: Option<Filter>,
 }
 
 impl FilteredQuery for RecordQuery {

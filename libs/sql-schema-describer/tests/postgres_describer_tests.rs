@@ -896,7 +896,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 
@@ -939,7 +939,7 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         )
     "#;
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 

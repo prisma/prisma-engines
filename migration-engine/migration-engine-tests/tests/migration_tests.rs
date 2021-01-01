@@ -7,8 +7,8 @@ mod existing_data;
 mod existing_databases;
 mod initialization;
 mod list_migration_directories;
-mod migration_persistence;
 mod migrations;
+mod native_types;
 mod reset;
 mod schema_push;
 
@@ -141,19 +141,24 @@ async fn adding_an_optional_field_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
+async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) -> TestResult {
     let dm2 = r#"
-            model Test {
-                specialName String @id @default(cuid())
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+        model Test {
+            specialName String @id @default(cuid())
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
     let column = result.table_bang("Test").column("specialName");
     assert_eq!(column.is_some(), true);
+
+    Ok(())
 }
 
 #[test_each_connector(ignore("sqlite"))]
-async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
             myId Int @id
@@ -161,14 +166,19 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column = result.table_bang("Test").column_bang("myId");
 
-    assert_eq!(column.auto_increment, false);
+    assert!(!column.auto_increment);
+
+    Ok(())
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
             myId Int @id
@@ -176,14 +186,17 @@ async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let column = result.table_bang("Test").column_bang("myId");
+    api.schema_push(dm2).send().await?.assert_green()?;
 
-    assert_eq!(column.auto_increment, true);
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("myId", |col| col.assert_auto_increments())
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
             myId Int @id @default(autoincrement())
@@ -191,7 +204,10 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column = result.table_bang("Test").column_bang("myId");
 
     match api.sql_family() {
@@ -202,6 +218,8 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) 
         }
         _ => assert_eq!(column.auto_increment, true),
     }
+
+    Ok(())
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
@@ -613,71 +631,103 @@ async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_
 }
 
 #[test_each_connector]
-async fn removing_a_scalar_field_must_work(api: &TestApi) {
+async fn removing_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model Test {
-                id String @id @default(cuid())
-                field String
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+        model Test {
+            id String @id @default(cuid())
+            field String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column1 = result.table_bang("Test").column("field");
     assert_eq!(column1.is_some(), true);
 
     let dm2 = r#"
-            model Test {
-                id String @id @default(cuid())
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+        model Test {
+            id String @id @default(cuid())
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column2 = result.table_bang("Test").column("field");
-    assert_eq!(column2.is_some(), false);
+
+    assert!(column2.is_none());
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) {
+async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model Group {
-                id String @id @default(cuid())
-                field String
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+        model Group {
+            id String @id @default(cuid())
+            field String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column = result.table_bang("Group").column_bang("field");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
 
     let dm2 = r#"
-            model Group {
-                id String @id @default(cuid())
-                field Int
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+        model Group {
+            id String @id @default(cuid())
+            field Int
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column = result.table_bang("Group").column_bang("field");
+
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) {
+async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model Test {
-                id String @id @default(cuid())
-                Group String
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+        model Test {
+            id String @id @default(cuid())
+            Group String
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column = result.table_bang("Test").column_bang("Group");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
 
     let dm2 = r#"
-            model Test {
-                id String @id @default(cuid())
-                Group Int
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+        model Test {
+            id String @id @default(cuid())
+            Group Int
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let column = result.table_bang("Test").column_bang("Group");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -824,7 +874,9 @@ async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) -> TestResu
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
     assert_eq!(result.table_bang("A").column("name1").is_some(), false);
     assert_eq!(result.table_bang("A").column("name2").is_some(), true);
 
@@ -898,7 +950,11 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
             id Int @id
         }
     "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("A");
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -1028,7 +1084,10 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
         }
     "#;
 
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("A");
 
     let b_column = table.column_bang("bid");
@@ -1075,7 +1134,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
 }
 
 #[test_each_connector]
-async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
+async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
@@ -1088,7 +1147,10 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("A");
     let column = table.column_bang("b_column");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -1108,22 +1170,28 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
             on_update_action: ForeignKeyAction::NoAction,
         }]
     );
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestApi) {
+async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                b_id String
-                b B @relation(fields: [b_id], references: [id])
-            }
+        model A {
+            id Int @id
+            b_id String
+            b B @relation(fields: [b_id], references: [id])
+        }
 
-            model B {
-                id String @id @default(cuid())
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+        model B {
+            id String @id @default(cuid())
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("A");
     let column = table.column_bang("b_id");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -1143,6 +1211,8 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
             on_update_action: ForeignKeyAction::NoAction,
         }]
     );
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1190,17 +1260,21 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
 #[test_each_connector]
 async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                b_id Int
-                b B @relation(fields: [b_id], references: [id])
-            }
+        model A {
+            id Int @id
+            b_id Int
+            b B @relation(fields: [b_id], references: [id])
+        }
 
-            model B {
-                id Int @id
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+        model B {
+            id Int @id
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("A");
     assert_eq!(
         table.foreign_keys,
@@ -1220,17 +1294,21 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
     );
 
     let dm2 = r#"
-            model A {
-                id Int @id
-            }
+        model A {
+            id Int @id
+        }
 
-            model B {
-                id Int @id
-                a_id Int
-                a A @relation(fields: [a_id], references: [id])
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+        model B {
+            id Int @id
+            a_id Int
+            a A @relation(fields: [a_id], references: [id])
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let table = result.table_bang("B");
     assert_eq!(
         table.foreign_keys,
@@ -1276,17 +1354,21 @@ async fn adding_a_new_unique_field_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) {
+async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                field String
-                secondField String
+        model A {
+            id Int @id
+            field String
+            secondField String
 
-                @@unique([field, secondField])
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+            @@unique([field, secondField])
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let index = result
         .table_bang("A")
         .indices
@@ -1294,10 +1376,12 @@ async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) {
         .find(|i| i.columns == vec!["field", "secondField"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
+async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
@@ -1305,18 +1389,24 @@ async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) 
         }
     "#;
 
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let index = result
         .table_bang("A")
         .indices
         .iter()
         .find(|i| i.columns == &["custom_field_name"]);
+
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
+async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
@@ -1327,7 +1417,10 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
         }
     "#;
 
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let index = result
         .table_bang("A")
         .indices
@@ -1335,10 +1428,12 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
         .find(|i| i.columns == &["custom_field_name", "second_custom_field_name"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
+
+    Ok(())
 }
 
 #[test_each_connector]
-async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
+async fn removing_an_existing_unique_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id    Int    @id
@@ -1346,7 +1441,10 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let index = result
         .table_bang("A")
         .indices
@@ -1361,13 +1459,19 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let index = result
         .table_bang("A")
         .indices
         .iter()
         .find(|i| i.columns == vec!["field"]);
-    assert_eq!(index.is_some(), false);
+
+    assert!(index.is_none());
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1410,7 +1514,7 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) -> TestResu
 }
 
 #[test_each_connector]
-async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
+async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id    Int    @id
@@ -1418,7 +1522,10 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
@@ -1430,9 +1537,14 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    let result = api.describe_database().await?;
+
     let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
     assert!(index.is_none());
+
+    Ok(())
 }
 
 // TODO: Enable SQL Server when cascading rules are in PSL.
@@ -1458,7 +1570,7 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &TestApi) {
+async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &TestApi) -> TestResult {
     // test case for https://github.com/prisma/lift/issues/148
     let dm_1 = r#"
         model User {
@@ -1477,7 +1589,10 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
             profiles    Profile[]
         }
     "#;
-    let sql_schema = api.infer_and_apply(&dm_1).await.sql_schema;
+
+    api.schema_push(dm_1).send().await?.assert_green()?;
+
+    let sql_schema = api.describe_database().await?;
 
     let index = sql_schema
         .table_bang("_ProfileToSkill")
@@ -1506,8 +1621,8 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
         }
     "#;
 
-    let result = api.infer_and_apply(&dm_2).await;
-    let sql_schema = result.sql_schema;
+    api.schema_push(dm_2).send().await?;
+    let sql_schema = api.describe_database().await?;
 
     let index = sql_schema
         .table_bang("_ProfileToSkill")
@@ -1515,7 +1630,10 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
         .iter()
         .find(|index| index.name == "_ProfileToSkill_AB_unique")
         .expect("index is present");
-    assert_eq!(index.tpe, IndexType::Unique);
+
+    assert!(index.tpe.is_unique());
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1576,7 +1694,7 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
 }
 
 #[test_each_connector]
-async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) {
+async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
             id Int   @id
@@ -1590,7 +1708,8 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
         }
     "#;
 
-    let schema = api.infer_and_apply(dm).await.sql_schema;
+    api.schema_push(dm).send().await?.assert_green()?;
+    let schema = api.describe_database().await?;
 
     let box_table = schema.table_bang("Box");
 
@@ -1601,6 +1720,8 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
     }];
 
     assert_eq!(box_table.indices, expected_indexes);
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1730,7 +1851,9 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
         }
     "#;
 
-    let schema = api.infer_and_apply(dm1).await.sql_schema;
+    api.schema_push(dm1).send().await?;
+
+    let schema = api.describe_database().await?;
 
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
     api.database().query(insert.into()).await.unwrap();
@@ -2311,9 +2434,6 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
 
     api.schema_push(dm1).send().await?.assert_green()?;
 
-    // Drop the existing migrations.
-    api.migration_persistence().await.reset().await?;
-
     let dm2 = r#"
         datasource db {
             provider = "sqlite"
@@ -2326,7 +2446,11 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2)
+        .migration_id(Some("mig2"))
+        .send()
+        .await?
+        .assert_green()?;
 
     Ok(())
 }

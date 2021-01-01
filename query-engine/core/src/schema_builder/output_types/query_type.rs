@@ -17,6 +17,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
             }
 
             append_opt(&mut vec, find_one_field(ctx, &model));
+            append_opt(&mut vec, find_unique_field(ctx, &model));
             vec
         })
         .flatten()
@@ -28,8 +29,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
     (OutputType::Object(Arc::downgrade(&strong_ref)), strong_ref)
 }
 
-/// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.
-/// Find one unique semantics.
+/// Deprecated field. Semantics are identical to `findUnique`.
 fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     arguments::where_unique_argument(ctx, model).map(|arg| {
         let field_name = ctx.pluralize_internal(camel_case(&model.name), format!("findOne{}", model.name));
@@ -41,6 +41,30 @@ fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputFi
             Some(QueryInfo {
                 model: Some(Arc::clone(&model)),
                 tag: QueryTag::FindOne,
+            }),
+        )
+        .optional()
+        .deprecate(
+            "The `findOne` query has been deprecated and replaced with `findUnique`.",
+            "2.14",
+            Some("2.15".to_owned()),
+        )
+    })
+}
+
+/// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.
+/// Find one unique semantics.
+fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
+    arguments::where_unique_argument(ctx, model).map(|arg| {
+        let field_name = ctx.pluralize_internal(camel_case(&model.name), format!("findUnique{}", model.name));
+
+        field(
+            field_name,
+            vec![arg],
+            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::FindUnique,
             }),
         )
         .optional()
