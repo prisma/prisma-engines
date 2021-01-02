@@ -8,9 +8,10 @@ use quaint::{
 };
 use std::{collections::HashMap, str::FromStr};
 
-// define everything as safe first
-// define typemaps
-// run tests and see which ones explode
+// do all safe number casts
+// setup number tests for risky
+// setup number tests for non-castable
+// start thinking about list->scalar , scalar -> list
 
 static ALL: &[&'static str] = &[
     "SmallInt",
@@ -47,12 +48,12 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Decimal(32,16)",
-                "Numeric(32,16)",
+                // "Decimal(32,16)", //todo risky
+                // "Numeric(32,16)", //todo risky
                 "Real",
                 "DoublePrecision",
-                "VarChar(53)",
-                "Char(53)",
+                // "VarChar(53)", //todo risky
+                // "Char(53)",    //todo risky
                 "Text",
                 // "ByteA",
                 // "Timestamp(3)",
@@ -76,12 +77,12 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 // "SmallInt", // todo risky
                 "Integer",
                 "BigInt",
-                "Decimal(32,16)",
-                "Numeric(32,16)",
+                // "Decimal(32,16)",//todo risky
+                // "Numeric(32,16)",//todo risky
                 "Real",
                 "DoublePrecision",
-                "VarChar(53)",
-                "Char(53)",
+                // "VarChar(53)", //todo risky
+                // "Char(53)",    //todo risky
                 "Text",
                 // "ByteA",
                 // "Timestamp(3)",
@@ -105,12 +106,12 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 // "SmallInt", // todo risky
                 // "Integer", // todo risky
                 "BigInt",
-                "Decimal(32,16)",
-                "Numeric(32,16)",
+                // "Decimal(32,16)",//todo risky
+                // "Numeric(32,16)", //todo risky
                 "Real",
                 "DoublePrecision",
-                "VarChar(53)",
-                "Char(53)",
+                // "VarChar(53)", //todo risky
+                // "Char(53)",    //todo risky
                 "Text",
                 // "ByteA",
                 // "Timestamp(3)",
@@ -127,10 +128,123 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 // "JsonB",
             ],
         ),
-        ("Decimal(10,2)", Value::numeric(BigDecimal::from_str("1").unwrap()), ALL),
-        ("Numeric(11,4)", Value::numeric(BigDecimal::from_str("1").unwrap()), ALL),
-        ("Real", Value::float(5.3), ALL),
-        ("DoublePrecision", Value::float(7.5), ALL),
+        (
+            "Decimal(10,2)",
+            Value::numeric(BigDecimal::from_str("1").unwrap()),
+            &[
+                "SmallInt",
+                "Integer",
+                "BigInt",
+                "Decimal(32,16)",
+                "Numeric(32,16)",
+                "Real",
+                "DoublePrecision",
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                "ByteA",
+                "Timestamp(3)",
+                "Timestamptz(3)",
+                "Date",
+                "Time(3)",
+                "Timetz(3)",
+                "Boolean",
+                "Bit(10)",
+                "VarBit(10)",
+                "Uuid",
+                "Xml",
+                "Json",
+                "JsonB",
+            ],
+        ),
+        (
+            "Numeric(11,4)",
+            Value::numeric(BigDecimal::from_str("1").unwrap()),
+            &[
+                "SmallInt",
+                "Integer",
+                "BigInt",
+                "Decimal(32,16)",
+                "Numeric(32,16)",
+                "Real",
+                "DoublePrecision",
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                "ByteA",
+                "Timestamp(3)",
+                "Timestamptz(3)",
+                "Date",
+                "Time(3)",
+                "Timetz(3)",
+                "Boolean",
+                "Bit(10)",
+                "VarBit(10)",
+                "Uuid",
+                "Xml",
+                "Json",
+                "JsonB",
+            ],
+        ),
+        (
+            "Real",
+            Value::float(5.3),
+            &[
+                "SmallInt",
+                "Integer",
+                "BigInt",
+                "Decimal(32,16)",
+                "Numeric(32,16)",
+                "Real",
+                "DoublePrecision",
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                "ByteA",
+                "Timestamp(3)",
+                "Timestamptz(3)",
+                "Date",
+                "Time(3)",
+                "Timetz(3)",
+                "Boolean",
+                "Bit(10)",
+                "VarBit(10)",
+                "Uuid",
+                "Xml",
+                "Json",
+                "JsonB",
+            ],
+        ),
+        (
+            "DoublePrecision",
+            Value::float(7.5),
+            &[
+                "SmallInt",
+                "Integer",
+                "BigInt",
+                "Decimal(32,16)",
+                "Numeric(32,16)",
+                "Real",
+                "DoublePrecision",
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                "ByteA",
+                "Timestamp(3)",
+                "Timestamptz(3)",
+                "Date",
+                "Time(3)",
+                "Timetz(3)",
+                "Boolean",
+                "Bit(10)",
+                "VarBit(10)",
+                "Uuid",
+                "Xml",
+                "Json",
+                "JsonB",
+            ],
+        ),
+        //todo later
         ("VarChar(5)", Value::text("true"), ALL),
         ("Char(5)", Value::text("true"), ALL),
         ("Text", Value::text("true"), ALL),
@@ -187,6 +301,7 @@ fn with_default_params(r#type: &str) -> &str {
         "Integer" => "int4",
         "BigInt" => "int8",
         "Decimal(32,16)" => "numeric",
+        "Decimal(10,2)" => "numeric",
         "Numeric(32,16)" => "numeric",
         "Real" => "float4",
         "DoublePrecision" => "float8",

@@ -292,6 +292,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
         // of digits in total we can have, scale the number of digits on the
         // right side of the comma.
         MsSqlType::Decimal(old_params) | MsSqlType::Numeric(old_params) => {
+            // todo most of these could be safe so we should match on the params as well?
             match next {
                 MsSqlType::TinyInt => RiskyCast,
                 MsSqlType::SmallInt => RiskyCast,

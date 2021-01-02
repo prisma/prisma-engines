@@ -66,7 +66,9 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             data_type: data_type.clone(),
             full_data_type: data_type,
             character_maximum_length: None,
-            family: sql::ColumnTypeFamily::String,
+            family: sql::ColumnTypeFamily::String, //todo this is wrong
+            //maybe we should have a mapping from Native type to ColumnTypeFamily in the datamodel connector
+            //this could be used here and in the describer to remove duplication
             arity: match field.arity() {
                 datamodel::FieldArity::Required => sql::ColumnArity::Required,
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,

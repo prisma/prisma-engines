@@ -1,4 +1,5 @@
 use super::DestructiveChangeCheckerFlavour;
+use crate::flavour::SqlFlavour;
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
@@ -9,6 +10,7 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
+use migration_connector::MigrationFeature;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultKind, DefaultValue};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
@@ -45,6 +47,18 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             )
         }
 
+        let (previous_type, next_type) = if self.features().contains(MigrationFeature::NativeTypes) {
+            (
+                format!("{}", columns.previous().column_type().full_data_type),
+                format!("{}", columns.next().column_type().full_data_type),
+            )
+        } else {
+            (
+                format!("{:?}", columns.previous().column_type_family()),
+                format!("{:?}", columns.next().column_type_family()),
+            )
+        };
+
         match type_change {
             None | Some(ColumnTypeChange::SafeCast) => (),
             Some(ColumnTypeChange::RiskyCast) => {
@@ -52,8 +66,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                     SqlMigrationWarningCheck::RiskyCast {
                         table: columns.previous().table().name().to_owned(),
                         column: columns.previous().name().to_owned(),
-                        previous_type: format!("{:?}", columns.previous().column_type_family()),
-                        next_type: format!("{:?}", columns.next().column_type_family()),
+                        previous_type,
+                        next_type,
                     },
                     step_index,
                 );
@@ -63,8 +77,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                     SqlMigrationWarningCheck::NotCastable {
                         table: columns.previous().table().name().to_owned(),
                         column: columns.previous().name().to_owned(),
-                        previous_type: format!("{:?}", columns.previous().column_type_family()),
-                        next_type: format!("{:?}", columns.next().column_type_family()),
+                        previous_type,
+                        next_type,
                     },
                     step_index,
                 );

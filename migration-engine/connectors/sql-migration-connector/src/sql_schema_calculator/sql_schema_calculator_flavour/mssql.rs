@@ -16,7 +16,8 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     ) -> ColumnType {
         use MsSqlType::*;
         let mssql_type: MsSqlType = native_type_instance.deserialize_native_type();
-
+        // todo should this go into the datamodel connector with all the other native type stuff
+        // maybe under render native type?
         let data_type = match mssql_type {
             TinyInt => "tinyint".to_string(),
             SmallInt => "smallint".to_string(),
@@ -68,7 +69,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
             data_type: data_type.clone(),
             full_data_type: data_type,
             character_maximum_length: None,
-            family: ColumnTypeFamily::String,
+            family: ColumnTypeFamily::String, // todo this is wrong
             arity: match field.arity() {
                 FieldArity::Required => ColumnArity::Required,
                 FieldArity::Optional => ColumnArity::Nullable,
