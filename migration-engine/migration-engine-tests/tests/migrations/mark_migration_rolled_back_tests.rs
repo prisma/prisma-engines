@@ -15,7 +15,7 @@ async fn mark_migration_rolled_back_on_an_empty_database_errors(api: &TestApi) -
 
 #[test_each_connector]
 async fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: &TestApi) -> TestResult {
-    api.imperative_migration_persistence().initialize().await?;
+    api.migration_persistence().initialize().await?;
 
     let err = api.mark_migration_rolled_back("anything").send().await.unwrap_err();
 
@@ -30,7 +30,7 @@ async fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(a
 #[test_each_connector]
 async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
-    let persistence = api.imperative_migration_persistence();
+    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
@@ -112,7 +112,7 @@ async fn mark_migration_rolled_back_with_a_failed_migration_works(api: &TestApi)
 #[test_each_connector]
 async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
-    let persistence = api.imperative_migration_persistence();
+    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
@@ -196,7 +196,7 @@ async fn mark_migration_rolled_back_with_a_successful_migration_errors(api: &Tes
 #[test_each_connector]
 async fn rolling_back_applying_again_then_rolling_back_again_should_error(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
-    let persistence = api.imperative_migration_persistence();
+    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {

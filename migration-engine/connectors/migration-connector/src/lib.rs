@@ -7,7 +7,7 @@ mod database_migration_step_applier;
 mod destructive_change_checker;
 mod error;
 pub mod features;
-mod imperative_migrations_persistence;
+mod migration_persistence;
 
 #[allow(missing_docs)]
 pub mod steps;
@@ -19,9 +19,7 @@ pub use database_migration_step_applier::*;
 pub use destructive_change_checker::*;
 pub use error::*;
 pub use features::MigrationFeature;
-pub use imperative_migrations_persistence::{
-    ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp,
-};
+pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 pub use migrations_directory::{create_migration_directory, list_migrations, ListMigrationsError, MigrationDirectory};
 pub use steps::MigrationStep;
 
@@ -60,8 +58,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
         None
     }
 
-    /// See [ImperativeMigrationPersistence](trait.ImperativeMigrationPersistence.html).
-    fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence;
+    /// See [MigrationPersistence](trait.MigrationPersistence.html).
+    fn migration_persistence(&self) -> &dyn MigrationPersistence;
 
     /// See [DatabaseMigrationInferrer](trait.DatabaseMigrationInferrer.html).
     fn database_migration_inferrer(&self) -> &dyn DatabaseMigrationInferrer<Self::DatabaseMigration>;

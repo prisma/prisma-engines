@@ -10,8 +10,8 @@ mod pair;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
 mod sql_destructive_change_checker;
-mod sql_imperative_migration_persistence;
 mod sql_migration;
+mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
@@ -140,7 +140,7 @@ impl MigrationConnector for SqlMigrationConnector {
         self
     }
 
-    fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence {
+    fn migration_persistence(&self) -> &dyn MigrationPersistence {
         self
     }
 }
