@@ -29,7 +29,7 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
     async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
         // We should take a lock on the migrations table.
 
-        let persistence = engine.connector().new_migration_persistence();
+        let persistence = engine.connector().migration_persistence();
 
         let migration_directory =
             MigrationDirectory::new(Path::new(&input.migrations_directory_path).join(&input.migration_name));

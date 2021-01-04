@@ -6,7 +6,7 @@ pub type Timestamp = chrono::DateTime<chrono::Utc>;
 
 /// Management of imperative migrations state in the database.
 #[async_trait::async_trait]
-pub trait ImperativeMigrationsPersistence: Send + Sync {
+pub trait MigrationPersistence: Send + Sync {
     /// Initialize the migration persistence without checking the database first.
     async fn baseline_initialize(&self) -> ConnectorResult<()>;
 

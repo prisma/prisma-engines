@@ -1,12 +1,12 @@
 use crate::{error::quaint_error_to_connector_error, SqlMigrationConnector};
 use migration_connector::{
-    ConnectorError, ConnectorResult, ImperativeMigrationsPersistence, MigrationRecord, PersistenceNotInitializedError,
+    ConnectorError, ConnectorResult, MigrationPersistence, MigrationRecord, PersistenceNotInitializedError,
 };
 use quaint::{ast::*, error::ErrorKind as QuaintKind};
 use uuid::Uuid;
 
 #[async_trait::async_trait]
-impl ImperativeMigrationsPersistence for SqlMigrationConnector {
+impl MigrationPersistence for SqlMigrationConnector {
     async fn baseline_initialize(&self) -> ConnectorResult<()> {
         self.flavour.create_imperative_migrations_table(&self.conn()).await?;
 

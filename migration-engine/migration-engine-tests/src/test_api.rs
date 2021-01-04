@@ -28,7 +28,7 @@ use super::{
 use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
 use enumflags2::BitFlags;
 use indoc::formatdoc;
-use migration_connector::{ImperativeMigrationsPersistence, MigrationFeature, MigrationRecord};
+use migration_connector::{MigrationFeature, MigrationPersistence, MigrationRecord};
 use migration_core::{
     api::{GenericApi, MigrationApi},
     commands::ApplyScriptInput,
@@ -75,7 +75,7 @@ impl TestApi {
         self.tags.contains(Tags::Mariadb)
     }
 
-    pub fn imperative_migration_persistence<'a>(&'a self) -> &(dyn ImperativeMigrationsPersistence + 'a) {
+    pub fn migration_persistence<'a>(&'a self) -> &(dyn MigrationPersistence + 'a) {
         self.api.connector()
     }
 
