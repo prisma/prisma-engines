@@ -193,8 +193,8 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 }
                 _ => SafeCast,
             },
-            PostgresType::Real => RiskyCast,            //todo depends on params
-            PostgresType::DoublePrecision => RiskyCast, //todo depends on params
+            PostgresType::Real => RiskyCast,            //todo depends on params??
+            PostgresType::DoublePrecision => RiskyCast, //todo depends on params??
             PostgresType::VarChar(length) | PostgresType::Char(length) => match (length, old_params) {
                 // We must fit p digits and a possible sign to our
                 // string, otherwise might truncate.

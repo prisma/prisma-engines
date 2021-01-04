@@ -7,7 +7,9 @@ use quaint::{
     Value,
 };
 use std::{collections::HashMap, str::FromStr};
+use migration_engine_tests::AssertionResult;
 
+// refactor testcase to run all mappings for one type at once
 // do all safe number casts
 // setup number tests for risky
 // setup number tests for non-castable
@@ -132,33 +134,33 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             "Decimal(10,2)",
             Value::numeric(BigDecimal::from_str("1").unwrap()),
             &[
-                "SmallInt",
-                "Integer",
-                "BigInt",
+                // "SmallInt", // todo risky
+                // "Integer", // todo risky
+                // "BigInt",// todo risky
                 "Decimal(32,16)",
                 "Numeric(32,16)",
-                "Real",
-                "DoublePrecision",
+                // "Real", // todo risky
+                // "DoublePrecision",// todo risky
                 "VarChar(53)",
                 "Char(53)",
                 "Text",
-                "ByteA",
-                "Timestamp(3)",
-                "Timestamptz(3)",
-                "Date",
-                "Time(3)",
-                "Timetz(3)",
-                "Boolean",
-                "Bit(10)",
-                "VarBit(10)",
-                "Uuid",
-                "Xml",
-                "Json",
-                "JsonB",
+                // "ByteA",
+                // "Timestamp(3)",
+                // "Timestamptz(3)",
+                // "Date",
+                // "Time(3)",
+                // "Timetz(3)",
+                // "Boolean",
+                // "Bit(10)",
+                // "VarBit(10)",
+                // "Uuid",
+                // "Xml",
+                // "Json",
+                // "JsonB",
             ],
         ),
         (
-            "Numeric(11,4)",
+            "Numeric(5,0)",
             Value::numeric(BigDecimal::from_str("1").unwrap()),
             &[
                 "SmallInt",
@@ -166,53 +168,53 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "BigInt",
                 "Decimal(32,16)",
                 "Numeric(32,16)",
-                "Real",
-                "DoublePrecision",
+                // "Real", // todo not risky due to params
+                // "DoublePrecision",// todo not risky due to params
                 "VarChar(53)",
                 "Char(53)",
                 "Text",
-                "ByteA",
-                "Timestamp(3)",
-                "Timestamptz(3)",
-                "Date",
-                "Time(3)",
-                "Timetz(3)",
-                "Boolean",
-                "Bit(10)",
-                "VarBit(10)",
-                "Uuid",
-                "Xml",
-                "Json",
-                "JsonB",
+                // "ByteA",
+                // "Timestamp(3)",
+                // "Timestamptz(3)",
+                // "Date",
+                // "Time(3)",
+                // "Timetz(3)",
+                // "Boolean",
+                // "Bit(10)",
+                // "VarBit(10)",
+                // "Uuid",
+                // "Xml",
+                // "Json",
+                // "JsonB",
             ],
         ),
         (
             "Real",
             Value::float(5.3),
             &[
-                "SmallInt",
-                "Integer",
-                "BigInt",
-                "Decimal(32,16)",
-                "Numeric(32,16)",
+                // "SmallInt",  //todo risky
+                // "Integer",  //todo risky
+                // "BigInt", //todo risky
+                // "Decimal(32,16)", //todo not risky
+                // "Numeric(32,16)",//todo not risky
                 "Real",
                 "DoublePrecision",
-                "VarChar(53)",
-                "Char(53)",
+                "VarChar(53)", //todo
+                "Char(53)",    // todo
                 "Text",
                 "ByteA",
-                "Timestamp(3)",
-                "Timestamptz(3)",
-                "Date",
-                "Time(3)",
-                "Timetz(3)",
-                "Boolean",
-                "Bit(10)",
-                "VarBit(10)",
-                "Uuid",
-                "Xml",
-                "Json",
-                "JsonB",
+                // "Timestamp(3)",
+                // "Timestamptz(3)",
+                // "Date",
+                // "Time(3)",
+                // "Timetz(3)",
+                // "Boolean",
+                // "Bit(10)",
+                // "VarBit(10)",
+                // "Uuid",
+                // "Xml",
+                // "Json",
+                // "JsonB",
             ],
         ),
         (
@@ -303,6 +305,7 @@ fn with_default_params(r#type: &str) -> &str {
         "Decimal(32,16)" => "numeric",
         "Decimal(10,2)" => "numeric",
         "Numeric(32,16)" => "numeric",
+        "Numeric(5,0)" => "numeric",
         "Real" => "float4",
         "DoublePrecision" => "float8",
         "VarChar(53)" => "varchar",
@@ -323,56 +326,95 @@ fn prisma_type(native_type: &str) -> &str {
 #[test_each_connector(tags("postgres"), features("native_types"))]
 async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
     for (from, seed, casts) in SAFE_CASTS.iter() {
-        for to in *casts {
+        let mut previous_columns = "".to_string();
+        let mut next_columns = "".to_string();
+        let mut insert = Insert::single_into((api.schema_name(), "A"));
+        let mut previous_assertions = vec![];
+        // let mut next_assertions = vec![];
+
+        for (idx, to) in casts.iter().enumerate() {
             println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
 
-            let dm1 = api.native_types_datamodel(format!(
-                r#"
-                model A {{
-                    id Int @id @default(autoincrement()) @test_db.Integer
-                    x  {prisma_type} @test_db.{native_type}
-                }}
-                "#,
+            let column_name = format!("column_{}", idx);
+
+            previous_columns.push_str(&format!(
+                "{column_name}  {prisma_type}? @test_db.{native_type} \n",
                 prisma_type = prisma_type(from),
                 native_type = from,
+                column_name = column_name
             ));
 
-            api.schema_push(&dm1).send().await?.assert_green()?;
-
-            let insert = Insert::single_into((api.schema_name(), "A")).value("x", seed.clone());
-            api.database().insert(insert.into()).await?;
-
-            api.assert_schema().await?.assert_table("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
-                        .assert_native_type(&with_default_params(from).to_lowercase())
-                })
-            })?;
-
-            let dm2 = api.native_types_datamodel(format!(
-                r#"
-                model A {{
-                    id Int @id @default(autoincrement()) @test_db.Integer
-                    x  {prisma_type} @test_db.{native_type}
-                }} 
-                "#,
+            next_columns.push_str(&format!(
+                "{column_name}  {prisma_type}? @test_db.{native_type}\n",
                 prisma_type = prisma_type(to),
                 native_type = to,
+                column_name = column_name
             ));
 
-            api.schema_push(&dm2).send().await?.assert_green()?;
+            insert = insert.value(column_name, seed.clone());
 
-            api.assert_schema().await?.assert_table("A", |table| {
-                table.assert_columns_count(2)?.assert_column("x", |c| {
-                    c.assert_is_required()?
-                        .assert_native_type(&with_default_params(to).to_lowercase())
-                })
-            })?;
-
-            api.database()
-                .raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()))
-                .await?;
+            previous_assertions.push((&column_name, with_default_params(from).to_lowercase()));
+            //
+            // next_assertions.push(|table: TableAssertion| {
+            //     table.assert_column(&column_name, |c| {
+            //             .assert_native_type(&with_default_params(to).to_lowercase())
+            //     })
+            // });
         }
+
+        let dm1 = api.native_types_datamodel(format!(
+            r#"
+                model A {{
+                    id Int @id @default(autoincrement()) @test_db.Integer
+                    {columns}
+                }}
+                "#,
+            columns = previous_columns
+        ));
+
+        api.schema_push(&dm1).send().await?.assert_green()?;
+
+        //inserts
+        api.database().insert(insert.into()).await?;
+
+        //first assertions
+        // api.assert_schema().await?.assert_table("A", |table| {
+        //
+        //
+        //     table.assert_column(column_name, |c| c.assert_native_type(native_type))
+        //     // previous_assertions.iter().map(|(column_name, native_type)|{
+        //     //
+        //     // table.assert_column(column_name, |c| c.assert_native_type(native_type)
+        //     // })
+        // })?;
+
+        let dm2 = api.native_types_datamodel(format!(
+            r#"
+                model A {{
+                    id Int @id @default(autoincrement()) @test_db.Integer
+                    {columns}
+                }}
+                "#,
+            columns = next_columns
+        ));
+
+        api.schema_push(&dm2).send().await?.assert_green()?;
+
+        //second assertions
+
+        api.assert_schema().await?.assert_table("A", |table| {
+            previous_assertions.iter().fold(_, |acc, |)
+
+            table.assert_column("x", |c| {
+                    c.assert_native_type(&with_default_params(to).to_lowercase())
+            }).and_then(table.assert_column("x", |c| {
+                c.assert_native_type(&with_default_params(to).to_lowercase())
+            }))
+        })?;
+
+        api.database()
+            .raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()))
+            .await?;
     }
 
     Ok(())
