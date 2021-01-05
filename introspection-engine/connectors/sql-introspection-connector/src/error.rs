@@ -20,6 +20,9 @@ pub enum SqlError {
     #[error("Error querying the database: {}", _0)]
     QueryError(#[source] anyhow::Error),
 
+    #[error("{}", _0)]
+    CrossSchemaReference(String),
+
     #[error("Database '{}' does not exist", db_name)]
     DatabaseDoesNotExist {
         db_name: String,
@@ -149,6 +152,12 @@ impl SqlError {
                     kind: ErrorKind::InvalidDatabaseUrl(reason),
                 }
             }
+            SqlError::CrossSchemaReference(explanation) => ConnectorError {
+                user_facing_error: Some(KnownError::new(DatabaseSchemaInconsistent {
+                    explanation: explanation.clone(),
+                })),
+                kind: ErrorKind::DatabaseSchemaInconsistent { explanation },
+            },
             error => ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
         }
     }
@@ -195,7 +204,14 @@ impl From<QuaintError> for SqlError {
 
 impl From<sql_schema_describer::DescriberError> for SqlError {
     fn from(error: sql_schema_describer::DescriberError) -> Self {
-        SqlError::QueryError(anyhow::anyhow!("{}", error))
+        match error.kind() {
+            sql_schema_describer::DescriberErrorKind::QuaintError(..) => {
+                SqlError::QueryError(anyhow::anyhow!("{}", error))
+            }
+            sql_schema_describer::DescriberErrorKind::CrossSchemaReference { .. } => {
+                SqlError::CrossSchemaReference(format!("{}", error))
+            }
+        }
     }
 }
 

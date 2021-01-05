@@ -281,45 +281,43 @@ impl SqlSchemaDescriber {
     async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
         let sql = r#"
-            SELECT
-                con.oid as "con_id",
-                att2.attname as "child_column",
-                cl.relname as "parent_table",
-                att.attname as "parent_column",
+            SELECT con.oid         as "con_id",
+                att2.attname    as "child_column",
+                cl.relname      as "parent_table",
+                att.attname     as "parent_column",
                 con.confdeltype,
                 con.confupdtype,
-                conname as constraint_name,
+                rel_ns.nspname as "referenced_schema_name",
+                conname         as constraint_name,
                 child,
                 parent,
                 table_name
-            FROM
-            (SELECT
-                    unnest(con1.conkey) as "parent",
-                    unnest(con1.confkey) as "child",
-                    cl.relname AS table_name,
-                    generate_subscripts(con1.conkey, 1) AS colidx,
-                    con1.oid,
-                    con1.confrelid,
-                    con1.conrelid,
-                    con1.conname,
-                    con1.confdeltype,
-                    con1.confupdtype
-                FROM
-                    pg_class cl
-                    join pg_namespace ns on cl.relnamespace = ns.oid
-                    join pg_constraint con1 on con1.conrelid = cl.oid
+            FROM (SELECT unnest(con1.conkey)                 as "parent",
+                        unnest(con1.confkey)                as "child",
+                        cl.relname                          AS table_name,
+                        ns.nspname                          AS schema_name,
+                        generate_subscripts(con1.conkey, 1) AS colidx,
+                        con1.oid,
+                        con1.confrelid,
+                        con1.conrelid,
+                        con1.conname,
+                        con1.confdeltype,
+                        con1.confupdtype
+                FROM pg_class cl
+                        join pg_constraint con1 on con1.conrelid = cl.oid
+                        join pg_namespace ns on cl.relnamespace = ns.oid
                 WHERE
                     ns.nspname = $1
                     and con1.contype = 'f'
-                    ORDER BY colidx
-            ) con
-            JOIN pg_attribute att on
-                att.attrelid = con.confrelid and att.attnum = con.child
-            JOIN pg_class cl on
-                cl.oid = con.confrelid
-            JOIN pg_attribute att2 on
-                att2.attrelid = con.conrelid and att2.attnum = con.parent
-            ORDER BY con_id, con.colidx"#;
+                ORDER BY colidx
+                ) con
+                    JOIN pg_attribute att on att.attrelid = con.confrelid and att.attnum = con.child
+                    JOIN pg_class cl on cl.oid = con.confrelid
+                    JOIN pg_attribute att2 on att2.attrelid = con.conrelid and att2.attnum = con.parent
+                    JOIN pg_class rel_cl on con.confrelid = rel_cl.oid
+                    JOIN pg_namespace rel_ns on rel_cl.relnamespace = rel_ns.oid
+            ORDER BY con_id, con.colidx;
+        "#;
 
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID, which we will have to combine into corresponding foreign key
@@ -336,6 +334,16 @@ impl SqlSchemaDescriber {
             let confdeltype = row.get_expect_char("confdeltype");
             let confupdtype = row.get_expect_char("confupdtype");
             let constraint_name = row.get_expect_string("constraint_name");
+
+            let referenced_schema_name = row.get_expect_string("referenced_schema_name");
+
+            if schema != referenced_schema_name {
+                return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
+                    from: format!("{}.{}", schema, table_name),
+                    to: format!("{}.{}", referenced_schema_name, referenced_table),
+                    constraint: constraint_name,
+                }));
+            }
 
             let on_delete_action = match confdeltype {
                 'a' => ForeignKeyAction::NoAction,

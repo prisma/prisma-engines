@@ -5,7 +5,10 @@ use quaint::{connector::PostgresUrl, error::ErrorKind as QuaintKind, prelude::Sq
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::collections::HashMap;
 use url::Url;
-use user_facing_errors::{common::DatabaseDoesNotExist, migration_engine, UserFacingError};
+use user_facing_errors::{
+    common::DatabaseDoesNotExist, introspection_engine::DatabaseSchemaInconsistent, migration_engine, KnownError,
+    UserFacingError,
+};
 
 #[derive(Debug)]
 pub(crate) struct PostgresFlavour(pub(crate) PostgresUrl);
@@ -82,6 +85,13 @@ impl SqlFlavour for PostgresFlavour {
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => {
                     quaint_error_to_connector_error(err, connection.connection_info())
+                }
+                e @ DescriberErrorKind::CrossSchemaReference { .. } => {
+                    let err = KnownError::new(DatabaseSchemaInconsistent {
+                        explanation: format!("{}", e),
+                    });
+
+                    ConnectorError::from(err)
                 }
             })
     }

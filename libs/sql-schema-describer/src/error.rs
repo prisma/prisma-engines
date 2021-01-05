@@ -22,9 +22,23 @@ impl DescriberError {
         self.kind
     }
 
+    /// The `DescriberErrorKind` wrapped by the error.
+    pub fn kind(&self) -> &DescriberErrorKind {
+        &self.kind
+    }
+
     /// The `tracing_error::SpanTrace` contained in the error.
     pub fn span_trace(&self) -> SpanTrace {
         self.context.clone()
+    }
+}
+
+impl From<DescriberErrorKind> for DescriberError {
+    fn from(kind: DescriberErrorKind) -> Self {
+        Self {
+            kind,
+            context: SpanTrace::capture(),
+        }
     }
 }
 
@@ -33,14 +47,39 @@ impl DescriberError {
 pub enum DescriberErrorKind {
     /// An error originating from Quaint or the database.
     QuaintError(quaint::error::Error),
+    /// An illegal cross-schema reference.
+    CrossSchemaReference {
+        /// Qualified path of the source table.
+        from: String,
+        /// Qualified path of the referenced table.
+        to: String,
+        /// Name of the constraint.
+        constraint: String,
+    },
 }
 
 impl Display for DescriberError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self.kind {
-            DescriberErrorKind::QuaintError(err) => {
-                err.fmt(f)?;
+        match self.kind() {
+            DescriberErrorKind::QuaintError(_) => {
+                self.kind().fmt(f)?;
                 self.context.fmt(f)
+            }
+            _ => self.kind().fmt(f),
+        }
+    }
+}
+
+impl Display for DescriberErrorKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::QuaintError(err) => err.fmt(f),
+            Self::CrossSchemaReference { from, to, constraint } => {
+                write!(
+                    f,
+                    "Illegal cross schema reference from `{}` to `{}` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow up the GitHub ticket: https://github.com/prisma/prisma/issues/1175",
+                    from, to, constraint
+                )
             }
         }
     }
@@ -50,6 +89,7 @@ impl Error for DescriberError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match &self.kind {
             DescriberErrorKind::QuaintError(err) => Some(err),
+            DescriberErrorKind::CrossSchemaReference { .. } => None,
         }
     }
 }

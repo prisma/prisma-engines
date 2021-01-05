@@ -9,6 +9,7 @@ use quaint::{
 };
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::str::FromStr;
+use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
 #[derive(Debug)]
 pub(crate) struct MssqlFlavour {
@@ -82,6 +83,13 @@ impl SqlFlavour for MssqlFlavour {
             .map_err(|err| match err.into_kind() {
                 DescriberErrorKind::QuaintError(err) => {
                     quaint_error_to_connector_error(err, connection.connection_info())
+                }
+                e @ DescriberErrorKind::CrossSchemaReference { .. } => {
+                    let err = KnownError::new(DatabaseSchemaInconsistent {
+                        explanation: format!("{}", e),
+                    });
+
+                    ConnectorError::from(err)
                 }
             })
     }
