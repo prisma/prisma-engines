@@ -366,10 +366,7 @@ impl<'a> ColumnAssertion<'a> {
 
     pub fn assert_native_type(self, expected: &str) -> AssertionResult<Self> {
         let found = &self.0.tpe.full_data_type;
-        let found2 = &self.0.tpe.data_type;
 
-        println!("{}", found);
-        println!("{}", found2);
         anyhow::ensure!(
             found == &expected,
             "Assertion failed. Expected the column native type for `{}` to be `{:?}`, found `{:?}`",

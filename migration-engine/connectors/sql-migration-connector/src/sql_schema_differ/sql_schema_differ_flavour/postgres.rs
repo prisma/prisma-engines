@@ -106,6 +106,7 @@ fn family_change_riskyness(previous: &ColumnTypeFamily, next: &ColumnTypeFamily)
 fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
 
+    //todo postgres varchar and char have different behaviour when no precision is defined -.-
     let cast = || match previous {
         PostgresType::SmallInt => match next {
             PostgresType::Integer => SafeCast,
@@ -118,8 +119,8 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::Real => SafeCast,
             PostgresType::DoublePrecision => SafeCast,
             PostgresType::VarChar(param) | PostgresType::Char(param) => match param {
-                // We can have five digits and an optional sign.
-                Some(len) if len < 6 => RiskyCast,
+                // Smallint can have three digits and an optional sign.
+                Some(len) if len < 4 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
             },
@@ -137,7 +138,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::Real => SafeCast,
             PostgresType::DoublePrecision => SafeCast,
             PostgresType::VarChar(param) | PostgresType::Char(param) => match param {
-                // We can have five digits and an optional sign.
+                // Integer can have five digits and an optional sign.
                 Some(len) if len < 6 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
@@ -149,14 +150,14 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::SmallInt => RiskyCast,
             PostgresType::Integer => RiskyCast,
             PostgresType::Decimal(params) | PostgresType::Numeric(params) => match params {
-                // Integer can be at most nineteen digits, so this might fail.
+                // Bigint can be at most nineteen digits, so this might fail.
                 Some((p, s)) if p - s < 19 => RiskyCast,
                 _ => SafeCast,
             },
             PostgresType::Real => SafeCast,
             PostgresType::DoublePrecision => SafeCast,
             PostgresType::VarChar(param) | PostgresType::Char(param) => match param {
-                // We can have twenty digits and an optional sign.
+                // Bigint can have twenty digits and an optional sign.
                 Some(len) if len < 20 => RiskyCast,
                 None => RiskyCast,
                 _ => SafeCast,
@@ -214,51 +215,49 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::SmallInt => RiskyCast,
             PostgresType::Integer => RiskyCast,
             PostgresType::BigInt => RiskyCast,
-            PostgresType::Decimal(_) | PostgresType::Numeric(_) => RiskyCast, //todo depends on params?
+            PostgresType::Decimal(_) | PostgresType::Numeric(_) => RiskyCast,
             PostgresType::Real => SafeCast,
             PostgresType::DoublePrecision => SafeCast,
-            PostgresType::VarChar(_) | PostgresType::Char(_) => RiskyCast, //todo depends on length
+            PostgresType::Char(len) => match len {
+                // If float, we can have 47 characters including the sign and comma.
+                Some(len) if len >= 47 => SafeCast,
+                Some(_) => RiskyCast,
+                // If length not set, char defaults to 1.
+                None => RiskyCast,
+            },
+            PostgresType::VarChar(len) => match len {
+                // If float, we can have 47 characters including the sign and comma.
+                Some(len) if len >= 47 => SafeCast,
+                Some(_) => RiskyCast,
+                // If length not set, varchar has no limit.
+                None => SafeCast,
+            },
             PostgresType::Text => SafeCast,
-            //todo ??
-            PostgresType::ByteA => SafeCast,
-            PostgresType::Timestamp(_) => SafeCast,
-            PostgresType::Timestamptz(_) => SafeCast,
-            PostgresType::Date => SafeCast,
-            PostgresType::Time(_) => SafeCast,
-            PostgresType::Timetz(_) => SafeCast,
-            PostgresType::Boolean => SafeCast,
-            PostgresType::Bit(_) => SafeCast,
-            PostgresType::VarBit(_) => SafeCast,
-            PostgresType::UUID => SafeCast,
-            PostgresType::Xml => SafeCast,
-            PostgresType::JSON => SafeCast,
-            PostgresType::JSONB => SafeCast,
+            _ => NotCastable,
         },
-        //todo
         PostgresType::DoublePrecision => match next {
-            PostgresType::SmallInt => SafeCast,
-            PostgresType::Integer => SafeCast,
-            PostgresType::BigInt => SafeCast,
-            PostgresType::Decimal(_) => SafeCast,
-            PostgresType::Numeric(_) => SafeCast,
-            PostgresType::Real => SafeCast,
+            PostgresType::SmallInt => RiskyCast,
+            PostgresType::Integer => RiskyCast,
+            PostgresType::BigInt => RiskyCast,
+            PostgresType::Decimal(_) | PostgresType::Numeric(_) => SafeCast,
+            PostgresType::Real => RiskyCast,
             PostgresType::DoublePrecision => SafeCast,
-            PostgresType::VarChar(_) => SafeCast,
-            PostgresType::Char(_) => SafeCast,
+            PostgresType::Char(len) => match len {
+                // If double, we can have 317 characters including the sign and comma.
+                Some(len) if len >= 317 => SafeCast,
+                Some(_) => RiskyCast,
+                // If length not set, char defaults to 1.
+                None => RiskyCast,
+            },
+            PostgresType::VarChar(len) => match len {
+                // If double, we can have 317 characters including the sign and comma.
+                Some(len) if len >= 317 => SafeCast,
+                Some(_) => RiskyCast,
+                // If length not set, varchar has no limit.
+                None => SafeCast,
+            },
             PostgresType::Text => SafeCast,
-            PostgresType::ByteA => SafeCast,
-            PostgresType::Timestamp(_) => SafeCast,
-            PostgresType::Timestamptz(_) => SafeCast,
-            PostgresType::Date => SafeCast,
-            PostgresType::Time(_) => SafeCast,
-            PostgresType::Timetz(_) => SafeCast,
-            PostgresType::Boolean => SafeCast,
-            PostgresType::Bit(_) => SafeCast,
-            PostgresType::VarBit(_) => SafeCast,
-            PostgresType::UUID => SafeCast,
-            PostgresType::Xml => SafeCast,
-            PostgresType::JSON => SafeCast,
-            PostgresType::JSONB => SafeCast,
+            _ => NotCastable,
         },
         //todo later
         PostgresType::VarChar(_) => match next {

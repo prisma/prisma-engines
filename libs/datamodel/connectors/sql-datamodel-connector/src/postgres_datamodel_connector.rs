@@ -37,6 +37,9 @@ pub struct PostgresDatamodelConnector {
     constructors: Vec<NativeTypeConstructor>,
 }
 
+//todo this should contain render and parse,
+//then the formatting will be the same in the error messages as in the schema
+
 impl PostgresDatamodelConnector {
     pub fn new() -> PostgresDatamodelConnector {
         let capabilities = vec![

@@ -49,6 +49,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
 
         let (previous_type, next_type) = if self.features().contains(MigrationFeature::NativeTypes) {
             (
+                //todo change this to use the rendered native type like it would look in the schema?
                 format!("{}", columns.previous().column_type().full_data_type),
                 format!("{}", columns.next().column_type().full_data_type),
             )
