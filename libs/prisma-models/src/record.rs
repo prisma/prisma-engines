@@ -1,5 +1,6 @@
 use crate::{DomainError, ModelProjection, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder};
 use std::collections::HashMap;
+use itertools::Itertools;
 
 #[derive(Debug, Clone)]
 pub struct SingleRecord {
@@ -59,6 +60,7 @@ impl ManyRecords {
                     values: v,
                     parent_id: None,
                 })
+                .unique()
                 .collect(),
             field_names: selected_fields.db_names().collect(),
         }
@@ -120,7 +122,7 @@ impl ManyRecords {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
     pub parent_id: Option<RecordProjection>,
