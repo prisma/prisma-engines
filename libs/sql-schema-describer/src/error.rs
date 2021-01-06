@@ -77,7 +77,7 @@ impl Display for DescriberErrorKind {
             Self::CrossSchemaReference { from, to, constraint } => {
                 write!(
                     f,
-                    "Illegal cross schema reference from `{}` to `{}` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow up the GitHub ticket: https://github.com/prisma/prisma/issues/1175",
+                    "Illegal cross schema reference from `{}` to `{}` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175",
                     from, to, constraint
                 )
             }
