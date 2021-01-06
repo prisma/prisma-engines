@@ -298,20 +298,6 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_data_type(self, data_type: &str) -> AssertionResult<Self> {
-        let found = &self.0.tpe.data_type;
-
-        anyhow::ensure!(
-            found == data_type,
-            "Assertion failed: expected the data_type for the `{}` column to be `{}`, found `{}`",
-            self.0.name,
-            data_type,
-            found
-        );
-
-        Ok(self)
-    }
-
     pub fn assert_default(self, expected: Option<DefaultValue>) -> AssertionResult<Self> {
         let found = &self.0.default.as_ref().map(|d| d.kind());
 

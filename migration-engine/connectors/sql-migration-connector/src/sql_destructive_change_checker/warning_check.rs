@@ -91,6 +91,8 @@ impl Check for SqlMigrationWarningCheck {
                 (_, _) => Some(format!("You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column could be lost. The data in that column will be cast from `{old_type}` to `{new_type}`.", column_name = column, table_name = table, old_type = previous_type, new_type = next_type)),
 
             },
+
+            // todo this seems to not be reached when only a table is dropped and recreated
             SqlMigrationWarningCheck::NotCastable { table, column, previous_type, next_type } => match database_check_results.get_row_and_non_null_value_count(table, column) {
                 (Some(0), _) => None, // it's safe to alter a column on an empty table
                 (_, Some(0)) => None, // it's safe to alter a column if it only contains null values

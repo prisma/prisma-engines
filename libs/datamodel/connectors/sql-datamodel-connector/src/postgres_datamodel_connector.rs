@@ -39,6 +39,10 @@ pub struct PostgresDatamodelConnector {
 
 //todo this should contain render and parse,
 //then the formatting will be the same in the error messages as in the schema
+//should it also contain the pretty printed output for SQL rendering?
+//could we then get rid of datatype and fulldatatype?
+// -seems like we need the full data type for types that have no native type definition
+// but we probably do not need both fdt and dt
 
 impl PostgresDatamodelConnector {
     pub fn new() -> PostgresDatamodelConnector {

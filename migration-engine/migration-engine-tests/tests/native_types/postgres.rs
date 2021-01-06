@@ -372,7 +372,6 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
 });
 
 fn with_default_params(r#type: &str) -> &str {
-    println!("{}", r#type);
     match r#type {
         "SmallInt" => "int2",
         "Integer" => "int4",
@@ -382,14 +381,18 @@ fn with_default_params(r#type: &str) -> &str {
         "Numeric(32,16)" => "numeric",
         "Numeric(3,0)" => "numeric",
         "Numeric(2,1)" => "DECIMAL(2, 1)",
+        "Decimal(4,3)" => "DECIMAL(4, 3)",
+        "Decimal(10,9)" => "DECIMAL(10, 9)",
         "Real" => "float4",
         "DoublePrecision" => "float8",
         "VarChar(53)" => "varchar",
         "VarChar(3)" => "VARCHAR(3)",
+        "VarChar(4)" => "VARCHAR(4)",
+        "VarChar(17)" => "VARCHAR(17)",
         "Char(53)" => "bpchar",
         "Char(1)" => "CHAR",
         "VarBinary" => "VarBinary(1)",
-        "Char" => "Char(1)",
+        "Char" => "CHAR",
         _ => r#type,
     }
 }
@@ -488,6 +491,11 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
 
 #[test_each_connector(tags("postgres"), features("native_types"))]
 async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
+    //todo here we seed the columns with data
+    // but since every single column switch is risky and we do not force
+    // we don't execute the migration. This probably should be split into:
+    // - risky and fails with force
+    // - risky but ultimately succeeds
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
@@ -520,7 +528,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
                 "You are about to alter the column `{column_name}` on the `A` table, which contains 1 non-null values. The data in that column will be cast from `{from}` to `{to}`.",
                column_name = column_name,
                 from = with_default_params(from),
-                to = with_default_params(to),
+                to = with_default_params(to).to_uppercase(),
             ).into());
 
             previous_assertions.push((column_name.clone(), with_default_params(from).to_lowercase()).clone());

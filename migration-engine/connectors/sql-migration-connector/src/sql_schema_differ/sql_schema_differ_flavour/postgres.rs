@@ -93,12 +93,18 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 }
 
 fn family_change_riskyness(previous: &ColumnTypeFamily, next: &ColumnTypeFamily) -> Option<ColumnTypeChange> {
+    // todo this is not completely correct yet it seems
+
+    println!("GOT HERE?");
+    println!("{}", previous);
+    println!("{}", next);
     match (previous, next) {
         (previous, next) if previous == next => None,
         (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
         (ColumnTypeFamily::String, ColumnTypeFamily::Int)
         | (ColumnTypeFamily::DateTime, ColumnTypeFamily::Float)
-        | (ColumnTypeFamily::String, ColumnTypeFamily::Float) => Some(ColumnTypeChange::NotCastable),
+        | (ColumnTypeFamily::String, ColumnTypeFamily::Float)
+        | (ColumnTypeFamily::Decimal, ColumnTypeFamily::DateTime) => Some(ColumnTypeChange::NotCastable),
         (_, _) => Some(ColumnTypeChange::RiskyCast),
     }
 }

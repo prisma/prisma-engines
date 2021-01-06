@@ -116,6 +116,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 step_index,
             )
         } else {
+            //todo this is probably due to a not castable type change. we should give that info in the warning
             plan.push_warning(
                 SqlMigrationWarningCheck::DropAndRecreateColumn {
                     column: columns.previous().name().to_owned(),
