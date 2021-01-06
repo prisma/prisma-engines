@@ -267,10 +267,19 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             },
             _ => RiskyCast,
         },
-        //todo later
-        PostgresType::Char(_) => match next {
-            _ => SafeCast,
+        PostgresType::Char(old_param) => match next {
+            PostgresType::Text => SafeCast,
+            PostgresType::VarChar(new_param) | PostgresType::Char(new_param) => match (old_param, new_param) {
+                (None, _) => SafeCast,
+                (Some(1), None) => SafeCast,
+                (Some(_), None) if next_is_char() => RiskyCast,
+                (Some(_), None) => SafeCast,
+                (Some(old_length), Some(new_length)) if old_length > new_length => RiskyCast,
+                _ => SafeCast,
+            },
+            _ => RiskyCast,
         },
+        //todo later
         PostgresType::Text => match next {
             _ => SafeCast,
         },

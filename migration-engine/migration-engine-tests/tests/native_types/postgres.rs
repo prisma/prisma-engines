@@ -99,8 +99,8 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             &["DoublePrecision", "Text"],
         ),
         ("VarChar(5)", Value::text("fiver"), &["VarChar(53)", "Char(53)", "Text"]),
+        ("Char(5)", Value::text("truer"), &["VarChar(53)", "Char(53)", "Text"]),
         //todo later
-        // ("Char(5)", Value::text("true"), ALL),
         // ("Text", Value::text("true"), ALL),
         // ("ByteA", Value::bytes(vec![1]), ALL),
         // ("Timestamp(3)", Value::datetime(Utc::now()), ALL),
@@ -391,6 +391,7 @@ fn with_default_params(r#type: &str) -> &str {
         "VarChar(4)" => "VARCHAR(4)",
         "VarChar(17)" => "VARCHAR(17)",
         "Char(53)" => "bpchar",
+        "Char(5)" => "bpchar",
         "Char(1)" => "CHAR",
         "VarBinary" => "VarBinary(1)",
         "Char" => "CHAR",
