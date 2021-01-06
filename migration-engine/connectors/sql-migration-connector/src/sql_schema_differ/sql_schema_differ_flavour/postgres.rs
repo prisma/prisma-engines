@@ -279,13 +279,19 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             },
             _ => RiskyCast,
         },
-        //todo later
         PostgresType::Text => match next {
-            _ => SafeCast,
+            PostgresType::Text => SafeCast,
+            PostgresType::VarChar(None) => SafeCast,
+            _ => RiskyCast,
         },
         PostgresType::ByteA => match next {
-            _ => SafeCast,
+            PostgresType::Text => SafeCast,
+            PostgresType::VarChar(None) => SafeCast,
+            PostgresType::VarChar(Some(length)) => RiskyCast,
+            PostgresType::Char(param) => RiskyCast,
+            _ => NotCastable,
         },
+        //todo later
         PostgresType::Timestamp(_) => match next {
             _ => SafeCast,
         },

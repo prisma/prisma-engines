@@ -9,7 +9,8 @@ use std::{collections::HashMap, str::FromStr};
 
 // start thinking about list->scalar , scalar -> list
 
-// static ALL: &[&'static str] = &[
+// static ALL: &[&'static str] =
+//     &[
 //     "SmallInt",
 //     "Integer",
 //     "BigInt",
@@ -100,9 +101,9 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         ("VarChar(5)", Value::text("fiver"), &["VarChar(53)", "Char(53)", "Text"]),
         ("Char(5)", Value::text("truer"), &["VarChar(53)", "Char(53)", "Text"]),
+        ("Text", Value::text("true"), &["VarChar", "Text"]),
+        ("ByteA", Value::bytes(vec![1]), &["Text", "VarChar"]),
         //todo later
-        // ("Text", Value::text("true"), ALL),
-        // ("ByteA", Value::bytes(vec![1]), ALL),
         // ("Timestamp(3)", Value::datetime(Utc::now()), ALL),
         // ("Timestamptz(3)", Value::datetime(Utc::now()), ALL),
         // ("Date", Value::date(Utc::today().naive_utc()), ALL),
@@ -171,7 +172,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         // ("VarChar(5)", Value::text("true"), ALL),
         // ("Char(5)", Value::text("true"), ALL),
         // ("Text", Value::text("true"), ALL),
-        // ("ByteA", Value::bytes(vec![1]), ALL),
+        ("ByteA", Value::bytes(vec![1]), &["VarChar(53)", "Char(53)"]),
         // ("Timestamp(3)", Value::datetime(Utc::now()), ALL),
         // ("Timestamptz(3)", Value::datetime(Utc::now()), ALL),
         // ("Date", Value::date(Utc::today().naive_utc()), ALL),
