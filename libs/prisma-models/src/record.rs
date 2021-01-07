@@ -1,6 +1,6 @@
 use crate::{DomainError, ModelProjection, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder};
-use std::collections::HashMap;
 use itertools::Itertools;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct SingleRecord {
