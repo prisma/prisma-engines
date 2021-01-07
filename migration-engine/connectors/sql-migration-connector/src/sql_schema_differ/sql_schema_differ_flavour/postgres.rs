@@ -283,6 +283,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::Text => SafeCast,
             PostgresType::VarChar(None) => SafeCast,
             _ => RiskyCast,
+            // todo not castable
         },
         PostgresType::ByteA => match next {
             PostgresType::Text => SafeCast,

@@ -1,4 +1,5 @@
 use bigdecimal::BigDecimal;
+use chrono::Utc;
 use migration_engine_tests::sql::*;
 use once_cell::sync::Lazy;
 use quaint::{
@@ -34,7 +35,8 @@ use std::{collections::HashMap, str::FromStr};
 //     "Xml",
 //     "Json",
 //     "JsonB",
-// ];
+// ]
+// ;
 
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
@@ -103,8 +105,28 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ("Char(5)", Value::text("truer"), &["VarChar(53)", "Char(53)", "Text"]),
         ("Text", Value::text("true"), &["VarChar", "Text"]),
         ("ByteA", Value::bytes(vec![1]), &["Text", "VarChar"]),
+        (
+            "Timestamp(3)",
+            Value::datetime(Utc::now()),
+            &[
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                "Timestamp(1)",
+                "Timestamptz(3)",
+                "Date",
+                "Time(3)",
+                "Timetz(3)",
+                "Boolean",
+                "Bit(10)",
+                "VarBit(10)",
+                "Uuid",
+                "Xml",
+                "Json",
+                "JsonB",
+            ],
+        ),
         //todo later
-        // ("Timestamp(3)", Value::datetime(Utc::now()), ALL),
         // ("Timestamptz(3)", Value::datetime(Utc::now()), ALL),
         // ("Date", Value::date(Utc::today().naive_utc()), ALL),
         // ("Time(3)", Value::time(Utc::now().naive_utc().time()), ALL),
@@ -119,6 +141,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     ]
 });
 
+//todo have a succeeding and failing seed
 static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
         (
@@ -168,11 +191,12 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Char(53)",
             ],
         ),
-        //todo later
-        // ("VarChar(5)", Value::text("true"), ALL),
-        // ("Char(5)", Value::text("true"), ALL),
-        // ("Text", Value::text("true"), ALL),
-        ("ByteA", Value::bytes(vec![1]), &["VarChar(53)", "Char(53)"]),
+        // todo the text ones could be all kinds of values
+        ("VarChar(5)", Value::text("true"), &["VarChar(3)", "Char(3)", "Char"]),
+        ("Char(5)", Value::text("fiver"), &["VarChar(3)", "Char(3)", "Char"]),
+        ("Text", Value::text("true"), &["VarChar(3)", "Char(3)", "Char"]),
+        ("ByteA", Value::bytes(vec![1]), &["VarChar(3)", "Char(3)", "Char"]),
+        //todo
         // ("Timestamp(3)", Value::datetime(Utc::now()), ALL),
         // ("Timestamptz(3)", Value::datetime(Utc::now()), ALL),
         // ("Date", Value::date(Utc::today().naive_utc()), ALL),
@@ -373,6 +397,7 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
 });
 
 fn with_default_params(r#type: &str) -> &str {
+    println!("{}", r#type);
     match r#type {
         "SmallInt" => "int2",
         "Integer" => "int4",
@@ -396,6 +421,7 @@ fn with_default_params(r#type: &str) -> &str {
         "Char(1)" => "CHAR",
         "VarBinary" => "VarBinary(1)",
         "Char" => "CHAR",
+        "Timestamp(3)" => "timestamp",
         _ => r#type,
     }
 }
