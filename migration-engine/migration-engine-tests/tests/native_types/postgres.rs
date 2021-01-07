@@ -77,7 +77,6 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             &["BigInt", "Real", "DoublePrecision", "VarChar(53)", "Char(53)", "Text"],
         ),
         (
-            // "Decimal(10,2)",
             "Numeric(10,2)",
             Value::numeric(BigDecimal::from_str("12345678.90").unwrap()),
             &["Numeric(32,16)", "VarChar(53)", "Char(53)", "Text"],
@@ -108,7 +107,8 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ("VarChar(5)", Value::text("fiver"), &["VarChar(53)", "Char(53)", "Text"]),
         ("Char(5)", Value::text("truer"), &["VarChar(53)", "Char(53)", "Text"]),
         ("Text", Value::text("true"), &["VarChar", "Text"]),
-        ("ByteA", Value::bytes(vec![1]), &["Text", "VarChar"]),
+        //split into safe and risky/ missing ones are not castable
+        ("ByteA", Value::bytes(b"DEAD".to_vec()), &["Text", "VarChar"]),
         (
             "Timestamp(3)",
             Value::datetime(Utc::now()),
@@ -136,17 +136,48 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Timetz(3)",
             ],
         ),
-        //todo later
-        // ("Date", Value::date(Utc::today().naive_utc()), ALL),
-        // ("Time(3)", Value::time(Utc::now().naive_utc().time()), ALL),
-        // ("Timetz(3)", Value::time(Utc::now().naive_utc().time()), ALL),
-        // ("Boolean", Value::boolean(true), ALL),
-        // ("Bit(10)", Value::bytes(vec![1]), ALL),
-        // ("VarBit(5)", Value::bytes(vec![1]), ALL),
-        // ("Uuid", Value::text("75bf0037-a8b8-4512-beea-5a186f8abf1e"), ALL),
-        // ("Xml", Value::boolean(true), ALL),
-        // ("Json", Value::boolean(true), ALL),
-        // ("JsonB", Value::boolean(true), ALL),
+        (
+            "Date",
+            Value::date(Utc::today().naive_utc()),
+            &["VarChar(53)", "Char(53)", "Text", "Timestamp(3)", "Timestamptz(3)"],
+        ),
+        (
+            "Time(3)",
+            Value::time(Utc::now().naive_utc().time()),
+            &["VarChar(53)", "Char(53)", "Text", "Timetz(3)"],
+        ),
+        (
+            "Timetz(3)",
+            Value::datetime(Utc::now()),
+            &["VarChar(53)", "Char(53)", "Text", "Time(3)", "Timetz(6)"],
+        ),
+        ("Boolean", Value::boolean(true), &["VarChar(53)", "Char(53)", "Text"]),
+        (
+            "Bit(10)",
+            Value::text("0010101001"),
+            &["VarChar(53)", "Char(53)", "Text", "VarBit(10)"],
+        ),
+        (
+            "VarBit(5)",
+            Value::text("00101"),
+            &["VarChar(53)", "Char(53)", "Text", "Bit(5)"],
+        ),
+        (
+            "Uuid",
+            Value::text("75bf0037-a8b8-4512-beea-5a186f8abf1e"),
+            &["VarChar(53)", "Char(53)", "Text"],
+        ),
+        ("Xml", Value::xml("[]"), &["VarChar(53)", "Char(53)", "Text"]),
+        (
+            "Json",
+            Value::json(serde_json::json!({"foo": "bar"})),
+            &["VarChar(53)", "Char(53)", "Text", "JsonB"],
+        ),
+        (
+            "JsonB",
+            Value::json(serde_json::json!({"foo": "bar"})),
+            &["VarChar(53)", "Char(53)", "Text", "Json"],
+        ),
     ]
 });
 
@@ -413,6 +444,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
     let connector = SqlDatamodelConnectors::postgres();
 
     for (from, seed, casts) in SAFE_CASTS.iter() {
+        println!("{}", seed);
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
         let mut insert = Insert::single_into((api.schema_name(), "A"));

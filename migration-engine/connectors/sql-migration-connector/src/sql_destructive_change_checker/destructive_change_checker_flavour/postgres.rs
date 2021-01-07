@@ -54,7 +54,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             //todo handle unsupported
             (
                 datamodel_connector.render_native_type(columns.previous().column_type().native_type.clone().unwrap()),
-                datamodel_connector.render_native_type(dbg!(columns.next().column_type().native_type.clone().unwrap())),
+                datamodel_connector.render_native_type(columns.next().column_type().native_type.clone().unwrap()),
             )
         } else {
             (
