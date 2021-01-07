@@ -15,21 +15,13 @@ class Prisma_933Spec extends FlatSpec with Matchers with ApiSpecBase {
          |  buyer_id Int    @id @default(autoincrement())
          |  name     String?
          |  sales    Sale[]    @relation("BuyersOnSale", references: [sale_id])
-         |  products Product[] @relation("BuyersOnProduct", references: [product_id])
          |}
          |
          |model Sale {
          |  sale_id  Int    @id @default(autoincrement())
          |  buyers   Buyer[]   @relation("BuyersOnSale", references: [buyer_id])
-         |  products Product[] @relation("SalesOnProduct", references: [product_id])
          |}
          |
-         |model Product {
-         |  product_id Int  @id @default(autoincrement())
-         |  name       String?
-         |  buyers     Buyer[] @relation("BuyersOnProduct", references: [buyer_id])
-         |  sales      Sale[]  @relation("SalesOnProduct", references: [sale_id])
-         |}
          |
        """.stripMargin
     }
@@ -42,7 +34,6 @@ class Prisma_933Spec extends FlatSpec with Matchers with ApiSpecBase {
        |   createOneBuyer(
        |    data: {
        |      name: "Foo",
-       |      products: { create: [{ name: "product 1" }, { name: "product2" }] },
        |      sales: {
        |        create: [{}, {}]
        |      }
@@ -52,9 +43,6 @@ class Prisma_933Spec extends FlatSpec with Matchers with ApiSpecBase {
        |     sales {
        |       sale_id
        |     }
-       |     products {
-       |       product_id
-       |     }
        |  }
        |}
       """,
@@ -62,19 +50,6 @@ class Prisma_933Spec extends FlatSpec with Matchers with ApiSpecBase {
       "",
       false
     )
-
-    server.query(
-      """
-       |mutation {
-       |  updateOneSale(
-       |    where: { sale_id: 1 },
-       |    data: { products: { connect: [{ product_id: 1, product_id: 2 }] } }
-       |  ) {
-       |    sale_id
-       |  }
-       |}
-       |
-       """, project, "", false)
 
     val res = server.query(
       """
