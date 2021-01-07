@@ -1,14 +1,13 @@
-use std::collections::HashMap;
-
+use indexmap::IndexMap;
 use query_core::Deprecation;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DmmfSchema {
-    pub input_object_types: HashMap<String, Vec<DmmfInputType>>,
-    pub output_object_types: HashMap<String, Vec<DmmfOutputType>>,
-    pub enum_types: HashMap<String, Vec<DmmfEnum>>,
+    pub input_object_types: IndexMap<String, Vec<DmmfInputType>>,
+    pub output_object_types: IndexMap<String, Vec<DmmfOutputType>>,
+    pub enum_types: IndexMap<String, Vec<DmmfEnum>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
