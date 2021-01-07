@@ -1,3 +1,4 @@
+use datamodel_connector::Connector;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{
     Column, ColumnTypeFamily, DefaultKind, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType,
@@ -350,11 +351,10 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_native_type(self, expected: &str) -> AssertionResult<Self> {
-        let found = &self.0.tpe.full_data_type;
-
+    pub fn assert_native_type(self, expected: &str, connector: &dyn Connector) -> AssertionResult<Self> {
+        let found = connector.render_native_type(self.0.tpe.native_type.clone().unwrap());
         anyhow::ensure!(
-            found == &expected,
+            found == expected,
             "Assertion failed. Expected the column native type for `{}` to be `{:?}`, found `{:?}`",
             self.0.name,
             expected,

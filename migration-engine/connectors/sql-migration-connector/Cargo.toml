@@ -7,6 +7,7 @@ version = "0.1.0"
 [dependencies]
 datamodel = {path = "../../../libs/datamodel/core"}
 datamodel-connector = {path = "../../../libs/datamodel/connectors/datamodel-connector"}
+sql-datamodel-connector = {path = "../../../libs/datamodel/connectors/sql-datamodel-connector"}
 migration-connector = {path = "../migration-connector"}
 native-types = {path = "../../../libs/native-types"}
 prisma-value = {path = "../../../libs/prisma-value"}

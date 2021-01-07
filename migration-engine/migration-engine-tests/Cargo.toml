@@ -12,6 +12,8 @@ sql = ["barrel", "sql-schema-describer", "sql-migration-connector", "quaint", "u
 
 [dependencies]
 datamodel = { path = "../../libs/datamodel/core" }
+datamodel-connector= { path = "../../libs/datamodel/connectors/datamodel-connector" }
+sql-datamodel-connector= { path = "../../libs/datamodel/connectors/sql-datamodel-connector" }
 migration-connector = { path = "../connectors/migration-connector" }
 migration-core = { path = "../core" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector", optional = true }

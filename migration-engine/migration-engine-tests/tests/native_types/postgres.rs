@@ -6,7 +6,12 @@ use quaint::{
     prelude::{Insert, Queryable},
     Value,
 };
+use sql_datamodel_connector::SqlDatamodelConnectors;
 use std::{collections::HashMap, str::FromStr};
+
+//how to handle aliases
+// serial
+// decimal
 
 // start thinking about list->scalar , scalar -> list
 
@@ -15,7 +20,6 @@ use std::{collections::HashMap, str::FromStr};
 //     "SmallInt",
 //     "Integer",
 //     "BigInt",
-//     "Decimal(32,16)",
 //     "Numeric(32,16)",
 //     "Real",
 //     "DoublePrecision",
@@ -73,9 +77,10 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             &["BigInt", "Real", "DoublePrecision", "VarChar(53)", "Char(53)", "Text"],
         ),
         (
-            "Decimal(10,2)",
+            // "Decimal(10,2)",
+            "Numeric(10,2)",
             Value::numeric(BigDecimal::from_str("12345678.90").unwrap()),
-            &["Decimal(32,16)", "VarChar(53)", "Char(53)", "Text"],
+            &["Numeric(32,16)", "VarChar(53)", "Char(53)", "Text"],
         ),
         (
             "Numeric(3,0)",
@@ -84,7 +89,6 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Decimal(32,16)",
                 "Numeric(32,16)",
                 "VarChar(53)",
                 "Char(53)",
@@ -116,18 +120,23 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Timestamptz(3)",
                 "Date",
                 "Time(3)",
+            ],
+        ),
+        (
+            "Timestamptz(3)",
+            Value::datetime(Utc::now()),
+            &[
+                "VarChar(53)",
+                "Char(53)",
+                "Text",
+                "Timestamp(1)",
+                "Timestamptz(3)",
+                "Date",
+                "Time(3)",
                 "Timetz(3)",
-                "Boolean",
-                "Bit(10)",
-                "VarBit(10)",
-                "Uuid",
-                "Xml",
-                "Json",
-                "JsonB",
             ],
         ),
         //todo later
-        // ("Timestamptz(3)", Value::datetime(Utc::now()), ALL),
         // ("Date", Value::date(Utc::today().naive_utc()), ALL),
         // ("Time(3)", Value::time(Utc::now().naive_utc().time()), ALL),
         // ("Timetz(3)", Value::time(Utc::now().naive_utc().time()), ALL),
@@ -152,15 +161,15 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         (
             "Integer",
             Value::integer(i32::MIN),
-            &["Decimal(4,3)", "Numeric(2,1)", "VarChar(4)", "Char"],
+            &["Numeric(2,1)", "VarChar(4)", "Char"],
         ),
         (
             "BigInt",
             Value::integer(i64::MIN),
-            &["Decimal(10,9)", "Numeric(2,1)", "VarChar(17)", "Char"],
+            &["Numeric(2,1)", "VarChar(17)", "Char"],
         ),
         (
-            "Decimal(10,2)",
+            "Numeric(10,2)",
             Value::numeric(BigDecimal::from_str("1").unwrap()),
             &["SmallInt", "Integer", "BigInt", "Real", "DoublePrecision"],
         ),
@@ -168,14 +177,14 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             "Numeric(5,0)",
             Value::numeric(BigDecimal::from_str("1").unwrap()),
             &[
-                "Real",            // todo not risky due to params
-                "DoublePrecision", // todo not risky due to params
+                "Real",            // todo not risky due to params but maybe due to inexact cast
+                "DoublePrecision", // todo not risky due to params but maybe due to inexact cast
             ],
         ),
         (
             "Real",
             Value::float(f32::MAX),
-            &["SmallInt", "Integer", "BigInt", "Decimal(32,16)", "Numeric(32,16)"],
+            &["SmallInt", "Integer", "BigInt", "Numeric(32,16)"],
         ),
         (
             "DoublePrecision",
@@ -184,7 +193,6 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Decimal(32,16)",
                 "Numeric(32,16)",
                 "Real",
                 "VarChar(53)",
@@ -372,7 +380,6 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps.insert("SmallInt", "Int");
     maps.insert("Integer", "Int");
     maps.insert("BigInt", "BigInt");
-    maps.insert("Decimal", "Decimal");
     maps.insert("Numeric", "Decimal");
     maps.insert("Real", "Float");
     maps.insert("DoublePrecision", "Float");
@@ -396,36 +403,6 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps
 });
 
-fn with_default_params(r#type: &str) -> &str {
-    println!("{}", r#type);
-    match r#type {
-        "SmallInt" => "int2",
-        "Integer" => "int4",
-        "BigInt" => "int8",
-        "VarChar(5)" => "varchar",
-        "Decimal(32,16)" => "numeric",
-        "Decimal(10,2)" => "numeric",
-        "Numeric(32,16)" => "numeric",
-        "Numeric(3,0)" => "numeric",
-        "Numeric(2,1)" => "DECIMAL(2, 1)",
-        "Decimal(4,3)" => "DECIMAL(4, 3)",
-        "Decimal(10,9)" => "DECIMAL(10, 9)",
-        "Real" => "float4",
-        "DoublePrecision" => "float8",
-        "VarChar(53)" => "varchar",
-        "VarChar(3)" => "VARCHAR(3)",
-        "VarChar(4)" => "VARCHAR(4)",
-        "VarChar(17)" => "VARCHAR(17)",
-        "Char(53)" => "bpchar",
-        "Char(5)" => "bpchar",
-        "Char(1)" => "CHAR",
-        "VarBinary" => "VarBinary(1)",
-        "Char" => "CHAR",
-        "Timestamp(3)" => "timestamp",
-        _ => r#type,
-    }
-}
-
 fn prisma_type(native_type: &str) -> &str {
     let kind = native_type.split("(").next().unwrap();
     TYPE_MAPS.get(kind).unwrap()
@@ -433,6 +410,8 @@ fn prisma_type(native_type: &str) -> &str {
 
 #[test_each_connector(tags("postgres"), features("native_types"))]
 async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
+    let connector = SqlDatamodelConnectors::postgres();
+
     for (from, seed, casts) in SAFE_CASTS.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
@@ -461,8 +440,8 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
 
             insert = insert.value(column_name.clone(), seed.clone());
 
-            previous_assertions.push((column_name.clone(), with_default_params(from).to_lowercase()).clone());
-            next_assertions.push((column_name.clone(), with_default_params(to).to_lowercase()).clone());
+            previous_assertions.push((column_name.clone(), from.clone()));
+            next_assertions.push((column_name, to).clone());
         }
 
         let dm1 = api.native_types_datamodel(format!(
@@ -485,7 +464,9 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |acc, (column_name, expected)| {
-                    acc.and_then(|table| table.assert_column(column_name, |c| c.assert_native_type(expected)))
+                    acc.and_then(|table| {
+                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    })
                 },
             )
         })?;
@@ -506,7 +487,9 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
         api.assert_schema().await?.assert_table("A", |table| {
             next_assertions.iter().fold(
                 table.assert_column_count(next_assertions.len() + 1),
-                |acc, (name, tpe)| acc.and_then(|table| table.assert_column(name, |c| c.assert_native_type(tpe))),
+                |acc, (name, expected)| {
+                    acc.and_then(|table| table.assert_column(name, |c| c.assert_native_type(expected, &connector)))
+                },
             )
         })?;
 
@@ -520,11 +503,13 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
 
 #[test_each_connector(tags("postgres"), features("native_types"))]
 async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
+    let connector = SqlDatamodelConnectors::postgres();
+
     //todo here we seed the columns with data
     // but since every single column switch is risky and we do not force
     // we don't execute the migration. This probably should be split into:
     // - risky and fails with force
-    // - risky but ultimately succeeds
+    // - risky but ultimately succeeds, then assert again
     for (from, seed, casts) in RISKY_CASTS.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
@@ -556,11 +541,11 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             warnings.push( format!(
                 "You are about to alter the column `{column_name}` on the `A` table, which contains 1 non-null values. The data in that column will be cast from `{from}` to `{to}`.",
                column_name = column_name,
-                from = with_default_params(from),
-                to = with_default_params(to).to_uppercase(),
+                from = from,
+                to = to,
             ).into());
 
-            previous_assertions.push((column_name.clone(), with_default_params(from).to_lowercase()).clone());
+            previous_assertions.push((column_name.clone(), from.clone()));
         }
 
         let dm1 = api.native_types_datamodel(format!(
@@ -579,11 +564,14 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
         api.database().insert(insert.into()).await?;
 
         //first assertions
+
         api.assert_schema().await?.assert_table("A", |table| {
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |acc, (column_name, expected)| {
-                    acc.and_then(|table| table.assert_column(column_name, |c| c.assert_native_type(expected)))
+                    acc.and_then(|table| {
+                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    })
                 },
             )
         })?;
@@ -605,7 +593,9 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |acc, (column_name, expected)| {
-                    acc.and_then(|table| table.assert_column(column_name, |c| c.assert_native_type(expected)))
+                    acc.and_then(|table| {
+                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    })
                 },
             )
         })?;
@@ -620,6 +610,8 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
 
 #[test_each_connector(tags("postgres"), features("native_types"))]
 async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResult {
+    let connector = SqlDatamodelConnectors::postgres();
+
     for (from, seed, casts) in NOT_CASTABLE.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
@@ -658,7 +650,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
                 .into(),
             );
 
-            previous_assertions.push((column_name.clone(), with_default_params(from).to_lowercase()).clone());
+            previous_assertions.push((column_name, from).clone());
         }
 
         let dm1 = api.native_types_datamodel(format!(
@@ -681,7 +673,9 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |acc, (column_name, expected)| {
-                    acc.and_then(|table| table.assert_column(column_name, |c| c.assert_native_type(expected)))
+                    acc.and_then(|table| {
+                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    })
                 },
             )
         })?;
@@ -703,7 +697,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |acc, (column_name, expected)| {
-                    acc.and_then(|table| table.assert_column(column_name, |c| c.assert_native_type(expected)))
+                    acc.and_then(|table| table.assert_column(column_name, |c| c.assert_full_data_type(expected)))
                 },
             )
         })?;

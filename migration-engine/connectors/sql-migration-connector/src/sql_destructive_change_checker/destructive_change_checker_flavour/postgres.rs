@@ -10,7 +10,9 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
+use datamodel_connector::Connector;
 use migration_connector::MigrationFeature;
+use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultKind, DefaultValue};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
@@ -48,10 +50,11 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         }
 
         let (previous_type, next_type) = if self.features().contains(MigrationFeature::NativeTypes) {
+            let datamodel_connector = SqlDatamodelConnectors::postgres();
+            //todo handle unsupported
             (
-                //todo change this to use the rendered native type like it would look in the schema?
-                format!("{}", columns.previous().column_type().full_data_type),
-                format!("{}", columns.next().column_type().full_data_type),
+                datamodel_connector.render_native_type(columns.previous().column_type().native_type.clone().unwrap()),
+                datamodel_connector.render_native_type(dbg!(columns.next().column_type().native_type.clone().unwrap())),
             )
         } else {
             (
