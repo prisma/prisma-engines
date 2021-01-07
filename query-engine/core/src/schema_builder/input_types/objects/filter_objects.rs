@@ -25,7 +25,7 @@ pub(crate) fn scalar_filter_object_type(
         .optional(),
         input_field(
             "OR",
-            vec![object_type.clone(), InputType::list(object_type.clone())],
+            vec![InputType::list(object_type.clone())],
             None,
         )
         .optional(),
@@ -60,7 +60,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
         .optional(),
         input_field(
             "OR",
-            vec![object_type.clone(), InputType::list(object_type.clone())],
+            vec![InputType::list(object_type.clone())],
             None,
         )
         .optional(),
