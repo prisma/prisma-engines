@@ -113,8 +113,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
     use ColumnTypeChange::*;
 
     //Postgres varchar and char have different behaviour when no precision is defined -.-
-    // varchar has no limit
-    // char is char(1)
+    // varchar has no limit char is char(1)
     let next_is_char = || matches!(next, PostgresType::Char(_));
 
     let cast = || match previous {
@@ -179,19 +178,19 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::SmallInt => match old_params {
                 None => RiskyCast,
                 Some((_, s)) if s > 0 => RiskyCast,
-                Some((p, 0)) if p > 5 => RiskyCast,
+                Some((p, 0)) if p > 2 => RiskyCast,
                 _ => SafeCast,
             },
             PostgresType::Integer => match old_params {
                 None => RiskyCast,
                 Some((_, s)) if s > 0 => RiskyCast,
-                Some((p, 0)) if p > 10 => RiskyCast,
+                Some((p, 0)) if p > 9 => RiskyCast,
                 _ => SafeCast,
             },
             PostgresType::BigInt => match old_params {
                 None => RiskyCast,
                 Some((_, s)) if s > 0 => RiskyCast,
-                Some((p, 0)) if p > 19 => RiskyCast,
+                Some((p, 0)) if p > 18 => RiskyCast,
                 _ => SafeCast,
             },
             PostgresType::Decimal(new_params) | PostgresType::Numeric(new_params) => match (old_params, new_params) {
@@ -204,6 +203,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 }
                 _ => SafeCast,
             },
+            //todo this is the same as in mssql, but could be more finegrained
             PostgresType::Real => RiskyCast,
             PostgresType::DoublePrecision => RiskyCast,
             PostgresType::VarChar(length) | PostgresType::Char(length) => match (length, old_params) {
@@ -242,7 +242,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::SmallInt => RiskyCast,
             PostgresType::Integer => RiskyCast,
             PostgresType::BigInt => RiskyCast,
-            PostgresType::Decimal(_) | PostgresType::Numeric(_) => SafeCast,
+            PostgresType::Decimal(_) | PostgresType::Numeric(_) => RiskyCast,
             PostgresType::Real => RiskyCast,
             PostgresType::DoublePrecision => SafeCast,
             PostgresType::VarChar(len) | PostgresType::Char(len) => match len {
@@ -280,16 +280,13 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             _ => RiskyCast,
         },
         PostgresType::Text => match next {
-            PostgresType::Text => SafeCast,
-            PostgresType::VarChar(None) => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
             _ => RiskyCast,
             // todo not castable
         },
         PostgresType::ByteA => match next {
-            PostgresType::Text => SafeCast,
-            PostgresType::VarChar(None) => SafeCast,
-            PostgresType::VarChar(Some(length)) => RiskyCast,
-            PostgresType::Char(param) => RiskyCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::VarChar(Some(length)) | PostgresType::Char(Some(length)) if length > 2 => RiskyCast,
             _ => NotCastable,
         },
         //todo later
@@ -312,10 +309,16 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             _ => SafeCast,
         },
         PostgresType::Bit(_) => match next {
+            //always safe or unsafe
             _ => SafeCast,
         },
-        PostgresType::VarBit(_) => match next {
-            _ => SafeCast,
+        PostgresType::VarBit(Some(length)) => match next {
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::VarBit(Some(new_length)) if new_length > length => SafeCast,
+            //varchar(len)
+            //char(len)
+            //char(none)
+            _ => RiskyCast,
         },
         PostgresType::UUID => match next {
             _ => SafeCast,
