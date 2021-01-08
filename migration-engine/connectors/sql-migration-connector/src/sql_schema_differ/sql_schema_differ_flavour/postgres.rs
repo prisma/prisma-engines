@@ -112,8 +112,9 @@ fn family_change_riskyness(previous: &ColumnTypeFamily, next: &ColumnTypeFamily)
 fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
 
-    //Postgres varchar and char have different behaviour when no precision is defined -.-
-    // varchar has no limit char is char(1)
+    //todo review the bit part
+    // varchar / varbit without param=> unlimited length
+    // char / bit without param => length is 1
     let next_is_char = || matches!(next, PostgresType::Char(_));
 
     let cast = || match previous {
@@ -265,7 +266,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 (Some(old_length), Some(new_length)) if old_length > new_length => RiskyCast,
                 _ => SafeCast,
             },
-            _ => RiskyCast,
+            _ => NotCastable,
         },
         PostgresType::Char(old_param) => match next {
             PostgresType::Text => SafeCast,
@@ -277,12 +278,12 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 (Some(old_length), Some(new_length)) if old_length > new_length => RiskyCast,
                 _ => SafeCast,
             },
-            _ => RiskyCast,
+            _ => NotCastable,
         },
         PostgresType::Text => match next {
             PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
-            _ => RiskyCast,
-            // todo not castable
+            PostgresType::VarChar(_) | PostgresType::Char(_) => RiskyCast,
+            _ => NotCastable,
         },
         PostgresType::ByteA => match next {
             PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
@@ -306,31 +307,57 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             _ => SafeCast,
         },
         PostgresType::Boolean => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(_) => SafeCast,
+            PostgresType::Char(Some(length)) if length > 4 => SafeCast,
+            PostgresType::Char(Some(length)) if length > 3 => RiskyCast,
+            _ => NotCastable,
         },
-        PostgresType::Bit(_) => match next {
-            //always safe or unsafe
-            _ => SafeCast,
+        PostgresType::Bit(None) => match next {
+            PostgresType::Text | PostgresType::VarChar(_) | PostgresType::Char(_) | PostgresType::VarBit(_) => SafeCast,
+            _ => NotCastable,
+        },
+        PostgresType::Bit(Some(length)) => match next {
+            PostgresType::Text | PostgresType::VarChar(None) | PostgresType::VarBit(None) => SafeCast,
+            PostgresType::VarChar(Some(new_length)) if new_length >= length => SafeCast,
+            PostgresType::VarBit(Some(new_length)) | PostgresType::Char(Some(new_length)) if new_length >= length => {
+                SafeCast
+            }
+            _ => NotCastable,
+        },
+
+        PostgresType::VarBit(None) => match next {
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::VarChar(_) | PostgresType::Char(_) | PostgresType::Bit(_) => RiskyCast,
+            _ => NotCastable,
         },
         PostgresType::VarBit(Some(length)) => match next {
-            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) | PostgresType::VarBit(None) => SafeCast,
             PostgresType::VarBit(Some(new_length)) if new_length > length => SafeCast,
-            //varchar(len)
-            //char(len)
-            //char(none)
-            _ => RiskyCast,
+            PostgresType::VarChar(Some(new_length)) | PostgresType::Char(Some(new_length)) if new_length >= length => {
+                SafeCast
+            }
+            PostgresType::Char(_) | PostgresType::VarChar(_) | PostgresType::Bit(_) => RiskyCast,
+            _ => NotCastable,
         },
         PostgresType::UUID => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::VarChar(Some(length)) | PostgresType::Char(Some(length)) if length > 31 => SafeCast,
+            _ => NotCastable,
         },
         PostgresType::Xml => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::VarChar(_) | PostgresType::Char(_) => RiskyCast,
+            _ => NotCastable,
         },
         PostgresType::JSON => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::JSONB | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::VarChar(_) | PostgresType::Char(_) => RiskyCast,
+            _ => NotCastable,
         },
         PostgresType::JSONB => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::JSON | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::VarChar(_) | PostgresType::Char(_) => RiskyCast,
+            _ => NotCastable,
         },
     };
 

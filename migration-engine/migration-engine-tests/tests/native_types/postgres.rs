@@ -14,9 +14,9 @@ use std::{collections::HashMap, str::FromStr};
 // decimal
 
 // do not castable ✓
-// split castable into safe and risky
-// split seeds into risky succeeds and risky fails
-// enable force in risky succeeds
+// split castable into safe and risky ✓
+// split seeds into risky succeeds ✓
+// enable force in risky succeeds ✓
 // adjust the differ
 // setup separate test case for risky fails
 // get this testfile to pass
@@ -67,8 +67,8 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             &["Numeric(32,16)", "VarChar(53)", "Char(53)", "Text"],
         ),
         (
-            "Numeric(3,0)",
-            Value::numeric(BigDecimal::from_str("123").unwrap()),
+            "Numeric(2,0)",
+            Value::numeric(BigDecimal::from_str("12").unwrap()),
             &[
                 "SmallInt",
                 "Integer",
@@ -89,8 +89,13 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             Value::Double(Some(f64::MIN)),
             &["DoublePrecision", "Text", "VarChar", "Char(1000)"],
         ),
+        ("VarChar", Value::text("fiver"), &["Text"]),
         ("VarChar(5)", Value::text("fiver"), &["VarChar(53)", "Char(53)", "Text"]),
-        ("Char(5)", Value::text("truer"), &["VarChar(53)", "Char(53)", "Text"]),
+        (
+            "Char(1)", // same as Char
+            Value::text("t"),
+            &["VarChar(3)", "Char(3)", "Text"],
+        ),
         ("Text", Value::text("true"), &["VarChar", "Text"]),
         ("ByteA", Value::bytes(b"DEAD".to_vec()), &["Text", "VarChar"]),
         (
@@ -135,28 +140,34 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             Value::datetime(Utc::now()),
             &["VarChar(53)", "Char(53)", "Text", "Time(3)", "Timetz(6)"],
         ),
-        ("Boolean", Value::boolean(true), &["VarChar(53)", "Char(53)", "Text"]),
+        ("Boolean", Value::boolean(false), &["VarChar", "Char(5)", "Text"]),
+        (
+            "Bit(1)", // same as Bit
+            Value::text("0"),
+            &["VarChar", "Char(1)", "Char(5)", "Text", "VarBit(10)"],
+        ),
         (
             "Bit(10)",
             Value::text("0010101001"),
             &["VarChar(53)", "Char(53)", "Text", "VarBit(10)"],
         ),
+        ("VarBit", Value::text("000101010101010010"), &["VarChar", "Text"]),
         ("VarBit(5)", Value::text("0010"), &["VarChar(53)", "Char(53)", "Text"]),
         (
             "Uuid",
             Value::text("75bf0037-a8b8-4512-beea-5a186f8abf1e"),
             &["VarChar(53)", "Char(53)", "Text"],
         ),
-        ("Xml", Value::xml("[]"), &["VarChar(53)", "Char(53)", "Text"]),
+        ("Xml", Value::xml("[]"), &["VarChar", "Text"]),
         (
             "Json",
             Value::json(serde_json::json!({"foo": "bar"})),
-            &["VarChar(53)", "Char(53)", "Text", "JsonB"],
+            &["Text", "JsonB", "VarChar"],
         ),
         (
             "JsonB",
             Value::json(serde_json::json!({"foo": "bar"})),
-            &["VarChar(53)", "Char(53)", "Text", "Json"],
+            &["Text", "Json", "VarChar"],
         ),
     ]
 });
@@ -223,7 +234,18 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ("VarChar(5)", Value::text("t"), &["VarChar(3)", "Char(1)"]),
         ("Text", Value::text("t"), &["VarChar(3)", "Char(1)"]),
         ("ByteA", Value::bytes(vec![1]), &["VarChar(4)", "Char(5)"]),
-        // ("VarBit(5)", Value::text("001"), &["Bit(3)"]), todo
+        ("VarBit(5)", Value::text("001"), &["Bit(3)"]),
+        ("Xml", Value::xml("[]"), &["VarChar(100)", "Char(100)"]),
+        (
+            "Json",
+            Value::json(serde_json::json!({"foo": "bar"})),
+            &["VarChar(100)", "Char(100)"],
+        ),
+        (
+            "JsonB",
+            Value::json(serde_json::json!({"foo": "bar"})),
+            &["VarChar(100)", "Char(100)"],
+        ),
     ]
 });
 
@@ -287,7 +309,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             ],
         ),
         (
-            "Decimal(10,2)",
+            "Numeric(10,2)",
             Value::numeric(BigDecimal::from_str("1").unwrap()),
             &[
                 "ByteA",
@@ -344,7 +366,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "DoublePrecision",
-            Value::float(7.5),
+            Value::double(7.5),
             &[
                 "ByteA",
                 "Timestamp(3)",
@@ -421,7 +443,6 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Numeric(32,16)",
                 "Real",
                 "DoublePrecision",
-                "Char(53)",
                 "ByteA",
                 "Timestamp(3)",
                 "Timestamptz(3)",
@@ -1021,9 +1042,10 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
 
             insert = insert.value(column_name.clone(), seed.clone());
 
+            //todo adjust to mention the to and from
             warnings.push(
                 format!(
-                    "Changed the type of `{column_name}` on the `A` table.",
+                    "The `{column_name}` column on the `A` table would be dropped and recreated. This will lead to data loss.",
                     column_name = column_name,
                     // from = from,
                     // to = to,
@@ -1078,7 +1100,9 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
             previous_assertions.iter().fold(
                 table.assert_column_count(previous_assertions.len() + 1),
                 |acc, (column_name, expected)| {
-                    acc.and_then(|table| table.assert_column(column_name, |c| c.assert_full_data_type(expected)))
+                    acc.and_then(|table| {
+                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    })
                 },
             )
         })?;
