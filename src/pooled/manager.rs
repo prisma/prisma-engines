@@ -91,7 +91,7 @@ impl Manager for QuaintManager {
             #[cfg(feature = "mysql")]
             QuaintManager::Mysql(url) => {
                 use crate::connector::Mysql;
-                Ok(Box::new(Mysql::new(url.clone())?) as Self::Connection)
+                Ok(Box::new(Mysql::new(url.clone()).await?) as Self::Connection)
             }
 
             #[cfg(feature = "postgresql")]

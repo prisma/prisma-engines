@@ -141,7 +141,7 @@ impl Quaint {
             #[cfg(feature = "mysql")]
             s if s.starts_with("mysql") => {
                 let url = connector::MysqlUrl::new(url::Url::parse(s)?)?;
-                let mysql = connector::Mysql::new(url)?;
+                let mysql = connector::Mysql::new(url).await?;
 
                 Arc::new(mysql) as Arc<dyn Queryable>
             }

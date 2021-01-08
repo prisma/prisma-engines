@@ -5,11 +5,10 @@ use async_trait::async_trait;
 use mysql_async::{
     self as my,
     prelude::{Query as _, Queryable as _},
-    Conn,
 };
 use percent_encoding::percent_decode;
 use std::{borrow::Cow, future::Future, path::Path, time::Duration};
-use tokio::time::timeout;
+use tokio::{sync::Mutex, time::timeout};
 use url::Url;
 
 use crate::{
@@ -23,7 +22,7 @@ use crate::{
 #[derive(Debug)]
 #[cfg_attr(feature = "docs", doc(cfg(feature = "mysql")))]
 pub struct Mysql {
-    pub(crate) pool: my::Pool,
+    pub(crate) conn: Mutex<my::Conn>,
     pub(crate) url: MysqlUrl,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
@@ -229,15 +228,11 @@ pub(crate) struct MysqlUrlQueryParams {
 
 impl Mysql {
     /// Create a new MySQL connection using `OptsBuilder` from the `mysql` crate.
-    pub fn new(url: MysqlUrl) -> crate::Result<Self> {
-        let mut opts = url.to_opts_builder();
-        let pool_opts = my::PoolOpts::default().with_constraints(my::PoolConstraints::new(1, 1).unwrap());
-        opts = opts.pool_opts(pool_opts);
-
+    pub async fn new(url: MysqlUrl) -> crate::Result<Self> {
         Ok(Self {
             socket_timeout: url.query_params.socket_timeout,
             connect_timeout: url.query_params.connect_timeout,
-            pool: my::Pool::new(opts),
+            conn: Mutex::new(my::Conn::new(url.to_opts_builder()).await?),
             url,
         })
     }
@@ -259,13 +254,6 @@ impl Mysql {
             },
         }
     }
-
-    async fn get_conn(&self) -> crate::Result<Conn> {
-        match self.connect_timeout {
-            Some(duration) => Ok(timeout(duration, self.pool.get_conn()).await??),
-            None => Ok(self.pool.get_conn().await?),
-        }
-    }
 }
 
 impl TransactionCapable for Mysql {}
@@ -284,7 +272,7 @@ impl Queryable for Mysql {
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || async move {
-            let mut conn = self.get_conn().await?;
+            let mut conn = self.conn.lock().await;
             let stmt = self.timeout(conn.prep(sql)).await?;
             let rows: Vec<my::Row> = self.timeout(conn.exec(&stmt, conversion::conv_params(params)?)).await?;
 
@@ -308,7 +296,7 @@ impl Queryable for Mysql {
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
-            let mut conn = self.get_conn().await?;
+            let mut conn = self.conn.lock().await;
             self.timeout(conn.exec_drop(sql, conversion::conv_params(params)?))
                 .await?;
             Ok(conn.affected_rows())
@@ -318,10 +306,10 @@ impl Queryable for Mysql {
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("mysql.raw_cmd", cmd, &[], move || async move {
-            let mut conn = self.get_conn().await?;
+            let mut conn = self.conn.lock().await;
 
             let fut = async {
-                let mut result = cmd.run(&mut conn).await?;
+                let mut result = cmd.run(&mut *conn).await?;
 
                 loop {
                     result.map(drop).await?;
@@ -358,7 +346,7 @@ impl Queryable for Mysql {
 mod tests {
     use super::MysqlUrl;
     use crate::tests::test_api::mysql::CONN_STR;
-    use crate::{connector::Queryable, error::*, single::Quaint};
+    use crate::{error::*, single::Quaint};
     use url::Url;
 
     #[test]
@@ -375,10 +363,7 @@ mod tests {
         url.set_path("/this_does_not_exist");
 
         let url = url.as_str().to_string();
-        let conn = Quaint::new(&url).await.unwrap();
-        let res = conn.query_raw("SELECT 1 + 1", &[]).await;
-
-        assert!(&res.is_err());
+        let res = Quaint::new(&url).await;
 
         let err = res.unwrap_err();
 
@@ -397,8 +382,7 @@ mod tests {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.set_username("WRONG").unwrap();
 
-        let conn = Quaint::new(url.as_str()).await.unwrap();
-        let res = conn.query_raw("SELECT 1", &[]).await;
+        let res = Quaint::new(url.as_str()).await;
         assert!(res.is_err());
 
         let err = res.unwrap_err();
