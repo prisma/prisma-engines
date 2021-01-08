@@ -241,3 +241,9 @@ pub struct TableDoesNotExist {
 pub struct ColumnDoesNotExist {
     pub column: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2023", message = "Inconsistent column data: {message}")]
+pub struct InconsistentColumnData {
+    pub message: String,
+}

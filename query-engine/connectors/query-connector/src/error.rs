@@ -48,6 +48,11 @@ impl ConnectorError {
                     field_name,
                 }))
             }
+            ErrorKind::ConversionError(message) => Some(KnownError::new(
+                user_facing_errors::query_engine::InconsistentColumnData {
+                    message: format!("{}", message),
+                },
+            )),
 
             _ => None,
         };
