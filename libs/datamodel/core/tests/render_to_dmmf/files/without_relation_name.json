@@ -23,7 +23,7 @@
           "name": "posts",
           "kind": "object",
           "isList": true,
-          "isRequired": false,
+          "isRequired": true,
           "isUnique": false,
           "isId": false,
           "isReadOnly": false,
