@@ -15,9 +15,7 @@ mod schema_push;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::ast::Insert;
 use quaint::prelude::{Queryable, SqlFamily};
-use quaint::Value;
 use sql_schema_describer::*;
 
 #[test_each_connector]
