@@ -6,7 +6,7 @@ pub type Timestamp = chrono::DateTime<chrono::Utc>;
 
 /// Management of imperative migrations state in the database.
 #[async_trait::async_trait]
-pub trait ImperativeMigrationsPersistence: Send + Sync {
+pub trait MigrationPersistence: Send + Sync {
     /// Initialize the migration persistence without checking the database first.
     async fn baseline_initialize(&self) -> ConnectorResult<()>;
 
@@ -41,7 +41,7 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     /// Record that a migration is about to be applied. Returns the unique
     /// identifier for the migration.
     ///
-    /// This is a default method that computes the checkum. Implementors should
+    /// This is a default method that computes the checksum. Implementors should
     /// implement record_migration_started_impl.
     async fn record_migration_started(&self, migration_name: &str, script: &str) -> ConnectorResult<String> {
         self.record_migration_started_impl(migration_name, &checksum(script))
@@ -67,7 +67,8 @@ pub trait ImperativeMigrationsPersistence: Send + Sync {
     async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()>;
 
     /// List all applied migrations, ordered by `started_at`. This should fail
-    /// hard if the migration persistence is not initialized.
+    /// with a PersistenceNotInitializedError when the migration persistence is
+    /// not initialized.
     async fn list_migrations(&self) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>>;
 }
 
@@ -90,8 +91,8 @@ pub struct MigrationRecord {
     /// A unique, randomly generated identifier.
     pub id: String,
     /// The SHA-256 checksum of the migration script, to detect if it was
-    /// edited. It covers only the content of the script, it does not include
-    /// timestamp or migration name information.
+    /// edited. It covers only the content of the script file, it does not
+    /// include timestamp or migration name information.
     pub checksum: String,
     /// The timestamp at which the migration completed *successfully*.
     pub finished_at: Option<Timestamp>,

@@ -10,12 +10,11 @@ mod pair;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
 mod sql_destructive_change_checker;
-mod sql_imperative_migration_persistence;
 mod sql_migration;
+mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
-pub use sql_migration::SqlMigration;
 
 use connection_wrapper::Connection;
 use datamodel::Datamodel;
@@ -24,6 +23,7 @@ use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
+use sql_migration::SqlMigration;
 use sql_schema_describer::SqlSchema;
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
@@ -140,7 +140,7 @@ impl MigrationConnector for SqlMigrationConnector {
         self
     }
 
-    fn new_migration_persistence(&self) -> &dyn ImperativeMigrationsPersistence {
+    fn migration_persistence(&self) -> &dyn MigrationPersistence {
         self
     }
 }

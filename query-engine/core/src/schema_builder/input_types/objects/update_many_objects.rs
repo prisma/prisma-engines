@@ -77,7 +77,7 @@ pub(crate) fn update_many_where_combination_object(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    let where_input_object = filter_objects::scalar_filter_object_type(ctx, &related_model);
+    let where_input_object = filter_objects::scalar_filter_object_type(ctx, &related_model, false);
     let update_types = update_many_input_types(ctx, &related_model, Some(parent_field));
 
     input_object.set_fields(vec![

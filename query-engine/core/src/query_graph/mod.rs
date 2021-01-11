@@ -575,22 +575,34 @@ impl QueryGraph {
 
     /// Inserts ordering edges into the graph to prevent interdependency issues when rotating
     /// nodes for `if`-flow nodes.
-    /// All sibling nodes of an if that are _not_ an if node themself will be ordered below the if
-    /// node in execution predence.
+    ///
+    /// All sibling nodes of an if-node that are...
+    /// - ... not an `if`-flow node themself
+    /// - ... not already connected to the current `if`-flow node in any form (to prevent double edges)
+    /// - ... not connected to another `if`-flow node with control flow edges (indirect sibling)
+    /// will be ordered below the currently processed `if`-flow node in execution predence.
+    ///
     /// ```text
-    /// ┌ ─ ─ ─ ─ ─ ─
-    ///     Parent   │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-    /// └ ─ ─ ─ ─ ─ ─            │                 │
-    ///        │
-    ///        │                 │                 │
-    ///        │
-    ///        ▼                 ▼                 ▼
-    /// ┌ ─ ─ ─ ─ ─ ─     ┌ ─ ─ ─ ─ ─ ─     ┌ ─ ─ ─ ─ ─ ─
-    ///       If     │       Sibling   │      Sibling If │
-    /// └ ─ ─ ─ ─ ─ ─     └ ─ ─ ─ ─ ─ ─     └ ─ ─ ─ ─ ─ ─
-    ///        │                 ▲
-    ///        │                 │
-    ///        └─────Ordering────┘
+    ///      ┌ ─ ─ ─ ─ ─ ─
+    /// ┌ ─ ─    Parent   │─ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┬ ─ ─ ─ ─
+    ///      └ ─ ─ ─ ─ ─ ─                        │                       │
+    /// │           │              │                             │
+    ///             │                             │                       │
+    /// │           │              │                             │
+    ///             ▼              ▼              ▼              ▼        │
+    /// │    ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─  ┌ ─ ─ ─ ─ ─ ─
+    ///   ┌ ─      If     │    Sibling   │   Sibling If │   Sibling If │  │
+    /// │    └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─  └ ─ ─ ─ ─ ─ ─
+    ///   │         │              ▲                             │        │
+    /// │           │              │
+    ///   │         └────Inserted ─┘                       (Then / Else)  │
+    /// │                Ordering
+    ///   │                                                      ▼        │
+    /// │    ┌ ─ ─ ─ ─ ─ ─                                ┌ ─ ─ ─ ─ ─ ─
+    ///   │     Already   │                                  Indirect  │  │
+    /// └ ──▶│ connected                                  │  sibling    ◀─
+    ///         sibling   │                                ─ ─ ─ ─ ─ ─ ┘
+    ///      └ ─ ─ ─ ─ ─ ─
     /// ```
     fn normalize_if_nodes(&mut self) -> QueryGraphResult<()> {
         for node_ix in self.graph.node_indices() {
@@ -601,10 +613,26 @@ impl QueryGraph {
 
                 for parent_edge in parents {
                     let parent = self.edge_source(&parent_edge);
-                    let siblings = self.direct_child_pairs(&parent);
+                    let siblings = self.child_pairs(&parent);
 
                     for (_, sibling) in siblings {
-                        if sibling != node && !matches!(self.node_content(&sibling).unwrap(), Node::Flow(_)) {
+                        let possible_edge = self.graph.find_edge(node.node_ix, sibling.node_ix);
+                        let is_if_node_child = self
+                            .incoming_edges(&sibling)
+                            .into_iter()
+                            .find(|edge| {
+                                matches!(
+                                    self.edge_content(&edge).unwrap(),
+                                    QueryGraphDependency::Then | QueryGraphDependency::Else
+                                )
+                            })
+                            .is_some();
+
+                        if sibling != node
+                            && possible_edge.is_none()
+                            && !is_if_node_child
+                            && !matches!(self.node_content(&sibling).unwrap(), Node::Flow(_))
+                        {
                             self.create_edge(&node, &sibling, QueryGraphDependency::ExecutionOrder)?;
                         }
                     }

@@ -13,7 +13,7 @@ use quaint::{
     connector::ConnectionInfo,
     visitor::{self, Visitor},
 };
-use sql_migration_connector::{SqlMigration, SqlMigrationConnector};
+use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 use test_setup::*;
 
@@ -39,7 +39,7 @@ impl QueryEngine {
 
 pub struct TestApi {
     connection_info: ConnectionInfo,
-    migration_api: MigrationApi<SqlMigrationConnector, SqlMigration>,
+    migration_api: MigrationApi<SqlMigrationConnector>,
     config: String,
 }
 
@@ -89,7 +89,7 @@ pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
     let url = mysql_8_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(mysql_migration_connector(&url).await).await.unwrap();
+    let migration_api = MigrationApi::new(mysql_migration_connector(&url).await);
 
     let config = mysql_8_test_config(db_name);
 
@@ -105,7 +105,7 @@ pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
     let url = mysql_5_6_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(mysql_migration_connector(&url).await).await.unwrap();
+    let migration_api = MigrationApi::new(mysql_migration_connector(&url).await);
 
     let config = mysql_5_6_test_config(db_name);
 
@@ -121,7 +121,7 @@ pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
     let url = mysql_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(mysql_migration_connector(&url).await).await.unwrap();
+    let migration_api = MigrationApi::new(mysql_migration_connector(&url).await);
 
     let config = mysql_test_config(db_name);
 
@@ -137,7 +137,7 @@ pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
     let url = mariadb_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(mysql_migration_connector(&url).await).await.unwrap();
+    let migration_api = MigrationApi::new(mysql_migration_connector(&url).await);
 
     let config = mariadb_test_config(db_name);
 
@@ -153,9 +153,7 @@ pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
     let url = postgres_9_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await)
-        .await
-        .unwrap();
+    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await);
 
     let config = postgres_9_test_config(db_name);
 
@@ -171,9 +169,7 @@ pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
     let url = postgres_10_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await)
-        .await
-        .unwrap();
+    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await);
 
     let config = postgres_10_test_config(db_name);
 
@@ -189,9 +185,7 @@ pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
     let url = postgres_11_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await)
-        .await
-        .unwrap();
+    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await);
 
     let config = postgres_11_test_config(db_name);
 
@@ -207,9 +201,7 @@ pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
     let url = postgres_12_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await)
-        .await
-        .unwrap();
+    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await);
 
     let config = postgres_12_test_config(db_name);
 
@@ -225,9 +217,7 @@ pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
     let url = postgres_13_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await)
-        .await
-        .unwrap();
+    let migration_api = MigrationApi::new(postgres_migration_connector(&url).await);
 
     let config = postgres_13_test_config(db_name);
 
@@ -243,9 +233,7 @@ pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
     let url = sqlite_test_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(sqlite_migration_connector(db_name).await)
-        .await
-        .unwrap();
+    let migration_api = MigrationApi::new(sqlite_migration_connector(db_name).await);
 
     let config = sqlite_test_config(db_name);
 
@@ -261,7 +249,7 @@ pub async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
     let url = mssql_2017_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(mssql_migration_connector(&url).await).await.unwrap();
+    let migration_api = MigrationApi::new(mssql_migration_connector(&url).await);
 
     let config = mssql_2017_test_config(db_name);
 
@@ -277,7 +265,7 @@ pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
     let url = mssql_2019_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
 
-    let migration_api = MigrationApi::new(mssql_migration_connector(&url).await).await.unwrap();
+    let migration_api = MigrationApi::new(mssql_migration_connector(&url).await);
 
     let config = mssql_2019_test_config(db_name);
 

@@ -5,11 +5,10 @@ mod commands;
 mod error_tests;
 mod logger;
 
-use std::io;
-
 use enumflags2::BitFlags;
 use migration_connector::MigrationFeature;
 use migration_core::{api::RpcApi, CoreError};
+use std::io;
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC

@@ -25,7 +25,17 @@ pub enum Filter {
     Relation(RelationFilter),
     NodeSubscription,
     BoolFilter(bool),
+    Aggregation(AggregationFilter),
     Empty,
+}
+
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
+pub enum AggregationFilter {
+    Count(Box<Filter>),
+    Average(Box<Filter>),
+    Sum(Box<Filter>),
+    Min(Box<Filter>),
+    Max(Box<Filter>),
 }
 
 impl Filter {
@@ -126,13 +136,28 @@ impl Filter {
             Filter::Or(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
             Filter::Not(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
             Filter::Scalar(sf) => sf.mode = mode,
-            Filter::ScalarList(_) => {}
-            Filter::OneRelationIsNull(_) => {}
-            Filter::Relation(_) => {}
-            Filter::NodeSubscription => {}
-            Filter::BoolFilter(_) => {}
-            Filter::Empty => {}
+            _ => {}
         }
+    }
+
+    pub fn count(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Count(Box::new(condition)))
+    }
+
+    pub fn average(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Average(Box::new(condition)))
+    }
+
+    pub fn sum(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Sum(Box::new(condition)))
+    }
+
+    pub fn min(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Min(Box::new(condition)))
+    }
+
+    pub fn max(condition: Filter) -> Self {
+        Self::Aggregation(AggregationFilter::Max(Box::new(condition)))
     }
 }
 

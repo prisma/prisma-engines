@@ -1,7 +1,6 @@
-use crate::{error::*, AliasedCondition, SqlRow, ToSqlRow};
+use crate::{column_metadata, error::*, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
-use datamodel::FieldArity;
 use futures::future::FutureExt;
 use prisma_models::*;
 use quaint::{
@@ -11,7 +10,7 @@ use quaint::{
 };
 
 use serde_json::{Map, Value};
-use std::{convert::TryFrom, panic::AssertUnwindSafe};
+use std::panic::AssertUnwindSafe;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
 impl QueryExt for PooledConnection {}
@@ -21,7 +20,7 @@ impl QueryExt for PooledConnection {}
 #[async_trait]
 pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
-    async fn filter(&self, q: Query<'_>, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<Vec<SqlRow>> {
+    async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>]) -> crate::Result<Vec<SqlRow>> {
         let result_set = self.query(q).await?;
         let mut sql_rows = Vec::new();
 
@@ -73,29 +72,12 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Select one row from the database.
-    async fn find(&self, q: Select<'_>, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<SqlRow> {
-        self.filter(q.limit(1).into(), idents)
+    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow> {
+        self.filter(q.limit(1).into(), meta)
             .await?
             .into_iter()
             .next()
             .ok_or(SqlError::RecordDoesNotExist)
-    }
-
-    /// Read the first column from the first row as an integer.
-    async fn find_int(&self, q: Select<'_>) -> crate::Result<i64> {
-        // UNWRAP: A dataset will always have at least one column, even if it contains no data.
-        let id = self
-            .find(q, &[(TypeIdentifier::Int, FieldArity::Required)])
-            .await?
-            .values
-            .into_iter()
-            .next()
-            .unwrap();
-
-        Ok(i64::try_from(id).map_err(|err| {
-            let domain_error: DomainError = err.into();
-            domain_error
-        })?)
     }
 
     /// Process the record filter and either return directly with precomputed values,
@@ -127,14 +109,16 @@ pub trait QueryExt: Queryable + Send + Sync {
     async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<RecordProjection>> {
         let idents: Vec<_> = model_id
             .fields()
-            .into_iter()
             .flat_map(|f| match f {
                 Field::Scalar(sf) => vec![sf.type_identifier_with_arity()],
                 Field::Relation(rf) => rf.type_identifiers_with_arities(),
             })
             .collect();
 
-        let mut rows = self.filter(select.into(), &idents).await?;
+        let field_names: Vec<_> = model_id.fields().map(|field| field.name()).collect();
+        let meta = column_metadata::create(field_names.as_slice(), &idents);
+
+        let mut rows = self.filter(select.into(), &meta).await?;
         let mut result = Vec::new();
 
         for row in rows.drain(0..) {

@@ -1,9 +1,10 @@
-use super::MigrationCommand;
-use crate::{migration_engine::MigrationEngine, CoreError, CoreResult};
+use crate::{api::MigrationApi, CoreError, CoreResult};
 use migration_connector::{ConnectorError, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use user_facing_errors::migration_engine::FoundFailedMigrations;
+
+use super::MigrationCommand;
 
 /// The input to the `ApplyMigrations` command.
 #[derive(Deserialize, Debug)]
@@ -29,17 +30,15 @@ pub struct ApplyMigrationsCommand;
 #[async_trait::async_trait]
 impl<'a> MigrationCommand for ApplyMigrationsCommand {
     type Input = ApplyMigrationsInput;
-
     type Output = ApplyMigrationsOutput;
 
-    async fn execute<C, D>(input: &Self::Input, engine: &MigrationEngine<C, D>) -> CoreResult<Self::Output>
+    async fn execute<C>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output>
     where
-        C: migration_connector::MigrationConnector<DatabaseMigration = D>,
-        D: migration_connector::DatabaseMigrationMarker + Send + Sync + 'static,
+        C: migration_connector::MigrationConnector,
     {
         let connector = engine.connector();
         let applier = connector.database_migration_step_applier();
-        let migration_persistence = connector.new_migration_persistence();
+        let migration_persistence = connector.migration_persistence();
 
         migration_persistence.initialize().await?;
 

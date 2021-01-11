@@ -9,11 +9,12 @@ mod type_renderer;
 use super::{DmmfModelOperations, DmmfOperationMappings};
 use enum_renderer::*;
 use field_renderer::*;
+use indexmap::map::Entry;
 use object_renderer::*;
 use query_core::schema::*;
 use schema_renderer::*;
 use std::{
-    collections::{hash_map::Entry, HashSet},
+    collections::HashSet,
     sync::{Arc, Weak},
 };
 use type_renderer::*;

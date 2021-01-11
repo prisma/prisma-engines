@@ -81,12 +81,15 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
     async fn aggregate_records(
         &self,
         model: &ModelRef,
+        query_arguments: QueryArguments,
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
-        query_arguments: QueryArguments,
+        having: Option<Filter>,
     ) -> connector::Result<Vec<AggregationRow>> {
-        self.catch(async move { read::aggregate(&self.inner, model, selections, group_by, query_arguments).await })
-            .await
+        self.catch(
+            async move { read::aggregate(&self.inner, model, query_arguments, selections, group_by, having).await },
+        )
+        .await
     }
 }
 

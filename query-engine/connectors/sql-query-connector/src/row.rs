@@ -1,4 +1,4 @@
-use crate::error::SqlError;
+use crate::{column_metadata::ColumnMetadata, error::SqlError};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{AggregationResult, AggregationSelection};
@@ -8,7 +8,7 @@ use quaint::{
     ast::{Expression, Value},
     connector::ResultRow,
 };
-use std::{borrow::Borrow, convert::TryFrom, io, str::FromStr};
+use std::{convert::TryFrom, io, str::FromStr};
 use uuid::Uuid;
 
 /// An allocated representation of a `Row` returned from the database.
@@ -98,26 +98,26 @@ impl From<SqlRow> for Record {
 
 pub trait ToSqlRow {
     /// Conversion from a database specific row to an allocated `SqlRow`. To
-    /// help deciding the right types, the provided `TypeIdentifier`s should map
+    /// help deciding the right types, the provided `ColumnMetadata`s should map
     /// to the returned columns in the right order.
-    fn to_sql_row<'b>(self, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<SqlRow>;
+    fn to_sql_row<'b>(self, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow>;
 }
 
 impl ToSqlRow for ResultRow {
-    fn to_sql_row<'b>(self, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<SqlRow> {
+    fn to_sql_row<'b>(self, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow> {
         let mut row = SqlRow::default();
-        let row_width = idents.len();
+        let row_width = meta.len();
 
         row.values.reserve(row_width);
 
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
-            let pv = match &idents[i] {
+            let pv = match (meta[i].identifier(), meta[i].arity()) {
                 (type_identifier, FieldArity::List) => match p_value {
                     value if value.is_null() => Ok(PrismaValue::List(Vec::new())),
                     Value::Array(None) => Ok(PrismaValue::List(Vec::new())),
                     Value::Array(Some(l)) => l
                         .into_iter()
-                        .map(|p_value| row_value_to_prisma_value(p_value, &type_identifier))
+                        .map(|p_value| row_value_to_prisma_value(p_value, meta[i]))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(PrismaValue::List),
                     _ => {
@@ -128,7 +128,7 @@ impl ToSqlRow for ResultRow {
                         return Err(SqlError::ConversionError(error.into()));
                     }
                 },
-                (type_identifier, _) => row_value_to_prisma_value(p_value, &type_identifier),
+                _ => row_value_to_prisma_value(p_value, meta[i]),
             }?;
 
             row.values.push(pv);
@@ -138,45 +138,52 @@ impl ToSqlRow for ResultRow {
     }
 }
 
-pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifier) -> Result<PrismaValue, SqlError> {
-    Ok(match type_identifier {
+pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Result<PrismaValue, SqlError> {
+    let create_error = |value: &Value| {
+        let message = match meta.name() {
+            Some(name) => {
+                format!(
+                    "Could not convert value {} of the field `{}` to type `{:?}`.",
+                    value,
+                    name,
+                    meta.identifier()
+                )
+            }
+            None => {
+                format!("Could not convert value {} to type `{:?}`.", value, meta.identifier())
+            }
+        };
+
+        let error = io::Error::new(io::ErrorKind::InvalidData, message);
+
+        SqlError::ConversionError(error.into())
+    };
+
+    Ok(match meta.identifier() {
         TypeIdentifier::Boolean => match p_value {
-            // Value::Array(vec) => PrismaValue::Boolean(b),
             value if value.is_null() => PrismaValue::Null,
             Value::Integer(Some(i)) => PrismaValue::Boolean(i != 0),
             Value::Boolean(Some(b)) => PrismaValue::Boolean(b),
-            _ => {
-                let error = io::Error::new(io::ErrorKind::InvalidData, "Bool value not stored as bool or int");
-                return Err(SqlError::ConversionError(error.into()));
-            }
+            _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Enum(_) => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Enum(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
             Value::Text(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
-            _ => {
-                let error = io::Error::new(io::ErrorKind::InvalidData, "Enum value not stored as enum");
-                return Err(SqlError::ConversionError(error.into()));
-            }
+            _ => return Err(create_error(&p_value)),
         },
 
         TypeIdentifier::Json => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Text(Some(json)) => PrismaValue::Json(json.into()),
             Value::Json(Some(json)) => PrismaValue::Json(json.to_string()),
-            _ => {
-                let error = io::Error::new(io::ErrorKind::InvalidData, "Json value not stored as text or json");
-                return Err(SqlError::ConversionError(error.into()));
-            }
+            _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::UUID => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Text(Some(uuid)) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
             Value::Uuid(Some(uuid)) => PrismaValue::Uuid(uuid),
-            _ => {
-                let error = io::Error::new(io::ErrorKind::InvalidData, "Uuid value not stored as text or uuid");
-                return Err(SqlError::ConversionError(error.into()));
-            }
+            _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::DateTime => match p_value {
             value if value.is_null() => PrismaValue::Null,
@@ -189,13 +196,10 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
 
                 PrismaValue::DateTime(datetime.into())
             }
-            Value::Text(Some(dt_string)) => {
-                let dt = DateTime::parse_from_rfc3339(dt_string.borrow())
-                    .or_else(|_| DateTime::parse_from_rfc2822(dt_string.borrow()))
-                    .map_err(|err| {
-                        anyhow::format_err!("Could not parse stored DateTime string: {} ({})", dt_string, err)
-                    })
-                    .unwrap();
+            Value::Text(Some(ref dt_string)) => {
+                let dt = DateTime::parse_from_rfc3339(dt_string)
+                    .or_else(|_| DateTime::parse_from_rfc2822(dt_string))
+                    .map_err(|_| create_error(&p_value))?;
 
                 PrismaValue::DateTime(dt.with_timezone(&Utc).into())
             }
@@ -208,100 +212,62 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
                 let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
                 PrismaValue::DateTime(dt.into())
             }
-            _ => {
-                let error = io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "DateTime value not stored as datetime, int or text",
-                );
-                return Err(SqlError::ConversionError(error.into()));
-            }
+            _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Float | TypeIdentifier::Decimal => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Numeric(Some(f)) => PrismaValue::Float(f.normalized()),
             Value::Double(Some(f)) => match f {
-                f if f.is_nan() => {
-                    let error = io::Error::new(io::ErrorKind::InvalidData, "Double value of `NaN` is not supported.");
-                    return Err(SqlError::ConversionError(error.into()));
-                }
-                f if f.is_infinite() => {
-                    let error = io::Error::new(
-                        io::ErrorKind::InvalidData,
-                        "Double value of `Infinity` is not supported.",
-                    );
-                    return Err(SqlError::ConversionError(error.into()));
-                }
+                f if f.is_nan() => return Err(create_error(&p_value)),
+                f if f.is_infinite() => return Err(create_error(&p_value)),
                 _ => PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
             },
             Value::Float(Some(f)) => match f {
-                f if f.is_nan() => {
-                    let error = io::Error::new(io::ErrorKind::InvalidData, "Float value of `NaN` is not supported.");
-                    return Err(SqlError::ConversionError(error.into()));
-                }
-                f if f.is_infinite() => {
-                    let error = io::Error::new(
-                        io::ErrorKind::InvalidData,
-                        "Float value of `Infinity` is not supported.",
-                    );
-                    return Err(SqlError::ConversionError(error.into()));
-                }
+                f if f.is_nan() => return Err(create_error(&p_value)),
+                f if f.is_infinite() => return Err(create_error(&p_value)),
                 _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
             },
-            Value::Integer(Some(i)) => {
-                PrismaValue::Float(BigDecimal::from_f64(i as f64).expect("f64 was not a BigDecimal."))
-            }
+            Value::Integer(Some(i)) => match BigDecimal::from_f64(i as f64) {
+                Some(dec) => PrismaValue::Float(dec),
+                None => return Err(create_error(&p_value)),
+            },
             Value::Text(_) | Value::Bytes(_) => {
                 let dec: BigDecimal = p_value
                     .as_str()
                     .expect("text/bytes as str")
                     .parse()
-                    .map_err(|err: bigdecimal::ParseBigDecimalError| SqlError::ColumnReadFailure(err.into()))?;
+                    .map_err(|_| create_error(&p_value))?;
 
                 PrismaValue::Float(dec.normalized())
             }
-            _ => {
-                let error = io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "Float/BigDecimal value not stored as float, double, number, decimal, int or text",
-                );
-                return Err(SqlError::ConversionError(error.into()));
-            }
+            _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Int | TypeIdentifier::BigInt => match p_value {
             Value::Integer(Some(i)) => PrismaValue::Int(i),
             Value::Bytes(Some(bytes)) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
-            Value::Text(Some(txt)) => PrismaValue::Int(
-                i64::from_str(txt.trim_start_matches('\0')).map_err(|err| SqlError::ConversionError(err.into()))?,
-            ),
+            Value::Text(Some(ref txt)) => {
+                PrismaValue::Int(i64::from_str(txt.trim_start_matches('\0')).map_err(|_| create_error(&p_value))?)
+            }
             other => PrismaValue::try_from(other)?,
         },
         TypeIdentifier::String => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Uuid(Some(uuid)) => PrismaValue::String(uuid.to_string()),
-            Value::Json(Some(json_value)) => {
-                PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))
+            Value::Json(Some(ref json_value)) => {
+                PrismaValue::String(serde_json::to_string(json_value).map_err(|_| create_error(&p_value))?)
             }
             other => PrismaValue::try_from(other)?,
         },
         TypeIdentifier::Bytes => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Bytes(Some(bytes)) => PrismaValue::Bytes(bytes.into()),
-            _ => {
-                let error = io::Error::new(io::ErrorKind::InvalidData, "Byte-type value not stored as bytes.");
-                return Err(SqlError::ConversionError(error.into()));
-            }
+            _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Xml => match p_value {
             value if value.is_null() => PrismaValue::Null,
             Value::Xml(Some(xml)) => PrismaValue::Xml(xml.to_string()),
             Value::Text(Some(s)) => PrismaValue::Xml(s.into_owned()),
-            _ => {
-                let error = io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    format!("Xml-type value '{:?}' not stored as XML.", p_value),
-                );
-                return Err(SqlError::ConversionError(error.into()));
-            }
+            _ => return Err(create_error(&p_value)),
         },
     })
 }

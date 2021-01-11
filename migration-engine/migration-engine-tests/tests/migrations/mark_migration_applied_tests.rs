@@ -5,7 +5,7 @@ use pretty_assertions::assert_eq;
 #[test_each_connector]
 async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
-    let persistence = api.imperative_migration_persistence();
+    let persistence = api.migration_persistence();
 
     let dm = r#"
         model Test {
@@ -53,7 +53,7 @@ async fn mark_migration_applied_on_an_empty_database_works(api: &TestApi) -> Tes
 #[test_each_connector]
 async fn mark_migration_applied_on_a_non_empty_database_works(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
-    let persistence = api.imperative_migration_persistence();
+    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
@@ -126,7 +126,7 @@ async fn mark_migration_applied_on_a_non_empty_database_works(api: &TestApi) -> 
 #[test_each_connector]
 async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
-    let persistence = api.imperative_migration_persistence();
+    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
@@ -206,7 +206,7 @@ async fn mark_migration_applied_when_the_migration_is_already_applied_errors(api
 #[test_each_connector]
 async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
-    let persistence = api.imperative_migration_persistence();
+    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
@@ -296,7 +296,7 @@ async fn mark_migration_applied_when_the_migration_is_failed(api: &TestApi) -> T
 #[test_each_connector]
 async fn baselining_should_work(api: &TestApi) -> TestResult {
     let migrations_directory = api.create_migrations_directory()?;
-    let persistence = api.imperative_migration_persistence();
+    let persistence = api.migration_persistence();
 
     api.barrel()
         .execute(|migration| {

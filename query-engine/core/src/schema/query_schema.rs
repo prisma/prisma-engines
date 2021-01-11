@@ -89,6 +89,7 @@ pub struct QueryInfo {
 #[derive(Debug, Clone, PartialEq)]
 pub enum QueryTag {
     FindOne,
+    FindUnique,
     FindFirst,
     FindMany,
     CreateOne,
@@ -107,6 +108,7 @@ impl fmt::Display for QueryTag {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
             Self::FindOne => "findOne",
+            Self::FindUnique => "findUnique",
             Self::FindFirst => "findFirst",
             Self::FindMany => "findMany",
             Self::CreateOne => "createOne",

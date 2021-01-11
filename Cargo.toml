@@ -1,9 +1,11 @@
 [workspace]
 members = [
-  "introspection-engine/core",
   "introspection-engine/connectors/introspection-connector",
   "introspection-engine/connectors/sql-introspection-connector",
+  "introspection-engine/core",
   "introspection-engine/introspection-engine-tests",
+  "libs/datamodel/connectors/datamodel-connector",
+  "libs/datamodel/connectors/sql-datamodel-connector",
   "migration-engine/cli",
   "migration-engine/connectors/migration-connector",
   "migration-engine/connectors/sql-migration-connector",
@@ -15,23 +17,22 @@ members = [
   "query-engine/query-engine",
   "prisma-fmt",
   "libs/datamodel/core",
-  "libs/datamodel/connectors/datamodel-connector",
-  "libs/datamodel/connectors/sql-datamodel-connector",
+  "libs/feature-flags",
   "libs/json-rpc-stdio",
+  "libs/native-types",
   "libs/prisma-inflector",
+  "libs/prisma-models",
+  "libs/prisma-value",
+  "libs/sql-ddl",
   "libs/sql-schema-describer",
   "libs/test-cli",
   "libs/user-facing-errors",
-  "libs/prisma-models",
-  "libs/prisma-value",
-  "libs/feature-flags",
-  "libs/native-types",
 ]
 
 [profile.dev.package.backtrace]
 opt-level = 3
 
 [profile.release.package.introspection-core]
-opt-level = 'z'  # Optimize for size.
-codegen-units = 1
+codegen-units = 1 
+opt-level = 'z' # Optimize for size.
 #strip="symbols"

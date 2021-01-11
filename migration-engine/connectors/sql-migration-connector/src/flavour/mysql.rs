@@ -116,6 +116,9 @@ impl SqlFlavour for MysqlFlavour {
                 DescriberErrorKind::QuaintError(err) => {
                     quaint_error_to_connector_error(err, connection.connection_info())
                 }
+                DescriberErrorKind::CrossSchemaReference { .. } => {
+                    unreachable!("No schemas in MySQL")
+                }
             })
     }
 

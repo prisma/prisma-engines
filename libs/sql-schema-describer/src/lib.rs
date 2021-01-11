@@ -333,6 +333,10 @@ impl ColumnTypeFamily {
         matches!(self, ColumnTypeFamily::Enum(_))
     }
 
+    pub fn is_int(&self) -> bool {
+        matches!(self, ColumnTypeFamily::Int)
+    }
+
     pub fn is_json(&self) -> bool {
         matches!(self, ColumnTypeFamily::Json)
     }

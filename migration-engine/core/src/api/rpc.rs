@@ -1,11 +1,10 @@
+use super::error_rendering::render_jsonrpc_error;
 use crate::{CoreError, CoreResult, GenericApi};
 use enumflags2::BitFlags;
 use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use migration_connector::MigrationFeature;
 use std::sync::Arc;
-
-use super::error_rendering::render_jsonrpc_error;
 
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
@@ -18,6 +17,7 @@ enum RpcCommand {
     ApplyScript,
     CreateMigration,
     DebugPanic,
+    DevDiagnostic,
     DiagnoseMigrationHistory,
     EvaluateDataLoss,
     GetDatabaseVersion,
@@ -36,6 +36,7 @@ impl RpcCommand {
             RpcCommand::ApplyScript => "applyScript",
             RpcCommand::CreateMigration => "createMigration",
             RpcCommand::DebugPanic => "debugPanic",
+            RpcCommand::DevDiagnostic => "devDiagnostic",
             RpcCommand::DiagnoseMigrationHistory => "diagnoseMigrationHistory",
             RpcCommand::EvaluateDataLoss => "evaluateDataLoss",
             RpcCommand::GetDatabaseVersion => "getDatabaseVersion",
@@ -54,6 +55,7 @@ const AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::ApplyScript,
     RpcCommand::CreateMigration,
     RpcCommand::DebugPanic,
+    RpcCommand::DevDiagnostic,
     RpcCommand::DiagnoseMigrationHistory,
     RpcCommand::EvaluateDataLoss,
     RpcCommand::GetDatabaseVersion,
@@ -116,6 +118,7 @@ impl RpcApi {
             RpcCommand::ApplyScript => render(executor.apply_script(&params.parse()?).await?),
             RpcCommand::ApplyMigrations => render(executor.apply_migrations(&params.parse()?).await?),
             RpcCommand::CreateMigration => render(executor.create_migration(&params.parse()?).await?),
+            RpcCommand::DevDiagnostic => render(executor.dev_diagnostic(&params.parse()?).await?),
             RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),
             RpcCommand::DiagnoseMigrationHistory => {
                 render(executor.diagnose_migration_history(&params.parse()?).await?)
@@ -138,7 +141,6 @@ fn render(result: impl serde::Serialize) -> serde_json::Value {
     serde_json::to_value(result).expect("Rendering of RPC response failed")
 }
 
-#[derive(Debug)]
 enum RunCommandError {
     JsonRpcError(JsonRpcError),
     CoreError(CoreError),

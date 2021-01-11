@@ -36,20 +36,20 @@ impl KnownError {
     }
 }
 
-#[derive(Serialize, PartialEq, Debug)]
+#[derive(Serialize, PartialEq, Debug, Clone)]
 pub struct UnknownError {
     pub message: String,
     pub backtrace: Option<String>,
 }
 
-#[derive(Serialize, PartialEq, Debug)]
+#[derive(Serialize, PartialEq, Debug, Clone)]
 pub struct Error {
     is_panic: bool,
     #[serde(flatten)]
     inner: ErrorType,
 }
 
-#[derive(Serialize, PartialEq, Debug)]
+#[derive(Serialize, PartialEq, Debug, Clone)]
 #[serde(untagged)]
 enum ErrorType {
     Known(KnownError),

@@ -8,6 +8,7 @@ use crate::{
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
+use sql_ddl::postgres::{self as ddl, CreateEnum, CreateIndex};
 use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
 
@@ -17,22 +18,30 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_add_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
-        let constraint_clause = foreign_key
-            .constraint_name()
-            .map(|constraint_name| format!("CONSTRAINT {} ", self.quote(constraint_name)))
-            .unwrap_or_else(String::new);
-
-        format!(
-            "ALTER TABLE {table} ADD {constraint_clause}FOREIGN KEY({columns}){references}",
-            table = self.quote(foreign_key.table().name()),
-            constraint_clause = constraint_clause,
-            columns = foreign_key
-                .constrained_column_names()
-                .iter()
-                .map(Quoted::postgres_ident)
-                .join(", "),
-            references = self.render_references(foreign_key),
-        )
+        ddl::AlterTable {
+            table_name: ddl::PostgresIdentifier::Simple(foreign_key.table().name().into()),
+            clauses: vec![ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
+                constrained_columns: foreign_key.constrained_columns().map(|c| c.name().into()).collect(),
+                referenced_columns: foreign_key.referenced_column_names().iter().map(|c| c.into()).collect(),
+                constraint_name: foreign_key.constraint_name().map(From::from),
+                referenced_table: foreign_key.referenced_table().name().into(),
+                on_delete: Some(match foreign_key.on_delete_action() {
+                    ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
+                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::DoNothing,
+                    ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
+                    ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
+                    ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
+                }),
+                on_update: Some(match foreign_key.on_update_action() {
+                    ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
+                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::DoNothing,
+                    ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
+                    ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
+                    ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
+                }),
+            })],
+        }
+        .to_string()
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -275,32 +284,21 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
-        let sql = format!(
-            r#"CREATE TYPE "{enum_name}" AS ENUM ({variants})"#,
-            enum_name = enm.name(),
-            variants = enm.values().iter().map(Quoted::postgres_string).join(", "),
-        );
-
-        vec![sql]
+        vec![CreateEnum {
+            enum_name: enm.name().into(),
+            variants: enm.values().iter().map(|s| Cow::Borrowed(s.as_str())).collect(),
+        }
+        .to_string()]
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        let index_type = match index.index_type() {
-            IndexType::Unique => "UNIQUE ",
-            IndexType::Normal => "",
-        };
-
-        let index_name = self.quote(index.name());
-        let table_reference = self.quote(index.table().name());
-        let columns = index.columns().map(|c| self.quote(c.name()));
-
-        format!(
-            "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
-            index_type = index_type,
-            index_name = index_name,
-            table_reference = table_reference,
-            columns = columns.join(", ")
-        )
+        CreateIndex {
+            index_name: index.name().into(),
+            is_unique: index.index_type().is_unique(),
+            table_reference: index.table().name().into(),
+            columns: index.columns().map(|c| c.name().into()).collect(),
+        }
+        .to_string()
     }
 
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {

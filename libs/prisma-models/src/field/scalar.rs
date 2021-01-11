@@ -199,4 +199,8 @@ impl ScalarField {
     pub fn is_read_only(&self) -> bool {
         *self.read_only.get_or_init(|| false)
     }
+
+    pub fn is_numeric(&self) -> bool {
+        self.type_identifier.is_numeric()
+    }
 }
