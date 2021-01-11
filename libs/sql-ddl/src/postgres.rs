@@ -1,10 +1,121 @@
-use std::{borrow::Cow, fmt::Display};
-
 use crate::common::IteratorJoin;
+use std::{borrow::Cow, fmt::Display, todo};
 
+#[derive(Debug, Default)]
+pub struct AlterTable<'a> {
+    pub table_name: PostgresIdentifier<'a>,
+    pub clauses: Vec<AlterTableClause<'a>>,
+}
+
+impl Display for AlterTable<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("ALTER TABLE ")?;
+        self.table_name.fmt(f)?;
+
+        if self.clauses.len() <= 1 {
+            f.write_str(" ")?;
+            self.clauses[0].fmt(f)?;
+        } else {
+            todo!("multiline ALTER TABLE")
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub enum AlterTableClause<'a> {
+    AddForeignKey(ForeignKey<'a>),
+}
+
+impl Display for AlterTableClause<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AlterTableClause::AddForeignKey(fk) => {
+                f.write_str("ADD ")?;
+                fk.fmt(f)
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct ForeignKey<'a> {
+    pub constraint_name: Option<Cow<'a, str>>,
+    pub constrained_columns: Vec<Cow<'a, str>>,
+    pub referenced_table: Cow<'a, str>,
+    pub referenced_columns: Vec<Cow<'a, str>>,
+    pub on_delete: Option<ForeignKeyAction>,
+    pub on_update: Option<ForeignKeyAction>,
+}
+
+impl Display for ForeignKey<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(constraint_name) = &self.constraint_name {
+            write!(
+                f,
+                "CONSTRAINT \"{constraint_name}\" ",
+                constraint_name = constraint_name,
+            )?;
+        }
+
+        f.write_str("FOREIGN KEY (")?;
+
+        self.constrained_columns.iter().map(|s| Ident(s)).join(", ", f)?;
+
+        write!(f, ") REFERENCES \"{}\"(", self.referenced_table)?;
+
+        self.referenced_columns.iter().map(|s| Ident(s)).join(", ", f)?;
+
+        f.write_str(")")?;
+
+        if let Some(on_delete) = &self.on_delete {
+            f.write_str(" ON DELETE ")?;
+            on_delete.fmt(f)?;
+        }
+
+        if let Some(on_update) = &self.on_update {
+            f.write_str(" ON UPDATE ")?;
+            on_update.fmt(f)?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub enum ForeignKeyAction {
+    Cascade,
+    DoNothing,
+    Restrict,
+    SetDefault,
+    SetNull,
+}
+
+impl Display for ForeignKeyAction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            ForeignKeyAction::Cascade => "CASCADE",
+            ForeignKeyAction::Restrict => "RESTRICT",
+            ForeignKeyAction::DoNothing => "DO NOTHING",
+            ForeignKeyAction::SetNull => "SET NULL",
+            ForeignKeyAction::SetDefault => "SET DEFAULT",
+        };
+
+        f.write_str(s)
+    }
+}
+
+#[derive(Debug)]
 pub enum PostgresIdentifier<'a> {
     Simple(Cow<'a, str>),
     WithSchema(Cow<'a, str>, Cow<'a, str>),
+}
+
+impl Default for PostgresIdentifier<'_> {
+    fn default() -> Self {
+        PostgresIdentifier::Simple(Cow::Borrowed(""))
+    }
 }
 
 impl<'a> From<&'a str> for PostgresIdentifier<'a> {
@@ -125,5 +236,25 @@ mod tests {
             create_index.to_string(),
             "CREATE UNIQUE INDEX \"meow_idx\" ON \"Cat\"(\"name\", \"age\")"
         )
+    }
+
+    #[test]
+    fn full_alter_table_add_foreign_key() {
+        let alter_table = AlterTable {
+            table_name: PostgresIdentifier::WithSchema("public".into(), "Cat".into()),
+            clauses: vec![AlterTableClause::AddForeignKey(ForeignKey {
+                constrained_columns: vec!["friendName".into(), "friendTemperament".into()],
+                constraint_name: Some("cat_friend".into()),
+                on_delete: None,
+                on_update: None,
+                referenced_columns: vec!["name".into(), "temperament".into()],
+                referenced_table: "Dog".into(),
+            })],
+        };
+
+        let expected =
+            "ALTER TABLE \"public\".\"Cat\" ADD CONSTRAINT \"cat_friend\" FOREIGN KEY (\"friendName\", \"friendTemperament\") REFERENCES \"Dog\"(\"name\", \"temperament\")";
+
+        assert_eq!(alter_table.to_string(), expected);
     }
 }
