@@ -1,6 +1,5 @@
 use crate::{pair::Pair, sql_schema_differ::ColumnChanges};
 use migration_connector::DatabaseMigrationMarker;
-use serde::{Serialize, Serializer};
 use sql_schema_describer::SqlSchema;
 
 /// The database migration type for SqlMigrationConnector.
@@ -40,20 +39,6 @@ pub(crate) enum SqlMigrationStep {
     CreateEnum(CreateEnum),
     DropEnum(DropEnum),
     AlterEnum(AlterEnum),
-}
-
-impl Serialize for SqlMigrationStep {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_newtype_variant(
-            "SqlMigrationStep",
-            0,
-            self.description(),
-            &serde_json::Value::Object(Default::default()),
-        )
-    }
 }
 
 impl SqlMigrationStep {

@@ -10,10 +10,10 @@ migration-connector = { path = "../connectors/migration-connector" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector", optional = true }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
-enumflags2 = "0.6.0"
 anyhow = "1.0.26"
 async-trait = "0.1.17"
 chrono = { version = "0.4", features = ["serde"] }
+enumflags2 = "0.6.0"
 futures = { version = "0.3", default-features = false, features = ["compat"] }
 jsonrpc-core = "14.0"
 serde = { version = "1.0", features = ["derive"] }
