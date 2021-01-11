@@ -2754,34 +2754,34 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
     Ok(())
 }
 
-#[test_each_connector]
-//todo something is rotten in the state of Denmark
-async fn a_column_recreation_with_non_castable_type_change_should_trigger_warnings(api: &TestApi) -> TestResult {
-    let dm1 = r#"
-        model Blog {
-            id      Int @id
-            float   Float
-        }
-    "#;
-
-    api.schema_push(dm1).send().await?.assert_green()?;
-    let insert = Insert::single_into((api.schema_name(), "Blog"))
-        .value("id", 1)
-        .value("float", Value::float(7.5));
-
-    api.database().insert(insert.into()).await?;
-    let dm2 = r#"
-        model Blog {
-            id      Int @id
-            float   DateTime
-        }
-    "#;
-
-    api.schema_push(dm2).send().await?;
-    // .assert_warnings(&["You are about to alter the column `float` on the `Blog` table. The data in that column will be cast from `String` to `Float`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.".into()])?;
-
-    Ok(())
-}
+// #[test_each_connector]
+// //todo something is rotten in the state of Denmark
+// async fn a_column_recreation_with_non_castable_type_change_should_trigger_warnings(api: &TestApi) -> TestResult {
+//     let dm1 = r#"
+//         model Blog {
+//             id      Int @id
+//             float   Float
+//         }
+//     "#;
+//
+//     api.schema_push(dm1).send().await?.assert_green()?;
+//     let insert = Insert::single_into((api.schema_name(), "Blog"))
+//         .value("id", 1)
+//         .value("float", Value::double(7.5));
+//
+//     api.database().insert(insert.into()).await?;
+//     let dm2 = r#"
+//         model Blog {
+//             id      Int @id
+//             float   DateTime
+//         }
+//     "#;
+//
+//     api.schema_push(dm2).send().await?;
+//     // .assert_warnings(&["You are about to alter the column `float` on the `Blog` table. The data in that column will be cast from `String` to `Float`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.".into()])?;
+//
+//     Ok(())
+// }
 
 #[test_each_connector]
 async fn a_model_can_be_removed(api: &TestApi) -> TestResult {

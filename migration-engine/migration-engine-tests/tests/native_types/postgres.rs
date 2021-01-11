@@ -1069,6 +1069,8 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
             columns = next_columns
         ));
 
+        // todo we could force here and then check that the db really returns not castable
+        // then we would again need to have separate calls per mapping
         api.schema_push(&dm2).send().await?.assert_warnings(&warnings)?;
 
         //second assertions same as first

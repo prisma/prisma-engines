@@ -130,7 +130,6 @@ impl SqlMigrationConnector {
 
         for sql_string in render_raw_sql(&step, renderer, schemas) {
             tracing::debug!(index, %sql_string);
-            println!("{}", sql_string);
             self.conn().raw_cmd(&sql_string).await?;
         }
 

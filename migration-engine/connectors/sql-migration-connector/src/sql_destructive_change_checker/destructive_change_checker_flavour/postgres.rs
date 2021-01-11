@@ -49,18 +49,16 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             )
         }
 
-        let (previous_type, next_type) = if self.features().contains(MigrationFeature::NativeTypes) {
-            let datamodel_connector = SqlDatamodelConnectors::postgres();
-            //todo handle unsupported
-            (
-                datamodel_connector.render_native_type(columns.previous().column_type().native_type.clone().unwrap()),
-                datamodel_connector.render_native_type(columns.next().column_type().native_type.clone().unwrap()),
-            )
-        } else {
-            (
-                format!("{:?}", columns.previous().column_type_family()),
-                format!("{:?}", columns.next().column_type_family()),
-            )
+        let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
+        let datamodel_connector = SqlDatamodelConnectors::postgres();
+        let previous_type = match &columns.previous().column_type().native_type {
+            Some(tpe) if native_types_enabled => datamodel_connector.render_native_type(tpe.clone()),
+            _ => format!("{:?}", columns.previous().column_type_family()),
+        };
+
+        let next_type = match &columns.next().column_type().native_type {
+            Some(tpe) if native_types_enabled => datamodel_connector.render_native_type(tpe.clone()),
+            _ => format!("{:?}", columns.next().column_type_family()),
         };
 
         match type_change {
