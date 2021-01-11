@@ -467,8 +467,6 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Numeric(32,16)",
                 "Real",
                 "DoublePrecision",
-                "Char(53)",
-                "ByteA",
                 "Timestamp(3)",
                 "Timestamptz(3)",
                 "Date",
@@ -494,7 +492,6 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Real",
                 "DoublePrecision",
                 "ByteA",
-                "Timetz(3)",
                 "Boolean",
                 "Bit(10)",
                 "VarBit(10)",
@@ -560,7 +557,6 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Timestamp(3)",
                 "Timestamptz(3)",
                 "Date",
-                "Time(3)",
                 "Boolean",
                 "Bit(10)",
                 "VarBit(10)",
@@ -572,7 +568,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Timetz(3)",
-            Value::time(Utc::now().naive_utc().time()),
+            Value::datetime(Utc::now()),
             &[
                 "SmallInt",
                 "Integer",
@@ -609,7 +605,6 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Date",
                 "Time(3)",
                 "Timetz(3)",
-                "Boolean",
                 "Bit(10)",
                 "VarBit(10)",
                 "Uuid",
@@ -620,7 +615,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Bit(10)",
-            Value::bytes(vec![1]),
+            Value::text("0010101001"),
             &[
                 "SmallInt",
                 "Integer",
@@ -643,7 +638,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "VarBit(5)",
-            Value::bytes(vec![1]),
+            Value::text("0010"),
             &[
                 "SmallInt",
                 "Integer",
@@ -684,7 +679,6 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Boolean",
                 "Bit(10)",
                 "VarBit(10)",
-                "Uuid",
                 "Xml",
                 "Json",
                 "JsonB",
@@ -692,7 +686,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Xml",
-            Value::boolean(true),
+            Value::text("[]"),
             &[
                 "SmallInt",
                 "Integer",
@@ -710,14 +704,13 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "Bit(10)",
                 "VarBit(10)",
                 "Uuid",
-                "Xml",
                 "Json",
                 "JsonB",
             ],
         ),
         (
             "Json",
-            Value::boolean(true),
+            Value::json(serde_json::json!({"foo": "bar"})),
             &[
                 "SmallInt",
                 "Integer",
@@ -740,7 +733,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "JsonB",
-            Value::boolean(true),
+            Value::json(serde_json::json!({"foo": "bar"})),
             &[
                 "SmallInt",
                 "Integer",

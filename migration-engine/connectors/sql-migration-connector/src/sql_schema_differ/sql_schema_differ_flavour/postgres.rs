@@ -358,7 +358,9 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::VarChar(Some(new_length)) | PostgresType::Char(Some(new_length)) if new_length >= length => {
                 SafeCast
             }
-            PostgresType::Char(_) | PostgresType::VarChar(_) | PostgresType::Bit(_) => RiskyCast,
+            PostgresType::Bit(Some(new_length)) if new_length <= length => RiskyCast,
+            PostgresType::Bit(None) => RiskyCast,
+            PostgresType::Char(_) | PostgresType::VarChar(_) => RiskyCast,
             _ => NotCastable,
         },
         PostgresType::UUID => match next {
