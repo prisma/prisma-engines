@@ -17,7 +17,7 @@ use std::{collections::HashMap, str::FromStr};
 // split castable into safe and risky ✓
 // split seeds into risky succeeds ✓
 // enable force in risky succeeds ✓
-// adjust the differ
+// adjust the differ ✓
 // setup separate test case for risky fails
 // get this testfile to pass
 // get everything else to pass
@@ -102,8 +102,8 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             "Timestamp(3)",
             Value::datetime(Utc::now()),
             &[
-                "VarChar(53)",
-                "Char(53)",
+                "VarChar(23)",
+                "Char(23)",
                 "Text",
                 "Timestamp(1)",
                 "Timestamptz(3)",
@@ -115,11 +115,10 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             "Timestamptz(3)",
             Value::datetime(Utc::now()),
             &[
-                "VarChar(53)",
+                "VarChar(28)",
                 "Char(53)",
                 "Text",
                 "Timestamp(1)",
-                "Timestamptz(3)",
                 "Date",
                 "Time(3)",
                 "Timetz(3)",
@@ -128,17 +127,17 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         (
             "Date",
             Value::date(Utc::today().naive_utc()),
-            &["VarChar(53)", "Char(53)", "Text", "Timestamp(3)", "Timestamptz(3)"],
+            &["VarChar(53)", "Char(28)", "Text", "Timestamp(3)", "Timestamptz(3)"],
         ),
         (
             "Time(3)",
             Value::time(Utc::now().naive_utc().time()),
-            &["VarChar(53)", "Char(53)", "Text", "Timetz(3)"],
+            &["VarChar(14)", "Char(53)", "Text", "Timetz(3)"],
         ),
         (
             "Timetz(3)",
             Value::datetime(Utc::now()),
-            &["VarChar(53)", "Char(53)", "Text", "Time(3)", "Timetz(6)"],
+            &["VarChar(53)", "Char(19)", "Text", "Time(3)", "Timetz(6)"],
         ),
         ("Boolean", Value::boolean(false), &["VarChar", "Char(5)", "Text"]),
         (

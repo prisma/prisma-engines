@@ -290,21 +290,43 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             PostgresType::VarChar(Some(length)) | PostgresType::Char(Some(length)) if length > 2 => RiskyCast,
             _ => NotCastable,
         },
-        //todo later
         PostgresType::Timestamp(_) => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::Char(Some(len)) | PostgresType::VarChar(Some(len)) if len > 22 => SafeCast,
+            PostgresType::Timestamp(_)
+            | PostgresType::Timestamptz(_)
+            | PostgresType::Date
+            | PostgresType::Time(_)
+            | PostgresType::Timetz(_) => SafeCast,
+            _ => NotCastable,
         },
         PostgresType::Timestamptz(_) => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::Char(Some(len)) | PostgresType::VarChar(Some(len)) if len > 27 => SafeCast,
+            PostgresType::Timestamp(_)
+            | PostgresType::Timestamptz(_)
+            | PostgresType::Date
+            | PostgresType::Time(_)
+            | PostgresType::Timetz(_) => SafeCast,
+            _ => NotCastable,
         },
         PostgresType::Date => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::Char(Some(len)) | PostgresType::VarChar(Some(len)) if len > 27 => SafeCast,
+            PostgresType::Timestamp(_) | PostgresType::Timestamptz(_) => SafeCast,
+            _ => NotCastable,
         },
         PostgresType::Time(_) => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::Char(Some(len)) | PostgresType::VarChar(Some(len)) if len > 13 => SafeCast,
+            PostgresType::Timetz(_) => SafeCast,
+            _ => NotCastable,
         },
         PostgresType::Timetz(_) => match next {
-            _ => SafeCast,
+            PostgresType::Text | PostgresType::VarChar(None) => SafeCast,
+            PostgresType::Char(Some(len)) | PostgresType::VarChar(Some(len)) if len > 18 => SafeCast,
+            PostgresType::Timetz(_) | PostgresType::Time(_) => SafeCast,
+            _ => NotCastable,
         },
         PostgresType::Boolean => match next {
             PostgresType::Text | PostgresType::VarChar(_) => SafeCast,
