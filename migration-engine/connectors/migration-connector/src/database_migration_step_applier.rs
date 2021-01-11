@@ -1,5 +1,4 @@
 use crate::*;
-use serde::{Deserialize, Serialize};
 
 /// Apply a single migration step to the connector's database. At this level, we are working with database migrations,
 /// i.e. the [associated type on MigrationConnector](trait.MigrationConnector.html#associatedtype.DatabaseMigration).
@@ -22,10 +21,8 @@ pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
 
 /// A helper struct to serialize a database migration with an additional `raw` field containing the
 /// rendered query string for that step.
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone)]
 pub struct PrettyDatabaseMigrationStep {
-    /// The serialized database migration step.
-    pub step: serde_json::Value,
     /// The raw query string.
     pub raw: String,
 }

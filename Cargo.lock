@@ -3439,7 +3439,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "barrel",
  "chrono",
  "connection-string",
  "datamodel",
@@ -3452,7 +3451,6 @@ dependencies = [
  "prisma-value",
  "quaint",
  "regex",
- "serde",
  "serde_json",
  "sql-ddl",
  "sql-schema-describer",

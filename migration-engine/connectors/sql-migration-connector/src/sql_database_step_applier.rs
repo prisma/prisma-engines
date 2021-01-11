@@ -32,10 +32,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
             let sql = render_raw_sql(&step, self.flavour(), database_migration.schemas()).join(";\n");
 
             if !sql.is_empty() {
-                steps.push(PrettyDatabaseMigrationStep {
-                    step: serde_json::to_value(&step).unwrap_or_else(|_| serde_json::json!({})),
-                    raw: sql,
-                });
+                steps.push(PrettyDatabaseMigrationStep { raw: sql });
             }
         }
 
