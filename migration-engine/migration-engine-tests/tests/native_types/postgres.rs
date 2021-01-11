@@ -23,8 +23,8 @@ use std::{collections::HashMap, str::FromStr};
 // think about removed/ignored aliases -> serial, decimal...
 // get everything else to pass
 // review
-// setup separate test case for risky fails
 // merge / review without list->scalar / scalar -> list on monday
+// setup separate test case for risky fails
 // work on list/scalar scalar/list separately
 
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
@@ -789,7 +789,6 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
     let connector = SqlDatamodelConnectors::postgres();
 
     for (from, seed, casts) in SAFE_CASTS.iter() {
-        println!("{}", seed);
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
         let mut insert = Insert::single_into((api.schema_name(), "A"));

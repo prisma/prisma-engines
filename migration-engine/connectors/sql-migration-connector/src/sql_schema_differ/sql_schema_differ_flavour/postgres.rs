@@ -94,10 +94,6 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
 fn family_change_riskyness(previous: &ColumnTypeFamily, next: &ColumnTypeFamily) -> Option<ColumnTypeChange> {
     // todo this is not completely correct yet it seems
-
-    println!("GOT HERE?");
-    println!("{}", previous);
-    println!("{}", next);
     match (previous, next) {
         (previous, next) if previous == next => None,
         (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
@@ -112,7 +108,6 @@ fn family_change_riskyness(previous: &ColumnTypeFamily, next: &ColumnTypeFamily)
 fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
 
-    //todo review the bit part
     // varchar / varbit without param=> unlimited length
     // char / bit without param => length is 1
     let next_is_char = || matches!(next, PostgresType::Char(_));
