@@ -3,19 +3,19 @@ use crate::types::helper::{test_native_types_with_field_attribute_support, test_
 use datamodel::{ast, diagnostics::DatamodelError};
 use native_types::PostgresType;
 
-#[test]
-fn should_fail_on_serial_data_types_with_number_default() {
-    fn error_msg(type_name: &str) -> String {
-        format!(
-            "Sequential native type {} of Postgres must not have a static default value.",
-            type_name
-        )
-    }
-
-    for tpe in &["SmallSerial", "Serial", "BigSerial"] {
-        test_native_types_with_field_attribute_support(tpe, "Int", "default(4)", &error_msg(tpe), POSTGRES_SOURCE);
-    }
-}
+// #[test] no more serial currently
+// fn should_fail_on_serial_data_types_with_number_default() {
+//     fn error_msg(type_name: &str) -> String {
+//         format!(
+//             "Sequential native type {} of Postgres must not have a static default value.",
+//             type_name
+//         )
+//     }
+//
+//     for tpe in &["SmallSerial", "Serial", "BigSerial"] {
+//         test_native_types_with_field_attribute_support(tpe, "Int", "default(4)", &error_msg(tpe), POSTGRES_SOURCE);
+//     }
+// }
 
 #[test]
 fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
