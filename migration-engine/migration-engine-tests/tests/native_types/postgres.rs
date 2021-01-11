@@ -18,12 +18,12 @@ use std::{collections::HashMap, str::FromStr};
 // split seeds into risky succeeds ✓
 // enable force in risky succeeds ✓
 // adjust the differ ✓
-// setup separate test case for risky fails
-// get this testfile to pass
-// get everything else to pass
+// get this testfile to pass ✓
 // cleanup
-// review
 // think about removed/ignored aliases -> serial, decimal...
+// get everything else to pass
+// review
+// setup separate test case for risky fails
 // merge / review without list->scalar / scalar -> list on monday
 // work on list/scalar scalar/list separately
 
@@ -171,7 +171,6 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     ]
 });
 
-//todo have a succeeding and failing seed
 static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
         (
@@ -188,8 +187,8 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Real",            //todo
-                "DoublePrecision", //todo
+                "Real",
+                "DoublePrecision",
                 "VarChar(5)",
                 "Char(5)",
             ],
@@ -197,13 +196,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         (
             "Numeric(5,0)",
             Value::numeric(BigDecimal::from_str("10").unwrap()),
-            &[
-                "SmallInt",
-                "VarChar(5)",
-                "Char(5)",
-                "Real",            //todo
-                "DoublePrecision", //todo
-            ],
+            &["SmallInt", "VarChar(5)", "Char(5)", "Real", "DoublePrecision"],
         ),
         (
             "Real",
@@ -889,16 +882,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
 async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
-    //todo here we seed the columns with data
-    // but since every single column switch is risky and we do not force
-    // we don't execute the migration. This probably should be split into:
-    // - risky and fails with force
-    // - risky but ultimately succeeds, then assert again
     for (from, seed, casts) in RISKY_CASTS.iter() {
-        api.database()
-            .raw_cmd(&format!("DROP TABLE IF Exists \"{}\".\"A\"", api.schema_name()))
-            .await?;
-
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
         let mut insert = Insert::single_into((api.schema_name(), "A"));
@@ -994,9 +978,9 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             )
         })?;
 
-        // api.database()
-        //     .raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()))
-        //     .await?;
+        api.database()
+            .raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()))
+            .await?;
     }
 
     Ok(())
