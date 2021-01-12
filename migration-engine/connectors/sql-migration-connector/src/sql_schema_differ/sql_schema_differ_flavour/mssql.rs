@@ -42,47 +42,36 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     }
 
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+        let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
+        let previous_type: Option<MsSqlType> = differ.previous.column_native_type();
+        let next_type: Option<MsSqlType> = differ.next.column_native_type();
 
-        let family_comparison = || {
-            if previous_family == next_family {
-                None
-            } else {
-                Some(family_change_riskyness(previous_family, next_family))
-            }
-        };
-
-        if self.features().contains(MigrationFeature::NativeTypes) {
-            let previous_type: Option<MsSqlType> = differ.previous.column_native_type();
-            let next_type: Option<MsSqlType> = differ.next.column_native_type();
-
-            match (previous_type, next_type) {
-                (None, _) | (_, None) => family_comparison(),
-                (Some(previous), Some(next)) if previous == next => None,
-                (Some(previous), Some(next)) => Some(native_type_change_riskyness(previous, next)),
-            }
-        } else {
-            family_comparison()
+        match (previous_type, next_type) {
+            _ if !native_types_enabled => family_change_riskyness(previous_family, next_family),
+            (None, _) | (_, None) => family_change_riskyness(previous_family, next_family),
+            (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
         }
     }
 }
 
-fn family_change_riskyness(previous: &ColumnTypeFamily, next: &ColumnTypeFamily) -> ColumnTypeChange {
+fn family_change_riskyness(previous: &ColumnTypeFamily, next: &ColumnTypeFamily) -> Option<ColumnTypeChange> {
     match (previous, next) {
-        (_, ColumnTypeFamily::String) => ColumnTypeChange::SafeCast,
+        (prev, next) if prev == next => None,
+        (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
         (ColumnTypeFamily::String, ColumnTypeFamily::Int)
         | (ColumnTypeFamily::DateTime, ColumnTypeFamily::Float)
-        | (ColumnTypeFamily::String, ColumnTypeFamily::Float) => ColumnTypeChange::NotCastable,
-        (_, _) => ColumnTypeChange::RiskyCast,
+        | (ColumnTypeFamily::String, ColumnTypeFamily::Float) => Some(ColumnTypeChange::NotCastable),
+        (_, _) => Some(ColumnTypeChange::RiskyCast),
     }
 }
 
-fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnTypeChange {
+fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<ColumnTypeChange> {
     use ColumnTypeChange::*;
     use MsSqlTypeParameter::*;
 
-    match previous {
+    let cast = || match previous {
         // Bit, as in booleans. 1 or 0.
         MsSqlType::Bit => match next {
             MsSqlType::TinyInt => SafeCast,
@@ -303,6 +292,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnT
         // of digits in total we can have, scale the number of digits on the
         // right side of the comma.
         MsSqlType::Decimal(old_params) | MsSqlType::Numeric(old_params) => {
+            // todo most of these could be safe so we should match on the params as well?
             match next {
                 MsSqlType::TinyInt => RiskyCast,
                 MsSqlType::SmallInt => RiskyCast,
@@ -1123,5 +1113,11 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> ColumnT
             },
             _ => NotCastable,
         },
+    };
+
+    if previous == next {
+        None
+    } else {
+        Some(cast())
     }
 }

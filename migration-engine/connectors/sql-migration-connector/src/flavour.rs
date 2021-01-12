@@ -41,7 +41,7 @@ pub(crate) fn from_connection_info(
             url: url.clone(),
             circumstances: Default::default(),
         }),
-        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour(url.clone())),
+        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone(), features)),
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
             attached_name: db_name.clone(),
