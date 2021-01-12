@@ -120,6 +120,13 @@ impl ManyRecords {
     pub fn reverse(&mut self) {
         self.records.reverse();
     }
+
+    pub fn with_unique_records(self) -> Self {
+        Self {
+            records: self.records.into_iter().unique().collect(),
+            field_names: self.field_names,
+        }
+    }
 }
 
 #[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
