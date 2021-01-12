@@ -88,6 +88,12 @@ mobc = { version = "0.5.7", optional = true }
 serde = { version = "1.0", optional = true }
 connection-string = "0.1.10"
 
+[target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
+tiberius = { version = "0.4.19", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal", "vendored-openssl"]}
+
+[target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies]
+tiberius = { version = "0.4.19", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal"]}
+
 [dev-dependencies]
 indoc = "0.3"
 names = "0.11"
@@ -111,11 +117,6 @@ features = ["std"]
 
 [dependencies.uuid]
 version = "0.8"
-optional = true
-
-[dependencies.tiberius]
-version = "0.4.17"
-features = ["sql-browser-tokio", "chrono", "bigdecimal"]
 optional = true
 
 [dependencies.tokio-postgres]
