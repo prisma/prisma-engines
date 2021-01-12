@@ -1,3 +1,4 @@
+use dml::native_type_instance::NativeTypeInstance;
 use thiserror::Error;
 
 #[derive(Debug, Error, Clone)]
@@ -5,6 +6,78 @@ use thiserror::Error;
 pub struct ConnectorError {
     /// The error information for internal use.
     pub kind: ErrorKind,
+}
+
+pub struct ConnectorErrorFactory {
+    pub native_type: String,
+    pub connector: String,
+}
+
+impl ConnectorErrorFactory {
+    pub fn new(tpe: NativeTypeInstance, connector: String) -> Self {
+        ConnectorErrorFactory {
+            native_type: tpe.render(),
+            connector,
+        }
+    }
+
+    pub fn new_scale_larger_than_precision_error(self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(ErrorKind::ScaleLargerThanPrecisionError {
+            native_type: self.native_type,
+            connector_name: self.connector,
+        }))
+    }
+
+    pub fn new_incompatible_native_type_with_index(self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::IncompatibleNativeTypeWithIndexAttribute {
+                native_type: self.native_type,
+                connector_name: self.connector,
+            },
+        ))
+    }
+
+    pub fn new_incompatible_native_type_with_unique(self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::IncompatibleNativeTypeWithUniqueAttribute {
+                native_type: self.native_type,
+                connector_name: self.connector,
+            },
+        ))
+    }
+
+    pub fn new_incompatible_native_type_with_id(self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::IncompatibleNativeTypeWithIdAttribute {
+                native_type: self.native_type,
+                connector_name: self.connector,
+            },
+        ))
+    }
+
+    pub fn new_incompatible_sequential_type_with_static_default_value_error(self) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(
+            ErrorKind::IncompatibleSequentialTypeWithStaticDefaultValue {
+                native_type: self.native_type,
+                connector_name: self.connector,
+            },
+        ))
+    }
+
+    pub fn new_argument_m_out_of_range_error(self, message: &str) -> Result<(), ConnectorError> {
+        Err(ConnectorError::from_kind(ErrorKind::ArgumentOutOfRangeError {
+            native_type: self.native_type,
+            connector_name: self.connector,
+            message: String::from(message),
+        }))
+    }
+
+    pub fn native_type_name_unknown(self) -> Result<NativeTypeInstance, ConnectorError> {
+        Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+            native_type: self.native_type,
+            connector_name: self.connector,
+        }))
+    }
 }
 
 impl ConnectorError {
@@ -24,69 +97,11 @@ impl ConnectorError {
         })
     }
 
-    pub fn new_optional_argument_count_mismatch_error(
-        native_type: &str,
-        optional_count: usize,
-        given_count: usize,
-    ) -> ConnectorError {
-        ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
-            native_type: String::from(native_type),
-            optional_count,
-            given_count,
-        })
-    }
-
-    pub fn new_scale_larger_than_precision_error(native_type: &str, connector_name: &str) -> ConnectorError {
-        ConnectorError::from_kind(ErrorKind::ScaleLargerThanPrecisionError {
-            native_type: String::from(native_type),
-            connector_name: String::from(connector_name),
-        })
-    }
-
-    pub fn new_incompatible_native_type_with_unique(native_type: &str, connector_name: &str) -> ConnectorError {
-        ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithUniqueAttribute {
-            native_type: String::from(native_type),
-            connector_name: String::from(connector_name),
-        })
-    }
-
-    pub fn new_incompatible_native_type_with_id(native_type: &str, connector_name: &str) -> ConnectorError {
-        ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithIdAttribute {
-            native_type: String::from(native_type),
-            connector_name: String::from(connector_name),
-        })
-    }
-
-    pub fn new_incompatible_native_type_with_index(native_type: &str, connector_name: &str) -> ConnectorError {
-        ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithIndexAttribute {
-            native_type: String::from(native_type),
-            connector_name: String::from(connector_name),
-        })
-    }
-
     pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::ValueParserError {
             expected_type: String::from(expected_type),
             parser_error: String::from(parser_error),
             raw: String::from(raw),
-        })
-    }
-
-    pub fn new_incompatible_sequential_type_with_static_default_value_error(
-        native_type: &str,
-        connector_name: &str,
-    ) -> ConnectorError {
-        ConnectorError::from_kind(ErrorKind::IncompatibleSequentialTypeWithStaticDefaultValue {
-            native_type: String::from(native_type),
-            connector_name: String::from(connector_name),
-        })
-    }
-
-    pub fn new_argument_m_out_of_range_error(message: &str, native_type: &str, connector_name: &str) -> ConnectorError {
-        ConnectorError::from_kind(ErrorKind::ArgumentOutOfRangeError {
-            native_type: String::from(native_type),
-            connector_name: String::from(connector_name),
-            message: String::from(message),
         })
     }
 }

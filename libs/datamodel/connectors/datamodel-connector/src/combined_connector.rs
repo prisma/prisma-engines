@@ -30,6 +30,10 @@ impl CombinedConnector {
 }
 
 impl Connector for CombinedConnector {
+    fn name(&self) -> String {
+        unimplemented!("A combined connector does not have a name")
+    }
+
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
     }
