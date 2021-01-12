@@ -2,10 +2,8 @@ pub(crate) mod error;
 #[cfg(test)]
 mod tests;
 
-use enumflags2::BitFlags;
 use error::CliError;
 use futures::FutureExt;
-use migration_connector::MigrationFeature;
 use migration_core::migration_api;
 use structopt::StructOpt;
 use user_facing_errors::{
@@ -23,8 +21,8 @@ pub(crate) struct Cli {
 }
 
 impl Cli {
-    pub(crate) async fn run(self, enabled_preview_features: BitFlags<MigrationFeature>) -> ! {
-        match std::panic::AssertUnwindSafe(self.run_inner(enabled_preview_features))
+    pub(crate) async fn run(self) -> ! {
+        match std::panic::AssertUnwindSafe(self.run_inner())
             .catch_unwind()
             .await
         {
@@ -54,11 +52,10 @@ impl Cli {
 
     pub(crate) async fn run_inner(
         self,
-        enabled_preview_features: BitFlags<MigrationFeature>,
     ) -> Result<String, CliError> {
         match self.command {
             CliCommand::CreateDatabase => create_database(&self.datasource).await,
-            CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource, enabled_preview_features).await,
+            CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
             CliCommand::DropDatabase => drop_database(&self.datasource).await,
             CliCommand::QeSetup => {
                 qe_setup(&self.datasource).await?;
@@ -97,10 +94,9 @@ fn parse_base64_string(s: &str) -> Result<String, CliError> {
 
 async fn connect_to_database(
     database_str: &str,
-    enabled_preview_features: BitFlags<MigrationFeature>,
 ) -> Result<String, CliError> {
     let datamodel = datasource_from_database_str(database_str)?;
-    migration_api(&datamodel, enabled_preview_features).await?;
+    migration_api(&datamodel).await?;
     Ok("Connection successful".to_owned())
 }
 

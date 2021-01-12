@@ -1,12 +1,11 @@
 use super::CliError;
-use enumflags2::BitFlags;
 use quaint::{prelude::*, single::Quaint};
 use structopt::StructOpt;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
 async fn run(args: &[&str]) -> Result<String, CliError> {
     let cli = super::Cli::from_iter(std::iter::once(&"migration-engine-cli-test").chain(args.iter()));
-    cli.run_inner(BitFlags::all()).await
+    cli.run_inner().await
 }
 
 fn postgres_url(db: Option<&str>) -> String {

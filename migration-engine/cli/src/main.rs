@@ -5,10 +5,7 @@ mod commands;
 mod error_tests;
 mod logger;
 
-use enumflags2::BitFlags;
-use migration_connector::MigrationFeature;
 use migration_core::{api::RpcApi, CoreError};
-use std::io;
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
@@ -19,32 +16,8 @@ struct MigrationEngineCli {
     /// Path to the datamodel
     #[structopt(short = "d", long, name = "FILE")]
     datamodel: Option<String>,
-    /// A list of blocked preview features to enable (`all` enables everything).
-    #[structopt(long, use_delimiter = true)]
-    enabled_preview_features: Vec<String>,
     #[structopt(subcommand)]
     cli_subcommand: Option<SubCommand>,
-}
-
-impl MigrationEngineCli {
-    pub fn preview_feature_flags(&self) -> BitFlags<MigrationFeature> {
-        let mut enabled_features = BitFlags::empty();
-
-        for feature in self.enabled_preview_features.iter() {
-            if feature == "all" {
-                return BitFlags::all();
-            }
-
-            let feature: io::Result<MigrationFeature> = feature.parse();
-
-            match feature {
-                Ok(feature) => enabled_features.insert(feature),
-                Err(e) => tracing::debug!("{}", e),
-            }
-        }
-
-        enabled_features
-    }
 }
 
 #[derive(Debug, StructOpt)]
@@ -69,24 +42,23 @@ async fn main() {
     logger::init_logger();
 
     let input = MigrationEngineCli::from_args();
-    let features = input.preview_feature_flags();
 
     match input.cli_subcommand {
         None => {
             if let Some(datamodel_location) = input.datamodel.as_ref() {
-                start_engine(datamodel_location, input.preview_feature_flags()).await
+                start_engine(datamodel_location).await
             } else {
                 panic!("Missing --datamodel");
             }
         }
         Some(SubCommand::Cli(cli_command)) => {
             tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
-            cli_command.run(features).await;
+            cli_command.run().await;
         }
     }
 }
 
-async fn start_engine(datamodel_location: &str, enabled_preview_features: BitFlags<MigrationFeature>) -> ! {
+async fn start_engine(datamodel_location: &str) -> ! {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
@@ -95,7 +67,7 @@ async fn start_engine(datamodel_location: &str, enabled_preview_features: BitFla
     let mut datamodel = String::new();
     file.read_to_string(&mut datamodel).unwrap();
 
-    match RpcApi::new(&datamodel, enabled_preview_features).await {
+    match RpcApi::new(&datamodel).await {
         // Block the thread and handle IO in async until EOF.
         Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
         Err(err) => {
