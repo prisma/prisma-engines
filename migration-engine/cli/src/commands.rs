@@ -22,10 +22,7 @@ pub(crate) struct Cli {
 
 impl Cli {
     pub(crate) async fn run(self) -> ! {
-        match std::panic::AssertUnwindSafe(self.run_inner())
-            .catch_unwind()
-            .await
-        {
+        match std::panic::AssertUnwindSafe(self.run_inner()).catch_unwind().await {
             Ok(Ok(msg)) => {
                 tracing::info!("{}", msg);
                 std::process::exit(0);
@@ -50,9 +47,7 @@ impl Cli {
         }
     }
 
-    pub(crate) async fn run_inner(
-        self,
-    ) -> Result<String, CliError> {
+    pub(crate) async fn run_inner(self) -> Result<String, CliError> {
         match self.command {
             CliCommand::CreateDatabase => create_database(&self.datasource).await,
             CliCommand::CanConnectToDatabase => connect_to_database(&self.datasource).await,
@@ -92,9 +87,7 @@ fn parse_base64_string(s: &str) -> Result<String, CliError> {
     }
 }
 
-async fn connect_to_database(
-    database_str: &str,
-) -> Result<String, CliError> {
+async fn connect_to_database(database_str: &str) -> Result<String, CliError> {
     let datamodel = datasource_from_database_str(database_str)?;
     migration_api(&datamodel).await?;
     Ok("Connection successful".to_owned())

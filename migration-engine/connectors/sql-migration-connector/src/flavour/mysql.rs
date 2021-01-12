@@ -7,7 +7,7 @@ use crate::{
 use datamodel::{walkers::walk_scalar_fields, Datamodel};
 use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
 use once_cell::sync::Lazy;
 use quaint::{connector::MysqlUrl, prelude::SqlFamily};
 use regex::RegexSet;
@@ -20,6 +20,8 @@ pub(crate) struct MysqlFlavour {
     pub(super) url: MysqlUrl,
     /// See the [Circumstances] enum.
     pub(super) circumstances: AtomicU8,
+    /// Relevant features enabled in the schema,
+    pub(super) features: BitFlags<MigrationFeature>,
 }
 
 impl MysqlFlavour {
@@ -39,6 +41,10 @@ impl MysqlFlavour {
         BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
             .unwrap_or_default()
             .contains(Circumstances::LowerCasesTableNames)
+    }
+
+    pub(crate) fn features(&self) -> BitFlags<MigrationFeature> {
+        self.features
     }
 }
 

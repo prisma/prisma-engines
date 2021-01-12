@@ -1,4 +1,4 @@
-use crate::flavour::SqlFlavour;
+use crate::{flavour::SqlFlavour, pair::Pair};
 use enumflags2::BitFlags;
 use migration_connector::MigrationFeature;
 use prisma_value::PrismaValue;
@@ -41,6 +41,10 @@ impl<'a> ColumnDiffer<'a> {
 
     pub(crate) fn arity_changed(&self) -> bool {
         self.previous.arity() != self.next.arity()
+    }
+
+    pub(crate) fn as_pair(&self) -> Pair<&ColumnWalker<'a>> {
+        Pair::new(&self.previous, &self.next)
     }
 
     pub(crate) fn autoincrement_changed(&self) -> bool {

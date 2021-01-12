@@ -124,7 +124,14 @@ impl SqlRenderer for MysqlFlavour {
                         )),
                     };
                 }
-                TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on MySQL"),
+                TableChange::DropAndRecreateColumn {
+                    column_index,
+                    changes: _,
+                } => {
+                    let columns = tables.columns(column_index);
+                    lines.push(format!("DROP COLUMN `{}`", columns.previous().name()));
+                    lines.push(format!("ADD COLUMN {}", self.render_column(columns.next())));
+                }
             };
         }
 

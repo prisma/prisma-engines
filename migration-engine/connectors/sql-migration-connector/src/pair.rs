@@ -49,6 +49,15 @@ impl<T> Pair<T> {
     }
 }
 
+impl<T> Pair<Option<T>> {
+    pub(crate) fn transpose(self) -> Option<Pair<T>> {
+        match (self.previous, self.next) {
+            (Some(previous), Some(next)) => Some(Pair { previous, next }),
+            _ => None,
+        }
+    }
+}
+
 impl<'a> Pair<&'a SqlSchema> {
     pub(crate) fn enums(&self, enum_indexes: &Pair<usize>) -> Pair<EnumWalker<'a>> {
         Pair::new(
