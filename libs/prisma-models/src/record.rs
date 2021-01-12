@@ -60,7 +60,6 @@ impl ManyRecords {
                     values: v,
                     parent_id: None,
                 })
-                .unique()
                 .collect(),
             field_names: selected_fields.db_names().collect(),
         }
@@ -121,11 +120,9 @@ impl ManyRecords {
         self.records.reverse();
     }
 
-    pub fn with_unique_records(self) -> Self {
-        Self {
-            records: self.records.into_iter().unique().collect(),
-            field_names: self.field_names,
-        }
+    pub fn with_unique_records(mut self) -> Self {
+        self.records = self.records.into_iter().unique().collect();
+        self
     }
 }
 
