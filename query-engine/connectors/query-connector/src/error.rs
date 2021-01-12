@@ -37,6 +37,22 @@ impl ConnectorError {
                     details,
                 }))
             }
+            ErrorKind::ForeignKeyConstraintViolation { constraint } => {
+                let field_name = match constraint {
+                    DatabaseConstraint::Fields(fields) => fields.join(","),
+                    DatabaseConstraint::Index(index) => format!("{} (index)", index),
+                    DatabaseConstraint::ForeignKey => format!("N/A"),
+                };
+
+                Some(KnownError::new(user_facing_errors::query_engine::ForeignKeyViolation {
+                    field_name,
+                }))
+            }
+            ErrorKind::ConversionError(message) => Some(KnownError::new(
+                user_facing_errors::query_engine::InconsistentColumnData {
+                    message: format!("{}", message),
+                },
+            )),
 
             _ => None,
         };

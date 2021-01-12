@@ -654,6 +654,32 @@ async fn all_postgres_column_types_must_work() {
 }
 
 #[tokio::test]
+async fn postgres_cross_schema_references_are_not_allowed() {
+    let schema2 = format!("{}_2", SCHEMA);
+
+    let sql = format!(
+        "DROP SCHEMA IF EXISTS \"{0}\" CASCADE;
+         CREATE SCHEMA \"{0}\";
+         CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
+         CREATE TABLE \"{1}\".\"User\" (
+            id INT PRIMARY KEY,
+            city INT REFERENCES \"{0}\".\"City\" (id) ON DELETE NO ACTION
+        );
+        ",
+        schema2, SCHEMA
+    );
+
+    let inspector = get_postgres_describer(&sql, "postgres_cross_schema_references_are_not_allowed").await;
+
+    let err = inspector.describe(SCHEMA).await.unwrap_err();
+
+    assert_eq!(
+        format!("Illegal cross schema reference from `DatabaseInspector-Test.User` to `DatabaseInspector-Test_2.City` in constraint `User_city_fkey`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175"),
+        format!("{}", err),
+    );
+}
+
+#[tokio::test]
 async fn postgres_foreign_key_on_delete_must_be_handled() {
     let sql = format!(
         "CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);

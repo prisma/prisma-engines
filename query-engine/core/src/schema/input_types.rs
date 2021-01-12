@@ -81,6 +81,7 @@ impl InputObjectType {
 pub struct InputField {
     pub name: String,
     pub default_value: Option<dml::DefaultValue>,
+    pub deprecation: Option<Deprecation>,
 
     /// Possible field types, represented as a union of input types, but only one can be provided at any time.
     pub field_types: Vec<InputType>,
@@ -123,6 +124,21 @@ impl InputField {
     /// Adds possible input type to this input field's type union.
     pub fn add_type(mut self, typ: InputType) -> Self {
         self.field_types.push(typ);
+        self
+    }
+
+    pub fn deprecate<T, S, U>(mut self, reason: T, since_version: S, planned_removal_version: Option<U>) -> Self
+    where
+        T: Into<String>,
+        S: Into<String>,
+        U: Into<String>,
+    {
+        self.deprecation = Some(Deprecation {
+            reason: reason.into(),
+            since_version: since_version.into(),
+            planned_removal_version: planned_removal_version.map(Into::into),
+        });
+
         self
     }
 }

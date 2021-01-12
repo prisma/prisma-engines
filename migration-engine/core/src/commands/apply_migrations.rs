@@ -38,7 +38,7 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
     {
         let connector = engine.connector();
         let applier = connector.database_migration_step_applier();
-        let migration_persistence = connector.new_migration_persistence();
+        let migration_persistence = connector.migration_persistence();
 
         migration_persistence.initialize().await?;
 

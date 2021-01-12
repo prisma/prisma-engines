@@ -37,6 +37,12 @@ pub trait Connector: Send + Sync {
     /// This powers the use of native types for QE + ME.
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError>;
 
+    /// This function is used in ME for error messages
+    fn render_native_type(&self, native_type: serde_json::Value) -> String {
+        let instance = self.introspect_native_type(native_type).unwrap(); //todo
+        instance.render()
+    }
+
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
     /// powers IE
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;

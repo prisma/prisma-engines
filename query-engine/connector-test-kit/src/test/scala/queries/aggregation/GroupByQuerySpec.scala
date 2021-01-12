@@ -272,6 +272,19 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
   /////// Error Cases
 
+  "Using a groupBy without any by selection" should "error" in {
+    server.queryThatMustFail(
+      s"""{
+         |  groupByModel(by: []) {
+         |    s
+         |  }
+         |}""".stripMargin,
+      project,
+      errorCode = 2019,
+      errorContains = "At least one selection is required for the `by` argument."
+    )
+  }
+
   "Using a groupBy with mismatching by-arguments and query selections" should "return an error detailing the missing fields" in {
     server.queryThatMustFail(
       s"""{
@@ -298,6 +311,19 @@ class GroupByQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project,
       errorCode = 2019,
       errorContains = "Every field used for orderBy must be included in the by-arguments of the query. Missing fields: s"
+    )
+  }
+
+  "Using a groupBy with an empty aggregation selection" should "throw an appropriate error" in {
+    server.queryThatMustFail(
+      s"""{
+         |  groupByModel(by: [s]) {
+         |    sum
+         |  }
+         |}""".stripMargin,
+      project,
+      errorCode = 2009,
+      errorContains = "Expected a minimum of 1 fields to be present, got 0."
     )
   }
 }

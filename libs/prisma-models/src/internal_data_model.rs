@@ -4,6 +4,7 @@ use std::sync::{Arc, Weak};
 
 pub type InternalDataModelRef = Arc<InternalDataModel>;
 pub type InternalDataModelWeakRef = Weak<InternalDataModel>;
+pub type InternalEnumRef = Arc<InternalEnum>;
 
 #[derive(Debug, Default)]
 pub struct InternalDataModelTemplate {
@@ -15,7 +16,7 @@ pub struct InternalDataModelTemplate {
 
 #[derive(Debug)]
 pub struct InternalDataModel {
-    pub enums: Vec<InternalEnum>,
+    pub enums: Vec<InternalEnumRef>,
     version: Option<String>,
 
     /// Todo clarify / rename.
@@ -79,7 +80,7 @@ impl InternalDataModelTemplate {
         let internal_data_model = Arc::new(InternalDataModel {
             models: OnceCell::new(),
             relations: OnceCell::new(),
-            enums: self.enums,
+            enums: self.enums.into_iter().map(Arc::new).collect(),
             version: self.version,
             db_name,
             relation_fields: OnceCell::new(),
@@ -116,6 +117,14 @@ impl InternalDataModel {
 
     pub fn relations(&self) -> &[RelationRef] {
         self.relations.get().unwrap().as_slice()
+    }
+
+    pub fn find_enum(&self, name: &str) -> crate::Result<InternalEnumRef> {
+        self.enums
+            .iter()
+            .find(|e| e.name == name)
+            .cloned()
+            .ok_or_else(|| DomainError::EnumNotFound { name: name.to_string() })
     }
 
     pub fn find_model(&self, name: &str) -> crate::Result<ModelRef> {

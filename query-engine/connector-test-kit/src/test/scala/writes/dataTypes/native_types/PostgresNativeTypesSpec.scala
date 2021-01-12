@@ -15,9 +15,6 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  int      Int    @test.Integer
         |  sInt     Int    @test.SmallInt
         |  bInt     BigInt @test.BigInt
-        |  serial   Int    @test.Serial      @default(autoincrement())
-        |  sSerial  Int    @test.SmallSerial @default(autoincrement())
-        |  bSerial  Int    @test.BigSerial   @default(autoincrement())
         |  inc_int  Int    @test.Integer     @default(autoincrement())
         |  inc_sInt Int    @test.SmallInt    @default(autoincrement())
         |  inc_bInt BigInt @test.BigInt      @default(autoincrement())
@@ -39,9 +36,6 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |    int
          |    sInt
          |    bInt
-         |    serial
-         |    sSerial
-         |    bSerial
          |    inc_int
          |    inc_sInt
          |    inc_bInt
@@ -52,7 +46,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     )
 
     res.toString should be(
-      """{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"bInt":"9223372036854775807","serial":1,"sSerial":1,"bSerial":1,"inc_int":1,"inc_sInt":1,"inc_bInt":"1"}}}""")
+      """{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"bInt":"9223372036854775807","inc_int":1,"inc_sInt":1,"inc_bInt":"1"}}}""")
   }
 
   "Postgres native decimal types" should "work" in {

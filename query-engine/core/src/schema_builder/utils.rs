@@ -57,6 +57,7 @@ where
         field_type: Arc::new(field_type),
         query_info,
         is_required: true,
+        deprecation: None,
     }
 }
 
@@ -71,6 +72,7 @@ where
         field_types: field_types.into(),
         default_value,
         is_required: true,
+        deprecation: None,
     }
 }
 

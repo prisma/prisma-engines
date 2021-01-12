@@ -251,6 +251,8 @@ impl Column {
 /// The type of a column.
 #[derive(PartialEq, Clone, Debug)]
 pub struct ColumnType {
+    //todo we can probably get rid of datatype and just streamline on full data type
+    // this would be the sql string necessary to recreate the column, drawn directly from the db
     /// The SQL data type.
     pub data_type: String,
     /// The full SQL data type.

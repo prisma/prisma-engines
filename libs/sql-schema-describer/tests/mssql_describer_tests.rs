@@ -5,7 +5,9 @@ use crate::mssql::*;
 use barrel::{types, Migration};
 use native_types::{MsSqlType, MsSqlTypeParameter::*, NativeType};
 use pretty_assertions::assert_eq;
+use quaint::single::Quaint;
 use sql_schema_describer::*;
+use test_setup::mssql_2019_url;
 
 #[tokio::test]
 async fn all_mssql_column_types_must_work() {
@@ -472,6 +474,42 @@ async fn all_mssql_column_types_must_work() {
         .as_ref()
         .map(|s| s.starts_with("PK__User__"))
         .unwrap_or(false));
+}
+
+#[tokio::test]
+async fn mssql_cross_schema_references_are_not_allowed() {
+    let db_name = "mssql_cross_schema_references_are_not_allowed";
+    let secondary = "mssql_foreign_key_on_delete_must_be_handled_B";
+
+    for s in &[db_name, secondary] {
+        let connection_string = mssql_2019_url("master");
+        let conn = Quaint::new(&connection_string).await.unwrap();
+
+        test_setup::connectors::mssql::reset_schema(&conn, s).await.unwrap();
+    }
+
+    let sql = format!(
+        "
+            CREATE TABLE [{1}].[City] (id INT NOT NULL IDENTITY(1,1), CONSTRAINT [PK__City] PRIMARY KEY ([id]));
+            CREATE TABLE [{0}].[User]
+            (
+                id           INT NOT NULL IDENTITY (1,1),
+                city         INT,
+                city_cascade INT,
+                CONSTRAINT [FK__city] FOREIGN KEY (city) REFERENCES [{1}].[City] (id) ON DELETE NO ACTION,
+                CONSTRAINT [PK__User] PRIMARY KEY ([id])
+            );
+        ",
+        db_name, secondary
+    );
+
+    let inspector = get_mssql_describer_for_schema(dbg!(&sql), db_name).await;
+    let err = inspector.describe(db_name).await.unwrap_err();
+
+    assert_eq!(
+        format!("Illegal cross schema reference from `mssql_cross_schema_references_are_not_allowed.User` to `mssql_foreign_key_on_delete_must_be_handled_B.City` in constraint `FK__city`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175"),
+        format!("{}", err),
+    );
 }
 
 #[tokio::test]

@@ -2082,7 +2082,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
             api.assert_schema().await?.assert_table("A", |table| {
                 table.assert_columns_count(2)?.assert_column("x", |c| {
                     c.assert_is_required()?
-                        .assert_native_type(&with_params(from).to_lowercase())
+                        .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             })?;
 
@@ -2104,7 +2104,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
             api.assert_schema().await?.assert_table("A", |table| {
                 table.assert_columns_count(2)?.assert_column("x", |c| {
                     c.assert_is_required()?
-                        .assert_native_type(&with_params(to).to_lowercase())
+                        .assert_full_data_type(&with_params(to).to_lowercase())
                 })
             })?;
 
@@ -2144,7 +2144,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             api.assert_schema().await?.assert_table("A", |table| {
                 table.assert_columns_count(2)?.assert_column("x", |c| {
                     c.assert_is_required()?
-                        .assert_native_type(&with_params(from).to_lowercase())
+                        .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             })?;
 
@@ -2172,7 +2172,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             api.assert_schema().await?.assert_table("A", |table| {
                 table.assert_columns_count(2)?.assert_column("x", |c| {
                     c.assert_is_required()?
-                        .assert_native_type(&with_params(from).to_lowercase())
+                        .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             })?;
 
@@ -2215,7 +2215,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
             api.assert_schema().await?.assert_table("A", |table| {
                 table.assert_columns_count(2)?.assert_column("x", |c| {
                     c.assert_is_required()?
-                        .assert_native_type(&with_params(from).to_lowercase())
+                        .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             })?;
 
@@ -2242,7 +2242,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
             api.assert_schema().await?.assert_table("A", |table| {
                 table.assert_columns_count(2)?.assert_column("x", |c| {
                     c.assert_is_required()?
-                        .assert_native_type(&with_params(from).to_lowercase())
+                        .assert_full_data_type(&with_params(from).to_lowercase())
                 })
             })?;
 

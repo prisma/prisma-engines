@@ -69,7 +69,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
 
     async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
         let connector = engine.connector();
-        let migration_persistence = connector.new_migration_persistence();
+        let migration_persistence = connector.migration_persistence();
         let migration_inferrer = connector.database_migration_inferrer();
 
         tracing::debug!("Diagnosing migration history");

@@ -438,13 +438,14 @@ impl SqlSchemaDescriber {
 
         let sql = indoc! {r#"
             SELECT OBJECT_NAME(fkc.constraint_object_id) AS constraint_name,
-                parent_table.name                     AS table_name,
-                referenced_table.name                 AS referenced_table_name,
-                parent_column.name                    AS column_name,
-                referenced_column.name                AS referenced_column_name,
-                fk.delete_referential_action          AS delete_referential_action,
-                fk.update_referential_action          AS update_referential_action,
-                fkc.constraint_column_id              AS ordinal_position
+                parent_table.name                       AS table_name,
+                referenced_table.name                   AS referenced_table_name,
+                SCHEMA_NAME(referenced_table.schema_id) AS referenced_schema_name,
+                parent_column.name                      AS column_name,
+                referenced_column.name                  AS referenced_column_name,
+                fk.delete_referential_action            AS delete_referential_action,
+                fk.update_referential_action            AS update_referential_action,
+                fkc.constraint_column_id                AS ordinal_position
             FROM sys.foreign_key_columns AS fkc
                     INNER JOIN sys.tables AS parent_table
                                 ON fkc.parent_object_id = parent_table.object_id
@@ -474,8 +475,17 @@ impl SqlSchemaDescriber {
             let constraint_name = row.get_expect_string("constraint_name");
             let column = row.get_expect_string("column_name");
             let referenced_table = row.get_expect_string("referenced_table_name");
+            let referenced_schema_name = row.get_expect_string("referenced_schema_name");
             let referenced_column = row.get_expect_string("referenced_column_name");
             let ord_pos = row.get_expect_i64("ordinal_position");
+
+            if schema != referenced_schema_name {
+                return Err(DescriberError::from(DescriberErrorKind::CrossSchemaReference {
+                    from: format!("{}.{}", schema, table_name),
+                    to: format!("{}.{}", referenced_schema_name, referenced_table),
+                    constraint: constraint_name,
+                }));
+            }
 
             let on_delete_action = match row.get_expect_i64("delete_referential_action") {
                 0 => ForeignKeyAction::NoAction,

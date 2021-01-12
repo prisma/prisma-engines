@@ -143,7 +143,7 @@ fn non_list_scalar_update_field_mapper(
         TypeIdentifier::String => InputType::object(operations_object_type(ctx, "String", field, false)),
         TypeIdentifier::Boolean => InputType::object(operations_object_type(ctx, "Bool", field, false)),
         TypeIdentifier::Enum(e) => InputType::object(operations_object_type(ctx, &format!("Enum{}", e), field, false)),
-        TypeIdentifier::Json => map_scalar_input_type(field),
+        TypeIdentifier::Json => map_scalar_input_type_for_field(ctx, field),
         TypeIdentifier::DateTime => InputType::object(operations_object_type(ctx, "DateTime", field, false)),
         TypeIdentifier::UUID => InputType::object(operations_object_type(ctx, "Uuid", field, false)),
         TypeIdentifier::Xml => InputType::object(operations_object_type(ctx, "Xml", field, false)),
@@ -151,7 +151,7 @@ fn non_list_scalar_update_field_mapper(
     };
 
     let input_field = if field.type_identifier != TypeIdentifier::Json {
-        let types = vec![map_scalar_input_type(field), base_update_type];
+        let types = vec![map_scalar_input_type_for_field(ctx, field), base_update_type];
         input_field(field.name.clone(), types, default)
     } else {
         input_field(field.name.clone(), base_update_type, default)
@@ -181,7 +181,7 @@ fn operations_object_type(
     let obj = Arc::new(obj);
     ctx.cache_input_type(ident, obj.clone());
 
-    let typ = map_scalar_input_type(field);
+    let typ = map_scalar_input_type_for_field(ctx, field);
     let mut fields = vec![input_field("set", typ.clone(), None)
         .optional()
         .nullable_if(!field.is_required)];

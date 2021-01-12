@@ -1,7 +1,6 @@
 use datamodel_connector::connector_error::ConnectorError;
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
-use dml::default_value::DefaultValue;
 use dml::field::{Field, FieldType};
 use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
@@ -17,9 +16,6 @@ const DECIMAL_TYPE_NAME: &str = "Decimal";
 const NUMERIC_TYPE_NAME: &str = "Numeric";
 const REAL_TYPE_NAME: &str = "Real";
 const DOUBLE_PRECISION_TYPE_NAME: &str = "DoublePrecision";
-const SMALL_SERIAL_TYPE_NAME: &str = "SmallSerial";
-const SERIAL_TYPE_NAME: &str = "Serial";
-const BIG_SERIAL_TYPE_NAME: &str = "BigSerial";
 const VARCHAR_TYPE_NAME: &str = "VarChar";
 const CHAR_TYPE_NAME: &str = "Char";
 const TEXT_TYPE_NAME: &str = "Text";
@@ -42,6 +38,7 @@ pub struct PostgresDatamodelConnector {
     constructors: Vec<NativeTypeConstructor>,
 }
 
+//todo should this also contain the pretty printed output for SQL rendering?
 impl PostgresDatamodelConnector {
     pub fn new() -> PostgresDatamodelConnector {
         let capabilities = vec![
@@ -62,9 +59,6 @@ impl PostgresDatamodelConnector {
         let numeric = NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]);
         let real = NativeTypeConstructor::without_args(REAL_TYPE_NAME, vec![ScalarType::Float]);
         let double_precision = NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, vec![ScalarType::Float]);
-        let small_serial = NativeTypeConstructor::without_args(SMALL_SERIAL_TYPE_NAME, vec![ScalarType::Int]);
-        let serial = NativeTypeConstructor::without_args(SERIAL_TYPE_NAME, vec![ScalarType::Int]);
-        let big_serial = NativeTypeConstructor::without_args(BIG_SERIAL_TYPE_NAME, vec![ScalarType::Int]);
         let varchar = NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]);
         let char = NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
         let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]);
@@ -91,9 +85,6 @@ impl PostgresDatamodelConnector {
             numeric,
             real,
             double_precision,
-            small_serial,
-            serial,
-            big_serial,
             varchar,
             char,
             text,
@@ -135,11 +126,6 @@ impl Connector for PostgresDatamodelConnector {
                 let error = self.native_instance_error(native_type_instance);
 
                 match native_type {
-                    SmallSerial | Serial | BigSerial
-                        if matches!(field.default_value(), Some(DefaultValue::Single(_))) =>
-                    {
-                        error.new_incompatible_sequential_type_with_static_default_value_error()
-                    }
                     Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
                         error.new_scale_larger_than_precision_error()
                     }
@@ -177,9 +163,6 @@ impl Connector for PostgresDatamodelConnector {
             NUMERIC_TYPE_NAME => Decimal(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
             REAL_TYPE_NAME => Real,
             DOUBLE_PRECISION_TYPE_NAME => DoublePrecision,
-            SMALL_SERIAL_TYPE_NAME => SmallSerial,
-            SERIAL_TYPE_NAME => Serial,
-            BIG_SERIAL_TYPE_NAME => BigSerial,
             VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME)?),
             CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
             TEXT_TYPE_NAME => Text,
@@ -188,7 +171,7 @@ impl Connector for PostgresDatamodelConnector {
             TIMESTAMP_TZ_TYPE_NAME => Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME)?),
             DATE_TYPE_NAME => Date,
             TIME_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TYPE_NAME)?),
-            TIME_TZ_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME)?),
+            TIME_TZ_TYPE_NAME => Timetz(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME)?),
             BOOLEAN_TYPE_NAME => Boolean,
             BIT_TYPE_NAME => Bit(parse_one_opt_u32(args, BIT_TYPE_NAME)?),
             VAR_BIT_TYPE_NAME => VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME)?),
@@ -212,9 +195,6 @@ impl Connector for PostgresDatamodelConnector {
             Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             Real => (REAL_TYPE_NAME, vec![]),
             DoublePrecision => (DOUBLE_PRECISION_TYPE_NAME, vec![]),
-            SmallSerial => (SMALL_SERIAL_TYPE_NAME, vec![]),
-            Serial => (SMALL_SERIAL_TYPE_NAME, vec![]),
-            BigSerial => (BIG_SERIAL_TYPE_NAME, vec![]),
             VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_from_opt(x)),
             Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
             Text => (TEXT_TYPE_NAME, vec![]),

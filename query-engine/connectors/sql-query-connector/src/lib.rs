@@ -1,3 +1,4 @@
+mod column_metadata;
 mod cursor_condition;
 mod database;
 mod error;
@@ -8,6 +9,7 @@ mod query_builder;
 mod query_ext;
 mod row;
 
+use column_metadata::*;
 use filter_conversion::*;
 use query_ext::QueryExt;
 use row::*;

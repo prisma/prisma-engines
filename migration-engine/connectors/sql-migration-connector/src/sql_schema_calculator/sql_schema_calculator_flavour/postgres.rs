@@ -44,9 +44,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             PostgresType::Numeric(precision) => format!("NUMERIC{}", render_decimal(precision)),
             PostgresType::Real => "REAL".to_owned(),
             PostgresType::DoublePrecision => "DOUBLE PRECISION".to_owned(),
-            PostgresType::SmallSerial => "SMALLSERIAL".to_owned(),
-            PostgresType::Serial => "SERIAL".to_owned(),
-            PostgresType::BigSerial => "BIGSERIAL".to_owned(),
             PostgresType::VarChar(length) => format!("VARCHAR{}", render(length)),
             PostgresType::Char(length) => format!("CHAR{}", render(length)),
             PostgresType::Text => "TEXT".to_owned(),
@@ -69,7 +66,9 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             data_type: data_type.clone(),
             full_data_type: data_type,
             character_maximum_length: None,
-            family: sql::ColumnTypeFamily::String,
+            family: sql::ColumnTypeFamily::String, //todo this is wrong
+            //maybe we should have a mapping from Native type to ColumnTypeFamily in the datamodel connector
+            //this could be used here and in the describer to remove duplication
             arity: match field.arity() {
                 datamodel::FieldArity::Required => sql::ColumnArity::Required,
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,

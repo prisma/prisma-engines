@@ -27,7 +27,7 @@ impl MigrationCommand for MarkMigrationRolledBackCommand {
     async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
         // We should take a lock on the migrations table.
 
-        let persistence = engine.connector().new_migration_persistence();
+        let persistence = engine.connector().migration_persistence();
 
         let all_migrations = persistence.list_migrations().await?.map_err(|_err| {
             CoreError::Generic(anyhow::anyhow!(

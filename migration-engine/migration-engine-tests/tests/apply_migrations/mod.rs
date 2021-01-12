@@ -112,7 +112,7 @@ async fn migrations_should_fail_when_the_script_is_invalid(api: &TestApi) -> Tes
 
     assert!(result.is_err());
 
-    let mut migrations = api.imperative_migration_persistence().list_migrations().await?.unwrap();
+    let mut migrations = api.migration_persistence().list_migrations().await?.unwrap();
 
     assert_eq!(migrations.len(), 2);
 

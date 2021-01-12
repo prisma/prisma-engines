@@ -40,3 +40,10 @@ impl<T> IntoArc<T> for Weak<T> {
         self.upgrade().expect("Expected weak reference to be valid.")
     }
 }
+
+#[derive(Debug, PartialEq)]
+pub struct Deprecation {
+    pub since_version: String,
+    pub planned_removal_version: Option<String>,
+    pub reason: String,
+}

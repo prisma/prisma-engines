@@ -1,8 +1,8 @@
 use super::*;
 use prisma_models::dml::DefaultValue;
 
-pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField) -> InputField {
-    let types = field_filter_types::get_field_filter_types(ctx, field);
+pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, include_aggregates: bool) -> InputField {
+    let types = field_filter_types::get_field_filter_types(ctx, field, include_aggregates);
     input_field(field.name().to_owned(), types, None).optional()
 }
 
@@ -37,7 +37,7 @@ pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, field: &RelationFiel
 /// Builds "deleteMany" field for nested updates (on relation fields).
 pub(crate) fn nested_delete_many_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     if field.is_list {
-        let input_object = filter_objects::scalar_filter_object_type(ctx, &field.related_model());
+        let input_object = filter_objects::scalar_filter_object_type(ctx, &field.related_model(), false);
         let input_type = InputType::object(input_object);
 
         Some(
@@ -153,7 +153,7 @@ where
         .filter(|f| f.is_list)
         .map(|f| {
             let name = f.name.clone();
-            let list_input_type = map_scalar_input_type(&f);
+            let list_input_type = map_scalar_input_type(ctx, &f.type_identifier, f.is_list);
             let set_object_ident = Identifier::new(
                 format!("{}{}{}Input", model_name, input_object_name, f.name),
                 PRISMA_NAMESPACE,

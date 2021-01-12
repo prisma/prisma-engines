@@ -125,6 +125,7 @@ impl AliasedCondition for Filter {
                     ConditionTree::NegativeCondition
                 }
             }
+            Filter::Aggregation(filter) => filter.aliased_cond(alias),
             Filter::Empty => ConditionTree::NoCondition,
             _ => unimplemented!(),
         }
@@ -292,6 +293,43 @@ impl AliasedCondition for OneRelationIsNullFilter {
         };
 
         ConditionTree::single(condition)
+    }
+}
+
+impl AliasedCondition for AggregationFilter {
+    /// Conversion from an `AggregationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
+    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+        match self {
+            AggregationFilter::Count(filter) => aggregate_conditions(*filter, alias, |x| count(x).into()),
+            AggregationFilter::Average(filter) => aggregate_conditions(*filter, alias, |x| avg(x).into()),
+            AggregationFilter::Sum(filter) => aggregate_conditions(*filter, alias, |x| sum(x).into()),
+            AggregationFilter::Min(filter) => aggregate_conditions(*filter, alias, |x| min(x).into()),
+            AggregationFilter::Max(filter) => aggregate_conditions(*filter, alias, |x| max(x).into()),
+        }
+    }
+}
+
+fn aggregate_conditions<T>(filter: Filter, alias: Option<Alias>, field_transformer: T) -> ConditionTree<'static>
+where
+    T: Fn(Column) -> Expression,
+{
+    let sf = match filter {
+        Filter::Scalar(sf) => sf,
+        _ => unimplemented!(),
+    };
+
+    match (alias, sf.projection) {
+        (_, ScalarProjection::Compound(_)) => {
+            unimplemented!("Compound aggregate projections are unsupported.")
+        }
+        (Some(alias), ScalarProjection::Single(field)) => {
+            let comparable: Expression = field_transformer(field.as_column().table(alias.to_string(None)).into());
+            convert_scalar_filter(comparable, sf.condition, sf.mode, &[field])
+        }
+        (None, ScalarProjection::Single(field)) => {
+            let comparable: Expression = field_transformer(field.as_column().into());
+            convert_scalar_filter(comparable, sf.condition, sf.mode, &[field])
+        }
     }
 }
 
