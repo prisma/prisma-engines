@@ -51,7 +51,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
 
   "one successful query" should "work" in {
     server.batch(Seq("""query {findOneArtist(where:{ArtistId: 1}){Name}}"""), transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}}]}"""
     )
   }
 
@@ -63,7 +63,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums","ArtistId":1}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"Name":"ArtistWithOneAlbumWithoutTracks","ArtistId":2}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums","ArtistId":1}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"Name":"ArtistWithOneAlbumWithoutTracks","ArtistId":2}}}]}"""
     )
   }
 
@@ -75,7 +75,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums","ArtistId":1}}},{"errors":[{"error":"Error in query graph construction: QueryParserError(QueryParserError { path: QueryPath { segments: [\"Query\", \"wtf\"] }, error_kind: FieldNotFoundError })","user_facing_error":{"is_panic":false,"message":"Failed to validate the query: `Field does not exist on enclosing type.` at `Query.wtf`","meta":{"query_validation_error":"Field does not exist on enclosing type.","query_position":"Query.wtf"},"error_code":"P2009"}}]},{"data":{"findOneArtist":{"ArtistId":2,"Name":"ArtistWithOneAlbumWithoutTracks"}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums","ArtistId":1}}},{"errors":[{"error":"Error in query graph construction: QueryParserError(QueryParserError { path: QueryPath { segments: [\"Query\", \"wtf\"] }, error_kind: FieldNotFoundError })","user_facing_error":{"is_panic":false,"message":"Failed to validate the query: `Field does not exist on enclosing type.` at `Query.wtf`","meta":{"query_validation_error":"Field does not exist on enclosing type.","query_position":"Query.wtf"},"error_code":"P2009"}}]},{"data":{"findOneArtist":{"ArtistId":2,"Name":"ArtistWithOneAlbumWithoutTracks"}}}]}"""
     )
   }
 
@@ -87,7 +87,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"ArtistId":1,"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"Name":"ArtistWithOneAlbumWithoutTracks","ArtistId":2}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"ArtistId":1,"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"Name":"ArtistWithOneAlbumWithoutTracks","ArtistId":2}}}]}"""
     )
   }
 
@@ -99,7 +99,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]}"""
     )
   }
 
@@ -111,7 +111,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]}"""
     )
   }
 
@@ -123,13 +123,13 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]}"""
     )
   }
 
   "one singular failing query" should "work" in {
     server.batch(Seq("""query {findOneArtist(where:{ArtistId: 420}){Name}}"""), transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":null}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":null}}]}"""
     )
   }
 
@@ -140,7 +140,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":null}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":null}}]}"""
     )
   }
 
@@ -151,7 +151,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}}]}"""
     )
   }
 }

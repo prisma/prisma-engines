@@ -9,5 +9,5 @@ use std::fmt::Debug;
 #[serde(untagged)]
 pub enum PrismaResponse {
     Single(GQLResponse),
-    Multi(Vec<PrismaResponse>),
+    Multi(GQLBatchResponse),
 }

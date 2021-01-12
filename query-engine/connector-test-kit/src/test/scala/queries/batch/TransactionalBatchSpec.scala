@@ -40,7 +40,7 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     server.batch(queries, transaction = true, project, legacy = false).toString should be(
-      """[{"data":{"createOneModelA":{"id":1}}},{"data":{"createOneModelA":{"id":2}}}]"""
+      """{"batchResult":[{"data":{"createOneModelA":{"id":1}}},{"data":{"createOneModelA":{"id":2}}}]}"""
     )
   }
 
@@ -82,7 +82,7 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should startWith(
-      """[{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Unique constraint failed"""
+      """{"batchResult":[{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Unique constraint failed"""
     )
 
     val result = server.query("""
@@ -114,6 +114,6 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
       """mutation { queryRaw(query: "SELECT * FROM \"ModelC\"", parameters: "[]") }"""
     )
 
-    server.batch(queries, transaction = true, project, legacy = false).toString should be("""[{"data":{"createOneModelB":{"id":1}}},{"data":{"executeRaw":1}},{"data":{"queryRaw":[]}}]""")
+    server.batch(queries, transaction = true, project, legacy = false).toString should be("""{"batchResult":[{"data":{"createOneModelB":{"id":1}}},{"data":{"executeRaw":1}},{"data":{"queryRaw":[]}}]}""")
   }
 }

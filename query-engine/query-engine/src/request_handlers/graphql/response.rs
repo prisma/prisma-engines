@@ -15,12 +15,23 @@ pub struct GQLResponse {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: Vec<GQLError>,
 }
+#[derive(Debug, serde::Serialize, Default, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct GQLBatchResponse {
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    batch_result: Vec<GQLResponse>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    errors: Vec<GQLError>,
+}
 
 #[derive(Debug, serde::Serialize, PartialEq)]
 pub struct GQLError {
     error: String,
     user_facing_error: user_facing_errors::Error,
 }
+
+/// GQLResponse converters
 
 impl GQLResponse {
     pub fn with_capacity(capacity: usize) -> Self {
@@ -109,5 +120,53 @@ impl From<CoreError> for GQLResponse {
 
         gql_response.insert_error(err);
         gql_response
+    }
+}
+
+/// GQLBatchResponse converters
+
+impl GQLBatchResponse {
+    pub fn insert_responses(&mut self, responses: Vec<GQLResponse>) {
+        responses.into_iter().for_each(|response| {
+            self.batch_result.push(response);
+        })
+    }
+
+    pub fn insert_error(&mut self, error: impl Into<GQLError>) {
+        self.errors.push(error.into());
+    }
+}
+
+impl From<user_facing_errors::Error> for GQLBatchResponse {
+    fn from(err: user_facing_errors::Error) -> Self {
+        let mut batch_response = Self::default();
+        batch_response.insert_error(err);
+        batch_response
+    }
+}
+
+impl From<CoreError> for GQLBatchResponse {
+    fn from(err: CoreError) -> Self {
+        let mut batch_response = Self::default();
+
+        batch_response.insert_error(err);
+        batch_response
+    }
+}
+
+impl From<PrismaError> for GQLBatchResponse {
+    fn from(err: PrismaError) -> Self {
+        let mut responses = Self::default();
+        responses.insert_error(err);
+        responses
+    }
+}
+
+impl From<Vec<GQLResponse>> for GQLBatchResponse {
+    fn from(responses: Vec<GQLResponse>) -> Self {
+        let mut batch_response = Self::default();
+
+        batch_response.insert_responses(responses);
+        batch_response
     }
 }
