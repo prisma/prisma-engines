@@ -2418,6 +2418,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
 
 [[package]]
+name = "openssl-src"
+version = "111.13.0+1.1.1i"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "045e4dc48af57aad93d665885789b43222ae26f4886494da12d1ed58d309dcb6"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "openssl-sys"
 version = "0.9.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2426,8 +2435,23 @@ dependencies = [
  "autocfg 1.0.1",
  "cc",
  "libc",
+ "openssl-src",
  "pkg-config",
  "vcpkg",
+]
+
+[[package]]
+name = "opentls"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a764fc7777a53b3fa76a73322c3fd5bf1112dc1c7cad548156c43398198bc4de"
+dependencies = [
+ "futures-util",
+ "log",
+ "openssl",
+ "openssl-probe",
+ "openssl-sys",
+ "url 2.2.0",
 ]
 
 [[package]]
@@ -2857,7 +2881,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#347a02912c2d8e03aca2461423909d66b45cab92"
+source = "git+https://github.com/prisma/quaint#7dff04ba464aae3b02c567d804a4956fda5115fd"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3759,9 +3783,9 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.4.18"
+version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f37c1be8e69f882687c9cfd554b9de4630331217437f509614cc21933a5d7600"
+checksum = "bd76149fef873316b9032e970f2b2d4665904b3f1fe60157f16261545115a4e2"
 dependencies = [
  "async-native-tls",
  "async-stream",
@@ -3780,6 +3804,7 @@ dependencies = [
  "num-bigint 0.3.1",
  "num-traits",
  "once_cell",
+ "opentls",
  "pin-project-lite 0.1.11",
  "pretty-hex",
  "thiserror",
