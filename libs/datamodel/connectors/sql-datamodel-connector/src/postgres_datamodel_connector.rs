@@ -160,7 +160,7 @@ impl Connector for PostgresDatamodelConnector {
             INTEGER_TYPE_NAME => Integer,
             BIG_INT_TYPE_NAME => BigInt,
             DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
-            NUMERIC_TYPE_NAME => Decimal(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
+            NUMERIC_TYPE_NAME => Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
             REAL_TYPE_NAME => Real,
             DOUBLE_PRECISION_TYPE_NAME => DoublePrecision,
             VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME)?),
