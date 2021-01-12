@@ -184,7 +184,7 @@ pub fn mssql_2017_url(db_name: &str) -> String {
     let (host, port) = db_host_mssql_2017();
 
     format!(
-        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;encrypt=DANGER_PLAINTEXT;isolationLevel=READ UNCOMMITTED",
+        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
         db_name = db_name,
         host = host,
         port = port,
@@ -195,7 +195,7 @@ pub fn mssql_2019_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_mssql_2019();
 
     format!(
-        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;encrypt=DANGER_PLAINTEXT;isolationLevel=READ UNCOMMITTED",
+        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
         db_name = db_name,
         host = host,
         port = port,
