@@ -3,9 +3,7 @@ use crate::{context::PrismaContext, PrismaResponse, PrismaResult};
 use futures::FutureExt;
 use graphql_parser as gql;
 use indexmap::IndexMap;
-use query_core::{
-    BatchDocument, CompactedDocument, Item, Operation, QueryDocument, QueryValue, ResponseData,
-};
+use query_core::{BatchDocument, CompactedDocument, Item, Operation, QueryDocument, QueryValue, ResponseData};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, panic::AssertUnwindSafe, sync::Arc};
 
