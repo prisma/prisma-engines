@@ -1091,3 +1091,98 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
 
     Ok(())
 }
+
+// lists
+
+#[test_each_connector(tags("postgres"), features("native_types"))]
+async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
+    let connector = SqlDatamodelConnectors::postgres();
+
+    for (from, seed, casts) in SAFE_CASTS.iter() {
+        let mut previous_columns = "".to_string();
+        let mut next_columns = "".to_string();
+        let mut insert = Insert::single_into((api.schema_name(), "A"));
+        let mut previous_assertions = vec![];
+        let mut next_assertions = vec![];
+
+        for (idx, to) in casts.iter().enumerate() {
+            println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
+
+            let column_name = format!("column_{}", idx);
+
+            previous_columns.push_str(&format!(
+                "{column_name}  {prisma_type}? @test_db.{native_type} \n",
+                prisma_type = prisma_type(from),
+                native_type = from,
+                column_name = column_name
+            ));
+
+            next_columns.push_str(&format!(
+                "{column_name}  {prisma_type}? @test_db.{native_type}\n",
+                prisma_type = prisma_type(to),
+                native_type = to,
+                column_name = column_name
+            ));
+
+            insert = insert.value(column_name.clone(), seed.clone());
+
+            previous_assertions.push((column_name.clone(), from.clone()));
+            next_assertions.push((column_name, to).clone());
+        }
+
+        let dm1 = api.native_types_datamodel(format!(
+            r#"
+                model A {{
+                    id Int @id @default(autoincrement()) @test_db.Integer
+                    {columns}
+                }}
+                "#,
+            columns = previous_columns
+        ));
+
+        api.schema_push(&dm1).send().await?.assert_green()?;
+
+        //inserts
+        api.database().insert(insert.into()).await?;
+
+        //first assertions
+        api.assert_schema().await?.assert_table("A", |table| {
+            previous_assertions.iter().fold(
+                table.assert_column_count(previous_assertions.len() + 1),
+                |acc, (column_name, expected)| {
+                    acc.and_then(|table| {
+                        table.assert_column(column_name, |c| c.assert_native_type(expected, &connector))
+                    })
+                },
+            )
+        })?;
+
+        let dm2 = api.native_types_datamodel(format!(
+            r#"
+                model A {{
+                    id Int @id @default(autoincrement()) @test_db.Integer
+                    {columns}
+                }}
+                "#,
+            columns = next_columns
+        ));
+
+        api.schema_push(&dm2).send().await?.assert_green()?;
+
+        //second assertions
+        api.assert_schema().await?.assert_table("A", |table| {
+            next_assertions.iter().fold(
+                table.assert_column_count(next_assertions.len() + 1),
+                |acc, (name, expected)| {
+                    acc.and_then(|table| table.assert_column(name, |c| c.assert_native_type(expected, &connector)))
+                },
+            )
+        })?;
+
+        api.database()
+            .raw_cmd(&format!("DROP TABLE \"{}\".\"A\"", api.schema_name()))
+            .await?;
+    }
+
+    Ok(())
+}
