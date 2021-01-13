@@ -64,6 +64,8 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
         use ColumnTypeChange::*;
         let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
+        let from_list_to_scalar = differ.previous.arity().is_list() && !differ.next.arity().is_list();
+        let from_scalar_to_list = !differ.previous.arity().is_list() && differ.next.arity().is_list();
 
         if !native_types_enabled {
             let previous_family = differ.previous.column_type_family();
