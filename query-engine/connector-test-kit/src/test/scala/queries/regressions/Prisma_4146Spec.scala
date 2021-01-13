@@ -29,7 +29,7 @@ class Prisma_4146Spec extends FlatSpec with Matchers with ApiSpecBase with Schem
      """.stripMargin
   }
 
-  "Updating a list of fields over a connect bound" should "change the update fields tagged with @updatedAt" taggedAs (IgnoreMsSql) in {
+  "Updating a list of fields over a connect bound" should "change the update fields tagged with @updatedAt" in {
     database.setup(project)
 
     server.query(
