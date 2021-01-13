@@ -40,13 +40,13 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         }
 
         if changes.arity_changed() && !columns.previous().arity().is_list() && columns.next().arity().is_list() {
-            // plan.push_unexecutable(
-            //     UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-            //         table: columns.previous().table().name().to_owned(),
-            //         column: columns.previous().name().to_owned(),
-            //     },
-            //     step_index,
-            // )
+            plan.push_unexecutable(
+                UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
+                    table: columns.previous().table().name().to_owned(),
+                    column: columns.previous().name().to_owned(),
+                },
+                step_index,
+            )
         }
 
         let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
