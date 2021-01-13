@@ -7,18 +7,13 @@ pub(crate) fn create_input_types(
     parent_field: Option<&RelationFieldRef>,
 ) -> Vec<InputType> {
     let checked_input = InputType::object(checked_create_input_type(ctx, model, parent_field));
+    let unchecked_input = InputType::object(unchecked_create_input_type(ctx, model, parent_field));
 
-    if feature_flags::get().uncheckedScalarInputs {
-        let unchecked_input = InputType::object(unchecked_create_input_type(ctx, model, parent_field));
-
-        // If the inputs are equal, only use one.
-        if checked_input == unchecked_input {
-            vec![checked_input]
-        } else {
-            vec![checked_input, unchecked_input]
-        }
-    } else {
+    // If the inputs are equal, only use one.
+    if checked_input == unchecked_input {
         vec![checked_input]
+    } else {
+        vec![checked_input, unchecked_input]
     }
 }
 
