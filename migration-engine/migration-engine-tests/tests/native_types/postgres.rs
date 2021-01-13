@@ -1092,33 +1092,120 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
     Ok(())
 }
 
-// lists
+//todo  lists
+// from nonlist->list does not seem to be allowed
+// from list-> nonlist                  =>does not work
+// list -> non list w. typechange to strings works {1,....}
+// non list -> list w. typechange       =>does not work
+
+static SAFE_CASTS_NON_LIST_TO_LIST: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = Lazy::new(|| {
+    vec![
+        (
+            "Text",
+            vec![
+                ("SmallInt", Value::array(vec![1])),
+                ("Integer", Value::array(vec![Value::integer(i32::MAX)])),
+                ("BigInt", Value::array(vec![Value::integer(i64::MAX)])),
+                (
+                    "Numeric(10,2)",
+                    Value::array(vec![Value::numeric(BigDecimal::from_str("128.90").unwrap())]),
+                ),
+                ("Real", Value::array(vec![Value::float(f32::MIN)])),
+                ("DoublePrecision", Value::array(vec![Value::Double(Some(f64::MIN))])),
+                ("VarChar", Value::array(vec!["test"])),
+                ("Char(1)", Value::array(vec!["a"])),
+                ("Text", Value::array(vec!["text"])),
+                ("ByteA", Value::array(vec![Value::bytes(b"DEAD".to_vec())])),
+                ("Timestamp(3)", Value::array(vec![Value::datetime(Utc::now())])),
+                ("Timestamptz(3)", Value::array(vec![Value::datetime(Utc::now())])),
+                ("Date", Value::array(vec![Value::date(Utc::today().naive_utc())])),
+                (
+                    "Time(3)",
+                    Value::array(vec![Value::time(Utc::now().naive_utc().time())]),
+                ),
+                ("Timetz(3)", Value::array(vec![Value::datetime(Utc::now())])),
+                ("Boolean", Value::array(vec![false])),
+                ("Bit(10)", Value::array(vec![Value::text("0010101001")])),
+                ("VarBit", Value::array(vec![Value::text("000101010101010010")])),
+                ("Uuid", Value::array(vec!["75bf0037-a8b8-4512-beea-5a186f8abf1e"])),
+                ("Xml", Value::array(vec![Value::xml("[]")])),
+                (
+                    "Json",
+                    Value::array(vec![Value::json(serde_json::json!({"foo": "bar"}))]),
+                ),
+                (
+                    "JsonB",
+                    Value::array(vec![Value::json(serde_json::json!({"foo": "bar"}))]),
+                ),
+            ],
+        ),
+        (
+            "VarChar",
+            vec![
+                ("SmallInt", Value::array(vec![1])),
+                ("Integer", Value::array(vec![Value::integer(i32::MAX)])),
+                ("BigInt", Value::array(vec![Value::integer(i64::MAX)])),
+                (
+                    "Numeric(10,2)",
+                    Value::array(vec![Value::numeric(BigDecimal::from_str("128.90").unwrap())]),
+                ),
+                ("Real", Value::array(vec![Value::float(f32::MIN)])),
+                ("DoublePrecision", Value::array(vec![Value::Double(Some(f64::MIN))])),
+                ("VarChar", Value::array(vec!["test"])),
+                ("Char(1)", Value::array(vec!["a"])),
+                ("Text", Value::array(vec!["text"])),
+                ("ByteA", Value::array(vec![Value::bytes(b"DEAD".to_vec())])),
+                ("Timestamp(3)", Value::array(vec![Value::datetime(Utc::now())])),
+                ("Timestamptz(3)", Value::array(vec![Value::datetime(Utc::now())])),
+                ("Date", Value::array(vec![Value::date(Utc::today().naive_utc())])),
+                (
+                    "Time(3)",
+                    Value::array(vec![Value::time(Utc::now().naive_utc().time())]),
+                ),
+                ("Timetz(3)", Value::array(vec![Value::datetime(Utc::now())])),
+                ("Boolean", Value::array(vec![false])),
+                ("Bit(10)", Value::array(vec![Value::text("0010101001")])),
+                ("VarBit", Value::array(vec![Value::text("000101010101010010")])),
+                ("Uuid", Value::array(vec!["75bf0037-a8b8-4512-beea-5a186f8abf1e"])),
+                ("Xml", Value::array(vec![Value::xml("[]")])),
+                (
+                    "Json",
+                    Value::array(vec![Value::json(serde_json::json!({"foo": "bar"}))]),
+                ),
+                (
+                    "JsonB",
+                    Value::array(vec![Value::json(serde_json::json!({"foo": "bar"}))]),
+                ),
+            ],
+        ),
+    ]
+});
 
 #[test_each_connector(tags("postgres"), features("native_types"))]
-async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
+async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
-    for (from, seed, casts) in SAFE_CASTS.iter() {
+    for (to, from) in SAFE_CASTS_NON_LIST_TO_LIST.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
         let mut insert = Insert::single_into((api.schema_name(), "A"));
         let mut previous_assertions = vec![];
         let mut next_assertions = vec![];
 
-        for (idx, to) in casts.iter().enumerate() {
+        for (idx, (from, seed)) in from.iter().enumerate() {
             println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
 
             let column_name = format!("column_{}", idx);
 
             previous_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @test_db.{native_type} \n",
+                "{column_name}  {prisma_type}[] @test_db.{native_type} \n",
                 prisma_type = prisma_type(from),
                 native_type = from,
                 column_name = column_name
             ));
 
             next_columns.push_str(&format!(
-                "{column_name}  {prisma_type}? @test_db.{native_type}\n",
+                "{column_name}  {prisma_type} @test_db.{native_type}\n",
                 prisma_type = prisma_type(to),
                 native_type = to,
                 column_name = column_name
