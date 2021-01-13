@@ -19,29 +19,23 @@ pub enum WriteQuery {
 
 impl WriteQuery {
     pub fn inject_projection_into_args(&mut self, projection: RecordProjection) {
-        let keys = projection.fields().map(|sf| sf.db_name().to_owned()).collect();
-        let values = projection.values().collect();
+        let keys: Vec<_> = projection.fields().map(|sf| sf.db_name().to_owned()).collect();
+        let values: Vec<_> = projection.values().collect();
 
-        self.inject_values_into_args(keys, values);
-    }
-
-    pub fn inject_values_into_args(&mut self, keys: Vec<String>, values: Vec<PrismaValue>) {
-        keys.into_iter()
-            .zip(values)
-            .for_each(|(key, value)| self.inject_field_arg(key, value));
-    }
-
-    // Injects PrismaValues into the write arguments based the passed key.
-    pub fn inject_field_arg(&mut self, key: String, value: PrismaValue) {
         let args = match self {
             Self::CreateRecord(ref mut x) => &mut x.args,
             Self::UpdateRecord(x) => &mut x.args,
             Self::UpdateManyRecords(x) => &mut x.args,
-
             _ => return,
         };
 
-        args.insert(DatasourceFieldName(key), value)
+        let model = projection.model().expect("Model was not found");
+
+        keys.into_iter()
+            .zip(values)
+            .for_each(|(key, value)| args.insert(DatasourceFieldName(key), value));
+
+        args.update_datetimes(model);
     }
 
     pub fn returns(&self, projection: &ModelProjection) -> bool {

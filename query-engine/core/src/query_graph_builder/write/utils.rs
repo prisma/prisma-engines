@@ -143,9 +143,7 @@ pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, mod
 where
     T: Into<Filter>,
 {
-    let mut args = WriteArgs::new();
-    args.update_datetimes(Arc::clone(&model));
-
+    let args = WriteArgs::new();
     let filter = filter.into();
     let record_filter = filter.into();
 
