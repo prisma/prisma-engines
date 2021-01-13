@@ -12,7 +12,6 @@ use native_types::PostgresType;
 use once_cell::sync::Lazy;
 use regex::RegexSet;
 use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
-
 /// The maximum length of postgres identifiers, in bytes.
 ///
 /// Reference: https://www.postgresql.org/docs/12/limits.html
@@ -63,18 +62,17 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+        use ColumnTypeChange::*;
         let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
-        let previous_family = differ.previous.column_type_family();
-        let next_family = differ.next.column_type_family();
-        let previous_type: Option<PostgresType> = differ.previous.column_native_type();
-        let next_type: Option<PostgresType> = differ.next.column_native_type();
         let from_list_to_scalar = differ.previous.arity().is_list() && !differ.next.arity().is_list();
         let from_scalar_to_list = !differ.previous.arity().is_list() && differ.next.arity().is_list();
 
         if !native_types_enabled {
+            let previous_family = differ.previous.column_type_family();
+            let next_family = differ.next.column_type_family();
             match (previous_family, next_family) {
-                (_, ColumnTypeFamily::String) if from_list_to_scalar => Some(ColumnTypeChange::SafeCast),
-                (_, _) if from_list_to_scalar => Some(ColumnTypeChange::NotCastable),
+                (_, ColumnTypeFamily::String) if from_list_to_scalar => Some(SafeCast),
+                (_, _) if from_list_to_scalar => Some(NotCastable),
                 (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal)
                 | (ColumnTypeFamily::Float, ColumnTypeFamily::Float)
                 | (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float)
@@ -82,12 +80,24 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 | (ColumnTypeFamily::Binary, ColumnTypeFamily::Binary)
                     if from_scalar_to_list =>
                 {
-                    Some(ColumnTypeChange::NotCastable)
+                    Some(NotCastable)
                 }
                 (previous, next) => family_change_riskyness(previous, next),
             }
         } else {
-            native_type_change_riskyness(previous_type.unwrap(), next_type.unwrap())
+            let previous_type: Option<PostgresType> = differ.previous.column_native_type();
+            let next_type: Option<PostgresType> = differ.next.column_native_type();
+
+            match (previous_type, next_type) {
+                (_, Some(PostgresType::Text)) if from_list_to_scalar => Some(SafeCast),
+                (_, Some(PostgresType::VarChar(None))) if from_list_to_scalar => Some(SafeCast),
+                (_, Some(PostgresType::VarChar(_))) if from_list_to_scalar => Some(RiskyCast),
+                (_, Some(PostgresType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
+                (_, _) if from_scalar_to_list => Some(NotCastable),
+                (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
+                // Unsupported types will have None as Native type
+                _ => Some(NotCastable),
+            }
         }
     }
 }

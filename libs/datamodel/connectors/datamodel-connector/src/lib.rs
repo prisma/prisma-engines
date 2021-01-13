@@ -39,7 +39,7 @@ pub trait Connector: Send + Sync {
 
     /// This function is used in ME for error messages
     fn render_native_type(&self, native_type: serde_json::Value) -> String {
-        let instance = self.introspect_native_type(native_type).unwrap(); //todo
+        let instance = self.introspect_native_type(native_type).unwrap();
         instance.render()
     }
 
