@@ -528,6 +528,7 @@ impl SqlSchemaDescriber {
         arity: ColumnArity,
         default: Option<&Value>,
     ) -> (ColumnType, Option<Enum>) {
+        const UNSIGNEDNESS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("(?i)unsigned$").unwrap());
         // println!("Name: {}", column_name);
         // println!("DT: {}", data_type);
         // println!("FDT: {}", full_data_type);
@@ -545,13 +546,26 @@ impl SqlSchemaDescriber {
         };
 
         let (family, native_type) = match data_type {
+            "int" if UNSIGNEDNESS_RE.is_match(full_data_type) => (ColumnTypeFamily::Int, Some(MySqlType::UnsignedInt)),
             "int" => (ColumnTypeFamily::Int, Some(MySqlType::Int)),
+            "smallint" if UNSIGNEDNESS_RE.is_match(full_data_type) => {
+                (ColumnTypeFamily::Int, Some(MySqlType::UnsignedSmallInt))
+            }
             "smallint" => (ColumnTypeFamily::Int, Some(MySqlType::SmallInt)),
             "tinyint" if is_tinyint1() && !invalid_bool_default() => {
                 (ColumnTypeFamily::Boolean, Some(MySqlType::TinyInt))
             }
+            "tinyint" if UNSIGNEDNESS_RE.is_match(full_data_type) => {
+                (ColumnTypeFamily::Int, Some(MySqlType::UnsignedTinyInt))
+            }
             "tinyint" => (ColumnTypeFamily::Int, Some(MySqlType::TinyInt)),
+            "mediumint" if UNSIGNEDNESS_RE.is_match(full_data_type) => {
+                (ColumnTypeFamily::Int, Some(MySqlType::UnsignedMediumInt))
+            }
             "mediumint" => (ColumnTypeFamily::Int, Some(MySqlType::MediumInt)),
+            "bigint" if UNSIGNEDNESS_RE.is_match(full_data_type) => {
+                (ColumnTypeFamily::BigInt, Some(MySqlType::UnsignedBigInt))
+            }
             "bigint" => (ColumnTypeFamily::BigInt, Some(MySqlType::BigInt)),
             "decimal" => (
                 ColumnTypeFamily::Decimal,
