@@ -1,4 +1,4 @@
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::ConnectorError;
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::Field;
 use dml::model::Model;
@@ -23,6 +23,9 @@ impl SqliteDatamodelConnector {
 }
 
 impl Connector for SqliteDatamodelConnector {
+    fn name(&self) -> String {
+        "sqlite".to_string()
+    }
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
     }
@@ -40,19 +43,11 @@ impl Connector for SqliteDatamodelConnector {
     }
 
     fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
-        Err(ConnectorError::from_kind(
-            ErrorKind::ConnectorNotSupportedForNativeTypes {
-                connector_name: "sqlite".to_string(),
-            },
-        ))
+        self.native_types_not_supported()
     }
 
     fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
-        Err(ConnectorError::from_kind(
-            ErrorKind::ConnectorNotSupportedForNativeTypes {
-                connector_name: "sqlite".to_string(),
-            },
-        ))
+        self.native_types_not_supported()
     }
 }
 

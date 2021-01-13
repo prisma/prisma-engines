@@ -27,12 +27,8 @@ fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
     }
 
     for tpe in &["Decimal", "Numeric"] {
-        test_native_types_without_attributes(
-            &format!("{}(1001, 3)", tpe),
-            "Decimal",
-            &error_msg(tpe),
-            POSTGRES_SOURCE,
-        );
+        let native_type = &format!("{}(1001,3)", tpe);
+        test_native_types_without_attributes(native_type, "Decimal", &error_msg(native_type), POSTGRES_SOURCE);
     }
 }
 
@@ -46,8 +42,10 @@ fn should_fail_on_invalid_precision_for_time_types() {
     }
 
     for tpe in &["Timestamp", "Time"] {
-        test_native_types_without_attributes(&format!("{}(7)", tpe), "DateTime", &error_msg(tpe), POSTGRES_SOURCE);
-        test_native_types_without_attributes(&format!("{}(-1)", tpe), "DateTime", &error_msg(tpe), POSTGRES_SOURCE);
+        let native_type = &format!("{}(7)", tpe);
+        test_native_types_without_attributes(native_type, "DateTime", &error_msg(native_type), POSTGRES_SOURCE);
+        let native_type = &format!("{}(-1)", tpe);
+        test_native_types_without_attributes(native_type, "DateTime", &error_msg(native_type), POSTGRES_SOURCE);
     }
 }
 
@@ -61,7 +59,8 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
     }
 
     for tpe in &["Bit", "VarBit"] {
-        test_native_types_without_attributes(&format!("{}(0)", tpe), "String", &error_msg(tpe), POSTGRES_SOURCE);
+        let native_type = &format!("{}(0)", tpe);
+        test_native_types_without_attributes(native_type, "String", &error_msg(native_type), POSTGRES_SOURCE);
     }
 }
 
@@ -87,7 +86,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Decimal native type in Postgres.",
+        "The scale must not be larger than the precision for the Decimal(2,4) native type in Postgres.",
         ast::Span::new(289, 319),
     ));
 }
@@ -114,7 +113,7 @@ fn should_fail_on_native_type_numeric_when_scale_is_bigger_than_precision() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Numeric native type in Postgres.",
+        "The scale must not be larger than the precision for the Numeric(2,4) native type in Postgres.",
         ast::Span::new(289, 319),
     ));
 }

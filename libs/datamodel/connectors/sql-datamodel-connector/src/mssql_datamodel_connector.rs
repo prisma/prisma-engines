@@ -1,4 +1,4 @@
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
+use datamodel_connector::connector_error::ConnectorError;
 use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
 use datamodel_connector::{Connector, ConnectorCapability};
 use dml::field::{Field, FieldType};
@@ -92,6 +92,10 @@ impl MsSqlDatamodelConnector {
 }
 
 impl Connector for MsSqlDatamodelConnector {
+    fn name(&self) -> String {
+        "SQL Server".to_string()
+    }
+
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
     }
@@ -100,72 +104,39 @@ impl Connector for MsSqlDatamodelConnector {
         match field.field_type() {
             FieldType::NativeType(_, native_type) => {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
+                let error = self.native_instance_error(native_type);
 
                 match r#type {
-                    Decimal(Some(params)) | Numeric(Some(params)) => match params {
-                        (precision, scale) if scale > precision => Err(
-                            ConnectorError::new_scale_larger_than_precision_error(&native_type.render(), "SQL Server"),
-                        ),
-                        (precision, _) if precision == 0 || precision > 38 => {
-                            Err(ConnectorError::new_argument_m_out_of_range_error(
-                                "Precision can range from 1 to 38.",
-                                &native_type.render(),
-                                "SQL Server",
-                            ))
-                        }
-                        (_, scale) if scale > 38 => Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Scale can range from 0 to 38.",
-                            &native_type.render(),
-                            "SQL Server",
-                        )),
-                        _ => Ok(()),
-                    },
-                    Float(Some(bits)) => match bits {
-                        bits if bits == 0 || bits > 53 => Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Bits can range from 1 to 53.",
-                            &native_type.render(),
-                            "SQL Server",
-                        )),
-                        _ => Ok(()),
-                    },
-                    typ if heap_allocated_types().contains(&typ) => {
-                        if field.is_unique() {
-                            Err(ConnectorError::new_incompatible_native_type_with_unique(
-                                &native_type.render(),
-                                "SQL Server",
-                            ))
-                        } else if field.is_id() {
-                            Err(ConnectorError::new_incompatible_native_type_with_id(
-                                &native_type.render(),
-                                "SQL Server",
-                            ))
-                        } else {
-                            Ok(())
-                        }
+                    Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
+                        error.new_scale_larger_than_precision_error()
                     }
-                    NVarChar(Some(Number(p))) if p > 2000 => Err(ConnectorError::new_argument_m_out_of_range_error(
+                    Decimal(Some((prec, _))) | Numeric(Some((prec, _))) if prec == 0 || prec > 38 => {
+                        error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.")
+                    }
+                    Decimal(Some((_, scale))) | Numeric(Some((_, scale))) if scale > 38 => {
+                        error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.")
+                    }
+                    Float(Some(bits)) if bits == 0 || bits > 53 => {
+                        error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.")
+                    }
+                    typ if heap_allocated_types().contains(&typ) && field.is_unique() => {
+                        error.new_incompatible_native_type_with_unique()
+                    }
+                    typ if heap_allocated_types().contains(&typ) && field.is_id() => {
+                        error.new_incompatible_native_type_with_id()
+                    }
+                    NVarChar(Some(Number(p))) if p > 2000 => error.new_argument_m_out_of_range_error(
                         "Length can range from 1 to 2000. For larger sizes, use the `Max` variant.",
-                        &native_type.render(),
-                        "SQL Server",
-                    )),
-                    VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 4000 => {
-                        Err(ConnectorError::new_argument_m_out_of_range_error(
+                    ),
+                    VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 4000 => error
+                        .new_argument_m_out_of_range_error(
                             r#"Length can range from 1 to 4000. For larger sizes, use the `Max` variant."#,
-                            &native_type.render(),
-                            "SQL Server",
-                        ))
+                        ),
+                    NChar(Some(p)) if p > 2000 => {
+                        error.new_argument_m_out_of_range_error("Length can range from 1 to 2000.")
                     }
-                    NChar(Some(p)) if p > 2000 => Err(ConnectorError::new_argument_m_out_of_range_error(
-                        "Length can range from 1 to 2000.",
-                        &native_type.render(),
-                        "SQL Server",
-                    )),
                     Char(Some(p)) | Binary(Some(p)) if p > 4000 => {
-                        Err(ConnectorError::new_argument_m_out_of_range_error(
-                            "Length can range from 1 to 4000.",
-                            &native_type.render(),
-                            "SQL Server",
-                        ))
+                        error.new_argument_m_out_of_range_error("Length can range from 1 to 4000.")
                     }
                     _ => Ok(()),
                 }
@@ -181,19 +152,14 @@ impl Connector for MsSqlDatamodelConnector {
             for field in fields {
                 if let FieldType::NativeType(_, native_type) = field.field_type() {
                     let r#type: MsSqlType = native_type.deserialize_native_type();
+                    let error = self.native_instance_error(native_type);
 
                     if heap_allocated_types().contains(&r#type) {
-                        if index_definition.tpe == IndexType::Unique {
-                            return Err(ConnectorError::new_incompatible_native_type_with_unique(
-                                &native_type.render(),
-                                "SQL Server",
-                            ));
+                        return if index_definition.tpe == IndexType::Unique {
+                            error.new_incompatible_native_type_with_unique()
                         } else {
-                            return Err(ConnectorError::new_incompatible_native_type_with_index(
-                                &native_type.render(),
-                                "SQL Server",
-                            ));
-                        }
+                            error.new_incompatible_native_type_with_index()
+                        };
                     }
                 }
             }
@@ -206,10 +172,9 @@ impl Connector for MsSqlDatamodelConnector {
                 let r#type: MsSqlType = native_type.deserialize_native_type();
 
                 if heap_allocated_types().contains(&r#type) {
-                    return Err(ConnectorError::new_incompatible_native_type_with_id(
-                        &native_type.render(),
-                        "SQL Server",
-                    ));
+                    return self
+                        .native_instance_error(native_type)
+                        .new_incompatible_native_type_with_id();
                 }
             }
         }
@@ -224,34 +189,34 @@ impl Connector for MsSqlDatamodelConnector {
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         let cloned_args = args.clone();
         let native_type = match name {
-            TINY_INT_TYPE_NAME => MsSqlType::TinyInt,
-            SMALL_INT_TYPE_NAME => MsSqlType::SmallInt,
-            INT_TYPE_NAME => MsSqlType::Int,
-            BIG_INT_TYPE_NAME => MsSqlType::BigInt,
-            DECIMAL_TYPE_NAME => MsSqlType::Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
-            NUMERIC_TYPE_NAME => MsSqlType::Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
-            MONEY_TYPE_NAME => MsSqlType::Money,
-            SMALL_MONEY_TYPE_NAME => MsSqlType::SmallMoney,
-            BIT_TYPE_NAME => MsSqlType::Bit,
-            FLOAT_TYPE_NAME => MsSqlType::Float(parse_one_opt_u32(args, FLOAT_TYPE_NAME)?),
-            REAL_TYPE_NAME => MsSqlType::Real,
-            DATE_TYPE_NAME => MsSqlType::Date,
-            TIME_TYPE_NAME => MsSqlType::Time,
-            DATETIME_TYPE_NAME => MsSqlType::DateTime,
-            DATETIME2_TYPE_NAME => MsSqlType::DateTime2,
-            DATETIME_OFFSET_TYPE_NAME => MsSqlType::DateTimeOffset,
-            SMALL_DATETIME_TYPE_NAME => MsSqlType::SmallDateTime,
-            CHAR_TYPE_NAME => MsSqlType::Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
-            NCHAR_TYPE_NAME => MsSqlType::NChar(parse_one_opt_u32(args, NCHAR_TYPE_NAME)?),
-            VARCHAR_TYPE_NAME => MsSqlType::VarChar(parse_mssql_type_parameter(args)),
-            TEXT_TYPE_NAME => MsSqlType::Text,
-            NVARCHAR_TYPE_NAME => MsSqlType::NVarChar(parse_mssql_type_parameter(args)),
-            NTEXT_TYPE_NAME => MsSqlType::NText,
-            BINARY_TYPE_NAME => MsSqlType::Binary(parse_one_opt_u32(args, BINARY_TYPE_NAME)?),
-            VAR_BINARY_TYPE_NAME => MsSqlType::VarBinary(parse_mssql_type_parameter(args)),
-            IMAGE_TYPE_NAME => MsSqlType::Image,
-            XML_TYPE_NAME => MsSqlType::Xml,
-            UNIQUE_IDENTIFIER_TYPE_NAME => MsSqlType::UniqueIdentifier,
+            TINY_INT_TYPE_NAME => TinyInt,
+            SMALL_INT_TYPE_NAME => SmallInt,
+            INT_TYPE_NAME => Int,
+            BIG_INT_TYPE_NAME => BigInt,
+            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            NUMERIC_TYPE_NAME => Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
+            MONEY_TYPE_NAME => Money,
+            SMALL_MONEY_TYPE_NAME => SmallMoney,
+            BIT_TYPE_NAME => Bit,
+            FLOAT_TYPE_NAME => Float(parse_one_opt_u32(args, FLOAT_TYPE_NAME)?),
+            REAL_TYPE_NAME => Real,
+            DATE_TYPE_NAME => Date,
+            TIME_TYPE_NAME => Time,
+            DATETIME_TYPE_NAME => DateTime,
+            DATETIME2_TYPE_NAME => DateTime2,
+            DATETIME_OFFSET_TYPE_NAME => DateTimeOffset,
+            SMALL_DATETIME_TYPE_NAME => SmallDateTime,
+            CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
+            NCHAR_TYPE_NAME => NChar(parse_one_opt_u32(args, NCHAR_TYPE_NAME)?),
+            VARCHAR_TYPE_NAME => VarChar(parse_mssql_type_parameter(args)),
+            TEXT_TYPE_NAME => Text,
+            NVARCHAR_TYPE_NAME => NVarChar(parse_mssql_type_parameter(args)),
+            NTEXT_TYPE_NAME => NText,
+            BINARY_TYPE_NAME => Binary(parse_one_opt_u32(args, BINARY_TYPE_NAME)?),
+            VAR_BINARY_TYPE_NAME => VarBinary(parse_mssql_type_parameter(args)),
+            IMAGE_TYPE_NAME => Image,
+            XML_TYPE_NAME => Xml,
+            UNIQUE_IDENTIFIER_TYPE_NAME => UniqueIdentifier,
             _ => panic!(),
         };
 
@@ -262,34 +227,34 @@ impl Connector for MsSqlDatamodelConnector {
         let native_type: MsSqlType = serde_json::from_value(native_type).unwrap();
 
         let (constructor_name, args) = match native_type {
-            MsSqlType::TinyInt => (TINY_INT_TYPE_NAME, vec![]),
-            MsSqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
-            MsSqlType::Int => (INT_TYPE_NAME, vec![]),
-            MsSqlType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
-            MsSqlType::Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
-            MsSqlType::Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
-            MsSqlType::Money => (MONEY_TYPE_NAME, vec![]),
-            MsSqlType::SmallMoney => (SMALL_MONEY_TYPE_NAME, vec![]),
-            MsSqlType::Bit => (BIT_TYPE_NAME, vec![]),
-            MsSqlType::Float(x) => (FLOAT_TYPE_NAME, arg_vec_from_opt(x)),
-            MsSqlType::Real => (REAL_TYPE_NAME, vec![]),
-            MsSqlType::Date => (DATE_TYPE_NAME, vec![]),
-            MsSqlType::Time => (TIME_TYPE_NAME, vec![]),
-            MsSqlType::DateTime => (DATETIME_TYPE_NAME, vec![]),
-            MsSqlType::DateTime2 => (DATETIME2_TYPE_NAME, vec![]),
-            MsSqlType::DateTimeOffset => (DATETIME_OFFSET_TYPE_NAME, vec![]),
-            MsSqlType::SmallDateTime => (SMALL_DATETIME_TYPE_NAME, vec![]),
-            MsSqlType::Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
-            MsSqlType::NChar(x) => (NCHAR_TYPE_NAME, arg_vec_from_opt(x)),
-            MsSqlType::VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_for_type_param(x)),
-            MsSqlType::Text => (TEXT_TYPE_NAME, vec![]),
-            MsSqlType::NVarChar(x) => (NVARCHAR_TYPE_NAME, arg_vec_for_type_param(x)),
-            MsSqlType::NText => (NTEXT_TYPE_NAME, vec![]),
-            MsSqlType::Binary(x) => (BINARY_TYPE_NAME, arg_vec_from_opt(x)),
-            MsSqlType::VarBinary(x) => (VAR_BINARY_TYPE_NAME, arg_vec_for_type_param(x)),
-            MsSqlType::Image => (IMAGE_TYPE_NAME, vec![]),
-            MsSqlType::Xml => (XML_TYPE_NAME, vec![]),
-            MsSqlType::UniqueIdentifier => (UNIQUE_IDENTIFIER_TYPE_NAME, vec![]),
+            TinyInt => (TINY_INT_TYPE_NAME, vec![]),
+            SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
+            Int => (INT_TYPE_NAME, vec![]),
+            BigInt => (BIG_INT_TYPE_NAME, vec![]),
+            Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
+            Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
+            Money => (MONEY_TYPE_NAME, vec![]),
+            SmallMoney => (SMALL_MONEY_TYPE_NAME, vec![]),
+            Bit => (BIT_TYPE_NAME, vec![]),
+            Float(x) => (FLOAT_TYPE_NAME, arg_vec_from_opt(x)),
+            Real => (REAL_TYPE_NAME, vec![]),
+            Date => (DATE_TYPE_NAME, vec![]),
+            Time => (TIME_TYPE_NAME, vec![]),
+            DateTime => (DATETIME_TYPE_NAME, vec![]),
+            DateTime2 => (DATETIME2_TYPE_NAME, vec![]),
+            DateTimeOffset => (DATETIME_OFFSET_TYPE_NAME, vec![]),
+            SmallDateTime => (SMALL_DATETIME_TYPE_NAME, vec![]),
+            Char(x) => (CHAR_TYPE_NAME, arg_vec_from_opt(x)),
+            NChar(x) => (NCHAR_TYPE_NAME, arg_vec_from_opt(x)),
+            VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_for_type_param(x)),
+            Text => (TEXT_TYPE_NAME, vec![]),
+            NVarChar(x) => (NVARCHAR_TYPE_NAME, arg_vec_for_type_param(x)),
+            NText => (NTEXT_TYPE_NAME, vec![]),
+            Binary(x) => (BINARY_TYPE_NAME, arg_vec_from_opt(x)),
+            VarBinary(x) => (VAR_BINARY_TYPE_NAME, arg_vec_for_type_param(x)),
+            Image => (IMAGE_TYPE_NAME, vec![]),
+            Xml => (XML_TYPE_NAME, vec![]),
+            UniqueIdentifier => (UNIQUE_IDENTIFIER_TYPE_NAME, vec![]),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
@@ -300,10 +265,7 @@ impl Connector for MsSqlDatamodelConnector {
                 &native_type,
             ))
         } else {
-            Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                native_type: constructor_name.parse().unwrap(),
-                connector_name: "Postgres".parse().unwrap(),
-            }))
+            self.native_str_error(constructor_name).native_type_name_unknown()
         }
     }
 }
@@ -316,13 +278,13 @@ impl Default for MsSqlDatamodelConnector {
 
 static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
     vec![
-        MsSqlType::Text,
-        MsSqlType::NText,
-        MsSqlType::Image,
-        MsSqlType::Xml,
-        MsSqlType::VarBinary(Some(Max)),
-        MsSqlType::VarChar(Some(Max)),
-        MsSqlType::NVarChar(Some(Max)),
+        Text,
+        NText,
+        Image,
+        Xml,
+        VarBinary(Some(Max)),
+        VarChar(Some(Max)),
+        NVarChar(Some(Max)),
     ]
 });
 

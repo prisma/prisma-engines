@@ -4,7 +4,7 @@
 //!
 //! This module is responsible for the management of the contents of the
 //! migrations directory. The migrations directory contains multiple migration
-//! directorys, named after the migration id, and each containing:
+//! directories, named after the migration id, and each containing:
 //!
 //! - A migration script
 

@@ -673,7 +673,7 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
         r#"
         datasource db {{
             provider = "sqlserver"
-            url = "sqlserver://{dbhost}:{dbport};database={dbname};user=prismashadowdbtestuser;password=1234batmanZ;encrypt=DANGER_PLAINTEXT"
+            url = "sqlserver://{dbhost}:{dbport};database={dbname};user=prismashadowdbtestuser;password=1234batmanZ;trustservercertificate=true"
         }}
         "#,
         dbhost = host,

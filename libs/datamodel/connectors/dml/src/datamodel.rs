@@ -25,16 +25,6 @@ impl Datamodel {
         self.enums.is_empty() && self.models.is_empty()
     }
 
-    /// Checks if a model with the given name exists.
-    pub fn has_model(&self, name: &str) -> bool {
-        self.find_model(name).is_some()
-    }
-
-    /// Checks if an enum with the given name exists.
-    pub fn has_enum(&self, name: &str) -> bool {
-        self.find_enum(name).is_some()
-    }
-
     /// Adds an enum to this datamodel.
     pub fn add_enum(&mut self, en: Enum) {
         self.enums.push(en);
