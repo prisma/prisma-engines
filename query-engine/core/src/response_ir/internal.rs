@@ -194,7 +194,7 @@ fn serialize_record_selection(
         OutputType::List(inner) => serialize_record_selection(record_selection, field, inner, true),
         OutputType::Object(obj) => {
             let result = serialize_objects(record_selection, obj.into_arc())?;
-            let is_optional = !field.is_required;
+            let is_optional = field.is_nullable;
 
             // Items will be ref'ed on the top level to allow cheap clones in nested scenarios.
             match (is_list, is_optional) {
@@ -344,7 +344,7 @@ fn write_nested_items(
                 let field = enclosing_type.find_field(field_name).unwrap();
                 let default = match field.field_type.borrow() {
                     OutputType::List(_) => Item::list(Vec::new()),
-                    _ if !field.is_required => Item::Value(PrismaValue::Null),
+                    _ if field.is_nullable => Item::Value(PrismaValue::Null),
                     _ => panic!(
                         "Application logic invariant error: received null value for field {} which may not be null",
                         &field_name
@@ -384,7 +384,7 @@ fn process_nested_results(
 
 fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
     match (&value, field.field_type.as_ref()) {
-        (PrismaValue::Null, _) if !field.is_required => Ok(Item::Value(PrismaValue::Null)),
+        (PrismaValue::Null, _) if field.is_nullable => Ok(Item::Value(PrismaValue::Null)),
         (_, OutputType::Enum(et)) => match et.borrow() {
             EnumType::Database(ref db) => convert_enum(value, db),
             _ => unreachable!(),

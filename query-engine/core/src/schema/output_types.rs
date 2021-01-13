@@ -150,7 +150,7 @@ pub struct OutputField {
 
     /// Indicates if the presence of the field on the higher output objects.
     /// As opposed to input fields, optional output fields are also automatically nullable.
-    pub is_required: bool,
+    pub is_nullable: bool,
 
     /// Relevant for resolving top level queries.
     pub query_info: Option<QueryInfo>,
@@ -158,7 +158,7 @@ pub struct OutputField {
 
 impl OutputField {
     pub fn optional(mut self) -> Self {
-        self.is_required = false;
+        self.is_nullable = true;
         self
     }
 
