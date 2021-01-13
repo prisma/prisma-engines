@@ -1092,13 +1092,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
     Ok(())
 }
 
-//todo  lists
-// from nonlist->list does not seem to be allowed
-// from list-> nonlist                  =>does not work
-// list -> non list w. typechange to strings works {1,....}
-// non list -> list w. typechange       =>does not work
-
-static SAFE_CASTS_NON_LIST_TO_LIST: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = Lazy::new(|| {
+static SAFE_CASTS_NON_LIST_TO_STRING: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = Lazy::new(|| {
     vec![
         (
             "Text",
@@ -1185,7 +1179,7 @@ static SAFE_CASTS_NON_LIST_TO_LIST: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = Lazy
 async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
-    for (to, from) in SAFE_CASTS_NON_LIST_TO_LIST.iter() {
+    for (to, from) in SAFE_CASTS_NON_LIST_TO_STRING.iter() {
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
         let mut insert = Insert::single_into((api.schema_name(), "A"));

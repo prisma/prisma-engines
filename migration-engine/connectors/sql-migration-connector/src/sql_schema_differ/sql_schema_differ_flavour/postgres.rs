@@ -85,7 +85,6 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 (previous, next) => family_change_riskyness(previous, next),
             }
         } else {
-            //todo what about unsupported??
             let previous_type: Option<PostgresType> = differ.previous.column_native_type();
             let next_type: Option<PostgresType> = differ.next.column_native_type();
 
@@ -96,10 +95,10 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 (_, Some(PostgresType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
                 (_, _) if from_scalar_to_list => Some(NotCastable),
                 (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
-                // None / some => also dont do anything
-                // None /None -> dont do anything
-                // Some / None => not possible to write in schema atm / later with unsupported
-                _ => None,
+                // Unsupported types will have None as Native type
+                (None, Some(PostgresType::Text)) => Some(SafeCast),
+                (None, Some(PostgresType::VarChar(None))) => Some(SafeCast),
+                _ => Some(NotCastable),
             }
         }
     }
