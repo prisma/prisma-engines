@@ -45,9 +45,9 @@ pub async fn m2m<'a, 'b>(
 
     // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
     let mut scalars = if query.args.do_nothing() && child_link_id == query.selected_fields {
-            let mut projected_scalars = ManyRecords::from_projection(child_ids, &query.selected_fields);
-            projected_scalars.dedup();
-            projected_scalars
+        let mut projected_scalars = ManyRecords::from_projection(child_ids, &query.selected_fields);
+        projected_scalars.dedup();
+        projected_scalars
     } else {
         let mut args = query.args.clone();
         let filter = child_link_id.is_in(child_ids);

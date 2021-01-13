@@ -126,7 +126,7 @@ impl ManyRecords {
     }
 }
 
-#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
     pub parent_id: Option<RecordProjection>,
