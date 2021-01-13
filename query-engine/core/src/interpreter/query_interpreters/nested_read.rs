@@ -45,7 +45,9 @@ pub async fn m2m<'a, 'b>(
 
     // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
     let mut scalars = if query.args.do_nothing() && child_link_id == query.selected_fields {
-        ManyRecords::from_projection(child_ids, &query.selected_fields).with_unique_records()
+            let mut projected_scalars = ManyRecords::from_projection(child_ids, &query.selected_fields);
+            projected_scalars.dedup();
+            projected_scalars
     } else {
         let mut args = query.args.clone();
         let filter = child_link_id.is_in(child_ids);
@@ -166,7 +168,9 @@ pub async fn one2m<'a, 'b>(
 
     // a roundtrip can be avoided if: there is no additional filter AND the selection set is the child_link_id
     let mut scalars = if query_args.do_nothing() && &child_link_id == selected_fields {
-        ManyRecords::from_projection(uniq_projections, selected_fields).with_unique_records()
+        let mut projected_scalars = ManyRecords::from_projection(uniq_projections, selected_fields);
+        projected_scalars.dedup();
+        projected_scalars
     } else {
         let filter = child_link_id.is_in(uniq_projections);
         let mut args = query_args;
