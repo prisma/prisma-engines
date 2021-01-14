@@ -149,7 +149,7 @@ pub struct OutputField {
     pub arguments: Vec<InputFieldRef>,
 
     /// Indicates the presence of the field on the higher output objects.
-    /// States whether the field can be null or can't
+    /// States whether or not the field can be null.
     pub is_nullable: bool,
 
     /// Relevant for resolving top level queries.
