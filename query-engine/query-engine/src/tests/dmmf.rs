@@ -124,7 +124,7 @@ fn nullable_fields_should_be_nullable_in_group_by_output_types() {
             }
         }
     }
-    
+
     let group_by_output_type = find_output_type(&dmmf, "BlogGroupByOutputType");
     recursively_assert_fields(&dmmf, &group_by_output_type.fields)
 }
