@@ -1,4 +1,4 @@
-pub mod ast;
+mod ast;
 
 mod enum_renderer;
 mod field_renderer;
