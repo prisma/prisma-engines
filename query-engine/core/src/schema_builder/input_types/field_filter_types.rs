@@ -97,13 +97,27 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     );
     return_cached_input!(ctx, &ident);
 
-    let object = Arc::new(init_input_object_type(ident.clone()));
+    let mut object = init_input_object_type(ident.clone());
+    object.require_exactly_one_field();
+
+    let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
-    let mapped_type = map_scalar_input_type_for_field(ctx, sf);
-    let fields = equality_filters(mapped_type, !sf.is_required).collect();
-    object.set_fields(fields);
+    let mapped_nonlist_type = map_scalar_input_type(ctx, &sf.type_identifier, false);
+    let mapped_list_type = InputType::list(mapped_nonlist_type.clone());
+    let mut fields: Vec<_> = equality_filters(mapped_list_type.clone(), !sf.is_required).collect();
 
+    fields.push(
+        input_field("has", mapped_nonlist_type.clone(), None)
+            .optional()
+            .nullable_if(!sf.is_required),
+    );
+
+    fields.push(input_field("hasEvery", mapped_list_type.clone(), None).optional());
+    fields.push(input_field("hasSome", mapped_list_type, None).optional());
+    fields.push(input_field("isEmpty", InputType::boolean(), None).optional());
+
+    object.set_fields(fields);
     Arc::downgrade(&object)
 }
 

@@ -20,8 +20,8 @@ pub enum ScalarListCondition {
     /// List contains some of the given values
     ContainsSome(Vec<PrismaValue>),
 
-    /// List is empty
-    ContainsNone,
+    /// List emptiness check
+    IsEmpty(bool),
 }
 
 #[allow(warnings)]
@@ -38,30 +38,28 @@ impl ScalarListCompare for Arc<ScalarField> {
 
     fn contains_every_element<T>(&self, values: Vec<T>) -> Filter
     where
-        T: Into<Filter>,
+        T: Into<PrismaValue>,
     {
-        // Filter::from(ScalarListFilter {
-        //     field: Arc::clone(self),
-        //     condition: ScalarListCondition::ContainsEvery(values.into()),
-        // })
-        unimplemented!()
+        Filter::from(ScalarListFilter {
+            field: Arc::clone(self),
+            condition: ScalarListCondition::ContainsEvery(values.into_iter().map(Into::into).collect()),
+        })
     }
 
     fn contains_some_element<T>(&self, values: Vec<T>) -> Filter
     where
-        T: Into<Filter>,
+        T: Into<PrismaValue>,
     {
-        // Filter::from(ScalarListFilter {
-        //     field: Arc::clone(self),
-        //     condition: ScalarListCondition::ContainsSome(values.into()),
-        // })
-        unimplemented!()
-    }
-
-    fn contains_none(&self) -> Filter {
         Filter::from(ScalarListFilter {
             field: Arc::clone(self),
-            condition: ScalarListCondition::ContainsNone,
+            condition: ScalarListCondition::ContainsSome(values.into_iter().map(Into::into).collect()),
+        })
+    }
+
+    fn is_empty_list(&self, b: bool) -> Filter {
+        Filter::from(ScalarListFilter {
+            field: Arc::clone(self),
+            condition: ScalarListCondition::IsEmpty(b),
         })
     }
 }

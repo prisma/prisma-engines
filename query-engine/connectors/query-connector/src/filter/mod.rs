@@ -23,7 +23,6 @@ pub enum Filter {
     ScalarList(ScalarListFilter),
     OneRelationIsNull(OneRelationIsNullFilter),
     Relation(RelationFilter),
-    NodeSubscription,
     BoolFilter(bool),
     Aggregation(AggregationFilter),
     Empty,

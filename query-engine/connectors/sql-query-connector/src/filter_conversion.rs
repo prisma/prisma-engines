@@ -127,7 +127,7 @@ impl AliasedCondition for Filter {
             }
             Filter::Aggregation(filter) => filter.aliased_cond(alias),
             Filter::Empty => ConditionTree::NoCondition,
-            _ => unimplemented!(),
+            Filter::ScalarList(filter) => filter.aliased_cond(alias),
         }
     }
 }
@@ -168,6 +168,37 @@ impl AliasedCondition for ScalarFilter {
             }
         }
     }
+}
+
+impl AliasedCondition for ScalarListFilter {
+    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+        match alias {
+            Some(alias) => {
+                let comparable: Expression = self.field.as_column().table(alias.to_string(None)).into();
+                convert_scalar_list_filter(comparable, self.condition, &self.field)
+            }
+            None => {
+                let comparable: Expression = self.field.as_column().into();
+                convert_scalar_list_filter(comparable, self.condition, &self.field)
+            }
+        }
+    }
+}
+
+fn convert_scalar_list_filter(
+    comparable: impl Comparable<'static>,
+    cond: ScalarListCondition,
+    field: &ScalarFieldRef,
+) -> ConditionTree<'static> {
+    let condition = match cond {
+        ScalarListCondition::Contains(val) => comparable.compare_raw("@>", convert_value(field, val)),
+        ScalarListCondition::ContainsEvery(vals) => comparable.compare_raw("<@", convert_list_value(field, vals)),
+        ScalarListCondition::ContainsSome(vals) => comparable.compare_raw("&&", convert_list_value(field, vals)),
+        ScalarListCondition::IsEmpty(cond) if cond => comparable.compare_raw("=", "{}"),
+        ScalarListCondition::IsEmpty(_) => comparable.compare_raw("<>", "{}"),
+    };
+
+    ConditionTree::single(condition)
 }
 
 impl AliasedCondition for RelationFilter {
@@ -353,18 +384,20 @@ fn default_scalar_filter(
     let condition = match cond {
         ScalarCondition::Equals(PrismaValue::Null) => comparable.is_null(),
         ScalarCondition::NotEquals(PrismaValue::Null) => comparable.is_not_null(),
-        ScalarCondition::Equals(value) => comparable.equals(convert_value(fields, value)),
-        ScalarCondition::NotEquals(value) => comparable.not_equals(convert_value(fields, value)),
+        ScalarCondition::Equals(value) => comparable.equals(convert_first_value(fields, value)),
+        ScalarCondition::NotEquals(value) => comparable.not_equals(convert_first_value(fields, value)),
         ScalarCondition::Contains(value) => comparable.like(format!("{}", value)),
         ScalarCondition::NotContains(value) => comparable.not_like(format!("{}", value)),
         ScalarCondition::StartsWith(value) => comparable.begins_with(format!("{}", value)),
         ScalarCondition::NotStartsWith(value) => comparable.not_begins_with(format!("{}", value)),
         ScalarCondition::EndsWith(value) => comparable.ends_into(format!("{}", value)),
         ScalarCondition::NotEndsWith(value) => comparable.not_ends_into(format!("{}", value)),
-        ScalarCondition::LessThan(value) => comparable.less_than(convert_value(fields, value)),
-        ScalarCondition::LessThanOrEquals(value) => comparable.less_than_or_equals(convert_value(fields, value)),
-        ScalarCondition::GreaterThan(value) => comparable.greater_than(convert_value(fields, value)),
-        ScalarCondition::GreaterThanOrEquals(value) => comparable.greater_than_or_equals(convert_value(fields, value)),
+        ScalarCondition::LessThan(value) => comparable.less_than(convert_first_value(fields, value)),
+        ScalarCondition::LessThanOrEquals(value) => comparable.less_than_or_equals(convert_first_value(fields, value)),
+        ScalarCondition::GreaterThan(value) => comparable.greater_than(convert_first_value(fields, value)),
+        ScalarCondition::GreaterThanOrEquals(value) => {
+            comparable.greater_than_or_equals(convert_first_value(fields, value))
+        }
         ScalarCondition::In(values) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
                 let mut sql_values = Values::with_capacity(values.len());
@@ -406,19 +439,21 @@ fn insensitive_scalar_filter(
     let condition = match cond {
         ScalarCondition::Equals(PrismaValue::Null) => comparable.is_null(),
         ScalarCondition::NotEquals(PrismaValue::Null) => comparable.is_not_null(),
-        ScalarCondition::Equals(value) => comparable.equals(lower(convert_value(fields, value))),
-        ScalarCondition::NotEquals(value) => comparable.not_equals(convert_value(fields, value)),
+        ScalarCondition::Equals(value) => comparable.equals(lower(convert_first_value(fields, value))),
+        ScalarCondition::NotEquals(value) => comparable.not_equals(convert_first_value(fields, value)),
         ScalarCondition::Contains(value) => comparable.compare_raw("ILIKE", format!("%{}%", value)),
         ScalarCondition::NotContains(value) => comparable.compare_raw("NOT ILIKE", format!("%{}%", value)),
         ScalarCondition::StartsWith(value) => comparable.compare_raw("ILIKE", format!("{}%", value)),
         ScalarCondition::NotStartsWith(value) => comparable.compare_raw("NOT ILIKE", format!("{}%", value)),
         ScalarCondition::EndsWith(value) => comparable.compare_raw("ILIKE", format!("%{}", value)),
         ScalarCondition::NotEndsWith(value) => comparable.compare_raw("NOT ILIKE", format!("%{}", value)),
-        ScalarCondition::LessThan(value) => comparable.less_than(lower(convert_value(fields, value))),
-        ScalarCondition::LessThanOrEquals(value) => comparable.less_than_or_equals(lower(convert_value(fields, value))),
-        ScalarCondition::GreaterThan(value) => comparable.greater_than(lower(convert_value(fields, value))),
+        ScalarCondition::LessThan(value) => comparable.less_than(lower(convert_first_value(fields, value))),
+        ScalarCondition::LessThanOrEquals(value) => {
+            comparable.less_than_or_equals(lower(convert_first_value(fields, value)))
+        }
+        ScalarCondition::GreaterThan(value) => comparable.greater_than(lower(convert_first_value(fields, value))),
         ScalarCondition::GreaterThanOrEquals(value) => {
-            comparable.greater_than_or_equals(lower(convert_value(fields, value)))
+            comparable.greater_than_or_equals(lower(convert_first_value(fields, value)))
         }
         ScalarCondition::In(values) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
@@ -435,7 +470,7 @@ fn insensitive_scalar_filter(
                 values
                     .into_iter()
                     .map(|v| {
-                        let val: Expression = lower(convert_value(fields, v)).into();
+                        let val: Expression = lower(convert_first_value(fields, v)).into();
                         val
                     })
                     .collect::<Vec<_>>(),
@@ -456,7 +491,7 @@ fn insensitive_scalar_filter(
                 values
                     .into_iter()
                     .map(|v| {
-                        let val: Expression = lower(convert_value(fields, v)).into();
+                        let val: Expression = lower(convert_first_value(fields, v)).into();
                         val
                     })
                     .collect::<Vec<_>>(),
@@ -466,9 +501,16 @@ fn insensitive_scalar_filter(
 
     ConditionTree::single(condition)
 }
-
-fn convert_value<'a>(fields: &[ScalarFieldRef], value: PrismaValue) -> Value<'a> {
+fn convert_first_value<'a>(fields: &[ScalarFieldRef], value: PrismaValue) -> Value<'a> {
     fields.first().unwrap().value(value)
+}
+
+fn convert_value<'a>(field: &ScalarFieldRef, value: PrismaValue) -> Value<'a> {
+    field.value(value)
+}
+
+fn convert_list_value<'a>(field: &ScalarFieldRef, values: Vec<PrismaValue>) -> Value<'a> {
+    Value::Array(Some(values.into_iter().map(|val| field.value(val)).collect()))
 }
 
 fn convert_values<'a>(fields: &[ScalarFieldRef], values: Vec<PrismaValue>) -> Vec<Value<'a>> {

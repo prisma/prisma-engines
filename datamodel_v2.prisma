@@ -1,11 +1,11 @@
 datasource chinook {
-  provider = "sqlite"
-  url      = "file:./db/4230.db?connection_limit=1&socket_timeout=20"
+  provider = "postgres"
+  url      = "postgresql://postgres:prisma@localhost:5432/postgres"
 }
 
 model Container {
   id  Int     @id @default(autoincrement())
-  gql String?
+  gql String[]
 
   Record Record[]
 }

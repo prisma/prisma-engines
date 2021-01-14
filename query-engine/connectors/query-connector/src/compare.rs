@@ -89,11 +89,11 @@ pub trait ScalarListCompare {
 
     fn contains_every_element<T>(&self, filter: Vec<T>) -> Filter
     where
-        T: Into<Filter>;
+        T: Into<PrismaValue>;
 
     fn contains_some_element<T>(&self, filter: Vec<T>) -> Filter
     where
-        T: Into<Filter>;
+        T: Into<PrismaValue>;
 
-    fn contains_none(&self) -> Filter;
+    fn is_empty_list(&self, b: bool) -> Filter;
 }

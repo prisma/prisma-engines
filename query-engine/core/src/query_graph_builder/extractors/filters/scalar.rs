@@ -3,6 +3,21 @@ use connector::{Filter, ScalarCompare};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 
+pub fn parse_list(
+    filter_key: &str,
+    field: &ScalarFieldRef,
+    input: ParsedInputValue,
+    reverse: bool,
+) -> QueryGraphBuilderResult<Vec<Filter>> {
+    // let filter = match filter_key {
+    //     "not" => {
+    //         match input {
+    //         }
+    //     }
+
+    todo!()
+}
+
 pub fn parse(
     filter_key: &str,
     field: &ScalarFieldRef,
