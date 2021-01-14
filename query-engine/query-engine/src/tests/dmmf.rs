@@ -87,11 +87,11 @@ fn nullable_fields_should_be_nullable_in_group_by_output_types() {
         }
 
         model Blog {
-            blogId String @id
-            firstName   String?
-            lastName    String
-            age    Int?
-
+            id           String @id
+            optional_string   String?
+            required_string   String
+            optional_int      Int?
+            required_int      Int
         }
     "#;
     let (query_schema, datamodel) = get_query_schema(dm);
@@ -114,15 +114,17 @@ fn nullable_fields_should_be_nullable_in_group_by_output_types() {
                     recursively_assert_fields(dmmf, &output_type.fields, true);
                 }
                 TypeLocation::Scalar => match (in_aggregation_type, field.name.as_str()) {
-                    (false, "blogId") => assert_eq!(field.is_nullable, false),
-                    (false, "firstName") => assert_eq!(field.is_nullable, true),
-                    (false, "lastName") => assert_eq!(field.is_nullable, false),
-                    (false, "age") => assert_eq!(field.is_nullable, true),
+                    (false, "id") => assert_eq!(field.is_nullable, false),
+                    (false, "optional_string") => assert_eq!(field.is_nullable, true),
+                    (false, "required_string") => assert_eq!(field.is_nullable, false),
+                    (false, "optional_int") => assert_eq!(field.is_nullable, true),
+                    (false, "required_int") => assert_eq!(field.is_nullable, false),
 
-                    (true, "blogId") => assert_eq!(field.is_nullable, true),
-                    (true, "firstName") => assert_eq!(field.is_nullable, true),
-                    (true, "lastName") => assert_eq!(field.is_nullable, true),
-                    (true, "age") => assert_eq!(field.is_nullable, true),
+                    (true, "id") => assert_eq!(field.is_nullable, true),
+                    (true, "optional_string") => assert_eq!(field.is_nullable, true),
+                    (true, "required_string") => assert_eq!(field.is_nullable, true),
+                    (true, "optional_int") => assert_eq!(field.is_nullable, true),
+                    (true, "required_int") => assert_eq!(field.is_nullable, false),
 
                     _ => (),
                 },
