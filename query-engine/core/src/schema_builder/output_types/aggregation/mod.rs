@@ -78,7 +78,7 @@ where
     let fields: Vec<OutputField> = fields
         .iter()
         .map(|sf| {
-            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!sf.is_required || !sf.is_numeric())
+            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!sf.is_required)
         })
         .collect();
 
