@@ -75,9 +75,13 @@ where
     );
     return_cached_output!(ctx, &ident);
 
+    // Non-numerical fields are always set as nullable
+    // This is because when there's no data, doing aggregation on them will return NULL
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|sf| field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!sf.is_required))
+        .map(|sf| {
+            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!sf.is_required || !sf.is_numeric())
+        })
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));
