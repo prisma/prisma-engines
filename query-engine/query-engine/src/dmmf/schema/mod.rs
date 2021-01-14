@@ -1,6 +1,6 @@
 mod ast;
-
 mod enum_renderer;
+
 mod field_renderer;
 mod object_renderer;
 mod schema_renderer;
