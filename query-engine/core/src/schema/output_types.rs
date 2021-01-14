@@ -148,8 +148,8 @@ pub struct OutputField {
     /// instead of being attached to an input object.
     pub arguments: Vec<InputFieldRef>,
 
-    /// Indicates if the presence of the field on the higher output objects.
-    /// As opposed to input fields, optional output fields are also automatically nullable.
+    /// Indicates the presence of the field on the higher output objects.
+    /// States whether the field can be null or can't
     pub is_nullable: bool,
 
     /// Relevant for resolving top level queries.
@@ -157,14 +157,14 @@ pub struct OutputField {
 }
 
 impl OutputField {
-    pub fn optional(mut self) -> Self {
+    pub fn nullable(mut self) -> Self {
         self.is_nullable = true;
         self
     }
 
-    pub fn optional_if(self, condition: bool) -> Self {
+    pub fn nullable_if(self, condition: bool) -> Self {
         if condition {
-            self.optional()
+            self.nullable()
         } else {
             self
         }

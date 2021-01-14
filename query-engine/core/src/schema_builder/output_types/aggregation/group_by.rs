@@ -94,7 +94,7 @@ fn scalar_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField>
     fields
         .into_iter()
         .map(|f| {
-            field(f.name.clone(), vec![], map_scalar_output_type_for_field(ctx, &f), None).optional_if(!f.is_required)
+            field(f.name.clone(), vec![], map_scalar_output_type_for_field(ctx, &f), None).nullable_if(!f.is_required)
         })
         .collect()
 }

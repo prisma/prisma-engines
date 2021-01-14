@@ -56,7 +56,7 @@ pub(crate) fn map_field(ctx: &mut BuilderContext, model_field: &ModelField) -> O
         map_output_type(ctx, &model_field),
         None,
     )
-    .optional_if(!model_field.is_required())
+    .nullable_if(!model_field.is_required())
 }
 
 pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputType {
