@@ -1,4 +1,4 @@
-use super::{protocol_adapter::GraphQLProtocolAdapter, GQLResponse};
+use super::{protocol_adapter::GraphQLProtocolAdapter, GQLBatchResponse, GQLResponse};
 use crate::{context::PrismaContext, PrismaResponse, PrismaResult};
 use futures::FutureExt;
 use graphql_parser as gql;
@@ -95,7 +95,7 @@ async fn handle_single_query(query: Operation, ctx: Arc<PrismaContext>) -> Prism
         .catch_unwind()
         .await
     {
-        Ok(Ok(responses)) => responses.into(),
+        Ok(Ok(response)) => response.into(),
         Ok(Err(err)) => err.into(),
         Err(err) => {
             // panicked
@@ -118,23 +118,23 @@ async fn handle_batch(queries: Vec<Operation>, transactional: bool, ctx: &Arc<Pr
     .await
     {
         Ok(Ok(responses)) => {
-            let gql_responses = responses
+            let gql_responses: Vec<GQLResponse> = responses
                 .into_iter()
                 .map(|response| match response {
-                    Ok(data) => PrismaResponse::Single(data.into()),
-                    Err(err) => PrismaResponse::Single(err.into()),
+                    Ok(data) => data.into(),
+                    Err(err) => err.into(),
                 })
                 .collect();
 
-            PrismaResponse::Multi(gql_responses)
+            PrismaResponse::Multi(gql_responses.into())
         }
-        Ok(Err(err)) => PrismaResponse::Single(err.into()),
+        Ok(Err(err)) => PrismaResponse::Multi(err.into()),
         Err(err) => {
             // panicked
             let error = Error::from_panic_payload(&err);
-            let resp: GQLResponse = error.into();
+            let resp: GQLBatchResponse = error.into();
 
-            PrismaResponse::Single(resp)
+            PrismaResponse::Multi(resp)
         }
     }
 }
@@ -163,7 +163,7 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
                 .unwrap()
                 .index_by(keys.as_slice());
 
-            let results = arguments
+            let results: Vec<GQLResponse> = arguments
                 .into_iter()
                 .map(|args| {
                     let vals: Vec<QueryValue> = args.into_iter().map(|(_, v)| v).collect();
@@ -189,19 +189,19 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
                         }
                     }
 
-                    PrismaResponse::Single(responses)
+                    responses
                 })
                 .collect();
 
-            PrismaResponse::Multi(results)
+            PrismaResponse::Multi(results.into())
         }
 
-        Ok(Err(err)) => PrismaResponse::Single(err.into()),
+        Ok(Err(err)) => PrismaResponse::Multi(err.into()),
 
         // panicked
         Err(err) => {
             let error = Error::from_panic_payload(&err);
-            PrismaResponse::Single(error.into())
+            PrismaResponse::Multi(error.into())
         }
     }
 }

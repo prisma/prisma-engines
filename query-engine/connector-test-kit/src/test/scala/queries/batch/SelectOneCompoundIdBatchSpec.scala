@@ -45,7 +45,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
         legacy = false
       )
       .toString should be(
-      """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}}]}"""
     )
   }
 
@@ -57,7 +57,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]}"""
     )
   }
 
@@ -68,7 +68,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]}"""
     )
   }
 
@@ -80,7 +80,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]}"""
     )
   }
 
@@ -92,7 +92,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
              project,
              legacy = false)
       .toString should be(
-      """[{"data":{"findOneArtist":null}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":null}}]}"""
     )
   }
 
@@ -103,7 +103,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}}]"""
+      """{"batchResult":[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}}]}"""
     )
   }
 }
