@@ -77,9 +77,7 @@ where
 
     let fields: Vec<OutputField> = fields
         .iter()
-        .map(|sf| {
-            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!sf.is_required)
-        })
+        .map(|sf| field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!sf.is_required))
         .collect();
 
     let object = object_mapper(object_type(ident.clone(), fields, None));
