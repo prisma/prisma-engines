@@ -7,7 +7,6 @@ pub enum PostgresType {
     Integer,
     BigInt,
     Decimal(Option<(u32, u32)>),
-    Numeric(Option<(u32, u32)>),
     Real,
     DoublePrecision,
     VarChar(Option<u32>),

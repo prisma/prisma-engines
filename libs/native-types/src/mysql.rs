@@ -13,7 +13,6 @@ pub enum MySqlType {
     UnsignedMediumInt,
     BigInt,
     Decimal(Option<(u32, u32)>),
-    Numeric(Option<(u32, u32)>),
     UnsignedBigInt,
     Float,
     Double,

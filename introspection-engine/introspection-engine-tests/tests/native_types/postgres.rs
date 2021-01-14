@@ -70,8 +70,8 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             smallint        Int      @postgres.SmallInt
             int             Int      @postgres.Integer
             bigint          BigInt   @postgres.BigInt
-            decimal         Decimal  @postgres.Numeric(4, 2)
-            numeric         Decimal  @postgres.Numeric(4, 2)
+            decimal         Decimal  @postgres.Decimal(4, 2)
+            numeric         Decimal  @postgres.Decimal(4, 2)
             real            Float    @postgres.Real
             doublePrecision Float    @postgres.DoublePrecision
             smallSerial     Int      @default(autoincrement()) @postgres.SmallInt
@@ -219,10 +219,10 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
 
          model Blog {
           id                Int        @id @postgres.Integer
-          decimal_array     Decimal[]  @postgres.Numeric(42, 0)
-          decimal_array_2   Decimal[]  @postgres.Numeric
-          numeric_array     Decimal[]  @postgres.Numeric(4, 2)
-          numeric_array_2   Decimal[]  @postgres.Numeric
+          decimal_array     Decimal[]  @postgres.Decimal(42, 0)
+          decimal_array_2   Decimal[]  @postgres.Decimal
+          numeric_array     Decimal[]  @postgres.Decimal(4, 2)
+          numeric_array_2   Decimal[]  @postgres.Decimal
           varchar_array     String[]   @postgres.VarChar(42)
           varchar_array_2   String[]   @postgres.VarChar
           char_array        String[]   @postgres.Char(200)

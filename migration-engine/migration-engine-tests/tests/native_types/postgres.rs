@@ -9,10 +9,6 @@ use quaint::{
 use sql_datamodel_connector::SqlDatamodelConnectors;
 use std::{collections::HashMap, str::FromStr};
 
-//how to handle aliases
-// serial
-// decimal
-
 // do not castable ✓
 // split castable into safe and risky ✓
 // split seeds into risky succeeds ✓
@@ -62,18 +58,18 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             &["BigInt", "Real", "DoublePrecision", "VarChar(53)", "Char(53)", "Text"],
         ),
         (
-            "Numeric(10,2)",
+            "Decimal(10,2)",
             Value::numeric(BigDecimal::from_str("12345678.90").unwrap()),
-            &["Numeric(32,16)", "VarChar(53)", "Char(53)", "Text"],
+            &["Decimal(32,16)", "VarChar(53)", "Char(53)", "Text"],
         ),
         (
-            "Numeric(2,0)",
+            "Decimal(2,0)",
             Value::numeric(BigDecimal::from_str("12").unwrap()),
             &[
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "VarChar(53)",
                 "Char(53)",
                 "Text",
@@ -176,12 +172,12 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         (
             "SmallInt",
             Value::integer(2),
-            &["Numeric(2,1)", "VarChar(3)", "Char(1)"],
+            &["Decimal(2,1)", "VarChar(3)", "Char(1)"],
         ),
-        ("Integer", Value::integer(1), &["Numeric(2,1)", "VarChar(4)", "Char(1)"]),
-        ("BigInt", Value::integer(2), &["Numeric(2,1)", "VarChar(17)", "Char(1)"]),
+        ("Integer", Value::integer(1), &["Decimal(2,1)", "VarChar(4)", "Char(1)"]),
+        ("BigInt", Value::integer(2), &["Decimal(2,1)", "VarChar(17)", "Char(1)"]),
         (
-            "Numeric(10,2)",
+            "Decimal(10,2)",
             Value::numeric(BigDecimal::from_str("1").unwrap()),
             &[
                 "SmallInt",
@@ -194,7 +190,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             ],
         ),
         (
-            "Numeric(5,0)",
+            "Decimal(5,0)",
             Value::numeric(BigDecimal::from_str("10").unwrap()),
             &["SmallInt", "VarChar(5)", "Char(5)", "Real", "DoublePrecision"],
         ),
@@ -205,7 +201,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "VarChar(10)",
                 "Char(1)",
             ],
@@ -217,7 +213,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "VarChar(5)",
                 "Char(1)",
@@ -301,7 +297,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             ],
         ),
         (
-            "Numeric(10,2)",
+            "Decimal(10,2)",
             Value::numeric(BigDecimal::from_str("1").unwrap()),
             &[
                 "ByteA",
@@ -320,7 +316,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
             ],
         ),
         (
-            "Numeric(5,0)",
+            "Decimal(5,0)",
             Value::numeric(BigDecimal::from_str("1").unwrap()),
             &[
                 "ByteA",
@@ -382,7 +378,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -407,7 +403,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -432,7 +428,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -457,7 +453,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "Timestamp(3)",
@@ -481,7 +477,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -501,7 +497,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -521,7 +517,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -543,7 +539,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -566,7 +562,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -589,7 +585,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -613,7 +609,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -636,7 +632,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -660,7 +656,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -684,7 +680,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -708,7 +704,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -731,7 +727,7 @@ static NOT_CASTABLE: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
                 "SmallInt",
                 "Integer",
                 "BigInt",
-                "Numeric(32,16)",
+                "Decimal(32,16)",
                 "Real",
                 "DoublePrecision",
                 "ByteA",
@@ -756,7 +752,7 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps.insert("SmallInt", "Int");
     maps.insert("Integer", "Int");
     maps.insert("BigInt", "BigInt");
-    maps.insert("Numeric", "Decimal");
+    maps.insert("Decimal", "Decimal");
     maps.insert("Real", "Float");
     maps.insert("DoublePrecision", "Float");
     maps.insert("VarChar", "String");
@@ -1101,7 +1097,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = La
                 ("Integer", Value::array(vec![Value::integer(i32::MAX)])),
                 ("BigInt", Value::array(vec![Value::integer(i64::MAX)])),
                 (
-                    "Numeric(10,2)",
+                    "Decimal(10,2)",
                     Value::array(vec![Value::numeric(BigDecimal::from_str("128.90").unwrap())]),
                 ),
                 ("Real", Value::array(vec![Value::float(f32::MIN)])),
@@ -1140,7 +1136,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = La
                 ("Integer", Value::array(vec![Value::integer(i32::MAX)])),
                 ("BigInt", Value::array(vec![Value::integer(i64::MAX)])),
                 (
-                    "Numeric(10,2)",
+                    "Decimal(10,2)",
                     Value::array(vec![Value::numeric(BigDecimal::from_str("128.90").unwrap())]),
                 ),
                 ("Real", Value::array(vec![Value::float(f32::MIN)])),
