@@ -1,4 +1,4 @@
-mod schema;
+pub mod schema;
 
 use query_core::schema::{QuerySchemaRef, QuerySchemaRenderer};
 use schema::*;

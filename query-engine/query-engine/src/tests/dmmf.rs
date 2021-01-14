@@ -1,5 +1,9 @@
 use crate::{
     cli::CliCommand,
+    dmmf::{
+        schema::{DmmfOutputField, DmmfOutputType, TypeLocation},
+        DataModelMetaFormat,
+    },
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
@@ -29,6 +33,57 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
     let inputs = &dmmf.schema.input_object_types;
 
     assert!(!inputs.is_empty());
+}
+
+#[test]
+#[serial]
+fn nullable_fields_should_be_nullable_in_group_by_output_type() {
+    let dm = r#"
+        datasource pg {
+            provider = "postgresql"
+            url = "postgresql://"
+        }
+
+        model Blog {
+            blogId String @id
+            firstName   String?
+            lastName    String
+            age    Int?
+
+        }
+    "#;
+    let (query_schema, datamodel) = get_query_schema(dm);
+    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+
+    fn find_output_type<'a>(dmmf: &'a DataModelMetaFormat, type_name: &str) -> &'a DmmfOutputType {
+        dmmf.schema
+            .output_object_types
+            .get("prisma")
+            .expect("should exist")
+            .into_iter()
+            .find(|o| o.name == type_name)
+            .expect("should exist")
+    }
+    fn recursively_assert_fields(dmmf: &DataModelMetaFormat, fields: &Vec<DmmfOutputField>) {
+        for field in fields {
+            match field.output_type.location {
+                TypeLocation::OutputObjectTypes => {
+                    let output_type = find_output_type(dmmf, field.output_type.typ.as_str());
+                    recursively_assert_fields(dmmf, &output_type.fields);
+                }
+                TypeLocation::Scalar => match field.name.as_str() {
+                    "blogId" => assert_eq!(field.is_nullable, false),
+                    "firstName" => assert_eq!(field.is_nullable, true),
+                    "lastName" => assert_eq!(field.is_nullable, false),
+                    "age" => assert_eq!(field.is_nullable, true),
+                    _ => (),
+                },
+                _ => (),
+            }
+        }
+    }
+    let group_by_output_type = find_output_type(&dmmf, "BlogGroupByOutputType");
+    recursively_assert_fields(&dmmf, &group_by_output_type.fields)
 }
 
 #[test]
