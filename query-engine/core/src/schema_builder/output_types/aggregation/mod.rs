@@ -52,7 +52,7 @@ where
             object_mapper,
         ));
 
-        Some(field(name, vec![], object_type, None).optional())
+        Some(field(name, vec![], object_type, None).nullable())
     }
 }
 
@@ -75,10 +75,12 @@ where
     );
     return_cached_output!(ctx, &ident);
 
+    // Non-numerical fields are always set as nullable
+    // This is because when there's no data, doing aggregation on them will return NULL
     let fields: Vec<OutputField> = fields
         .iter()
         .map(|sf| {
-            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).optional_if(!sf.is_required || !sf.is_numeric())
+            field(sf.name.clone(), vec![], type_mapper(ctx, sf), None).nullable_if(!sf.is_required || !sf.is_numeric())
         })
         .collect();
 

@@ -56,7 +56,7 @@ where
         arguments: arguments.into_iter().map(Arc::new).collect(),
         field_type: Arc::new(field_type),
         query_info,
-        is_required: true,
+        is_nullable: false,
         deprecation: None,
     }
 }

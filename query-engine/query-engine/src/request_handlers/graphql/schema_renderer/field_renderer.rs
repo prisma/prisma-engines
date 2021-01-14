@@ -45,7 +45,8 @@ impl GqlFieldRenderer {
         };
 
         let rendered_type = field.field_type.into_renderer().render(ctx);
-        format!("{}{}: {}", field.name, rendered_args, rendered_type)
+        let bang = if !field.is_nullable { "!" } else { "" };
+        format!("{}{}: {}{}", field.name, rendered_args, rendered_type, bang)
     }
 
     fn render_arguments(&self, args: &[InputFieldRef], ctx: &mut RenderContext) -> Vec<String> {

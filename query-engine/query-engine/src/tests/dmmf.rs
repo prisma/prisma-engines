@@ -1,11 +1,15 @@
 use crate::{
     cli::CliCommand,
+    dmmf::{
+        schema::{DmmfOutputField, DmmfOutputType, TypeLocation},
+        DataModelMetaFormat,
+    },
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
-use query_core::{schema_builder, BuildMode, QuerySchema};
+use query_core::{schema_builder, BuildMode, QuerySchema, PRISMA_NAMESPACE};
 use serial_test::serial;
 use std::sync::Arc;
 
@@ -73,6 +77,54 @@ fn must_fail_if_the_schema_is_invalid() {
     assert!(test_dmmf_cli_command(schema).is_err());
 }
 
+#[test]
+#[serial]
+fn nullable_fields_should_be_nullable_in_group_by_output_types() {
+    let dm = r#"
+        datasource pg {
+            provider = "postgresql"
+            url = "postgresql://"
+        }
+
+        model Blog {
+            id           String @id
+            optional_string   String?
+            required_string   String
+            optional_int      Int?
+            required_int      Int
+        }
+    "#;
+    let (query_schema, datamodel) = get_query_schema(dm);
+    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+    let group_by_output_type = find_output_type(&dmmf, PRISMA_NAMESPACE, "BlogGroupByOutputType");
+
+    iterate_output_type_fields(group_by_output_type, &dmmf, &|field, parent_type| {
+        let field_in_nested_type = parent_type.name != "BlogGroupByOutputType";
+        let is_nullable = field.is_nullable;
+
+        match (field.output_type.location, field_in_nested_type) {
+            (TypeLocation::Scalar, false) => match field.name.as_str() {
+                "id" => assert_eq!(is_nullable, false),
+                "optional_string" => assert_eq!(is_nullable, true),
+                "required_string" => assert_eq!(is_nullable, false),
+                "optional_int" => assert_eq!(is_nullable, true),
+                "required_int" => assert_eq!(is_nullable, false),
+                _ => (),
+            },
+            (TypeLocation::Scalar, true) => match field.name.as_str() {
+                "id" => assert_eq!(is_nullable, true),
+                "optional_string" => assert_eq!(is_nullable, true),
+                // non-numerical fields in aggregation types should always be nullable
+                "required_string" => assert_eq!(is_nullable, true),
+                "optional_int" => assert_eq!(is_nullable, true),
+                "required_int" => assert_eq!(is_nullable, false),
+                _ => (),
+            },
+            _ => (),
+        }
+    });
+}
+
 fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
     feature_flags::initialize(&[String::from("all")]).unwrap();
 
@@ -118,4 +170,39 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
         schema_builder::build(internal_ref, BuildMode::Modern, false, capabilities),
         dm,
     )
+}
+
+fn find_output_type<'a>(dmmf: &'a DataModelMetaFormat, namespace: &str, type_name: &str) -> &'a DmmfOutputType {
+    dmmf.schema
+        .output_object_types
+        .get(namespace)
+        .expect(&format!("unknown dmmf namespace {}", namespace))
+        .into_iter()
+        .find(|o| o.name == type_name)
+        .expect(&format!("could not find output type named {}", type_name))
+}
+
+fn iterate_output_type_fields<P>(output_type: &DmmfOutputType, dmmf: &DataModelMetaFormat, iteratee: &P)
+where
+    P: Fn(&DmmfOutputField, &DmmfOutputType),
+{
+    for field in &output_type.fields {
+        match field.output_type.location {
+            TypeLocation::OutputObjectTypes => {
+                let namespace = field
+                    .output_type
+                    .namespace
+                    .as_ref()
+                    .expect("a namespace is required to iterate over a nested output type but could not find one");
+                let nested_output_type = find_output_type(dmmf, namespace, field.output_type.typ.as_str());
+
+                iteratee(&field, nested_output_type);
+                iterate_output_type_fields(nested_output_type, dmmf, iteratee)
+            }
+            TypeLocation::Scalar | TypeLocation::EnumTypes => {
+                iteratee(&field, output_type);
+            }
+            _ => (),
+        }
+    }
 }

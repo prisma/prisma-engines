@@ -29,7 +29,7 @@ impl IrSerializer {
                 // so we just unpack the only result possible.
                 // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
                 let result = if serialized.is_empty() {
-                    if !self.output_field.is_required {
+                    if self.output_field.is_nullable {
                         Item::Value(PrismaValue::Null)
                     } else {
                         match self.output_field.field_type.borrow() {

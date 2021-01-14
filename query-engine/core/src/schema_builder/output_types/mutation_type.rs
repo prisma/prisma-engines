@@ -145,7 +145,7 @@ fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
                 tag: QueryTag::DeleteOne,
             }),
         )
-        .optional()
+        .nullable()
     })
 }
 
@@ -182,7 +182,7 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
                 tag: QueryTag::UpdateOne,
             }),
         )
-        .optional()
+        .nullable()
     })
 }
 

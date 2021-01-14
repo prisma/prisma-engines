@@ -15,7 +15,6 @@ pub struct DmmfSchema {
 pub struct DmmfOutputField {
     pub name: String,
     pub args: Vec<DmmfInputField>,
-    pub is_required: bool,
     pub is_nullable: bool,
     pub output_type: DmmfTypeReference,
 

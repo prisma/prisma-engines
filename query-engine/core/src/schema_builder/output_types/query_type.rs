@@ -43,7 +43,7 @@ fn find_one_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputFi
                 tag: QueryTag::FindOne,
             }),
         )
-        .optional()
+        .nullable()
         .deprecate(
             "The `findOne` query has been deprecated and replaced with `findUnique`.",
             "2.14",
@@ -67,7 +67,7 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
                 tag: QueryTag::FindUnique,
             }),
         )
-        .optional()
+        .nullable()
     })
 }
 
@@ -85,7 +85,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
             tag: QueryTag::FindFirst,
         }),
     )
-    .optional()
+    .nullable()
 }
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.

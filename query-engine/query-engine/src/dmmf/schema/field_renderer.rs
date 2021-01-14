@@ -30,8 +30,7 @@ pub(super) fn render_output_field(field: &OutputFieldRef, ctx: &mut RenderContex
         name: field.name.clone(),
         args: rendered_inputs,
         output_type,
-        is_required: field.is_required,
-        is_nullable: !field.is_required,
+        is_nullable: field.is_nullable,
         deprecation: field.deprecation.as_ref().map(Into::into),
     };
 
