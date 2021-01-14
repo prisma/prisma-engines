@@ -37,7 +37,49 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
 
 #[test]
 #[serial]
-fn nullable_fields_should_be_nullable_in_group_by_output_type() {
+fn must_not_fail_if_no_datasource_is_defined() {
+    let schema = r#"
+        model Blog {
+            blogId String @id
+        }
+    "#;
+
+    test_dmmf_cli_command(schema).unwrap();
+}
+
+#[test]
+#[serial]
+fn must_not_fail_if_an_invalid_datasource_url_is_provided() {
+    let schema = r#"
+        datasource pg {
+            provider = "postgresql"
+            url      = "mysql:://"
+        }
+
+        model Blog {
+            blogId String @id
+        }
+    "#;
+
+    test_dmmf_cli_command(schema).unwrap();
+}
+
+#[test]
+#[serial]
+fn must_fail_if_the_schema_is_invalid() {
+    let schema = r#"
+        // invalid because of field type
+        model Blog {
+            blogId StringyString @id
+        }
+    "#;
+
+    assert!(test_dmmf_cli_command(schema).is_err());
+}
+
+#[test]
+#[serial]
+fn nullable_fields_should_be_nullable_in_group_by_output_types() {
     let dm = r#"
         datasource pg {
             provider = "postgresql"
@@ -82,50 +124,9 @@ fn nullable_fields_should_be_nullable_in_group_by_output_type() {
             }
         }
     }
+    
     let group_by_output_type = find_output_type(&dmmf, "BlogGroupByOutputType");
     recursively_assert_fields(&dmmf, &group_by_output_type.fields)
-}
-
-#[test]
-#[serial]
-fn must_not_fail_if_no_datasource_is_defined() {
-    let schema = r#"
-        model Blog {
-            blogId String @id
-        }
-    "#;
-
-    test_dmmf_cli_command(schema).unwrap();
-}
-
-#[test]
-#[serial]
-fn must_not_fail_if_an_invalid_datasource_url_is_provided() {
-    let schema = r#"
-        datasource pg {
-            provider = "postgresql"
-            url      = "mysql:://"
-        }
-
-        model Blog {
-            blogId String @id
-        }
-    "#;
-
-    test_dmmf_cli_command(schema).unwrap();
-}
-
-#[test]
-#[serial]
-fn must_fail_if_the_schema_is_invalid() {
-    let schema = r#"
-        // invalid because of field type
-        model Blog {
-            blogId StringyString @id
-        }
-    "#;
-
-    assert!(test_dmmf_cli_command(schema).is_err());
 }
 
 fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
