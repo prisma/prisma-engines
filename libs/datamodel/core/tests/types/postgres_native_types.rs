@@ -3,22 +3,8 @@ use crate::types::helper::test_native_types_without_attributes;
 use datamodel::{ast, diagnostics::DatamodelError};
 use native_types::PostgresType;
 
-// #[test] no more serial currently
-// fn should_fail_on_serial_data_types_with_number_default() {
-//     fn error_msg(type_name: &str) -> String {
-//         format!(
-//             "Sequential native type {} of Postgres must not have a static default value.",
-//             type_name
-//         )
-//     }
-//
-//     for tpe in &["SmallSerial", "Serial", "BigSerial"] {
-//         test_native_types_with_field_attribute_support(tpe, "Int", "default(4)", &error_msg(tpe), POSTGRES_SOURCE);
-//     }
-// }
-
 #[test]
-fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
+fn should_fail_on_invalid_precision_for_decimal_type() {
     fn error_msg(type_name: &str) -> String {
         format!(
             "Argument M is out of range for Native type {} of Postgres: Precision must be positive with a maximum value of 1000.",
@@ -26,10 +12,8 @@ fn should_fail_on_invalid_precision_for_decimal_and_numeric_type() {
         )
     }
 
-    for tpe in &["Decimal", "Numeric"] {
-        let native_type = &format!("{}(1001,3)", tpe);
-        test_native_types_without_attributes(native_type, "Decimal", &error_msg(native_type), POSTGRES_SOURCE);
-    }
+    let native_type = "Decimal(1001,3)";
+    test_native_types_without_attributes(native_type, "Decimal", &error_msg(native_type), POSTGRES_SOURCE);
 }
 
 #[test]
@@ -87,33 +71,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "The scale must not be larger than the precision for the Decimal(2,4) native type in Postgres.",
-        ast::Span::new(289, 319),
-    ));
-}
-
-#[test]
-fn should_fail_on_native_type_numeric_when_scale_is_bigger_than_precision() {
-    let dml = r#"
-        datasource db {
-          provider = "postgres"
-          url      = "postgresql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id     Int   @id
-            dec Decimal @db.Numeric(2, 4)
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Numeric(2,4) native type in Postgres.",
         ast::Span::new(289, 319),
     ));
 }

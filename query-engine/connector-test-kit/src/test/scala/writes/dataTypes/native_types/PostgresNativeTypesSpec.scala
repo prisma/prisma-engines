@@ -57,7 +57,6 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  float    Float   @test.Real
         |  dfloat   Float   @test.DoublePrecision
         |  decFloat Decimal @test.Decimal(2, 1)
-        |  numFloat Decimal @test.Numeric(10, 6)
         |}"""
     }
 
@@ -71,13 +70,11 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
        |      float: 1.1
        |      dfloat: 2.2
        |      decFloat: 3.1234
-       |      numFloat: "4.12345"
        |    }
        |  ) {
        |    float
        |    dfloat
        |    decFloat
-       |    numFloat
        |  }
        |}""".stripMargin,
       project,
@@ -85,7 +82,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     )
 
     // decFloat is cut due to precision
-    res.toString should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"decFloat":"3.1","numFloat":"4.12345"}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"decFloat":"3.1"}}}""")
   }
 
   "Postgres native string types" should "work" in {

@@ -61,7 +61,6 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::MediumInt => "MEDIUMINT".into(),
             MySqlType::BigInt => "BIGINT".into(),
             MySqlType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)),
-            MySqlType::Numeric(precision) => format!("NUMERIC{}", render_decimal(precision)),
             MySqlType::Float => "FLOAT".into(),
             MySqlType::Double => "DOUBLE".into(),
             MySqlType::Bit(size) => format!("BIT({size})", size = size),

@@ -228,7 +228,6 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
             if api.is_mysql_8() { "bigint" } else { "bigint(20)" },
         ),
         ("decimal", "Decimal", "Decimal(5, 3)", "decimal(5,3)"),
-        ("numeric", "Decimal", "Numeric(4,1)", "decimal(4,1)"),
         ("float", "Float", "Float", "float"),
         ("double", "Float", "Double", "double"),
         ("bits", "Bytes", "Bit(10)", "bit(10)"),

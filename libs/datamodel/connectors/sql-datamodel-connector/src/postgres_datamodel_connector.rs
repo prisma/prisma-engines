@@ -13,7 +13,6 @@ const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
 const BIG_INT_TYPE_NAME: &str = "BigInt";
 const DECIMAL_TYPE_NAME: &str = "Decimal";
-const NUMERIC_TYPE_NAME: &str = "Numeric";
 const REAL_TYPE_NAME: &str = "Real";
 const DOUBLE_PRECISION_TYPE_NAME: &str = "DoublePrecision";
 const VARCHAR_TYPE_NAME: &str = "VarChar";
@@ -56,7 +55,6 @@ impl PostgresDatamodelConnector {
         let integer = NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, vec![ScalarType::Int]);
         let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, vec![ScalarType::BigInt]);
         let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
-        let numeric = NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]);
         let real = NativeTypeConstructor::without_args(REAL_TYPE_NAME, vec![ScalarType::Float]);
         let double_precision = NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, vec![ScalarType::Float]);
         let varchar = NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]);
@@ -82,7 +80,6 @@ impl PostgresDatamodelConnector {
             integer,
             big_int,
             decimal,
-            numeric,
             real,
             double_precision,
             varchar,
@@ -126,10 +123,10 @@ impl Connector for PostgresDatamodelConnector {
                 let error = self.native_instance_error(native_type_instance);
 
                 match native_type {
-                    Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
+                    Decimal(Some((precision, scale))) if scale > precision => {
                         error.new_scale_larger_than_precision_error()
                     }
-                    Decimal(Some((prec, _))) | Numeric(Some((prec, _))) if prec > 1000 || prec == 0 => error
+                    Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => error
                         .new_argument_m_out_of_range_error("Precision must be positive with a maximum value of 1000."),
                     Bit(Some(0)) | VarBit(Some(0)) => {
                         error.new_argument_m_out_of_range_error("M must be a positive integer.")
@@ -160,7 +157,6 @@ impl Connector for PostgresDatamodelConnector {
             INTEGER_TYPE_NAME => Integer,
             BIG_INT_TYPE_NAME => BigInt,
             DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
-            NUMERIC_TYPE_NAME => Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
             REAL_TYPE_NAME => Real,
             DOUBLE_PRECISION_TYPE_NAME => DoublePrecision,
             VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME)?),
@@ -192,7 +188,6 @@ impl Connector for PostgresDatamodelConnector {
             Integer => (INTEGER_TYPE_NAME, vec![]),
             BigInt => (BIG_INT_TYPE_NAME, vec![]),
             Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
-            Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             Real => (REAL_TYPE_NAME, vec![]),
             DoublePrecision => (DOUBLE_PRECISION_TYPE_NAME, vec![]),
             VarChar(x) => (VARCHAR_TYPE_NAME, arg_vec_from_opt(x)),

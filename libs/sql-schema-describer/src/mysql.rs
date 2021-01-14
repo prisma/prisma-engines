@@ -574,13 +574,6 @@ impl SqlSchemaDescriber {
                     precision.numeric_scale.unwrap(),
                 )))),
             ),
-            "numeric" => (
-                ColumnTypeFamily::Decimal,
-                Some(MySqlType::Numeric(Some((
-                    precision.numeric_precision.unwrap(),
-                    precision.numeric_scale.unwrap(),
-                )))),
-            ),
             "float" => (ColumnTypeFamily::Float, Some(MySqlType::Float)),
             "double" => (ColumnTypeFamily::Float, Some(MySqlType::Double)),
 

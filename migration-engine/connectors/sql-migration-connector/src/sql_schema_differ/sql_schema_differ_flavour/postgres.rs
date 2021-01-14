@@ -127,7 +127,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
         SmallInt => match next {
             Integer => SafeCast,
             BigInt => SafeCast,
-            Decimal(params) | Numeric(params) => match params {
+            Decimal(params) => match params {
                 // SmallInt can be at most three digits, so this might fail.
                 Some((p, s)) if p - s < 3 => RiskyCast,
                 _ => SafeCast,
@@ -146,7 +146,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
         Integer => match next {
             SmallInt => RiskyCast,
             BigInt => SafeCast,
-            Decimal(params) | Numeric(params) => match params {
+            Decimal(params) => match params {
                 // Integer can be at most 10 digits, so this might fail.
                 Some((p, s)) if p - s < 10 => RiskyCast,
                 _ => SafeCast,
@@ -165,7 +165,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
         BigInt => match next {
             SmallInt => RiskyCast,
             Integer => RiskyCast,
-            Decimal(params) | Numeric(params) => match params {
+            Decimal(params) => match params {
                 // Bigint can be at most nineteen digits, so this might fail.
                 Some((p, s)) if p - s < 19 => RiskyCast,
                 _ => SafeCast,
@@ -181,7 +181,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             Text => SafeCast,
             _ => NotCastable,
         },
-        Decimal(old_params) | Numeric(old_params) => match next {
+        Decimal(old_params) => match next {
             SmallInt => match old_params {
                 None => RiskyCast,
                 Some((_, s)) if s > 0 => RiskyCast,
@@ -200,7 +200,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 Some((p, 0)) if p > 18 => RiskyCast,
                 _ => SafeCast,
             },
-            Decimal(new_params) | Numeric(new_params) => match (old_params, new_params) {
+            Decimal(new_params) => match (old_params, new_params) {
                 (Some(_), None) => SafeCast,
                 (None, Some((p_new, s_new))) if p_new < 131072 || s_new < 16383 => RiskyCast,
                 // Sigh... So, numeric(4,0) to numeric(4,2) would be risky,
@@ -233,7 +233,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             SmallInt => RiskyCast,
             Integer => RiskyCast,
             BigInt => RiskyCast,
-            Decimal(_) | Numeric(_) => RiskyCast,
+            Decimal(_) => RiskyCast,
             Real => SafeCast,
             DoublePrecision => SafeCast,
             VarChar(len) | Char(len) => match len {
@@ -249,7 +249,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
             SmallInt => RiskyCast,
             Integer => RiskyCast,
             BigInt => RiskyCast,
-            Decimal(_) | Numeric(_) => RiskyCast,
+            Decimal(_) => RiskyCast,
             Real => RiskyCast,
             DoublePrecision => SafeCast,
             VarChar(len) | Char(len) => match len {

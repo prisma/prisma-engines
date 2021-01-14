@@ -111,7 +111,6 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("int", "Int", "Integer", "int4"),
         ("bigint", "BigInt", "BigInt", "int8"),
         ("decimal", "Decimal", "Decimal(4, 2)", "numeric"),
-        ("numeric", "Decimal", "Numeric(4, 2)", "numeric"),
         ("real", "Float", "Real", "float4"),
         ("doublePrecision", "Float", "DoublePrecision", "float8"),
         ("varChar", "String", "VarChar(200)", "varchar"),

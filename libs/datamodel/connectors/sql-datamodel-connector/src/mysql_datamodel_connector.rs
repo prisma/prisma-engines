@@ -20,7 +20,6 @@ const UNSIGNED_MEDIUM_INT_TYPE_NAME: &str = "UnsignedMediumInt";
 const BIG_INT_TYPE_NAME: &str = "BigInt";
 const UNSIGNED_BIG_INT_TYPE_NAME: &str = "UnsignedBigInt";
 const DECIMAL_TYPE_NAME: &str = "Decimal";
-const NUMERIC_TYPE_NAME: &str = "Numeric";
 const FLOAT_TYPE_NAME: &str = "Float";
 const DOUBLE_TYPE_NAME: &str = "Double";
 const BIT_TYPE_NAME: &str = "Bit";
@@ -85,7 +84,6 @@ impl MySqlDatamodelConnector {
         let unsigned_big_int =
             NativeTypeConstructor::without_args(UNSIGNED_BIG_INT_TYPE_NAME, vec![ScalarType::BigInt]);
         let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
-        let numeric = NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]);
         let float = NativeTypeConstructor::without_args(FLOAT_TYPE_NAME, vec![ScalarType::Float]);
         let double = NativeTypeConstructor::without_args(DOUBLE_TYPE_NAME, vec![ScalarType::Float]);
         let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, vec![ScalarType::Bytes]);
@@ -120,7 +118,6 @@ impl MySqlDatamodelConnector {
             big_int,
             unsigned_big_int,
             decimal,
-            numeric,
             float,
             double,
             bit,
@@ -170,13 +167,13 @@ impl Connector for MySqlDatamodelConnector {
                     NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name);
 
                 match native_type {
-                    Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
+                    Decimal(Some((precision, scale))) if scale > precision => {
                         error.new_scale_larger_than_precision_error()
                     }
-                    Decimal(Some((precision, _))) | Numeric(Some((precision, _))) if precision > 65 => {
+                    Decimal(Some((precision, _))) if precision > 65 => {
                         error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.")
                     }
-                    Decimal(Some((_, scale))) | Numeric(Some((_, scale))) if scale > 30 => {
+                    Decimal(Some((_, scale))) if scale > 30 => {
                         error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.")
                     }
                     Bit(length) if length == 0 || length > 64 => {
@@ -249,7 +246,6 @@ impl Connector for MySqlDatamodelConnector {
             BIG_INT_TYPE_NAME => BigInt,
             UNSIGNED_BIG_INT_TYPE_NAME => UnsignedBigInt,
             DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
-            NUMERIC_TYPE_NAME => Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
             FLOAT_TYPE_NAME => Float,
             DOUBLE_TYPE_NAME => Double,
             BIT_TYPE_NAME => Bit(parse_one_u32(args, BIT_TYPE_NAME)?),
@@ -294,7 +290,6 @@ impl Connector for MySqlDatamodelConnector {
             BigInt => (BIG_INT_TYPE_NAME, vec![]),
             UnsignedBigInt => (UNSIGNED_BIG_INT_TYPE_NAME, vec![]),
             Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
-            Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             Float => (FLOAT_TYPE_NAME, vec![]),
             Double => (DOUBLE_TYPE_NAME, vec![]),
             Bit(x) => (BIT_TYPE_NAME, vec![x.to_string()]),

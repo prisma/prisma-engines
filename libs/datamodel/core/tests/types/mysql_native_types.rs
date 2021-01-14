@@ -114,7 +114,7 @@ fn should_fail_on_argument_out_of_range_for_varchar_type() {
 }
 
 #[test]
-fn should_fail_on_argument_out_of_range_for_decimal_and_numeric_type() {
+fn should_fail_on_argument_out_of_range_for_decimal_type() {
     fn error_msg(type_name: &str, arg: &str, range: &str) -> String {
         format!(
             "Argument M is out of range for Native type {} of MySQL: {} can range from {}.",
@@ -122,24 +122,23 @@ fn should_fail_on_argument_out_of_range_for_decimal_and_numeric_type() {
         )
     };
 
-    for tpe in &["Numeric", "Decimal"] {
-        let native_type = &format!("{}(66,20)", tpe);
+    let native_type = "Decimal(66,20)";
 
-        test_native_types_without_attributes(
-            native_type,
-            "Decimal",
-            &error_msg(native_type, "Precision", "1 to 65"),
-            MYSQL_SOURCE,
-        );
-        let native_type = &format!("{}(44,33)", tpe);
+    test_native_types_without_attributes(
+        native_type,
+        "Decimal",
+        &error_msg(native_type, "Precision", "1 to 65"),
+        MYSQL_SOURCE,
+    );
 
-        test_native_types_without_attributes(
-            native_type,
-            "Decimal",
-            &error_msg(native_type, "Scale", "0 to 30"),
-            MYSQL_SOURCE,
-        );
-    }
+    let native_type = "Decimal(44,33)";
+
+    test_native_types_without_attributes(
+        native_type,
+        "Decimal",
+        &error_msg(native_type, "Scale", "0 to 30"),
+        MYSQL_SOURCE,
+    );
 }
 
 #[test]
@@ -165,33 +164,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     error.assert_is(DatamodelError::new_connector_error(
         "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.",
-        ast::Span::new(281, 311),
-    ));
-}
-
-#[test]
-fn should_fail_on_native_type_numeric_when_scale_is_bigger_than_precision() {
-    let dml = r#"
-        datasource db {
-          provider = "mysql"
-          url      = "mysql://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id     Int   @id
-            dec Decimal @db.Numeric(2, 4)
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Numeric(2,4) native type in MySQL.",
         ast::Span::new(281, 311),
     ));
 }

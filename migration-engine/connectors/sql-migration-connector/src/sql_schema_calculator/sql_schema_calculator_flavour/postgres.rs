@@ -41,7 +41,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             PostgresType::Integer => "INTEGER".to_owned(),
             PostgresType::BigInt => "BIGINT".to_owned(),
             PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)),
-            PostgresType::Numeric(precision) => format!("NUMERIC{}", render_decimal(precision)),
             PostgresType::Real => "REAL".to_owned(),
             PostgresType::DoublePrecision => "DOUBLE PRECISION".to_owned(),
             PostgresType::VarChar(length) => format!("VARCHAR{}", render(length)),

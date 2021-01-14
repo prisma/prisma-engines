@@ -695,7 +695,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_maximum_length))),
         "numeric" | "_numeric" => (
             Decimal,
-            Some(PostgresType::Numeric(
+            Some(PostgresType::Decimal(
                 match (precision.numeric_precision, precision.numeric_scale) {
                     (None, None) => None,
                     (Some(prec), Some(scale)) => Some((prec, scale)),

@@ -466,7 +466,7 @@ async fn all_postgres_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
-                native_type: Some(PostgresType::Numeric(None).to_json()),
+                native_type: Some(PostgresType::Decimal(None).to_json()),
             },
             default: None,
             auto_increment: false,
