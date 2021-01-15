@@ -29,9 +29,6 @@ members = [
   "libs/user-facing-errors",
 ]
 
-[patch."https://github.com/prisma/quaint"]
-quaint = { path = "../quaint" }
-
 [profile.dev.package.backtrace]
 opt-level = 3
 
