@@ -191,11 +191,13 @@ fn convert_scalar_list_filter(
     field: &ScalarFieldRef,
 ) -> ConditionTree<'static> {
     let condition = match cond {
-        ScalarListCondition::Contains(val) => comparable.compare_raw("@>", convert_value(field, val)),
-        ScalarListCondition::ContainsEvery(vals) => comparable.compare_raw("<@", convert_list_value(field, vals)),
+        ScalarListCondition::Contains(val) => {
+            comparable.compare_raw("@>", Value::Array(Some(vec![convert_value(field, val)])))
+        }
+        ScalarListCondition::ContainsEvery(vals) => comparable.compare_raw("@>", convert_list_value(field, vals)),
         ScalarListCondition::ContainsSome(vals) => comparable.compare_raw("&&", convert_list_value(field, vals)),
-        ScalarListCondition::IsEmpty(cond) if cond => comparable.compare_raw("=", "{}"),
-        ScalarListCondition::IsEmpty(_) => comparable.compare_raw("<>", "{}"),
+        ScalarListCondition::IsEmpty(cond) if cond => comparable.compare_raw("=", Value::Array(Some(vec![])).raw()),
+        ScalarListCondition::IsEmpty(_) => comparable.compare_raw("<>", Value::Array(Some(vec![])).raw()),
     };
 
     ConditionTree::single(condition)
