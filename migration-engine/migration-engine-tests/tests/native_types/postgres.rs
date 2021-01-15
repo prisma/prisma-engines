@@ -765,8 +765,8 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps.insert("Time", "DateTime");
     maps.insert("Timetz", "DateTime");
     maps.insert("Boolean", "Boolean");
-    maps.insert("Bit", "String");
-    maps.insert("VarBit", "String");
+    maps.insert("Bit", "Bytes");
+    maps.insert("VarBit", "Bytes");
     maps.insert("Uuid", "String");
     maps.insert("Xml", "String");
     maps.insert("Json", "Json");

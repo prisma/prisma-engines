@@ -88,8 +88,8 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             time_2          DateTime @postgres.Time(6)
             timetz          DateTime @postgres.Timetz(2)
             bool            Boolean  @postgres.Boolean
-            bit             String   @postgres.Bit(1)
-            varbit          String   @postgres.VarBit(1)
+            bit             Bytes    @postgres.Bit(1)
+            varbit          Bytes    @postgres.VarBit(1)
             uuid            String   @postgres.Uuid
             xml             String   @postgres.Xml
             json            Json     @postgres.Json
@@ -227,10 +227,10 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
           varchar_array_2   String[]   @postgres.VarChar
           char_array        String[]   @postgres.Char(200)
           char_array_2      String[]   @postgres.Char(1)
-          bit_array         String[]   @postgres.Bit(20)
-          bit_array_2       String[]   @postgres.Bit(1)
-          varbit_array      String[]   @postgres.VarBit(2)
-          varbit_array_2    String[]   @postgres.VarBit
+          bit_array         Bytes[]    @postgres.Bit(20)
+          bit_array_2       Bytes[]    @postgres.Bit(1)
+          varbit_array      Bytes[]    @postgres.VarBit(2)
+          varbit_array_2    Bytes[]    @postgres.VarBit
           timestamp_array   DateTime[] @postgres.Timestamp(4)
           time_array        DateTime[] @postgres.Time(4)
         }
