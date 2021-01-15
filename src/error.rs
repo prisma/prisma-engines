@@ -147,11 +147,18 @@ pub enum ErrorKind {
     #[error("Error in an I/O operation: {0}")]
     IoError(io::Error),
 
-    #[error("Connect timed out ({0})")]
-    ConnectTimeout(String),
+    #[error("Timed out when connecting to the database.")]
+    ConnectTimeout,
 
-    #[error("Operation timed out ({0})")]
-    Timeout(String),
+    #[error(
+        "Timed out fetching a connection from the pool (connection limit: {}, in use: {})",
+        max_open,
+        in_use
+    )]
+    PoolTimeout { max_open: u64, in_use: u64 },
+
+    #[error("Timed out during query execution.")]
+    SocketTimeout,
 
     #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
@@ -178,6 +185,11 @@ impl ErrorKind {
     #[allow(dead_code)]
     pub(crate) fn database_url_is_invalid(msg: impl Into<String>) -> Self {
         Self::DatabaseUrlIsInvalid(msg.into())
+    }
+
+    #[cfg(feature = "pooled")]
+    pub(crate) fn pool_timeout(max_open: u64, in_use: u64) -> Self {
+        Self::PoolTimeout { max_open, in_use }
     }
 }
 
@@ -222,41 +234,6 @@ impl From<num::TryFromIntError> for Error {
 impl From<connection_string::Error> for Error {
     fn from(err: connection_string::Error) -> Error {
         Self::builder(ErrorKind::DatabaseUrlIsInvalid(err.to_string())).build()
-    }
-}
-
-#[cfg(feature = "pooled")]
-#[cfg_attr(feature = "docs", doc(cfg(feature = "pooled")))]
-impl From<mobc::Error<Error>> for Error {
-    fn from(e: mobc::Error<Error>) -> Self {
-        match e {
-            mobc::Error::Inner(e) => e,
-            mobc::Error::Timeout => {
-                let kind = ErrorKind::Timeout("mobc timeout".into());
-
-                let mut builder = Error::builder(kind);
-                builder.set_original_message("Connection timed out.");
-
-                builder.build()
-            }
-            e @ mobc::Error::BadConn => Error::builder(ErrorKind::ConnectionError(Box::new(e))).build(),
-        }
-    }
-}
-
-#[cfg(any(feature = "postgresql", feature = "mysql", feature = "mssql"))]
-#[cfg_attr(
-    feature = "docs",
-    doc(cfg(feature = "postgresql", feature = "mysql", feature = "mssql"))
-)]
-impl From<tokio::time::Elapsed> for Error {
-    fn from(_: tokio::time::Elapsed) -> Self {
-        let kind = ErrorKind::Timeout("tokio timeout".into());
-
-        let mut builder = Error::builder(kind);
-        builder.set_original_message("Query timed out.");
-
-        builder.build()
     }
 }
 

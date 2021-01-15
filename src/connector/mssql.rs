@@ -10,9 +10,9 @@ use crate::{
 use async_trait::async_trait;
 use connection_string::JdbcString;
 use futures::lock::Mutex;
-use std::{convert::TryFrom, fmt, future::Future, str::FromStr, time::Duration};
+use std::{convert::TryFrom, fmt, str::FromStr, time::Duration};
 use tiberius::*;
-use tokio::{net::TcpStream, time::timeout};
+use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
 
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
@@ -73,6 +73,7 @@ pub(crate) struct MssqlQueryParams {
     connection_limit: Option<usize>,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
+    pool_timeout: Option<Duration>,
     transaction_isolation_level: Option<IsolationLevel>,
 }
 
@@ -146,6 +147,11 @@ impl MssqlUrl {
         self.query_params.connect_timeout()
     }
 
+    /// A pool check_out timeout.
+    pub fn pool_timeout(&self) -> Option<Duration> {
+        self.query_params.pool_timeout()
+    }
+
     /// The isolation level of a transaction.
     pub fn transaction_isolation_level(&self) -> Option<IsolationLevel> {
         self.query_params.transaction_isolation_level
@@ -214,6 +220,10 @@ impl MssqlQueryParams {
     fn connection_limit(&self) -> Option<usize> {
         self.connection_limit
     }
+
+    fn pool_timeout(&self) -> Option<Duration> {
+        self.pool_timeout
+    }
 }
 
 /// A connector interface for the SQL Server database.
@@ -231,7 +241,10 @@ impl Mssql {
         let config = Config::from_jdbc_string(&url.connection_string)?;
 
         let tcp = TcpStream::connect_named(&config).await?;
-        let client = Client::connect(config, tcp.compat_write()).await?;
+
+        let client =
+            super::timeout::connect(url.connect_timeout(), Client::connect(config, tcp.compat_write())).await?;
+
         let socket_timeout = url.socket_timeout();
 
         let this = Self {
@@ -246,24 +259,6 @@ impl Mssql {
         };
 
         Ok(this)
-    }
-
-    async fn timeout<T, F, E>(&self, f: F) -> crate::Result<T>
-    where
-        F: Future<Output = std::result::Result<T, E>>,
-        E: Into<Error>,
-    {
-        match self.socket_timeout {
-            Some(duration) => match timeout(duration, f).await {
-                Ok(Ok(result)) => Ok(result),
-                Ok(Err(err)) => Err(err.into()),
-                Err(to) => Err(to.into()),
-            },
-            None => match f.await {
-                Ok(result) => Ok(result),
-                Err(err) => Err(err.into()),
-            },
-        }
     }
 }
 
@@ -283,9 +278,13 @@ impl Queryable for Mssql {
         metrics::query("mssql.query_raw", sql, params, move || async move {
             let mut client = self.client.lock().await;
             let params = conversion::conv_params(params)?;
-            let query = client.query(sql, params.as_slice());
 
-            let mut results = self.timeout(query).await?.into_results().await?;
+            let query = client.query(sql, params.as_slice());
+            let mut results = super::timeout::socket(self.socket_timeout, query)
+                .await?
+                .into_results()
+                .await?;
+
             match results.pop() {
                 Some(rows) => {
                     let mut columns_set = false;
@@ -319,9 +318,9 @@ impl Queryable for Mssql {
         metrics::query("mssql.execute_raw", sql, params, move || async move {
             let mut client = self.client.lock().await;
             let params = conversion::conv_params(params)?;
-            let query = client.execute(sql, params.as_slice());
 
-            let changes = self.timeout(query).await?.total();
+            let query = client.execute(sql, params.as_slice());
+            let changes = super::timeout::socket(self.socket_timeout, query).await?.total();
 
             Ok(changes)
         })
@@ -331,7 +330,11 @@ impl Queryable for Mssql {
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("mssql.raw_cmd", cmd, &[], move || async move {
             let mut client = self.client.lock().await;
-            self.timeout(client.simple_query(cmd)).await?.into_results().await?;
+
+            super::timeout::socket(self.socket_timeout, client.simple_query(cmd))
+                .await?
+                .into_results()
+                .await?;
 
             Ok(())
         })
@@ -395,12 +398,29 @@ impl MssqlUrl {
             .map(|level| IsolationLevel::from_str(&level))
             .transpose()?;
 
-        let connect_timeout = props
+        let mut connect_timeout = props
             .remove("logintimeout")
             .or_else(|| props.remove("connecttimeout"))
             .or_else(|| props.remove("connectiontimeout"))
             .map(|param| param.parse().map(Duration::from_secs))
             .transpose()?;
+
+        match connect_timeout {
+            None => connect_timeout = Some(Duration::from_secs(5)),
+            Some(dur) if dur.as_secs() == 0 => connect_timeout = None,
+            _ => (),
+        }
+
+        let mut pool_timeout = props
+            .remove("pooltimeout")
+            .map(|param| param.parse().map(Duration::from_secs))
+            .transpose()?;
+
+        match pool_timeout {
+            None => pool_timeout = Some(Duration::from_secs(5)),
+            Some(dur) if dur.as_secs() == 0 => pool_timeout = None,
+            _ => (),
+        }
 
         let socket_timeout = props
             .remove("sockettimeout")
@@ -431,6 +451,7 @@ impl MssqlUrl {
             connection_limit,
             socket_timeout,
             connect_timeout,
+            pool_timeout,
             transaction_isolation_level,
         })
     }

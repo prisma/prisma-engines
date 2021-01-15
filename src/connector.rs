@@ -13,6 +13,8 @@ mod connection_info;
 pub(crate) mod metrics;
 mod queryable;
 mod result_set;
+#[cfg(any(feature = "mssql", feature = "postgresql", feature = "mysql"))]
+mod timeout;
 mod transaction;
 mod type_identifier;
 

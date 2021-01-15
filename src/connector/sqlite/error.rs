@@ -132,7 +132,7 @@ impl From<rusqlite::Error> for Error {
                 },
                 description,
             ) => {
-                let mut builder = Error::builder(ErrorKind::Timeout("SQLite database is busy".into()));
+                let mut builder = Error::builder(ErrorKind::SocketTimeout);
                 builder.set_original_code(format!("{}", extended_code));
 
                 if let Some(description) = description {

@@ -47,3 +47,41 @@ where
 
     res
 }
+
+#[cfg(feature = "pooled")]
+pub(crate) async fn check_out<F, T>(f: F) -> std::result::Result<T, mobc::Error<crate::error::Error>>
+where
+    F: Future<Output = std::result::Result<T, mobc::Error<crate::error::Error>>>,
+{
+    let start = Instant::now();
+    let res = f.await;
+    let end = Instant::now();
+
+    if *crate::LOG_QUERIES {
+        let result = match res {
+            Ok(_) => "success",
+            Err(_) => "error",
+        };
+
+        #[cfg(not(feature = "tracing-log"))]
+        {
+            info!(
+                "Fetched a connection from the pool ({} in {}ms)",
+                result,
+                start.elapsed().as_millis(),
+            );
+        }
+        #[cfg(feature = "tracing-log")]
+        {
+            tracing::info!(
+                message = "Fetched a connection from the pool",
+                duration_ms = start.elapsed().as_millis() as u64,
+                result,
+            );
+        }
+    }
+
+    timing!("pool.check_out", start, end);
+
+    res
+}

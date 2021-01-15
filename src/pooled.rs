@@ -55,7 +55,10 @@
 //!   `Timeout` error if it fails to resolve before given time.
 //! - `connect_timeout` defined in seconds. Connecting to a
 //!   database will return a `ConnectTimeout` error if taking more than the
-//!   defined value.
+//!   defined value. Defaults to 5 seconds, if set to 0, no timeout.
+//! - `pool_timeout` defined in seconds. If all connections are in use, the
+//!   database will return a `PoolTimeout` error after waiting for the given time.
+//!   If set to zero, no timeout.
 //! - `pgbouncer` either `true` or `false`. If set, allows usage with the
 //!   pgBouncer connection pool in transaction mode. Additionally a transaction
 //!   is required for every query for the mode to work. When starting a new
@@ -81,7 +84,10 @@
 //!   `Timeout` error if it fails to resolve before given time.
 //! - `connect_timeout` defined in seconds. Connecting to a
 //!   database will return a `ConnectTimeout` error if taking more than the
-//!   defined value.
+//!   defined value. Defaults to 5 seconds, if set to 0, no timeout.
+//! - `pool_timeout` defined in seconds. If all connections are in use, the
+//!   database will return a `PoolTimeout` error after waiting for the given time.
+//!   If set to zero, no timeout.
 //!
 //! ## Microsoft SQL Server
 //!
@@ -97,7 +103,10 @@
 //!   `Timeout` error if it fails to resolve before given time.
 //! - `connectTimeout` defined in seconds (default: 5). Connecting to a
 //!   database will return a `ConnectTimeout` error if taking more than the
-//!   defined value.
+//!   defined value. Defaults to 5 seconds, disabled if set to zero.
+//! - `poolTimeout` defined in seconds. If all connections are in use, the
+//!   database will return a `Timeout` error after waiting for the given time.
+//!   If set to zero, no timeout.
 //! - `connectionLimit` defines the maximum number of connections opened to the
 //!   database.
 //! - `schema` the name of the lookup schema. Only stored to the connection,
@@ -139,7 +148,10 @@ mod manager;
 
 pub use manager::*;
 
-use crate::connector::ConnectionInfo;
+use crate::{
+    connector::ConnectionInfo,
+    error::{Error, ErrorKind},
+};
 use mobc::Pool;
 use std::{sync::Arc, time::Duration};
 
@@ -152,7 +164,7 @@ use std::convert::TryFrom;
 pub struct Quaint {
     pub(crate) inner: Pool<QuaintManager>,
     connection_info: Arc<ConnectionInfo>,
-    connect_timeout: Option<Duration>,
+    pool_timeout: Option<Duration>,
 }
 
 /// A `Builder` to construct an instance of a [`Quaint`] pool.
@@ -167,6 +179,7 @@ pub struct Builder {
     health_check_interval: Option<Duration>,
     test_on_check_out: bool,
     connect_timeout: Option<Duration>,
+    pool_timeout: Option<Duration>,
 }
 
 impl Builder {
@@ -183,6 +196,7 @@ impl Builder {
             health_check_interval: None,
             test_on_check_out: false,
             connect_timeout: None,
+            pool_timeout: None,
         })
     }
 
@@ -203,8 +217,8 @@ impl Builder {
         self.max_idle = Some(max_idle);
     }
 
-    /// A timeout for acquiring a connection with the [`check_out`] method. If
-    /// not set, the method never times out.
+    /// A timeout for connecting to the database. If not set, the connection
+    /// never times out.
     ///
     /// # Panics
     ///
@@ -219,6 +233,20 @@ impl Builder {
         );
 
         self.connect_timeout = Some(connect_timeout);
+    }
+
+    /// A timeout for acquiring a connection with the [`check_out`] method. If
+    /// not set, the method never times out.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `pool_timeout` is zero.
+    ///
+    /// [`check_out`]: struct.Quaint.html#method.check_out
+    pub fn pool_timeout(&mut self, pool_timeout: Duration) {
+        assert_ne!(pool_timeout, Duration::from_secs(0), "pool_timeout must be positive");
+
+        self.pool_timeout = Some(pool_timeout);
     }
 
     /// A time how long an idling connection can be kept in the pool before
@@ -280,7 +308,7 @@ impl Builder {
         Quaint {
             inner,
             connection_info,
-            connect_timeout: self.connect_timeout,
+            pool_timeout: self.pool_timeout,
         }
     }
 
@@ -334,17 +362,17 @@ impl Quaint {
             s if s.starts_with("mysql") => {
                 let url = crate::connector::MysqlUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
-                let connect_timeout = url.connect_timeout();
+                let pool_timeout = url.pool_timeout();
 
-                let manager = QuaintManager::Mysql(url);
+                let manager = QuaintManager::Mysql { url };
                 let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {
                     builder.connection_limit(limit);
                 }
 
-                if let Some(timeout) = connect_timeout {
-                    builder.connect_timeout(timeout);
+                if let Some(timeout) = pool_timeout {
+                    builder.pool_timeout(timeout);
                 }
 
                 Ok(builder)
@@ -353,17 +381,17 @@ impl Quaint {
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
                 let url = crate::connector::PostgresUrl::new(url::Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
-                let connect_timeout = url.connect_timeout();
+                let pool_timeout = url.pool_timeout();
 
-                let manager = QuaintManager::Postgres(url);
+                let manager = QuaintManager::Postgres { url };
                 let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {
                     builder.connection_limit(limit);
                 }
 
-                if let Some(timeout) = connect_timeout {
-                    builder.connect_timeout(timeout);
+                if let Some(timeout) = pool_timeout {
+                    builder.pool_timeout(timeout);
                 }
 
                 Ok(builder)
@@ -372,17 +400,17 @@ impl Quaint {
             s if s.starts_with("jdbc:sqlserver") || s.starts_with("sqlserver") => {
                 let url = crate::connector::MssqlUrl::new(s)?;
                 let connection_limit = url.connection_limit();
-                let connect_timeout = url.connect_timeout();
+                let pool_timeout = url.pool_timeout();
 
-                let manager = QuaintManager::Mssql(url);
+                let manager = QuaintManager::Mssql { url };
                 let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {
                     builder.connection_limit(limit);
                 }
 
-                if let Some(timeout) = connect_timeout {
-                    builder.connect_timeout(timeout);
+                if let Some(timeout) = pool_timeout {
+                    builder.pool_timeout(timeout);
                 }
 
                 Ok(builder)
@@ -398,9 +426,22 @@ impl Quaint {
 
     /// Reserve a connection from the pool.
     pub async fn check_out(&self) -> crate::Result<PooledConnection> {
-        let inner = match self.connect_timeout {
-            Some(duration) => self.inner.get_timeout(duration).await?,
-            None => self.inner.get().await?,
+        let res = match self.pool_timeout {
+            Some(duration) => crate::connector::metrics::check_out(self.inner.get_timeout(duration)).await,
+            None => crate::connector::metrics::check_out(self.inner.get()).await,
+        };
+
+        let inner = match res {
+            Ok(conn) => conn,
+            Err(mobc::Error::Timeout) => {
+                let state = self.inner.state().await;
+                return Err(Error::builder(ErrorKind::pool_timeout(state.max_open, state.in_use)).build());
+            }
+            Err(mobc::Error::Inner(e)) => return Err(e),
+            Err(e @ mobc::Error::BadConn) => {
+                let error = Error::builder(ErrorKind::ConnectionError(Box::new(e))).build();
+                return Err(error);
+            }
         };
 
         Ok(PooledConnection { inner })

@@ -4,13 +4,12 @@ use crate::connector::MssqlUrl;
 use crate::connector::MysqlUrl;
 #[cfg(feature = "postgresql")]
 use crate::connector::PostgresUrl;
-use async_trait::async_trait;
-
 use crate::{
     ast,
     connector::{self, Queryable, Transaction, TransactionCapable},
     error::Error,
 };
+use async_trait::async_trait;
 use mobc::{Connection as MobcPooled, Manager};
 
 /// A connection from the pool. Implements
@@ -59,16 +58,16 @@ impl Queryable for PooledConnection {
 #[doc(hidden)]
 pub enum QuaintManager {
     #[cfg(feature = "mysql")]
-    Mysql(MysqlUrl),
+    Mysql { url: MysqlUrl },
 
     #[cfg(feature = "postgresql")]
-    Postgres(PostgresUrl),
+    Postgres { url: PostgresUrl },
 
     #[cfg(feature = "sqlite")]
     Sqlite { url: String, db_name: String },
 
     #[cfg(feature = "mssql")]
-    Mssql(MssqlUrl),
+    Mssql { url: MssqlUrl },
 }
 
 #[async_trait]
@@ -89,19 +88,19 @@ impl Manager for QuaintManager {
             }
 
             #[cfg(feature = "mysql")]
-            QuaintManager::Mysql(url) => {
+            QuaintManager::Mysql { url } => {
                 use crate::connector::Mysql;
                 Ok(Box::new(Mysql::new(url.clone()).await?) as Self::Connection)
             }
 
             #[cfg(feature = "postgresql")]
-            QuaintManager::Postgres(url) => {
+            QuaintManager::Postgres { url } => {
                 use crate::connector::PostgreSql;
                 Ok(Box::new(PostgreSql::new(url.clone()).await?) as Self::Connection)
             }
 
             #[cfg(feature = "mssql")]
-            QuaintManager::Mssql(url) => {
+            QuaintManager::Mssql { url } => {
                 use crate::connector::Mssql;
                 Ok(Box::new(Mssql::new(url.clone()).await?) as Self::Connection)
             }

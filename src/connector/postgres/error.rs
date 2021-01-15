@@ -197,9 +197,7 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 match reason.as_str() {
                     "error connecting to server: timed out" => {
-                        let mut builder = Error::builder(ErrorKind::ConnectTimeout(
-                            "tokio-postgres timeout connecting to server".into(),
-                        ));
+                        let mut builder = Error::builder(ErrorKind::ConnectTimeout);
 
                         if let Some(code) = code {
                             builder.set_original_code(code);

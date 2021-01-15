@@ -16,10 +16,8 @@ use postgres_native_tls::MakeTlsConnector;
 use std::{
     borrow::{Borrow, Cow},
     fs,
-    future::Future,
     time::Duration,
 };
-use tokio::time::timeout;
 use tokio_postgres::{config::SslMode, Client, Config, Statement};
 use url::Url;
 
@@ -227,6 +225,16 @@ impl PostgresUrl {
         self.query_params.connect_timeout
     }
 
+    /// Pool check_out timeout
+    pub fn pool_timeout(&self) -> Option<Duration> {
+        self.query_params.pool_timeout
+    }
+
+    /// The socket timeout
+    pub fn socket_timeout(&self) -> Option<Duration> {
+        self.query_params.socket_timeout
+    }
+
     pub(crate) fn cache(&self) -> LruCache<String, Statement> {
         if self.query_params.pg_bouncer {
             LruCache::new(0)
@@ -245,7 +253,8 @@ impl PostgresUrl {
         let mut ssl_mode = SslMode::Prefer;
         let mut host = None;
         let mut socket_timeout = None;
-        let mut connect_timeout = None;
+        let mut connect_timeout = Some(Duration::from_secs(5));
+        let mut pool_timeout = Some(Duration::from_secs(5));
         let mut pg_bouncer = false;
         let mut statement_cache_size = 500;
 
@@ -326,7 +335,23 @@ impl PostgresUrl {
                     let as_int = v
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    connect_timeout = Some(Duration::from_secs(as_int));
+
+                    if as_int == 0 {
+                        connect_timeout = None;
+                    } else {
+                        connect_timeout = Some(Duration::from_secs(as_int));
+                    }
+                }
+                "pool_timeout" => {
+                    let as_int = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
+                    if as_int == 0 {
+                        pool_timeout = None;
+                    } else {
+                        pool_timeout = Some(Duration::from_secs(as_int));
+                    }
                 }
                 _ => {
                     #[cfg(not(feature = "tracing-log"))]
@@ -349,6 +374,7 @@ impl PostgresUrl {
             ssl_mode,
             host,
             connect_timeout,
+            pool_timeout,
             socket_timeout,
             pg_bouncer,
             statement_cache_size,
@@ -394,6 +420,7 @@ pub(crate) struct PostgresUrlQueryParams {
     host: Option<String>,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
+    pool_timeout: Option<Duration>,
     statement_cache_size: usize,
 }
 
@@ -420,7 +447,7 @@ impl PostgreSql {
         }
 
         let tls = MakeTlsConnector::new(tls_builder.build()?);
-        let (client, conn) = config.connect(tls).await?;
+        let (client, conn) = super::timeout::connect(url.connect_timeout(), config.connect(tls)).await?;
 
         tokio::spawn(conn.map(|r| match r {
             Ok(_) => (),
@@ -458,24 +485,6 @@ impl PostgreSql {
             pg_bouncer: url.query_params.pg_bouncer,
             statement_cache: Mutex::new(url.cache()),
         })
-    }
-
-    async fn timeout<T, F, E>(&self, f: F) -> crate::Result<T>
-    where
-        F: Future<Output = std::result::Result<T, E>>,
-        E: Into<Error>,
-    {
-        match self.socket_timeout {
-            Some(duration) => match timeout(duration, f).await {
-                Ok(Ok(result)) => Ok(result),
-                Ok(Err(err)) => Err(err.into()),
-                Err(to) => Err(to.into()),
-            },
-            None => match f.await {
-                Ok(result) => Ok(result),
-                Err(err) => Err(err.into()),
-            },
-        }
     }
 
     async fn fetch_cached(&self, sql: &str) -> crate::Result<Statement> {
@@ -526,7 +535,7 @@ impl PostgreSql {
                     );
                 }
 
-                let stmt = self.timeout(self.client.0.prepare(sql)).await?;
+                let stmt = super::timeout::socket(self.socket_timeout, self.client.0.prepare(sql)).await?;
                 cache.insert(sql.to_string(), stmt.clone());
                 Ok(stmt)
             }
@@ -552,9 +561,11 @@ impl Queryable for PostgreSql {
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql).await?;
 
-            let rows = self
-                .timeout(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
-                .await?;
+            let rows = super::timeout::socket(
+                self.socket_timeout,
+                self.client.0.query(&stmt, conversion::conv_params(params).as_slice()),
+            )
+            .await?;
 
             let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
@@ -571,9 +582,11 @@ impl Queryable for PostgreSql {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let stmt = self.fetch_cached(sql).await?;
 
-            let changes = self
-                .timeout(self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()))
-                .await?;
+            let changes = super::timeout::socket(
+                self.socket_timeout,
+                self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()),
+            )
+            .await?;
 
             Ok(changes)
         })
@@ -582,7 +595,7 @@ impl Queryable for PostgreSql {
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
-            self.timeout(self.client.0.simple_query(cmd)).await?;
+            super::timeout::socket(self.socket_timeout, self.client.0.simple_query(cmd)).await?;
 
             Ok(())
         })

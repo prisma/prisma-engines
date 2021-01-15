@@ -7,8 +7,8 @@ use mysql_async::{
     prelude::{Query as _, Queryable as _},
 };
 use percent_encoding::percent_decode;
-use std::{borrow::Cow, future::Future, path::Path, time::Duration};
-use tokio::{sync::Mutex, time::timeout};
+use std::{borrow::Cow, path::Path, time::Duration};
+use tokio::sync::Mutex;
 use url::Url;
 
 use crate::{
@@ -25,7 +25,6 @@ pub struct Mysql {
     pub(crate) conn: Mutex<my::Conn>,
     pub(crate) url: MysqlUrl,
     socket_timeout: Option<Duration>,
-    connect_timeout: Option<Duration>,
 }
 
 /// Wraps a connection url and exposes the parsing logic used by quaint, including default values.
@@ -105,13 +104,24 @@ impl MysqlUrl {
         self.query_params.connect_timeout
     }
 
+    /// The pool check_out timeout
+    pub fn pool_timeout(&self) -> Option<Duration> {
+        self.query_params.pool_timeout
+    }
+
+    /// The socket timeout
+    pub fn socket_timeout(&self) -> Option<Duration> {
+        self.query_params.socket_timeout
+    }
+
     fn parse_query_params(url: &Url) -> Result<MysqlUrlQueryParams, Error> {
         let mut connection_limit = None;
         let mut ssl_opts = my::SslOpts::default();
         let mut use_ssl = false;
         let mut socket = None;
         let mut socket_timeout = None;
-        let mut connect_timeout = None;
+        let mut connect_timeout = Some(Duration::from_secs(5));
+        let mut pool_timeout = Some(Duration::from_secs(5));
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -145,9 +155,23 @@ impl MysqlUrl {
                 }
                 "connect_timeout" => {
                     let as_int = v
-                        .parse()
+                        .parse::<u64>()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    connect_timeout = Some(Duration::from_secs(as_int));
+
+                    connect_timeout = match as_int {
+                        0 => None,
+                        _ => Some(Duration::from_secs(as_int)),
+                    };
+                }
+                "pool_timeout" => {
+                    let as_int = v
+                        .parse::<u64>()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+
+                    pool_timeout = match as_int {
+                        0 => None,
+                        _ => Some(Duration::from_secs(as_int)),
+                    };
                 }
                 "sslaccept" => {
                     match v.as_ref() {
@@ -182,6 +206,7 @@ impl MysqlUrl {
             socket,
             connect_timeout,
             socket_timeout,
+            pool_timeout,
         })
     }
 
@@ -224,35 +249,19 @@ pub(crate) struct MysqlUrlQueryParams {
     socket: Option<String>,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
+    pool_timeout: Option<Duration>,
 }
 
 impl Mysql {
     /// Create a new MySQL connection using `OptsBuilder` from the `mysql` crate.
     pub async fn new(url: MysqlUrl) -> crate::Result<Self> {
+        let conn = super::timeout::connect(url.connect_timeout(), my::Conn::new(url.to_opts_builder())).await?;
+
         Ok(Self {
             socket_timeout: url.query_params.socket_timeout,
-            connect_timeout: url.query_params.connect_timeout,
-            conn: Mutex::new(my::Conn::new(url.to_opts_builder()).await?),
+            conn: Mutex::new(conn),
             url,
         })
-    }
-
-    async fn timeout<T, F, E>(&self, f: F) -> crate::Result<T>
-    where
-        F: Future<Output = std::result::Result<T, E>>,
-        E: Into<Error>,
-    {
-        match self.socket_timeout {
-            Some(duration) => match timeout(duration, f).await {
-                Ok(Ok(result)) => Ok(result),
-                Ok(Err(err)) => Err(err.into()),
-                Err(to) => Err(to.into()),
-            },
-            None => match f.await {
-                Ok(result) => Ok(result),
-                Err(err) => Err(err.into()),
-            },
-        }
     }
 }
 
@@ -273,8 +282,10 @@ impl Queryable for Mysql {
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || async move {
             let mut conn = self.conn.lock().await;
-            let stmt = self.timeout(conn.prep(sql)).await?;
-            let rows: Vec<my::Row> = self.timeout(conn.exec(&stmt, conversion::conv_params(params)?)).await?;
+            let stmt = super::timeout::socket(self.socket_timeout, conn.prep(sql)).await?;
+
+            let rows: Vec<my::Row> =
+                super::timeout::socket(self.socket_timeout, conn.exec(&stmt, conversion::conv_params(params)?)).await?;
 
             let columns = stmt.columns().iter().map(|s| s.name_str().into_owned()).collect();
 
@@ -297,8 +308,13 @@ impl Queryable for Mysql {
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
             let mut conn = self.conn.lock().await;
-            self.timeout(conn.exec_drop(sql, conversion::conv_params(params)?))
-                .await?;
+
+            super::timeout::socket(
+                self.socket_timeout,
+                conn.exec_drop(sql, conversion::conv_params(params)?),
+            )
+            .await?;
+
             Ok(conn.affected_rows())
         })
         .await
@@ -323,7 +339,7 @@ impl Queryable for Mysql {
                 crate::Result::<()>::Ok(())
             };
 
-            self.timeout(fut).await?;
+            super::timeout::socket(self.socket_timeout, fut).await?;
 
             Ok(())
         })
@@ -332,7 +348,7 @@ impl Queryable for Mysql {
 
     async fn version(&self) -> crate::Result<Option<String>> {
         let query = r#"SELECT @@GLOBAL.version version"#;
-        let rows = self.query_raw(query, &[]).await?;
+        let rows = super::timeout::socket(self.socket_timeout, self.query_raw(query, &[])).await?;
 
         let version_string = rows
             .get(0)
