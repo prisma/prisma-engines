@@ -93,8 +93,8 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  char  String @test.Char(10)
         |  vChar String @test.VarChar(11)
         |  text  String @test.Text
-        |  bit   String @test.Bit(4)
-        |  vBit  String @test.VarBit(5)
+        |  bit   Bytes @test.Bit(4)
+        |  vBit  Bytes  @test.VarBit(5)
         |  uuid  String @test.Uuid
         |}"""
     }
