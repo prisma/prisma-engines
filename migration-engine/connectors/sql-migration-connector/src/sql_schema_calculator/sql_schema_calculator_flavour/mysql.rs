@@ -81,7 +81,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             MySqlType::DateTime(precision) => format!("DATETIME{}", render(precision)),
             MySqlType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)),
             MySqlType::Year => "YEAR".into(),
-            MySqlType::JSON => "JSON".into(),
+            MySqlType::Json => "JSON".into(),
             MySqlType::UnsignedInt => "INTEGER UNSIGNED".into(),
             MySqlType::UnsignedSmallInt => "SMALLINT UNSIGNED".into(),
             MySqlType::UnsignedTinyInt => "TINYINT UNSIGNED".into(),

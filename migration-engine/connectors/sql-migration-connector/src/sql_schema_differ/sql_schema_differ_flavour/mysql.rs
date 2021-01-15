@@ -21,7 +21,7 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
                 differ.previous.column_type_family(),
                 differ.next.column_type_family(),
             ) {
-                (Some(MySqlType::LongText), Some(MySqlType::JSON), _, _) => return None,
+                (Some(MySqlType::LongText), Some(MySqlType::Json), _, _) => return None,
                 (Some(_), Some(_), _, _) => (),
                 (_, _, ColumnTypeFamily::String, ColumnTypeFamily::Json) => return None,
                 _ => (),
@@ -154,7 +154,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
         MySqlType::Binary(size) => match next {
             MySqlType::Binary(n) if n == size => return None,
@@ -192,7 +192,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::UnsignedTinyInt
             | MySqlType::Year => risky(),
 
-            MySqlType::Date | MySqlType::DateTime(_) | MySqlType::JSON | MySqlType::Timestamp(_) => not_castable(),
+            MySqlType::Date | MySqlType::DateTime(_) | MySqlType::Json | MySqlType::Timestamp(_) => not_castable(),
         },
         MySqlType::Bit(n) => match next {
             MySqlType::Bit(m) if n == m => return None,
@@ -232,7 +232,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::DateTime(_)
             | MySqlType::Time(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
         MySqlType::Blob => match next {
             MySqlType::Blob => return None,
@@ -257,7 +257,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Double
             | MySqlType::Float
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::MediumInt
             | MySqlType::SmallInt
             | MySqlType::Time(_)
@@ -303,7 +303,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::UnsignedTinyInt => risky(),
 
             MySqlType::Bit(_)
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
@@ -328,7 +328,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::MediumInt
             | MySqlType::Time(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::UnsignedMediumInt
             | MySqlType::UnsignedSmallInt => not_castable(),
 
@@ -375,7 +375,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Decimal(_)
             | MySqlType::TinyInt
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::UnsignedInt
             | MySqlType::SmallInt
             | MySqlType::UnsignedSmallInt
@@ -419,7 +419,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Float
             | MySqlType::Double
             | MySqlType::Year
-            | MySqlType::JSON => risky(),
+            | MySqlType::Json => risky(),
 
             MySqlType::DateTime(_) | MySqlType::Timestamp(_) | MySqlType::Date => not_castable(),
         },
@@ -437,7 +437,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::UnsignedBigInt
             | MySqlType::TinyInt
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::UnsignedInt
             | MySqlType::SmallInt
             | MySqlType::UnsignedSmallInt
@@ -482,7 +482,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::UnsignedBigInt
             | MySqlType::TinyInt
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::UnsignedInt
             | MySqlType::SmallInt
             | MySqlType::UnsignedSmallInt
@@ -551,10 +551,10 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Time(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
-        MySqlType::JSON => match next {
-            MySqlType::JSON => return None,
+        MySqlType::Json => match next {
+            MySqlType::Json => return None,
 
             // To string
             MySqlType::Binary(_)
@@ -615,7 +615,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Double
             | MySqlType::Float
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::MediumInt
             | MySqlType::SmallInt
             | MySqlType::Time(_)
@@ -662,7 +662,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
         },
@@ -689,7 +689,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Double
             | MySqlType::Float
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::MediumInt
             | MySqlType::SmallInt
             | MySqlType::Time(_)
@@ -740,7 +740,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
             | MySqlType::Time(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
         MySqlType::MediumText => match next {
             MySqlType::MediumText => return None,
@@ -777,7 +777,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
         },
@@ -816,7 +816,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
 
         MySqlType::Text => match next {
@@ -854,7 +854,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
         },
@@ -880,7 +880,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
 
             MySqlType::Date | MySqlType::DateTime(_) | MySqlType::Timestamp(_) => risky(),
 
-            MySqlType::JSON | MySqlType::Year => not_castable(),
+            MySqlType::Json | MySqlType::Year => not_castable(),
 
             // To numeric
             MySqlType::BigInt
@@ -925,7 +925,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Decimal(_)
             | MySqlType::TinyInt
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::UnsignedInt
             | MySqlType::SmallInt
             | MySqlType::UnsignedSmallInt
@@ -959,7 +959,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Double
             | MySqlType::Float
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::MediumInt
             | MySqlType::SmallInt
             | MySqlType::Time(_)
@@ -1008,7 +1008,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
 
         MySqlType::TinyText => match next {
@@ -1047,7 +1047,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::Time(_)
             | MySqlType::Year => risky(),
         },
@@ -1089,7 +1089,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
 
         MySqlType::UnsignedInt => match next {
@@ -1129,7 +1129,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
         MySqlType::UnsignedMediumInt => match next {
             MySqlType::UnsignedMediumInt => return None,
@@ -1168,7 +1168,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
         MySqlType::UnsignedSmallInt => match next {
             MySqlType::UnsignedSmallInt => return None,
@@ -1206,7 +1206,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
         MySqlType::UnsignedTinyInt => match next {
             MySqlType::UnsignedTinyInt => return None,
@@ -1246,7 +1246,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Date
             | MySqlType::DateTime(_)
             | MySqlType::Timestamp(_)
-            | MySqlType::JSON => not_castable(),
+            | MySqlType::Json => not_castable(),
         },
         MySqlType::VarBinary(n) => match next {
             MySqlType::VarBinary(m) if n > m => risky(),
@@ -1274,7 +1274,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::Double
             | MySqlType::Float
             | MySqlType::Int
-            | MySqlType::JSON
+            | MySqlType::Json
             | MySqlType::MediumInt
             | MySqlType::SmallInt
             | MySqlType::Time(_)
@@ -1324,7 +1324,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
             | MySqlType::UnsignedSmallInt
             | MySqlType::UnsignedTinyInt
             | MySqlType::Year
-            | MySqlType::JSON => risky(),
+            | MySqlType::Json => risky(),
         },
         MySqlType::Year => match next {
             MySqlType::Year => return None,
@@ -1356,7 +1356,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
 
             MySqlType::Float | MySqlType::Double => safe(),
 
-            MySqlType::Decimal(_) | MySqlType::JSON => risky(),
+            MySqlType::Decimal(_) | MySqlType::Json => risky(),
 
             MySqlType::Date
             | MySqlType::DateTime(_)

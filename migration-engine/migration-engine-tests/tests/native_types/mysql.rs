@@ -161,7 +161,7 @@ const SAFE_CASTS: Cases = &[
             "Decimal(10,5)",
             "TinyInt",
             "Int",
-            "JSON",
+            "Json",
             "UnsignedInt",
             "SmallInt",
             "UnsignedSmallInt",
@@ -186,7 +186,7 @@ const SAFE_CASTS: Cases = &[
             "Decimal(10,5)",
             "TinyInt",
             "Int",
-            "JSON",
+            "Json",
             "UnsignedInt",
             "SmallInt",
             "UnsignedSmallInt",
@@ -198,7 +198,7 @@ const SAFE_CASTS: Cases = &[
         ],
     ),
     (
-        "JSON",
+        "Json",
         quaint::Value::Text(Some(Cow::Borrowed("{\"a\":\"b\"}"))),
         &[
             // To string
@@ -326,7 +326,7 @@ const RISKY_CASTS: Cases = &[
     (
         "Decimal(20,5)",
         quaint::Value::Text(Some(Cow::Borrowed("350"))),
-        &["BigInt", "UnsignedBigInt", "Time(0)", "JSON"],
+        &["BigInt", "UnsignedBigInt", "Time(0)", "Json"],
     ),
     (
         "Double",
@@ -389,7 +389,7 @@ const RISKY_CASTS: Cases = &[
     (
         "Year",
         quaint::Value::Text(Some(Cow::Borrowed("1999"))),
-        &["Decimal(10,0)", "JSON"],
+        &["Decimal(10,0)", "Json"],
     ),
 ];
 
@@ -397,17 +397,17 @@ const IMPOSSIBLE_CASTS: Cases = &[
     (
         "BigInt",
         quaint::Value::Integer(Some(500)),
-        &["Decimal(15,6)", "Date", "Datetime(0)", "JSON", "Timestamp(0)"],
+        &["Decimal(15,6)", "Date", "Datetime(0)", "Json", "Timestamp(0)"],
     ),
     (
         "Binary(12)",
         quaint::Value::Bytes(Some(Cow::Borrowed(b"8080008"))),
-        &["Date", "Datetime(0)", "JSON", "Timestamp(0)"],
+        &["Date", "Datetime(0)", "Json", "Timestamp(0)"],
     ),
     (
         "Bit(32)",
         quaint::Value::Bytes(Some(Cow::Borrowed(b""))),
-        &["Date", "Datetime(0)", "Time(0)", "Timestamp(0)", "JSON"],
+        &["Date", "Datetime(0)", "Time(0)", "Timestamp(0)", "Json"],
     ),
     (
         "Blob",
@@ -421,7 +421,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "Double",
             "Float",
             "Int",
-            "JSON",
+            "Json",
             "MediumInt",
             "SmallInt",
             "Time(0)",
@@ -473,7 +473,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
         &["Binary(10)", "Date", "Timestamp(0)", "Datetime(0)"],
     ),
     (
-        "JSON",
+        "Json",
         quaint::Value::Text(Some(Cow::Borrowed("{\"a\":\"b\"}"))),
         &[
             // Integer types
@@ -492,7 +492,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
         ],
     ),
     (
-        "JSON",
+        "Json",
         quaint::Value::Text(Some(Cow::Borrowed("\"2020-06-02\""))),
         &["Date", "Time(0)", "Timestamp(0)", "Datetime(0)", "Year"],
     ),
@@ -508,7 +508,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "Double",
             "Float",
             "Int",
-            "JSON",
+            "Json",
             "MediumInt",
             "SmallInt",
             "Time(0)",
@@ -533,7 +533,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "Double",
             "Float",
             "Int",
-            "JSON",
+            "Json",
             "MediumInt",
             "SmallInt",
             "Time(0)",
@@ -546,7 +546,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "Year",
         ],
     ),
-    ("Time(0)", quaint::Value::Integer(Some(0)), &["JSON", "Year"]),
+    ("Time(0)", quaint::Value::Integer(Some(0)), &["Json", "Year"]),
     (
         "TinyBlob",
         quaint::Value::Bytes(Some(Cow::Borrowed(&[0x00]))),
@@ -559,7 +559,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "Double",
             "Float",
             "Int",
-            "JSON",
+            "Json",
             "MediumInt",
             "SmallInt",
             "Time(0)",
@@ -600,7 +600,7 @@ fn native_type_name_to_prisma_scalar_type_name(scalar_type: &str) -> &'static st
         ("Double", "Float"),
         ("Float", "Float"),
         ("Int", "Int"),
-        ("JSON", "Json"),
+        ("Json", "Json"),
         ("LongBlob", "Bytes"),
         ("LongText", "String"),
         ("MediumBlob", "Bytes"),
@@ -695,7 +695,7 @@ fn expand_cases<'a, 'b>(
 }
 
 fn type_is_unsupported_mariadb(ty: &str) -> bool {
-    ty == "Time(0)" || ty == "JSON"
+    ty == "Time(0)" || ty == "Json"
 }
 
 fn type_is_unsupported_mysql_5_6(ty: &str) -> bool {
