@@ -690,9 +690,8 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "jsonb" | "_jsonb" => (Json, Some(PostgresType::JSONB)),
         "uuid" | "_uuid" => (Uuid, Some(PostgresType::UUID)),
         "xml" | "_xml" => (String, Some(PostgresType::Xml)),
-        // bit and varbit should be binary, but are currently mapped to strings.
-        "bit" | "_bit" => (String, Some(PostgresType::Bit(precision.character_maximum_length))),
-        "varbit" | "_varbit" => (String, Some(PostgresType::VarBit(precision.character_maximum_length))),
+        "bit" | "_bit" => (Binary, Some(PostgresType::Bit(precision.character_maximum_length))),
+        "varbit" | "_varbit" => (Binary, Some(PostgresType::VarBit(precision.character_maximum_length))),
         "numeric" | "_numeric" => (
             Decimal,
             Some(PostgresType::Decimal(

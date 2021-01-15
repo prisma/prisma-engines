@@ -386,9 +386,26 @@ pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -
         }
     };
 
+    let is_postgres_bit_or_varbit = {
+        if family.is_postgres() {
+            let datamodel_connector = SqlDatamodelConnectors::postgres();
+
+            match &column.tpe.native_type {
+                None => false,
+                Some(native_type) => {
+                    let tpe = datamodel_connector.introspect_native_type(native_type.clone()).unwrap();
+                    tpe.name == "Bit" || tpe.name == "VarBit"
+                }
+            }
+        } else {
+            false
+        }
+    };
+
     match &column.tpe.family {
         _ if is_mysql_bit => FieldType::Base(ScalarType::Int, None),
         _ if is_postgres_interval => FieldType::Base(ScalarType::String, None),
+        _ if is_postgres_bit_or_varbit => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::Int, None),
         ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
