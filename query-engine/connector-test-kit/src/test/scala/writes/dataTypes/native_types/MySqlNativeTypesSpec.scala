@@ -146,7 +146,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
         |  id    String   @id @default(cuid())
         |  date  DateTime @test.Date
         |  time  DateTime @test.Time(5)
-        |  dtime DateTime @test.Datetime
+        |  dtime DateTime @test.DateTime
         |  ts    DateTime @test.Timestamp
         |  year  Int      @test.Year
         |}"""

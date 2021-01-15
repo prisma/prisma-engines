@@ -245,7 +245,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("longText", "String", "LongText", "longtext"),
         ("date", "DateTime", "Date", "date"),
         ("timeWithPrecision", "DateTime", "Time(3)", "time(3)"),
-        ("dateTimeWithPrecision", "DateTime", "Datetime(3)", "datetime(3)"),
+        ("dateTimeWithPrecision", "DateTime", "DateTime(3)", "datetime(3)"),
         ("timestampWithPrecision", "DateTime", "Timestamp(3)", "timestamp(3)"),
         ("year", "Int", "Year", if api.is_mysql_8() { "year" } else { "year(4)" }),
     ];

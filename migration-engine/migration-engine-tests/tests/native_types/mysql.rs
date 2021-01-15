@@ -112,7 +112,7 @@ const SAFE_CASTS: Cases = &[
         "Date",
         quaint::Value::Text(Some(Cow::Borrowed("2020-01-12"))),
         &[
-            "Datetime(0)",
+            "DateTime(0)",
             "Decimal(10,0)",
             "Float",
             "Double",
@@ -133,7 +133,7 @@ const SAFE_CASTS: Cases = &[
         ],
     ),
     (
-        "Datetime(0)",
+        "DateTime(0)",
         quaint::Value::Text(Some(Cow::Borrowed("2020-01-08 08:00:00"))),
         &[
             "BigInt",
@@ -384,7 +384,7 @@ const RISKY_CASTS: Cases = &[
     (
         "Time(0)",
         quaint::Value::Integer(Some(5002)),
-        &["Date", "Datetime(0)", "Timestamp(0)"],
+        &["Date", "DateTime(0)", "Timestamp(0)"],
     ),
     (
         "Year",
@@ -397,17 +397,17 @@ const IMPOSSIBLE_CASTS: Cases = &[
     (
         "BigInt",
         quaint::Value::Integer(Some(500)),
-        &["Decimal(15,6)", "Date", "Datetime(0)", "Json", "Timestamp(0)"],
+        &["Decimal(15,6)", "Date", "DateTime(0)", "Json", "Timestamp(0)"],
     ),
     (
         "Binary(12)",
         quaint::Value::Bytes(Some(Cow::Borrowed(b"8080008"))),
-        &["Date", "Datetime(0)", "Json", "Timestamp(0)"],
+        &["Date", "DateTime(0)", "Json", "Timestamp(0)"],
     ),
     (
         "Bit(32)",
         quaint::Value::Bytes(Some(Cow::Borrowed(b""))),
-        &["Date", "Datetime(0)", "Time(0)", "Timestamp(0)", "Json"],
+        &["Date", "DateTime(0)", "Time(0)", "Timestamp(0)", "Json"],
     ),
     (
         "Blob",
@@ -416,7 +416,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "TinyInt",
             "BigInt",
             "Date",
-            "Datetime(0)",
+            "DateTime(0)",
             "Decimal(10,5)",
             "Double",
             "Float",
@@ -448,7 +448,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
         ],
     ),
     (
-        "Datetime(0)",
+        "DateTime(0)",
         quaint::Value::Text(Some(Cow::Borrowed("2020-01-08 08:00:00"))),
         &[
             "TinyInt",
@@ -465,12 +465,12 @@ const IMPOSSIBLE_CASTS: Cases = &[
     (
         "Double",
         quaint::Value::Float(Some(3.14)),
-        &["Binary(10)", "Date", "Timestamp(0)", "Datetime(0)"],
+        &["Binary(10)", "Date", "Timestamp(0)", "DateTime(0)"],
     ),
     (
         "Float",
         quaint::Value::Float(Some(3.14)),
-        &["Binary(10)", "Date", "Timestamp(0)", "Datetime(0)"],
+        &["Binary(10)", "Date", "Timestamp(0)", "DateTime(0)"],
     ),
     (
         "Json",
@@ -494,7 +494,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
     (
         "Json",
         quaint::Value::Text(Some(Cow::Borrowed("\"2020-06-02\""))),
-        &["Date", "Time(0)", "Timestamp(0)", "Datetime(0)", "Year"],
+        &["Date", "Time(0)", "Timestamp(0)", "DateTime(0)", "Year"],
     ),
     (
         "LongBlob",
@@ -503,7 +503,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "TinyInt",
             "BigInt",
             "Date",
-            "Datetime(0)",
+            "DateTime(0)",
             "Decimal(10,5)",
             "Double",
             "Float",
@@ -528,7 +528,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "TinyInt",
             "BigInt",
             "Date",
-            "Datetime(0)",
+            "DateTime(0)",
             "Decimal(10,5)",
             "Double",
             "Float",
@@ -554,7 +554,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "TinyInt",
             "BigInt",
             "Date",
-            "Datetime(0)",
+            "DateTime(0)",
             "Decimal(10,5)",
             "Double",
             "Float",
@@ -580,7 +580,7 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "UnsignedTinyInt",
             "Date",
             "Time(0)",
-            "Datetime(0)",
+            "DateTime(0)",
             "Timestamp(0)",
         ],
     ),
@@ -595,7 +595,7 @@ fn native_type_name_to_prisma_scalar_type_name(scalar_type: &str) -> &'static st
         ("Blob", "Bytes"),
         ("Char", "String"),
         ("Date", "DateTime"),
-        ("Datetime", "DateTime"),
+        ("DateTime", "DateTime"),
         ("Decimal", "Decimal"),
         ("Double", "Float"),
         ("Float", "Float"),
