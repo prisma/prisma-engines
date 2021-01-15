@@ -131,19 +131,58 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             message: message.into(),
         })),
 
-        (ErrorKind::ConnectTimeout(..), ConnectionInfo::Mysql(url)) => {
+        (ErrorKind::ConnectTimeout, ConnectionInfo::Mysql(url)) => {
             Some(KnownError::new(common::DatabaseNotReachable {
                 database_host: url.host().to_owned(),
                 database_port: url.port(),
             }))
         }
 
-        (ErrorKind::ConnectTimeout(..), ConnectionInfo::Postgres(url)) => {
+        (ErrorKind::ConnectTimeout, ConnectionInfo::Postgres(url)) => {
             Some(KnownError::new(common::DatabaseNotReachable {
                 database_host: url.host().to_owned(),
                 database_port: url.port(),
             }))
         }
+
+        (ErrorKind::ConnectTimeout, ConnectionInfo::Mssql(url)) => {
+            Some(KnownError::new(common::DatabaseNotReachable {
+                database_host: url.host().to_owned(),
+                database_port: url.port(),
+            }))
+        }
+
+        (ErrorKind::SocketTimeout, ConnectionInfo::Mysql(url)) => {
+            let time = match url.socket_timeout() {
+                Some(dur) => format!("{}s", dur.as_secs()),
+                None => String::from("N/A"),
+            };
+
+            Some(KnownError::new(common::DatabaseOperationTimeout { time }))
+        }
+
+        (ErrorKind::SocketTimeout, ConnectionInfo::Postgres(url)) => {
+            let time = match url.socket_timeout() {
+                Some(dur) => format!("{}s", dur.as_secs()),
+                None => String::from("N/A"),
+            };
+
+            Some(KnownError::new(common::DatabaseOperationTimeout { time }))
+        }
+
+        (ErrorKind::SocketTimeout, ConnectionInfo::Mssql(url)) => {
+            let time = match url.socket_timeout() {
+                Some(dur) => format!("{}s", dur.as_secs()),
+                None => String::from("N/A"),
+            };
+
+            Some(KnownError::new(common::DatabaseOperationTimeout { time }))
+        }
+
+        (ErrorKind::PoolTimeout { max_open, in_use }, _) => Some(KnownError::new(query_engine::PoolTimeout {
+            connection_limit: *max_open,
+            current_connections: *in_use,
+        })),
 
         (ErrorKind::DatabaseUrlIsInvalid(details), _connection_info) => {
             Some(KnownError::new(common::InvalidDatabaseString {

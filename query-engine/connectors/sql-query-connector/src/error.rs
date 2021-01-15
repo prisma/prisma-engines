@@ -224,8 +224,9 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::DatabaseAccessDenied { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::DatabaseAlreadyExists { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::InvalidConnectionArguments => SqlError::ConnectionError(e),
-            e @ QuaintKind::ConnectTimeout { .. } => SqlError::ConnectionError(e),
-            e @ QuaintKind::Timeout(..) => SqlError::ConnectionError(e),
+            e @ QuaintKind::ConnectTimeout => SqlError::ConnectionError(e),
+            e @ QuaintKind::SocketTimeout => SqlError::ConnectionError(e),
+            e @ QuaintKind::PoolTimeout { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::TlsError { .. } => Self::ConnectionError(e),
         }
     }
