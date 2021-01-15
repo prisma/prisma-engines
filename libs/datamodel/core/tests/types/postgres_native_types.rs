@@ -44,7 +44,7 @@ fn should_fail_on_argument_out_of_range_for_bit_data_types() {
 
     for tpe in &["Bit", "VarBit"] {
         let native_type = &format!("{}(0)", tpe);
-        test_native_types_without_attributes(native_type, "String", &error_msg(native_type), POSTGRES_SOURCE);
+        test_native_types_without_attributes(native_type, "Bytes", &error_msg(native_type), POSTGRES_SOURCE);
     }
 }
 
