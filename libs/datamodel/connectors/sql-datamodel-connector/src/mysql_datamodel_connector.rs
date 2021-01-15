@@ -40,7 +40,7 @@ const TIME_TYPE_NAME: &str = "Time";
 const DATETIME_TYPE_NAME: &str = "Datetime";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const YEAR_TYPE_NAME: &str = "Year";
-const JSON_TYPE_NAME: &str = "JSON";
+const JSON_TYPE_NAME: &str = "Json";
 
 const NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION: &[&str] = &[
     TEXT_TYPE_NAME,
@@ -266,7 +266,7 @@ impl Connector for MySqlDatamodelConnector {
             DATETIME_TYPE_NAME => DateTime(parse_one_opt_u32(args, DATETIME_TYPE_NAME)?),
             TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
             YEAR_TYPE_NAME => Year,
-            JSON_TYPE_NAME => JSON,
+            JSON_TYPE_NAME => Json,
             x => unreachable!(format!(
                 "This code is unreachable as the core must guarantee to just call with known names. {}",
                 x
@@ -310,7 +310,7 @@ impl Connector for MySqlDatamodelConnector {
             DateTime(x) => (DATETIME_TYPE_NAME, arg_vec_from_opt(x)),
             Timestamp(x) => (TIMESTAMP_TYPE_NAME, arg_vec_from_opt(x)),
             Year => (YEAR_TYPE_NAME, vec![]),
-            JSON => (JSON_TYPE_NAME, vec![]),
+            Json => (JSON_TYPE_NAME, vec![]),
         };
 
         fn arg_vec_from_opt(input: Option<u32>) -> Vec<String> {

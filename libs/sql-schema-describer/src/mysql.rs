@@ -590,7 +590,7 @@ impl SqlSchemaDescriber {
             "mediumtext" => (ColumnTypeFamily::String, Some(MySqlType::MediumText)),
             "longtext" => (ColumnTypeFamily::String, Some(MySqlType::LongText)),
             "enum" => (ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)), None),
-            "json" => (ColumnTypeFamily::Json, Some(MySqlType::JSON)),
+            "json" => (ColumnTypeFamily::Json, Some(MySqlType::Json)),
             "set" => (ColumnTypeFamily::String, None),
             //temporal
             "date" => (ColumnTypeFamily::DateTime, Some(MySqlType::Date)),

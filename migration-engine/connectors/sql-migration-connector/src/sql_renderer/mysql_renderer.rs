@@ -408,7 +408,7 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
 
             format!("ENUM({})", variants).into()
         }
-        ColumnTypeFamily::Json => "JSON".into(),
+        ColumnTypeFamily::Json => "Json".into(),
         ColumnTypeFamily::Binary => "LONGBLOB".into(),
         ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
         ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),

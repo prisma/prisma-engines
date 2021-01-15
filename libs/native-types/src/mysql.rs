@@ -34,7 +34,7 @@ pub enum MySqlType {
     DateTime(Option<u32>),
     Timestamp(Option<u32>),
     Year,
-    JSON,
+    Json,
 }
 
 impl super::NativeType for MySqlType {

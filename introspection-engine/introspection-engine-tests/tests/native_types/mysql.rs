@@ -66,7 +66,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let (json, default) = match api {
-        _ if api.tags.contains(Tags::Mysql8) => ("Json     @mysql.JSON", ""),
+        _ if api.tags.contains(Tags::Mysql8) => ("Json     @mysql.Json", ""),
         _ if api.tags.contains(Tags::Mariadb) => ("String   @mysql.LongText", "@default(now())"),
         _ => unreachable!(),
     };

@@ -604,7 +604,7 @@ async fn all_mysql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
-                native_type: Some(MySqlType::JSON.to_json()),
+                native_type: Some(MySqlType::Json.to_json()),
             },
 
             default: None,
