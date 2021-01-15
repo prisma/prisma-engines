@@ -85,6 +85,26 @@ impl TryInto<Vec<ParsedInputValue>> for ParsedInputValue {
     }
 }
 
+impl TryInto<Vec<PrismaValue>> for ParsedInputValue {
+    type Error = QueryParserError;
+
+    fn try_into(self) -> QueryParserResult<Vec<PrismaValue>> {
+        match self {
+            ParsedInputValue::List(vals) => vals
+                .into_iter()
+                .map(|val| val.try_into())
+                .collect::<QueryParserResult<Vec<_>>>(),
+            v => Err(QueryParserError {
+                path: QueryPath::default(),
+                error_kind: QueryParserErrorKind::AssertionError(format!(
+                    "Attempted conversion of non-list ParsedInputValue ({:?}) into prisma value list failed.",
+                    v
+                )),
+            }),
+        }
+    }
+}
+
 impl TryInto<Option<String>> for ParsedInputValue {
     type Error = QueryParserError;
 

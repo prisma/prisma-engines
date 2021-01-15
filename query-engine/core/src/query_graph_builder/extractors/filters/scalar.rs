@@ -1,22 +1,7 @@
 use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
-use connector::{Filter, ScalarCompare};
+use connector::{Filter, ScalarCompare, ScalarListCompare};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
-
-pub fn parse_list(
-    filter_key: &str,
-    field: &ScalarFieldRef,
-    input: ParsedInputValue,
-    reverse: bool,
-) -> QueryGraphBuilderResult<Vec<Filter>> {
-    // let filter = match filter_key {
-    //     "not" => {
-    //         match input {
-    //         }
-    //     }
-
-    todo!()
-}
 
 pub fn parse(
     filter_key: &str,
@@ -96,6 +81,12 @@ pub fn parse(
         "lte" => vec![field.less_than_or_equals(as_prisma_value(input)?)],
         "gte" => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
 
+        // List-specific filters
+        "has" => vec![field.contains_element(as_prisma_value(input)?)],
+        "hasEvery" => vec![field.contains_every_element(as_prisma_value_list(input)?)],
+        "hasSome" => vec![field.contains_some_element(as_prisma_value_list(input)?)],
+        "isEmpty" => vec![field.is_empty_list(input.try_into()?)],
+
         // Aggregation filters
         "count" => aggregation_filter(field, input, reverse, Filter::count)?,
         "avg" => aggregation_filter(field, input, reverse, Filter::average)?,
@@ -115,6 +106,10 @@ pub fn parse(
 }
 
 fn as_prisma_value(input: ParsedInputValue) -> QueryGraphBuilderResult<PrismaValue> {
+    Ok(input.try_into()?)
+}
+
+fn as_prisma_value_list(input: ParsedInputValue) -> QueryGraphBuilderResult<Vec<PrismaValue>> {
     Ok(input.try_into()?)
 }
 
