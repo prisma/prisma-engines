@@ -35,13 +35,6 @@ class ListFilterSpec extends FlatSpec with Matchers with ApiSpecBase with Connec
     createTestData()
   }
 
-  // equals
-  // not equals
-  // has
-  // hasEvery
-  // hasSome
-  // isEmpty
-
   "The `equals` operation" should "work as expected" in {
     query("strList", "equals", """["a", "A", "c"]""", Some(1))
     query("intList", "equals", """[1, 2, 3]""", Some(1))
