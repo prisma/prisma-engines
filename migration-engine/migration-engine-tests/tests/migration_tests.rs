@@ -91,7 +91,7 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("json"), ignore("mysql_5_6"))]
+#[test_each_connector(capabilities("json"), ignore("mysql_5_6"), log = "debug")]
 async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"

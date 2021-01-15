@@ -2079,7 +2079,6 @@ name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
  "base64 0.13.0",
- "enumflags2",
  "futures 0.3.8",
  "json-rpc-stdio",
  "migration-connector",

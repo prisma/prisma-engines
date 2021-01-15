@@ -7,36 +7,27 @@ pub mod api;
 pub mod commands;
 
 mod core_error;
-mod gate_keeper;
 
 use anyhow::anyhow;
 pub use api::GenericApi;
 use api::MigrationApi;
 pub use commands::SchemaPushInput;
-pub use core_error::{CoreError, CoreResult};
-use enumflags2::BitFlags;
-pub use gate_keeper::GateKeeper;
-
 use commands::{MigrationCommand, SchemaPushCommand};
+pub use core_error::{CoreError, CoreResult};
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,
     Configuration,
 };
-use migration_connector::{features, ConnectorError, MigrationFeature};
+use migration_connector::{features, ConnectorError};
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
 
 /// Top-level constructor for the migration engine API.
-pub async fn migration_api(
-    datamodel: &str,
-    enabled_preview_features: BitFlags<MigrationFeature>,
-) -> CoreResult<Arc<dyn api::GenericApi>> {
+pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericApi>> {
     let config = parse_configuration(datamodel)?;
     let features = features::from_config(&config);
-
-    GateKeeper::new(enabled_preview_features).any_blocked(features)?;
 
     let source = config
         .datasources
@@ -209,7 +200,7 @@ mod tests {
             }
         "#;
 
-        let err = migration_api(datamodel, BitFlags::empty())
+        let err = migration_api(datamodel)
             .await
             .map(drop)
             .unwrap_err()

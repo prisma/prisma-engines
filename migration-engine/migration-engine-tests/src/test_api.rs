@@ -9,8 +9,6 @@ mod mark_migration_rolled_back;
 mod reset;
 mod schema_push;
 
-use std::fmt::Display;
-
 pub use apply_migrations::ApplyMigrations;
 pub use create_migration::CreateMigration;
 pub use diagnose_migration_history::DiagnoseMigrationHistory;
@@ -39,6 +37,7 @@ use quaint::{
 };
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::*;
+use std::fmt::{Display, Write};
 use tempfile::TempDir;
 use test_setup::*;
 
@@ -73,6 +72,10 @@ impl TestApi {
 
     pub fn is_mariadb(&self) -> bool {
         self.tags.contains(Tags::Mariadb)
+    }
+
+    pub fn is_mysql_5_6(&self) -> bool {
+        self.tags.contains(Tags::Mysql56)
     }
 
     pub fn migration_persistence<'a>(&'a self) -> &(dyn MigrationPersistence + 'a) {
@@ -216,6 +219,32 @@ impl TestApi {
             select: quaint::ast::Select::from_table(self.render_table_name(table_name)),
             api: self,
         }
+    }
+
+    pub fn write_native_types_datamodel_header(&self, buf: &mut String) {
+        let provider = match self.sql_family() {
+            SqlFamily::Mssql => "sqlserver",
+            SqlFamily::Mysql => "mysql",
+            SqlFamily::Postgres => "postgresql",
+            SqlFamily::Sqlite => "sqlite",
+        };
+
+        indoc::writedoc!(
+            buf,
+            r#"
+            datasource test_db {{
+                provider = "{provider}"
+                url      = "{provider}://localhost:666"
+              }}
+
+              generator client {{
+                provider        = "prisma-client-js"
+                previewFeatures = ["nativeTypes"]
+              }}
+            "#,
+            provider = provider
+        )
+        .unwrap();
     }
 
     pub fn native_types_datamodel(&self, data_model: impl Display) -> String {
