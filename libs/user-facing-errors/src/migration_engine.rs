@@ -148,6 +148,16 @@ pub struct CannotRollBackSucceededMigration {
 )]
 pub struct DeprecatedProviderArray;
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3014",
+    message = "The datasource provider `{provider}` specified in your schema does not match the one specified in the schema_lock.toml. You will encounter errors when you try to apply migrations generated for a different provider. Please archive your current migration directory and call the provider switching command."
+)]
+pub struct ProviderSwitchedError {
+    ///The provider specified in the schema.
+    pub provider: String,
+}
+
 #[derive(Debug, Serialize)]
 pub struct ShadowDbCreationError {
     pub inner_error: crate::Error,

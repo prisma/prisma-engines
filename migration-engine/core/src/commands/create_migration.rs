@@ -3,7 +3,7 @@ use crate::{api::MigrationApi, parse_datamodel, CoreError, CoreResult};
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use user_facing_errors::migration_engine::MigrationNameTooLong;
+use user_facing_errors::migration_engine::{MigrationNameTooLong, ProviderSwitchedError};
 
 /// Create and potentially apply a new migration.
 pub struct CreateMigrationCommand;
@@ -43,6 +43,27 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
 
         if input.migration_name.len() > 200 {
             return Err(CoreError::user_facing(MigrationNameTooLong));
+        }
+
+        //check for provider switch
+        let connector_type = engine.connector().connector_type();
+        match migration_connector::match_provider_in_lock_file(&input.migrations_directory_path, connector_type) {
+            None => {
+                migration_connector::write_migration_lock_file(&input.migrations_directory_path, connector_type)
+                    .map_err(|err| {
+                        CoreError::Generic(
+                            anyhow::Error::new(err)
+                                .context(format!("Failed to write the migration lock file to `{:?}`", "todo",)),
+                        )
+                    })?;
+            }
+            Some(true) => (),
+            Some(false) => {
+                return Err(CoreError::user_facing(ProviderSwitchedError {
+                    provider: connector_type.into(),
+                })
+                .into())
+            }
         }
 
         // Infer the migration.

@@ -56,6 +56,9 @@ impl MigrationCommand for EvaluateDataLoss {
         let applier = connector.database_migration_step_applier();
         let checker = connector.destructive_change_checker();
 
+        //Validate Provider
+        migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+
         let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
         let target_schema = parse_datamodel(&input.prisma_schema)?;
 
