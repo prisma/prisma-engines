@@ -183,9 +183,10 @@ impl From<QuaintKind> for SqlError {
                 cause: kind,
             },
             QuaintKind::DatabaseUrlIsInvalid(reason) => Self::DatabaseUrlIsInvalid(reason),
-            e @ QuaintKind::ConnectTimeout(..) => Self::ConnectTimeout(e),
+            e @ QuaintKind::ConnectTimeout => Self::ConnectTimeout(e),
+            e @ QuaintKind::SocketTimeout => Self::Timeout(format!("{}", e)),
+            e @ QuaintKind::PoolTimeout { .. } => Self::Timeout(format!("{}", e)),
             QuaintKind::ConnectionError { .. } => Self::ConnectionError { cause: kind },
-            QuaintKind::Timeout(message) => Self::Timeout(format!("quaint timeout: {}", message)),
             QuaintKind::TlsError { .. } => Self::TlsError { cause: kind },
             QuaintKind::UniqueConstraintViolation { ref constraint } => Self::UniqueConstraintViolation {
                 constraint: constraint.into(),

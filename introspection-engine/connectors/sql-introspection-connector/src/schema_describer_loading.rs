@@ -18,7 +18,7 @@ pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBack
 
     let wrapper = match tokio::time::timeout(CONNECTION_TIMEOUT, wrapper_fut).await {
         Ok(result) => result?,
-        Err(_elapsed) => return Err(SqlError::from(ErrorKind::ConnectTimeout("Tokio timer".into()))),
+        Err(_elapsed) => return Err(SqlError::from(ErrorKind::ConnectTimeout)),
     };
 
     let connection_info = wrapper.connection_info().to_owned();
