@@ -120,20 +120,20 @@ version = "0.8"
 optional = true
 
 [dependencies.tokio-postgres]
-branch = "pgbouncer-mode"
 features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
 git = "https://github.com/pimeys/rust-postgres"
+rev = "87316f0afb831155fb96e2d0f413e86eb94b369c"
 optional = true
 
 [dependencies.postgres-types]
-branch = "pgbouncer-mode"
 features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
 git = "https://github.com/pimeys/rust-postgres"
+rev = "87316f0afb831155fb96e2d0f413e86eb94b369c"
 optional = true
 
 [dependencies.postgres-native-tls]
-branch = "pgbouncer-mode"
 git = "https://github.com/pimeys/rust-postgres"
+rev = "87316f0afb831155fb96e2d0f413e86eb94b369c"
 optional = true
 
 [dependencies.libsqlite3-sys]
