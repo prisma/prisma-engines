@@ -79,7 +79,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => SafeCast,
             MsSqlType::BigInt => SafeCast,
             MsSqlType::Decimal(_) => SafeCast,
-            MsSqlType::Numeric(_) => SafeCast,
             MsSqlType::Money => SafeCast,
             MsSqlType::SmallMoney => SafeCast,
             MsSqlType::Float(_) => SafeCast,
@@ -103,11 +102,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => SafeCast,
             MsSqlType::BigInt => SafeCast,
             MsSqlType::Decimal(params) => match params {
-                // TinyInt can be at most three digits, so this might fail.
-                Some((p, s)) if p - s < 3 => RiskyCast,
-                _ => SafeCast,
-            },
-            MsSqlType::Numeric(params) => match params {
                 // TinyInt can be at most three digits, so this might fail.
                 Some((p, s)) if p - s < 3 => RiskyCast,
                 _ => SafeCast,
@@ -143,11 +137,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => SafeCast,
             MsSqlType::BigInt => SafeCast,
             MsSqlType::Decimal(params) => match params {
-                // SmallInt can be at most five digits, so this might fail.
-                Some((p, s)) if p - s < 5 => RiskyCast,
-                _ => SafeCast,
-            },
-            MsSqlType::Numeric(params) => match params {
                 // SmallInt can be at most five digits, so this might fail.
                 Some((p, s)) if p - s < 5 => RiskyCast,
                 _ => SafeCast,
@@ -193,11 +182,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => SafeCast,
             MsSqlType::BigInt => SafeCast,
             MsSqlType::Decimal(params) => match params {
-                // Int can be at most ten digits, so this might fail.
-                Some((p, s)) if p - s < 10 => RiskyCast,
-                _ => SafeCast,
-            },
-            MsSqlType::Numeric(params) => match params {
                 // Int can be at most ten digits, so this might fail.
                 Some((p, s)) if p - s < 10 => RiskyCast,
                 _ => SafeCast,
@@ -248,12 +232,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
                 None => RiskyCast,
                 _ => SafeCast,
             },
-            MsSqlType::Numeric(params) => match params {
-                // BigInt can have at most 19 digits.
-                Some((p, s)) if p - s < 19 => RiskyCast,
-                None => RiskyCast,
-                _ => SafeCast,
-            },
             MsSqlType::Money => RiskyCast,
             MsSqlType::SmallMoney => RiskyCast,
             MsSqlType::Float(_) => SafeCast,
@@ -291,7 +269,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
         // A number, described by precision and scale. Precision is the number
         // of digits in total we can have, scale the number of digits on the
         // right side of the comma.
-        MsSqlType::Decimal(old_params) | MsSqlType::Numeric(old_params) => {
+        MsSqlType::Decimal(old_params) => {
             // todo most of these could be safe so we should match on the params as well?
             match next {
                 MsSqlType::TinyInt => RiskyCast,
@@ -307,7 +285,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
                 MsSqlType::SmallDateTime => RiskyCast,
                 MsSqlType::Binary(_) => RiskyCast,
                 MsSqlType::VarBinary(_) => RiskyCast,
-                MsSqlType::Decimal(new_params) | MsSqlType::Numeric(new_params) => match (old_params, new_params) {
+                MsSqlType::Decimal(new_params) => match (old_params, new_params) {
                     (Some((p_old, s_old)), None) if p_old > 18 || s_old > 0 => RiskyCast,
                     (None, Some((p_new, s_new))) if p_new < 18 || s_new > 0 => RiskyCast,
                     // Sigh... So, numeric(4,0) to numeric(4,2) would be risky,
@@ -353,7 +331,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallInt => RiskyCast,
             MsSqlType::Int => RiskyCast,
             MsSqlType::BigInt => RiskyCast,
-            MsSqlType::Decimal(params) | MsSqlType::Numeric(params) => match params {
+            MsSqlType::Decimal(params) => match params {
                 // We can have 19 digits and four decimals.
                 Some((p, s)) if p < 19 || s < 4 => RiskyCast,
                 None => RiskyCast,
@@ -400,7 +378,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::SmallInt => RiskyCast,
             MsSqlType::Int => RiskyCast,
             MsSqlType::BigInt => RiskyCast,
-            MsSqlType::Decimal(params) | MsSqlType::Numeric(params) => match params {
+            MsSqlType::Decimal(params) => match params {
                 // Ten digits, four decimals
                 Some((p, s)) if p < 10 || s < 4 => RiskyCast,
                 None => RiskyCast,
@@ -449,7 +427,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => RiskyCast,
             MsSqlType::BigInt => RiskyCast,
             MsSqlType::Decimal(_) => RiskyCast,
-            MsSqlType::Numeric(_) => RiskyCast,
             MsSqlType::Money => RiskyCast,
             MsSqlType::SmallMoney => RiskyCast,
             MsSqlType::Bit => RiskyCast,
@@ -516,7 +493,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => RiskyCast,
             MsSqlType::BigInt => RiskyCast,
             MsSqlType::Decimal(_) => RiskyCast,
-            MsSqlType::Numeric(_) => RiskyCast,
             MsSqlType::Money => RiskyCast,
             MsSqlType::SmallMoney => RiskyCast,
             MsSqlType::Bit => RiskyCast,
@@ -689,7 +665,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => RiskyCast,
             MsSqlType::BigInt => RiskyCast,
             MsSqlType::Decimal(_) => RiskyCast,
-            MsSqlType::Numeric(_) => RiskyCast,
             MsSqlType::Money => RiskyCast,
             MsSqlType::SmallMoney => RiskyCast,
             MsSqlType::Bit => RiskyCast,
@@ -729,7 +704,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => RiskyCast,
             MsSqlType::BigInt => RiskyCast,
             MsSqlType::Decimal(_) => RiskyCast,
-            MsSqlType::Numeric(_) => RiskyCast,
             MsSqlType::Money => RiskyCast,
             MsSqlType::SmallMoney => RiskyCast,
             MsSqlType::Bit => RiskyCast,
@@ -772,7 +746,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => RiskyCast,
             MsSqlType::BigInt => RiskyCast,
             MsSqlType::Decimal(_) => RiskyCast,
-            MsSqlType::Numeric(_) => RiskyCast,
             MsSqlType::Money => RiskyCast,
             MsSqlType::SmallMoney => RiskyCast,
             MsSqlType::Bit => RiskyCast,
@@ -823,7 +796,6 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
             MsSqlType::Int => RiskyCast,
             MsSqlType::BigInt => RiskyCast,
             MsSqlType::Decimal(_) => RiskyCast,
-            MsSqlType::Numeric(_) => RiskyCast,
             MsSqlType::Money => RiskyCast,
             MsSqlType::SmallMoney => RiskyCast,
             MsSqlType::Bit => RiskyCast,
@@ -916,7 +888,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
                 None => SafeCast,
                 _ => RiskyCast,
             },
-            MsSqlType::Decimal(_) | MsSqlType::Numeric(_) => RiskyCast,
+            MsSqlType::Decimal(_) => RiskyCast,
             MsSqlType::Money => match old_param {
                 // We can fit at most eight bytes here.
                 Some(len) if len > 8 => RiskyCast,
@@ -998,7 +970,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
                 Some(Number(binary_len)) if binary_len <= 8 => SafeCast,
                 _ => RiskyCast,
             },
-            MsSqlType::Decimal(_) | MsSqlType::Numeric(_) => RiskyCast,
+            MsSqlType::Decimal(_) => RiskyCast,
             MsSqlType::Money => match old_param {
                 // Spending eight bytes for money.
                 Some(Number(binary_len)) if binary_len > 8 => RiskyCast,
