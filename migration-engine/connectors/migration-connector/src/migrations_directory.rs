@@ -3,7 +3,7 @@
 //! Migrations directory management.
 //!
 //! This module is responsible for the management of the contents of the
-//! migrations directory. At the top level it contains a schema.lock file which lists the provider.
+//! migrations directory. At the top level it contains a migration_lock.toml file which lists the provider.
 //! It also contains multiple subfolders, named after the migration id, and each containing:
 //! - A migration script
 
