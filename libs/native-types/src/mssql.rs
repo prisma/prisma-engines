@@ -32,9 +32,6 @@ pub enum MsSqlType {
     /// Numeric data types that have fixed precision and scale. Decimal and
     /// numeric are synonyms and can be used interchangeably.
     Decimal(Option<(u32, u32)>),
-    /// Numeric data types that have fixed precision and scale. Decimal and
-    /// numeric are synonyms and can be used interchangeably.
-    Numeric(Option<(u32, u32)>),
     /// 8-byte numeric money value, accurate to a ten-thousandth of the monetary
     /// units.
     Money,

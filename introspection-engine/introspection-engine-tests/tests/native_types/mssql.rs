@@ -81,8 +81,8 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
           bigint      BigInt   @sqlserver.BigInt
           decimal     Decimal  @sqlserver.Decimal(5, 3)
           decimal_2   Decimal  @sqlserver.Decimal(18, 0)
-          numeric     Decimal  @sqlserver.Numeric(4, 1)
-          numeric_2   Decimal  @sqlserver.Numeric(18, 0)
+          numeric     Decimal  @sqlserver.Decimal(4, 1)
+          numeric_2   Decimal  @sqlserver.Decimal(18, 0)
           money       Float    @sqlserver.Money
           smallmoney  Float    @sqlserver.SmallMoney
           float       Float    @sqlserver.Real

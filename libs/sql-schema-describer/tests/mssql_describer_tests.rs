@@ -130,7 +130,7 @@ async fn all_mssql_column_types_must_work() {
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
-                native_type: Some(MsSqlType::Numeric(Some((18, 0))).to_json()),
+                native_type: Some(MsSqlType::Decimal(Some((18, 0))).to_json()),
             },
 
             default: None,

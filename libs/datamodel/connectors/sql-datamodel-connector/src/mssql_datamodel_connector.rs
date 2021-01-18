@@ -107,13 +107,13 @@ impl Connector for MsSqlDatamodelConnector {
                 let error = self.native_instance_error(native_type);
 
                 match r#type {
-                    Decimal(Some((precision, scale))) | Numeric(Some((precision, scale))) if scale > precision => {
+                    Decimal(Some((precision, scale))) if scale > precision => {
                         error.new_scale_larger_than_precision_error()
                     }
-                    Decimal(Some((prec, _))) | Numeric(Some((prec, _))) if prec == 0 || prec > 38 => {
+                    Decimal(Some((prec, _))) if prec == 0 || prec > 38 => {
                         error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.")
                     }
-                    Decimal(Some((_, scale))) | Numeric(Some((_, scale))) if scale > 38 => {
+                    Decimal(Some((_, scale))) if scale > 38 => {
                         error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.")
                     }
                     Float(Some(bits)) if bits == 0 || bits > 53 => {
@@ -194,7 +194,6 @@ impl Connector for MsSqlDatamodelConnector {
             INT_TYPE_NAME => Int,
             BIG_INT_TYPE_NAME => BigInt,
             DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
-            NUMERIC_TYPE_NAME => Numeric(parse_two_opt_u32(args, NUMERIC_TYPE_NAME)?),
             MONEY_TYPE_NAME => Money,
             SMALL_MONEY_TYPE_NAME => SmallMoney,
             BIT_TYPE_NAME => Bit,
@@ -232,7 +231,6 @@ impl Connector for MsSqlDatamodelConnector {
             Int => (INT_TYPE_NAME, vec![]),
             BigInt => (BIG_INT_TYPE_NAME, vec![]),
             Decimal(x) => (DECIMAL_TYPE_NAME, args_vec_from_opt(x)),
-            Numeric(x) => (NUMERIC_TYPE_NAME, args_vec_from_opt(x)),
             Money => (MONEY_TYPE_NAME, vec![]),
             SmallMoney => (SMALL_MONEY_TYPE_NAME, vec![]),
             Bit => (BIT_TYPE_NAME, vec![]),

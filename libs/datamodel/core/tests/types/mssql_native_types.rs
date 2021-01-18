@@ -122,35 +122,6 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 }
 
 #[test]
-fn should_fail_on_native_type_numeric_when_scale_is_bigger_than_precision() {
-    let dml = indoc!(
-        r#"
-        datasource db {
-            provider = "sqlserver"
-            url      = "sqlserver://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-
-        model Blog {
-            id  Int     @id
-            dec Decimal @db.Numeric(2, 4)
-        }
-    "#
-    );
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Numeric(2,4) native type in SQL Server.",
-        ast::Span::new(203, 233),
-    ));
-}
-
-#[test]
 fn should_fail_on_argument_out_of_range_for_char_type() {
     let error_msg =
         "Argument M is out of range for Native type Char(4001) of SQL Server: Length can range from 1 to 4000.";
@@ -328,8 +299,8 @@ test_type!(decimal(
 ));
 
 test_type!(number(
-    ("Decimal @db.Numeric", MsSqlType::Numeric(None)),
-    ("Decimal @db.Numeric(32,16)", MsSqlType::Numeric(Some((32, 16)))),
+    ("Decimal @db.Decimal", MsSqlType::Decimal(None)),
+    ("Decimal @db.Decimal(32,16)", MsSqlType::Decimal(Some((32, 16)))),
 ));
 
 test_type!(float(

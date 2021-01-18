@@ -75,7 +75,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
         |  money      Float   @test.Money
         |  smallMoney Float   @test.SmallMoney
         |  decFloat   Decimal @test.Decimal(2, 1)
-        |  numFloat   Decimal @test.Numeric(10, 6)
+        |  decFloat2  Decimal @test.Decimal(10, 6)
         |}"""
     }
 
@@ -91,7 +91,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
          |      money: 22.14
          |      smallMoney: 22.12
          |      decFloat: 3.1234
-         |      numFloat: "4.12345"
+         |      decFloat2: "4.12345"
          |    }
          |  ) {
          |    float
@@ -99,7 +99,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
          |    money
          |    smallMoney
          |    decFloat
-         |    numFloat
+         |    decFloat2
          |  }
          |}""".stripMargin,
       project,
@@ -107,7 +107,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
     )
 
     // decFloat is cut due to precision
-    res should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"money":22.14,"smallMoney":22.12,"decFloat":"3.1","numFloat":"4.12345"}}}""".parseJson)
+    res should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"money":22.14,"smallMoney":22.12,"decFloat":"3.1","decFloat2":"4.12345"}}}""".parseJson)
   }
 
   "SQL Server native string types" should "work" in {
@@ -138,7 +138,7 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
          |      text: "text"
          |      nText: "教育漢字"
          |    }
-         |  ) {    
+         |  ) {
          |    char
          |    nchar
          |    vChar
