@@ -38,6 +38,8 @@ all = [
   "bigdecimal"
 ]
 
+vendored-openssl = ["tiberius/vendored-openssl"]
+
 postgresql = [
   "native-tls",
   "tokio-postgres",
@@ -87,11 +89,6 @@ bytes = { version = "0.5", optional = true }
 mobc = { version = "0.5.7", optional = true }
 serde = { version = "1.0", optional = true }
 connection-string = "0.1.10"
-
-[target.'cfg(any(target_os = "macos", target_os = "ios"))'.dependencies]
-tiberius = { version = "0.4.19", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal", "vendored-openssl"]}
-
-[target.'cfg(not(any(target_os = "macos", target_os = "ios")))'.dependencies]
 tiberius = { version = "0.4.19", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal"]}
 
 [dev-dependencies]
