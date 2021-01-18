@@ -18,7 +18,6 @@ mod mark_migration_rolled_back;
 mod plan_migration;
 mod reset;
 mod schema_push;
-mod switch_provider;
 
 pub use apply_migrations::{ApplyMigrationsCommand, ApplyMigrationsInput, ApplyMigrationsOutput};
 pub use apply_script::{ApplyScriptCommand, ApplyScriptInput, ApplyScriptOutput};
@@ -40,4 +39,3 @@ pub use mark_migration_rolled_back::{
 pub use plan_migration::{PlanMigrationCommand, PlanMigrationInput, PlanMigrationOutput};
 pub use reset::ResetCommand;
 pub use schema_push::{SchemaPushCommand, SchemaPushInput, SchemaPushOutput};
-pub use switch_provider::{SwitchProviderCommand, SwitchProviderInput};
