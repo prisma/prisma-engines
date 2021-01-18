@@ -1,7 +1,7 @@
-use crate::{exec_loader, PrismaError, PrismaResult};
+use crate::{PrismaError, PrismaResult};
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
-use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
+use query_core::{exec_loader, schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
 use std::{fmt, sync::Arc};
 
 /// Prisma request context containing all immutable state of the process.
@@ -56,6 +56,7 @@ impl PrismaContext {
             .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
         // Load executor
+
         let (db_name, executor) = exec_loader::load(&data_source).await?;
 
         // Build internal data model

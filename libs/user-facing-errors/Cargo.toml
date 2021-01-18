@@ -16,7 +16,7 @@ indoc = "1"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-features = ["mysql", "postgresql", "sqlite"]
+features = ["mysql", "postgresql", "sqlite", "mssql"]
 optional = true
 
 [features]

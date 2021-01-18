@@ -3,7 +3,7 @@ use serde::Serialize;
 use std::collections::HashMap;
 
 #[serde(rename_all = "camelCase")]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Generator {
     pub name: String,
     pub provider: String,
