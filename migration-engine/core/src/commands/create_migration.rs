@@ -47,23 +47,14 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
 
         //check for provider switch
         let connector_type = engine.connector().connector_type();
-        match migration_connector::match_provider_in_lock_file(&input.migrations_directory_path, connector_type) {
-            None => {
-                migration_connector::write_migration_lock_file(&input.migrations_directory_path, connector_type)
-                    .map_err(|err| {
-                        CoreError::Generic(
-                            anyhow::Error::new(err)
-                                .context(format!("Failed to write the migration lock file to `{:?}`", "todo",)),
-                        )
-                    })?;
-            }
-            Some(true) => (),
-            Some(false) => {
-                return Err(CoreError::user_facing(ProviderSwitchedError {
-                    provider: connector_type.into(),
-                })
-                .into())
-            }
+        if matches!(
+            migration_connector::match_provider_in_lock_file(&input.migrations_directory_path, connector_type),
+            Some(false)
+        ) {
+            return Err(CoreError::user_facing(ProviderSwitchedError {
+                provider: connector_type.into(),
+            })
+            .into());
         }
 
         // Infer the migration.
@@ -99,6 +90,15 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
                     directory.path(),
                 )))
             })?;
+
+        migration_connector::write_migration_lock_file(&input.migrations_directory_path, connector_type).map_err(
+            |err| {
+                CoreError::Generic(anyhow::Error::new(err).context(format!(
+                    "Failed to write the migration lock file to `{:?}`",
+                    &input.migrations_directory_path
+                )))
+            },
+        )?;
 
         Ok(CreateMigrationOutput {
             generated_migration_name: Some(directory.migration_name().to_owned()),
