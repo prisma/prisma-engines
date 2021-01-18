@@ -66,7 +66,7 @@ fn map_enum_input_type(ctx: &mut BuilderContext, enum_name: &str) -> InputType {
         .find_enum(enum_name)
         .expect("Enum references must always be valid.");
 
-    let et: EnumType = e.clone().into();
+    let et: EnumType = e.into();
 
     et.into()
 }

@@ -53,8 +53,7 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
         ) {
             return Err(CoreError::user_facing(ProviderSwitchedError {
                 provider: connector_type.into(),
-            })
-            .into());
+            }));
         }
 
         // Infer the migration.
