@@ -42,4 +42,4 @@ url = "2.1.1"
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
 optional = true
-features = ["serde-support", "tracing-log"]
+features = ["serde-support", "tracing-log", "vendored-openssl"]

@@ -41,5 +41,6 @@ features = [
     "json",
     "uuid",
     "chrono",
-    "bigdecimal"
+    "bigdecimal",
+    "vendored-openssl"
 ]
