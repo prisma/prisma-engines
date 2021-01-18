@@ -170,12 +170,15 @@ dependencies = [
 
 [[package]]
 name = "async-global-executor"
-version = "1.4.3"
+version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73079b49cd26b8fd5a15f68fc7707fc78698dc2a3d61430f2a7a9430230dfa04"
+checksum = "9586ec52317f36de58453159d48351bc244bc24ced3effc1fce22f3d48664af6"
 dependencies = [
+ "async-channel",
  "async-executor",
  "async-io",
+ "async-mutex",
+ "blocking",
  "futures-lite",
  "num_cpus",
  "once_cell",
@@ -218,6 +221,15 @@ dependencies = [
  "vec-arena",
  "waker-fn",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "async-lock"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1996609732bde4a9988bc42125f55f2af5f3c36370e27c778d5191a4a1b63bfb"
+dependencies = [
+ "event-listener",
 ]
 
 [[package]]
@@ -273,17 +285,16 @@ dependencies = [
 
 [[package]]
 name = "async-std"
-version = "1.8.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f9f84f1280a2b436a2c77c2582602732b6c2f4321d5494d6e799e6c367859a8"
+checksum = "d9f06685bad74e0570f5213741bea82158279a4103d988e57bfada11ad230341"
 dependencies = [
  "async-attributes",
  "async-channel",
  "async-global-executor",
  "async-io",
- "async-mutex",
+ "async-lock",
  "async-process",
- "blocking",
  "crossbeam-utils 0.8.1",
  "futures-channel",
  "futures-core",
@@ -1462,9 +1473,9 @@ dependencies = [
 
 [[package]]
 name = "hermit-abi"
-version = "0.1.17"
+version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5aca5565f760fb5b220e499d72710ed156fdb74e631659e99377d9ebfbd13ae8"
+checksum = "322f4de77956e22ed0e5032c359a0f1273f1f7f0d79bfa3b8ffbc730d7fbcc5c"
 dependencies = [
  "libc",
 ]
@@ -2693,7 +2704,7 @@ dependencies = [
 [[package]]
 name = "postgres-native-tls"
 version = "0.3.0"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#87316f0afb831155fb96e2d0f413e86eb94b369c"
+source = "git+https://github.com/pimeys/rust-postgres?rev=87316f0afb831155fb96e2d0f413e86eb94b369c#87316f0afb831155fb96e2d0f413e86eb94b369c"
 dependencies = [
  "bytes",
  "futures 0.3.12",
@@ -2706,7 +2717,7 @@ dependencies = [
 [[package]]
 name = "postgres-protocol"
 version = "0.5.2"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#87316f0afb831155fb96e2d0f413e86eb94b369c"
+source = "git+https://github.com/pimeys/rust-postgres?rev=87316f0afb831155fb96e2d0f413e86eb94b369c#87316f0afb831155fb96e2d0f413e86eb94b369c"
 dependencies = [
  "base64 0.12.3",
  "byteorder",
@@ -2723,7 +2734,7 @@ dependencies = [
 [[package]]
 name = "postgres-types"
 version = "0.1.2"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#87316f0afb831155fb96e2d0f413e86eb94b369c"
+source = "git+https://github.com/pimeys/rust-postgres?rev=87316f0afb831155fb96e2d0f413e86eb94b369c#87316f0afb831155fb96e2d0f413e86eb94b369c"
 dependencies = [
  "bit-vec",
  "bytes",
@@ -2871,7 +2882,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#c9168f4d43b767085f002f75c9bf93089e8f7c76"
+source = "git+https://github.com/prisma/quaint#faf320e5daa0a262efc58190da8eb189c77bf8b7"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3999,7 +4010,7 @@ dependencies = [
 [[package]]
 name = "tokio-postgres"
 version = "0.5.5"
-source = "git+https://github.com/pimeys/rust-postgres?branch=pgbouncer-mode#87316f0afb831155fb96e2d0f413e86eb94b369c"
+source = "git+https://github.com/pimeys/rust-postgres?rev=87316f0afb831155fb96e2d0f413e86eb94b369c#87316f0afb831155fb96e2d0f413e86eb94b369c"
 dependencies = [
  "async-trait",
  "byteorder",

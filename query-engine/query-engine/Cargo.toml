@@ -8,6 +8,7 @@ version = "0.1.0"
 default = ["sql", "graphql"]
 graphql = ["graphql-parser"]
 sql = ["sql-connector"]
+vendored-openssl = ["quaint/vendored-openssl"]
 
 [dependencies]
 futures = "0.3"

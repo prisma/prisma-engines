@@ -4,6 +4,9 @@ edition = "2018"
 name = "sql-introspection-connector"
 version = "0.1.0"
 
+[features]
+vendored-openssl = ["quaint/vendored-openssl"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

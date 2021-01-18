@@ -30,6 +30,7 @@ quaint = { git = "https://github.com/prisma/quaint" }
 [features]
 default = ["sql"]
 sql = ["migration-core/sql"]
+vendored-openssl = ["quaint/vendored-openssl"]
 
 [[bin]]
 name = "migration-engine"
