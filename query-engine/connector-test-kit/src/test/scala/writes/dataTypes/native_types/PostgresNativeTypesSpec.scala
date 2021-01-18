@@ -93,8 +93,6 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  char  String @test.Char(10)
         |  vChar String @test.VarChar(11)
         |  text  String @test.Text
-        |  bit   Bytes @test.Bit(4)
-        |  vBit  Bytes  @test.VarBit(5)
         |  uuid  String @test.Uuid
         |}"""
     }
@@ -109,16 +107,12 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
        |      char: "1234567890"
        |      vChar: "12345678910"
        |      text: "text"
-       |      bit: "1010"
-       |      vBit: "00110"
        |      uuid: "123e4567-e89b-12d3-a456-426614174000"
        |    }
        |  ) {
        |    char
        |    vChar
        |    text
-       |    bit
-       |    vBit
        |    uuid
        |  }
        |}""".stripMargin,
@@ -127,7 +121,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     )
 
     res.toString should be(
-      """{"data":{"createOneModel":{"char":"1234567890","vChar":"12345678910","text":"text","bit":"1010","vBit":"00110","uuid":"123e4567-e89b-12d3-a456-426614174000"}}}""")
+      """{"data":{"createOneModel":{"char":"1234567890","vChar":"12345678910","text":"text","uuid":"123e4567-e89b-12d3-a456-426614174000"}}}""")
   }
 
   "Other Postgres native types" should "work" in {
@@ -137,6 +131,8 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  id    String  @id @default(cuid())
         |  bool  Boolean @test.Boolean
         |  byteA Bytes   @test.ByteA
+        |  bit   Bytes @test.Bit(4)
+        |  vBit  Bytes  @test.VarBit(5)
         |  xml   String  @test.Xml
         |  json  Json    @test.Json
         |  jsonb Json    @test.JsonB
@@ -152,6 +148,8 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |    data: {
          |      bool: true
          |      byteA: "dGVzdA=="
+         |      bit: "MDExMQ=="
+         |      vBit: "MDExMTAxMTAx"
          |      xml: "<wurst>salat</wurst>"
          |      json: "{}"
          |      jsonb: "{\\"a\\": \\"b\\"}"
@@ -159,6 +157,8 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |  ) {
          |    bool
          |    byteA
+         |    bit
+         |    vBit
          |    xml
          |    json
          |    jsonb
