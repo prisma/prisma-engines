@@ -64,15 +64,14 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
 
     for entry in std::fs::read_dir(directory.path())? {
         let entry = entry?;
+        if entry.metadata()?.is_dir() {
+            let file_path = entry.path().join("migration.sql");
+            let contents = std::fs::read_to_string(file_path)?;
 
-        assert!(entry.metadata()?.is_dir());
+            squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
 
-        let file_path = entry.path().join("migration.sql");
-        let contents = std::fs::read_to_string(file_path)?;
-
-        squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
-
-        std::fs::remove_dir_all(entry.path())?;
+            std::fs::remove_dir_all(entry.path())?;
+        }
     }
 
     squashed_migrations.sort_by(|left, right| left.0.cmp(&right.0));
@@ -273,12 +272,12 @@ async fn squashing_migrations_history_at_the_start_works(api: &TestApi) -> TestR
     for entry in std::fs::read_dir(directory.path())? {
         let entry = entry?;
 
-        assert!(entry.metadata()?.is_dir());
+        if entry.metadata()?.is_dir() {
+            let file_path = entry.path().join("migration.sql");
+            let contents = std::fs::read_to_string(file_path)?;
 
-        let file_path = entry.path().join("migration.sql");
-        let contents = std::fs::read_to_string(file_path)?;
-
-        squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
+            squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
+        }
     }
 
     squashed_migrations.sort_by(|left, right| left.0.cmp(&right.0));
@@ -434,12 +433,12 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
     for entry in std::fs::read_dir(directory.path())? {
         let entry = entry?;
 
-        assert!(entry.metadata()?.is_dir());
+        if entry.metadata()?.is_dir() {
+            let file_path = entry.path().join("migration.sql");
+            let contents = std::fs::read_to_string(file_path)?;
 
-        let file_path = entry.path().join("migration.sql");
-        let contents = std::fs::read_to_string(file_path)?;
-
-        squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
+            squashed_migrations.push((entry.file_name().into_string().unwrap(), contents));
+        }
     }
 
     squashed_migrations.sort_by(|left, right| left.0.cmp(&right.0));

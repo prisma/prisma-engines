@@ -75,7 +75,8 @@ impl<'a> CreateMigrationAssertion<'a> {
         }
 
         anyhow::ensure!(
-            expected_count == count,
+            // the lock file is counted as an entry
+            expected_count == count - 1,
             "Assertion failed. Expected {expected} migrations in the migrations directory, found {actual}.",
             expected = expected_count,
             actual = count

@@ -3,7 +3,7 @@ use crate::{api::MigrationApi, parse_datamodel, CoreError, CoreResult};
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use user_facing_errors::migration_engine::MigrationNameTooLong;
+use user_facing_errors::migration_engine::{MigrationNameTooLong, ProviderSwitchedError};
 
 /// Create and potentially apply a new migration.
 pub struct CreateMigrationCommand;
@@ -45,6 +45,18 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
             return Err(CoreError::user_facing(MigrationNameTooLong));
         }
 
+        //check for provider switch
+        let connector_type = engine.connector().connector_type();
+        if matches!(
+            migration_connector::match_provider_in_lock_file(&input.migrations_directory_path, connector_type),
+            Some(false)
+        ) {
+            return Err(CoreError::user_facing(ProviderSwitchedError {
+                provider: connector_type.into(),
+            })
+            .into());
+        }
+
         // Infer the migration.
         let previous_migrations = migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
         let target_schema = parse_datamodel(&input.prisma_schema)?;
@@ -78,6 +90,15 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
                     directory.path(),
                 )))
             })?;
+
+        migration_connector::write_migration_lock_file(&input.migrations_directory_path, connector_type).map_err(
+            |err| {
+                CoreError::Generic(anyhow::Error::new(err).context(format!(
+                    "Failed to write the migration lock file to `{:?}`",
+                    &input.migrations_directory_path
+                )))
+            },
+        )?;
 
         Ok(CreateMigrationOutput {
             generated_migration_name: Some(directory.migration_name().to_owned()),

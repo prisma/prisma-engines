@@ -31,6 +31,12 @@ impl<'a> MigrationCommand for DevDiagnosticCommand {
     type Output = DevDiagnosticOutput;
 
     async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
+        //Validate Provider
+        migration_connector::error_on_changed_provider(
+            &input.migrations_directory_path,
+            engine.connector().connector_type(),
+        )?;
+
         let diagnose_migration_history_output = engine
             .handle_command::<DiagnoseMigrationHistoryCommand>(&DiagnoseMigrationHistoryInput {
                 migrations_directory_path: input.migrations_directory_path.clone(),
