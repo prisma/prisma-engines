@@ -163,6 +163,20 @@ pub struct ShadowDbCreationError {
     pub inner_error: crate::Error,
 }
 
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3015",
+    message = "You tried to switch the provider, but there are still sub-folders in your migration directory. Please archive your whole migration directory at a different location first."
+)]
+pub struct ProviderSwitchedWithExistingMigrations;
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3016",
+    message = "You tried to switch the provider, but there is still a schema_lock.toml in your migration directory. Please archive your whole migration directory at a different location first."
+)]
+pub struct ProviderSwitchedWithExistingLockFile;
+
 impl crate::UserFacingError for ShadowDbCreationError {
     const ERROR_CODE: &'static str = "P3014";
 

@@ -78,7 +78,6 @@ provider = "{}""##,
 /// Error if the provider in the schema does not match the one in the schema_lock.toml
 #[tracing::instrument]
 pub fn error_on_changed_provider(migrations_directory_path: &String, provider: &str) -> ConnectorResult<()> {
-    //todo error handling
     match match_provider_in_lock_file(migrations_directory_path, provider) {
         None => Ok(()),
         Some(false) => Err(ConnectorError::user_facing_error(ProviderSwitchedError {

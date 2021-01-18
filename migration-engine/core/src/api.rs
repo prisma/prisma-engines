@@ -57,6 +57,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn plan_migration(&self, input: &PlanMigrationInput) -> CoreResult<PlanMigrationOutput>;
     async fn reset(&self, input: &()) -> CoreResult<()>;
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
+    async fn switch_provider(&self, input: &SwitchProviderInput) -> CoreResult<()>;
 }
 
 #[async_trait::async_trait]
@@ -164,6 +165,12 @@ impl<C: MigrationConnector> GenericApi for MigrationApi<C> {
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput> {
         self.handle_command::<SchemaPushCommand>(input)
             .instrument(tracing::info_span!("SchemaPush"))
+            .await
+    }
+
+    async fn switch_provider(&self, input: &SwitchProviderInput) -> CoreResult<()> {
+        self.handle_command::<SwitchProviderCommand>(input)
+            .instrument(tracing::info_span!("SwitchProvider"))
             .await
     }
 }
