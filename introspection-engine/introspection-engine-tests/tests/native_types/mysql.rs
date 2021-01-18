@@ -39,7 +39,7 @@ const TYPES: &[(&str, &str)] = &[
     ("date", "Date"),
     ("timeWithPrecision", "Time(3)"),
     ("timeWithPrecision_no_precision", "DateTime"),
-    ("dateTimeWithPrecision", "Datetime(3)"),
+    ("dateTimeWithPrecision", "DateTime(3)"),
     ("timestampWithPrecision", "Timestamp(3)"),
     ("year", "Year"),
     ("json", "Json"),
@@ -117,8 +117,8 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             longText                       String   @mysql.LongText
             date                           DateTime @mysql.Date
             timeWithPrecision              DateTime @mysql.Time(3)
-            timeWithPrecision_no_precision DateTime @mysql.Datetime(0)
-            dateTimeWithPrecision          DateTime @mysql.Datetime(3)
+            timeWithPrecision_no_precision DateTime @mysql.DateTime(0)
+            dateTimeWithPrecision          DateTime @mysql.DateTime(3)
             timestampWithPrecision         DateTime {default} @mysql.Timestamp(3)
             year                           Int      @mysql.Year
             json                           {json}

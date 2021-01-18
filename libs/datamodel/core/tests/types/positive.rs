@@ -224,7 +224,7 @@ fn should_handle_type_specifications_on_mysql() {
         model Blog {
             id       Int      @id
             smallInt Int      @mys.SmallInt
-            foobar   DateTime @mys.Datetime(6)
+            foobar   DateTime @mys.DateTime(6)
             fooBool  Boolean  @mys.TinyInt
             fooInt   Int      @mys.TinyInt
         }
