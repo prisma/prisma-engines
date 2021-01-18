@@ -57,9 +57,9 @@ pub fn create_migration_directory(
 #[tracing::instrument]
 pub fn write_migration_lock_file(migrations_directory_path: &String, provider: &str) -> std::io::Result<()> {
     let directory_path = Path::new(migrations_directory_path);
-    let file_path = directory_path.join(MIGRATION_LOCK_FILENAME);
+    let mut file_path = directory_path.join(MIGRATION_LOCK_FILENAME);
 
-    file_path.with_extension("toml");
+    file_path.set_extension("toml");
 
     tracing::debug!("Writing migration lockfile at {:?}", &file_path);
 
@@ -97,7 +97,7 @@ pub fn match_provider_in_lock_file(migrations_directory_path: &String, provider:
 
     match read_result {
         Err(_) => None,
-        Ok(content) => Some(content.contains(format!("provider = \"{}\"\n", provider).as_str())),
+        Ok(content) => Some(content.contains(format!("provider = \"{}\"", provider).as_str())),
     }
 }
 
