@@ -10,16 +10,15 @@ use datamodel::Datamodel;
 /// description of the underlying database.
 #[async_trait::async_trait]
 pub trait DatabaseMigrationInferrer<T>: Send + Sync {
-    /// Infer the database migration steps. The previous datamodel is provided,
-    /// but the implementor can ignore it.
+    /// Infer the database migration to the passed in Prisma schema.
     async fn infer(&self, next: &Datamodel) -> ConnectorResult<T>;
 
     /// Infer the database migration steps assuming an empty schema on a new
     /// database as a starting point.
     fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<T>;
 
-    /// Look at the previous migrations and the target schema, and infer a
-    /// database migration taking the database to the expected Prisma schema.
+    /// Look at the previous migrations and the target Prisma schema, and infer
+    /// a database migration taking the database to the target Prisma schema.
     async fn infer_next_migration(
         &self,
         previous_migrations: &[MigrationDirectory],
