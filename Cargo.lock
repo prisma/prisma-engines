@@ -2442,9 +2442,9 @@ dependencies = [
 
 [[package]]
 name = "opentls"
-version = "0.1.2"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a764fc7777a53b3fa76a73322c3fd5bf1112dc1c7cad548156c43398198bc4de"
+checksum = "e0aa55c310bdfd54988501905fcb9e7980961cf74e4c017903d4629a3e6b3fee"
 dependencies = [
  "futures-util",
  "log",
@@ -2882,7 +2882,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#faf320e5daa0a262efc58190da8eb189c77bf8b7"
+source = "git+https://github.com/prisma/quaint#a806300f666a11c6db750a5dafa713f00bf855c2"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3332,7 +3332,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.11.1",
+ "parking_lot 0.10.2",
  "serial_test_derive",
 ]
 
@@ -3834,11 +3834,12 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.4.19"
+version = "0.4.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd76149fef873316b9032e970f2b2d4665904b3f1fe60157f16261545115a4e2"
+checksum = "12de075eb1ab4cd08cc78e4d96bcac5ac76b7be82b738177342257445afd2ad6"
 dependencies = [
  "async-native-tls",
+ "async-std",
  "async-stream",
  "async-trait",
  "bigdecimal 0.2.0",
