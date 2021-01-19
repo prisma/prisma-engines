@@ -25,7 +25,6 @@ use super::{
 };
 use crate::{connectors::Tags, test_api::list_migration_directories::ListMigrationDirectories, AssertionResult};
 use enumflags2::BitFlags;
-use indoc::formatdoc;
 use migration_connector::{MigrationFeature, MigrationPersistence, MigrationRecord};
 use migration_core::{
     api::{GenericApi, MigrationApi},
@@ -37,7 +36,7 @@ use quaint::{
 };
 use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::*;
-use std::fmt::{Display, Write};
+use std::fmt::Write;
 use tempfile::TempDir;
 use test_setup::*;
 
@@ -247,27 +246,13 @@ impl TestApi {
         .unwrap();
     }
 
-    pub fn native_types_datamodel(&self, data_model: impl Display) -> String {
-        let provider = match self.sql_family() {
-            SqlFamily::Mssql => "sqlserver",
-            SqlFamily::Mysql => "mysql",
-            SqlFamily::Postgres => "postgresql",
-            SqlFamily::Sqlite => "sqlite",
-        };
+    pub fn native_types_datamodel(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
 
-        formatdoc! {r#"
-            datasource test_db {{
-              provider = "{provider}"
-              url      = "{provider}://localhost:666"
-            }}
+        self.write_native_types_datamodel_header(&mut out);
+        out.push_str(schema);
 
-            generator client {{
-              provider        = "prisma-client-js"
-              previewFeatures = ["nativeTypes"]
-            }}
-
-            {data_model}
-        "#, provider = provider, data_model = data_model}
+        out
     }
 }
 
