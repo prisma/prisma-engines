@@ -235,7 +235,7 @@ impl QueryDocumentParser {
                 Self::parse_uuid(parent_path, s.as_str()).map(PrismaValue::Uuid)
             }
             (QueryValue::String(s), ScalarType::Json) => {
-                Ok(PrismaValue::Json(Self::parse_json(parent_path, &s).map(|_| s)?))
+                Ok(PrismaValue::Json(s))
             }
             (QueryValue::String(s), ScalarType::DateTime) => {
                 Self::parse_datetime(parent_path, s.as_str()).map(PrismaValue::DateTime)

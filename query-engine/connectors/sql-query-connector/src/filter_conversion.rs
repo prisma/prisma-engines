@@ -129,7 +129,19 @@ impl AliasedCondition for Filter {
             Filter::Aggregation(filter) => filter.aliased_cond(alias),
             Filter::ScalarList(filter) => filter.aliased_cond(alias),
             Filter::Empty => ConditionTree::NoCondition,
+            Filter::Json(filter) => filter.aliased_cond(alias),
+            _ => unimplemented!(),
         }
+    }
+}
+
+impl AliasedCondition for JsonFilter {
+    fn aliased_cond(self, _alias: Option<Alias>) -> ConditionTree<'static> {
+        let comparable: Expression = self.field.as_column().into();
+
+        let compare = comparable.equals(self.path);
+
+        ConditionTree::single(compare)
     }
 }
 

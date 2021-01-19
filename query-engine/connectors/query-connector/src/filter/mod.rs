@@ -5,11 +5,13 @@
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
 
 mod id_filter;
+mod json_filter;
 mod list;
 mod relation;
 mod scalar;
 
 pub use id_filter::*;
+pub use json_filter::*;
 pub use list::*;
 pub use relation::*;
 pub use scalar::*;
@@ -25,6 +27,7 @@ pub enum Filter {
     Relation(RelationFilter),
     BoolFilter(bool),
     Aggregation(AggregationFilter),
+    Json(JsonFilter),
     Empty,
 }
 

@@ -163,7 +163,13 @@ fn full_scalar_filter_type(
             .chain(alphanumeric_filters(mapped_scalar_type.clone()))
             .collect(),
 
-        TypeIdentifier::Boolean | TypeIdentifier::Json | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
+        TypeIdentifier::Json => equality_filters(mapped_scalar_type.clone(), nullable)
+            .chain(alphanumeric_filters(mapped_scalar_type.clone()))
+            .chain(string_filters(mapped_scalar_type.clone()))
+            .chain(json_filters(ctx))
+            .collect(),
+
+        TypeIdentifier::Boolean | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
             equality_filters(mapped_scalar_type.clone(), nullable).collect()
         }
 
@@ -254,6 +260,28 @@ fn string_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
         input_field(filters::ENDS_WITH, mapped_type, None).optional(),
     ]
     .into_iter()
+}
+
+fn json_path_object(ctx: &mut BuilderContext) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new("JsonPath".to_string(), PRISMA_NAMESPACE);
+
+    return_cached_input!(ctx, &ident);
+
+    let object = Arc::new(init_input_object_type(ident.clone()));
+
+    ctx.cache_input_type(ident, object.clone());
+
+    object.set_fields(vec![
+        input_field("value", InputType::string(), None),
+        input_field("isTargetArray", InputType::boolean(), None).optional(),
+    ]);
+
+    Arc::downgrade(&object)
+}
+
+fn json_filters(ctx: &mut BuilderContext) -> impl Iterator<Item = InputField> {
+    // TODO: also add json-specific "keys" filters
+    vec![input_field("path", vec![InputType::object(json_path_object(ctx))], None).optional()].into_iter()
 }
 
 fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = InputField> {

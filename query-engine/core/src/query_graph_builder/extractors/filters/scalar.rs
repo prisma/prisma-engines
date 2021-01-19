@@ -2,6 +2,7 @@ use crate::{
     constants::inputs::filters, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{Filter, ScalarCompare, ScalarListCompare};
+use connector::{Filter, JsonFilter, ScalarCompare};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 
@@ -96,7 +97,24 @@ pub fn parse(
         filters::SUM => aggregation_filter(field, input, reverse, Filter::sum)?,
         filters::MIN => aggregation_filter(field, input, reverse, Filter::min)?,
         filters::MAX => aggregation_filter(field, input, reverse, Filter::max)?,
+        "path" => {
+            let inner_object: ParsedInputMap = input.try_into()?;
 
+            let path = inner_object.get("value").expect("path should be set");
+            let path: String = match path {
+                ParsedInputValue::Single(val) => match val {
+                    PrismaValue::String(inner_val) => inner_val.to_owned(),
+                    _ => panic!("should not happen"),
+                },
+                _ => panic!("should not happen"),
+            };
+
+            vec![Filter::Json(JsonFilter {
+                path,
+                is_target_array: false,
+                field: field.to_owned(),
+            })]
+        }
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(
                 "{} is not a valid scalar filter operation",
