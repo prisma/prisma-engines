@@ -1,6 +1,9 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, pair::Pair, sql_schema_differ::column::ColumnDiffer,
+    flavour::MYSQL_IDENTIFIER_SIZE_LIMIT,
+    flavour::{MysqlFlavour, SqlFlavour},
+    pair::Pair,
+    sql_schema_differ::column::ColumnDiffer,
     sql_schema_differ::ColumnTypeChange,
 };
 use migration_connector::MigrationFeature;
@@ -350,7 +353,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
         MySqlType::DateTime(n) => match next {
             MySqlType::DateTime(m) if n < m => safe(),
             MySqlType::DateTime(m) if n > m => risky(),
-            MySqlType::DateTime(_) => risky(),
+            MySqlType::DateTime(_) => return None,
 
             // To string
             MySqlType::Binary(_)
@@ -900,7 +903,7 @@ fn native_type_change(types: Pair<MySqlType>) -> Option<ColumnTypeChange> {
         MySqlType::Timestamp(n) => match next {
             MySqlType::Timestamp(m) if n < m => safe(),
             MySqlType::Timestamp(m) if n > m => risky(),
-            MySqlType::Timestamp(_) => risky(),
+            MySqlType::Timestamp(_) => return None,
 
             // To string
             MySqlType::Binary(_)

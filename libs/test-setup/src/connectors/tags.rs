@@ -14,6 +14,7 @@ pub enum Tags {
     Mssql2017 = 0b01000000,
     Mssql2019 = 0b10000000,
     Postgres12 = 0b100000000,
+    Mssql = 0b1000000000,
 }
 
 impl Tags {
@@ -47,6 +48,7 @@ impl StdError for UnknownTagError {}
 static TAG_NAMES: Lazy<Vec<(&str, BitFlags<Tags>)>> = Lazy::new(|| {
     vec![
         ("mariadb", Tags::Mariadb.into()),
+        ("mssql", Tags::Mssql.into()),
         ("mssql_2017", Tags::Mssql2017.into()),
         ("mssql_2019", Tags::Mssql2019.into()),
         ("mysql", Tags::Mysql.into()),
@@ -54,7 +56,7 @@ static TAG_NAMES: Lazy<Vec<(&str, BitFlags<Tags>)>> = Lazy::new(|| {
         ("mysql_8", Tags::Mysql8.into()),
         ("postgres", Tags::Postgres.into()),
         ("postgres_12", Tags::Postgres12.into()),
-        ("sql", Tags::Mysql | Tags::Postgres | Tags::Sqlite),
+        ("sql", Tags::Mysql | Tags::Postgres | Tags::Sqlite), // TODO: include MSSQL
         ("sqlite", Tags::Sqlite.into()),
     ]
 });

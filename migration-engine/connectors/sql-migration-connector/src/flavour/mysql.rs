@@ -42,10 +42,6 @@ impl MysqlFlavour {
             .unwrap_or_default()
             .contains(Circumstances::LowerCasesTableNames)
     }
-
-    pub(crate) fn features(&self) -> BitFlags<MigrationFeature> {
-        self.features
-    }
 }
 
 #[async_trait::async_trait]
@@ -275,6 +271,10 @@ impl SqlFlavour for MysqlFlavour {
         connection.raw_cmd(&drop_database).await?;
 
         sql_schema_result
+    }
+
+    fn features(&self) -> BitFlags<MigrationFeature> {
+        self.features
     }
 }
 

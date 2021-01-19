@@ -112,6 +112,31 @@ impl TestApi {
         Ok(tempfile::tempdir()?)
     }
 
+    pub fn display_migrations(&self, migrations_directory: &TempDir) -> anyhow::Result<()> {
+        for entry in std::fs::read_dir(migrations_directory.path())? {
+            let entry = entry?;
+            if entry.file_type()?.is_dir() {
+                for file in std::fs::read_dir(&entry.path())? {
+                    let entry = file?;
+
+                    if entry.file_type()?.is_dir() {
+                        continue;
+                    }
+
+                    let s = std::fs::read_to_string(entry.path())?;
+                    dbg!(entry.path());
+                    dbg!(s);
+                }
+            } else {
+                let s = std::fs::read_to_string(entry.path())?;
+                dbg!(entry.path());
+                dbg!(s);
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
         ApplyMigrations::new(&self.api, migrations_directory)
     }

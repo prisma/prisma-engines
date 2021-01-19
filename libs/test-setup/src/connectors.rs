@@ -1,6 +1,7 @@
+pub mod mssql;
+
 mod capabilities;
 mod features;
-pub mod mssql;
 mod tags;
 
 pub use capabilities::*;
@@ -12,8 +13,8 @@ use once_cell::sync::Lazy;
 
 fn connector_names() -> Vec<(&'static str, BitFlags<Tags>)> {
     vec![
-        ("mssql_2017", Tags::Mssql2017.into()),
-        ("mssql_2019", Tags::Mssql2019.into()),
+        ("mssql_2017", (Tags::Mssql | Tags::Mssql2017)),
+        ("mssql_2019", (Tags::Mssql | Tags::Mssql2019)),
         ("mysql_8", Tags::Mysql | Tags::Mysql8),
         ("mysql", Tags::Mysql.into()),
         ("mysql_5_6", Tags::Mysql | Tags::Mysql56),

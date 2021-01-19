@@ -1,6 +1,7 @@
 use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_connector_error, flavour::SqlFlavour};
+use enumflags2::BitFlags;
 use indoc::indoc;
-use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory};
+use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
 use quaint::prelude::{ConnectionInfo, SqlFamily};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::path::Path;
@@ -139,5 +140,9 @@ impl SqlFlavour for SqliteFlavour {
         let sql_schema = self.describe_schema(&conn).await?;
 
         Ok(sql_schema)
+    }
+
+    fn features(&self) -> BitFlags<MigrationFeature> {
+        BitFlags::empty()
     }
 }

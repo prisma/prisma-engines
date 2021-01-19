@@ -18,6 +18,8 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType;
 
+    fn default_native_type_for_family(&self, family: sql::ColumnTypeFamily) -> Option<serde_json::Value>;
+
     fn enum_column_type(&self, _field: &ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {
         unreachable!("unreachable enum_column_type")
     }

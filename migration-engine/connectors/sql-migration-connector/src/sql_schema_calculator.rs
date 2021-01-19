@@ -55,7 +55,7 @@ impl<'a> SqlSchemaCalculator<'a> {
 
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
-                            tpe: column_type(&f),
+                            tpe: column_type(&f, self.flavour),
                             default: migration_value_new(&f),
                             auto_increment: has_auto_increment_default || self.flavour.field_is_implicit_autoincrement_primary_key(&f),
                         })
@@ -224,13 +224,13 @@ impl<'a> SqlSchemaCalculator<'a> {
                 let columns = vec![
                     sql::Column {
                         name: m2m.model_a_column().into(),
-                        tpe: column_type(&model_a_id),
+                        tpe: column_type(&model_a_id, self.flavour),
                         default: None,
                         auto_increment: false,
                     },
                     sql::Column {
                         name: m2m.model_b_column().into(),
-                        tpe: column_type(&model_b_id),
+                        tpe: column_type(&model_b_id, self.flavour),
                         default: None,
                         auto_increment: false,
                     },
@@ -280,8 +280,8 @@ fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_descr
     Some(sql_schema_describer::DefaultValue::value(value))
 }
 
-fn column_type(field: &ScalarFieldWalker<'_>) -> sql::ColumnType {
-    column_type_for_scalar_type(&scalar_type_for_field(field), column_arity(field.arity()))
+fn column_type(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavour) -> sql::ColumnType {
+    column_type_for_scalar_type(&scalar_type_for_field(field), column_arity(field.arity()), flavour)
 }
 
 fn scalar_type_for_field(field: &ScalarFieldWalker<'_>) -> ScalarType {
@@ -305,8 +305,12 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
     }
 }
 
-fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnArity) -> sql::ColumnType {
-    match scalar_type {
+fn column_type_for_scalar_type(
+    scalar_type: &ScalarType,
+    column_arity: ColumnArity,
+    flavour: &dyn SqlFlavour,
+) -> sql::ColumnType {
+    let mut column_type = match scalar_type {
         ScalarType::Int => sql::ColumnType::pure(sql::ColumnTypeFamily::Int, column_arity),
         ScalarType::Float => sql::ColumnType::pure(sql::ColumnTypeFamily::Float, column_arity),
         ScalarType::Boolean => sql::ColumnType::pure(sql::ColumnTypeFamily::Boolean, column_arity),
@@ -316,7 +320,11 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
         ScalarType::Bytes => sql::ColumnType::pure(sql::ColumnTypeFamily::Binary, column_arity),
         ScalarType::Decimal => sql::ColumnType::pure(sql::ColumnTypeFamily::Decimal, column_arity),
         ScalarType::BigInt => sql::ColumnType::pure(sql::ColumnTypeFamily::BigInt, column_arity),
-    }
+    };
+
+    column_type.native_type = flavour.default_native_type_for_family(column_type.family.clone());
+
+    column_type
 }
 
 fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[String]) {

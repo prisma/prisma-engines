@@ -108,7 +108,5 @@ pub(crate) trait SqlFlavour:
     }
 
     /// Feature flags for the flavor
-    fn features(&self) -> BitFlags<MigrationFeature> {
-        BitFlags::empty()
-    }
+    fn features(&self) -> BitFlags<MigrationFeature>;
 }

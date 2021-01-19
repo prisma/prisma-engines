@@ -1263,3 +1263,139 @@ async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> 
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"), features("native_types"))]
+async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi) -> TestResult {
+    let dm = api.native_types_datamodel(
+        r#"
+        model Post {
+            id        Int     @id @default(autoincrement())
+            title     String
+            content   String?
+            published Boolean @default(false)
+            author    User?   @relation(fields: [authorId], references: [id])
+            authorId  Int?
+        }
+
+        model User {
+            id    Int     @id @default(autoincrement())
+            email String  @unique
+            name  String?
+            posts Post[]
+        }
+    "#,
+    );
+
+    let dm2 = api.native_types_datamodel(
+        r#"
+        model Post {
+            id        Int     @id @default(autoincrement()) @test_db.Integer
+            title     String  @test_db.Text
+            content   String? @test_db.Text
+            published Boolean @default(false) @test_db.Boolean
+            author    User?   @relation(fields: [authorId], references: [id])
+            authorId  Int?    @test_db.Integer
+        }
+
+        model User {
+            id    Int     @id @default(autoincrement()) @test_db.Integer
+            email String  @unique @test_db.Text
+            name  String? @test_db.Text
+            posts Post[]
+        }
+
+    "#,
+    );
+
+    api.schema_push(&dm)
+        .migration_id(Some("first"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_has_executed_steps()?;
+    api.schema_push(&dm)
+        .migration_id(Some("second"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
+    api.schema_push(&dm2)
+        .migration_id(Some("third"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
+
+    Ok(())
+}
+
+#[test_each_connector(log = "debug", tags("postgres"), features("native_types"))]
+async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: &TestApi) -> TestResult {
+    let dm = api.native_types_datamodel(
+        r#"
+        model Post {
+            id        Int     @id @default(autoincrement())
+            title     String
+            content   String?
+            published Boolean @default(false)
+            author    User?   @relation(fields: [authorId], references: [id])
+            authorId  Int?
+        }
+
+        model User {
+            id    Int     @id @default(autoincrement())
+            email String  @unique
+            name  String?
+            posts Post[]
+        }
+    "#,
+    );
+
+    let dm2 = api.native_types_datamodel(
+        r#"
+        model Post {
+            id        Int     @id @default(autoincrement()) @test_db.Integer
+            title     String  @test_db.VarChar(100)
+            content   String? @test_db.VarChar(100)
+            published Boolean @default(false) @test_db.Boolean
+            author    User?   @relation(fields: [authorId], references: [id])
+            authorId  Int?    @test_db.Integer
+        }
+
+        model User {
+            id    Int     @id @default(autoincrement()) @test_db.Integer
+            email String  @unique @test_db.VarChar(100)
+            name  String? @test_db.VarChar(100)
+            posts Post[]
+        }
+
+    "#,
+    );
+
+    api.schema_push(&dm)
+        .migration_id(Some("first"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_has_executed_steps()?;
+    api.schema_push(&dm)
+        .migration_id(Some("second"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
+    api.schema_push(&dm2)
+        .migration_id(Some("third"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_has_executed_steps()?;
+    api.schema_push(&dm2)
+        .migration_id(Some("third"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
+
+    Ok(())
+}
