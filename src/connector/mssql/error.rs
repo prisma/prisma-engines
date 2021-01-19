@@ -5,7 +5,7 @@ impl From<tiberius::error::Error> for Error {
         match e {
             tiberius::error::Error::Tls(message) => {
                 let message = format!(
-                    "The TLS settings didn't allow the connection to be established. Please review your connection string. Note that TLS encryption is currently not supported on macOS devices. You can subscribe to the following issue: https://github.com/prisma/prisma-engines/issues/1140 (error: `{}`)",
+                    "The TLS settings didn't allow the connection to be established. Please review your connection string. (error: {})",
                     message
                 );
 
