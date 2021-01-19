@@ -2,29 +2,27 @@
 
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
+pub mod features;
+
 mod database_migration_inferrer;
 mod database_migration_step_applier;
 mod destructive_change_checker;
 mod error;
-pub mod features;
 mod migration_persistence;
-
-#[allow(missing_docs)]
-pub mod steps;
-
 mod migrations_directory;
 
-pub use database_migration_inferrer::*;
-pub use database_migration_step_applier::*;
-pub use destructive_change_checker::*;
-pub use error::*;
+pub use database_migration_inferrer::DatabaseMigrationInferrer;
+pub use database_migration_step_applier::{DatabaseMigrationStepApplier, PrettyDatabaseMigrationStep};
+pub use destructive_change_checker::{
+    DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
+};
+pub use error::ConnectorError;
 pub use features::MigrationFeature;
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 pub use migrations_directory::{
     create_migration_directory, error_on_changed_provider, list_migrations, match_provider_in_lock_file,
     write_migration_lock_file, ListMigrationsError, MigrationDirectory,
 };
-pub use steps::MigrationStep;
 
 use sha2::{Digest, Sha256};
 use std::fmt::Debug;

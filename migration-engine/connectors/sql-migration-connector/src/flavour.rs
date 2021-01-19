@@ -7,7 +7,6 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use enumflags2::BitFlags;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
@@ -19,6 +18,7 @@ use crate::{
     sql_schema_differ::SqlSchemaDifferFlavour,
 };
 use datamodel::Datamodel;
+use enumflags2::BitFlags;
 use migration_connector::{ConnectorResult, MigrationDirectory, MigrationFeature};
 use quaint::{
     connector::ConnectionInfo,
