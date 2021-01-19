@@ -1,4 +1,4 @@
-use crate::*;
+use crate::{destructive_change_checker::DestructiveChangeDiagnostics, ConnectorResult};
 
 /// Apply a single migration step to the connector's database. At this level, we are working with database migrations,
 /// i.e. the [associated type on MigrationConnector](trait.MigrationConnector.html#associatedtype.DatabaseMigration).

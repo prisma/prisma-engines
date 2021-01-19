@@ -22,7 +22,7 @@ impl MigrationCommand for SchemaPushCommand {
         let database_migration = if input.assume_empty {
             inferrer.infer_from_empty(&schema)?
         } else {
-            inferrer.infer(&schema, &schema, &[]).await?
+            inferrer.infer(&schema).await?
         };
 
         if let Some(err) = connector.check_database_version_compatibility(&schema) {
