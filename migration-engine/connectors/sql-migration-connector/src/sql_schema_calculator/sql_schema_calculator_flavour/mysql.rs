@@ -5,6 +5,7 @@ use datamodel::{
     Datamodel, NativeTypeInstance, ScalarType,
 };
 use native_types::MySqlType;
+use sql::ColumnTypeFamily;
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
@@ -54,46 +55,49 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             }
         }
 
-        let data_type: String = match mysql_type {
-            MySqlType::Int => "INTEGER".into(),
-            MySqlType::SmallInt => "SMALLINT".into(),
-            MySqlType::TinyInt => "TINYINT".into(),
-            MySqlType::MediumInt => "MEDIUMINT".into(),
-            MySqlType::BigInt => "BIGINT".into(),
-            MySqlType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)),
-            MySqlType::Float => "FLOAT".into(),
-            MySqlType::Double => "DOUBLE".into(),
-            MySqlType::Bit(size) => format!("BIT({size})", size = size),
-            MySqlType::Char(size) => format!("CHAR({size})", size = size),
-            MySqlType::VarChar(size) => format!("VARCHAR({size})", size = size),
-            MySqlType::Binary(size) => format!("BINARY({size})", size = size),
-            MySqlType::VarBinary(size) => format!("VARBINARY({size})", size = size),
-            MySqlType::TinyBlob => "TINYBLOB".into(),
-            MySqlType::Blob => "BLOB".into(),
-            MySqlType::MediumBlob => "MEDIUMBLOB".into(),
-            MySqlType::LongBlob => "LONGBLOB".into(),
-            MySqlType::TinyText => "TINYTEXT".into(),
-            MySqlType::Text => "TEXT".into(),
-            MySqlType::MediumText => "MEDIUMTEXT".into(),
-            MySqlType::LongText => "LONGTEXT".into(),
-            MySqlType::Date => "DATE".into(),
-            MySqlType::Time(precision) => format!("TIME{}", render(precision)),
-            MySqlType::DateTime(precision) => format!("DATETIME{}", render(precision)),
-            MySqlType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)),
-            MySqlType::Year => "YEAR".into(),
-            MySqlType::Json => "JSON".into(),
-            MySqlType::UnsignedInt => "INTEGER UNSIGNED".into(),
-            MySqlType::UnsignedSmallInt => "SMALLINT UNSIGNED".into(),
-            MySqlType::UnsignedTinyInt => "TINYINT UNSIGNED".into(),
-            MySqlType::UnsignedMediumInt => "MEDIUMINT UNSIGNED".into(),
-            MySqlType::UnsignedBigInt => "BIGINT UNSIGNED".into(),
+        let (family, data_type) = match mysql_type {
+            MySqlType::Int => (ColumnTypeFamily::Int, "INTEGER".into()),
+            MySqlType::SmallInt => (ColumnTypeFamily::Int, "SMALLINT".into()),
+            MySqlType::TinyInt => (ColumnTypeFamily::Int, "TINYINT".into()),
+            MySqlType::MediumInt => (ColumnTypeFamily::Int, "MEDIUMINT".into()),
+            MySqlType::BigInt => (ColumnTypeFamily::BigInt, "BIGINT".into()),
+            MySqlType::Decimal(precision) => (
+                ColumnTypeFamily::Decimal,
+                format!("DECIMAL{}", render_decimal(precision)),
+            ),
+            MySqlType::Float => (ColumnTypeFamily::Float, "FLOAT".into()),
+            MySqlType::Double => (ColumnTypeFamily::Float, "DOUBLE".into()),
+            MySqlType::Bit(size) => (ColumnTypeFamily::Binary, format!("BIT({size})", size = size)),
+            MySqlType::Char(size) => (ColumnTypeFamily::String, format!("CHAR({size})", size = size)),
+            MySqlType::VarChar(size) => (ColumnTypeFamily::String, format!("VARCHAR({size})", size = size)),
+            MySqlType::Binary(size) => (ColumnTypeFamily::Binary, format!("BINARY({size})", size = size)),
+            MySqlType::VarBinary(size) => (ColumnTypeFamily::Binary, format!("VARBINARY({size})", size = size)),
+            MySqlType::TinyBlob => (ColumnTypeFamily::Binary, "TINYBLOB".into()),
+            MySqlType::Blob => (ColumnTypeFamily::Binary, "BLOB".into()),
+            MySqlType::MediumBlob => (ColumnTypeFamily::Binary, "MEDIUMBLOB".into()),
+            MySqlType::LongBlob => (ColumnTypeFamily::Binary, "LONGBLOB".into()),
+            MySqlType::TinyText => (ColumnTypeFamily::String, "TINYTEXT".into()),
+            MySqlType::Text => (ColumnTypeFamily::String, "TEXT".into()),
+            MySqlType::MediumText => (ColumnTypeFamily::String, "MEDIUMTEXT".into()),
+            MySqlType::LongText => (ColumnTypeFamily::String, "LONGTEXT".into()),
+            MySqlType::Date => (ColumnTypeFamily::DateTime, "DATE".into()),
+            MySqlType::Time(precision) => (ColumnTypeFamily::DateTime, format!("TIME{}", render(precision))),
+            MySqlType::DateTime(precision) => (ColumnTypeFamily::DateTime, format!("DATETIME{}", render(precision))),
+            MySqlType::Timestamp(precision) => (ColumnTypeFamily::DateTime, format!("TIMESTAMP{}", render(precision))),
+            MySqlType::Year => (ColumnTypeFamily::Int, "YEAR".into()),
+            MySqlType::Json => (ColumnTypeFamily::Json, "JSON".into()),
+            MySqlType::UnsignedInt => (ColumnTypeFamily::Int, "INTEGER UNSIGNED".into()),
+            MySqlType::UnsignedSmallInt => (ColumnTypeFamily::Int, "SMALLINT UNSIGNED".into()),
+            MySqlType::UnsignedTinyInt => (ColumnTypeFamily::Int, "TINYINT UNSIGNED".into()),
+            MySqlType::UnsignedMediumInt => (ColumnTypeFamily::Int, "MEDIUMINT UNSIGNED".into()),
+            MySqlType::UnsignedBigInt => (ColumnTypeFamily::BigInt, "BIGINT UNSIGNED".into()),
         };
 
         sql::ColumnType {
             data_type: data_type.clone(),
             full_data_type: data_type,
             character_maximum_length: None,
-            family: sql::ColumnTypeFamily::String,
+            family,
             arity: match field.arity() {
                 datamodel::FieldArity::Required => sql::ColumnArity::Required,
                 datamodel::FieldArity::Optional => sql::ColumnArity::Nullable,
@@ -110,5 +114,24 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().db_name(), field.db_name())),
             arity,
         )
+    }
+
+    fn default_native_type_for_family(&self, family: sql::ColumnTypeFamily) -> Option<serde_json::Value> {
+        let ty = match family {
+            ColumnTypeFamily::Int => MySqlType::Int,
+            ColumnTypeFamily::BigInt => MySqlType::BigInt,
+            ColumnTypeFamily::Float => MySqlType::Decimal(Some((65, 30))),
+            ColumnTypeFamily::Decimal => MySqlType::Decimal(Some((65, 30))),
+            ColumnTypeFamily::Boolean => MySqlType::TinyInt,
+            ColumnTypeFamily::String => MySqlType::VarChar(191),
+            ColumnTypeFamily::DateTime => MySqlType::DateTime(Some(3)),
+            ColumnTypeFamily::Binary => MySqlType::VarBinary(191),
+            ColumnTypeFamily::Json => MySqlType::Json,
+            ColumnTypeFamily::Uuid => MySqlType::VarChar(37),
+            ColumnTypeFamily::Enum(_) => return None,
+            ColumnTypeFamily::Unsupported(_) => return None,
+        };
+
+        Some(serde_json::to_value(ty).expect("MySqlType to JSON failed"))
     }
 }

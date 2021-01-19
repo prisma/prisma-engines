@@ -66,6 +66,8 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
             .await?;
 
         if migration.is_empty() && !input.draft {
+            tracing::info!("Database is up-to-date, returning without creating new migration.");
+
             return Ok(CreateMigrationOutput {
                 generated_migration_name: None,
             });
