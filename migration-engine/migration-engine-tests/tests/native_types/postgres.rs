@@ -816,7 +816,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
             next_assertions.push((column_name, to).clone());
         }
 
-        let dm1 = api.native_types_datamodel(format!(
+        let dm1 = api.native_types_datamodel(&format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @test_db.Integer
@@ -843,7 +843,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
             )
         })?;
 
-        let dm2 = api.native_types_datamodel(format!(
+        let dm2 = api.native_types_datamodel(&format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @test_db.Integer
@@ -917,7 +917,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             next_assertions.push((column_name.clone(), to.clone()));
         }
 
-        let dm1 = api.native_types_datamodel(format!(
+        let dm1 = api.native_types_datamodel(&format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @test_db.Integer
@@ -945,7 +945,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
             )
         })?;
 
-        let dm2 = api.native_types_datamodel(format!(
+        let dm2 = api.native_types_datamodel(&format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @test_db.Integer
@@ -1027,7 +1027,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
             previous_assertions.push((column_name, from).clone());
         }
 
-        let dm1 = api.native_types_datamodel(format!(
+        let dm1 = api.native_types_datamodel(&format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @test_db.Integer
@@ -1054,7 +1054,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
             )
         })?;
 
-        let dm2 = api.native_types_datamodel(format!(
+        let dm2 = api.native_types_datamodel(&format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @test_db.Integer
@@ -1207,7 +1207,7 @@ async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> 
             next_assertions.push((column_name, to).clone());
         }
 
-        let dm1 = api.native_types_datamodel(format!(
+        let dm1 = api.native_types_datamodel(&format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @test_db.Integer
@@ -1234,7 +1234,7 @@ async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> 
             )
         })?;
 
-        let dm2 = api.native_types_datamodel(format!(
+        let dm2 = api.native_types_datamodel(&format!(
             r#"
                 model A {{
                     id Int @id @default(autoincrement()) @test_db.Integer
