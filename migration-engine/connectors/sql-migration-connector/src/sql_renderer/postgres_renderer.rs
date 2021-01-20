@@ -230,23 +230,20 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
-        let tpe_str = render_column_type(column.column_type());
+        let tpe_str = render_column_type(column);
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
             .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
-            .map(|default| format!(" DEFAULT {}", self.render_default(default, column.column_type_family())))
+            .map(|default| self.render_default(default, column.column_type_family()))
+            .filter(|default| !default.is_empty())
+            .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);
-        let is_serial = column.is_autoincrement();
 
-        if is_serial {
-            format!("{} SERIAL", column_name)
-        } else {
-            format!(
-                "{}{} {}{}{}",
-                SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
-            )
-        }
+        format!(
+            "{}{} {}{}{}",
+            SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
+        )
     }
 
     fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
@@ -362,7 +359,10 @@ impl SqlRenderer for PostgresFlavour {
     }
 }
 
-pub(crate) fn render_column_type(t: &ColumnType) -> String {
+pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> String {
+    let t = col.column_type();
+    let is_autoincrement = col.is_autoincrement();
+
     let array = match t.arity {
         ColumnArity::List => "[]",
         _ => "",
@@ -377,7 +377,9 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::DateTime => format!("TIMESTAMP(3){}", array),
         ColumnTypeFamily::Float => format!("DECIMAL(65,30){}", array),
         ColumnTypeFamily::Decimal => format!("DECIMAL(65,30){}", array),
+        ColumnTypeFamily::Int if is_autoincrement => format!("SERIAL{}", array),
         ColumnTypeFamily::Int => format!("INTEGER{}", array),
+        ColumnTypeFamily::BigInt if is_autoincrement => format!("BIGSERIAL{}", array),
         ColumnTypeFamily::BigInt => format!("BIGINT{}", array),
         ColumnTypeFamily::String => format!("TEXT{}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
@@ -429,10 +431,10 @@ fn render_alter_column(
             )),
             PostgresAlterColumn::DropNotNull => clauses.push(format!("{} DROP NOT NULL", &alter_column_prefix)),
             PostgresAlterColumn::SetNotNull => clauses.push(format!("{} SET NOT NULL", &alter_column_prefix)),
-            PostgresAlterColumn::SetType(ty) => clauses.push(format!(
+            PostgresAlterColumn::SetType => clauses.push(format!(
                 "{} SET DATA TYPE {}",
                 &alter_column_prefix,
-                render_column_type(&ty)
+                render_column_type(columns.next())
             )),
             PostgresAlterColumn::AddSequence => {
                 // We imitate the sequence that would be automatically created on a `SERIAL` column.
@@ -511,7 +513,7 @@ fn expand_alter_column(columns: &Pair<ColumnWalker<'_>>, column_changes: &Column
 
     // This is a flag so we don't push multiple SetTypes from arity and type changes.
     if set_type {
-        changes.push(PostgresAlterColumn::SetType(columns.next().column_type().clone()));
+        changes.push(PostgresAlterColumn::SetType);
     }
 
     changes
@@ -523,7 +525,7 @@ enum PostgresAlterColumn {
     SetDefault(sql_schema_describer::DefaultValue),
     DropDefault,
     DropNotNull,
-    SetType(ColumnType),
+    SetType,
     SetNotNull,
     /// Add an auto-incrementing sequence as a default on the column.
     AddSequence,
