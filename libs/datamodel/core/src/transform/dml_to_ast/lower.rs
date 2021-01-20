@@ -113,14 +113,14 @@ impl<'a> LowerDmlToAst<'a> {
         }
     }
 
-    /// Internal: Lowers a field's arity.
+    /// Internal: Lowers a field's type.
     fn lower_type(&self, field_type: &dml::FieldType) -> ast::Identifier {
         match field_type {
             dml::FieldType::Base(tpe, custom_type_name) => {
                 ast::Identifier::new(&custom_type_name.as_ref().unwrap_or(&tpe.to_string()))
             }
             dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
-            dml::FieldType::Unsupported(tpe) => ast::Identifier::new(&tpe.to_string()),
+            dml::FieldType::Unsupported(tpe) => ast::Identifier::new(&format!("Unsupported(\"{}\")", tpe)),
             dml::FieldType::Relation(rel) => ast::Identifier::new(&rel.to),
             dml::FieldType::NativeType(prisma_tpe, _native_tpe) => ast::Identifier::new(&prisma_tpe.to_string()),
         }

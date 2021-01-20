@@ -82,7 +82,7 @@ pub fn warning_fields_with_empty_names(affected: &[ModelAndField]) -> Warning {
 pub fn warning_unsupported_types(affected: &[ModelAndFieldAndType]) -> Warning {
     Warning {
         code: 3,
-        message: "These fields were commented out because Prisma currently does not support their types.".into(),
+        message: "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.".into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }

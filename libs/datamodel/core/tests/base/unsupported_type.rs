@@ -3,13 +3,7 @@ use dml::field::FieldArity;
 
 #[test]
 fn parse_unsupported_types() {
-    let dml = r#"
-    datasource db {
-            provider        = "postgres"
-            url             = "postgresql://"
-    }
-    
-    model User {
+    let dml = r#"model User {
         id           Int    @id
         point        Unsupported("point")
         ip           Unsupported("ip4r")?
@@ -17,7 +11,18 @@ fn parse_unsupported_types() {
     }
     "#;
 
-    let schema = parse(dml);
+    let dml_with_generator = format!(
+        r#"
+    datasource db {{
+            provider        = "postgres"
+            url             = "postgresql://"
+    }}
+    
+    {}"#,
+        dml
+    );
+
+    let schema = parse(&dml_with_generator);
     let user_model = schema.assert_has_model("User");
     user_model
         .assert_has_scalar_field("point")
@@ -31,4 +36,8 @@ fn parse_unsupported_types() {
         .assert_has_scalar_field("with_space")
         .assert_unsupported_type("something weird with spaces")
         .assert_arity(&FieldArity::List);
+
+    let rendered_dml = datamodel::render_datamodel_to_string(&schema);
+
+    assert_eq!(rendered_dml.replace(' ', ""), dml.replace(' ', ""));
 }

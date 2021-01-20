@@ -407,13 +407,11 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
             attrs.append(&mut custom_type.attributes.clone());
             Ok((field_type, attrs))
         } else if UNSUPPORTED_REGEX.is_match(type_name) {
-            println!("{}", type_name);
             let captures = UNSUPPORTED_REGEX.captures(type_name).unwrap();
             let type_definition = captures.get(1).expect("get type definition").as_str();
 
             Ok((dml::FieldType::Unsupported(type_definition.into()), vec![]))
         } else {
-            // todo match on custom type here
             Err(DatamodelError::new_type_not_found_error(
                 type_name,
                 ast_field.field_type.span,

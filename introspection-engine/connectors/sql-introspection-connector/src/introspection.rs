@@ -40,14 +40,16 @@ pub fn introspect(
         foreign_keys_copy.clear_duplicates();
         let model_copy = model.clone();
 
-        for foreign_key in foreign_keys_copy.iter().filter(|fk| {
-            !fk.columns.iter().any(|c| {
-                matches!(
-                    model_copy.find_scalar_field(c).unwrap().field_type,
-                    FieldType::Unsupported(_)
-                )
-            })
-        }) {
+        for foreign_key in &foreign_keys_copy
+        //     .iter().filter(|fk| {
+        //     !fk.columns.iter().any(|c| {
+        //         matches!(
+        //             model_copy.find_scalar_field(c).unwrap().field_type,
+        //             FieldType::Unsupported(_)
+        //         )
+        //     })
+        // })
+        {
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
             let relation_field = calculate_relation_field(schema, table, foreign_key)?;

@@ -57,7 +57,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
 
         for field in model.scalar_fields_mut() {
             if let FieldType::Unsupported(tpe) = &field.field_type {
-                field.is_commented_out = true;
+                // field.is_commented_out = true;
                 unsupported_types.push(ModelAndFieldAndType {
                     model: model_name.clone(),
                     field: field.name.clone(),
@@ -68,19 +68,20 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
     }
 
     // use unsupported types to drop @@id / @@unique /@@index
-    for mf in &unsupported_types {
-        let model = datamodel.find_model_mut(&mf.model);
-        model.indices.retain(|i| !i.fields.contains(&mf.field));
-        if model.id_fields.contains(&mf.field) {
-            model.id_fields = vec![]
-        };
-    }
+    // for mf in &unsupported_types {
+    //     let model = datamodel.find_model_mut(&mf.model);
+    //     model.indices.retain(|i| !i.fields.contains(&mf.field));
+    //     if model.id_fields.contains(&mf.field) {
+    //         model.id_fields = vec![]
+    //     };
+    // }
 
     //on postgres this is allowed, on the other dbs, this could be a symptom of missing privileges
     for model in datamodel.models_mut() {
         if model.fields.is_empty() {
             model.is_commented_out = true;
 
+            //todo, this seems wrong
             let comment = match family {
                 SqlFamily::Postgres =>
                     "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.".to_string(),
@@ -89,7 +90,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
 
             };
             //postgres could be valid, or privileges, commenting out because we cannot handle it.
-            //others, this is invalid,, commenting out because we cannot handle it.
+            //others, this is invalid, commenting out because we cannot handle it.
             model.documentation = Some(comment);
             models_without_columns.push(Model {
                 model: model.name.clone(),
