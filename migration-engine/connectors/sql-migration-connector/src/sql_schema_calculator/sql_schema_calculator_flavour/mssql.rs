@@ -115,8 +115,8 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         let ty = match family {
             ColumnTypeFamily::Int => MsSqlType::Int,
             ColumnTypeFamily::BigInt => MsSqlType::BigInt,
-            ColumnTypeFamily::Float => MsSqlType::Decimal(Some((65, 30))),
-            ColumnTypeFamily::Decimal => MsSqlType::Decimal(Some((65, 30))),
+            ColumnTypeFamily::Float => MsSqlType::Decimal(Some((32, 16))),
+            ColumnTypeFamily::Decimal => MsSqlType::Decimal(Some((32, 16))),
             ColumnTypeFamily::Boolean => MsSqlType::Bit,
             ColumnTypeFamily::String => MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
             ColumnTypeFamily::DateTime => MsSqlType::DateTime2,

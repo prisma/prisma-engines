@@ -18,8 +18,61 @@ use prisma_value::PrismaValue;
 use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
 
-#[test_each_connector]
+#[test_each_connector(features("native_types"), log = "debug")]
 async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
+    let dm = api.native_types_datamodel(
+        r#"
+        model Test {
+            id          String @id @default(cuid())
+            int         Int
+            float       Float
+            boolean     Boolean
+            string      String
+            dateTime    DateTime
+            decimal     Decimal
+            bytes       Bytes
+        }
+    "#,
+    );
+
+    api.schema_push(&dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table
+            .assert_columns_count(8)?
+            .assert_column("int", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("float", |c| {
+                //The native types work made the inferrence more correct on the describer level.
+                // But unless the feature is activated, this will be mapped to float like before in the datamodel level
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
+            })?
+            .assert_column("boolean", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Boolean)
+            })?
+            .assert_column("string", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
+            })?
+            .assert_column("dateTime", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
+            })?
+            .assert_column("decimal", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
+            })?
+            .assert_column("bytes", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Binary)
+            })
+    })?;
+
+    // Check that the migration is idempotent.
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn adding_a_scalar_field_must_work_with_native_types_off(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -54,6 +107,9 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
             })
     })?;
+
+    // Check that the migration is idempotent.
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }

@@ -536,7 +536,7 @@ async fn drift_can_be_detected_without_migrations_table(api: &TestApi) -> TestRe
 }
 
 #[test_each_connector(tags("mysql_8"))]
-async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) -> TestResult {
+async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
     let dm1 = r#"
@@ -589,7 +589,7 @@ async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) ->
 }
 
 #[test_each_connector(tags("postgres_12"), log = "debug")]
-async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi) -> TestResult {
+async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
     let dm1 = r#"
@@ -639,8 +639,8 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2019"))]
-async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) -> TestResult {
+#[test_each_connector(tags("mssql"))]
+async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
     let dm1 = r#"

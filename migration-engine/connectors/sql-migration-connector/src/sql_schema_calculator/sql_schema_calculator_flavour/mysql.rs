@@ -125,7 +125,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             ColumnTypeFamily::Boolean => MySqlType::TinyInt,
             ColumnTypeFamily::String => MySqlType::VarChar(191),
             ColumnTypeFamily::DateTime => MySqlType::DateTime(Some(3)),
-            ColumnTypeFamily::Binary => MySqlType::VarBinary(191),
+            ColumnTypeFamily::Binary => MySqlType::LongBlob,
             ColumnTypeFamily::Json => MySqlType::Json,
             ColumnTypeFamily::Uuid => MySqlType::VarChar(37),
             ColumnTypeFamily::Enum(_) => return None,
