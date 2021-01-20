@@ -220,7 +220,7 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Float => "REAL",
         ColumnTypeFamily::Decimal => "REAL",
         ColumnTypeFamily::Int => "INTEGER",
-        ColumnTypeFamily::BigInt => "INTEGER",
+        ColumnTypeFamily::BigInt => "BIGINT",
         ColumnTypeFamily::String => "TEXT",
         ColumnTypeFamily::Binary => "BLOB",
         ColumnTypeFamily::Json => unreachable!("ColumnTypeFamily::Json on SQLite"),
