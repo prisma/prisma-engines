@@ -674,7 +674,7 @@ async fn postgres_cross_schema_references_are_not_allowed() {
     let err = inspector.describe(SCHEMA).await.unwrap_err();
 
     assert_eq!(
-        format!("Illegal cross schema reference from `DatabaseInspector-Test.User` to `DatabaseInspector-Test_2.City` in constraint `User_city_fkey`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175"),
+        "Illegal cross schema reference from `DatabaseInspector-Test.User` to `DatabaseInspector-Test_2.City` in constraint `User_city_fkey`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175".to_string(),
         format!("{}", err),
     );
 }

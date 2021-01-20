@@ -176,10 +176,10 @@ fn find_output_type<'a>(dmmf: &'a DataModelMetaFormat, namespace: &str, type_nam
     dmmf.schema
         .output_object_types
         .get(namespace)
-        .expect(&format!("unknown dmmf namespace {}", namespace))
-        .into_iter()
+        .unwrap_or_else(|| panic!("unknown dmmf namespace {}", namespace))
+        .iter()
         .find(|o| o.name == type_name)
-        .expect(&format!("could not find output type named {}", type_name))
+        .unwrap_or_else(|| panic!("could not find output type named {}", type_name))
 }
 
 fn iterate_output_type_fields<P>(output_type: &DmmfOutputType, dmmf: &DataModelMetaFormat, iteratee: &P)

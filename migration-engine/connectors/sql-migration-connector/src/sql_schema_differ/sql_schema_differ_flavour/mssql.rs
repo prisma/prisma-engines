@@ -301,7 +301,7 @@ fn native_type_change_riskyness(previous: MsSqlType, next: MsSqlType) -> Option<
                     (Some(len), Some((p, 0))) if p + 1 > len => RiskyCast,
                     // We must fit p digits, a possible sign and a comma to
                     // our string, otherwise might truncate.
-                    (Some(len), Some((p, n))) if n > 0 && p + 2 > len.into() => RiskyCast,
+                    (Some(len), Some((p, n))) if n > 0 && p + 2 > len => RiskyCast,
                     // Defaults to `number(18, 0)`, so we must fit 18 digits
                     // and a possible sign without truncating.
                     (Some(len), None) if len < 19 => RiskyCast,
