@@ -72,7 +72,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             .map(|column| column.column_type_family_as_enum())
             .as_tuple()
         {
-            if previous_enum == next_enum {
+            if previous_enum.name == next_enum.name {
                 return None;
             }
         }
