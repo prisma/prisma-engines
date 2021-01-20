@@ -49,6 +49,9 @@ pub fn parse_field_type(token: &Token) -> Result<(FieldArity, String), Datamodel
     match current.as_rule() {
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current))),
         Rule::base_type => Ok((FieldArity::Required, parse_base_type(&current))),
+        Rule::list_unsupported_type => Ok((FieldArity::List, current.as_str().into())),
+        Rule::optional_unsupported_type => Ok((FieldArity::Optional, current.as_str().into())),
+        Rule::unsupported_type => Ok((FieldArity::Required, current.as_str().into())),
         Rule::list_type => Ok((FieldArity::List, parse_base_type(&current))),
         Rule::legacy_required_type => Err(DatamodelError::new_legacy_parser_error(
             "Fields are required by default, `!` is no longer required.",

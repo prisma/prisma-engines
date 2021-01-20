@@ -8,6 +8,8 @@ use crate::transform::helpers::ValueValidator;
 use crate::{ast, configuration, dml, Field, FieldType};
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
 use itertools::Itertools;
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 /// Helper for lifting a datamodel.
 ///
@@ -375,6 +377,9 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
     ) -> Result<(dml::FieldType, Vec<ast::Attribute>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
+        static UNSUPPORTED_REGEX: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r#"Unsupported\("(.*)"\)(\?|\[\])?$"#).unwrap());
+
         if checked_types.iter().any(|x| x == type_name) {
             // Recursive type.
             return Err(DatamodelError::new_validation_error(
@@ -401,7 +406,14 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
 
             attrs.append(&mut custom_type.attributes.clone());
             Ok((field_type, attrs))
+        } else if UNSUPPORTED_REGEX.is_match(type_name) {
+            println!("{}", type_name);
+            let captures = UNSUPPORTED_REGEX.captures(type_name).unwrap();
+            let type_definition = captures.get(1).expect("get type definition").as_str();
+
+            Ok((dml::FieldType::Unsupported(type_definition.into()), vec![]))
         } else {
+            // todo match on custom type here
             Err(DatamodelError::new_type_not_found_error(
                 type_name,
                 ast_field.field_type.span,
