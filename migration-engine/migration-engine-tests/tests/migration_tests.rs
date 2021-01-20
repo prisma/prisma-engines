@@ -58,7 +58,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("enums"))]
+#[test_each_connector(features("native_types"), capabilities("enums"))]
 async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -87,6 +87,45 @@ async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
                 _ => c.assert_is_required()?.assert_type_is_string(),
             })
     })?;
+
+    // Check that the migration is idempotent.
+    api.schema_push(dm).send().await?.assert_no_steps()?;
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("enums"))]
+async fn adding_an_enum_field_must_work_with_native_types_off(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            enum MyEnum
+        }
+
+        enum MyEnum {
+            A
+            B
+        }
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table
+            .assert_columns_count(2)?
+            .assert_column("enum", |c| match api.sql_family() {
+                SqlFamily::Postgres => c
+                    .assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned())),
+                SqlFamily::Mysql => c
+                    .assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Enum("Test_enum".to_owned())),
+                _ => c.assert_is_required()?.assert_type_is_string(),
+            })
+    })?;
+
+    // Check that the migration is idempotent.
+    api.schema_push(dm).send().await?.assert_no_steps()?;
 
     Ok(())
 }
