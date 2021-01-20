@@ -6,7 +6,7 @@ use crate::introspection_helpers::{
 use crate::version_checker::VersionChecker;
 use crate::Dedup;
 use crate::SqlError;
-use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, FieldType, Model, RelationField};
+use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, RelationField};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
@@ -38,7 +38,7 @@ pub fn introspect(
 
         let mut foreign_keys_copy = table.foreign_keys.clone();
         foreign_keys_copy.clear_duplicates();
-        let model_copy = model.clone();
+        // let model_copy = model.clone();
 
         for foreign_key in &foreign_keys_copy
         //     .iter().filter(|fk| {
