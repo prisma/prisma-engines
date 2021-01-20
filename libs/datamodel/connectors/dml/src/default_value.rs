@@ -23,6 +23,11 @@ impl DefaultValue {
         }
     }
 
+    /// Does this match @default(autoincrement())?
+    pub fn is_autoincrement(&self) -> bool {
+        matches!(self, DefaultValue::Expression(generator) if generator.name == "autoincrement")
+    }
+
     pub fn new_db_generated() -> Self {
         DefaultValue::Expression(ValueGenerator::new_dbgenerated())
     }
@@ -155,5 +160,17 @@ impl fmt::Debug for DefaultValue {
             Self::Single(ref v) => write!(f, "DefaultValue::Single({:?})", v),
             Self::Expression(g) => write!(f, "DefaultValue::Expression({})", g.name()),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{DefaultValue, ValueGenerator};
+
+    #[test]
+    fn default_value_is_autoincrement() {
+        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_autoincrement());
+
+        assert!(auto_increment_default.is_autoincrement());
     }
 }

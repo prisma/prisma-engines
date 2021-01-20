@@ -42,6 +42,10 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
         let postgres_type: PostgresType = native_type_instance.deserialize_native_type();
+        let is_autoincrement = field
+            .default_value()
+            .map(|default| default.is_autoincrement())
+            .unwrap_or(false);
 
         fn render(input: Option<u32>) -> String {
             match input {
@@ -57,8 +61,11 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         }
 
         let (family, data_type) = match postgres_type {
+            PostgresType::SmallInt if is_autoincrement => (ColumnTypeFamily::Int, "SMALLSERIAL".to_owned()),
             PostgresType::SmallInt => (ColumnTypeFamily::Int, "SMALLINT".to_owned()),
+            PostgresType::Integer if is_autoincrement => (ColumnTypeFamily::Int, "SERIAL".to_owned()),
             PostgresType::Integer => (ColumnTypeFamily::Int, "INTEGER".to_owned()),
+            PostgresType::BigInt if is_autoincrement => (ColumnTypeFamily::BigInt, "BIGSERIAL".to_owned()),
             PostgresType::BigInt => (ColumnTypeFamily::BigInt, "BIGINT".to_owned()),
             PostgresType::Decimal(precision) => (
                 ColumnTypeFamily::Decimal,
