@@ -67,6 +67,16 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         let from_list_to_scalar = differ.previous.arity().is_list() && !differ.next.arity().is_list();
         let from_scalar_to_list = !differ.previous.arity().is_list() && differ.next.arity().is_list();
 
+        if let (Some(previous_enum), Some(next_enum)) = differ
+            .as_pair()
+            .map(|column| column.column_type_family_as_enum())
+            .as_tuple()
+        {
+            if previous_enum == next_enum {
+                return None;
+            }
+        }
+
         if !native_types_enabled {
             let previous_family = differ.previous.column_type_family();
             let next_family = differ.next.column_type_family();
