@@ -35,26 +35,6 @@ fn int_native_type(api: &TestApi) -> Option<Value> {
     }
 }
 
-fn int_data_type(api: &TestApi) -> String {
-    match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => "integer".to_string(),
-        (SqlFamily::Sqlite, _) => "INTEGER".to_string(),
-        (SqlFamily::Mysql, "mysql8") => "int".to_string(),
-        (SqlFamily::Mysql, _) => "int".to_string(),
-        (SqlFamily::Mssql, _) => "int".to_string(),
-    }
-}
-
-fn varchar_data_type(api: &TestApi, length: u64) -> String {
-    match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => "character varying".to_string(),
-        (SqlFamily::Sqlite, _) => format!("VARCHAR({})", length),
-        (SqlFamily::Mysql, "mysql8") => "varchar".to_string(),
-        (SqlFamily::Mysql, _) => "varchar".to_string(),
-        (SqlFamily::Mssql, _) => "varchar".to_string(),
-    }
-}
-
 fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
     match (api.sql_family(), api.connector_name()) {
         (SqlFamily::Postgres, _) => "varchar".to_string(),
@@ -92,7 +72,6 @@ async fn is_required_must_work(api: &TestApi) {
         Column {
             name: "column1".to_string(),
             tpe: ColumnType {
-                data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
                 character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
@@ -105,10 +84,8 @@ async fn is_required_must_work(api: &TestApi) {
         Column {
             name: "column2".to_string(),
             tpe: ColumnType {
-                data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Nullable,
                 native_type: int_native_type(api),
@@ -148,10 +125,8 @@ async fn foreign_keys_must_work(api: &TestApi) {
     let expected_columns = vec![Column {
         name: "city".to_string(),
         tpe: ColumnType {
-            data_type: int_data_type(api),
             full_data_type: int_full_data_type(api),
             character_maximum_length: None,
-
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
             native_type: int_native_type(api),
@@ -243,10 +218,8 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
         Column {
             name: "city".to_string(),
             tpe: ColumnType {
-                data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -257,7 +230,6 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
         Column {
             name: "city_name".to_string(),
             tpe: ColumnType {
-                data_type: varchar_data_type(api, 255),
                 full_data_type: varchar_full_data_type(api, 255),
                 character_maximum_length: if api.sql_family() == SqlFamily::Sqlite {
                     None
@@ -327,10 +299,8 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
     let expected_columns = vec![Column {
         name: "column-1".to_string(),
         tpe: ColumnType {
-            data_type: int_data_type(api),
             full_data_type: int_full_data_type(api),
             character_maximum_length: None,
-
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
             native_type: int_native_type(api),
@@ -378,10 +348,8 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
         Column {
             name: "id".to_string(),
             tpe: ColumnType {
-                data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -392,7 +360,6 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
         Column {
             name: "name".to_string(),
             tpe: ColumnType {
-                data_type: varchar_data_type(api, 255),
                 full_data_type: varchar_full_data_type(api, 255),
                 character_maximum_length: if api.sql_family() == SqlFamily::Sqlite {
                     None
@@ -450,10 +417,8 @@ async fn indices_must_work(api: &TestApi) {
         Column {
             name: "id".to_string(),
             tpe: ColumnType {
-                data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -465,10 +430,8 @@ async fn indices_must_work(api: &TestApi) {
         Column {
             name: "count".to_string(),
             tpe: ColumnType {
-                data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -533,10 +496,8 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         Column {
             name: "uniq1".to_string(),
             tpe: ColumnType {
-                data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -547,10 +508,8 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         Column {
             name: "uniq2".to_string(),
             tpe: ColumnType {
-                data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -659,10 +618,8 @@ async fn defaults_must_work(api: &TestApi) {
     assert_eq!(false, id.auto_increment);
 
     let expected_type = ColumnType {
-        data_type: int_data_type(api),
         full_data_type: int_full_data_type(api),
         character_maximum_length: None,
-
         family: ColumnTypeFamily::Int,
         arity: ColumnArity::Nullable,
         native_type: int_native_type(api),

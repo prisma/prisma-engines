@@ -638,7 +638,6 @@ impl SqlSchemaDescriber {
         };
 
         let tpe = ColumnType {
-            data_type: data_type.to_owned(),
             full_data_type: full_data_type.to_owned(),
             character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
             family: family.clone(),

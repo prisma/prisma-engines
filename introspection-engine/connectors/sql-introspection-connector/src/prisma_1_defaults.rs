@@ -4,9 +4,7 @@ use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::SqlSchema;
 
-const CHAR: &str = "char";
 const VARCHAR: &str = "varchar";
-const CHARACTER_VARYING: &str = "character varying";
 const CHAR_25: &str = "char(25)";
 const CHAR_36: &str = "char(36)";
 
@@ -29,22 +27,17 @@ pub fn add_prisma_1_id_defaults(
                 let column = table.column(column_name).unwrap();
                 let model_and_field = ModelAndField::new(&model.name, &id_field.name);
 
-                match (
-                    &column.tpe.data_type,
-                    &column.tpe.full_data_type,
-                    &column.tpe.character_maximum_length,
-                    family,
-                ) {
-                    (dt, fdt, Some(25), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => {
+                match (&column.tpe.full_data_type, &column.tpe.character_maximum_length, family) {
+                    (fdt, Some(25), SqlFamily::Postgres) if fdt == VARCHAR => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, Some(36), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => {
+                    (fdt, Some(36), SqlFamily::Postgres) if fdt == VARCHAR => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
-                    (dt, fdt, Some(25), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_25 => {
+                    (fdt, Some(25), SqlFamily::Mysql) if fdt == CHAR_25 => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, Some(36), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_36 => {
+                    (fdt, Some(36), SqlFamily::Mysql) if fdt == CHAR_36 => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                     _ => (),

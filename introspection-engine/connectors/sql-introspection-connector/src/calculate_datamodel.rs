@@ -462,7 +462,6 @@ mod tests {
                     columns: vec![Column {
                         name: "primary".to_string(),
                         tpe: ColumnType {
-                            data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
                             character_maximum_length: None,
                             family: ColumnTypeFamily::Int,
@@ -485,7 +484,6 @@ mod tests {
                     columns: vec![Column {
                         name: "primary".to_string(),
                         tpe: ColumnType {
-                            data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
                             character_maximum_length: None,
                             family: ColumnTypeFamily::Int,
@@ -508,7 +506,6 @@ mod tests {
                     columns: vec![Column {
                         name: "primary".to_string(),
                         tpe: ColumnType {
-                            data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
                             character_maximum_length: None,
                             family: ColumnTypeFamily::Int,
@@ -727,7 +724,6 @@ mod tests {
                         Column {
                             name: "id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
                                 character_maximum_length: None,
 
@@ -741,7 +737,6 @@ mod tests {
                         Column {
                             name: "name".to_string(),
                             tpe: ColumnType {
-                                data_type: "text".to_string(),
                                 full_data_type: "text".to_string(),
                                 character_maximum_length: None,
 
@@ -767,7 +762,6 @@ mod tests {
                         Column {
                             name: "id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
                                 character_maximum_length: None,
 
@@ -781,7 +775,6 @@ mod tests {
                         Column {
                             name: "city-id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
                                 character_maximum_length: None,
 
@@ -795,7 +788,6 @@ mod tests {
                         Column {
                             name: "city-name".to_string(),
                             tpe: ColumnType {
-                                data_type: "text".to_string(),
                                 full_data_type: "text".to_string(),
                                 character_maximum_length: None,
 
@@ -885,7 +877,6 @@ mod tests {
                     Column {
                         name: "id".to_string(),
                         tpe: ColumnType {
-                            data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
                             character_maximum_length: None,
 
@@ -899,7 +890,6 @@ mod tests {
                     Column {
                         name: "name".to_string(),
                         tpe: ColumnType {
-                            data_type: "text".to_string(),
                             full_data_type: "text".to_string(),
                             character_maximum_length: None,
 
@@ -913,7 +903,6 @@ mod tests {
                     Column {
                         name: "lastname".to_string(),
                         tpe: ColumnType {
-                            data_type: "text".to_string(),
                             full_data_type: "text".to_string(),
                             character_maximum_length: None,
 
@@ -1044,7 +1033,6 @@ mod tests {
                         Column {
                             name: "id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
                                 character_maximum_length: None,
 
@@ -1058,7 +1046,6 @@ mod tests {
                         Column {
                             name: "name".to_string(),
                             tpe: ColumnType {
-                                data_type: "text".to_string(),
                                 full_data_type: "text".to_string(),
                                 character_maximum_length: None,
 
@@ -1084,7 +1071,6 @@ mod tests {
                         Column {
                             name: "id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
                                 character_maximum_length: None,
 
@@ -1098,7 +1084,6 @@ mod tests {
                         Column {
                             name: "city_id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
                                 character_maximum_length: None,
 

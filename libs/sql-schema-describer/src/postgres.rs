@@ -199,7 +199,9 @@ impl SqlSchemaDescriber {
             };
 
             let tpe = get_column_type(&col, enums);
-            let default = Self::get_default_value(&col, &tpe, sequences);
+            let data_type = col.get_expect_string("data_type");
+
+            let default = Self::get_default_value(&col, &tpe, &data_type, sequences);
 
             let auto_increment =
                 is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(_)));
@@ -570,7 +572,12 @@ impl SqlSchemaDescriber {
         Ok(enums)
     }
 
-    fn get_default_value(col: &ResultRow, tpe: &ColumnType, sequences: &[Sequence]) -> Option<DefaultValue> {
+    fn get_default_value(
+        col: &ResultRow,
+        tpe: &ColumnType,
+        data_type: &str,
+        sequences: &[Sequence],
+    ) -> Option<DefaultValue> {
         match col.get("column_default") {
             None => None,
             Some(param_value) => match param_value.to_string() {
@@ -605,7 +612,7 @@ impl SqlSchemaDescriber {
                             None => DefaultValue::db_generated(default_string),
                         },
                         ColumnTypeFamily::String => {
-                            match unsuffix_default_literal(&default_string, &tpe.data_type, &tpe.full_data_type) {
+                            match unsuffix_default_literal(&default_string, data_type, &tpe.full_data_type) {
                                 Some(default_literal) => {
                                     DefaultValue::value(process_string_literal(default_literal.as_ref()).into_owned())
                                 }
@@ -650,7 +657,7 @@ impl SqlSchemaDescriber {
 
 fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     use ColumnTypeFamily::*;
-    let data_type = row.get_expect_string("data_type");
+    let data_type = row.get_expect_string("full_data_type");
     let full_data_type = row.get_expect_string("full_data_type");
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
@@ -724,7 +731,6 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     };
 
     ColumnType {
-        data_type,
         full_data_type,
         character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
         family,

@@ -89,7 +89,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         };
 
         sql::ColumnType {
-            data_type: data_type.clone(),
             full_data_type: data_type,
             character_maximum_length: None,
             family,

@@ -23,47 +23,31 @@ pub struct VersionChecker {
     has_inline_relations: bool,
 }
 
-const CHAR: &str = "char";
 const CHAR_25: &str = "char(25)";
 const CHAR_36: &str = "char(36)";
 const INT: &str = "int";
 const INT_11: &str = "int(11)";
-const INTEGER: &str = "integer";
 const INT_4: &str = "int4";
 const VARCHAR: &str = "varchar";
-const CHARACTER_VARYING: &str = "character varying";
 
-const SQLITE_TYPES: &[(&str, &str)] = &[
-    ("BOOLEAN", "BOOLEAN"),
-    ("DATE", "DATE"),
-    ("REAL", "REAL"),
-    ("INTEGER", "INTEGER"),
-    ("TEXT", "TEXT"),
-];
+const SQLITE_TYPES: &[&str] = &["BOOLEAN", "DATE", "REAL", "INTEGER", "TEXT"];
 
-const POSTGRES_TYPES: &[(&str, &str)] = &[
-    ("boolean", "bool"),
-    ("timestamp without time zone", "timestamp"),
-    ("numeric", "numeric"),
-    ("integer", "int4"),
-    ("text", "text"),
-    ("character varying", "varchar"),
-];
+const POSTGRES_TYPES: &[&str] = &["bool", "timestamp", "numeric", "int4", "text", "varchar"];
 
-const POSTGRES_VAR_CHAR: &[(&str, &str)] = &[("character varying", "varchar")];
+const POSTGRES_VAR_CHAR: &[&str] = &["varchar"];
 const POSTGRES_VAR_CHAR_LENGTHS: &[i64] = &[25, 36, 191];
 
-const MYSQL_TYPES: &[(&str, &str)] = &[
-    ("tinyint", "tinyint(1)"),
-    ("datetime", "datetime(3)"),
-    ("decimal", "decimal(65,30)"),
-    ("int", "int(11)"),
-    ("int", "int(4)"),
-    ("int", "int"),
-    ("mediumtext", "mediumtext"),
-    ("varchar", "varchar(191)"),
-    ("char", "char(25)"),
-    ("char", "char(36)"),
+const MYSQL_TYPES: &[&str] = &[
+    "tinyint(1)",
+    "datetime(3)",
+    "decimal(65,30)",
+    "int(11)",
+    "int(4)",
+    "int",
+    "mediumtext",
+    "varchar(191)",
+    "char(25)",
+    "char(36)",
 ];
 
 impl VersionChecker {
@@ -87,17 +71,17 @@ impl VersionChecker {
     }
 
     pub fn check_column_for_type_and_default_value(&mut self, column: &Column) {
-        match (&column.tpe.data_type, &column.tpe.full_data_type, self.sql_family) {
-            (dt, fdt, SqlFamily::Mysql) if !MYSQL_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
-            (dt, fdt, SqlFamily::Sqlite) if !SQLITE_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
-            (dt, fdt, SqlFamily::Postgres)
-                if POSTGRES_VAR_CHAR.contains(&(dt, fdt))
+        match (&column.tpe.full_data_type, self.sql_family) {
+            (fdt, SqlFamily::Mysql) if !MYSQL_TYPES.contains(&&***&fdt) => self.uses_non_prisma_types = true,
+            (fdt, SqlFamily::Sqlite) if !SQLITE_TYPES.contains(&&***&fdt) => self.uses_non_prisma_types = true,
+            (fdt, SqlFamily::Postgres)
+                if POSTGRES_VAR_CHAR.contains(&&***&fdt)
                     && column.tpe.character_maximum_length.is_some()
                     && !POSTGRES_VAR_CHAR_LENGTHS.contains(&column.tpe.character_maximum_length.unwrap()) =>
             {
                 self.uses_non_prisma_types = true
             }
-            (dt, fdt, SqlFamily::Postgres) if !POSTGRES_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
+            (fdt, SqlFamily::Postgres) if !POSTGRES_TYPES.contains(&&***&fdt) => self.uses_non_prisma_types = true,
             _ => (),
         };
 
@@ -133,18 +117,13 @@ impl VersionChecker {
                 if columns.len() == 1 {
                     let tpe = &table.column_bang(columns.first().unwrap()).tpe;
 
-                    match (
-                        &tpe.data_type,
-                        &tpe.full_data_type,
-                        &tpe.character_maximum_length,
-                        self.sql_family,
-                    ) {
-                        (dt, fdt, Some(25), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_25 => (),
-                        (dt, fdt, Some(36), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_36 => (),
-                        (dt, fdt, None, SqlFamily::Mysql) if dt == INT && (fdt == INT_11 || fdt == INT) => (),
-                        (dt, fdt, Some(25), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
-                        (dt, fdt, Some(36), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
-                        (dt, fdt, None, SqlFamily::Postgres) if dt == INTEGER && fdt == INT_4 => (),
+                    match (&tpe.full_data_type, &tpe.character_maximum_length, self.sql_family) {
+                        (fdt, Some(25), SqlFamily::Mysql) if fdt == CHAR_25 => (),
+                        (fdt, Some(36), SqlFamily::Mysql) if fdt == CHAR_36 => (),
+                        (fdt, None, SqlFamily::Mysql) if (fdt == INT_11 || fdt == INT) => (),
+                        (fdt, Some(25), SqlFamily::Postgres) if fdt == VARCHAR => (),
+                        (fdt, Some(36), SqlFamily::Postgres) if fdt == VARCHAR => (),
+                        (fdt, None, SqlFamily::Postgres) if fdt == INT_4 => (),
                         _ => self.always_has_p1_or_p_1_1_compatible_id = false,
                     }
                 }
