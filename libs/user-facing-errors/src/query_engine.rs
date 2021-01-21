@@ -251,9 +251,8 @@ pub struct InconsistentColumnData {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2024",
-    message = "Timed out fetching a new connection from the pool. Please consider reducing the number of requests or increasing the `connection_limit` parameter (https://www.prisma.io/docs/concepts/components/prisma-client/connection-management#connection-pool). Current limit: {connection_limit}, amount of connections currently in use: {current_connections}."
+    message = "Timed out fetching a new connection from the pool. Please consider reducing the number of requests or increasing the `connection_limit` parameter (https://www.prisma.io/docs/concepts/components/prisma-client/connection-management#connection-pool). Current limit: {connection_limit}."
 )]
 pub struct PoolTimeout {
     pub connection_limit: u64,
-    pub current_connections: u64,
 }
