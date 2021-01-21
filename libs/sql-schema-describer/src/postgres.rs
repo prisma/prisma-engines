@@ -657,7 +657,7 @@ impl SqlSchemaDescriber {
 
 fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     use ColumnTypeFamily::*;
-    let data_type = row.get_expect_string("full_data_type");
+    let data_type = row.get_expect_string("data_type");
     let full_data_type = row.get_expect_string("full_data_type");
     let is_required = match row.get_expect_string("is_nullable").to_lowercase().as_ref() {
         "no" => true,
