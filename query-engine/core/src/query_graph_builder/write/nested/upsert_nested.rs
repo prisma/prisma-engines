@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_graph_builder::write::utils::coerce_vec;
+use crate::{constants::inputs::args, query_graph_builder::write::utils::coerce_vec};
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -98,12 +98,15 @@ pub fn nested_upsert(
         let child_link = parent_relation_field.related_field().linking_fields();
 
         let mut as_map: ParsedInputMap = value.try_into()?;
-        let create_input = as_map.remove("create").expect("create argument is missing");
-        let update_input = as_map.remove("update").expect("update argument is missing");
+        let create_input = as_map.remove(args::CREATE).expect("create argument is missing");
+        let update_input = as_map.remove(args::UPDATE).expect("update argument is missing");
 
         // Read child(ren) node
         let filter: Filter = if parent_relation_field.is_list {
-            let where_input: ParsedInputMap = as_map.remove("where").expect("where argument is missing").try_into()?;
+            let where_input: ParsedInputMap = as_map
+                .remove(args::WHERE)
+                .expect("where argument is missing")
+                .try_into()?;
             extract_unique_filter(where_input, &child_model)?
         } else {
             Filter::empty()

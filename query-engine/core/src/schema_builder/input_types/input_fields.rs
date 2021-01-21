@@ -1,4 +1,5 @@
 use super::*;
+use constants::inputs::args;
 use prisma_models::dml::DefaultValue;
 
 pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, include_aggregates: bool) -> InputField {
@@ -13,13 +14,13 @@ pub(crate) fn nested_create_input_field(ctx: &mut BuilderContext, field: &Relati
         .flat_map(|typ| list_union_type(typ, field.is_list))
         .collect();
 
-    input_field("create", types, None).optional()
+    input_field(args::CREATE, types, None).optional()
 }
 
 pub(crate) fn nested_connect_or_create_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     connect_or_create_objects::nested_connect_or_create_input_object(ctx, field).map(|input_object_type| {
         input_field(
-            "connectOrCreate",
+            args::CONNECT_OR_CREATE,
             list_union_object_type(input_object_type, field.is_list),
             None,
         )
@@ -30,7 +31,12 @@ pub(crate) fn nested_connect_or_create_field(ctx: &mut BuilderContext, field: &R
 /// Builds "upsert" field for nested updates (on relation fields).
 pub(crate) fn nested_upsert_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     upsert_objects::nested_upsert_input_object(ctx, field).map(|input_object_type| {
-        input_field("upsert", list_union_object_type(input_object_type, field.is_list), None).optional()
+        input_field(
+            args::UPSERT,
+            list_union_object_type(input_object_type, field.is_list),
+            None,
+        )
+        .optional()
     })
 }
 
@@ -42,7 +48,7 @@ pub(crate) fn nested_delete_many_field(ctx: &mut BuilderContext, field: &Relatio
 
         Some(
             input_field(
-                "deleteMany",
+                args::DELETE_MANY,
                 vec![input_type.clone(), InputType::list(input_type)],
                 None,
             )
@@ -63,7 +69,7 @@ pub(crate) fn nested_update_many_field(
 
         Some(
             input_field(
-                "updateMany",
+                args::UPDATE_MANY,
                 list_union_object_type(input_type, true), //vec![input_type.clone(), InputType::list(input_type)],
                 None,
             )
@@ -78,7 +84,7 @@ pub(crate) fn nested_update_many_field(
 pub(crate) fn nested_set_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     match (field.related_model().is_embedded, field.is_list) {
         (true, _) => None,
-        (false, true) => Some(where_input_field(ctx, "set", field)),
+        (false, true) => Some(where_input_field(ctx, args::SET, field)),
         (false, false) => None,
     }
 }
@@ -87,8 +93,8 @@ pub(crate) fn nested_set_input_field(ctx: &mut BuilderContext, field: &RelationF
 pub(crate) fn nested_disconnect_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     match (field.related_model().is_embedded, field.is_list, field.is_required) {
         (true, _, _) => None,
-        (false, true, _) => Some(where_input_field(ctx, "disconnect", field)),
-        (false, false, false) => Some(input_field("disconnect", InputType::boolean(), None).optional()),
+        (false, true, _) => Some(where_input_field(ctx, args::DISCONNECT, field)),
+        (false, false, false) => Some(input_field(args::DISCONNECT, InputType::boolean(), None).optional()),
         (false, false, true) => None,
     }
 }
@@ -96,8 +102,8 @@ pub(crate) fn nested_disconnect_input_field(ctx: &mut BuilderContext, field: &Re
 /// Builds "delete" field for nested updates (on relation fields).
 pub(crate) fn nested_delete_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Option<InputField> {
     match (field.is_list, field.is_required) {
-        (true, _) => Some(where_input_field(ctx, "delete", field)),
-        (false, false) => Some(input_field("delete", InputType::boolean(), None).optional()),
+        (true, _) => Some(where_input_field(ctx, args::DELETE, field)),
+        (false, false) => Some(input_field(args::DELETE, InputType::boolean(), None).optional()),
         (false, true) => None,
     }
 }
@@ -107,7 +113,7 @@ pub(crate) fn nested_connect_input_field(ctx: &mut BuilderContext, field: &Relat
     if field.related_model().is_embedded {
         None
     } else {
-        Some(where_input_field(ctx, "connect", field))
+        Some(where_input_field(ctx, args::CONNECT, field))
     }
 }
 
@@ -121,7 +127,7 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, field: &Relati
         update_one_types
     };
 
-    input_field("update", update_types, None).optional()
+    input_field(args::UPDATE, update_types, None).optional()
 }
 
 /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
@@ -162,7 +168,7 @@ where
             let input_object = match ctx.get_input_type(&set_object_ident) {
                 Some(t) => t,
                 None => {
-                    let set_fields = vec![input_field("set", list_input_type.clone(), None)];
+                    let set_fields = vec![input_field(args::SET, list_input_type.clone(), None)];
                     let input_object = Arc::new(input_object_type(set_object_ident.clone(), set_fields));
 
                     ctx.cache_input_type(set_object_ident, input_object.clone());

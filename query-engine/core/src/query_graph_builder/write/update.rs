@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_graph_builder::write::write_args_parser::*;
+use crate::{constants::inputs::args, query_graph_builder::write::write_args_parser::*};
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
@@ -12,11 +12,11 @@ use std::{convert::TryInto, sync::Arc};
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     // "where"
-    let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
+    let where_arg: ParsedInputMap = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
     let filter = extract_unique_filter(where_arg, &model)?;
 
     // "data"
-    let data_argument = field.arguments.lookup("data").unwrap();
+    let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
 
     let update_node = update_record_node(graph, filter, Arc::clone(&model), data_map)?;
@@ -58,12 +58,12 @@ pub fn update_many_records(
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
-    let filter = match field.arguments.lookup("where") {
+    let filter = match field.arguments.lookup(args::WHERE) {
         Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
     };
 
-    let data_argument = field.arguments.lookup("data").unwrap();
+    let data_argument = field.arguments.lookup(args::DATA).unwrap();
     let data_map: ParsedInputMap = data_argument.value.try_into()?;
     let update_args = WriteArgsParser::from(&model, data_map)?;
 

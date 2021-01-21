@@ -1,4 +1,5 @@
 use super::*;
+use constants::inputs::args;
 
 pub(crate) fn update_many_input_types(
     ctx: &mut BuilderContext,
@@ -13,6 +14,22 @@ pub(crate) fn update_many_input_types(
         vec![checked_input]
     } else {
         vec![checked_input, unchecked_input]
+    }
+}
+
+trait Toto {
+    fn x(&self);
+}
+
+impl Toto for &str {
+    fn x(&self) {
+        println!("{}", self);
+    }
+}
+
+impl Toto for i32 {
+    fn x(&self) {
+        println!("{}", self);
     }
 }
 
@@ -76,8 +93,8 @@ pub(crate) fn update_many_where_combination_object(
     let update_types = update_many_input_types(ctx, &related_model, Some(parent_field));
 
     input_object.set_fields(vec![
-        input_field("where", InputType::object(where_input_object), None),
-        input_field("data", update_types, None),
+        input_field(args::WHERE, InputType::object(where_input_object), None),
+        input_field(args::DATA, update_types, None),
     ]);
 
     Arc::downgrade(&input_object)

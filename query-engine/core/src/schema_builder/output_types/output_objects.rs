@@ -1,4 +1,6 @@
 use super::*;
+
+use crate::constants::outputs::fields;
 use prisma_models::ScalarFieldRef;
 
 /// Initializes model output object type cache on the context.
@@ -118,7 +120,7 @@ pub(crate) fn batch_payload_object_type(ctx: &mut BuilderContext) -> ObjectTypeW
 
     let object_type = Arc::new(object_type(
         ident.clone(),
-        vec![field("count", vec![], OutputType::int(), None)],
+        vec![field(fields::COUNT, vec![], OutputType::int(), None)],
         None,
     ));
 

@@ -1,3 +1,5 @@
+use crate::constants::inputs::args;
+
 use super::*;
 use input_types::input_fields;
 use prisma_models::{dml, PrismaValue};
@@ -79,9 +81,9 @@ fn create_execute_raw_field() -> OutputField {
     field(
         "executeRaw",
         vec![
-            input_field("query", InputType::string(), None),
+            input_field(args::QUERY, InputType::string(), None),
             input_field(
-                "parameters",
+                args::PARAMETERS,
                 InputType::json_list(),
                 Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
             )
@@ -99,9 +101,9 @@ fn create_query_raw_field() -> OutputField {
     field(
         "queryRaw",
         vec![
-            input_field("query", InputType::string(), None),
+            input_field(args::QUERY, InputType::string(), None),
             input_field(
-                "parameters",
+                args::PARAMETERS,
                 InputType::json_list(),
                 Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
             )

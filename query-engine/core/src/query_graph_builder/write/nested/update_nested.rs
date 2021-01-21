@@ -1,5 +1,6 @@
 use super::*;
 use crate::{
+    constants::inputs::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
@@ -39,10 +40,10 @@ pub fn nested_update(
             // This is used to read the children first, to make sure they're actually connected.
             // The update itself operates on the record found by the read check.
             let mut map: ParsedInputMap = value.try_into()?;
-            let where_arg: ParsedInputMap = map.remove("where").unwrap().try_into()?;
+            let where_arg: ParsedInputMap = map.remove(args::WHERE).unwrap().try_into()?;
 
             let filter = extract_unique_filter(where_arg, &child_model)?;
-            let data_value = map.remove("data").unwrap();
+            let data_value = map.remove(args::DATA).unwrap();
 
             (data_value, filter)
         } else {
@@ -92,8 +93,8 @@ pub fn nested_update_many(
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let mut map: ParsedInputMap = value.try_into()?;
-        let where_arg = map.remove("where").unwrap();
-        let data_value = map.remove("data").unwrap();
+        let where_arg = map.remove(args::WHERE).unwrap();
+        let data_value = map.remove(args::DATA).unwrap();
         let data_map: ParsedInputMap = data_value.try_into()?;
         let where_map: ParsedInputMap = where_arg.try_into()?;
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();

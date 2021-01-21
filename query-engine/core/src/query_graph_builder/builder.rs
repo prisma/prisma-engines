@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
+use crate::{constants::inputs::args, query_document::*, query_graph::*, schema::*, IrSerializer};
 use prisma_value::PrismaValue;
 
 // TODO: Think about if this is really necessary here, or if the whole code should move into
@@ -17,7 +17,7 @@ struct RawArgs {
 impl RawArgs {
     fn add_arg(&mut self, arg: Option<ParsedArgument>) {
         if let Some(arg) = arg {
-            if arg.name == "query" {
+            if arg.name == args::QUERY {
                 self.query = arg.into_value().unwrap().into_string().unwrap();
             } else {
                 self.parameters = arg.into_value().unwrap().into_list().unwrap();
