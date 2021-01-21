@@ -8,6 +8,7 @@ use quaint::{
     connector::{self, Queryable},
     pooled::PooledConnection,
 };
+use tracing_futures::Instrument;
 
 use serde_json::{Map, Value};
 use std::panic::AssertUnwindSafe;
@@ -21,7 +22,11 @@ impl QueryExt for PooledConnection {}
 pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
     async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>]) -> crate::Result<Vec<SqlRow>> {
-        let result_set = self.query(q).await?;
+        let result_set = self
+            .query(q)
+            .instrument(tracing::info_span!("Filter read query"))
+            .await?;
+
         let mut sql_rows = Vec::new();
 
         for row in result_set {
