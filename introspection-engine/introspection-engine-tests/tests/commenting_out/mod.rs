@@ -179,7 +179,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
         },
         {
             "code": 3,
-            "message": "These fields were commented out because Prisma currently does not support their types.",
+            "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
             "affected": [{
                 "model": "Test",
                 "field": "network_mac",
@@ -194,8 +194,8 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
         // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
         // model Test {
           // dummy       Int
-          // This type is currently not supported.
-          // network_mac macaddr @id
+          /// This type is currently not supported.
+          // network_mac Unsupported("macaddr") @id
         // }
     "#};
 

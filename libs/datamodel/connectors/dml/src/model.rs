@@ -196,10 +196,11 @@ impl Model {
     /// returns the order of unique criterias ordered based on their precedence
     fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
+
         // first candidate: the singular id field
         {
             if let Some(x) = self.singular_id_fields().next() {
-                if !x.is_commented_out {
+                if !x.is_ineligible_for_client() {
                     result.push(UniqueCriteria::new(vec![x]))
                 }
             }
@@ -213,7 +214,7 @@ impl Model {
                 .map(|f| self.find_scalar_field(&f).unwrap())
                 .collect();
 
-            if !id_fields.is_empty() && !id_fields.iter().any(|f| f.is_commented_out) {
+            if !id_fields.is_empty() && !id_fields.iter().any(|f| f.is_ineligible_for_client()) {
                 result.push(UniqueCriteria::new(id_fields));
             }
         }
@@ -222,7 +223,9 @@ impl Model {
         {
             let mut unique_required_fields: Vec<_> = self
                 .scalar_fields()
-                .filter(|field| field.is_unique && (field.is_required() || allow_optional) && !field.is_commented_out)
+                .filter(|field| {
+                    field.is_unique && (field.is_required() || allow_optional) && !field.is_ineligible_for_client()
+                })
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
@@ -237,7 +240,7 @@ impl Model {
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
-                    let no_fields_are_commented_out = !fields.iter().any(|f| f.is_commented_out);
+                    let no_fields_are_commented_out = !fields.iter().any(|f| f.is_ineligible_for_client());
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     if (all_fields_are_required || allow_optional) && no_fields_are_commented_out {
                         Some(UniqueCriteria::new(fields))
