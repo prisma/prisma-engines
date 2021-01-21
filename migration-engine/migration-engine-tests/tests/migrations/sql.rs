@@ -352,7 +352,7 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_each_connector(tags("sql"), ignore("mssql"))]
 async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
     model A {
