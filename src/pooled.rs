@@ -301,6 +301,7 @@ impl Builder {
             .max_open(self.connection_limit as u64)
             .max_idle(self.max_idle.unwrap_or(self.connection_limit as u64))
             .max_idle_lifetime(self.max_idle_lifetime)
+            .get_timeout(None) // we handle timeouts here
             .health_check_interval(self.health_check_interval)
             .test_on_check_out(self.test_on_check_out)
             .build(self.manager);
