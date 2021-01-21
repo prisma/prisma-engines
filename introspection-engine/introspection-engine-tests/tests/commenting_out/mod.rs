@@ -194,7 +194,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
         // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
         // model Test {
           // dummy       Int
-          /// This type is currently not supported.
+          // This type is currently not supported.
           // network_mac Unsupported("macaddr") @id
         // }
     "#};

@@ -7,7 +7,11 @@ use datamodel::{Datamodel, FieldType};
 use introspection_connector::Warning;
 use quaint::connector::SqlFamily;
 
-pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
+pub fn commenting_out_guardrails(
+    datamodel: &mut Datamodel,
+    family: &SqlFamily,
+    native_types_enabled: bool,
+) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
     let mut models_without_columns = vec![];
     let mut fields_with_empty_names = vec![];
@@ -57,7 +61,9 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
 
         for field in model.scalar_fields_mut() {
             if let FieldType::Unsupported(tpe) = &field.field_type {
-                // field.is_commented_out = true;
+                if !native_types_enabled {
+                    field.is_commented_out = true;
+                }
                 unsupported_types.push(ModelAndFieldAndType {
                     model: model_name.clone(),
                     field: field.name.clone(),
@@ -69,11 +75,13 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
 
     // use unsupported types to drop @@id / @@unique /@@index
     for mf in &unsupported_types {
-        let model = datamodel.find_model_mut(&mf.model);
-        model.indices.retain(|i| !i.fields.contains(&mf.field));
-        if model.id_fields.contains(&mf.field) {
-            model.id_fields = vec![]
-        };
+        if !native_types_enabled {
+            let model = datamodel.find_model_mut(&mf.model);
+            model.indices.retain(|i| !i.fields.contains(&mf.field));
+            if model.id_fields.contains(&mf.field) {
+                model.id_fields = vec![]
+            };
+        }
     }
 
     //on postgres this is allowed, on the other dbs, this could be a symptom of missing privileges
@@ -104,7 +112,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
         .filter(|model| !models_without_columns.iter().any(|m| m.model == model.name))
     {
         if model.strict_unique_criterias().is_empty() {
-            model.is_commented_out = true;
+            model.is_commented_out = true; //todo this becomes ignore later
             model.documentation = Some(
                 "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."
                     .to_string(),
