@@ -153,7 +153,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             char            String
             text            String
             // This type is currently not supported.
-            // bytea        bytea
+            // bytea        Unsupported("bytea")
             ts              DateTime
             tstz            DateTime
             date            DateTime

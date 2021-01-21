@@ -195,17 +195,17 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             chars                          String
             varchars                       String
             // This type is currently not supported.
-            // binary                      binary(230)
+            // binary                      Unsupported("binary(230)")
             // This type is currently not supported.
-            // varbinary                   varbinary(150)
+            // varbinary                   Unsupported("varbinary(150)")
             // This type is currently not supported.
-            // tinyBlob                    tinyblob
+            // tinyBlob                    Unsupported("tinyblob")
             // This type is currently not supported.
-            // blob                        blob
+            // blob                        Unsupported("blob")
             // This type is currently not supported.
-            // mediumBlob                  mediumblob
+            // mediumBlob                  Unsupported("mediumblob")
             // This type is currently not supported.
-            // longBlob                    longblob
+            // longBlob                    Unsupported("longblob")
             tinytext                       String
             text                           String
             mediumText                     String
