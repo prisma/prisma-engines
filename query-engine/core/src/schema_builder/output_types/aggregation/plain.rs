@@ -48,7 +48,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             ctx,
             fields::SUM,
             &model,
-            numeric_fields.clone(),
+            numeric_fields,
             map_scalar_output_type_for_field,
             identity,
         ),

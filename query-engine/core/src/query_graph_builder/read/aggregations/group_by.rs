@@ -95,7 +95,7 @@ fn verify_having(having: Option<&Filter>, selectors: &[AggregationSelection]) ->
     if let Some(filter) = having {
         let having_fields: Vec<&ScalarFieldRef> = collect_scalar_fields(filter);
         let selector_fields: Vec<&ScalarFieldRef> = selectors
-            .into_iter()
+            .iter()
             .filter_map(|selector| match selector {
                 AggregationSelection::Field(field) => Some(field),
                 _ => None,
@@ -129,9 +129,9 @@ fn verify_having(having: Option<&Filter>, selectors: &[AggregationSelection]) ->
 /// Collects all flat scalar fields that are used in the having filter.
 fn collect_scalar_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
     match filter {
-        Filter::And(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
-        Filter::Or(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
-        Filter::Not(inner) => inner.into_iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::And(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::Or(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::Not(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
         Filter::Scalar(sf) => sf.projection.scalar_fields(),
         Filter::Aggregation(_) => vec![], // Aggregations have no effect here.
         _ => unreachable!(),
@@ -142,12 +142,12 @@ fn extract_grouping(value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<Scal
     match value {
         ParsedInputValue::ScalarField(field) => Ok(vec![field]),
 
-        ParsedInputValue::List(list) if list.len() > 0 => list
+        ParsedInputValue::List(list) if !list.is_empty() => list
             .into_iter()
             .map(|item| Ok(item.try_into()?))
             .collect::<QueryGraphBuilderResult<Vec<ScalarFieldRef>>>(),
 
-        ParsedInputValue::List(list) if list.len() == 0 => Err(QueryGraphBuilderError::InputError(
+        ParsedInputValue::List(list) if list.is_empty() => Err(QueryGraphBuilderError::InputError(
             "At least one selection is required for the `by` argument.".to_owned(),
         )),
 

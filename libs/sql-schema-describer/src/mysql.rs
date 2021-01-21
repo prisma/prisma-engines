@@ -528,7 +528,7 @@ impl SqlSchemaDescriber {
         arity: ColumnArity,
         default: Option<&Value>,
     ) -> (ColumnType, Option<Enum>) {
-        const UNSIGNEDNESS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("(?i)unsigned$").unwrap());
+        static UNSIGNEDNESS_RE: Lazy<Regex> = Lazy::new(|| Regex::new("(?i)unsigned$").unwrap());
         // println!("Name: {}", column_name);
         // println!("DT: {}", data_type);
         // println!("FDT: {}", full_data_type);

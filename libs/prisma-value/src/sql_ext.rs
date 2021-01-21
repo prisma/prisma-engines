@@ -18,24 +18,30 @@ impl<'a> TryFrom<Value<'a>> for PrismaValue {
                         to: "BigDecimal",
                     })
                 }
-                f if f.is_infinite() => Err(crate::ConversionFailure {
-                    from: "Infinity",
-                    to: "BigDecimal",
-                })?,
+                f if f.is_infinite() => {
+                    return Err(crate::ConversionFailure {
+                        from: "Infinity",
+                        to: "BigDecimal",
+                    })
+                }
                 _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
             },
 
             Value::Float(None) => PrismaValue::Null,
 
             Value::Double(Some(f)) => match f {
-                f if f.is_nan() => Err(crate::ConversionFailure {
-                    from: "NaN",
-                    to: "BigDecimal",
-                })?,
-                f if f.is_infinite() => Err(crate::ConversionFailure {
-                    from: "Infinity",
-                    to: "BigDecimal",
-                })?,
+                f if f.is_nan() => {
+                    return Err(crate::ConversionFailure {
+                        from: "NaN",
+                        to: "BigDecimal",
+                    })
+                }
+                f if f.is_infinite() => {
+                    return Err(crate::ConversionFailure {
+                        from: "Infinity",
+                        to: "BigDecimal",
+                    })
+                }
                 _ => PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
             },
 

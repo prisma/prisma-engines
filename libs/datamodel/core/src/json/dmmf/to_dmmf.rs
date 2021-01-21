@@ -97,7 +97,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
     Field {
         name: field.name().to_string(),
         kind: get_field_kind(field),
-        is_required: *field.arity() == dml::FieldArity::Required,
+        is_required: *field.arity() == dml::FieldArity::Required || *field.arity() == dml::FieldArity::List,
         is_list: *field.arity() == dml::FieldArity::List,
         is_id: field.is_id(),
         is_read_only: a_relation_field_is_based_on_this_field,

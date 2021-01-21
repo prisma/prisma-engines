@@ -229,7 +229,7 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 (Some(len), Some((p, 0))) if p + 1 > len => RiskyCast,
                 // We must fit p digits, a possible sign and a comma to
                 // our string, otherwise might truncate.
-                (Some(len), Some((p, n))) if n > 0 && p + 2 > len.into() => RiskyCast,
+                (Some(len), Some((p, n))) if n > 0 && p + 2 > len => RiskyCast,
                 //up to 131072 digits before the decimal point; up to 16383 digits after the decimal point
                 (Some(len), None) if len < 131073 => RiskyCast,
                 (None, _) if next_is_char() => RiskyCast,

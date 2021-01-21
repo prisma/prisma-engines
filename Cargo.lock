@@ -2967,6 +2967,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
+ "tracing-futures",
  "user-facing-errors",
  "uuid",
 ]
@@ -3561,6 +3562,8 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tokio",
+ "tracing",
+ "tracing-futures",
  "user-facing-errors",
  "uuid",
 ]

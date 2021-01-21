@@ -109,7 +109,7 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     let mut fields: Vec<_> = equality_filters(mapped_list_type.clone(), !sf.is_required).collect();
 
     fields.push(
-        input_field(filters::HAS, mapped_nonlist_type.clone(), None)
+        input_field(filters::HAS, mapped_nonlist_type, None)
             .optional()
             .nullable_if(!sf.is_required),
     );
@@ -168,7 +168,7 @@ fn full_scalar_filter_type(
     };
 
     // Shorthand `not equals` filter, skips the nested object filter.
-    let mut not_types = vec![mapped_scalar_type.clone()];
+    let mut not_types = vec![mapped_scalar_type];
 
     if typ != &TypeIdentifier::Json {
         // Full nested filter. Only available on non-JSON fields.

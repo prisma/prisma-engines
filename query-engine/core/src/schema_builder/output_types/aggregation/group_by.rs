@@ -54,7 +54,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
             ctx,
             fields::SUM,
             &model,
-            numeric_fields.clone(),
+            numeric_fields,
             map_scalar_output_type_for_field,
             identity,
         ),

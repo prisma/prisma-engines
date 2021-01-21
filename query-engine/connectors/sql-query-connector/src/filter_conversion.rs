@@ -356,11 +356,11 @@ where
             unimplemented!("Compound aggregate projections are unsupported.")
         }
         (Some(alias), ScalarProjection::Single(field)) => {
-            let comparable: Expression = field_transformer(field.as_column().table(alias.to_string(None)).into());
+            let comparable: Expression = field_transformer(field.as_column().table(alias.to_string(None)));
             convert_scalar_filter(comparable, sf.condition, sf.mode, &[field])
         }
         (None, ScalarProjection::Single(field)) => {
-            let comparable: Expression = field_transformer(field.as_column().into());
+            let comparable: Expression = field_transformer(field.as_column());
             convert_scalar_filter(comparable, sf.condition, sf.mode, &[field])
         }
     }
