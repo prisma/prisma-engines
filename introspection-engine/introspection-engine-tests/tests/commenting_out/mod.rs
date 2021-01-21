@@ -159,6 +159,57 @@ async fn commenting_out_an_unsupported_type_drops_its_usages(api: &TestApi) -> c
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn unsupported_type_with_native_types_keeps_its_usages(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer().unique(true));
+                t.add_column("dummy", types::integer());
+                t.add_column("broken", types::custom("macaddr"));
+
+                t.add_index("unique", types::index(vec!["broken", "dummy"]).unique(true));
+                t.add_index("non_unique", types::index(vec!["broken", "dummy"]).unique(false));
+                t.set_primary_key(&["broken", "dummy"]);
+            });
+        })
+        .await?;
+
+    let expected = json!([{
+        "code": 3,
+        "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
+        "affected": [
+            {
+                "model": "Test",
+                "field": "broken",
+                "tpe": "macaddr"
+            }
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let dm = indoc! {r#"
+        modelTest{
+            id          Int     @unique
+            dummy       Int
+            ///This type is currently not supported.
+            broken Unsupported("macaddr")
+        
+            @@id([broken, dummy])
+            @@unique([broken, dummy], name: "unique")
+            @@index([broken, dummy], name: "non_unique")
+        }
+    "#};
+
+    assert_eq!(
+        dm.replace(" ", ""),
+        api.introspect_with_native_types().await?.replace(" ", "")
+    );
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
@@ -200,6 +251,52 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
     "#};
 
     assert_eq!(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn a_table_with_only_an_unsupported_id_with_native_types_is_still_invalid(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("dummy", types::integer());
+                t.add_column("network_mac", types::custom("macaddr").primary(true));
+            });
+        })
+        .await?;
+
+    let expected = json!([
+        {
+            "code": 1,
+            "message": "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by Prisma.",
+            "affected": [{
+                "model": "Test"
+            }]
+        },
+        {
+            "code": 3,
+            "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
+            "affected": [{
+                "model": "Test",
+                "field": "network_mac",
+                "tpe": "macaddr"
+            }]
+        }
+    ]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let dm = indoc! {r#"
+        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+        // model Test {
+          // dummy       Int
+          /// This type is currently not supported.
+          // network_mac Unsupported("macaddr") @id
+        // }
+    "#};
+
+    assert_eq!(dm, &api.introspect_with_native_types().await?);
 
     Ok(())
 }
@@ -256,7 +353,7 @@ async fn db_generated_values_should_add_comments(api: &TestApi) -> crate::TestRe
         }
     "##};
 
-    assert_eq!(dm, &api.introspect().await?);
+    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
 
     Ok(())
 }
