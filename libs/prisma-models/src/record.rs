@@ -120,7 +120,7 @@ impl ManyRecords {
         self.records.reverse();
     }
 
-    /// Reverses the wrapped records in place
+    /// Deduplicate the wrapped records
     pub fn with_unique_records(mut self) -> Self {
         self.records = self.records.into_iter().unique().collect();
         self
