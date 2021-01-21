@@ -1,4 +1,5 @@
 use crate::{DomainError, ModelProjection, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder};
+use itertools::Itertools;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -120,28 +121,16 @@ impl ManyRecords {
     }
 
     /// Reverses the wrapped records in place
-    pub fn dedup(&mut self) {
-        self.records.sort_unstable();
-        self.records.dedup();
+    pub fn with_unique_records(mut self) -> Self {
+        self.records = self.records.into_iter().unique().collect();
+        self
     }
 }
 
-#[derive(Debug, Default, Clone, Eq, PartialEq)]
+#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
     pub parent_id: Option<RecordProjection>,
-}
-
-impl Ord for Record {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.values.cmp(&other.values)
-    }
-}
-
-impl PartialOrd for Record {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.values.partial_cmp(&other.values)
-    }
 }
 
 impl Record {
