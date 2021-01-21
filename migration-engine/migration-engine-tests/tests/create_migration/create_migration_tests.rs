@@ -403,3 +403,47 @@ async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
+    let dm = r#"
+        datasource test {
+          provider = "postgresql"
+          url = "postgresql://unreachable:unreachable@example.com/unreachable"
+        }
+
+        model Cat {
+            id      Int @id
+            home    Unsupported("point")
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("create-cats", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .assert_migration("create-cats", |migration| {
+            let expected_script = match api.sql_family() {
+                SqlFamily::Postgres => {
+                    indoc! {
+                        r#"
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                            "id" INTEGER NOT NULL,
+                            "home" point NOT NULL,
+
+                            PRIMARY KEY ("id")
+                        );
+                        "#
+                    }
+                }
+                _ => unreachable!(),
+            };
+
+            migration.assert_contents(expected_script)
+        })?;
+
+    Ok(())
+}

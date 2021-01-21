@@ -79,6 +79,14 @@ impl<'a> SqlSchemaCalculator<'a> {
                             auto_increment: has_auto_increment_default || self.flavour.field_is_implicit_autoincrement_primary_key(&f)
                         })
                     } ,
+                        TypeWalker::Unsupported(description)=>{
+                            Some(sql::Column {
+                                name: f.db_name().to_owned(),
+                                tpe: self.flavour.column_type_for_unsupported_type(&f, description),
+                                default: migration_value_new(&f),
+                                auto_increment: false
+                            })
+                        },
                     _ => None,
                 })
                 .collect();

@@ -3,8 +3,11 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, ScalarType};
+use datamodel::{
+    walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, FieldArity, NativeTypeInstance, ScalarType,
+};
 use sql_schema_describer as sql;
+use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
     fn calculate_enums(&self, _datamodel: &Datamodel) -> Vec<sql::Enum> {
@@ -17,6 +20,21 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType;
+
+    fn column_type_for_unsupported_type(&self, field: &ScalarFieldWalker<'_>, description: String) -> sql::ColumnType {
+        ColumnType {
+            data_type: description.clone(),
+            full_data_type: description.clone(),
+            character_maximum_length: None,
+            family: ColumnTypeFamily::Unsupported(description.clone()),
+            arity: match field.arity() {
+                FieldArity::Required => ColumnArity::Required,
+                FieldArity::Optional => ColumnArity::Nullable,
+                FieldArity::List => ColumnArity::List,
+            },
+            native_type: None,
+        }
+    }
 
     fn default_native_type_for_family(&self, family: sql::ColumnTypeFamily) -> Option<serde_json::Value>;
 
