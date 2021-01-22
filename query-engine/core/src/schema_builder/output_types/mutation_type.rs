@@ -14,6 +14,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
             append_opt(&mut vec, update_item_field(ctx, &model));
             append_opt(&mut vec, upsert_item_field(ctx, &model));
 
+            vec.push(create_many_field(ctx, &model));
             vec.push(update_many_field(ctx, &model));
             vec.push(delete_many_field(ctx, &model));
 
@@ -160,7 +161,7 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     field(
         field_name,
         arguments,
-        OutputType::object(output_objects::batch_payload_object_type(ctx)),
+        OutputType::object(output_objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::DeleteMany,
@@ -186,6 +187,22 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
     })
 }
 
+/// Builds a create many mutation field (e.g. createManyUsers) for given model.
+fn create_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+    let arguments = arguments::create_many_arguments(ctx, model);
+    let field_name = format!("createMany{}", model.name);
+
+    field(
+        field_name,
+        arguments,
+        OutputType::object(output_objects::affected_records_object_type(ctx)),
+        Some(QueryInfo {
+            model: Some(Arc::clone(&model)),
+            tag: QueryTag::UpdateMany,
+        }),
+    )
+}
+
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
 fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let arguments = arguments::update_many_arguments(ctx, model);
@@ -197,7 +214,7 @@ fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     field(
         field_name,
         arguments,
-        OutputType::object(output_objects::batch_payload_object_type(ctx)),
+        OutputType::object(output_objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::UpdateMany,

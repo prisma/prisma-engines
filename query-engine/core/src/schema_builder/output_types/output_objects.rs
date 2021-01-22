@@ -112,8 +112,8 @@ fn map_enum_type(ctx: &mut BuilderContext, enum_name: &str) -> EnumType {
     e.into()
 }
 
-pub(crate) fn batch_payload_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
-    let ident = Identifier::new("BatchPayload".to_owned(), PRISMA_NAMESPACE);
+pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
+    let ident = Identifier::new("AffectedRowsOutput".to_owned(), PRISMA_NAMESPACE);
     return_cached_output!(ctx, &ident);
 
     let object_type = Arc::new(object_type(
