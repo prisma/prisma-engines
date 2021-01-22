@@ -181,6 +181,13 @@ impl<'de> serde::de::Visitor<'de> for BigDecimalVisitor {
 }
 
 impl PrismaValue {
+    pub fn as_enum_value(&self) -> Option<&str> {
+        match self {
+            PrismaValue::Enum(s) => Some(s.as_str()),
+            _ => None,
+        }
+    }
+
     pub fn is_null(&self) -> bool {
         matches!(self, PrismaValue::Null)
     }

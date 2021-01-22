@@ -5,7 +5,7 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
-    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType, ValueGenerator, ValueGeneratorFn,
+    Datamodel, FieldArity, IndexDefinition, IndexType, ScalarType,
 };
 use prisma_value::PrismaValue;
 use sql_schema_describer::{self as sql, walkers::SqlSchemaExt};
@@ -31,7 +31,7 @@ fn calculate_model_tables<'a>(
     walk_models(datamodel).map(move |model| {
         let columns = model
             .scalar_fields()
-            .flat_map(|field| column_for_scalar_field(&field, flavour))
+            .map(|field| column_for_scalar_field(&field, flavour))
             .collect();
 
         let primary_key = Some(sql::PrimaryKey {
@@ -247,80 +247,65 @@ fn column_type_for_implicit_relation(id_field: &ScalarFieldWalker<'_>, schema: &
         .clone()
 }
 
-fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavour) -> Option<sql::Column> {
-    match field.field_type() {
-        TypeWalker::Enum(r#enum) => Some(sql::Column {
-            name: field.db_name().to_owned(),
-            tpe: flavour.enum_column_type(field, r#enum.db_name()),
-            default: column_default_for_scalar_field(field),
-            auto_increment: false,
-        }),
-        TypeWalker::Base(scalar_type) => {
-            let family = match scalar_type {
-                ScalarType::Int => sql::ColumnTypeFamily::Int,
-                ScalarType::Float => sql::ColumnTypeFamily::Float,
-                ScalarType::Boolean => sql::ColumnTypeFamily::Boolean,
-                ScalarType::String => sql::ColumnTypeFamily::String,
-                ScalarType::DateTime => sql::ColumnTypeFamily::DateTime,
-                ScalarType::Json => sql::ColumnTypeFamily::Json,
-                ScalarType::Bytes => sql::ColumnTypeFamily::Binary,
-                ScalarType::Decimal => sql::ColumnTypeFamily::Decimal,
-                ScalarType::BigInt => sql::ColumnTypeFamily::BigInt,
-            };
-
-            let has_auto_increment_default =
-                matches!(field.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
-
-            Some(sql::Column {
+fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavour) -> sql::Column {
+    let (scalar_type, native_type) = match field.field_type() {
+        // Special-case enums. Defaults and type are handled differently.
+        TypeWalker::Enum(r#enum) => {
+            return sql::Column {
                 name: field.db_name().to_owned(),
-                tpe: sql::ColumnType {
-                    data_type: String::new(),
-                    full_data_type: String::new(),
-                    character_maximum_length: None,
-                    native_type: flavour.default_native_type_for_family(&family),
-                    family,
-                    arity: column_arity(field.arity()),
-                },
-                default: column_default_for_scalar_field(field),
-                auto_increment: has_auto_increment_default
-                    || flavour.field_is_implicit_autoincrement_primary_key(field),
-            })
-        }
-        TypeWalker::NativeType(_, native_type_instance) => {
-            let has_auto_increment_default =
-                matches!(field.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
+                tpe: flavour.enum_column_type(field, r#enum.db_name()),
+                default: field
+                    .default_value()
+                    .and_then(|default| default.as_single().and_then(|v| v.as_enum_value()))
+                    .and_then(|value| {
+                        let corresponding_value = r#enum.value(value).expect("Could not find enum value");
 
-            Some(sql::Column {
-                name: field.db_name().to_owned(),
-                tpe: flavour.column_type_for_native_type(field, native_type_instance),
-                default: column_default_for_scalar_field(field),
-                auto_increment: has_auto_increment_default
-                    || flavour.field_is_implicit_autoincrement_primary_key(field),
-            })
-        }
-    }
-}
-
-fn column_default_for_scalar_field(field: &ScalarFieldWalker<'_>) -> Option<sql::DefaultValue> {
-    match &field.default_value()? {
-        datamodel::DefaultValue::Single(s) => match field.field_type() {
-            TypeWalker::Enum(inum) => {
-                let corresponding_value = inum
-                    .r#enum
-                    .values()
-                    .find(|val| val.name.as_str() == s.to_string())
-                    .expect("could not find enum value");
-
-                Some(sql::DefaultValue::value(PrismaValue::Enum(
-                    corresponding_value.final_database_name().to_owned(),
-                )))
+                        Some(sql::DefaultValue::value(PrismaValue::Enum(
+                            corresponding_value.final_database_name().to_owned(),
+                        )))
+                    }),
+                auto_increment: false,
             }
-            _ => Some(sql::DefaultValue::value(s.clone())),
+        }
+        TypeWalker::Base(scalar_type) => (scalar_type, flavour.default_native_type_for_scalar_type(&scalar_type)),
+        TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
+    };
+
+    let has_auto_increment_default = field
+        .default_value()
+        .map(|default| default.is_autoincrement())
+        .unwrap_or(false);
+
+    let family = match scalar_type {
+        ScalarType::Int => sql::ColumnTypeFamily::Int,
+        ScalarType::Float => sql::ColumnTypeFamily::Float,
+        ScalarType::Boolean => sql::ColumnTypeFamily::Boolean,
+        ScalarType::String => sql::ColumnTypeFamily::String,
+        ScalarType::DateTime => sql::ColumnTypeFamily::DateTime,
+        ScalarType::Json => sql::ColumnTypeFamily::Json,
+        ScalarType::Bytes => sql::ColumnTypeFamily::Binary,
+        ScalarType::Decimal => sql::ColumnTypeFamily::Decimal,
+        ScalarType::BigInt => sql::ColumnTypeFamily::BigInt,
+    };
+
+    sql::Column {
+        auto_increment: has_auto_increment_default || flavour.field_is_implicit_autoincrement_primary_key(field),
+        name: field.db_name().to_owned(),
+        tpe: sql::ColumnType {
+            data_type: String::new(),
+            full_data_type: String::new(),
+            character_maximum_length: None,
+            native_type: Some(native_type),
+            family,
+            arity: column_arity(field.arity()),
         },
-        default if default.is_dbgenerated() => Some(sql::DefaultValue::db_generated(String::new())),
-        default if default.is_now() => Some(sql::DefaultValue::now()),
-        default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
-        datamodel::DefaultValue::Expression(_) => None,
+        default: field.default_value().and_then(|v| match v {
+            datamodel::DefaultValue::Single(v) => Some(sql::DefaultValue::value(v.clone())),
+            default if default.is_dbgenerated() => Some(sql::DefaultValue::db_generated(String::new())),
+            default if default.is_now() => Some(sql::DefaultValue::now()),
+            default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
+            datamodel::DefaultValue::Expression(_) => None,
+        }),
     }
 }
 
