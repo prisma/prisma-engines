@@ -11,240 +11,230 @@ use prisma_value::PrismaValue;
 use sql_schema_describer::{self as sql, ColumnArity};
 
 pub(crate) fn calculate_sql_schema(datamodel: &Datamodel, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
-    let calculator = SqlSchemaCalculator {
-        data_model: datamodel,
-        flavour,
-    };
-    calculator.calculate_internal()
-}
+    let mut tables = Vec::with_capacity(datamodel.models().len());
+    let model_tables_without_inline_relations = calculate_model_tables(datamodel, flavour);
 
-struct SqlSchemaCalculator<'a> {
-    data_model: &'a Datamodel,
-    flavour: &'a dyn SqlFlavour,
-}
-
-impl<'a> SqlSchemaCalculator<'a> {
-    fn calculate_internal(&self) -> sql::SqlSchema {
-        let mut tables = Vec::with_capacity(self.data_model.models().len());
-        let model_tables_without_inline_relations = self.calculate_model_tables();
-
-        for (model, mut table) in model_tables_without_inline_relations {
-            self.add_inline_relations_to_model_tables(model, &mut table);
-            tables.push(table);
-        }
-
-        tables.extend(self.calculate_relation_tables());
-
-        let enums = self.flavour.calculate_enums(&self.data_model);
-        let sequences = Vec::new();
-
-        sql::SqlSchema {
-            tables,
-            enums,
-            sequences,
-        }
+    for (model, mut table) in model_tables_without_inline_relations {
+        add_inline_relations_to_model_tables(model, &mut table);
+        tables.push(table);
     }
 
-    fn calculate_model_tables<'iter>(&'iter self) -> impl Iterator<Item = (ModelWalker<'a>, sql::Table)> + 'iter {
-        walk_models(self.data_model).map(move |model| {
-            let columns = model
-                .scalar_fields()
-                .flat_map(|f| match f.field_type() {
-                    TypeWalker::Base(_) => {
-                        let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
+    tables.extend(calculate_relation_tables(datamodel, flavour));
 
-                        Some(sql::Column {
-                            name: f.db_name().to_owned(),
-                            tpe: column_type(&f, self.flavour),
-                            default: calculate_column_default(&f),
-                            auto_increment: has_auto_increment_default || self.flavour.field_is_implicit_autoincrement_primary_key(&f),
-                        })
-                    },
-                    TypeWalker::Enum(r#enum) => {
-                        let enum_db_name = r#enum.db_name();
-                        Some(sql::Column {
-                            name: f.db_name().to_owned(),
-                            tpe: self.flavour.enum_column_type(&f,  enum_db_name),
-                            default: calculate_column_default(&f),
-                            auto_increment: false,
-                        })
-                    }
-                    TypeWalker::NativeType(scalar_type, native_type_instance) =>{
-                        let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
+    let enums = flavour.calculate_enums(datamodel);
+    let sequences = Vec::new();
 
-                        Some(sql::Column {
-                            name: f.db_name().to_owned(),
-                            tpe: self.flavour.column_type_for_native_type(&f, scalar_type, native_type_instance),
-                            default: calculate_column_default(&f),
-                            auto_increment: has_auto_increment_default || self.flavour.field_is_implicit_autoincrement_primary_key(&f)
-                        })
-                    } ,
-                    _ => None,
-                })
+    sql::SqlSchema {
+        tables,
+        enums,
+        sequences,
+    }
+}
+
+fn calculate_model_tables<'a>(
+    datamodel: &'a Datamodel,
+    flavour: &'a dyn SqlFlavour,
+) -> impl Iterator<Item = (ModelWalker<'a>, sql::Table)> + 'a {
+    walk_models(datamodel).map(move |model| {
+        let columns = model
+            .scalar_fields()
+            .flat_map(|f| match f.field_type() {
+                TypeWalker::Base(_) => {
+                    let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
+
+                    Some(sql::Column {
+                        name: f.db_name().to_owned(),
+                        tpe: column_type(&f, flavour),
+                        default: calculate_column_default(&f),
+                        auto_increment: has_auto_increment_default || flavour.field_is_implicit_autoincrement_primary_key(&f),
+                    })
+                },
+                TypeWalker::Enum(r#enum) => {
+                    let enum_db_name = r#enum.db_name();
+                    Some(sql::Column {
+                        name: f.db_name().to_owned(),
+                        tpe: flavour.enum_column_type(&f,  enum_db_name),
+                        default: calculate_column_default(&f),
+                        auto_increment: false,
+                    })
+                }
+                TypeWalker::NativeType(scalar_type, native_type_instance) =>{
+                    let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
+
+                    Some(sql::Column {
+                        name: f.db_name().to_owned(),
+                        tpe: flavour.column_type_for_native_type(&f, scalar_type, native_type_instance),
+                        default: calculate_column_default(&f),
+                        auto_increment: has_auto_increment_default || flavour.field_is_implicit_autoincrement_primary_key(&f)
+                    })
+                } ,
+                _ => None,
+            })
+            .collect();
+
+        let primary_key = Some(sql::PrimaryKey {
+            columns: model
+                .id_fields()
+                .map(|field| field.db_name().to_owned())
+                .collect(),
+            sequence: None,
+            constraint_name: None,
+        }).filter(|pk| !pk.columns.is_empty());
+
+        // TODO: HERE
+        let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f| {
+            sql::Index {
+                name: flavour.single_field_index_name(model.db_name(), f.db_name()),
+                columns: vec![f.db_name().to_owned()],
+                tpe: sql::IndexType::Unique,
+            }
+        });
+
+        let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
+            let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
+                .fields
+                .iter()
+                .map(|field_name| model.find_scalar_field(field_name).expect("Unknown field in index directive."))
                 .collect();
 
-            let primary_key = Some(sql::PrimaryKey {
-                columns: model
-                    .id_fields()
-                    .map(|field| field.db_name().to_owned())
-                    .collect(),
-                sequence: None,
-                constraint_name: None,
-            }).filter(|pk| !pk.columns.is_empty());
-
-            // TODO: HERE
-            let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f| {
-                sql::Index {
-                    name: self.flavour.single_field_index_name(model.db_name(), f.db_name()),
-                    columns: vec![f.db_name().to_owned()],
-                    tpe: sql::IndexType::Unique,
-                }
-            });
-
-            let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
-                let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
-                    .fields
-                    .iter()
-                    .map(|field_name| model.find_scalar_field(field_name).expect("Unknown field in index directive."))
-                    .collect();
-
-                let index_type = match index_definition.tpe {
-                    IndexType::Unique => sql::IndexType::Unique,
-                    IndexType::Normal => sql::IndexType::Normal,
-                };
-
-                let index_name = index_definition.name.clone().unwrap_or_else(|| {
-                    format!(
-                        "{table}.{fields}_{qualifier}",
-                        table = &model.db_name(),
-                        fields = referenced_fields.iter().map(|field| field.db_name()).join("_"),
-                        qualifier = if index_type.is_unique() { "unique" } else { "index" },
-                    )
-                });
-
-                sql::Index {
-                    name: index_name,
-                    // The model index definition uses the model field names, but the SQL Index
-                    // wants the column names.
-                    columns: referenced_fields
-                        .iter()
-                        .map(|field| field.db_name().to_owned())
-                        .collect(),
-                    tpe: index_type,
-                }
-            });
-
-            let table = sql::Table {
-                name: model.database_name().to_owned(),
-                columns,
-                indices: single_field_indexes.chain(multiple_field_indexes).collect(),
-                primary_key,
-                foreign_keys: Vec::new(),
+            let index_type = match index_definition.tpe {
+                IndexType::Unique => sql::IndexType::Unique,
+                IndexType::Normal => sql::IndexType::Normal,
             };
 
-            (model, table)
-        })
-    }
+            let index_name = index_definition.name.clone().unwrap_or_else(|| {
+                format!(
+                    "{table}.{fields}_{qualifier}",
+                    table = &model.db_name(),
+                    fields = referenced_fields.iter().map(|field| field.db_name()).join("_"),
+                    qualifier = if index_type.is_unique() { "unique" } else { "index" },
+                )
+            });
 
-    fn add_inline_relations_to_model_tables(&self, model: ModelWalker<'a>, table: &mut sql::Table) {
-        let relation_fields = model
-            .relation_fields()
-            .filter(|relation_field| !relation_field.is_virtual());
-
-        for relation_field in relation_fields {
-            let fk_columns: Vec<String> = relation_field.referencing_columns().map(String::from).collect();
-
-            // Optional unique index for 1:1 relations.
-            if relation_field.is_one_to_one() {
-                add_one_to_one_relation_unique_index(table, &fk_columns);
+            sql::Index {
+                name: index_name,
+                // The model index definition uses the model field names, but the SQL Index
+                // wants the column names.
+                columns: referenced_fields
+                    .iter()
+                    .map(|field| field.db_name().to_owned())
+                    .collect(),
+                tpe: index_type,
             }
+        });
 
-            // Foreign key
-            {
-                let fk = sql::ForeignKey {
-                    constraint_name: None,
-                    columns: fk_columns,
-                    referenced_table: relation_field.referenced_model().database_name().to_owned(),
-                    referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
-                    on_update_action: sql::ForeignKeyAction::Cascade,
-                    on_delete_action: match column_arity(relation_field.arity()) {
-                        ColumnArity::Required => sql::ForeignKeyAction::Cascade,
-                        _ => sql::ForeignKeyAction::SetNull,
-                    },
-                };
+        let table = sql::Table {
+            name: model.database_name().to_owned(),
+            columns,
+            indices: single_field_indexes.chain(multiple_field_indexes).collect(),
+            primary_key,
+            foreign_keys: Vec::new(),
+        };
 
-                table.foreign_keys.push(fk);
-            }
+        (model, table)
+    })
+}
+
+fn add_inline_relations_to_model_tables(model: ModelWalker<'_>, table: &mut sql::Table) {
+    let relation_fields = model
+        .relation_fields()
+        .filter(|relation_field| !relation_field.is_virtual());
+
+    for relation_field in relation_fields {
+        let fk_columns: Vec<String> = relation_field.referencing_columns().map(String::from).collect();
+
+        // Optional unique index for 1:1 relations.
+        if relation_field.is_one_to_one() {
+            add_one_to_one_relation_unique_index(table, &fk_columns);
+        }
+
+        // Foreign key
+        {
+            let fk = sql::ForeignKey {
+                constraint_name: None,
+                columns: fk_columns,
+                referenced_table: relation_field.referenced_model().database_name().to_owned(),
+                referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
+                on_update_action: sql::ForeignKeyAction::Cascade,
+                on_delete_action: match column_arity(relation_field.arity()) {
+                    ColumnArity::Required => sql::ForeignKeyAction::Cascade,
+                    _ => sql::ForeignKeyAction::SetNull,
+                },
+            };
+
+            table.foreign_keys.push(fk);
         }
     }
+}
 
-    #[allow(clippy::needless_lifetimes)] // clippy is wrong here
-    fn calculate_relation_tables<'b>(&'b self) -> impl Iterator<Item = sql::Table> + 'b {
-        walk_relations(self.data_model)
-            .filter_map(|relation| relation.as_m2m())
-            .map(move |m2m| {
-                let table_name = m2m.table_name();
-                let model_a_id = m2m.model_a_id();
-                let model_b_id = m2m.model_b_id();
-                let model_a = model_a_id.model();
-                let model_b = model_b_id.model();
+fn calculate_relation_tables<'a>(
+    datamodel: &'a Datamodel,
+    flavour: &'a dyn SqlFlavour,
+) -> impl Iterator<Item = sql::Table> + 'a {
+    walk_relations(datamodel)
+        .filter_map(|relation| relation.as_m2m())
+        .map(move |m2m| {
+            let table_name = m2m.table_name();
+            let model_a_id = m2m.model_a_id();
+            let model_b_id = m2m.model_b_id();
+            let model_a = model_a_id.model();
+            let model_b = model_b_id.model();
 
-                let foreign_keys = vec![
-                    sql::ForeignKey {
-                        constraint_name: None,
-                        columns: vec![m2m.model_a_column().into()],
-                        referenced_table: model_a.db_name().into(),
-                        referenced_columns: vec![model_a_id.db_name().into()],
-                        on_update_action: self.flavour.m2m_foreign_key_action(&model_a, &model_b),
-                        on_delete_action: self.flavour.m2m_foreign_key_action(&model_a, &model_b),
-                    },
-                    sql::ForeignKey {
-                        constraint_name: None,
-                        columns: vec![m2m.model_b_column().into()],
-                        referenced_table: model_b.db_name().into(),
-                        referenced_columns: vec![model_b_id.db_name().into()],
-                        on_update_action: self.flavour.m2m_foreign_key_action(&model_a, &model_b),
-                        on_delete_action: self.flavour.m2m_foreign_key_action(&model_a, &model_b),
-                    },
-                ];
+            let foreign_keys = vec![
+                sql::ForeignKey {
+                    constraint_name: None,
+                    columns: vec![m2m.model_a_column().into()],
+                    referenced_table: model_a.db_name().into(),
+                    referenced_columns: vec![model_a_id.db_name().into()],
+                    on_update_action: flavour.m2m_foreign_key_action(&model_a, &model_b),
+                    on_delete_action: flavour.m2m_foreign_key_action(&model_a, &model_b),
+                },
+                sql::ForeignKey {
+                    constraint_name: None,
+                    columns: vec![m2m.model_b_column().into()],
+                    referenced_table: model_b.db_name().into(),
+                    referenced_columns: vec![model_b_id.db_name().into()],
+                    on_update_action: flavour.m2m_foreign_key_action(&model_a, &model_b),
+                    on_delete_action: flavour.m2m_foreign_key_action(&model_a, &model_b),
+                },
+            ];
 
-                let indexes = vec![
-                    sql::Index {
-                        name: format!("{}_AB_unique", &table_name),
-                        columns: vec![m2m.model_a_column().into(), m2m.model_b_column().into()],
-                        tpe: sql::IndexType::Unique,
-                    },
-                    sql::Index {
-                        name: format!("{}_B_index", &table_name),
-                        columns: vec![m2m.model_b_column().into()],
-                        tpe: sql::IndexType::Normal,
-                    },
-                ];
+            let indexes = vec![
+                sql::Index {
+                    name: format!("{}_AB_unique", &table_name),
+                    columns: vec![m2m.model_a_column().into(), m2m.model_b_column().into()],
+                    tpe: sql::IndexType::Unique,
+                },
+                sql::Index {
+                    name: format!("{}_B_index", &table_name),
+                    columns: vec![m2m.model_b_column().into()],
+                    tpe: sql::IndexType::Normal,
+                },
+            ];
 
-                let columns = vec![
-                    sql::Column {
-                        name: m2m.model_a_column().into(),
-                        tpe: column_type(&model_a_id, self.flavour),
-                        default: None,
-                        auto_increment: false,
-                    },
-                    sql::Column {
-                        name: m2m.model_b_column().into(),
-                        tpe: column_type(&model_b_id, self.flavour),
-                        default: None,
-                        auto_increment: false,
-                    },
-                ];
+            let columns = vec![
+                sql::Column {
+                    name: m2m.model_a_column().into(),
+                    tpe: column_type(&model_a_id, flavour),
+                    default: None,
+                    auto_increment: false,
+                },
+                sql::Column {
+                    name: m2m.model_b_column().into(),
+                    tpe: column_type(&model_b_id, flavour),
+                    default: None,
+                    auto_increment: false,
+                },
+            ];
 
-                sql::Table {
-                    name: table_name,
-                    columns,
-                    indices: indexes,
-                    primary_key: None,
-                    foreign_keys,
-                }
-            })
-    }
+            sql::Table {
+                name: table_name,
+                columns,
+                indices: indexes,
+                primary_key: None,
+                foreign_keys,
+            }
+        })
 }
 
 fn calculate_column_default(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_describer::DefaultValue> {
