@@ -88,13 +88,10 @@ pub fn commenting_out_guardrails(
     for model in datamodel.models_mut() {
         if model.fields.is_empty() {
             model.is_commented_out = true;
-
-            //todo, this seems wrong
             let comment = match family {
                 SqlFamily::Postgres =>
                     "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.".to_string(),
-
-                _ => "We could not retrieve columns for the underlying table. Either it has none or you are missing rights to see them. Please check your privileges.".to_string(),
+                _ => "We could not retrieve columns for the underlying table. You probably have no rights to see them. Please check your privileges.".to_string(),
 
             };
             //postgres could be valid, or privileges, commenting out because we cannot handle it.

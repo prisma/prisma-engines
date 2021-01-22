@@ -29,7 +29,6 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> crate::Tes
                     name: "id",
                     tpe: ColumnType {
                         full_data_type: "int(11)",
-                        character_maximum_length: None,
                         family: Int,
                         arity: Required,
                         native_type: Some(
@@ -45,9 +44,6 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> crate::Tes
                     name: "string",
                     tpe: ColumnType {
                         full_data_type: "text",
-                        character_maximum_length: Some(
-                                65535,
-                        ),
                         family: String,
                         arity: Required,
                         native_type: Some(
@@ -96,7 +92,6 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> crate::T
                     name: "id",
                     tpe: ColumnType {
                         full_data_type: "int",
-                        character_maximum_length: None,
                         family: Int,
                         arity: Required,
                         native_type: Some(
@@ -112,9 +107,6 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> crate::T
                     name: "string",
                     tpe: ColumnType {
                         full_data_type: "text",
-                        character_maximum_length: Some(
-                                65535,
-                        ),
                         family: String,
                         arity: Required,
                         native_type: Some(
@@ -163,7 +155,6 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> crate::
                     name: "id",
                     tpe: ColumnType {
                         full_data_type: "int4",
-                        character_maximum_length: None,
                         family: Int,
                         arity: Required,
                         native_type: Some(
@@ -186,7 +177,6 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> crate::
                     name: "string",
                     tpe: ColumnType {
                         full_data_type: "text",
-                        character_maximum_length: None,
                         family: String,
                         arity: Required,
                         native_type: Some(
@@ -245,7 +235,6 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> crate::Te
                     name: "id",
                     tpe: ColumnType {
                         full_data_type: "INTEGER",
-                        character_maximum_length: None,
                         family: Int,
                         arity: Required,
                         native_type: None,
@@ -257,7 +246,6 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> crate::Te
                     name: "string",
                     tpe: ColumnType {
                         full_data_type: "TEXT",
-                        character_maximum_length: None,
                         family: String,
                         arity: Required,
                         native_type: None,
