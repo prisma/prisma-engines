@@ -2856,3 +2856,51 @@ async fn a_default_can_be_dropped(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+//unsupported
+#[test_each_connector(tags("postgres"))]
+async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Post {
+            id            Int                     @id @default(autoincrement())
+            /// This type is currently not supported.
+            user_balance  Unsupported("money")
+            User          User                    @relation(fields: [user_balance], references: [balance])
+        }
+            
+        model User {
+            id            Int                     @id @default(autoincrement())
+            /// This type is currently not supported.
+            balance       Unsupported("money")  @unique
+            Post          Post[]
+        }   
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |table| {
+        table
+            .assert_columns_count(2)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("user_balance", |c| {
+                c.assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+            })
+    })?;
+
+    api.assert_schema().await?.assert_table("User", |table| {
+        table
+            .assert_columns_count(2)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("balance", |c| {
+                c.assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+            })
+    })?;
+
+    Ok(())
+}

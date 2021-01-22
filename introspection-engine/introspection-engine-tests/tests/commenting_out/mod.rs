@@ -5,6 +5,9 @@ use pretty_assertions::assert_eq;
 use serde_json::json;
 use test_macros::test_each_connector;
 
+//todo once we stabilize native types and with it unsupported,
+// a lot of the commented out testcases are going to become obsolete
+// this can then be the unsupported / ignore testfile
 #[test_each_connector]
 async fn a_table_without_uniques(api: &TestApi) -> crate::TestResult {
     api.barrel()
@@ -297,6 +300,46 @@ async fn a_table_with_only_an_unsupported_id_with_native_types_is_still_invalid(
     "#};
 
     assert_eq!(dm, &api.introspect_with_native_types().await?);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("balance money not null unique");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("user_balance money not null ");
+                t.add_foreign_key(&["user_balance"], "User", &["balance"]);
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+            model Post {
+              id            Int                     @id @default(autoincrement())
+              /// This type is currently not supported.
+              user_balance  Unsupported("money")
+              User          User                    @relation(fields: [user_balance], references: [balance])
+            }
+                    
+            model User {
+              id            Int                     @id @default(autoincrement())
+              /// This type is currently not supported.
+              balance       Unsupported("money")  @unique
+              Post          Post[]
+            }                
+        "#};
+
+    assert_eq!(
+        dm.replace(" ", ""),
+        api.introspect_with_native_types().await?.replace(" ", "")
+    );
 
     Ok(())
 }

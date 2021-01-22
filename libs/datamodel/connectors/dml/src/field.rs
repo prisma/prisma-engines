@@ -350,7 +350,8 @@ impl ScalarField {
     }
 
     pub fn is_ineligible_for_client(&self) -> bool {
-        self.is_commented_out || matches!(self.field_type, FieldType::Unsupported(_))
+        // self.is_commented_out || matches!(self.field_type, FieldType::Unsupported(_))
+        self.is_commented_out
     }
 }
 
