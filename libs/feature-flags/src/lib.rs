@@ -54,7 +54,8 @@ macro_rules! flags {
 
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases
 // `groupBy`: Group-By aggregations in the QE.
-flags!(microsoftSqlServer, groupBy);
+// `createMany`: Create many (bulk insert) API operation.
+flags!(microsoftSqlServer, groupBy, createMany);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.
