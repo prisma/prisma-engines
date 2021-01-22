@@ -248,7 +248,7 @@ impl<'a> SqlSchemaCalculator<'a> {
 }
 
 fn calculate_column_default(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_describer::DefaultValue> {
-    let value = match &field.default_value()? {
+    match &field.default_value()? {
         datamodel::DefaultValue::Single(s) => match field.field_type() {
             TypeWalker::Enum(inum) => {
                 let corresponding_value = inum
@@ -257,27 +257,17 @@ fn calculate_column_default(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_
                     .find(|val| val.name.as_str() == s.to_string())
                     .expect("could not find enum value");
 
-                PrismaValue::Enum(corresponding_value.final_database_name().to_owned())
+                Some(sql::DefaultValue::value(PrismaValue::Enum(
+                    corresponding_value.final_database_name().to_owned(),
+                )))
             }
-            _ => s.clone(),
+            _ => Some(sql::DefaultValue::value(s.clone())),
         },
-        datamodel::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
-            return Some(sql_schema_describer::DefaultValue::now())
-        }
-        datamodel::DefaultValue::Expression(expression)
-            if expression.name == "dbgenerated" && expression.args.is_empty() =>
-        {
-            return Some(sql_schema_describer::DefaultValue::db_generated(String::new()))
-        }
-        datamodel::DefaultValue::Expression(expression)
-            if expression.name == "autoincrement" && expression.args.is_empty() =>
-        {
-            return Some(sql_schema_describer::DefaultValue::sequence(String::new()))
-        }
-        datamodel::DefaultValue::Expression(_) => return None,
-    };
-
-    Some(sql_schema_describer::DefaultValue::value(value))
+        default if default.is_dbgenerated() => Some(sql::DefaultValue::db_generated(String::new())),
+        default if default.is_now() => Some(sql::DefaultValue::now()),
+        default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
+        datamodel::DefaultValue::Expression(_) => None,
+    }
 }
 
 fn column_type(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavour) -> sql::ColumnType {
