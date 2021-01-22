@@ -56,7 +56,7 @@ static TAG_NAMES: Lazy<Vec<(&str, BitFlags<Tags>)>> = Lazy::new(|| {
         ("mysql_8", Tags::Mysql8.into()),
         ("postgres", Tags::Postgres.into()),
         ("postgres_12", Tags::Postgres12.into()),
-        ("sql", Tags::Mysql | Tags::Postgres | Tags::Sqlite), // TODO: include MSSQL
+        ("sql", Tags::Mysql | Tags::Postgres | Tags::Sqlite | Tags::Mssql),
         ("sqlite", Tags::Sqlite.into()),
     ]
 });
