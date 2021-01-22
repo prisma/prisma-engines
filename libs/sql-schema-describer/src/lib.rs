@@ -251,10 +251,8 @@ impl Column {
 /// The type of a column.
 #[derive(PartialEq, Clone, Debug)]
 pub struct ColumnType {
-    /// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db
+    /// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db, used when there is no native type.
     pub full_data_type: String,
-    /// The maximum length for character or string bit types if specified.
-    pub character_maximum_length: Option<i64>,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
     /// The arity of the column.
@@ -267,7 +265,6 @@ impl ColumnType {
     pub fn pure(family: ColumnTypeFamily, arity: ColumnArity) -> Self {
         ColumnType {
             full_data_type: "".to_string(),
-            character_maximum_length: None,
             family,
             arity,
             native_type: None,
@@ -277,7 +274,6 @@ impl ColumnType {
     pub fn with_full_data_type(family: ColumnTypeFamily, arity: ColumnArity, full_data_type: String) -> Self {
         ColumnType {
             full_data_type,
-            character_maximum_length: None,
             family,
             arity,
             native_type: None,

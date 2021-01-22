@@ -26,22 +26,26 @@ pub struct VersionChecker {
 
 const SQLITE_TYPES: &[&str] = &["BOOLEAN", "DATE", "REAL", "INTEGER", "TEXT"];
 
-const POSTGRES_TYPES: &[&str] = &["bool", "timestamp", "numeric", "int4", "text", "varchar"];
+const POSTGRES_TYPES: &[PostgresType] = &[
+    PostgresType::Boolean,
+    PostgresType::Timestamp(Some(3)),
+    PostgresType::Decimal(Some((65, 30))),
+    PostgresType::Integer,
+    PostgresType::Text,
+    PostgresType::VarChar(Some(25)),
+    PostgresType::VarChar(Some(36)),
+    PostgresType::VarChar(Some(191)),
+];
 
-const POSTGRES_VAR_CHAR: &[&str] = &["varchar"];
-const POSTGRES_VAR_CHAR_LENGTHS: &[i64] = &[25, 36, 191];
-
-const MYSQL_TYPES: &[&str] = &[
-    "tinyint(1)",
-    "datetime(3)",
-    "decimal(65,30)",
-    "int(11)",
-    "int(4)",
-    "int",
-    "mediumtext",
-    "varchar(191)",
-    "char(25)",
-    "char(36)",
+const MYSQL_TYPES: &[MySqlType] = &[
+    MySqlType::TinyInt,
+    MySqlType::DateTime(Some(3)),
+    MySqlType::Decimal(Some((65, 30))),
+    MySqlType::Int,
+    MySqlType::MediumText,
+    MySqlType::VarChar(191),
+    MySqlType::Char(25),
+    MySqlType::Char(36),
 ];
 
 impl VersionChecker {
@@ -65,19 +69,30 @@ impl VersionChecker {
     }
 
     pub fn check_column_for_type_and_default_value(&mut self, column: &Column) {
-        match (&column.tpe.full_data_type, self.sql_family) {
-            (fdt, SqlFamily::Mysql) if !MYSQL_TYPES.contains(&&***&fdt) => self.uses_non_prisma_types = true,
-            (fdt, SqlFamily::Sqlite) if !SQLITE_TYPES.contains(&&***&fdt) => self.uses_non_prisma_types = true,
-            (fdt, SqlFamily::Postgres)
-                if POSTGRES_VAR_CHAR.contains(&&***&fdt)
-                    && column.tpe.character_maximum_length.is_some()
-                    && !POSTGRES_VAR_CHAR_LENGTHS.contains(&column.tpe.character_maximum_length.unwrap()) =>
-            {
+        match self.sql_family {
+            SqlFamily::Postgres => {
+                if let Some(native_type) = &column.tpe.native_type {
+                    let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
+
+                    if !POSTGRES_TYPES.contains(&native_type) {
+                        self.uses_non_prisma_types = true
+                    }
+                }
+            }
+            SqlFamily::Mysql => {
+                if let Some(native_type) = &column.tpe.native_type {
+                    let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
+
+                    if !MYSQL_TYPES.contains(&native_type) {
+                        self.uses_non_prisma_types = true
+                    }
+                }
+            }
+            SqlFamily::Sqlite if !SQLITE_TYPES.contains(&&**&column.tpe.full_data_type) => {
                 self.uses_non_prisma_types = true
             }
-            (fdt, SqlFamily::Postgres) if !POSTGRES_TYPES.contains(&&***&fdt) => self.uses_non_prisma_types = true,
             _ => (),
-        };
+        }
 
         if !column.auto_increment && column.default.is_some() {
             self.uses_default_values = true;

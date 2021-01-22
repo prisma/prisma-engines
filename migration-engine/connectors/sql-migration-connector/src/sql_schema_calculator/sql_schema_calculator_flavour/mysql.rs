@@ -95,7 +95,6 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
 
         sql::ColumnType {
             full_data_type: data_type,
-            character_maximum_length: None,
             family,
             arity: match field.arity() {
                 datamodel::FieldArity::Required => sql::ColumnArity::Required,

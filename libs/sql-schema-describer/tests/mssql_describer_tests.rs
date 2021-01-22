@@ -57,7 +57,6 @@ async fn all_mssql_column_types_must_work() {
             name: "primary_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "int".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Int.to_json()),
@@ -70,7 +69,6 @@ async fn all_mssql_column_types_must_work() {
             name: "bit_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "bit".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Bit.to_json()),
@@ -83,7 +81,6 @@ async fn all_mssql_column_types_must_work() {
             name: "decimal_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "decimal(18,0)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Decimal(Some((18, 0))).to_json()),
@@ -96,7 +93,6 @@ async fn all_mssql_column_types_must_work() {
             name: "int_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "int".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Int.to_json()),
@@ -108,7 +104,6 @@ async fn all_mssql_column_types_must_work() {
             name: "money_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "money".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Money.to_json()),
@@ -121,7 +116,6 @@ async fn all_mssql_column_types_must_work() {
             name: "numeric_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "numeric(18,0)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Decimal(Some((18, 0))).to_json()),
@@ -134,7 +128,6 @@ async fn all_mssql_column_types_must_work() {
             name: "smallint_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "smallint".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::SmallInt.to_json()),
@@ -147,7 +140,6 @@ async fn all_mssql_column_types_must_work() {
             name: "smallmoney_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "smallmoney".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::SmallMoney.to_json()),
@@ -160,7 +152,6 @@ async fn all_mssql_column_types_must_work() {
             name: "tinyint_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "tinyint".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::TinyInt.to_json()),
@@ -173,7 +164,6 @@ async fn all_mssql_column_types_must_work() {
             name: "float_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "real".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Real.to_json()),
@@ -186,7 +176,6 @@ async fn all_mssql_column_types_must_work() {
             name: "double_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "float(53)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Float(Some(53)).to_json()),
@@ -199,7 +188,6 @@ async fn all_mssql_column_types_must_work() {
             name: "date_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "date".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Date.to_json()),
@@ -212,7 +200,6 @@ async fn all_mssql_column_types_must_work() {
             name: "datetime_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "datetime".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::DateTime.to_json()),
@@ -224,7 +211,6 @@ async fn all_mssql_column_types_must_work() {
             name: "datetime2_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "datetime2".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::DateTime2.to_json()),
@@ -237,7 +223,6 @@ async fn all_mssql_column_types_must_work() {
             name: "datetimeoffset_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "datetimeoffset".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::DateTimeOffset.to_json()),
@@ -250,7 +235,6 @@ async fn all_mssql_column_types_must_work() {
             name: "smalldatetime_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "smalldatetime".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::SmallDateTime.to_json()),
@@ -263,7 +247,6 @@ async fn all_mssql_column_types_must_work() {
             name: "time_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "time".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Time.to_json()),
@@ -276,7 +259,6 @@ async fn all_mssql_column_types_must_work() {
             name: "char_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "char(255)".to_string(),
-                character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Char(Some(255)).to_json()),
@@ -289,7 +271,6 @@ async fn all_mssql_column_types_must_work() {
             name: "varchar_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "varchar(255)".to_string(),
-                character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::VarChar(Some(Number(255))).to_json()),
@@ -302,7 +283,6 @@ async fn all_mssql_column_types_must_work() {
             name: "varchar_max_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "varchar(max)".to_string(),
-                character_maximum_length: Some(-1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::VarChar(Some(Max)).to_json()),
@@ -315,7 +295,6 @@ async fn all_mssql_column_types_must_work() {
             name: "text_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "text".to_string(),
-                character_maximum_length: Some(2147483647),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Text.to_json()),
@@ -328,7 +307,6 @@ async fn all_mssql_column_types_must_work() {
             name: "nvarchar_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "nvarchar(255)".to_string(),
-                character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::NVarChar(Some(Number(255))).to_json()),
@@ -341,7 +319,6 @@ async fn all_mssql_column_types_must_work() {
             name: "nvarchar_max_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "nvarchar(max)".to_string(),
-                character_maximum_length: Some(-1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::NVarChar(Some(Max)).to_json()),
@@ -354,7 +331,6 @@ async fn all_mssql_column_types_must_work() {
             name: "ntext_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "ntext".to_string(),
-                character_maximum_length: Some(1073741823),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::NText.to_json()),
@@ -367,7 +343,6 @@ async fn all_mssql_column_types_must_work() {
             name: "binary_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "binary(20)".to_string(),
-                character_maximum_length: Some(20),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Binary(Some(20)).to_json()),
@@ -380,7 +355,6 @@ async fn all_mssql_column_types_must_work() {
             name: "varbinary_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "varbinary(20)".to_string(),
-                character_maximum_length: Some(20),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::VarBinary(Some(Number(20))).to_json()),
@@ -393,7 +367,6 @@ async fn all_mssql_column_types_must_work() {
             name: "varbinary_max_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "varbinary(max)".to_string(),
-                character_maximum_length: Some(-1),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::VarBinary(Some(Max)).to_json()),
@@ -406,7 +379,6 @@ async fn all_mssql_column_types_must_work() {
             name: "image_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "image".to_string(),
-                character_maximum_length: Some(2147483647),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Image.to_json()),
@@ -419,7 +391,6 @@ async fn all_mssql_column_types_must_work() {
             name: "xml_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "xml".to_string(),
-                character_maximum_length: Some(-1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MsSqlType::Xml.to_json()),
@@ -517,7 +488,6 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                     name: "id".to_string(),
                     tpe: ColumnType {
                         full_data_type: "int".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                         native_type: Some(MsSqlType::Int.to_json()),
@@ -530,7 +500,6 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                     name: "city".to_string(),
                     tpe: ColumnType {
                         full_data_type: "int".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(MsSqlType::Int.to_json()),
@@ -542,7 +511,6 @@ async fn mssql_foreign_key_on_delete_must_be_handled() {
                     name: "city_cascade".to_string(),
                     tpe: ColumnType {
                         full_data_type: "int".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(MsSqlType::Int.to_json()),

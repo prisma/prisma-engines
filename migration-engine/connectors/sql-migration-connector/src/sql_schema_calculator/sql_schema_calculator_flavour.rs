@@ -24,7 +24,6 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn column_type_for_unsupported_type(&self, field: &ScalarFieldWalker<'_>, description: String) -> sql::ColumnType {
         ColumnType {
             full_data_type: description.clone(),
-            character_maximum_length: None,
             family: ColumnTypeFamily::Unsupported(description.clone()),
             arity: match field.arity() {
                 FieldArity::Required => ColumnArity::Required,

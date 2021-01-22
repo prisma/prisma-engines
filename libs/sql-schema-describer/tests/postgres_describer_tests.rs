@@ -72,7 +72,6 @@ async fn all_postgres_column_types_must_work() {
             name: "array_bin_col".into(),
             tpe: ColumnType {
                 full_data_type: "_bytea".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::List,
                 native_type: Some(PostgresType::ByteA.to_json()),
@@ -84,7 +83,6 @@ async fn all_postgres_column_types_must_work() {
             name: "array_bool_col".into(),
             tpe: ColumnType {
                 full_data_type: "_bool".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::List,
                 native_type: Some(PostgresType::Boolean.to_json()),
@@ -96,7 +94,6 @@ async fn all_postgres_column_types_must_work() {
             name: "array_date_col".into(),
             tpe: ColumnType {
                 full_data_type: "_date".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::List,
                 native_type: Some(PostgresType::Date.to_json()),
@@ -108,7 +105,6 @@ async fn all_postgres_column_types_must_work() {
             name: "array_double_col".into(),
             tpe: ColumnType {
                 full_data_type: "_float8".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::List,
                 native_type: Some(PostgresType::DoublePrecision.to_json()),
@@ -120,7 +116,6 @@ async fn all_postgres_column_types_must_work() {
             name: "array_float_col".into(),
             tpe: ColumnType {
                 full_data_type: "_float8".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::List,
                 native_type: Some(PostgresType::DoublePrecision.to_json()),
@@ -132,7 +127,6 @@ async fn all_postgres_column_types_must_work() {
             name: "array_int_col".into(),
             tpe: ColumnType {
                 full_data_type: "_int4".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::List,
                 native_type: Some(PostgresType::Integer.to_json()),
@@ -144,7 +138,6 @@ async fn all_postgres_column_types_must_work() {
             name: "array_text_col".into(),
             tpe: ColumnType {
                 full_data_type: "_text".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
                 native_type: Some(PostgresType::Text.to_json()),
@@ -156,7 +149,6 @@ async fn all_postgres_column_types_must_work() {
             name: "array_varchar_col".into(),
             tpe: ColumnType {
                 full_data_type: "_varchar".into(),
-                character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
                 native_type: Some(PostgresType::VarChar(Some(255)).to_json()),
@@ -168,7 +160,6 @@ async fn all_postgres_column_types_must_work() {
             name: "binary_col".into(),
             tpe: ColumnType {
                 full_data_type: "bytea".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::ByteA.to_json()),
@@ -180,7 +171,6 @@ async fn all_postgres_column_types_must_work() {
             name: "boolean_col".into(),
             tpe: ColumnType {
                 full_data_type: "bool".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Boolean.to_json()),
@@ -192,7 +182,6 @@ async fn all_postgres_column_types_must_work() {
             name: "date_time_col".into(),
             tpe: ColumnType {
                 full_data_type: "date".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Date.to_json()),
@@ -204,7 +193,6 @@ async fn all_postgres_column_types_must_work() {
             name: "double_col".into(),
             tpe: ColumnType {
                 full_data_type: "float8".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::DoublePrecision.to_json()),
@@ -216,7 +204,6 @@ async fn all_postgres_column_types_must_work() {
             name: "float_col".into(),
             tpe: ColumnType {
                 full_data_type: "float8".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::DoublePrecision.to_json()),
@@ -228,7 +215,6 @@ async fn all_postgres_column_types_must_work() {
             name: "int_col".into(),
             tpe: ColumnType {
                 full_data_type: "int4".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Integer.to_json()),
@@ -240,7 +226,6 @@ async fn all_postgres_column_types_must_work() {
             name: "primary_col".into(),
             tpe: ColumnType {
                 full_data_type: "int4".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Integer.to_json()),
@@ -252,7 +237,6 @@ async fn all_postgres_column_types_must_work() {
             name: "string1_col".into(),
             tpe: ColumnType {
                 full_data_type: "text".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Text.to_json()),
@@ -264,7 +248,6 @@ async fn all_postgres_column_types_must_work() {
             name: "string2_col".into(),
             tpe: ColumnType {
                 full_data_type: "varchar".into(),
-                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::VarChar(Some(1)).to_json()),
@@ -276,7 +259,6 @@ async fn all_postgres_column_types_must_work() {
             name: "bigint_col".into(),
             tpe: ColumnType {
                 full_data_type: "int8".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::BigInt,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::BigInt.to_json()),
@@ -288,7 +270,6 @@ async fn all_postgres_column_types_must_work() {
             name: "bigserial_col".into(),
             tpe: ColumnType {
                 full_data_type: "int8".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::BigInt,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::BigInt.to_json()),
@@ -300,7 +281,6 @@ async fn all_postgres_column_types_must_work() {
             name: "bit_col".into(),
             tpe: ColumnType {
                 full_data_type: "bit".into(),
-                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Bit(Some(1)).to_json()),
@@ -312,7 +292,6 @@ async fn all_postgres_column_types_must_work() {
             name: "bit_varying_col".into(),
             tpe: ColumnType {
                 full_data_type: "varbit".into(),
-                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::VarBit(Some(1)).to_json()),
@@ -324,7 +303,6 @@ async fn all_postgres_column_types_must_work() {
             name: "box_col".into(),
             tpe: ColumnType {
                 full_data_type: "box".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("box".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -336,7 +314,6 @@ async fn all_postgres_column_types_must_work() {
             name: "char_col".into(),
             tpe: ColumnType {
                 full_data_type: "bpchar".into(),
-                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Char(Some(1)).to_json()),
@@ -348,7 +325,6 @@ async fn all_postgres_column_types_must_work() {
             name: "circle_col".into(),
             tpe: ColumnType {
                 full_data_type: "circle".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("circle".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -360,7 +336,6 @@ async fn all_postgres_column_types_must_work() {
             name: "line_col".into(),
             tpe: ColumnType {
                 full_data_type: "line".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("line".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -372,7 +347,6 @@ async fn all_postgres_column_types_must_work() {
             name: "time_col".into(),
             tpe: ColumnType {
                 full_data_type: "time".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Time(Some(6)).to_json()),
@@ -384,7 +358,6 @@ async fn all_postgres_column_types_must_work() {
             name: "timetz_col".into(),
             tpe: ColumnType {
                 full_data_type: "timetz".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Timetz(Some(6)).to_json()),
@@ -396,7 +369,6 @@ async fn all_postgres_column_types_must_work() {
             name: "timestamp_col".into(),
             tpe: ColumnType {
                 full_data_type: "timestamp".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Timestamp(Some(6)).to_json()),
@@ -408,7 +380,6 @@ async fn all_postgres_column_types_must_work() {
             name: "timestamptz_col".into(),
             tpe: ColumnType {
                 full_data_type: "timestamptz".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Timestamptz(Some(6)).to_json()),
@@ -420,7 +391,6 @@ async fn all_postgres_column_types_must_work() {
             name: "lseg_col".into(),
             tpe: ColumnType {
                 full_data_type: "lseg".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("lseg".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -432,7 +402,6 @@ async fn all_postgres_column_types_must_work() {
             name: "numeric_col".into(),
             tpe: ColumnType {
                 full_data_type: "numeric".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Decimal(None).to_json()),
@@ -444,7 +413,6 @@ async fn all_postgres_column_types_must_work() {
             name: "path_col".into(),
             tpe: ColumnType {
                 full_data_type: "path".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("path".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -456,7 +424,6 @@ async fn all_postgres_column_types_must_work() {
             name: "pg_lsn_col".into(),
             tpe: ColumnType {
                 full_data_type: "pg_lsn".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("pg_lsn".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -468,7 +435,6 @@ async fn all_postgres_column_types_must_work() {
             name: "polygon_col".into(),
             tpe: ColumnType {
                 full_data_type: "polygon".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("polygon".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -480,7 +446,6 @@ async fn all_postgres_column_types_must_work() {
             name: "smallint_col".into(),
             tpe: ColumnType {
                 full_data_type: "int2".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::SmallInt.to_json()),
@@ -492,7 +457,6 @@ async fn all_postgres_column_types_must_work() {
             name: "smallserial_col".into(),
             tpe: ColumnType {
                 full_data_type: "int2".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::SmallInt.to_json()),
@@ -504,7 +468,6 @@ async fn all_postgres_column_types_must_work() {
             name: "serial_col".into(),
             tpe: ColumnType {
                 full_data_type: "int4".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::Integer.to_json()),
@@ -516,7 +479,6 @@ async fn all_postgres_column_types_must_work() {
             name: "tsquery_col".into(),
             tpe: ColumnType {
                 full_data_type: "tsquery".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("tsquery".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -528,7 +490,6 @@ async fn all_postgres_column_types_must_work() {
             name: "tsvector_col".into(),
             tpe: ColumnType {
                 full_data_type: "tsvector".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("tsvector".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -540,7 +501,6 @@ async fn all_postgres_column_types_must_work() {
             name: "txid_col".into(),
             tpe: ColumnType {
                 full_data_type: "txid_snapshot".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("txid_snapshot".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -552,7 +512,6 @@ async fn all_postgres_column_types_must_work() {
             name: "json_col".into(),
             tpe: ColumnType {
                 full_data_type: "json".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::JSON.to_json()),
@@ -564,7 +523,6 @@ async fn all_postgres_column_types_must_work() {
             name: "jsonb_col".into(),
             tpe: ColumnType {
                 full_data_type: "jsonb".into(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::JSONB.to_json()),
@@ -576,8 +534,6 @@ async fn all_postgres_column_types_must_work() {
             name: "uuid_col".into(),
             tpe: ColumnType {
                 full_data_type: "uuid".into(),
-                character_maximum_length: None,
-
                 family: ColumnTypeFamily::Uuid,
                 arity: ColumnArity::Required,
                 native_type: Some(PostgresType::UUID.to_json()),
@@ -666,8 +622,6 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "id".into(),
                     tpe: ColumnType {
                         full_data_type: "int4".into(),
-                        character_maximum_length: None,
-
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -680,8 +634,6 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city".into(),
                     tpe: ColumnType {
                         full_data_type: "int4".into(),
-                        character_maximum_length: None,
-
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -693,8 +645,6 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city_cascade".into(),
                     tpe: ColumnType {
                         full_data_type: "int4".into(),
-                        character_maximum_length: None,
-
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -706,8 +656,6 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city_restrict".into(),
                     tpe: ColumnType {
                         full_data_type: "int4".into(),
-                        character_maximum_length: None,
-
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -719,8 +667,6 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city_set_null".into(),
                     tpe: ColumnType {
                         full_data_type: "int4".into(),
-                        character_maximum_length: None,
-
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),
@@ -732,8 +678,6 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city_set_default".into(),
                     tpe: ColumnType {
                         full_data_type: "int4".into(),
-                        character_maximum_length: None,
-
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(PostgresType::Integer.to_json()),

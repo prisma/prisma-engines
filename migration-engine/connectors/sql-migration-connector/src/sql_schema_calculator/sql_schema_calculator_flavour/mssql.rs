@@ -86,7 +86,6 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
 
         ColumnType {
             full_data_type: data_type,
-            character_maximum_length: None,
             family,
             arity: match field.arity() {
                 FieldArity::Required => ColumnArity::Required,

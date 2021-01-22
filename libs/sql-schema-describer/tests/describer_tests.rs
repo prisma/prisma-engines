@@ -73,7 +73,6 @@ async fn is_required_must_work(api: &TestApi) {
             name: "column1".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -85,7 +84,6 @@ async fn is_required_must_work(api: &TestApi) {
             name: "column2".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Nullable,
                 native_type: int_native_type(api),
@@ -126,7 +124,6 @@ async fn foreign_keys_must_work(api: &TestApi) {
         name: "city".to_string(),
         tpe: ColumnType {
             full_data_type: int_full_data_type(api),
-            character_maximum_length: None,
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
             native_type: int_native_type(api),
@@ -219,7 +216,6 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             name: "city".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -231,11 +227,6 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             name: "city_name".to_string(),
             tpe: ColumnType {
                 full_data_type: varchar_full_data_type(api, 255),
-                character_maximum_length: if api.sql_family() == SqlFamily::Sqlite {
-                    None
-                } else {
-                    Some(255)
-                },
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: varchar_native_type(api, 255),
@@ -300,7 +291,6 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
         name: "column-1".to_string(),
         tpe: ColumnType {
             full_data_type: int_full_data_type(api),
-            character_maximum_length: None,
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
             native_type: int_native_type(api),
@@ -349,7 +339,6 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
             name: "id".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -361,11 +350,6 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
             name: "name".to_string(),
             tpe: ColumnType {
                 full_data_type: varchar_full_data_type(api, 255),
-                character_maximum_length: if api.sql_family() == SqlFamily::Sqlite {
-                    None
-                } else {
-                    Some(255)
-                },
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: varchar_native_type(api, 255),
@@ -418,7 +402,6 @@ async fn indices_must_work(api: &TestApi) {
             name: "id".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -431,7 +414,6 @@ async fn indices_must_work(api: &TestApi) {
             name: "count".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -497,7 +479,6 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
             name: "uniq1".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -509,7 +490,6 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
             name: "uniq2".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -619,7 +599,6 @@ async fn defaults_must_work(api: &TestApi) {
 
     let expected_type = ColumnType {
         full_data_type: int_full_data_type(api),
-        character_maximum_length: None,
         family: ColumnTypeFamily::Int,
         arity: ColumnArity::Nullable,
         native_type: int_native_type(api),
