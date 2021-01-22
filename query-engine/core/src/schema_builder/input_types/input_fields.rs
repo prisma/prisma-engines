@@ -7,7 +7,7 @@ pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, i
 }
 
 pub(crate) fn nested_create_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
-    let create_types = create_objects::create_input_types(ctx, &field.related_model(), Some(field));
+    let create_types = create_one_objects::create_one_input_types(ctx, &field.related_model(), Some(field));
     let types: Vec<InputType> = create_types
         .into_iter()
         .flat_map(|typ| list_union_type(typ, field.is_list))

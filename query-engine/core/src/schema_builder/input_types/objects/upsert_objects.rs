@@ -18,7 +18,7 @@ fn nested_upsert_list_input_object(
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();
     let where_object = filter_objects::where_unique_object_type(ctx, &related_model);
-    let create_types = create_objects::create_input_types(ctx, &related_model, Some(parent_field));
+    let create_types = create_one_objects::create_one_input_types(ctx, &related_model, Some(parent_field));
     let update_types = update_one_objects::update_one_input_types(ctx, &related_model, Some(parent_field));
 
     if where_object.into_arc().is_empty() || create_types.iter().all(|typ| typ.is_empty()) {
@@ -58,7 +58,7 @@ fn nested_upsert_nonlist_input_object(
     parent_field: &RelationFieldRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();
-    let create_types = create_objects::create_input_types(ctx, &related_model, Some(parent_field));
+    let create_types = create_one_objects::create_one_input_types(ctx, &related_model, Some(parent_field));
     let update_types = update_one_objects::update_one_input_types(ctx, &related_model, Some(parent_field));
 
     if create_types.iter().all(|typ| typ.is_empty()) {

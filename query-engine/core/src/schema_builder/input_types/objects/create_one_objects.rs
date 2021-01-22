@@ -1,7 +1,7 @@
 use super::*;
 use prisma_models::dml::DefaultValue;
 
-pub(crate) fn create_input_types(
+pub(crate) fn create_one_input_types(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
