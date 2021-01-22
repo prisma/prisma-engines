@@ -28,6 +28,16 @@ impl DefaultValue {
         matches!(self, DefaultValue::Expression(generator) if generator.name == "autoincrement")
     }
 
+    /// Does this match @default(dbgenerated())?
+    pub fn is_dbgenerated(&self) -> bool {
+        matches!(self, DefaultValue::Expression(generator) if generator.name == "dbgenerated")
+    }
+
+    /// Does this match @default(now())?
+    pub fn is_now(&self) -> bool {
+        matches!(self, DefaultValue::Expression(generator) if generator.name == "now")
+    }
+
     pub fn new_db_generated() -> Self {
         DefaultValue::Expression(ValueGenerator::new_dbgenerated())
     }
@@ -172,5 +182,22 @@ mod tests {
         let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_autoincrement());
 
         assert!(auto_increment_default.is_autoincrement());
+    }
+
+    #[test]
+    fn default_value_is_now() {
+        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_now());
+
+        assert!(auto_increment_default.is_now());
+        assert!(!auto_increment_default.is_autoincrement());
+    }
+
+    #[test]
+    fn default_value_is_dbgenerated() {
+        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_dbgenerated());
+
+        assert!(auto_increment_default.is_dbgenerated());
+        assert!(!auto_increment_default.is_now());
+        assert!(!auto_increment_default.is_autoincrement());
     }
 }
