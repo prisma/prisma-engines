@@ -56,7 +56,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
                             tpe: column_type(&f, self.flavour),
-                            default: migration_value_new(&f),
+                            default: calculate_column_default(&f),
                             auto_increment: has_auto_increment_default || self.flavour.field_is_implicit_autoincrement_primary_key(&f),
                         })
                     },
@@ -65,7 +65,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
                             tpe: self.flavour.enum_column_type(&f,  enum_db_name),
-                            default: migration_value_new(&f),
+                            default: calculate_column_default(&f),
                             auto_increment: false,
                         })
                     }
@@ -75,7 +75,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
                             tpe: self.flavour.column_type_for_native_type(&f, scalar_type, native_type_instance),
-                            default: migration_value_new(&f),
+                            default: calculate_column_default(&f),
                             auto_increment: has_auto_increment_default || self.flavour.field_is_implicit_autoincrement_primary_key(&f)
                         })
                     } ,
@@ -247,7 +247,7 @@ impl<'a> SqlSchemaCalculator<'a> {
     }
 }
 
-fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_describer::DefaultValue> {
+fn calculate_column_default(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_describer::DefaultValue> {
     let value = match &field.default_value()? {
         datamodel::DefaultValue::Single(s) => match field.field_type() {
             TypeWalker::Enum(inum) => {
