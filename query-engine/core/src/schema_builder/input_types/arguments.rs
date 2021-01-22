@@ -20,7 +20,7 @@ pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) 
 
 /// Builds "data" argument intended for the create field.
 /// The data argument is not present if no data can be created.
-pub(crate) fn create_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
+pub(crate) fn create_one_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     let create_types = create_one_objects::create_one_input_types(ctx, model, None);
     let any_empty = create_types.iter().any(|typ| typ.is_empty());
     let all_empty = create_types.iter().all(|typ| typ.is_empty());
@@ -33,12 +33,12 @@ pub(crate) fn create_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 }
 
 /// Builds "where" (unique) argument intended for the delete field.
-pub(crate) fn delete_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
+pub(crate) fn delete_one_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     where_unique_argument(ctx, model).map(|arg| vec![arg])
 }
 
 /// Builds "where" (unique) and "data" arguments intended for the update field.
-pub(crate) fn update_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
+pub(crate) fn update_one_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<InputField>> {
     where_unique_argument(ctx, model).map(|unique_arg| {
         let update_types = update_one_objects::update_one_input_types(ctx, model, None);
 
@@ -66,10 +66,10 @@ pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 
 /// Builds "skip_duplicates" and "data" arguments intended for the create many field.
 pub(crate) fn create_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
-    let create_many_types: Vec<InputType> = todo!(); //create_many_objects::create_many_input_types(ctx, model, None);
+    let create_many_type = InputType::object(create_many_objects::create_many_object_type(ctx, model, None));
     let skip_arg = input_field("skip_duplicates", InputType::boolean(), None).optional();
 
-    vec![input_field("data", create_many_types, None), skip_arg]
+    vec![input_field("data", InputType::list(create_many_type), None), skip_arg]
 }
 
 /// Builds "where" and "data" arguments intended for the update many field.
