@@ -17,22 +17,6 @@ pub(crate) fn update_many_input_types(
     }
 }
 
-trait Toto {
-    fn x(&self);
-}
-
-impl Toto for &str {
-    fn x(&self) {
-        println!("{}", self);
-    }
-}
-
-impl Toto for i32 {
-    fn x(&self) {
-        println!("{}", self);
-    }
-}
-
 /// Builds "<x>UpdateManyMutationInput" input object type.
 pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(format!("{}UpdateManyMutationInput", model.name), PRISMA_NAMESPACE);
