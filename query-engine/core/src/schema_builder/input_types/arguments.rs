@@ -152,7 +152,7 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
             None,
         )
         .optional(),
-        input_field(args::BY, InputType::int(), None).optional(),
+        input_field(args::TAKE, InputType::int(), None).optional(),
         input_field(args::SKIP, InputType::int(), None).optional(),
     ]
 }
