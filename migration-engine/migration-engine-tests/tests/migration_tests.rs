@@ -25,6 +25,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
         model Test {
             id          String @id @default(cuid())
             int         Int
+            bigInt      BigInt
             float       Float
             boolean     Boolean
             string      String
@@ -39,9 +40,12 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
-            .assert_columns_count(8)?
+            .assert_columns_count(9)?
             .assert_column("int", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("bigInt", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::BigInt)
             })?
             .assert_column("float", |c| {
                 //The native types work made the inferrence more correct on the describer level.
