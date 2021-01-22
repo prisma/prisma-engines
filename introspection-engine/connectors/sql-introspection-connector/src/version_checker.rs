@@ -4,6 +4,7 @@ use crate::introspection_helpers::{
 };
 use datamodel::{Datamodel, Model};
 use introspection_connector::{Version, Warning};
+use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{Column, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
 use tracing::debug;
@@ -22,13 +23,6 @@ pub struct VersionChecker {
     uses_non_prisma_types: bool,
     has_inline_relations: bool,
 }
-
-const CHAR_25: &str = "char(25)";
-const CHAR_36: &str = "char(36)";
-const INT: &str = "int";
-const INT_11: &str = "int(11)";
-const INT_4: &str = "int4";
-const VARCHAR: &str = "varchar";
 
 const SQLITE_TYPES: &[&str] = &["BOOLEAN", "DATE", "REAL", "INTEGER", "TEXT"];
 
@@ -117,15 +111,29 @@ impl VersionChecker {
                 if columns.len() == 1 {
                     let tpe = &table.column_bang(columns.first().unwrap()).tpe;
 
-                    match (&tpe.full_data_type, &tpe.character_maximum_length, self.sql_family) {
-                        (fdt, Some(25), SqlFamily::Mysql) if fdt == CHAR_25 => (),
-                        (fdt, Some(36), SqlFamily::Mysql) if fdt == CHAR_36 => (),
-                        (fdt, None, SqlFamily::Mysql) if (fdt == INT_11 || fdt == INT) => (),
-                        (fdt, Some(25), SqlFamily::Postgres) if fdt == VARCHAR => (),
-                        (fdt, Some(36), SqlFamily::Postgres) if fdt == VARCHAR => (),
-                        (fdt, None, SqlFamily::Postgres) if fdt == INT_4 => (),
-                        _ => self.always_has_p1_or_p_1_1_compatible_id = false,
-                    }
+                    if self.sql_family == SqlFamily::Postgres {
+                        if let Some(native_type) = &tpe.native_type {
+                            let native_type: PostgresType = serde_json::from_value(native_type.clone()).unwrap();
+
+                            if native_type != PostgresType::VarChar(Some(25))
+                                && native_type != PostgresType::VarChar(Some(36))
+                                && native_type != PostgresType::Integer
+                            {
+                                self.always_has_p1_or_p_1_1_compatible_id = false
+                            }
+                        }
+                    } else if self.sql_family == SqlFamily::Mysql {
+                        if let Some(native_type) = &tpe.native_type {
+                            let native_type: MySqlType = serde_json::from_value(native_type.clone()).unwrap();
+
+                            if native_type != MySqlType::Char(25)
+                                && native_type != MySqlType::Char(36)
+                                && native_type != MySqlType::Int
+                            {
+                                self.always_has_p1_or_p_1_1_compatible_id = false
+                            }
+                        }
+                    };
                 }
             }
         }
