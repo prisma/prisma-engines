@@ -1,5 +1,5 @@
 use super::*;
-use crate::{query_ast::*, query_graph::QueryGraph, ArgumentListLookup, ParsedField};
+use crate::{constants::inputs::args, query_ast::*, query_graph::QueryGraph, ArgumentListLookup, ParsedField};
 use prisma_value::PrismaValue;
 use std::convert::TryInto;
 
@@ -18,8 +18,8 @@ pub fn query_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuilde
 }
 
 fn raw_query(mut field: ParsedField) -> QueryGraphBuilderResult<RawQuery> {
-    let query_arg = field.arguments.lookup("query").unwrap().value;
-    let parameters_arg = field.arguments.lookup("parameters");
+    let query_arg = field.arguments.lookup(args::QUERY).unwrap().value;
+    let parameters_arg = field.arguments.lookup(args::PARAMETERS);
 
     let query_value: PrismaValue = query_arg.try_into()?;
     let parameters: Vec<PrismaValue> = match parameters_arg {

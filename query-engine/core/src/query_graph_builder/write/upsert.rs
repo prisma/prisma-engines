@@ -1,5 +1,6 @@
 use super::*;
 use crate::{
+    constants::inputs::args,
     query_ast::*,
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
@@ -11,13 +12,13 @@ use std::{convert::TryInto, sync::Arc};
 pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
-    let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
+    let where_arg: ParsedInputMap = field.arguments.lookup(args::WHERE).unwrap().value.try_into()?;
 
     let filter = extract_unique_filter(where_arg, &model)?;
     let model_id = model.primary_identifier();
 
-    let create_argument = field.arguments.lookup("create").unwrap();
-    let update_argument = field.arguments.lookup("update").unwrap();
+    let create_argument = field.arguments.lookup(args::CREATE).unwrap();
+    let update_argument = field.arguments.lookup(args::UPDATE).unwrap();
 
     let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
     let read_parent_records_node = graph.create_node(read_parent_records);

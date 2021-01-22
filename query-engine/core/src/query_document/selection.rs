@@ -1,3 +1,5 @@
+use crate::constants::inputs::filters;
+
 use super::QueryValue;
 use indexmap::IndexMap;
 use itertools::Itertools;
@@ -238,7 +240,11 @@ impl<'a> From<In<'a>> for QueryValue {
                 let mut argument = IndexMap::new();
                 argument.insert(
                     key.to_string(),
-                    QueryValue::Object(vec![("in".to_owned(), QueryValue::List(vals))].into_iter().collect()),
+                    QueryValue::Object(
+                        vec![(filters::IN.to_owned(), QueryValue::List(vals))]
+                            .into_iter()
+                            .collect(),
+                    ),
                 );
 
                 QueryValue::Object(argument)
@@ -326,7 +332,7 @@ fn single_to_multi_filter(obj: IndexMap<String, QueryValue>) -> IndexMap<String,
     let mut new_obj = IndexMap::new();
 
     for (key, value) in obj {
-        let equality_obj = vec![("equals".to_owned(), value)].into_iter().collect();
+        let equality_obj = vec![(filters::EQUALS.to_owned(), value)].into_iter().collect();
         new_obj.insert(key, QueryValue::Object(equality_obj));
     }
 

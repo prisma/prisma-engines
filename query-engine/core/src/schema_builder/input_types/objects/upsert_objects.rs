@@ -1,3 +1,5 @@
+use crate::constants::inputs::args;
+
 use super::*;
 
 pub(crate) fn nested_upsert_input_object(
@@ -40,9 +42,9 @@ fn nested_upsert_list_input_object(
             ctx.cache_input_type(ident, input_object.clone());
 
             let fields = vec![
-                input_field("where", InputType::object(where_object), None),
-                input_field("update", update_types, None),
-                input_field("create", create_types, None),
+                input_field(args::WHERE, InputType::object(where_object), None),
+                input_field(args::UPDATE, update_types, None),
+                input_field(args::CREATE, create_types, None),
             ];
 
             input_object.set_fields(fields);
@@ -80,8 +82,8 @@ fn nested_upsert_nonlist_input_object(
             ctx.cache_input_type(ident, input_object.clone());
 
             let fields = vec![
-                input_field("update", update_types, None),
-                input_field("create", create_types, None),
+                input_field(args::UPDATE, update_types, None),
+                input_field(args::CREATE, create_types, None),
             ];
 
             input_object.set_fields(fields);

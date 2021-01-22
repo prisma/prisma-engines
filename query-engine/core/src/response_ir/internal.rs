@@ -1,5 +1,6 @@
 use super::*;
 use crate::{
+    constants::outputs::fields,
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
     CoreError, DatabaseEnumType, EnumType, OutputFieldRef, QueryResult, RecordAggregations, RecordSelection,
 };
@@ -47,7 +48,7 @@ pub fn serialize_internal(
             let mut map: Map = IndexMap::with_capacity(1);
             let mut result = CheckedItemsWithParents::new();
 
-            map.insert("count".into(), Item::Value(PrismaValue::Int(c as i64)));
+            map.insert(fields::COUNT.into(), Item::Value(PrismaValue::Int(c as i64)));
             result.insert(None, Item::Map(map));
 
             Ok(result)
@@ -87,17 +88,20 @@ fn serialize_aggregations(
                 }
 
                 AggregationResult::Average(field, value) => {
-                    let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "avg", &field.name);
+                    let output_field =
+                        find_nested_aggregate_output_field(&aggregate_object_type, fields::AVG, &field.name);
                     flattened.insert(format!("avg_{}", &field.name), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Sum(field, value) => {
-                    let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "sum", &field.name);
+                    let output_field =
+                        find_nested_aggregate_output_field(&aggregate_object_type, fields::SUM, &field.name);
                     flattened.insert(format!("sum_{}", &field.name), serialize_scalar(&output_field, value)?);
                 }
 
                 AggregationResult::Min(field, value) => {
-                    let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "min", &field.name);
+                    let output_field =
+                        find_nested_aggregate_output_field(&aggregate_object_type, fields::MIN, &field.name);
                     flattened.insert(
                         format!("min_{}", &field.name),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,
@@ -105,7 +109,8 @@ fn serialize_aggregations(
                 }
 
                 AggregationResult::Max(field, value) => {
-                    let output_field = find_nested_aggregate_output_field(&aggregate_object_type, "max", &field.name);
+                    let output_field =
+                        find_nested_aggregate_output_field(&aggregate_object_type, fields::MAX, &field.name);
                     flattened.insert(
                         format!("max_{}", &field.name),
                         serialize_scalar(&output_field, coerce_non_numeric(value, &output_field.field_type))?,

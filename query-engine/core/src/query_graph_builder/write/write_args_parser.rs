@@ -1,5 +1,8 @@
 use super::*;
-use crate::query_document::{ParsedInputMap, ParsedInputValue};
+use crate::{
+    constants::inputs::operations,
+    query_document::{ParsedInputMap, ParsedInputValue},
+};
 use connector::{WriteArgs, WriteExpression};
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
@@ -23,7 +26,7 @@ impl WriteArgsParser {
                     Field::Scalar(sf) if sf.is_list => {
                         let set_value: PrismaValue = match v {
                             ParsedInputValue::List(_) => v.try_into()?,
-                            ParsedInputValue::Map(mut map) => map.remove("set").unwrap().try_into()?,
+                            ParsedInputValue::Map(mut map) => map.remove(operations::SET).unwrap().try_into()?,
                             _ => unreachable!(),
                         };
 
@@ -38,11 +41,11 @@ impl WriteArgsParser {
                                 let value: PrismaValue = value.try_into()?;
 
                                 match operation.as_str() {
-                                    "set" => WriteExpression::Value(value),
-                                    "increment" => WriteExpression::Add(value),
-                                    "decrement" => WriteExpression::Substract(value),
-                                    "multiply" => WriteExpression::Multiply(value),
-                                    "divide" => WriteExpression::Divide(value),
+                                    operations::SET => WriteExpression::Value(value),
+                                    operations::INCREMENT => WriteExpression::Add(value),
+                                    operations::DECREMENT => WriteExpression::Substract(value),
+                                    operations::MULTIPLY => WriteExpression::Multiply(value),
+                                    operations::DIVIDE => WriteExpression::Divide(value),
                                     _ => unreachable!("Invalid update operation"),
                                 }
                             }
