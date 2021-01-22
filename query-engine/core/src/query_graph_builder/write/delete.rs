@@ -1,5 +1,6 @@
 use super::*;
 use crate::{
+    constants::inputs::args,
     query_ast::*,
     query_graph::{QueryGraph, QueryGraphDependency},
     ArgumentListLookup, FilteredQuery, ParsedField,
@@ -12,7 +13,7 @@ use std::{convert::TryInto, sync::Arc};
 pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
-    let where_arg = field.arguments.lookup("where").unwrap();
+    let where_arg = field.arguments.lookup(args::WHERE).unwrap();
     let filter = extract_unique_filter(where_arg.value.try_into()?, &model)?;
 
     // Prefetch read query for the delete
@@ -57,7 +58,7 @@ pub fn delete_many_records(
 ) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
-    let filter = match field.arguments.lookup("where") {
+    let filter = match field.arguments.lookup(args::WHERE) {
         Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
     };

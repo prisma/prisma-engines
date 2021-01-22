@@ -1,5 +1,6 @@
 use super::*;
 use crate::{
+    constants::inputs::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap,
@@ -13,7 +14,7 @@ use write_args_parser::*;
 pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     graph.flag_transactional();
 
-    let data_map = match field.arguments.lookup("data") {
+    let data_map = match field.arguments.lookup(args::DATA) {
         Some(data) => data.value.try_into()?,
         None => ParsedInputMap::new(),
     };

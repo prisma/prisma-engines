@@ -1,5 +1,7 @@
 use super::*;
 use crate::{
+    constants::inputs::args,
+    constants::inputs::ordering,
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
@@ -18,32 +20,32 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
         |result: QueryGraphBuilderResult<QueryArguments>, arg| {
             if let Ok(res) = result {
                 match arg.name.as_str() {
-                    "cursor" => Ok(QueryArguments {
+                    args::CURSOR => Ok(QueryArguments {
                         cursor: extract_cursor(arg.value, model)?,
                         ..res
                     }),
 
-                    "take" => Ok(QueryArguments {
+                    args::TAKE => Ok(QueryArguments {
                         take: arg.value.try_into()?,
                         ..res
                     }),
 
-                    "skip" => Ok(QueryArguments {
+                    args::SKIP => Ok(QueryArguments {
                         skip: extract_skip(arg.value)?,
                         ..res
                     }),
 
-                    "orderBy" => Ok(QueryArguments {
+                    args::ORDER_BY => Ok(QueryArguments {
                         order_by: extract_order_by(model, arg.value)?,
                         ..res
                     }),
 
-                    "distinct" => Ok(QueryArguments {
+                    args::DISTINCT => Ok(QueryArguments {
                         distinct: Some(extract_distinct(arg.value)?),
                         ..res
                     }),
 
-                    "where" => {
+                    args::WHERE => {
                         let val: Option<ParsedInputMap> = arg.value.try_into()?;
                         match val {
                             Some(m) => {
@@ -79,8 +81,8 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
                         let field = model.fields().find_from_scalar(&field_name)?;
                         let value: PrismaValue = sort_order.try_into()?;
                         let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                            "asc" => SortOrder::Ascending,
-                            "desc" => SortOrder::Descending,
+                            ordering::ASC => SortOrder::Ascending,
+                            ordering::DESC => SortOrder::Descending,
                             _ => unreachable!(),
                         };
 
@@ -109,8 +111,8 @@ fn process_order_object(model: &ModelRef, object: ParsedInputMap) -> QueryGraphB
             let field = model.fields().find_from_scalar(&field_name)?;
             let value: PrismaValue = sort_order.try_into()?;
             let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                "asc" => SortOrder::Ascending,
-                "desc" => SortOrder::Descending,
+                ordering::ASC => SortOrder::Ascending,
+                ordering::DESC => SortOrder::Descending,
                 _ => unreachable!(),
             };
 

@@ -30,6 +30,8 @@ pub use query_value::*;
 pub use selection::*;
 pub use transformers::*;
 
+use crate::constants::inputs::args;
+
 pub type QueryParserResult<T> = std::result::Result<T, QueryParserError>;
 
 #[derive(Debug)]
@@ -158,7 +160,7 @@ impl From<Vec<Operation>> for CompactedDocument {
 
             // The `In` handles both cases, with singular id it'll do an `IN`
             // expression and with a compound id a combination of `AND` and `OR`.
-            builder.push_argument("where", In::new(selection_set));
+            builder.push_argument(args::WHERE, In::new(selection_set));
 
             if let Some(ref alias) = selections[0].alias() {
                 builder.alias(alias);

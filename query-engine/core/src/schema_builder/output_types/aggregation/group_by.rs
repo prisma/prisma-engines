@@ -1,3 +1,5 @@
+use crate::constants::outputs::fields;
+
 use super::*;
 use std::convert::identity;
 
@@ -23,7 +25,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
         &mut object_fields,
         aggregation_field(
             ctx,
-            "count",
+            fields::COUNT,
             &model,
             model.fields().scalar(),
             |_, _| OutputType::int(),
@@ -38,7 +40,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
         &mut object_fields,
         aggregation_field(
             ctx,
-            "avg",
+            fields::AVG,
             &model,
             numeric_fields.clone(),
             field_avg_output_type,
@@ -50,7 +52,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
         &mut object_fields,
         aggregation_field(
             ctx,
-            "sum",
+            fields::SUM,
             &model,
             numeric_fields,
             map_scalar_output_type_for_field,
@@ -62,7 +64,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
         &mut object_fields,
         aggregation_field(
             ctx,
-            "min",
+            fields::MIN,
             &model,
             non_list_fields.clone(),
             map_scalar_output_type_for_field,
@@ -74,7 +76,7 @@ pub(crate) fn group_by_output_object_type(ctx: &mut BuilderContext, model: &Mode
         &mut object_fields,
         aggregation_field(
             ctx,
-            "max",
+            fields::MAX,
             &model,
             non_list_fields,
             map_scalar_output_type_for_field,

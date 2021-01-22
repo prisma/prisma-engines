@@ -1,4 +1,5 @@
 use super::*;
+use constants::inputs::filters;
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
@@ -71,16 +72,16 @@ fn full_relation_filter(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
 
     let fields = if rf.is_list {
         vec![
-            input_field("every", InputType::object(related_input_type.clone()), None).optional(),
-            input_field("some", InputType::object(related_input_type.clone()), None).optional(),
-            input_field("none", InputType::object(related_input_type), None).optional(),
+            input_field(filters::EVERY, InputType::object(related_input_type.clone()), None).optional(),
+            input_field(filters::SOME, InputType::object(related_input_type.clone()), None).optional(),
+            input_field(filters::NONE, InputType::object(related_input_type), None).optional(),
         ]
     } else {
         vec![
-            input_field("is", InputType::object(related_input_type.clone()), None)
+            input_field(filters::IS, InputType::object(related_input_type.clone()), None)
                 .optional()
                 .nullable_if(!rf.is_required),
-            input_field("isNot", InputType::object(related_input_type), None)
+            input_field(filters::IS_NOT, InputType::object(related_input_type), None)
                 .optional()
                 .nullable_if(!rf.is_required),
         ]
@@ -108,14 +109,14 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     let mut fields: Vec<_> = equality_filters(mapped_list_type.clone(), !sf.is_required).collect();
 
     fields.push(
-        input_field("has", mapped_nonlist_type, None)
+        input_field(filters::HAS, mapped_nonlist_type, None)
             .optional()
             .nullable_if(!sf.is_required),
     );
 
-    fields.push(input_field("hasEvery", mapped_list_type.clone(), None).optional());
-    fields.push(input_field("hasSome", mapped_list_type, None).optional());
-    fields.push(input_field("isEmpty", InputType::boolean(), None).optional());
+    fields.push(input_field(filters::HAS_EVERY, mapped_list_type.clone(), None).optional());
+    fields.push(input_field(filters::HAS_SOME, mapped_list_type, None).optional());
+    fields.push(input_field(filters::IS_EMPTY, InputType::boolean(), None).optional());
 
     object.set_fields(fields);
     Arc::downgrade(&object)
@@ -181,13 +182,15 @@ fn full_scalar_filter_type(
         )));
     }
 
-    let not_field = input_field("not", not_types, None).optional().nullable_if(nullable);
+    let not_field = input_field(filters::NOT_LOWERCASE, not_types, None)
+        .optional()
+        .nullable_if(nullable);
     fields.push(not_field);
 
     if include_aggregates {
         fields.push(aggregate_filter_field(
             ctx,
-            "count",
+            filters::COUNT,
             &TypeIdentifier::Int,
             nullable,
             list,
@@ -195,13 +198,13 @@ fn full_scalar_filter_type(
 
         if typ.is_numeric() {
             let avg_type = map_avg_type_ident(typ.clone());
-            fields.push(aggregate_filter_field(ctx, "avg", &avg_type, nullable, list));
-            fields.push(aggregate_filter_field(ctx, "sum", typ, nullable, list));
+            fields.push(aggregate_filter_field(ctx, filters::AVG, &avg_type, nullable, list));
+            fields.push(aggregate_filter_field(ctx, filters::SUM, typ, nullable, list));
         }
 
         if !list {
-            fields.push(aggregate_filter_field(ctx, "min", typ, nullable, list));
-            fields.push(aggregate_filter_field(ctx, "max", typ, nullable, list));
+            fields.push(aggregate_filter_field(ctx, filters::MIN, typ, nullable, list));
+            fields.push(aggregate_filter_field(ctx, filters::MAX, typ, nullable, list));
         }
     }
 
@@ -210,7 +213,7 @@ fn full_scalar_filter_type(
 }
 
 fn equality_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<Item = InputField> {
-    vec![input_field("equals", mapped_type, None)
+    vec![input_field(filters::EQUALS, mapped_type, None)
         .optional()
         .nullable_if(nullable)]
     .into_iter()
@@ -220,27 +223,29 @@ fn inclusion_filters(mapped_type: InputType, nullable: bool) -> impl Iterator<It
     let typ = InputType::list(mapped_type);
 
     vec![
-        input_field("in", typ.clone(), None).optional().nullable_if(nullable),
-        input_field("notIn", typ, None).optional().nullable_if(nullable), // Kept for legacy reasons!
+        input_field(filters::IN, typ.clone(), None)
+            .optional()
+            .nullable_if(nullable),
+        input_field(filters::NOT_IN, typ, None).optional().nullable_if(nullable), // Kept for legacy reasons!
     ]
     .into_iter()
 }
 
 fn alphanumeric_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
     vec![
-        input_field("lt", mapped_type.clone(), None).optional(),
-        input_field("lte", mapped_type.clone(), None).optional(),
-        input_field("gt", mapped_type.clone(), None).optional(),
-        input_field("gte", mapped_type, None).optional(),
+        input_field(filters::LOWER_THAN, mapped_type.clone(), None).optional(),
+        input_field(filters::LOWER_THAN_OR_EQUAL, mapped_type.clone(), None).optional(),
+        input_field(filters::GREATER_THAN, mapped_type.clone(), None).optional(),
+        input_field(filters::GREATER_THAN_OR_EQUAL, mapped_type, None).optional(),
     ]
     .into_iter()
 }
 
 fn string_filters(mapped_type: InputType) -> impl Iterator<Item = InputField> {
     vec![
-        input_field("contains", mapped_type.clone(), None).optional(),
-        input_field("startsWith", mapped_type.clone(), None).optional(),
-        input_field("endsWith", mapped_type, None).optional(),
+        input_field(filters::CONTAINS, mapped_type.clone(), None).optional(),
+        input_field(filters::STARTS_WITH, mapped_type.clone(), None).optional(),
+        input_field(filters::ENDS_WITH, mapped_type, None).optional(),
     ]
     .into_iter()
 }
@@ -251,13 +256,13 @@ fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = 
     let fields = if !nested && ctx.capabilities.contains(ConnectorCapability::InsensitiveFilters) {
         let enum_type = Arc::new(string_enum_type(
             "QueryMode",
-            vec!["default".to_owned(), "insensitive".to_owned()],
+            vec![filters::DEFAULT.to_owned(), filters::INSENSITIVE.to_owned()],
         ));
 
         let field = input_field(
-            "mode",
+            filters::MODE,
             InputType::enum_type(enum_type),
-            Some(DefaultValue::Single(PrismaValue::Enum("default".to_owned()))),
+            Some(DefaultValue::Single(PrismaValue::Enum(filters::DEFAULT.to_owned()))),
         )
         .optional();
 
