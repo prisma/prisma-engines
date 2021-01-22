@@ -2,7 +2,7 @@ use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MysqlFlavour;
 use datamodel::{
     walkers::{walk_scalar_fields, ScalarFieldWalker},
-    Datamodel, NativeTypeInstance, ScalarType,
+    Datamodel, NativeTypeInstance,
 };
 use native_types::MySqlType;
 use sql::ColumnTypeFamily;
@@ -36,7 +36,6 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
     fn column_type_for_native_type(
         &self,
         field: &ScalarFieldWalker<'_>,
-        _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
         let mysql_type: MySqlType = native_type_instance.deserialize_native_type();
@@ -116,7 +115,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         )
     }
 
-    fn default_native_type_for_family(&self, family: sql::ColumnTypeFamily) -> Option<serde_json::Value> {
+    fn default_native_type_for_family(&self, family: &sql::ColumnTypeFamily) -> Option<serde_json::Value> {
         let ty = match family {
             ColumnTypeFamily::Int => MySqlType::Int,
             ColumnTypeFamily::BigInt => MySqlType::BigInt,

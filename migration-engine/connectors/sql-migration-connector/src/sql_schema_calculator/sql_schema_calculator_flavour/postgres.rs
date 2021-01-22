@@ -1,6 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::PostgresFlavour;
-use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, ScalarType, WithDatabaseName};
+use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, WithDatabaseName};
 use native_types::PostgresType;
 use sql::ColumnTypeFamily;
 use sql_schema_describer::{self as sql};
@@ -16,7 +16,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             .collect()
     }
 
-    fn default_native_type_for_family(&self, family: ColumnTypeFamily) -> Option<serde_json::Value> {
+    fn default_native_type_for_family(&self, family: &ColumnTypeFamily) -> Option<serde_json::Value> {
         let ty = match family {
             ColumnTypeFamily::Int => PostgresType::Integer,
             ColumnTypeFamily::BigInt => PostgresType::BigInt,
@@ -38,7 +38,6 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     fn column_type_for_native_type(
         &self,
         field: &ScalarFieldWalker<'_>,
-        _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
         let postgres_type: PostgresType = native_type_instance.deserialize_native_type();
