@@ -5,7 +5,7 @@ pub(crate) mod input_fields;
 mod objects;
 
 use super::*;
-use crate::{constants::inputs::filters, schema::*};
+use crate::{constants::inputs::ordering, schema::*};
 use objects::*;
 use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
@@ -13,7 +13,7 @@ use prisma_models::{RelationFieldRef, ScalarFieldRef};
 pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
     let enum_type = Arc::new(string_enum_type(
         "SortOrder",
-        vec![filters::ASC.to_owned(), filters::DESC.to_owned()],
+        vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()],
     ));
     let ident = Identifier::new(format!("{}OrderByInput", model.name), PRISMA_NAMESPACE);
 

@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    constants::inputs::args,
+    constants::inputs::operations,
     query_document::{ParsedInputMap, ParsedInputValue},
 };
 use connector::{WriteArgs, WriteExpression};
@@ -26,7 +26,7 @@ impl WriteArgsParser {
                     Field::Scalar(sf) if sf.is_list => {
                         let set_value: PrismaValue = match v {
                             ParsedInputValue::List(_) => v.try_into()?,
-                            ParsedInputValue::Map(mut map) => map.remove(args::SET).unwrap().try_into()?,
+                            ParsedInputValue::Map(mut map) => map.remove(operations::SET).unwrap().try_into()?,
                             _ => unreachable!(),
                         };
 
@@ -41,11 +41,11 @@ impl WriteArgsParser {
                                 let value: PrismaValue = value.try_into()?;
 
                                 match operation.as_str() {
-                                    args::SET => WriteExpression::Value(value),
-                                    args::INCREMENT => WriteExpression::Add(value),
-                                    args::DECREMENT => WriteExpression::Substract(value),
-                                    args::MULTIPLY => WriteExpression::Multiply(value),
-                                    args::DIVIDE => WriteExpression::Divide(value),
+                                    operations::SET => WriteExpression::Value(value),
+                                    operations::INCREMENT => WriteExpression::Add(value),
+                                    operations::DECREMENT => WriteExpression::Substract(value),
+                                    operations::MULTIPLY => WriteExpression::Multiply(value),
+                                    operations::DIVIDE => WriteExpression::Divide(value),
                                     _ => unreachable!("Invalid update operation"),
                                 }
                             }

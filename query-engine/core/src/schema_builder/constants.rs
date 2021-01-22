@@ -3,23 +3,9 @@ pub mod inputs {
         pub const WHERE: &str = "where";
         pub const DATA: &str = "data";
 
-        // nested operations
+        // upsert args
         pub const CREATE: &str = "create";
-        pub const CONNECT_OR_CREATE: &str = "connectOrCreate";
-        pub const CONNECT: &str = "connect";
-        pub const DISCONNECT: &str = "disconnect";
         pub const UPDATE: &str = "update";
-        pub const UPDATE_MANY: &str = "updateMany";
-        pub const UPSERT: &str = "upsert";
-        pub const DELETE: &str = "delete";
-        pub const DELETE_MANY: &str = "deleteMany";
-        // scalar lists
-        pub const SET: &str = "set";
-        // numbers
-        pub const INCREMENT: &str = "increment";
-        pub const DECREMENT: &str = "decrement";
-        pub const MULTIPLY: &str = "multiply";
-        pub const DIVIDE: &str = "divide";
 
         // pagination args
         pub const CURSOR: &str = "cursor";
@@ -39,6 +25,29 @@ pub mod inputs {
 
         pub const DISTINCT: &str = "distinct";
     }
+
+    pub mod operations {
+        // nested operations
+        pub const CONNECT: &str = "connect";
+        pub const CREATE: &str = "create";
+        pub const CONNECT_OR_CREATE: &str = "connectOrCreate";
+        pub const DISCONNECT: &str = "disconnect";
+        pub const UPDATE: &str = "update";
+        pub const UPDATE_MANY: &str = "updateMany";
+        pub const DELETE: &str = "delete";
+        pub const DELETE_MANY: &str = "deleteMany";
+        pub const UPSERT: &str = "upsert";
+        
+        // scalar lists
+        pub const SET: &str = "set";
+
+        // numbers
+        pub const INCREMENT: &str = "increment";
+        pub const DECREMENT: &str = "decrement";
+        pub const MULTIPLY: &str = "multiply";
+        pub const DIVIDE: &str = "divide";
+    }
+
     pub mod filters {
         // scalar filters
         pub const EQUALS: &str = "equals";
@@ -89,8 +98,9 @@ pub mod inputs {
         pub const SUM: &str = "sum";
         pub const MIN: &str = "min";
         pub const MAX: &str = "max";
+    }
 
-        // ordering
+    pub mod ordering {
         pub const ASC: &str = "asc";
         pub const DESC: &str = "desc";
     }

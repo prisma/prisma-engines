@@ -1,5 +1,5 @@
 use super::*;
-use constants::inputs::args;
+use constants::inputs::{args, operations};
 use prisma_models::dml::DefaultValue;
 
 pub(crate) fn update_one_input_types(
@@ -178,15 +178,15 @@ fn operations_object_type(
     ctx.cache_input_type(ident, obj.clone());
 
     let typ = map_scalar_input_type_for_field(ctx, field);
-    let mut fields = vec![input_field(args::SET, typ.clone(), None)
+    let mut fields = vec![input_field(operations::SET, typ.clone(), None)
         .optional()
         .nullable_if(!field.is_required)];
 
     if with_number_operators {
-        fields.push(input_field(args::INCREMENT, typ.clone(), None).optional());
-        fields.push(input_field(args::DECREMENT, typ.clone(), None).optional());
-        fields.push(input_field(args::MULTIPLY, typ.clone(), None).optional());
-        fields.push(input_field(args::DIVIDE, typ, None).optional());
+        fields.push(input_field(operations::INCREMENT, typ.clone(), None).optional());
+        fields.push(input_field(operations::DECREMENT, typ.clone(), None).optional());
+        fields.push(input_field(operations::MULTIPLY, typ.clone(), None).optional());
+        fields.push(input_field(operations::DIVIDE, typ, None).optional());
     }
 
     obj.set_fields(fields);

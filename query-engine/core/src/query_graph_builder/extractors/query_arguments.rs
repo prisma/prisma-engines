@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     constants::inputs::args,
-    constants::inputs::filters,
+    constants::inputs::ordering,
     query_document::{ParsedArgument, ParsedInputMap},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
@@ -81,8 +81,8 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
                         let field = model.fields().find_from_scalar(&field_name)?;
                         let value: PrismaValue = sort_order.try_into()?;
                         let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                            filters::ASC => SortOrder::Ascending,
-                            filters::DESC => SortOrder::Descending,
+                            ordering::ASC => SortOrder::Ascending,
+                            ordering::DESC => SortOrder::Descending,
                             _ => unreachable!(),
                         };
 
@@ -111,8 +111,8 @@ fn process_order_object(model: &ModelRef, object: ParsedInputMap) -> QueryGraphB
             let field = model.fields().find_from_scalar(&field_name)?;
             let value: PrismaValue = sort_order.try_into()?;
             let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                filters::ASC => SortOrder::Ascending,
-                filters::DESC => SortOrder::Descending,
+                ordering::ASC => SortOrder::Ascending,
+                ordering::DESC => SortOrder::Descending,
                 _ => unreachable!(),
             };
 
