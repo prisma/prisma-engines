@@ -108,7 +108,7 @@ pub fn commenting_out_guardrails(
         .models_mut()
         .filter(|model| !models_without_columns.iter().any(|m| m.model == model.name))
     {
-        if model.strict_unique_criterias().is_empty() {
+        if model.strict_unique_criterias_disregarding_unsupported().is_empty() {
             model.is_commented_out = true; //todo this becomes ignore later
             model.documentation = Some(
                 "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."

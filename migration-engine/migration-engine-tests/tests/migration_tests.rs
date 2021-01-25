@@ -12,6 +12,7 @@ mod native_types;
 mod reset;
 mod schema_push;
 
+use migration_core::commands::EvaluateDataLossOutput;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
@@ -1697,7 +1698,14 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
 async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
-            id Int   @id
+            id Int   @id    let output = api.evaluate_data_loss(&directory, dm).send().await?.into_output();
+    let expected_output = EvaluateDataLossOutput {
+        migration_steps: vec![],
+        warnings: vec![],
+        unexecutable_steps: vec![],
+    };
+
+    assert_eq!(output, expected_output);
             box Box?
         }
 
@@ -2904,3 +2912,51 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+// going from unsupported to supported
+// #[test_each_connector(tags("postgres"), features("native_types"))]
+// async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> TestResult {
+//     let directory = api.create_migrations_directory()?;
+//
+//     let dm1 = r#"
+//         model Post {
+//             id            Int                     @id @default(autoincrement())
+//             user_home  Unsupported("point")
+//             user_location  Unsupported("point")
+//         }
+//     "#;
+//
+//     api.create_migration("initial", dm1, &directory).send().await?;
+//
+//     let dm2 = r#"
+//         model Post {
+//             id            Int                     @id @default(autoincrement())
+//             user_home     String
+//             user_location Int
+//         }
+//     "#;
+//
+//     let output = api.evaluate_data_loss(&directory, dm2).send().await?.into_output();
+//     let expected_output = EvaluateDataLossOutput {
+//         migration_steps: vec![],
+//         warnings: vec![],
+//         unexecutable_steps: vec![],
+//     };
+//
+//     assert_eq!(output, expected_output);
+//
+//     api.create_migration("second-migration", dm2, &directory).send().await?;
+//     api.apply_migrations(&directory)
+//         .send()
+//         .await?
+//         .assert_applied_migrations(&["initial", "second-migration"])?;
+//     let output = api.diagnose_migration_history(&directory).send().await?.into_output();
+//     assert!(output.is_empty());
+//
+//     Ok(())
+// }
+
+// going from supported to unsupported
+// adding properties to unsupported
+// removing properties from unsupported
+// switching unsupported types

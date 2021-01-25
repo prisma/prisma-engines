@@ -348,11 +348,6 @@ impl ScalarField {
     pub fn is_auto_increment(&self) -> bool {
         matches!(&self.default_value, Some(DefaultValue::Expression(expr)) if expr == &ValueGenerator::new_autoincrement())
     }
-
-    pub fn is_ineligible_for_client(&self) -> bool {
-        // self.is_commented_out || matches!(self.field_type, FieldType::Unsupported(_))
-        self.is_commented_out
-    }
 }
 
 impl WithName for ScalarField {
