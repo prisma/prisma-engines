@@ -131,7 +131,7 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
     assert!(column.is_required());
 
-    let index = table.indices.iter().find(|i| i.columns == &["title"]);
+    let index = table.indices.iter().find(|i| i.columns == ["title"]);
 
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);

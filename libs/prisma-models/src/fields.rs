@@ -244,7 +244,7 @@ impl Fields {
         }
     }
 
-    pub fn db_names<'a>(&'a self) -> impl Iterator<Item = String> + 'a {
+    pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {
         self.all
             .iter()
             .flat_map(|field| field.scalar_fields().into_iter().map(|f| f.db_name().to_owned()))
