@@ -65,3 +65,9 @@ impl TypeNameValidator {
         self.reserved_names.contains(&name.as_ref())
     }
 }
+
+impl Default for TypeNameValidator {
+    fn default() -> Self {
+        Self::new()
+    }
+}

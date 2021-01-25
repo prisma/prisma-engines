@@ -84,12 +84,12 @@ impl Model {
     }
 
     /// Gets a mutable  iterator over all fields.
-    pub fn fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut Field> + 'a {
+    pub fn fields_mut(&mut self) -> impl Iterator<Item = &mut Field> {
         self.fields.iter_mut()
     }
 
     /// Gets an iterator over all scalar fields.
-    pub fn scalar_fields<'a>(&'a self) -> impl Iterator<Item = &'a ScalarField> + 'a {
+    pub fn scalar_fields(&self) -> impl Iterator<Item = &ScalarField> {
         self.fields().filter_map(|fw| match fw {
             Field::RelationField(_) => None,
             Field::ScalarField(sf) => Some(sf),
@@ -97,7 +97,7 @@ impl Model {
     }
 
     /// Gets an iterator over all relation fields.
-    pub fn relation_fields<'a>(&'a self) -> impl Iterator<Item = &'a RelationField> + 'a {
+    pub fn relation_fields(&self) -> impl Iterator<Item = &RelationField> {
         self.fields().filter_map(|fw| match fw {
             Field::RelationField(rf) => Some(rf),
             Field::ScalarField(_) => None,
@@ -105,7 +105,7 @@ impl Model {
     }
 
     /// Gets a mutable iterator over all scalar fields.
-    pub fn scalar_fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut ScalarField> + 'a {
+    pub fn scalar_fields_mut(&mut self) -> impl Iterator<Item = &mut ScalarField> {
         self.fields_mut().filter_map(|fw| match fw {
             Field::RelationField(_) => None,
             Field::ScalarField(sf) => Some(sf),
@@ -113,7 +113,7 @@ impl Model {
     }
 
     /// Gets a mutable iterator over all relation fields.
-    pub fn relation_fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut RelationField> + 'a {
+    pub fn relation_fields_mut(&mut self) -> impl Iterator<Item = &mut RelationField> {
         self.fields_mut().filter_map(|fw| match fw {
             Field::RelationField(rf) => Some(rf),
             Field::ScalarField(_) => None,
