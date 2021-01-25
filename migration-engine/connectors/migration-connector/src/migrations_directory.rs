@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 //! Migrations directory management.
 //!
 //! This module is responsible for the management of the contents of the
