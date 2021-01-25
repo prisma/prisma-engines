@@ -23,7 +23,7 @@ tracing-futures = "0.2.0"
 url = "2.1.1"
 
 [dev-dependencies]
-tokio = { version = "0.2.0", default-features = false, features = ["macros"] }
+tokio = { version = "1.0", default-features = false, features = ["macros"] }
 
 [features]
 default = ["sql"]

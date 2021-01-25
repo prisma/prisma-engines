@@ -20,7 +20,7 @@ enumflags2 = "0.6.0"
 serde = { version = "1", features = ["derive"] }
 pretty_assertions = "0.6.1"
 tracing-futures = "0.2"
-tokio = {version = "0.2.13", features = ["rt-threaded", "macros"]}
+tokio = {version = "1.0", features = ["rt-multi-thread", "macros"]}
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 tracing = "0.1.10"
 eyre = "0.6.1"

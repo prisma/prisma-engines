@@ -7,7 +7,7 @@ use migration_connector::{
     ConnectorError, ConnectorResult, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
 use std::time::Duration;
-use tokio::time::{timeout, Elapsed};
+use tokio::time::{error::Elapsed, timeout};
 
 const DESTRUCTIVE_TIMEOUT_DURATION: Duration = Duration::from_secs(60);
 
