@@ -267,14 +267,13 @@ impl QueryGraph {
 
         graph
             .node_indices()
-            .filter_map(|ix| {
-                if graph.edges_directed(ix, Direction::Incoming).next().is_some() {
+            .filter_map(|node_ix| {
+                if graph.edges_directed(node_ix, Direction::Incoming).next().is_some() {
                     None
                 } else {
-                    Some(ix)
+                    Some(NodeRef { node_ix })
                 }
             })
-            .map(|node_ix: NodeIndex| NodeRef { node_ix })
             .collect()
     }
 

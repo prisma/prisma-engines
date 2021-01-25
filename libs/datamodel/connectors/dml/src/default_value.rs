@@ -134,6 +134,7 @@ impl ValueGeneratorFn {
     }
 
     fn can_handle(&self, scalar_type: ScalarType) -> bool {
+        #[allow(clippy::clippy::match_like_matches_macro)]
         match (self, scalar_type) {
             (Self::UUID, ScalarType::String) => true,
             (Self::CUID, ScalarType::String) => true,

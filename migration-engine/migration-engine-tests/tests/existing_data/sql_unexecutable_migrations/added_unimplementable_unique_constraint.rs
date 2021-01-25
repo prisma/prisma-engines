@@ -40,23 +40,13 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
 
-    if api.is_mysql() {
-        assert_eq!(
-            rows,
-            &[
-                &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
-                &[r#"Text(Some("def"))"#, r#"Text(Some("george"))"#]
-            ]
-        );
-    } else {
-        assert_eq!(
-            rows,
-            &[
-                &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
-                &[r#"Text(Some("def"))"#, r#"Text(Some("george"))"#]
-            ]
-        );
-    }
+    assert_eq!(
+        rows,
+        &[
+            &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
+            &[r#"Text(Some("def"))"#, r#"Text(Some("george"))"#]
+        ]
+    );
 
     Ok(())
 }

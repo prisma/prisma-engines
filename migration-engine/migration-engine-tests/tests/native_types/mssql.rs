@@ -1903,7 +1903,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
         for to in *casts {
             println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
 
-            let kind = from.split("(").next().unwrap();
+            let kind = from.split('(').next().unwrap();
 
             let dm1 = api.native_types_datamodel(&format!(
                 r#"
@@ -1928,7 +1928,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
                 })
             })?;
 
-            let kind = to.split("(").next().unwrap();
+            let kind = to.split('(').next().unwrap();
 
             let dm2 = api.native_types_datamodel(&format!(
                 r#"
@@ -1965,7 +1965,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
         for to in *casts {
             println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
 
-            let kind = from.split("(").next().unwrap();
+            let kind = from.split('(').next().unwrap();
 
             let dm1 = api.native_types_datamodel(&format!(
                 r#"
@@ -1990,7 +1990,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
                 })
             })?;
 
-            let kind = to.split("(").next().unwrap();
+            let kind = to.split('(').next().unwrap();
 
             let dm2 = api.native_types_datamodel(&format!(
                 r#"
@@ -2061,7 +2061,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
                 })
             })?;
 
-            let kind = to.split("(").next().unwrap();
+            let kind = to.split('(').next().unwrap();
 
             let dm2 = api.native_types_datamodel(&format!(
                 r#"
