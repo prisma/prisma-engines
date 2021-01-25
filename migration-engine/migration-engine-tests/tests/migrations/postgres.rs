@@ -118,6 +118,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("text", "String", "Text", "text"),
         ("bytea", "Bytes", "ByteA", "bytea"),
         ("ts", "DateTime", "Timestamp(0)", "timestamp"),
+        ("tstz", "DateTime", "Timestamptz", "timestamptz"),
         ("date", "DateTime", "Date", "date"),
         ("time", "DateTime", "Time(2)", "time"),
         ("bool", "Boolean", "Boolean", "bool"),
@@ -151,7 +152,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
 
     dm.push_str("}\n");
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         types.iter().fold(
@@ -161,6 +162,8 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
             },
         )
     })?;
+
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }
