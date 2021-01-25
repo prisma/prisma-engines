@@ -10,6 +10,7 @@ use std::path::Path;
 pub(crate) struct SqliteFlavour {
     pub(super) file_path: String,
     pub(super) attached_name: String,
+    pub(super) features: BitFlags<MigrationFeature>,
 }
 
 #[async_trait::async_trait]
@@ -143,6 +144,6 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn features(&self) -> BitFlags<MigrationFeature> {
-        BitFlags::empty()
+        self.features
     }
 }

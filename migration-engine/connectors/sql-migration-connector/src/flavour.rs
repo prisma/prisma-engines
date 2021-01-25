@@ -46,6 +46,7 @@ pub(crate) fn from_connection_info(
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
             attached_name: db_name.clone(),
+            features,
         }),
         ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone(), features)),
         ConnectionInfo::InMemorySqlite { .. } => unreachable!("SqlFlavour for in-memory SQLite"),

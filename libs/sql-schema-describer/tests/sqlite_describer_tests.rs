@@ -65,7 +65,7 @@ async fn sqlite_column_types_must_work() {
             name: "real_col".to_string(),
             tpe: ColumnType {
                 full_data_type: "REAL".to_string(),
-                family: ColumnTypeFamily::Decimal,
+                family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: None,
             },

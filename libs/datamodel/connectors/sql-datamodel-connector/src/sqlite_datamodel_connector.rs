@@ -29,7 +29,7 @@ impl Connector for SqliteDatamodelConnector {
         &self.capabilities
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType, _: bool) -> serde_json::Value {
         serde_json::Value::Null
     }
 

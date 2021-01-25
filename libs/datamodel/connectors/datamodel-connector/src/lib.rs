@@ -30,7 +30,11 @@ pub trait Connector: Send + Sync {
 
     /// On each connector, each built-in Prisma scalar type (`Boolean`,
     /// `String`, `Float`, etc.) has a corresponding native type.
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value;
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarType,
+        temporary_native_types_on: bool,
+    ) -> serde_json::Value;
 
     /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
     fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool;

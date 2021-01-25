@@ -1,9 +1,10 @@
 use super::{common::*, SqlRenderer};
 use crate::{
-    flavour::SqliteFlavour,
+    flavour::{SqlFlavour, SqliteFlavour},
     pair::Pair,
     sql_migration::{AddColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
 };
+use migration_connector::MigrationFeature;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
@@ -39,7 +40,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_column(&self, column: &ColumnWalker<'_>) -> String {
-        render_column(column).to_string()
+        render_column(column, self).to_string()
     }
 
     fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
@@ -119,7 +120,7 @@ impl SqlRenderer for SqliteFlavour {
     fn render_create_table_as(&self, table: &TableWalker<'_>, table_name: &str) -> String {
         let mut create_table = sql_ddl::sqlite::CreateTable {
             table_name: table_name.into(),
-            columns: table.columns().map(|col| render_column(&col)).collect(),
+            columns: table.columns().map(|col| render_column(&col, self)).collect(),
             primary_key: None,
             foreign_keys: table
                 .foreign_keys()
@@ -213,12 +214,18 @@ impl SqlRenderer for SqliteFlavour {
     }
 }
 
-fn render_column_type(t: &ColumnType) -> &str {
+fn render_column_type<'a>(t: &'a ColumnType, flavour: &SqliteFlavour) -> &'a str {
     match &t.family {
         ColumnTypeFamily::Boolean => "BOOLEAN",
         ColumnTypeFamily::DateTime => "DATETIME",
-        ColumnTypeFamily::Float => "REAL",
-        ColumnTypeFamily::Decimal => "REAL",
+        ColumnTypeFamily::Float => {
+            if flavour.features().contains(MigrationFeature::NativeTypes) {
+                "REAL"
+            } else {
+                "DECIMAL"
+            }
+        }
+        ColumnTypeFamily::Decimal => "DECIMAL",
         ColumnTypeFamily::Int => "INTEGER",
         ColumnTypeFamily::BigInt => "BIGINT",
         ColumnTypeFamily::String => "TEXT",
@@ -291,7 +298,7 @@ fn copy_current_table_into_new_table(
     steps.push(query)
 }
 
-fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
+fn render_column<'a>(column: &ColumnWalker<'a>, flavour: &SqliteFlavour) -> ddl::Column<'a> {
     sql_ddl::sqlite::Column {
         autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
         default: column
@@ -301,7 +308,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),
         primary_key: column.is_single_primary_key(),
-        r#type: render_column_type(column.column_type()).into(),
+        r#type: render_column_type(column.column_type(), flavour).into(),
     }
 }
 

@@ -125,7 +125,7 @@ impl PostgresDatamodelConnector {
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
     (ScalarType::Int, PostgresType::Integer),
     (ScalarType::BigInt, PostgresType::BigInt),
-    (ScalarType::Float, PostgresType::Decimal(Some((65, 30)))),
+    (ScalarType::Float, PostgresType::DoublePrecision),
     (ScalarType::Decimal, PostgresType::Decimal(Some((65, 30)))),
     (ScalarType::Boolean, PostgresType::Boolean),
     (ScalarType::String, PostgresType::Text),
@@ -143,7 +143,17 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarType,
+        temporary_native_types_on: bool,
+    ) -> serde_json::Value {
+        let scalar_type = if !temporary_native_types_on && scalar_type.is_float() {
+            &ScalarType::Decimal
+        } else {
+            scalar_type
+        };
+
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)

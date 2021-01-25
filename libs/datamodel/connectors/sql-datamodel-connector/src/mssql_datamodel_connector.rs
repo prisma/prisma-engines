@@ -95,7 +95,7 @@ impl MsSqlDatamodelConnector {
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
     (ScalarType::Int, MsSqlType::Int),
     (ScalarType::BigInt, MsSqlType::BigInt),
-    (ScalarType::Float, MsSqlType::Decimal(Some((32, 16)))),
+    (ScalarType::Float, MsSqlType::Float(Some(53))),
     (ScalarType::Decimal, MsSqlType::Decimal(Some((32, 16)))),
     (ScalarType::Boolean, MsSqlType::Bit),
     (
@@ -119,7 +119,17 @@ impl Connector for MsSqlDatamodelConnector {
         &self.capabilities
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarType,
+        temporary_native_types: bool,
+    ) -> serde_json::Value {
+        let scalar_type = if !temporary_native_types && scalar_type.is_float() {
+            &ScalarType::Decimal
+        } else {
+            scalar_type
+        };
+
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)

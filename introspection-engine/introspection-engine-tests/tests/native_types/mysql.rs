@@ -102,7 +102,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             decimal_2                      Decimal  @mysql.Decimal(10, 0)
             numeric                        Decimal  @mysql.Decimal(4, 1)
             float                          Float    @mysql.Float
-            double                         Float    @mysql.Double
+            double                         Float
             bits                           Bytes    @mysql.Bit(64)
             bit_bool                       Boolean  @mysql.Bit(1)
             chars                          String   @mysql.Char(10)
