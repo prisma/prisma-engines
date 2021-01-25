@@ -237,7 +237,7 @@ model Author {
 }
 "#;
 
-    assert_eq!(input, input);
+    assert_rendered(input, input);
 }
 
 #[test]

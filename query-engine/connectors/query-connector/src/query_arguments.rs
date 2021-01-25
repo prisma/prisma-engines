@@ -91,7 +91,7 @@ impl QueryArguments {
     }
 
     pub fn take_abs(&self) -> Option<i64> {
-        self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
+        self.take.clone().map(|t| if t < 0 { -t } else { t })
     }
 
     pub fn can_batch(&self) -> bool {

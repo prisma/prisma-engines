@@ -1,4 +1,5 @@
 use super::*;
+use constants::inputs::{args, operations};
 use prisma_models::dml::DefaultValue;
 
 pub(crate) fn update_one_input_types(
@@ -177,15 +178,15 @@ fn operations_object_type(
     ctx.cache_input_type(ident, obj.clone());
 
     let typ = map_scalar_input_type_for_field(ctx, field);
-    let mut fields = vec![input_field("set", typ.clone(), None)
+    let mut fields = vec![input_field(operations::SET, typ.clone(), None)
         .optional()
         .nullable_if(!field.is_required)];
 
     if with_number_operators {
-        fields.push(input_field("increment", typ.clone(), None).optional());
-        fields.push(input_field("decrement", typ.clone(), None).optional());
-        fields.push(input_field("multiply", typ.clone(), None).optional());
-        fields.push(input_field("divide", typ, None).optional());
+        fields.push(input_field(operations::INCREMENT, typ.clone(), None).optional());
+        fields.push(input_field(operations::DECREMENT, typ.clone(), None).optional());
+        fields.push(input_field(operations::MULTIPLY, typ.clone(), None).optional());
+        fields.push(input_field(operations::DIVIDE, typ, None).optional());
     }
 
     obj.set_fields(fields);
@@ -334,8 +335,8 @@ pub(crate) fn update_one_where_combination_object(
     ctx.cache_input_type(ident, input_object.clone());
 
     let fields = vec![
-        input_field("where", InputType::object(where_input_object), None),
-        input_field("data", update_types, None),
+        input_field(args::WHERE, InputType::object(where_input_object), None),
+        input_field(args::DATA, update_types, None),
     ];
 
     input_object.set_fields(fields);

@@ -1,9 +1,8 @@
 //! The feature handling for SQL Migration Connector.
 
-use std::{fmt::Display, io, str::FromStr};
-
 use datamodel::Configuration;
 use enumflags2::BitFlags;
+use std::{fmt::Display, io, str::FromStr};
 
 static NATIVE_TYPES: &str = "nativeTypes";
 

@@ -1,4 +1,5 @@
 use super::*;
+use constants::inputs::filters;
 use std::sync::Arc;
 
 pub(crate) fn scalar_filter_object_type(
@@ -18,13 +19,18 @@ pub(crate) fn scalar_filter_object_type(
 
     let mut input_fields = vec![
         input_field(
-            "AND",
+            filters::AND,
             vec![object_type.clone(), InputType::list(object_type.clone())],
             None,
         )
         .optional(),
-        input_field("OR", vec![InputType::list(object_type.clone())], None).optional(),
-        input_field("NOT", vec![object_type.clone(), InputType::list(object_type)], None).optional(),
+        input_field(filters::OR, vec![InputType::list(object_type.clone())], None).optional(),
+        input_field(
+            filters::NOT,
+            vec![object_type.clone(), InputType::list(object_type)],
+            None,
+        )
+        .optional(),
     ];
 
     input_fields.extend(model.fields().all.iter().filter_map(|f| match f {
@@ -48,13 +54,18 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
 
     let mut fields = vec![
         input_field(
-            "AND",
+            filters::AND,
             vec![object_type.clone(), InputType::list(object_type.clone())],
             None,
         )
         .optional(),
-        input_field("OR", vec![InputType::list(object_type.clone())], None).optional(),
-        input_field("NOT", vec![object_type.clone(), InputType::list(object_type)], None).optional(),
+        input_field(filters::OR, vec![InputType::list(object_type.clone())], None).optional(),
+        input_field(
+            filters::NOT,
+            vec![object_type.clone(), InputType::list(object_type)],
+            None,
+        )
+        .optional(),
     ];
 
     fields.extend(

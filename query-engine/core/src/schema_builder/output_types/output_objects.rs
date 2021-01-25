@@ -1,4 +1,6 @@
 use super::*;
+
+use crate::constants::outputs::fields;
 use prisma_models::ScalarFieldRef;
 
 /// Initializes model output object type cache on the context.
@@ -14,7 +16,7 @@ pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
         .into_iter()
         .for_each(|model| {
             let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
-            ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident.clone(), Some(model))))
+            ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model))))
         });
 
     // Compute fields on all cached object types.
@@ -109,7 +111,7 @@ fn map_enum_type(ctx: &mut BuilderContext, enum_name: &str) -> EnumType {
         .find_enum(enum_name)
         .expect("Enum references must always be valid.");
 
-    e.clone().into()
+    e.into()
 }
 
 pub(crate) fn batch_payload_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
@@ -118,7 +120,7 @@ pub(crate) fn batch_payload_object_type(ctx: &mut BuilderContext) -> ObjectTypeW
 
     let object_type = Arc::new(object_type(
         ident.clone(),
-        vec![field("count", vec![], OutputType::int(), None)],
+        vec![field(fields::COUNT, vec![], OutputType::int(), None)],
         None,
     ));
 

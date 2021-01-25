@@ -942,9 +942,8 @@ impl<'a> Validator<'a> {
                     }
                 }
 
-                if !errors.has_errors() {
-                    if field.is_required() && !related_field_rel_info.references.is_empty() {
-                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                if !errors.has_errors() && field.is_required() && !related_field_rel_info.references.is_empty() {
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` is required. This is no longer valid because it's not possible to enforce this constraint on the database level. Please change the field type from `{}` to `{}?` to fix this.",
                                 &field.name, &model.name, &related_model.name, &related_model.name,
@@ -952,7 +951,6 @@ impl<'a> Validator<'a> {
                             RELATION_ATTRIBUTE_NAME,
                             field_span,
                         ));
-                    }
                 }
             }
 
@@ -991,7 +989,7 @@ impl<'a> Validator<'a> {
                         // but pointing to the same foreign model,
                         // and also no names set.
                         if rel_a.to == rel_b.to && rel_a.name == rel_b.name {
-                            if rel_a.name == "" {
+                            if rel_a.name.is_empty() {
                                 // unnamed relation
                                 return Err(DatamodelError::new_model_validation_error(
                                             &format!(

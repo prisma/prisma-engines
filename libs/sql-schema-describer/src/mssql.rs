@@ -597,12 +597,12 @@ impl SqlSchemaDescriber {
             "bigint" => (BigInt, Some(MsSqlType::BigInt)),
             "numeric" => match (numeric_precision, numeric_scale) {
                 (Some(p), Some(s)) => (Decimal, Some(MsSqlType::Decimal(Some((p, s))))),
-                (None, None) => (Decimal, Some(MsSqlType::Decimal(None))),
+                (None, None) => (Decimal, Some(MsSqlType::Decimal(Some((18, 0))))),
                 _ => unreachable!("Unexpected params for a numeric field."),
             },
             "decimal" => match (numeric_precision, numeric_scale) {
                 (Some(p), Some(s)) => (Decimal, Some(MsSqlType::Decimal(Some((p, s))))),
-                (None, None) => (Decimal, Some(MsSqlType::Decimal(None))),
+                (None, None) => (Decimal, Some(MsSqlType::Decimal(Some((18, 0))))),
                 _ => unreachable!("Unexpected params for a decimal field."),
             },
             "money" => (Float, Some(MsSqlType::Money)),

@@ -1,4 +1,4 @@
-use crate::{QueryGraphBuilderError, QueryGraphBuilderResult};
+use crate::{constants::inputs::filters, QueryGraphBuilderError, QueryGraphBuilderResult};
 use std::str::FromStr;
 
 #[derive(Debug)]
@@ -13,9 +13,9 @@ impl FromStr for FilterGrouping {
 
     fn from_str(s: &str) -> QueryGraphBuilderResult<Self> {
         match s.to_lowercase().as_str() {
-            "and" => Ok(Self::And),
-            "or" => Ok(Self::Or),
-            "not" => Ok(Self::Not),
+            filters::AND_LOWERCASE => Ok(Self::And),
+            filters::OR_LOWERCASE => Ok(Self::Or),
+            filters::NOT_LOWERCASE => Ok(Self::Not),
             _ => Err(QueryGraphBuilderError::InputError(format!(
                 "{} is not a valid grouping filter operation",
                 s

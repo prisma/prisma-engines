@@ -1,6 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::PostgresFlavour;
-use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, ScalarType, WithDatabaseName};
+use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, WithDatabaseName};
 use native_types::PostgresType;
 use sql::ColumnTypeFamily;
 use sql_schema_describer::{self as sql};
@@ -16,7 +16,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             .collect()
     }
 
-    fn default_native_type_for_family(&self, family: ColumnTypeFamily) -> Option<serde_json::Value> {
+    fn default_native_type_for_family(&self, family: &ColumnTypeFamily) -> Option<serde_json::Value> {
         let ty = match family {
             ColumnTypeFamily::Int => PostgresType::Integer,
             ColumnTypeFamily::BigInt => PostgresType::BigInt,
@@ -38,10 +38,13 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     fn column_type_for_native_type(
         &self,
         field: &ScalarFieldWalker<'_>,
-        _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> sql::ColumnType {
         let postgres_type: PostgresType = native_type_instance.deserialize_native_type();
+        let is_autoincrement = field
+            .default_value()
+            .map(|default| default.is_autoincrement())
+            .unwrap_or(false);
 
         fn render(input: Option<u32>) -> String {
             match input {
@@ -57,8 +60,11 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         }
 
         let (family, data_type) = match postgres_type {
+            PostgresType::SmallInt if is_autoincrement => (ColumnTypeFamily::Int, "SMALLSERIAL".to_owned()),
             PostgresType::SmallInt => (ColumnTypeFamily::Int, "SMALLINT".to_owned()),
+            PostgresType::Integer if is_autoincrement => (ColumnTypeFamily::Int, "SERIAL".to_owned()),
             PostgresType::Integer => (ColumnTypeFamily::Int, "INTEGER".to_owned()),
+            PostgresType::BigInt if is_autoincrement => (ColumnTypeFamily::BigInt, "BIGSERIAL".to_owned()),
             PostgresType::BigInt => (ColumnTypeFamily::BigInt, "BIGINT".to_owned()),
             PostgresType::Decimal(precision) => (
                 ColumnTypeFamily::Decimal,

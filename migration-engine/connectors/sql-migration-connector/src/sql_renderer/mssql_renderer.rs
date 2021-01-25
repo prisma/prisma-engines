@@ -61,25 +61,25 @@ impl SqlRenderer for MssqlFlavour {
         let r#type = render_column_type(column);
         let nullability = common::render_nullability(&column);
 
-        let default = column
-            .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
-            .map(|default| {
-                let constraint_name = format!("DF__{}__{}", column.table().name(), column.name());
-
-                format!(
-                    " CONSTRAINT {} DEFAULT {}",
-                    self.quote(&constraint_name),
-                    self.render_default(default, &column.column_type_family())
-                )
-            })
-            .unwrap_or_else(String::new);
-
-        if column.is_autoincrement() {
-            format!("{} INT IDENTITY(1,1)", column_name)
+        let default = if column.is_autoincrement() {
+            Cow::Borrowed(" IDENTITY(1,1)")
         } else {
-            format!("{} {}{}{}", column_name, r#type, nullability, default)
-        }
+            column
+                .default()
+                .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
+                .map(|default| {
+                    let constraint_name = format!("DF__{}__{}", column.table().name(), column.name());
+
+                    Cow::Owned(format!(
+                        " CONSTRAINT {} DEFAULT {}",
+                        self.quote(&constraint_name),
+                        self.render_default(default, &column.column_type_family())
+                    ))
+                })
+                .unwrap_or_default()
+        };
+
+        format!("{} {}{}{}", column_name, r#type, nullability, default)
     }
 
     fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {

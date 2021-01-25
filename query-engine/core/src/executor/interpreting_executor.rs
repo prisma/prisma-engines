@@ -26,6 +26,7 @@ where
     }
 
     /// Async wrapper for executing an individual operation to allow code sharing with `execute_batch`.
+    #[tracing::instrument(skip(operation, conn, force_transactions, query_schema))]
     async fn execute_single_operation(
         operation: Operation,
         conn: Box<dyn Connection>,

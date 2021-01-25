@@ -2,7 +2,7 @@ use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
 use datamodel::{
     walkers::{ModelWalker, ScalarFieldWalker},
-    FieldArity, NativeTypeInstance, ScalarType,
+    FieldArity, NativeTypeInstance,
 };
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, ForeignKeyAction};
@@ -11,7 +11,6 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     fn column_type_for_native_type(
         &self,
         field: &ScalarFieldWalker<'_>,
-        _scalar_type: ScalarType,
         native_type_instance: &NativeTypeInstance,
     ) -> ColumnType {
         use MsSqlType::*;
@@ -109,12 +108,12 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         format!("{}_{}_unique", model_name, field_name)
     }
 
-    fn default_native_type_for_family(&self, family: ColumnTypeFamily) -> Option<serde_json::Value> {
+    fn default_native_type_for_family(&self, family: &ColumnTypeFamily) -> Option<serde_json::Value> {
         let ty = match family {
             ColumnTypeFamily::Int => MsSqlType::Int,
             ColumnTypeFamily::BigInt => MsSqlType::BigInt,
-            ColumnTypeFamily::Float => MsSqlType::Decimal(Some((65, 30))),
-            ColumnTypeFamily::Decimal => MsSqlType::Decimal(Some((65, 30))),
+            ColumnTypeFamily::Float => MsSqlType::Decimal(Some((32, 16))),
+            ColumnTypeFamily::Decimal => MsSqlType::Decimal(Some((32, 16))),
             ColumnTypeFamily::Boolean => MsSqlType::Bit,
             ColumnTypeFamily::String => MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
             ColumnTypeFamily::DateTime => MsSqlType::DateTime2,

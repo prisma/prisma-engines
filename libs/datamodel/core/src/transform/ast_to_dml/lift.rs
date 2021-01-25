@@ -311,7 +311,7 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
                         ));
                     }
 
-                    // check for compatability with scalar type
+                    // check for compatibility with scalar type
                     if !constructor.prisma_types.contains(&scalar_type) {
                         return Err(DatamodelError::new_connector_error(
                             &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {

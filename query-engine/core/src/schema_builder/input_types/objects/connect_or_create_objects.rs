@@ -1,4 +1,5 @@
 use super::*;
+use constants::inputs::args;
 
 /// Builds "<x>CreateOrConnectNestedInput" input object types.
 pub(crate) fn nested_connect_or_create_input_object(
@@ -29,8 +30,8 @@ pub(crate) fn nested_connect_or_create_input_object(
             ctx.cache_input_type(ident, input_object.clone());
 
             let fields = vec![
-                input_field("where", InputType::object(where_object), None),
-                input_field("create", create_types, None),
+                input_field(args::WHERE, InputType::object(where_object), None),
+                input_field(args::CREATE, create_types, None),
             ];
 
             input_object.set_fields(fields);

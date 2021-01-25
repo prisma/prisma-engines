@@ -103,7 +103,7 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Null => unreachable!("Null types should not be picked for GQL rendering."),
                 };
 
-                format!("{}", stringified)
+                stringified.to_string()
             }
         }
     }

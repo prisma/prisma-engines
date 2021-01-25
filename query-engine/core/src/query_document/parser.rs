@@ -447,7 +447,7 @@ impl QueryDocumentParser {
                 })?;
 
                 let path = path.add(field.name.clone());
-                let parsed = Self::parse_input_value(path.clone(), v, &field.field_types)?;
+                let parsed = Self::parse_input_value(path, v, &field.field_types)?;
 
                 Ok((k, parsed))
             })

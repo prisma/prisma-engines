@@ -1,4 +1,4 @@
-use crate::{migrations_directory::MigrationDirectory, ConnectorResult, MigrationStep};
+use crate::{migrations_directory::MigrationDirectory, ConnectorResult};
 use datamodel::Datamodel;
 
 /// The component responsible for generating a
@@ -10,27 +10,15 @@ use datamodel::Datamodel;
 /// description of the underlying database.
 #[async_trait::async_trait]
 pub trait DatabaseMigrationInferrer<T>: Send + Sync {
-    /// Infer the database migration steps. The previous datamodel is provided,
-    /// but the implementor can ignore it.
-    async fn infer(&self, previous: &Datamodel, next: &Datamodel, steps: &[MigrationStep]) -> ConnectorResult<T>;
+    /// Infer the database migration to the passed in Prisma schema.
+    async fn infer(&self, next: &Datamodel) -> ConnectorResult<T>;
 
     /// Infer the database migration steps assuming an empty schema on a new
     /// database as a starting point.
     fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<T>;
 
-    /// Infer a database migration based on the previous and next datamodels.
-    /// The method signature is identical to `infer`, but it is expected that
-    /// this method is implemented based on the provided previous datamodel, and
-    /// does not rely on the current state of the database.
-    fn infer_from_datamodels(
-        &self,
-        previous: &Datamodel,
-        next: &Datamodel,
-        steps: &[MigrationStep],
-    ) -> ConnectorResult<T>;
-
-    /// Look at the previous migrations and the target schema, and infer a
-    /// database migration taking the database to the expected Prisma schema.
+    /// Look at the previous migrations and the target Prisma schema, and infer
+    /// a database migration taking the database to the target Prisma schema.
     async fn infer_next_migration(
         &self,
         previous_migrations: &[MigrationDirectory],

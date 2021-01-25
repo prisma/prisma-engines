@@ -19,7 +19,7 @@ pub struct CreateTable<'a> {
 
 impl Display for CreateTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "CREATE TABLE \"{}\" (\n", self.table_name)?;
+        writeln!(f, "CREATE TABLE \"{}\" (", self.table_name)?;
 
         self.columns.iter().map(Indented).join(",\n", f)?;
 
@@ -96,7 +96,7 @@ impl Display for ForeignKey<'_> {
 
         f.write_str("FOREIGN KEY (")?;
 
-        self.constrains.iter().map(|s| SqliteIdentifier(s)).join(", ", f)?;
+        self.constrains.iter().map(SqliteIdentifier).join(", ", f)?;
 
         write!(
             f,
@@ -104,7 +104,7 @@ impl Display for ForeignKey<'_> {
             referenced_table = self.references.0,
         )?;
 
-        self.references.1.iter().map(|s| SqliteIdentifier(s)).join(", ", f)?;
+        self.references.1.iter().map(SqliteIdentifier).join(", ", f)?;
 
         f.write_str(")")?;
 
@@ -258,7 +258,6 @@ mod tests {
                     ..Default::default()
                 },
             ],
-            ..Default::default()
         };
 
         let expected = indoc!(

@@ -1,4 +1,6 @@
-use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
+use crate::{
+    constants::inputs::filters, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
+};
 use connector::{Filter, ScalarCompare, ScalarListCompare};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
@@ -10,7 +12,7 @@ pub fn parse(
     reverse: bool,
 ) -> QueryGraphBuilderResult<Vec<Filter>> {
     let filter = match filter_key {
-        "not" => {
+        filters::NOT_LOWERCASE => {
             match input {
                 // Support for syntax `{ scalarField: { not: null } }` and `{ scalarField: { not: <value> } }`
                 ParsedInputValue::Single(value) => {
@@ -30,7 +32,7 @@ pub fn parse(
             }
         }
 
-        "in" => {
+        filters::IN => {
             let value: PrismaValue = input.try_into()?;
             let filter = match value {
                 PrismaValue::Null if reverse => field.not_equals(value),
@@ -46,7 +48,7 @@ pub fn parse(
         }
 
         // Legacy operation
-        "notIn" => {
+        filters::NOT_IN => {
             let value: PrismaValue = input.try_into()?;
             let filter = match value {
                 PrismaValue::Null if reverse => field.equals(value), // not not in null => in null
@@ -61,38 +63,38 @@ pub fn parse(
             vec![filter]
         }
 
-        "equals" if reverse => vec![field.not_equals(as_prisma_value(input)?)],
-        "contains" if reverse => vec![field.not_contains(as_prisma_value(input)?)],
-        "startsWith" if reverse => vec![field.not_starts_with(as_prisma_value(input)?)],
-        "endsWith" if reverse => vec![field.not_ends_with(as_prisma_value(input)?)],
+        filters::EQUALS if reverse => vec![field.not_equals(as_prisma_value(input)?)],
+        filters::CONTAINS if reverse => vec![field.not_contains(as_prisma_value(input)?)],
+        filters::STARTS_WITH if reverse => vec![field.not_starts_with(as_prisma_value(input)?)],
+        filters::ENDS_WITH if reverse => vec![field.not_ends_with(as_prisma_value(input)?)],
 
-        "equals" => vec![field.equals(as_prisma_value(input)?)],
-        "contains" => vec![field.contains(as_prisma_value(input)?)],
-        "startsWith" => vec![field.starts_with(as_prisma_value(input)?)],
-        "endsWith" => vec![field.ends_with(as_prisma_value(input)?)],
+        filters::EQUALS => vec![field.equals(as_prisma_value(input)?)],
+        filters::CONTAINS => vec![field.contains(as_prisma_value(input)?)],
+        filters::STARTS_WITH => vec![field.starts_with(as_prisma_value(input)?)],
+        filters::ENDS_WITH => vec![field.ends_with(as_prisma_value(input)?)],
 
-        "lt" if reverse => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
-        "gt" if reverse => vec![field.less_than_or_equals(as_prisma_value(input)?)],
-        "lte" if reverse => vec![field.greater_than(as_prisma_value(input)?)],
-        "gte" if reverse => vec![field.less_than(as_prisma_value(input)?)],
+        filters::LOWER_THAN if reverse => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
+        filters::GREATER_THAN if reverse => vec![field.less_than_or_equals(as_prisma_value(input)?)],
+        filters::LOWER_THAN_OR_EQUAL if reverse => vec![field.greater_than(as_prisma_value(input)?)],
+        filters::GREATER_THAN_OR_EQUAL if reverse => vec![field.less_than(as_prisma_value(input)?)],
 
-        "lt" => vec![field.less_than(as_prisma_value(input)?)],
-        "gt" => vec![field.greater_than(as_prisma_value(input)?)],
-        "lte" => vec![field.less_than_or_equals(as_prisma_value(input)?)],
-        "gte" => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
+        filters::LOWER_THAN => vec![field.less_than(as_prisma_value(input)?)],
+        filters::GREATER_THAN => vec![field.greater_than(as_prisma_value(input)?)],
+        filters::LOWER_THAN_OR_EQUAL => vec![field.less_than_or_equals(as_prisma_value(input)?)],
+        filters::GREATER_THAN_OR_EQUAL => vec![field.greater_than_or_equals(as_prisma_value(input)?)],
 
         // List-specific filters
-        "has" => vec![field.contains_element(as_prisma_value(input)?)],
-        "hasEvery" => vec![field.contains_every_element(as_prisma_value_list(input)?)],
-        "hasSome" => vec![field.contains_some_element(as_prisma_value_list(input)?)],
-        "isEmpty" => vec![field.is_empty_list(input.try_into()?)],
+        filters::HAS => vec![field.contains_element(as_prisma_value(input)?)],
+        filters::HAS_EVERY => vec![field.contains_every_element(as_prisma_value_list(input)?)],
+        filters::HAS_SOME => vec![field.contains_some_element(as_prisma_value_list(input)?)],
+        filters::IS_EMPTY => vec![field.is_empty_list(input.try_into()?)],
 
         // Aggregation filters
-        "count" => aggregation_filter(field, input, reverse, Filter::count)?,
-        "avg" => aggregation_filter(field, input, reverse, Filter::average)?,
-        "sum" => aggregation_filter(field, input, reverse, Filter::sum)?,
-        "min" => aggregation_filter(field, input, reverse, Filter::min)?,
-        "max" => aggregation_filter(field, input, reverse, Filter::max)?,
+        filters::COUNT => aggregation_filter(field, input, reverse, Filter::count)?,
+        filters::AVG => aggregation_filter(field, input, reverse, Filter::average)?,
+        filters::SUM => aggregation_filter(field, input, reverse, Filter::sum)?,
+        filters::MIN => aggregation_filter(field, input, reverse, Filter::min)?,
+        filters::MAX => aggregation_filter(field, input, reverse, Filter::max)?,
 
         _ => {
             return Err(QueryGraphBuilderError::InputError(format!(

@@ -55,18 +55,16 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
                 .as_pair()
                 .map(|walker| walker.column_native_type())
                 .transpose()
-                .and_then(|types| native_type_change(types))
+                .and_then(native_type_change)
             {
                 return Some(change);
             }
-        } else {
-            if differ.previous.column_type_family() != differ.next.column_type_family() {
-                return match (differ.previous.column_type_family(), differ.next.column_type_family()) {
-                    (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
-                    (ColumnTypeFamily::String, ColumnTypeFamily::Int) => Some(ColumnTypeChange::RiskyCast),
-                    (_, _) => Some(ColumnTypeChange::RiskyCast),
-                };
-            }
+        } else if differ.previous.column_type_family() != differ.next.column_type_family() {
+            return match (differ.previous.column_type_family(), differ.next.column_type_family()) {
+                (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
+                (ColumnTypeFamily::String, ColumnTypeFamily::Int) => Some(ColumnTypeChange::RiskyCast),
+                (_, _) => Some(ColumnTypeChange::RiskyCast),
+            };
         }
 
         None

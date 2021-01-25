@@ -3,19 +3,12 @@ use crate::{
     SqlMigrationConnector,
 };
 use datamodel::*;
-use migration_connector::{
-    steps::MigrationStep, ConnectorResult, DatabaseMigrationInferrer, MigrationConnector, MigrationDirectory,
-};
+use migration_connector::{ConnectorResult, DatabaseMigrationInferrer, MigrationConnector, MigrationDirectory};
 use sql_schema_describer::*;
 
 #[async_trait::async_trait]
 impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
-    async fn infer(
-        &self,
-        _previous: &Datamodel,
-        next: &Datamodel,
-        _steps: &[MigrationStep],
-    ) -> ConnectorResult<SqlMigration> {
+    async fn infer(&self, next: &Datamodel) -> ConnectorResult<SqlMigration> {
         let current_database_schema: SqlSchema = self.describe_schema().await?;
         let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, self.flavour());
         Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
@@ -24,18 +17,6 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
     /// Infer the database migration steps, skipping the schema describer and assuming an empty database.
     fn infer_from_empty(&self, next: &Datamodel) -> ConnectorResult<SqlMigration> {
         let current_database_schema = SqlSchema::empty();
-        let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, self.flavour());
-
-        Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
-    }
-
-    fn infer_from_datamodels(
-        &self,
-        previous: &Datamodel,
-        next: &Datamodel,
-        _steps: &[MigrationStep],
-    ) -> ConnectorResult<SqlMigration> {
-        let current_database_schema: SqlSchema = sql_schema_calculator::calculate_sql_schema(previous, self.flavour());
         let expected_database_schema = sql_schema_calculator::calculate_sql_schema(next, self.flavour());
 
         Ok(infer(current_database_schema, expected_database_schema, self.flavour()))

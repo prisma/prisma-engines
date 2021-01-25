@@ -14,7 +14,7 @@ impl ScalarProjection {
     pub fn scalar_fields(&self) -> Vec<&ScalarFieldRef> {
         match self {
             ScalarProjection::Single(sf) => vec![sf],
-            ScalarProjection::Compound(sfs) => sfs.iter().map(|sf| sf).collect(),
+            ScalarProjection::Compound(sfs) => sfs.iter().collect(),
         }
     }
 }
