@@ -68,7 +68,7 @@ pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 /// Builds "skip_duplicates" and "data" arguments intended for the create many field.
 pub(crate) fn create_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
     let create_many_type = InputType::object(create_many_objects::create_many_object_type(ctx, model, None));
-    let skip_arg = input_field("skip_duplicates", InputType::boolean(), None).optional();
+    let skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
 
     vec![input_field("data", InputType::list(create_many_type), None), skip_arg]
 }

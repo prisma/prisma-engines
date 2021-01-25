@@ -86,6 +86,7 @@ impl QueryGraphBuilder {
             (QueryTag::Aggregate, Some(m)) => read::aggregate(parsed_field, m).map(Into::into),
             (QueryTag::GroupBy, Some(m)) => read::group_by(parsed_field, m).map(Into::into),
             (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, m, parsed_field)),
+            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, m, parsed_field)),
             (QueryTag::UpdateOne, Some(m)) => QueryGraph::root(|g| write::update_record(g, m, parsed_field)),
             (QueryTag::UpdateMany, Some(m)) => QueryGraph::root(|g| write::update_many_records(g, m, parsed_field)),
             (QueryTag::UpsertOne, Some(m)) => QueryGraph::root(|g| write::upsert_record(g, m, parsed_field)),

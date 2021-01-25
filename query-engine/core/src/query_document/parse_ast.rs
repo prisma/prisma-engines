@@ -5,6 +5,7 @@ use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 
 pub type ParsedInputMap = IndexMap<String, ParsedInputValue>;
+pub type ParsedInputList = Vec<ParsedInputValue>;
 
 #[derive(Debug, Clone)]
 pub struct ParsedObject {
@@ -39,7 +40,7 @@ pub enum ParsedInputValue {
     Single(PrismaValue),
     OrderBy(OrderBy),
     ScalarField(ScalarFieldRef),
-    List(Vec<ParsedInputValue>),
+    List(ParsedInputList),
     Map(ParsedInputMap),
 }
 

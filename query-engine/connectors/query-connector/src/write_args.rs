@@ -150,7 +150,7 @@ impl WriteArgs {
         self.args.len()
     }
 
-    pub fn add_datetimes(&mut self, model: ModelRef) {
+    pub fn add_datetimes(&mut self, model: &ModelRef) {
         let now = PrismaValue::DateTime(Utc::now().into());
         let created_at_field = model.fields().created_at();
         let updated_at_field = model.fields().updated_at();
