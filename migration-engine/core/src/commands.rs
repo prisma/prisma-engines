@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 //! The commands exposed by the migration engine core are defined in this
 //! module.
 
