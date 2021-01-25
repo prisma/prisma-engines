@@ -19,7 +19,7 @@ pub struct CreateTable<'a> {
 
 impl Display for CreateTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "CREATE TABLE \"{}\" (\n", self.table_name)?;
+        writeln!(f, "CREATE TABLE \"{}\" (", self.table_name)?;
 
         self.columns.iter().map(Indented).join(",\n", f)?;
 
@@ -258,7 +258,6 @@ mod tests {
                     ..Default::default()
                 },
             ],
-            ..Default::default()
         };
 
         let expected = indoc!(

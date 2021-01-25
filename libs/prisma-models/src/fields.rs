@@ -209,7 +209,7 @@ impl Fields {
         acc
     }
 
-    fn relation_filter<'a>(mut acc: Vec<Weak<RelationField>>, field: &'a Field) -> Vec<Weak<RelationField>> {
+    fn relation_filter(mut acc: Vec<Weak<RelationField>>, field: &Field) -> Vec<Weak<RelationField>> {
         if let Field::Relation(relation_field) = field {
             acc.push(Arc::downgrade(relation_field));
         };

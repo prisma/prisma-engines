@@ -29,17 +29,17 @@ impl ModelProjection {
     }
 
     /// Returns all field names (NOT database level column names!) of contained fields.
-    pub fn names<'a>(&'a self) -> impl Iterator<Item = &'a str> + 'a {
+    pub fn names(&self) -> impl Iterator<Item = &str> {
         self.fields.iter().map(|field| field.name())
     }
 
     /// Returns all database (e.g. column or field) names of contained fields.
-    pub fn db_names<'a>(&'a self) -> impl Iterator<Item = String> + 'a {
+    pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {
         self.scalar_fields().map(|f| f.db_name().to_owned())
     }
 
     /// Returns an iterator over all fields contained in this projection.
-    pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a Field> + 'a {
+    pub fn fields(&self) -> impl Iterator<Item = &Field> {
         self.fields.iter()
     }
 
@@ -56,7 +56,7 @@ impl ModelProjection {
 
     /// Returns an iterator over all scalar fields represented by this model projection, in order.
     /// Resolves relation fields to all backing scalar fields, if existing.
-    pub fn scalar_fields<'a>(&'a self) -> impl Iterator<Item = ScalarFieldRef> + 'a {
+    pub fn scalar_fields(&self) -> impl Iterator<Item = ScalarFieldRef> + '_ {
         self.fields
             .iter()
             .flat_map(|field| match field {
