@@ -48,6 +48,19 @@ impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
                         }
                     }
                 }
+            } else if let dml::FieldType::Unsupported(_) = sf.field_type {
+                let default_arg = args.default_arg("value")?;
+
+                match default_arg.as_value_generator() {
+                    Ok(generator) if generator == ValueGenerator::new_dbgenerated() => {
+                        sf.default_value = Some(dml::DefaultValue::Expression(generator))
+                    }
+                    Err(e) => return Err(self.wrap_in_attribute_validation_error(&e)),
+                    _ => {
+                        return self
+                            .new_attribute_validation_error("Invalid default value on Unsupported type.", args.span())
+                    }
+                }
             }
         }
         Ok(())
