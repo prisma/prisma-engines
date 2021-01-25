@@ -7,6 +7,7 @@ use std::sync::Arc;
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
     CreateRecord(CreateRecord),
+    CreateManyRecords(CreateManyRecords),
     UpdateRecord(UpdateRecord),
     DeleteRecord(DeleteRecord),
     UpdateManyRecords(UpdateManyRecords),
@@ -46,6 +47,7 @@ impl WriteQuery {
         // DeleteMany, Connect and Disconnect do not return anything.
         match self {
             Self::CreateRecord(_) => returns_id,
+            Self::CreateManyRecords(_) => false,
             Self::UpdateRecord(_) => returns_id,
             Self::DeleteRecord(_) => returns_id,
             Self::UpdateManyRecords(_) => returns_id,
@@ -60,6 +62,7 @@ impl WriteQuery {
     pub fn model(&self) -> ModelRef {
         match self {
             Self::CreateRecord(q) => Arc::clone(&q.model),
+            Self::CreateManyRecords(q) => Arc::clone(&q.model),
             Self::UpdateRecord(q) => Arc::clone(&q.model),
             Self::DeleteRecord(q) => Arc::clone(&q.model),
             Self::UpdateManyRecords(q) => Arc::clone(&q.model),
@@ -97,7 +100,8 @@ impl FilteredQuery for WriteQuery {
 impl std::fmt::Display for WriteQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::CreateRecord(q) => write!(f, "CreateRecord(model: {}, args: {:?})", q.model.name, q.args,),
+            Self::CreateRecord(q) => write!(f, "CreateRecord(model: {}, args: {:?})", q.model.name, q.args),
+            Self::CreateManyRecords(q) => write!(f, "CreateManyRecord(model: {})", q.model.name),
             Self::UpdateRecord(q) => write!(
                 f,
                 "UpdateRecord(model: {}, filter: {:?}, args: {:?})",
@@ -118,6 +122,13 @@ impl std::fmt::Display for WriteQuery {
 pub struct CreateRecord {
     pub model: ModelRef,
     pub args: WriteArgs,
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateManyRecords {
+    pub model: ModelRef,
+    pub args: Vec<WriteArgs>,
+    pub skip_duplicates: bool,
 }
 
 #[derive(Debug, Clone)]
