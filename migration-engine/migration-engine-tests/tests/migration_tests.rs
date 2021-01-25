@@ -2937,7 +2937,7 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
         model Post {
             id            Int                     @id @default(autoincrement())
             user_home     String
-            user_location Int
+            user_location String
         }
     "#;
 
@@ -2953,35 +2953,9 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
             })?
             .assert_column("user_location", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
-            })
-    })?;
-
-    let dm3 = r#"
-        model Post {
-            id            Int                     @id @default(autoincrement())
-            user_home     Unsupported("money")
-            user_location String
-        }
-    "#;
-
-    api.schema_push(dm3).send().await?.assert_green()?;
-
-    api.assert_schema().await?.assert_table("Post", |table| {
-        table
-            .assert_columns_count(3)?
-            .assert_column("id", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
-            })?
-            .assert_column("user_home", |c| {
-                c.assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
-            })?
-            .assert_column("user_location", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
             })
     })?;
-
     Ok(())
 }
 
@@ -2998,34 +2972,35 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
 
     api.assert_schema().await?.assert_table("Post", |table| {
         table
-            .assert_columns_count(3)?
+            .assert_columns_count(2)?
             .assert_column("id", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
             .assert_column("user_balance", |c| {
                 c.assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))
+                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
             })
     })?;
 
     let dm2 = r#"
         model Post {
-            id            Int                     @id @default(autoincrement())
-            user_balance     Unsupported("money")? @unique
+            id            Int                      @id @default(autoincrement())
+            user_balance  Unsupported("money")? @unique
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?;
+    api.schema_push(dm2).force(true).send().await?.assert_warnings(&["The migration will add a unique constraint covering the columns `[user_balance]` on the table `Post`. If there are existing duplicate values, the migration will fail.".into()])?;
 
     api.assert_schema().await?.assert_table("Post", |table| {
         table
+            .assert_columns_count(2)?
             .assert_index_on_columns(&["user_balance"], |index| index.assert_is_unique())?
-            .assert_columns_count(3)?
             .assert_column("id", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
             .assert_column("user_balance", |c| {
-                c.assert_is_nullable()?.assert_type_family(ColumnTypeFamily::String)
+                c.assert_is_nullable()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
             })
     })?;
 
@@ -3040,7 +3015,7 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
 
     api.assert_schema().await?.assert_table("Post", |table| {
         table
-            .assert_columns_count(3)?
+            .assert_columns_count(2)?
             .assert_column("id", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?

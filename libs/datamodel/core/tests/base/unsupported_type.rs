@@ -6,7 +6,7 @@ fn parse_unsupported_types() {
     let dml = r#"model User {
         id           Int    @id
         point        Unsupported("point")
-        ip           Unsupported("ip4r")?
+        ip           Unsupported("ip4r")? @default(dbgenerated())
         with_space   Unsupported("something weird with spaces")[]
     }
     "#;
