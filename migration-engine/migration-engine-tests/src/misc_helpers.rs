@@ -1,14 +1,9 @@
-use datamodel::ast::{parser, SchemaAst};
 use enumflags2::BitFlags;
 use migration_connector::*;
 use sql_migration_connector::SqlMigrationConnector;
 use test_setup::*;
 
 pub type TestResult = Result<(), anyhow::Error>;
-
-pub fn parse(datamodel_string: &str) -> SchemaAst {
-    parser::parse_schema(datamodel_string).unwrap()
-}
 
 pub(super) async fn mysql_migration_connector(
     url_str: &str,

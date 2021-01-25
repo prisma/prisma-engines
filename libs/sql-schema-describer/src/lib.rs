@@ -329,6 +329,10 @@ impl ColumnTypeFamily {
         }
     }
 
+    pub fn is_boolean(&self) -> bool {
+        matches!(self, ColumnTypeFamily::Boolean)
+    }
+
     pub fn is_enum(&self) -> bool {
         matches!(self, ColumnTypeFamily::Enum(_))
     }
