@@ -63,6 +63,15 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
     }
 }
 
+pub async fn create_records(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    args: Vec<WriteArgs>,
+    skip_duplicates: bool,
+) -> crate::Result<usize> {
+    todo!()
+}
+
 /// Update multiple records in a database defined in `conn` and the records
 /// defined in `args`, resulting the identifiers that were modified in the
 /// operation.

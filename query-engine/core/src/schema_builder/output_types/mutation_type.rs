@@ -16,9 +16,12 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
             append_opt(&mut vec, update_item_field(ctx, &model));
             append_opt(&mut vec, upsert_item_field(ctx, &model));
 
-            vec.push(create_many_field(ctx, &model));
             vec.push(update_many_field(ctx, &model));
             vec.push(delete_many_field(ctx, &model));
+
+            if feature_flags::get().createMany {
+                vec.push(create_many_field(ctx, &model));
+            }
 
             vec
         })
@@ -49,8 +52,11 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
             let mut fields = vec![input_fields::nested_create_one_input_field(ctx, &rf)];
 
             append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
-            append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
+
+            if feature_flags::get().createMany {
+                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+            }
 
             input_object.set_fields(fields);
         }

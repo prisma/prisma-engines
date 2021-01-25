@@ -100,6 +100,16 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
             .await
     }
 
+    async fn create_records(
+        &self,
+        model: &ModelRef,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+    ) -> connector::Result<usize> {
+        self.catch(async move { write::create_records(&self.inner, model, args, skip_duplicates).await })
+            .await
+    }
+
     async fn update_records(
         &self,
         model: &ModelRef,
