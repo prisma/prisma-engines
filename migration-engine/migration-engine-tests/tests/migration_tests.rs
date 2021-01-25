@@ -1697,14 +1697,7 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
 async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
-            id Int   @id    let output = api.evaluate_data_loss(&directory, dm).send().await?.into_output();
-    let expected_output = EvaluateDataLossOutput {
-        migration_steps: vec![],
-        warnings: vec![],
-        unexecutable_steps: vec![],
-    };
-
-    assert_eq!(output, expected_output);
+            id Int   @id    
             box Box?
         }
 

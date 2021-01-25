@@ -169,7 +169,6 @@ async fn unsupported_type_with_native_types_keeps_its_usages(api: &TestApi) -> c
                 t.add_column("id", types::integer().unique(true));
                 t.add_column("dummy", types::integer());
                 t.add_column("broken", types::custom("macaddr"));
-
                 t.add_index("unique", types::index(vec!["broken", "dummy"]).unique(true));
                 t.add_index("non_unique", types::index(vec!["broken", "dummy"]).unique(false));
                 t.set_primary_key(&["broken", "dummy"]);
