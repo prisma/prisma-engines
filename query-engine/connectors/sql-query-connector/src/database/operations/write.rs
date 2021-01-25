@@ -1,10 +1,14 @@
 use crate::{error::SqlError, query_builder::write, QueryExt};
 use connector_interface::*;
+use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::{collections::HashMap, convert::TryFrom};
+use std::{collections::HashMap, convert::TryFrom, fmt::Write, usize};
 use user_facing_errors::query_engine::DatabaseConstraint;
+
+/// The maximum amount of rows that can be inserted at once.
+const MAX_ROWS: usize = 2500;
 
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
@@ -69,7 +73,66 @@ pub async fn create_records(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
 ) -> crate::Result<usize> {
-    todo!()
+    if args.is_empty() {
+        return Ok(0);
+    }
+
+    // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
+    // -> Horizontal partitioning by row number, vertical by number of args.
+    let batches = args
+        .into_iter()
+        .peekable()
+        .batching(|iter| {
+            let mut param_count: usize = 0;
+            let mut batch = vec![];
+
+            while param_count < *connector_interface::MAX_BATCH_SIZE {
+                let proceed = match iter.peek() {
+                    Some(next) => (param_count + next.len()) >= *MAX_BATCH_SIZE,
+                    None => break,
+                };
+
+                if proceed {
+                    match iter.next() {
+                        Some(next) => {
+                            param_count += next.len();
+                            batch.push(next)
+                        }
+                        None => break,
+                    }
+                }
+            }
+
+            Some(batch)
+        })
+        .collect_vec();
+
+    let capacity = batches.len();
+    let partitioned_batches = batches
+        .into_iter()
+        .fold(Vec::with_capacity(capacity), |mut batches, next_batch| {
+            if next_batch.len() > MAX_ROWS {
+                batches.extend(
+                    next_batch
+                        .into_iter()
+                        .chunks(MAX_ROWS)
+                        .into_iter()
+                        .map(|chunk| chunk.into_iter().collect_vec()),
+                );
+            } else {
+                batches.push(next_batch);
+            }
+
+            batches
+        });
+
+    let mut count = 0;
+    for batch in partitioned_batches {
+        let stmt = write::create_records(model, batch, skip_duplicates);
+        count += conn.execute(stmt.into()).await?;
+    }
+
+    Ok(count as usize)
 }
 
 /// Update multiple records in a database defined in `conn` and the records

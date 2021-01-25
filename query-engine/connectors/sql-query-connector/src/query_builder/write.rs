@@ -33,6 +33,16 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
     )
 }
 
+/// `INSERT` new records into the database based on the given write arguments,
+/// where each `WriteArg` in the Vec is one row.
+pub fn create_records(model: &ModelRef, mut args: Vec<WriteArgs>, skip_duplicates: bool) -> Insert<'static> {
+    // We need to bring all write args into a uniform shape.
+    // The easiest way to do this is to take go over all fields of the batch
+
+    // Insert::multi_into(table, columns)
+    todo!()
+}
+
 pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());

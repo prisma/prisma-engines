@@ -1,8 +1,7 @@
 use super::Filter;
-use crate::compare::ScalarCompare;
-use once_cell::sync::Lazy;
+use crate::{compare::ScalarCompare, MAX_BATCH_SIZE};
 use prisma_models::{ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
-use std::{collections::BTreeSet, env, sync::Arc};
+use std::{collections::BTreeSet, sync::Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarProjection {
@@ -41,15 +40,6 @@ pub enum QueryMode {
     Insensitive,
 }
 
-/// Number of allowed elements in query's `IN` or `NOT IN` statement.
-/// Certain databases error out if querying with too many items. For test
-/// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment
-/// value to a smaller number.
-static BATCH_SIZE: Lazy<usize> = Lazy::new(|| match env::var("QUERY_BATCH_SIZE") {
-    Ok(size) => size.parse().unwrap_or(5000),
-    Err(_) => 5000,
-});
-
 impl ScalarFilter {
     /// The number of values in the filter. `IN` and `NOT IN` may contain more
     /// than one.
@@ -69,7 +59,7 @@ impl ScalarFilter {
     /// If `true`, the filter can be split into smaller filters executed in
     /// separate queries.
     pub fn can_batch(&self) -> bool {
-        self.len() > *BATCH_SIZE
+        self.len() > *MAX_BATCH_SIZE
     }
 
     /// If possible, converts the filter into multiple smaller filters.
@@ -77,12 +67,12 @@ impl ScalarFilter {
         fn inner(mut list: PrismaListValue) -> Vec<PrismaListValue> {
             let dedup_list: BTreeSet<_> = list.drain(..).collect();
 
-            let mut batches = Vec::with_capacity(list.len() % *BATCH_SIZE + 1);
-            batches.push(Vec::with_capacity(*BATCH_SIZE));
+            let mut batches = Vec::with_capacity(list.len() % *MAX_BATCH_SIZE + 1);
+            batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
 
             for (idx, item) in dedup_list.into_iter().enumerate() {
-                if idx != 0 && idx % *BATCH_SIZE == 0 {
-                    batches.push(Vec::with_capacity(*BATCH_SIZE));
+                if idx != 0 && idx % *MAX_BATCH_SIZE == 0 {
+                    batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
                 }
 
                 batches.last_mut().unwrap().push(item);
