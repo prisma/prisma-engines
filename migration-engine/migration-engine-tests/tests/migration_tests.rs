@@ -12,7 +12,6 @@ mod native_types;
 mod reset;
 mod schema_push;
 
-use migration_core::commands::EvaluateDataLossOutput;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
@@ -2913,50 +2912,150 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-// going from unsupported to supported
-// #[test_each_connector(tags("postgres"), features("native_types"))]
-// async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> TestResult {
-//     let directory = api.create_migrations_directory()?;
-//
-//     let dm1 = r#"
-//         model Post {
-//             id            Int                     @id @default(autoincrement())
-//             user_home  Unsupported("point")
-//             user_location  Unsupported("point")
-//         }
-//     "#;
-//
-//     api.create_migration("initial", dm1, &directory).send().await?;
-//
-//     let dm2 = r#"
-//         model Post {
-//             id            Int                     @id @default(autoincrement())
-//             user_home     String
-//             user_location Int
-//         }
-//     "#;
-//
-//     let output = api.evaluate_data_loss(&directory, dm2).send().await?.into_output();
-//     let expected_output = EvaluateDataLossOutput {
-//         migration_steps: vec![],
-//         warnings: vec![],
-//         unexecutable_steps: vec![],
-//     };
-//
-//     assert_eq!(output, expected_output);
-//
-//     api.create_migration("second-migration", dm2, &directory).send().await?;
-//     api.apply_migrations(&directory)
-//         .send()
-//         .await?
-//         .assert_applied_migrations(&["initial", "second-migration"])?;
-//     let output = api.diagnose_migration_history(&directory).send().await?.into_output();
-//     assert!(output.is_empty());
-//
-//     Ok(())
-// }
+#[test_each_connector(tags("postgres"), features("native_types"))]
+async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Post {
+            id            Int                     @id @default(autoincrement())
+            user_home  Unsupported("point")
+            user_location  Unsupported("point")
+        }
+    "#;
 
-// going from supported to unsupported
-// adding properties to unsupported
-// removing properties from unsupported
-// switching unsupported types
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |table| {
+        table
+            .assert_columns_count(3)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("user_home", |c| {
+                c.assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))
+            })?
+            .assert_column("user_location", |c| {
+                c.assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))
+            })
+    })?;
+
+    let dm2 = r#"
+        model Post {
+            id            Int                     @id @default(autoincrement())
+            user_home     String
+            user_location Int
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |table| {
+        table
+            .assert_columns_count(3)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("user_home", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
+            })?
+            .assert_column("user_location", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })
+    })?;
+
+    let dm3 = r#"
+        model Post {
+            id            Int                     @id @default(autoincrement())
+            user_home     Unsupported("money")
+            user_location String
+        }
+    "#;
+
+    api.schema_push(dm3).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |table| {
+        table
+            .assert_columns_count(3)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("user_home", |c| {
+                c.assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+            })?
+            .assert_column("user_location", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
+            })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"), features("native_types"))]
+async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Post {
+            id               Int    @id @default(autoincrement())
+            user_balance     Unsupported("money")
+        }
+    "#;
+
+    api.schema_push(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |table| {
+        table
+            .assert_columns_count(3)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("user_balance", |c| {
+                c.assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))
+            })
+    })?;
+
+    let dm2 = r#"
+        model Post {
+            id            Int                     @id @default(autoincrement())
+            user_balance     Unsupported("money")? @unique
+        }
+    "#;
+
+    api.schema_push(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |table| {
+        table
+            .assert_index_on_columns(&["user_balance"], |index| index.assert_is_unique())?
+            .assert_columns_count(3)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("user_balance", |c| {
+                c.assert_is_nullable()?.assert_type_family(ColumnTypeFamily::String)
+            })
+    })?;
+
+    let dm3 = r#"
+        model Post {
+            id               Int    @id @default(autoincrement())
+            user_balance     Unsupported("money")
+        }
+    "#;
+
+    api.schema_push(dm3).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |table| {
+        table
+            .assert_columns_count(3)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("user_balance", |c| {
+                c.assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+            })
+    })?;
+
+    Ok(())
+}
