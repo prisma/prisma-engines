@@ -734,7 +734,7 @@ async fn with_an_invalid_unapplied_migration_should_report_it(api: &TestApi) -> 
     assert!(edited_migration_names.is_empty());
     assert!(failed_migration_names.is_empty());
     assert!(
-        matches!(history, Some(HistoryDiagnostic::DatabaseIsBehind { unapplied_migration_names: names }) if names == &[generated_migration_name.unwrap()])
+        matches!(history, Some(HistoryDiagnostic::DatabaseIsBehind { unapplied_migration_names: names }) if names == [generated_migration_name.unwrap()])
     );
     assert!(drift.is_none());
 

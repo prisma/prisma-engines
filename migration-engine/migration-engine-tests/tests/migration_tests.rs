@@ -1496,7 +1496,7 @@ async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) 
         .table_bang("A")
         .indices
         .iter()
-        .find(|i| i.columns == &["custom_field_name"]);
+        .find(|i| i.columns == ["custom_field_name"]);
 
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
@@ -1524,7 +1524,7 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
         .table_bang("A")
         .indices
         .iter()
-        .find(|i| i.columns == &["custom_field_name", "second_custom_field_name"]);
+        .find(|i| i.columns == ["custom_field_name", "second_custom_field_name"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
@@ -1625,7 +1625,7 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
 
     let result = api.describe_database().await?;
 
-    let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
+    let index = result.table_bang("A").indices.iter().find(|i| i.columns == ["field"]);
     assert!(index.is_some());
     assert_eq!(index.unwrap().tpe, IndexType::Unique);
 
@@ -1640,7 +1640,7 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) -> Test
 
     let result = api.describe_database().await?;
 
-    let index = result.table_bang("A").indices.iter().find(|i| i.columns == &["field"]);
+    let index = result.table_bang("A").indices.iter().find(|i| i.columns == ["field"]);
     assert!(index.is_none());
 
     Ok(())

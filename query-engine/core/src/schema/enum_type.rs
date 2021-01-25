@@ -73,18 +73,18 @@ pub struct DatabaseEnumType {
 }
 
 impl DatabaseEnumType {
-    pub fn map_input_value(&self, val: &String) -> Option<PrismaValue> {
+    pub fn map_input_value(&self, val: &str) -> Option<PrismaValue> {
         Some(PrismaValue::Enum(
             self.internal_enum
                 .values
                 .iter()
-                .find(|ev| &ev.name == val)?
+                .find(|ev| ev.name == val)?
                 .db_name()
                 .clone(),
         ))
     }
 
-    pub fn map_output_value(&self, val: &String) -> Option<PrismaValue> {
+    pub fn map_output_value(&self, val: &str) -> Option<PrismaValue> {
         Some(PrismaValue::Enum(
             self.internal_enum
                 .values
@@ -115,7 +115,7 @@ impl FieldRefEnumType {
     pub fn value_for(&self, name: &str) -> Option<&ScalarFieldRef> {
         self.values
             .iter()
-            .find_map(|val| if &val.0 == name { Some(&val.1) } else { None })
+            .find_map(|val| if val.0 == name { Some(&val.1) } else { None })
     }
 
     pub fn values(&self) -> Vec<String> {

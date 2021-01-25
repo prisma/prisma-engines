@@ -47,7 +47,7 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
             let DatasourceFieldName(name) = field_name;
             let field = scalar_fields
                 .iter()
-                .find(|f| f.db_name() == &name)
+                .find(|f| f.db_name() == name)
                 .expect("Expected field to be valid");
 
             let value: Expression = match val {

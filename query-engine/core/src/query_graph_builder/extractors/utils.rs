@@ -24,6 +24,6 @@ pub fn resolve_index_fields(name: &str, model: &ModelRef) -> Option<Vec<ScalarFi
     model
         .unique_indexes()
         .into_iter()
-        .find(|index| &schema_builder::compound_index_field_name(index) == name)
+        .find(|index| schema_builder::compound_index_field_name(index) == name)
         .map(|index| index.fields())
 }

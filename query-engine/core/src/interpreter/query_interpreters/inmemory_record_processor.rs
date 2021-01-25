@@ -31,7 +31,7 @@ impl InMemoryRecordProcessor {
     }
 
     fn take_abs(&self) -> Option<i64> {
-        self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
+        self.take.clone().map(|t| if t < 0 { -t } else { t })
     }
 
     /// Checks whether or not we need to take records going backwards in the record list,

@@ -24,10 +24,12 @@ pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> Que
                     Ok(field.equals(value))
                 }
                 Err(_) => utils::resolve_compound_field(&field_name, &model)
-                    .ok_or(QueryGraphBuilderError::AssertionError(format!(
-                        "Unable to resolve field {} to a field or set of scalar fields on model {}",
-                        field_name, model.name
-                    )))
+                    .ok_or_else(|| {
+                        QueryGraphBuilderError::AssertionError(format!(
+                            "Unable to resolve field {} to a field or set of scalar fields on model {}",
+                            field_name, model.name
+                        ))
+                    })
                     .and_then(|fields| handle_compound_field(fields, value)),
             }
         })

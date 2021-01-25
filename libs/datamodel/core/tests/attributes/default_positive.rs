@@ -10,7 +10,7 @@ fn should_set_default_for_all_scalar_types() {
     model Model {
         id Int @id
         int Int @default(3)
-        float Float @default(3.14)
+        float Float @default(3.20)
         string String @default("String")
         boolean Boolean @default(false)
         dateTime DateTime @default("2019-06-17T14:20:57Z")
@@ -27,7 +27,7 @@ fn should_set_default_for_all_scalar_types() {
         .assert_has_scalar_field("float")
         .assert_base_type(&ScalarType::Float)
         .assert_default_value(DefaultValue::Single(PrismaValue::Float(
-            BigDecimal::from_f64(3.14).unwrap(),
+            BigDecimal::from_f64(3.20).unwrap(),
         )));
 
     user_model
