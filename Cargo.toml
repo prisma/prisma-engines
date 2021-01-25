@@ -80,16 +80,16 @@ lru-cache = { version = "0.1", optional = true }
 serde_json = { version = "1.0.48", optional = true }
 rusqlite = { version = "0.23", features = ["chrono", "bundled"], optional = true }
 native-tls = { version = "0.2", optional = true }
-mysql_async = { version = "0.24.2", optional = true }
+mysql_async = { version = "0.26.0", optional = true }
 log = { version = "0.4", features = ["release_max_level_trace"] }
 tracing = { version = "0.1", optional = true }
 tracing-core = { version = "0.1", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
-bytes = { version = "0.5", optional = true }
-mobc = { version = "0.5.7", optional = true }
+bytes = { version = "1.0", optional = true }
+mobc = { version = "0.7.0", optional = true }
 serde = { version = "1.0", optional = true }
 connection-string = "0.1.10"
-tiberius = { version = "0.4.21", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal"]}
+tiberius = { version = "0.5.5", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal"]}
 
 [dev-dependencies]
 indoc = "0.3"
@@ -99,7 +99,7 @@ serde = { version = "1.0", features = ["derive"] }
 test-macros = { path = "test-macros" }
 test-setup = { path = "test-setup" }
 uuid = { version = "0.8", features = ["v4"] }
-tokio = { version = "0.2", features = ["rt-threaded", "macros", "io-driver", "time"] }
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "time"] }
 
 [dependencies.bigdecimal_]
 version = "0.2.0"
@@ -119,18 +119,18 @@ optional = true
 [dependencies.tokio-postgres]
 features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
 git = "https://github.com/pimeys/rust-postgres"
-rev = "87316f0afb831155fb96e2d0f413e86eb94b369c"
+branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.postgres-types]
 features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
 git = "https://github.com/pimeys/rust-postgres"
-rev = "87316f0afb831155fb96e2d0f413e86eb94b369c"
+branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.postgres-native-tls]
 git = "https://github.com/pimeys/rust-postgres"
-rev = "87316f0afb831155fb96e2d0f413e86eb94b369c"
+branch = "pgbouncer-mode"
 optional = true
 
 [dependencies.libsqlite3-sys]
@@ -140,11 +140,11 @@ features = ["bundled"]
 optional = true
 
 [dependencies.tokio]
-version = "0.2"
-features = ["rt-threaded", "macros", "sync"]
+version = "1.0"
+features = ["rt-multi-thread", "macros", "sync"]
 optional = true
 
 [dependencies.tokio-util]
-version = "0.3"
+version = "0.6"
 features = ["compat"]
 optional = true

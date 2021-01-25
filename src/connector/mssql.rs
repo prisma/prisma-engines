@@ -13,7 +13,7 @@ use futures::lock::Mutex;
 use std::{convert::TryFrom, fmt, str::FromStr, time::Duration};
 use tiberius::*;
 use tokio::net::TcpStream;
-use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
+use tokio_util::compat::{Compat, TokioAsyncWriteCompatExt};
 
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
 /// including default values.

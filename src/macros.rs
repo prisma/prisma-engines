@@ -170,7 +170,7 @@ macro_rules! test_type {
                 use crate::tests::test_api::TestApi;
                 use tokio::runtime::Builder;
 
-                let mut rt = Builder::new().threaded_scheduler().enable_io().enable_time().build().unwrap();
+                let rt = Builder::new_multi_thread().enable_all().build().unwrap();
 
                 rt.block_on(async {
                     let mut setup = [< $db _test_api >]().await?;
@@ -206,7 +206,7 @@ macro_rules! test_type {
                 use crate::tests::test_api::TestApi;
                 use tokio::runtime::Builder;
 
-                let mut rt = Builder::new().threaded_scheduler().enable_io().enable_time().build().unwrap();
+                let rt = Builder::new_multi_thread().enable_all().build().unwrap();
 
                 rt.block_on(async {
                     let mut setup = [< $db _test_api >]().await?;

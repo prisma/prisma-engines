@@ -4,8 +4,7 @@ pub use once_cell::sync::Lazy;
 pub use tags::*;
 
 pub fn run_with_tokio<O, F: std::future::Future<Output = O>>(fut: F) -> O {
-    tokio::runtime::Builder::new()
-        .threaded_scheduler()
+    tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
         .unwrap()
