@@ -1,5 +1,4 @@
 use crate::common::*;
-use dml::default_value::DefaultValue;
 use dml::field::FieldArity;
 
 #[test]
