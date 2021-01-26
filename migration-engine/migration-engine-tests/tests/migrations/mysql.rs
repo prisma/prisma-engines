@@ -199,7 +199,7 @@ async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql"), features("native_types"), log = "debug")]
 async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     let types = &[
         ("int", "Int", "Int", if api.is_mysql_8() { "int" } else { "int(11)" }),
@@ -210,6 +210,12 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
             if api.is_mysql_8() { "smallint" } else { "smallint(6)" },
         ),
         ("tinyint", "Boolean", "TinyInt", "tinyint(1)"),
+        (
+            "tinyintInt",
+            "Int",
+            "TinyInt",
+            if api.is_mysql_8() { "tinyint" } else { "tinyint(4)" },
+        ),
         (
             "mediumint",
             "Int",
@@ -241,7 +247,12 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("date", "DateTime", "Date", "date"),
         ("timeWithPrecision", "DateTime", "Time(3)", "time(3)"),
         ("dateTimeWithPrecision", "DateTime", "DateTime(3)", "datetime(3)"),
-        ("timestampWithPrecision", "DateTime", "Timestamp(3)", "timestamp(3)"),
+        (
+            "timestampWithPrecision",
+            "DateTime @default(now())",
+            "Timestamp(3)",
+            "timestamp(3)",
+        ),
         ("year", "Int", "Year", if api.is_mysql_8() { "year" } else { "year(4)" }),
     ];
 
@@ -267,7 +278,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
 
     dm.push_str("}\n");
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         types.iter().fold(
@@ -277,6 +288,9 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
             },
         )
     })?;
+
+    // Check that the migration is idempotent
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }
