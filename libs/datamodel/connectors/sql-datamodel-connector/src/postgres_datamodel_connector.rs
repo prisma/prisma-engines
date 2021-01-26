@@ -49,6 +49,8 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
             ConnectorCapability::InsensitiveFilters,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
+            ConnectorCapability::CreateMany,
+            ConnectorCapability::WritableAutoincField,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);

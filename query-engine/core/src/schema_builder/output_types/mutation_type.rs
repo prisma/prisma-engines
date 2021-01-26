@@ -1,6 +1,7 @@
 use crate::constants::inputs::args;
 
 use super::*;
+use datamodel_connector::ConnectorCapability;
 use input_types::input_fields;
 use prisma_models::{dml, PrismaValue};
 
@@ -20,7 +21,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
             vec.push(delete_many_field(ctx, &model));
 
             if feature_flags::get().createMany {
-                vec.push(create_many_field(ctx, &model));
+                append_opt(&mut vec, create_many_field(ctx, &model));
             }
 
             vec
@@ -196,19 +197,23 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 }
 
 /// Builds a create many mutation field (e.g. createManyUsers) for given model.
-fn create_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
+fn create_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
     let arguments = arguments::create_many_arguments(ctx, model);
     let field_name = format!("createMany{}", model.name);
 
-    field(
-        field_name,
-        arguments,
-        OutputType::object(output_objects::affected_records_object_type(ctx)),
-        Some(QueryInfo {
-            model: Some(Arc::clone(&model)),
-            tag: QueryTag::CreateMany,
-        }),
-    )
+    if ctx.capabilities.contains(ConnectorCapability::CreateMany) {
+        Some(field(
+            field_name,
+            arguments,
+            OutputType::object(output_objects::affected_records_object_type(ctx)),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::CreateMany,
+            }),
+        ))
+    } else {
+        None
+    }
 }
 
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.

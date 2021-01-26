@@ -1,4 +1,5 @@
 use super::*;
+use datamodel_connector::ConnectorCapability;
 use prisma_models::dml::DefaultValue;
 
 /// Create many data input type.
@@ -32,17 +33,23 @@ pub(crate) fn create_many_object_type(
         vec![]
     };
 
+    // 1) Filter out parent links.
+    // 2) Only allow writing autoincrement fields if the connector supports it.
     let scalar_fields: Vec<ScalarFieldRef> = model
         .fields()
         .scalar()
         .into_iter()
-        .filter(|sf| !linking_fields.contains(sf))
+        .filter(|sf| {
+            !linking_fields.contains(sf)
+                && (!sf.is_autoincrement
+                    || (sf.is_autoincrement && ctx.capabilities.contains(ConnectorCapability::WritableAutoincField)))
+        })
         .collect();
 
     let fields = input_fields::scalar_input_fields(
         ctx,
         model.name.clone(),
-        "Create",
+        "CreateMany",
         scalar_fields,
         |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
             let typ = map_scalar_input_type_for_field(ctx, &f);

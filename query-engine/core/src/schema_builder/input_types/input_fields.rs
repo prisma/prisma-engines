@@ -1,5 +1,6 @@
 use super::*;
 use constants::inputs::operations;
+use datamodel_connector::ConnectorCapability;
 use prisma_models::dml::DefaultValue;
 
 pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, include_aggregates: bool) -> InputField {
@@ -26,7 +27,10 @@ pub(crate) fn nested_create_many_input_field(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
 ) -> Option<InputField> {
-    if parent_field.is_list && !parent_field.is_inlined_on_enclosing_model() {
+    if ctx.capabilities.contains(ConnectorCapability::CreateMany)
+        && parent_field.is_list
+        && !parent_field.is_inlined_on_enclosing_model()
+    {
         let create_object_type = InputType::object(create_many_objects::create_many_object_type(
             ctx,
             &parent_field.related_model(),

@@ -122,6 +122,8 @@ pub enum ConnectorCapability {
     RelationFieldsInArbitraryOrder,
     // start of Query Engine Capabilities
     InsensitiveFilters,
+    CreateMany,
+    WritableAutoincField,
 }
 
 /// Contains all capabilities that the connector is able to serve.

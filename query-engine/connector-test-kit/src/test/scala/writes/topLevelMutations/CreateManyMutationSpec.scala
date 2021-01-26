@@ -6,8 +6,40 @@ import util.ConnectorCapability.EnumCapability
 import util._
 
 class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
-  // Covers: Autoincrement working, basic functionality.
-  "A basic createMany" should "work" in {
+  "A basic createMany" should "work" taggedAs IgnoreSQLite in {
+    val project = ProjectDsl.fromString {
+      """
+        |model Test {
+        |  id   Int @id
+        |  str1 String
+        |  str2 String?
+        |  str3 String? @default("SOME_DEFAULT")
+        |}
+        |""".stripMargin
+    }
+    database.setup(project)
+
+    val result = server.query(
+      """
+        |mutation {
+        |  createManyTest(data: [
+        |    { id: 1, str1: "1", str2: "1", str3: "1"},
+        |    { id: 2, str1: "2",            str3: null},
+        |    { id: 3, str1: "1"},
+        |  ]) {
+        |    count
+        |  }
+        |}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+
+    result.toString() should be("""{"data":{"createManyTest":{"count":3}}}""")
+  }
+
+  // Covers: Autoincrement ID working with basic functionality.
+  "A basic createMany with autoincrementid " should "work" taggedAs (IgnoreSQLite, IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       """
         |model Test {
@@ -39,7 +71,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString() should be("""{"data":{"createManyTest":{"count":3}}}""")
   }
 
-  "createMany" should "correctly use defaults and nulls" in {
+  "createMany" should "correctly use defaults and nulls" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
         |model Test {
@@ -84,7 +116,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     check.toString() should be("""{"data":{"findManyTest":[{"id":1,"str":"SOME_DEFAULT"},{"id":2,"str":null}]}}""")
   }
 
-  "createMany" should "error on duplicates by default" in {
+  "createMany" should "error on duplicates by default" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
         |model Test {
@@ -112,7 +144,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "createMany" should "not error on duplicates with skipDuplicates true" in {
+  "createMany" should "not error on duplicates with skipDuplicates true" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
         |model Test {
@@ -144,7 +176,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   // 5000 params are allowed per single query, but only 2500 rows at once
   // Each created row has 1 param and we create 10000 records, so 4 queries will be fired.
   // Note: Validation of the correct batching behavior is done manually.
-  "createMany" should "allow creating a large number of records (horizontal partitioning check)" in {
+  "createMany" should "allow creating a large number of records (horizontal partitioning check)" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
         |model Test {
@@ -174,7 +206,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   // 5000 params are allowed per single query, but only 2500 rows at once
   // Each created row has 5 params and we create 2000 rows, so 2 queries will be fired.
   // Note: Validation of the correct batching behavior is done manually.
-  "createMany" should "allow creating a large number of records (vertical partitioning check)" in {
+  "createMany" should "allow creating a large number of records (vertical partitioning check)" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
         |model Test {
@@ -201,5 +233,29 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString() should be("""{"data":{"createManyTest":{"count":2000}}}""")
+  }
+
+  "createMany" should "not be available on SQLite" taggedAs (IgnoreMsSql, IgnoreMySql, IgnorePostgres) in {
+    val project = ProjectDsl.fromString {
+      """
+        |model Test {
+        |  id Int @id
+        |}
+        |""".stripMargin
+    }
+    database.setup(project)
+
+    server.queryThatMustFail(
+      s"""
+         |mutation {
+         |  createManyTest(data: []) {
+         |    count
+         |  }
+         |}
+      """.stripMargin,
+      project,
+      errorContains = "`Field does not exist on enclosing type.` at `Mutation.createManyTest`",
+      errorCode = 2009,
+    )
   }
 }

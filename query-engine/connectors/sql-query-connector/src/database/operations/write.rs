@@ -7,8 +7,8 @@ use quaint::error::ErrorKind;
 use std::{collections::HashMap, convert::TryFrom, usize};
 use user_facing_errors::query_engine::DatabaseConstraint;
 
-/// The maximum amount of rows that can be inserted at once.
-const MAX_ROWS: usize = 2500;
+/// The maximum amount of rows that can be inserted at once in a batch.
+const MAX_ROWS: usize = 2100;
 
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
