@@ -583,6 +583,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
         .render_user_facing()
         .unwrap_known();
 
+    assert_eq!(err.error_code, ShadowDbCreationError::ERROR_CODE);
     assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases.  More info: https://pris.ly/d/migrate-shadow."));
 
     Ok(())
@@ -616,63 +617,6 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres
         datasource db {{
             provider = "postgresql"
             url = "postgresql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
-        }}
-        "#,
-        dbhost = host,
-        dbname = api.connection_info().dbname().unwrap(),
-        dbport = port,
-    );
-
-    let migration_api = migration_api(&datamodel).await?;
-
-    let err = migration_api
-        .dev_diagnostic(&DevDiagnosticInput {
-            migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-        })
-        .await
-        .unwrap_err()
-        .render_user_facing()
-        .unwrap_known();
-
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases.  More info: https://pris.ly/d/migrate-shadow."));
-
-    Ok(())
-}
-
-#[test_each_connector(tags("mssql"))]
-async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) -> TestResult {
-    let directory = api.create_migrations_directory()?;
-
-    let dm1 = r#"
-        model Cat {
-            id      Int @id @default(autoincrement())
-        }
-    "#;
-
-    api.create_migration("initial", dm1, &directory).send().await?;
-
-    api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser;").await.ok();
-
-    api.database()
-        .raw_cmd(
-            "
-            DROP USER IF EXISTS prismashadowdbtestuser;
-
-            CREATE LOGIN prismashadowdbtestuser
-                WITH PASSWORD = '1234batmanZ';
-
-            CREATE USER prismashadowdbtestuser FOR LOGIN prismashadowdbtestuser;
-            ",
-        )
-        .await?;
-
-    let (host, port) = db_host_and_port_mssql_2019();
-
-    let datamodel = format!(
-        r#"
-        datasource db {{
-            provider = "sqlserver"
-            url = "sqlserver://{dbhost}:{dbport};database={dbname};user=prismashadowdbtestuser;password=1234batmanZ;trustservercertificate=true"
         }}
         "#,
         dbhost = host,

@@ -163,7 +163,7 @@ async fn diagnose_migration_history_without_opt_in_to_shadow_database_does_not_c
     Ok(())
 }
 
-#[test_each_connector(ignore("postgres", "mssql_2017", "mssql_2019"))]
+#[test_each_connector(ignore("postgres", "mssql"))]
 async fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migrations(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -900,7 +900,7 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2019"))]
+#[test_each_connector(tags("mssql"))]
 async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -920,12 +920,17 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
             DROP USER IF EXISTS prismashadowdbtestuser;
 
             CREATE LOGIN prismashadowdbtestuser
-                WITH PASSWORD = '1234batmanZ';
+                    WITH PASSWORD = '1234batmanZ';
 
             CREATE USER prismashadowdbtestuser FOR LOGIN prismashadowdbtestuser;
+
+            GRANT SELECT TO prismashadowdbtestuser;
             ",
         )
         .await?;
+
+    // This is sad but necessary — it appears the user creation is asynchronous.
+    tokio::time::sleep(std::time::Duration::from_millis(250)).await;
 
     let (host, port) = db_host_and_port_mssql_2019();
 
