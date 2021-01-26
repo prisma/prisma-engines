@@ -3,7 +3,9 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, FieldArity, NativeTypeInstance};
+use datamodel::{
+    walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, FieldArity, NativeTypeInstance, ScalarType,
+};
 use sql_schema_describer as sql;
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily};
 
@@ -31,7 +33,7 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
         }
     }
 
-    fn default_native_type_for_family(&self, family: &sql::ColumnTypeFamily) -> Option<serde_json::Value>;
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value;
 
     fn enum_column_type(&self, _field: &ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {
         unreachable!("unreachable enum_column_type")

@@ -14,6 +14,13 @@ pub enum DefaultValue {
 }
 
 impl DefaultValue {
+    pub fn as_single(&self) -> Option<&PrismaValue> {
+        match self {
+            DefaultValue::Single(v) => Some(v),
+            _ => None,
+        }
+    }
+
     /// Returns either a copy of the contained single value or produces a new
     /// value as defined by the expression.
     pub fn get(&self) -> Option<PrismaValue> {

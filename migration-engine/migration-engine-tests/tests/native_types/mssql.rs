@@ -2005,8 +2005,8 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
 
             let warning = format!(
                 "You are about to alter the column `x` on the `A` table, which contains 1 non-null values. The data in that column will be cast from `{}` to `{}`.",
-                with_params(from).to_lowercase(),
-                to.to_lowercase()
+                with_params(from),
+                to,
             );
 
             api.schema_push(&dm2).send().await?.assert_warnings(&[warning.into()])?;

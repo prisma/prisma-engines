@@ -2,11 +2,10 @@ use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MysqlFlavour;
 use datamodel::{
     walkers::{walk_scalar_fields, ScalarFieldWalker},
-    Datamodel, NativeTypeInstance,
+    Datamodel, NativeTypeInstance, ScalarType,
 };
 use native_types::MySqlType;
-use sql::ColumnTypeFamily;
-use sql_schema_describer::{self as sql};
+use sql_schema_describer::{self as sql, ColumnTypeFamily};
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
     fn calculate_enums(&self, datamodel: &Datamodel) -> Vec<sql::Enum> {
@@ -113,22 +112,19 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         )
     }
 
-    fn default_native_type_for_family(&self, family: &sql::ColumnTypeFamily) -> Option<serde_json::Value> {
-        let ty = match family {
-            ColumnTypeFamily::Int => MySqlType::Int,
-            ColumnTypeFamily::BigInt => MySqlType::BigInt,
-            ColumnTypeFamily::Float => MySqlType::Decimal(Some((65, 30))),
-            ColumnTypeFamily::Decimal => MySqlType::Decimal(Some((65, 30))),
-            ColumnTypeFamily::Boolean => MySqlType::TinyInt,
-            ColumnTypeFamily::String => MySqlType::VarChar(191),
-            ColumnTypeFamily::DateTime => MySqlType::DateTime(Some(3)),
-            ColumnTypeFamily::Binary => MySqlType::LongBlob,
-            ColumnTypeFamily::Json => MySqlType::Json,
-            ColumnTypeFamily::Uuid => MySqlType::VarChar(37),
-            ColumnTypeFamily::Enum(_) => return None,
-            ColumnTypeFamily::Unsupported(_) => return None,
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+        let ty = match scalar_type {
+            ScalarType::Int => MySqlType::Int,
+            ScalarType::BigInt => MySqlType::BigInt,
+            ScalarType::Float => MySqlType::Decimal(Some((65, 30))),
+            ScalarType::Decimal => MySqlType::Decimal(Some((65, 30))),
+            ScalarType::Boolean => MySqlType::TinyInt,
+            ScalarType::String => MySqlType::VarChar(191),
+            ScalarType::DateTime => MySqlType::DateTime(Some(3)),
+            ScalarType::Bytes => MySqlType::LongBlob,
+            ScalarType::Json => MySqlType::Json,
         };
 
-        Some(serde_json::to_value(ty).expect("MySqlType to JSON failed"))
+        serde_json::to_value(ty).expect("MySqlType to JSON failed")
     }
 }

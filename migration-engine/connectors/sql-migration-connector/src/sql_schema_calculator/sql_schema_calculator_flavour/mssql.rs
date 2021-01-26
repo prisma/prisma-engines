@@ -1,9 +1,7 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
-use datamodel::{
-    walkers::{ModelWalker, ScalarFieldWalker},
-    FieldArity, NativeTypeInstance,
-};
+use datamodel::walkers::ScalarFieldWalker;
+use datamodel::{walkers::ModelWalker, FieldArity, NativeTypeInstance, ScalarType};
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, ForeignKeyAction};
 
@@ -108,22 +106,19 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         format!("{}_{}_unique", model_name, field_name)
     }
 
-    fn default_native_type_for_family(&self, family: &ColumnTypeFamily) -> Option<serde_json::Value> {
-        let ty = match family {
-            ColumnTypeFamily::Int => MsSqlType::Int,
-            ColumnTypeFamily::BigInt => MsSqlType::BigInt,
-            ColumnTypeFamily::Float => MsSqlType::Decimal(Some((32, 16))),
-            ColumnTypeFamily::Decimal => MsSqlType::Decimal(Some((32, 16))),
-            ColumnTypeFamily::Boolean => MsSqlType::Bit,
-            ColumnTypeFamily::String => MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
-            ColumnTypeFamily::DateTime => MsSqlType::DateTime2,
-            ColumnTypeFamily::Binary => MsSqlType::VarBinary(Some(MsSqlTypeParameter::Max)),
-            ColumnTypeFamily::Json => MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
-            ColumnTypeFamily::Uuid => MsSqlType::UniqueIdentifier,
-            ColumnTypeFamily::Enum(_) => return None,
-            ColumnTypeFamily::Unsupported(_) => return None,
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+        let ty = match scalar_type {
+            ScalarType::Int => MsSqlType::Int,
+            ScalarType::BigInt => MsSqlType::BigInt,
+            ScalarType::Float => MsSqlType::Decimal(Some((32, 16))),
+            ScalarType::Decimal => MsSqlType::Decimal(Some((32, 16))),
+            ScalarType::Boolean => MsSqlType::Bit,
+            ScalarType::String => MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
+            ScalarType::DateTime => MsSqlType::DateTime2,
+            ScalarType::Bytes => MsSqlType::VarBinary(Some(MsSqlTypeParameter::Max)),
+            ScalarType::Json => MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
         };
 
-        Some(serde_json::to_value(ty).expect("MySqlType to JSON failed"))
+        serde_json::to_value(ty).expect("MsSqlType to JSON failed")
     }
 }

@@ -5,6 +5,7 @@ use crate::{
     sql_migration::{AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, RedefineTable, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
+use native_types::PostgresType;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
@@ -358,34 +359,63 @@ impl SqlRenderer for PostgresFlavour {
     }
 }
 
-pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> String {
+pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
     let t = col.column_type();
     let is_autoincrement = col.is_autoincrement();
 
-    let array = match t.arity {
-        ColumnArity::List => "[]",
-        _ => "",
-    };
-
-    if !t.full_data_type.is_empty() {
-        return format!("{}{}", t.full_data_type, array);
+    if let ColumnTypeFamily::Enum(name) = &t.family {
+        return format!("\"{}\"{}", name, if t.arity.is_list() { "[]" } else { "" }).into();
     }
 
-    match &t.family {
-        ColumnTypeFamily::Boolean => format!("BOOLEAN{}", array),
-        ColumnTypeFamily::DateTime => format!("TIMESTAMP(3){}", array),
-        ColumnTypeFamily::Float => format!("DECIMAL(65,30){}", array),
-        ColumnTypeFamily::Decimal => format!("DECIMAL(65,30){}", array),
-        ColumnTypeFamily::Int if is_autoincrement => format!("SERIAL{}", array),
-        ColumnTypeFamily::Int => format!("INTEGER{}", array),
-        ColumnTypeFamily::BigInt if is_autoincrement => format!("BIGSERIAL{}", array),
-        ColumnTypeFamily::BigInt => format!("BIGINT{}", array),
-        ColumnTypeFamily::String => format!("TEXT{}", array),
-        ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
-        ColumnTypeFamily::Json => format!("JSONB{}", array),
-        ColumnTypeFamily::Binary => format!("BYTEA{}", array),
-        ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
-        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
+    let native_type = col
+        .column_native_type()
+        .expect("Missing native type in postgres_renderer::render_column_type()");
+
+    fn render(input: Option<u32>) -> String {
+        match input {
+            None => "".to_string(),
+            Some(arg) => format!("({})", arg),
+        }
+    }
+    fn render_decimal(input: Option<(u32, u32)>) -> String {
+        match input {
+            None => "".to_string(),
+            Some((precision, scale)) => format!("({}, {})", precision, scale),
+        }
+    }
+
+    let tpe: Cow<'_, str> = match native_type {
+        PostgresType::SmallInt if is_autoincrement => "SMALLSERIAL".into(),
+        PostgresType::SmallInt => "SMALLINT".into(),
+        PostgresType::Integer if is_autoincrement => "SERIAL".into(),
+        PostgresType::Integer => "INTEGER".into(),
+        PostgresType::BigInt if is_autoincrement => "BIGSERIAL".into(),
+        PostgresType::BigInt => "BIGINT".into(),
+        PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)).into(),
+        PostgresType::Real => "REAL".into(),
+        PostgresType::DoublePrecision => "DOUBLE PRECISION".into(),
+        PostgresType::VarChar(length) => format!("VARCHAR{}", render(length)).into(),
+        PostgresType::Char(length) => format!("CHAR{}", render(length)).into(),
+        PostgresType::Text => "TEXT".into(),
+        PostgresType::ByteA => "BYTEA".into(),
+        PostgresType::Date => "DATE".into(),
+        PostgresType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)).into(),
+        PostgresType::Timestamptz(precision) => format!("TIMESTAMPTZ{}", render(precision)).into(),
+        PostgresType::Time(precision) => format!("TIME{}", render(precision)).into(),
+        PostgresType::Timetz(precision) => format!("TIMETZ{}", render(precision)).into(),
+        PostgresType::Boolean => "BOOLEAN".into(),
+        PostgresType::Bit(length) => format!("BIT{}", render(length)).into(),
+        PostgresType::VarBit(length) => format!("VARBIT{}", render(length)).into(),
+        PostgresType::UUID => "UUID".into(),
+        PostgresType::Xml => "XML".into(),
+        PostgresType::JSON => "JSON".into(),
+        PostgresType::JSONB => "JSONB".into(),
+    };
+
+    if t.arity.is_list() {
+        format!("{}[]", tpe.to_owned()).into()
+    } else {
+        tpe
     }
 }
 

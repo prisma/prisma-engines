@@ -1,4 +1,5 @@
 use crate::{DomainError, ModelProjection, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder};
+use itertools::Itertools;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -118,9 +119,15 @@ impl ManyRecords {
     pub fn reverse(&mut self) {
         self.records.reverse();
     }
+
+    /// Deduplicate the wrapped records
+    pub fn with_unique_records(mut self) -> Self {
+        self.records = self.records.into_iter().unique().collect();
+        self
+    }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
     pub parent_id: Option<RecordProjection>,

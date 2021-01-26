@@ -1,6 +1,3 @@
-use migration_connector::MigrationFeature;
-use sql_schema_describer::walkers::ColumnWalker;
-
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
     flavour::{MssqlFlavour, SqlFlavour},
@@ -12,7 +9,10 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
-use sql_schema_describer::{DefaultKind, DefaultValue};
+use datamodel_connector::Connector;
+use migration_connector::MigrationFeature;
+use sql_datamodel_connector::SqlDatamodelConnectors;
+use sql_schema_describer::{walkers::ColumnWalker, DefaultKind, DefaultValue};
 
 impl DestructiveChangeCheckerFlavour for MssqlFlavour {
     fn check_alter_column(
@@ -47,27 +47,27 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         match type_change {
             Some(ColumnTypeChange::SafeCast) | None => (),
             Some(ColumnTypeChange::RiskyCast) => {
-                if self.features().contains(MigrationFeature::NativeTypes) {
-                    plan.push_warning(
-                        SqlMigrationWarningCheck::RiskyCast {
-                            table: columns.previous().table().name().to_owned(),
-                            column: columns.previous().name().to_owned(),
-                            previous_type: columns.previous().column_type().full_data_type.to_string(),
-                            next_type: columns.next().column_type().full_data_type.to_string(),
-                        },
-                        step_index,
-                    );
-                } else {
-                    plan.push_warning(
-                        SqlMigrationWarningCheck::RiskyCast {
-                            table: columns.previous().table().name().to_owned(),
-                            column: columns.previous().name().to_owned(),
-                            previous_type: format!("{:?}", columns.previous().column_type_family()),
-                            next_type: format!("{:?}", columns.next().column_type_family()),
-                        },
-                        step_index,
-                    );
-                }
+                let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
+                let datamodel_connector = SqlDatamodelConnectors::mssql();
+                let previous_type = match &columns.previous().column_type().native_type {
+                    Some(tpe) if native_types_enabled => datamodel_connector.render_native_type(tpe.clone()),
+                    _ => format!("{:?}", columns.previous().column_type_family()),
+                };
+
+                let next_type = match &columns.next().column_type().native_type {
+                    Some(tpe) if native_types_enabled => datamodel_connector.render_native_type(tpe.clone()),
+                    _ => format!("{:?}", columns.next().column_type_family()),
+                };
+
+                plan.push_warning(
+                    SqlMigrationWarningCheck::RiskyCast {
+                        table: columns.previous().table().name().to_owned(),
+                        column: columns.previous().name().to_owned(),
+                        previous_type,
+                        next_type,
+                    },
+                    step_index,
+                );
             }
             Some(ColumnTypeChange::NotCastable) => {
                 plan.push_warning(

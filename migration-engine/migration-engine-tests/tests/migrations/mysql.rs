@@ -209,12 +209,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
             "SmallInt",
             if api.is_mysql_8() { "smallint" } else { "smallint(6)" },
         ),
-        (
-            "tinyint",
-            "Boolean",
-            "TinyInt",
-            if api.is_mysql_8() { "tinyint" } else { "tinyint(4)" },
-        ),
+        ("tinyint", "Boolean", "TinyInt", "tinyint(1)"),
         (
             "mediumint",
             "Int",

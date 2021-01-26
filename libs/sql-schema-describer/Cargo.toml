@@ -41,4 +41,4 @@ barrel = {git = "https://github.com/prisma/barrel.git", features = ["sqlite3", "
 pretty_assertions = "0.6"
 test-macros = { path = "../test-macros" }
 test-setup = { path = "../test-setup" }
-tokio = {version = "0.2.13", default_features = false, features = ["rt-core", "macros"]}
+tokio = {version = "1.0", default_features = false, features = ["rt", "macros"]}

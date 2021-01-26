@@ -1,9 +1,8 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::PostgresFlavour;
-use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, WithDatabaseName};
+use datamodel::{walkers::ScalarFieldWalker, Datamodel, NativeTypeInstance, ScalarType, WithDatabaseName};
 use native_types::PostgresType;
-use sql::ColumnTypeFamily;
-use sql_schema_describer::{self as sql};
+use sql_schema_describer::{self as sql, ColumnTypeFamily};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     fn calculate_enums(&self, datamodel: &Datamodel) -> Vec<sql::Enum> {
@@ -16,23 +15,20 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             .collect()
     }
 
-    fn default_native_type_for_family(&self, family: &ColumnTypeFamily) -> Option<serde_json::Value> {
-        let ty = match family {
-            ColumnTypeFamily::Int => PostgresType::Integer,
-            ColumnTypeFamily::BigInt => PostgresType::BigInt,
-            ColumnTypeFamily::Float => PostgresType::Decimal(Some((65, 30))),
-            ColumnTypeFamily::Decimal => PostgresType::Decimal(Some((65, 30))),
-            ColumnTypeFamily::Boolean => PostgresType::Boolean,
-            ColumnTypeFamily::String => PostgresType::Text,
-            ColumnTypeFamily::DateTime => PostgresType::Timestamp(Some(3)),
-            ColumnTypeFamily::Binary => PostgresType::ByteA,
-            ColumnTypeFamily::Json => PostgresType::JSONB,
-            ColumnTypeFamily::Uuid => PostgresType::UUID,
-            ColumnTypeFamily::Enum(_) => return None,
-            ColumnTypeFamily::Unsupported(_) => return None,
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+        let ty = match scalar_type {
+            ScalarType::Int => PostgresType::Integer,
+            ScalarType::BigInt => PostgresType::BigInt,
+            ScalarType::Float => PostgresType::Decimal(Some((65, 30))),
+            ScalarType::Decimal => PostgresType::Decimal(Some((65, 30))),
+            ScalarType::Boolean => PostgresType::Boolean,
+            ScalarType::String => PostgresType::Text,
+            ScalarType::DateTime => PostgresType::Timestamp(Some(3)),
+            ScalarType::Bytes => PostgresType::ByteA,
+            ScalarType::Json => PostgresType::JSONB,
         };
 
-        Some(serde_json::to_value(ty).expect("PostgresType to json failed"))
+        serde_json::to_value(ty).expect("PostgresType to json failed")
     }
 
     fn column_type_for_native_type(
