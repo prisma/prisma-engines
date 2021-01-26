@@ -296,7 +296,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
         default: column
             .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_) | DefaultKind::SEQUENCE(_)))
+            .filter(|default| !matches!(default.kind(), DefaultKind::SEQUENCE(_)))
             .map(|default| render_default(default, column.column_type_family())),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),

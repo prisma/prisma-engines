@@ -234,7 +234,6 @@ impl SqlRenderer for PostgresFlavour {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
             .map(|default| self.render_default(default, column.column_type_family()))
             .filter(|default| !default.is_empty())
             .map(|default| format!(" DEFAULT {}", default))

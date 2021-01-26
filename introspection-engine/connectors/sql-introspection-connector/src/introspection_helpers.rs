@@ -291,7 +291,7 @@ pub(crate) fn calculate_default(
         (Some(DefaultKind::SEQUENCE(_)), _) => (Some(DMLDef::Expression(VG::new_autoincrement())), None),
         (Some(DefaultKind::NOW), ColumnTypeFamily::DateTime) => (Some(DMLDef::Expression(VG::new_now())), None),
         (Some(DefaultKind::DBGENERATED(default_string)), _) => (
-            Some(DMLDef::Expression(VG::new_dbgenerated())),
+            Some(DMLDef::Expression(VG::new_dbgenerated(default_string.clone()))),
             Some(default_string.clone()),
         ),
         (Some(DefaultKind::VALUE(val)), _) => (Some(DMLDef::Single(val.clone())), None),

@@ -119,8 +119,8 @@ impl<'a> ColumnDiffer<'a> {
             (None, Some(DefaultKind::VALUE(_))) => false,
             (None, Some(DefaultKind::NOW)) => false,
 
-            // We can never migrate to @dbgenerated
-            (_, Some(DefaultKind::DBGENERATED(_))) => true,
+            // We now do migrate to @dbgenerated
+            (_, Some(DefaultKind::DBGENERATED(_))) => false,
             // Sequence migrations are handled separately.
             (_, Some(DefaultKind::SEQUENCE(_))) => true,
         }

@@ -3106,7 +3106,7 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
     let dm3 = r#"
         model Post {
             id               Int    @id @default(autoincrement())
-            user_balance     Unsupported("money")
+            user_balance     Unsupported("money") @default(dbgenerated("12"))
         }
     "#;
 
@@ -3120,7 +3120,8 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
             })?
             .assert_column("user_balance", |c| {
                 c.assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))?
+                    .assert_default_value(&PrismaValue::Null)
             })
     })?;
 

@@ -321,7 +321,9 @@ fn column_default_for_scalar_field(field: &ScalarFieldWalker<'_>) -> Option<sql:
             }
             _ => Some(sql::DefaultValue::value(s.clone())),
         },
-        default if default.is_dbgenerated() => Some(sql::DefaultValue::db_generated(String::new())),
+        default if default.is_dbgenerated() => Some(sql::DefaultValue::db_generated(
+            default.db_generated_description().unwrap(),
+        )),
         default if default.is_now() => Some(sql::DefaultValue::now()),
         default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
         datamodel::DefaultValue::Expression(_) => None,

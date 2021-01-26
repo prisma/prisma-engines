@@ -66,7 +66,6 @@ impl SqlRenderer for MssqlFlavour {
         } else {
             column
                 .default()
-                .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
                 .map(|default| {
                     let constraint_name = format!("DF__{}__{}", column.table().name(), column.name());
 

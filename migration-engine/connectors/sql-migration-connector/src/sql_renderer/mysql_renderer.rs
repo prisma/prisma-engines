@@ -153,7 +153,7 @@ impl SqlRenderer for MysqlFlavour {
         let default_str = column
             .default()
             .filter(|default| {
-                !matches!(default.kind(), DefaultKind::DBGENERATED(_) | DefaultKind::SEQUENCE(_))
+                !matches!(default.kind(),  DefaultKind::SEQUENCE(_))
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
                     // We do not want to render binary defaults because they are not supported by MySQL.
