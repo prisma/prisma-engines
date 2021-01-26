@@ -4,7 +4,7 @@ use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::{collections::HashMap, convert::TryFrom, fmt::Write, usize};
+use std::{collections::HashMap, convert::TryFrom, usize};
 use user_facing_errors::query_engine::DatabaseConstraint;
 
 /// The maximum amount of rows that can be inserted at once.
@@ -87,8 +87,10 @@ pub async fn create_records(
             let mut batch = vec![];
 
             while param_count < *connector_interface::MAX_BATCH_SIZE {
+                // If the param count _including_ the next item doens't exceed the limit,
+                // we continue filling up the current batch.
                 let proceed = match iter.peek() {
-                    Some(next) => (param_count + next.len()) >= *MAX_BATCH_SIZE,
+                    Some(next) => (param_count + next.len()) <= *MAX_BATCH_SIZE,
                     None => break,
                 };
 
@@ -100,10 +102,16 @@ pub async fn create_records(
                         }
                         None => break,
                     }
+                } else {
+                    break;
                 }
             }
 
-            Some(batch)
+            if batch.is_empty() {
+                None
+            } else {
+                Some(batch)
+            }
         })
         .collect_vec();
 

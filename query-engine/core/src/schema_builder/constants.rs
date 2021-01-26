@@ -26,7 +26,7 @@ pub mod inputs {
         pub const DISTINCT: &str = "distinct";
 
         // createMany-specific args
-        pub const SKIP_DUPLICATES: &str = "skip_duplicates";
+        pub const SKIP_DUPLICATES: &str = "skipDuplicates";
     }
 
     pub mod operations {

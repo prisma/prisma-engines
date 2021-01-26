@@ -206,7 +206,7 @@ fn create_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
         OutputType::object(output_objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
-            tag: QueryTag::UpdateMany,
+            tag: QueryTag::CreateMany,
         }),
     )
 }
