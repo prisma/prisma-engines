@@ -3065,6 +3065,13 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
             id               Int    @id @default(autoincrement())
             user_balance     Unsupported("money")
         }
+        
+        model Blog {
+          id            Int    @id              @default(autoincrement())
+          number        Int?                    @default(1)
+          bigger_number Int?                    @default(dbgenerated("sqrt((4)::double precision)"))
+          point         Unsupported("point")?   @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
+        }   
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
@@ -3081,10 +3088,33 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
             })
     })?;
 
+    api.assert_schema().await?.assert_table("Blog", |table| {
+        table
+            .assert_columns_count(4)?
+            .assert_column("id", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("number", |c| {
+                c.assert_is_nullable()?
+                    .assert_type_family(ColumnTypeFamily::Int)?
+                    .assert_default_value(&PrismaValue::Int(1))
+            })?
+            .assert_column("bigger_number", |c| {
+                c.assert_is_nullable()?
+                    .assert_type_family(ColumnTypeFamily::Int)?
+                    .assert_dbgenerated("sqrt((4)::double precision)")
+            })?
+            .assert_column("point", |c| {
+                c.assert_is_nullable()?
+                    .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))?
+                    .assert_dbgenerated("point((0)::double precision, (0)::double precision)")
+            })
+    })?;
+
     let dm2 = r#"
         model Post {
             id            Int                      @id @default(autoincrement())
-            user_balance  Unsupported("money")? @unique
+            user_balance  Unsupported("money")?    @unique
         }
     "#;
 
@@ -3121,7 +3151,7 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
             .assert_column("user_balance", |c| {
                 c.assert_is_required()?
                     .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))?
-                    .assert_default_value(&PrismaValue::Null)
+                    .assert_dbgenerated("12")
             })
     })?;
 

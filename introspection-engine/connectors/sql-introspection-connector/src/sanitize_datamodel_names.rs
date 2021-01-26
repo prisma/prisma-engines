@@ -82,7 +82,7 @@ fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<Str
                                 let sanitized_value = sanitize_string(value);
 
                                 match sanitized_value {
-                                    x if x == EMPTY_STRING => DefaultValue::new_db_generated("".to_string()),
+                                    x if x == EMPTY_STRING => DefaultValue::new_db_generated(value.clone()),
                                     _ => DefaultValue::Single(PrismaValue::Enum(sanitized_value)),
                                 }
                             };
