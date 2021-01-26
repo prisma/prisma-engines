@@ -10,6 +10,14 @@ test_type!(tinyint(
     Value::integer(i8::MAX)
 ));
 
+test_type!(tinyint1(
+    mysql,
+    "tinyint(1)",
+    Value::integer(-1),
+    Value::integer(1),
+    Value::integer(0)
+));
+
 test_type!(tinyint_unsigned(
     mysql,
     "tinyint(4) unsigned",
@@ -112,19 +120,19 @@ test_type!(double_decimal(
     )
 ));
 
+test_type!(bit1(
+    mysql,
+    "bit(1)",
+    (Value::Bytes(None), Value::Boolean(None)),
+    (Value::integer(0), Value::boolean(false)),
+    (Value::integer(1), Value::boolean(true)),
+));
+
 test_type!(bit64(
     mysql,
     "bit(64)",
     Value::Bytes(None),
     Value::bytes(vec![0, 0, 0, 0, 0, 6, 107, 58])
-));
-
-test_type!(boolean(
-    mysql,
-    "tinyint(1)",
-    Value::Boolean(None),
-    Value::boolean(true),
-    Value::boolean(false)
 ));
 
 test_type!(char(mysql, "char(255)", Value::Text(None), Value::text("foobar")));

@@ -175,8 +175,7 @@ impl TypeIdentifier for my::Column {
     }
 
     fn is_bool(&self) -> bool {
-        (self.column_type() == ColumnType::MYSQL_TYPE_TINY && self.column_length() == 1)
-            || (self.column_type() == ColumnType::MYSQL_TYPE_BIT && self.column_length() == 1)
+        self.column_type() == ColumnType::MYSQL_TYPE_BIT && self.column_length() == 1
     }
 
     fn is_json(&self) -> bool {
@@ -243,10 +242,13 @@ impl TakeRow for my::Row {
 
                     Value::numeric(dec)
                 }
+                my::Value::Bytes(b) if column.is_bool() => match b.as_slice() {
+                    [0] => Value::boolean(false),
+                    _ => Value::boolean(true),
+                },
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
                 my::Value::Bytes(s) => Value::text(String::from_utf8(s)?),
-                my::Value::Int(i) if column.is_bool() => Value::boolean(i == 1),
                 my::Value::Int(i) => Value::integer(i),
                 my::Value::UInt(i) => Value::integer(i64::try_from(i).map_err(|_| {
                     let msg = "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.";
