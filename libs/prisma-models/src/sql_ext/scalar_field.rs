@@ -36,6 +36,7 @@ impl ScalarFieldExt for ScalarField {
                 TypeIdentifier::BigInt => Value::Integer(None),
                 TypeIdentifier::Bytes => Value::Bytes(None),
                 TypeIdentifier::Xml => Value::Xml(None),
+                TypeIdentifier::Unsupported => panic!("No unsupported field should reach that path"),
             },
         }
     }

@@ -17,6 +17,7 @@ pub struct ModelTemplate {
     pub manifestation: Option<String>,
     pub id_field_names: Vec<String>,
     pub indexes: Vec<IndexTemplate>,
+    pub supports_create_operation: bool,
     pub dml_model: datamodel::Model,
 }
 
@@ -31,6 +32,7 @@ pub struct Model {
     dml_model: datamodel::Model,
 
     pub internal_data_model: InternalDataModelWeakRef,
+    pub supports_create_operation: bool,
 }
 
 impl Debug for Model {
@@ -59,6 +61,7 @@ impl ModelTemplate {
             primary_identifier: OnceCell::new(),
             dml_model: self.dml_model,
             internal_data_model,
+            supports_create_operation: self.supports_create_operation,
         });
 
         let fields = Fields::new(

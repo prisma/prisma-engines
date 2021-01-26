@@ -54,6 +54,7 @@ fn map_scalar_input_type(ctx: &mut BuilderContext, typ: &TypeIdentifier, list: b
         TypeIdentifier::Xml => InputType::xml(),
         TypeIdentifier::Bytes => InputType::bytes(),
         TypeIdentifier::BigInt => InputType::bigint(),
+        TypeIdentifier::Unsupported => panic!("No unsupported field should reach that path"),
     };
 
     if list {
