@@ -11,7 +11,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
     let object = ObjectTypeStrongRef::new(ObjectType::new(ident.clone(), Some(ModelRef::clone(model))));
     let mut object_fields = vec![];
 
-    let non_list_fields = collect_non_list_fields(model);
+    let non_list_nor_json_fields = collect_non_list_nor_json_fields(model);
     let numeric_fields = collect_numeric_fields(model);
 
     // Count is available on all fields.
@@ -19,7 +19,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
         &mut object_fields,
         aggregation_field(
             ctx,
-            "count",
+            fields::COUNT,
             &model,
             model.fields().scalar(),
             |_, _| OutputType::int(),
@@ -60,7 +60,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             ctx,
             fields::MIN,
             &model,
-            non_list_fields.clone(),
+            non_list_nor_json_fields.clone(),
             map_scalar_output_type_for_field,
             identity,
         ),
@@ -72,7 +72,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
             ctx,
             fields::MAX,
             &model,
-            non_list_fields,
+            non_list_nor_json_fields,
             map_scalar_output_type_for_field,
             identity,
         ),

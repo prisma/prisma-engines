@@ -13,8 +13,13 @@ fn field_avg_output_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> Ou
     }
 }
 
-fn collect_non_list_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
-    model.fields().scalar().into_iter().filter(|f| !f.is_list).collect()
+fn collect_non_list_nor_json_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
+    model
+        .fields()
+        .scalar()
+        .into_iter()
+        .filter(|f| !f.is_list && f.type_identifier != TypeIdentifier::Json)
+        .collect()
 }
 
 fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
