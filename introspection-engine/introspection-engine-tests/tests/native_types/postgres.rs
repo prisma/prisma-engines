@@ -152,7 +152,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             varChar         String
             char            String
             text            String
-            // This type is currently not supported.
+            // This type is currently not supported by the Prisma Client.
             // bytea        Unsupported("bytea")
             ts              DateTime
             tstz            DateTime

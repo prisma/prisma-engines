@@ -172,18 +172,18 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
           varchars_2     String
           nvarchars      String
           nvarchars_2    String
-          // This type is currently not supported.
+          // This type is currently not supported by the Prisma Client.
           // binary      Unsupported("binary(230)")
-          // This type is currently not supported.
+          // This type is currently not supported by the Prisma Client.
           // varbinary   Unsupported("varbinary(150)")
-          // This type is currently not supported.
+          // This type is currently not supported by the Prisma Client.
           // varbinary_2 Unsupported("varbinary(max)")
           date           DateTime
           time           DateTime
           datetime       DateTime
           datetime2      DateTime
           xml            String
-          // This type is currently not supported.
+          // This type is currently not supported by the Prisma Client.
           // image       Unsupported("image")
           text           String
           ntext          String

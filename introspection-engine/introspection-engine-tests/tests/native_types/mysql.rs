@@ -194,17 +194,17 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             bits                           Int
             chars                          String
             varchars                       String
-            // This type is currently not supported.
+            // This type is currently not supported by the Prisma Client.
             // binary                      Unsupported("binary(230)")
-            // This type is currently not supported.
+            // This type is currently not supported by the Prisma Client.
             // varbinary                   Unsupported("varbinary(150)")
-            // This type is currently not supported.
+            // This type is currently not supported by the Prisma Client.
             // tinyBlob                    Unsupported("tinyblob")
-            // This type is currently not supported.
+            // This type is currently not supported by the Prisma Client.
             // blob                        Unsupported("blob")
-            // This type is currently not supported.
+            // This type is currently not supported by the Prisma Client.
             // mediumBlob                  Unsupported("mediumblob")
-            // This type is currently not supported.
+            // This type is currently not supported by the Prisma Client.
             // longBlob                    Unsupported("longblob")
             tinytext                       String
             text                           String
