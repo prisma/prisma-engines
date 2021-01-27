@@ -172,9 +172,10 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString() should be("""{"data":{"createManyTest":{"count":1}}}""")
   }
 
+  // Note: Checks were originally higher, but test method (command line args) blows up...
   // Covers: Batching by row number.
   // Each DB allows a certain amount of params per single query, and a certain number of rows.
-  // Each created row has 1 param and we create 10000 records, so 4 queries will be fired.
+  // Each created row has 1 param and we create 1000 records.
   "createMany" should "allow creating a large number of records (horizontal partitioning check)" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
@@ -185,7 +186,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
     database.setup(project)
 
-    val records: Seq[String] = for (i <- 1 to 10000) yield { s"{ id: $i }" }
+    val records: Seq[String] = for (i <- 1 to 1000) yield { s"{ id: $i }" }
     val result = server.query(
       s"""
         |mutation {
@@ -201,9 +202,10 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     result.toString() should be("""{"data":{"createManyTest":{"count":10000}}}""")
   }
 
+  // Note: Checks were originally higher, but test method (command line args) blows up...
   // Covers: Batching by row number.
   // Each DB allows a certain amount of params per single query, and a certain number of rows.
-  // Each created row has 4 params and we create 2000 rows.
+  // Each created row has 4 params and we create 1000 rows.
   "createMany" should "allow creating a large number of records (vertical partitioning check)" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """

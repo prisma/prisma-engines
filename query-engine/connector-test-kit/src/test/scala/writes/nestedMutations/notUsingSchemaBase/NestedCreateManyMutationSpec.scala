@@ -115,11 +115,12 @@ class NestedCreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBa
     result.toString() should be("""{"data":{"createOneModelA":{"bs":[{"id":1}]}}}""")
   }
 
+  // Note: Checks were originally higher, but test method (command line args) blows up...
   // Covers: Batching by row number.
   // Each DB allows a certain amount of params per single query, and a certain number of rows.
-  // We create 5000 nested records.
+  // We create 1000 nested records.
   "Nested createMany" should "allow creating a large number of records (horizontal partitioning check)" taggedAs IgnoreSQLite in {
-    val records: Seq[String] = for (i <- 1 to 5000) yield { s"""{ id: $i, str1: "$i" }""" }
+    val records: Seq[String] = for (i <- 1 to 1000) yield { s"""{ id: $i, str1: "$i" }""" }
     server.query(
       s"""
          |mutation {

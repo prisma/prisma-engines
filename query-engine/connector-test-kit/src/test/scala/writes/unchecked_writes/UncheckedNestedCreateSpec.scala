@@ -184,7 +184,7 @@ class UncheckedNestedCreateSpec extends FlatSpec with Matchers with ApiSpecBase 
       project,
       errorCode = 2009,
       errorContains =
-        """`Mutation.createOneModelB.data.ModelBUncheckedCreateInput.a.ModelAUncheckedCreateManyWithoutBInput.create.ModelAUncheckedCreateWithoutBInput.c_id_2`: A value is required but not set.""",
+        """`Mutation.createOneModelB.data.ModelBUncheckedCreateInput.a.ModelAUncheckedCreateNestedManyWithoutBInput.create.ModelAUncheckedCreateWithoutBInput.c_id_2`: A value is required but not set.""",
       legacy = false
     )
   }
