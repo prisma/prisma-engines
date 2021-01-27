@@ -38,7 +38,7 @@ pub fn calculate_datamodel(
     tracing::debug!("Enriching datamodel is done: {:?}", data_model);
 
     // commenting out models, fields, enums, enum values
-    warnings.append(&mut commenting_out_guardrails(&mut data_model, family));
+    warnings.append(&mut commenting_out_guardrails(&mut data_model, family, native_types));
 
     // try to identify whether the schema was created by a previous Prisma version
     let version = version_check.version(&warnings, &data_model);
@@ -84,7 +84,7 @@ mod tests {
             (
                 FieldType::Unsupported(family.to_string()),
                 true,
-                Some("This type is currently not supported.".to_string()),
+                Some("This type is currently not supported by the Prisma Client.".to_string()),
             )
         }
 
@@ -462,9 +462,7 @@ mod tests {
                     columns: vec![Column {
                         name: "primary".to_string(),
                         tpe: ColumnType {
-                            data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
-                            character_maximum_length: None,
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                             native_type: Some(PostgresType::Integer.to_json()),
@@ -485,9 +483,7 @@ mod tests {
                     columns: vec![Column {
                         name: "primary".to_string(),
                         tpe: ColumnType {
-                            data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
-                            character_maximum_length: None,
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                             native_type: Some(PostgresType::Integer.to_json()),
@@ -508,9 +504,7 @@ mod tests {
                     columns: vec![Column {
                         name: "primary".to_string(),
                         tpe: ColumnType {
-                            data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
-                            character_maximum_length: None,
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                             native_type: Some(PostgresType::Integer.to_json()),
@@ -727,10 +721,7 @@ mod tests {
                         Column {
                             name: "id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Integer.to_json()),
@@ -741,10 +732,7 @@ mod tests {
                         Column {
                             name: "name".to_string(),
                             tpe: ColumnType {
-                                data_type: "text".to_string(),
                                 full_data_type: "text".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::String,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Text.to_json()),
@@ -767,10 +755,7 @@ mod tests {
                         Column {
                             name: "id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Integer.to_json()),
@@ -781,10 +766,7 @@ mod tests {
                         Column {
                             name: "city-id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Integer.to_json()),
@@ -795,10 +777,7 @@ mod tests {
                         Column {
                             name: "city-name".to_string(),
                             tpe: ColumnType {
-                                data_type: "text".to_string(),
                                 full_data_type: "text".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::String,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Text.to_json()),
@@ -885,10 +864,7 @@ mod tests {
                     Column {
                         name: "id".to_string(),
                         tpe: ColumnType {
-                            data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
-                            character_maximum_length: None,
-
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                             native_type: Some(PostgresType::Integer.to_json()),
@@ -899,10 +875,7 @@ mod tests {
                     Column {
                         name: "name".to_string(),
                         tpe: ColumnType {
-                            data_type: "text".to_string(),
                             full_data_type: "text".to_string(),
-                            character_maximum_length: None,
-
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
                             native_type: Some(PostgresType::Text.to_json()),
@@ -913,10 +886,7 @@ mod tests {
                     Column {
                         name: "lastname".to_string(),
                         tpe: ColumnType {
-                            data_type: "text".to_string(),
                             full_data_type: "text".to_string(),
-                            character_maximum_length: None,
-
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
                             native_type: Some(PostgresType::Text.to_json()),
@@ -1044,10 +1014,7 @@ mod tests {
                         Column {
                             name: "id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Integer.to_json()),
@@ -1058,10 +1025,7 @@ mod tests {
                         Column {
                             name: "name".to_string(),
                             tpe: ColumnType {
-                                data_type: "text".to_string(),
                                 full_data_type: "text".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::String,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Text.to_json()),
@@ -1084,10 +1048,7 @@ mod tests {
                         Column {
                             name: "id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Integer.to_json()),
@@ -1098,10 +1059,7 @@ mod tests {
                         Column {
                             name: "city_id".to_string(),
                             tpe: ColumnType {
-                                data_type: "integer".to_string(),
                                 full_data_type: "integer".to_string(),
-                                character_maximum_length: None,
-
                                 family: ColumnTypeFamily::Int,
                                 arity: ColumnArity::Required,
                                 native_type: Some(PostgresType::Integer.to_json()),

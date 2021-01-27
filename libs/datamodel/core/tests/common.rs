@@ -17,6 +17,7 @@ pub trait FieldAsserts {
 
 pub trait ScalarFieldAsserts {
     fn assert_base_type(&self, t: &ScalarType) -> &Self;
+    fn assert_unsupported_type(&self, t: &str) -> &Self;
     fn assert_enum_type(&self, en: &str) -> &Self;
     fn assert_native_type(&self) -> &NativeTypeInstance;
     fn assert_with_db_name(&self, t: &str) -> &Self;
@@ -106,6 +107,15 @@ impl ScalarFieldAsserts for dml::ScalarField {
             assert_eq!(base_type, t);
         } else {
             panic!("Scalar expected, but found {:?}", self.field_type);
+        }
+        self
+    }
+
+    fn assert_unsupported_type(&self, t: &str) -> &Self {
+        if let dml::FieldType::Unsupported(description) = &self.field_type {
+            assert_eq!(description, t);
+        } else {
+            panic!("Unsupported expected, but found {:?}", self.field_type);
         }
         self
     }

@@ -213,7 +213,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 }
 
-fn render_column_type(t: &ColumnType) -> &'static str {
+fn render_column_type(t: &ColumnType) -> &str {
     match &t.family {
         ColumnTypeFamily::Boolean => "BOOLEAN",
         ColumnTypeFamily::DateTime => "DATETIME",
@@ -226,7 +226,7 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Json => unreachable!("ColumnTypeFamily::Json on SQLite"),
         ColumnTypeFamily::Enum(_) => unreachable!("ColumnTypeFamily::Enum on SQLite"),
         ColumnTypeFamily::Uuid => unimplemented!("ColumnTypeFamily::Uuid on SQLite"),
-        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
+        ColumnTypeFamily::Unsupported(x) => x.as_ref(),
     }
 }
 
@@ -296,7 +296,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         autoincrement: column.is_single_primary_key() && column.column_type_family().is_int(),
         default: column
             .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_) | DefaultKind::SEQUENCE(_)))
+            .filter(|default| !matches!(default.kind(), DefaultKind::SEQUENCE(_)))
             .map(|default| render_default(default, column.column_type_family())),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),

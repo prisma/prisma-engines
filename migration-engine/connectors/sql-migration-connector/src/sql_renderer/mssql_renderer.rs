@@ -67,7 +67,6 @@ impl SqlRenderer for MssqlFlavour {
         } else {
             column
                 .default()
-                .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
                 .map(|default| {
                     let constraint_name = format!("DF__{}__{}", column.table().name(), column.name());
 
@@ -421,6 +420,10 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
             Some(MsSqlTypeParameter::Number(x)) => format!("({})", x),
             Some(MsSqlTypeParameter::Max) => "(max)".to_string(),
         }
+    }
+
+    if let ColumnTypeFamily::Unsupported(description) = &column.column_type().family {
+        return format!("{}", description).into();
     }
 
     let native_type = column

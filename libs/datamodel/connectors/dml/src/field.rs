@@ -28,6 +28,7 @@ impl FieldArity {
 }
 
 // TODO: when progressing with the native types implementation we should consider merging the variants `NativeType` and `Base`
+//Agreed
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]
 pub enum FieldType {
@@ -37,7 +38,7 @@ pub enum FieldType {
     Relation(RelationInfo),
     /// native field type.
     NativeType(ScalarType, NativeTypeInstance),
-    /// This is a field with an unsupported datatype - used by introspection only.
+    /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
     Unsupported(String),
     /// The option is Some(x) if the scalar type is based upon a type alias.
     Base(ScalarType, Option<String>),

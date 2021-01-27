@@ -106,7 +106,14 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                 (_, _) if from_scalar_to_list => Some(NotCastable),
                 (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
                 // Unsupported types will have None as Native type
-                _ => Some(NotCastable),
+                (None, Some(_)) => Some(RiskyCast),
+                (Some(_), None) => Some(RiskyCast),
+                (None, None)
+                    if differ.previous.column_type().full_data_type == differ.previous.column_type().full_data_type =>
+                {
+                    None
+                }
+                (None, None) => Some(RiskyCast),
             }
         }
     }

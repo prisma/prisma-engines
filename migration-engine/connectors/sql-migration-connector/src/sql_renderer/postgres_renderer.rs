@@ -235,7 +235,6 @@ impl SqlRenderer for PostgresFlavour {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
-            .filter(|default| !matches!(default.kind(), DefaultKind::DBGENERATED(_)))
             .map(|default| self.render_default(default, column.column_type_family()))
             .filter(|default| !default.is_empty())
             .map(|default| format!(" DEFAULT {}", default))
@@ -366,6 +365,10 @@ pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
 
     if let ColumnTypeFamily::Enum(name) = &t.family {
         return format!("\"{}\"{}", name, if t.arity.is_list() { "[]" } else { "" }).into();
+    }
+
+    if let ColumnTypeFamily::Unsupported(description) = &t.family {
+        return format!("{}{}", description, if t.arity.is_list() { "[]" } else { "" }).into();
     }
 
     let native_type = col

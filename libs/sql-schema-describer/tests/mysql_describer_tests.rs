@@ -67,9 +67,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "primary_col".to_string(),
             tpe: ColumnType {
-                data_type: "int".to_string(),
                 full_data_type: "int(11)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Int.to_json()),
@@ -81,9 +79,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "int_col".to_string(),
             tpe: ColumnType {
-                data_type: "int".to_string(),
                 full_data_type: "int(11)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Int.to_json()),
@@ -95,9 +91,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "smallint_col".to_string(),
             tpe: ColumnType {
-                data_type: "smallint".to_string(),
                 full_data_type: "smallint(6)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::SmallInt.to_json()),
@@ -109,9 +103,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "tinyint4_col".to_string(),
             tpe: ColumnType {
-                data_type: "tinyint".to_string(),
                 full_data_type: "tinyint(4)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::TinyInt.to_json()),
@@ -122,9 +114,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "tinyint1_col".to_string(),
             tpe: ColumnType {
-                data_type: "tinyint".to_string(),
                 full_data_type: "tinyint(1)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::TinyInt.to_json()),
@@ -136,9 +126,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "mediumint_col".to_string(),
             tpe: ColumnType {
-                data_type: "mediumint".to_string(),
                 full_data_type: "mediumint(9)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::MediumInt.to_json()),
@@ -150,9 +138,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "bigint_col".to_string(),
             tpe: ColumnType {
-                data_type: "bigint".to_string(),
                 full_data_type: "bigint(20)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::BigInt,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::BigInt.to_json()),
@@ -164,9 +150,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "decimal_col".to_string(),
             tpe: ColumnType {
-                data_type: "decimal".to_string(),
                 full_data_type: "decimal(10,0)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Decimal(Some((10, 0))).to_json()),
@@ -178,9 +162,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "numeric_col".to_string(),
             tpe: ColumnType {
-                data_type: "decimal".to_string(),
                 full_data_type: "decimal(10,0)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Decimal(Some((10, 0))).to_json()),
@@ -192,9 +174,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "float_col".to_string(),
             tpe: ColumnType {
-                data_type: "float".to_string(),
                 full_data_type: "float".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Float.to_json()),
@@ -206,9 +186,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "double_col".to_string(),
             tpe: ColumnType {
-                data_type: "double".to_string(),
                 full_data_type: "double".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Double.to_json()),
@@ -220,9 +198,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "date_col".to_string(),
             tpe: ColumnType {
-                data_type: "date".to_string(),
                 full_data_type: "date".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Date.to_json()),
@@ -234,9 +210,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "time_col".to_string(),
             tpe: ColumnType {
-                data_type: "time".to_string(),
                 full_data_type: "time".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Time(Some(0)).to_json()),
@@ -248,9 +222,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "datetime_col".to_string(),
             tpe: ColumnType {
-                data_type: "datetime".to_string(),
                 full_data_type: "datetime".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::DateTime(Some(0)).to_json()),
@@ -262,9 +234,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "timestamp_col".to_string(),
             tpe: ColumnType {
-                data_type: "timestamp".to_string(),
                 full_data_type: "timestamp".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Timestamp(Some(0)).to_json()),
@@ -276,9 +246,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "year_col".to_string(),
             tpe: ColumnType {
-                data_type: "year".to_string(),
                 full_data_type: "year(4)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Year.to_json()),
@@ -290,9 +258,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "char_col".to_string(),
             tpe: ColumnType {
-                data_type: "char".to_string(),
                 full_data_type: "char(1)".to_string(),
-                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Char(1).to_json()),
@@ -304,9 +270,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "varchar_col".to_string(),
             tpe: ColumnType {
-                data_type: "varchar".to_string(),
                 full_data_type: "varchar(255)".to_string(),
-                character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::VarChar(255).to_json()),
@@ -318,9 +282,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "text_col".to_string(),
             tpe: ColumnType {
-                data_type: "text".to_string(),
                 full_data_type: "text".to_string(),
-                character_maximum_length: Some(65535),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Text.to_json()),
@@ -332,9 +294,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "tinytext_col".to_string(),
             tpe: ColumnType {
-                data_type: "tinytext".to_string(),
                 full_data_type: "tinytext".to_string(),
-                character_maximum_length: Some(255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::TinyText.to_json()),
@@ -346,9 +306,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "mediumtext_col".to_string(),
             tpe: ColumnType {
-                data_type: "mediumtext".to_string(),
                 full_data_type: "mediumtext".to_string(),
-                character_maximum_length: Some(16777215),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::MediumText.to_json()),
@@ -360,9 +318,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "longtext_col".to_string(),
             tpe: ColumnType {
-                data_type: "longtext".to_string(),
                 full_data_type: "longtext".to_string(),
-                character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::LongText.to_json()),
@@ -374,9 +330,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "enum_col".to_string(),
             tpe: ColumnType {
-                data_type: "enum".to_string(),
                 full_data_type: "enum(\'a\',\'b\')".to_string(),
-                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::Enum("User_enum_col".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -388,9 +342,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "set_col".to_string(),
             tpe: ColumnType {
-                data_type: "set".to_string(),
                 full_data_type: "set(\'a\',\'b\')".to_string(),
-                character_maximum_length: Some(3),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -402,9 +354,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "binary_col".to_string(),
             tpe: ColumnType {
-                data_type: "binary".to_string(),
                 full_data_type: "binary(1)".to_string(),
-                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Binary(1).to_json()),
@@ -416,9 +366,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "varbinary_col".to_string(),
             tpe: ColumnType {
-                data_type: "varbinary".to_string(),
                 full_data_type: "varbinary(255)".to_string(),
-                character_maximum_length: Some(255),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::VarBinary(255).to_json()),
@@ -430,9 +378,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "blob_col".to_string(),
             tpe: ColumnType {
-                data_type: "blob".to_string(),
                 full_data_type: "blob".to_string(),
-                character_maximum_length: Some(65535),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Blob.to_json()),
@@ -444,10 +390,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "tinyblob_col".to_string(),
             tpe: ColumnType {
-                data_type: "tinyblob".to_string(),
                 full_data_type: "tinyblob".to_string(),
-                character_maximum_length: Some(255),
-
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::TinyBlob.to_json()),
@@ -459,9 +402,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "mediumblob_col".to_string(),
             tpe: ColumnType {
-                data_type: "mediumblob".to_string(),
                 full_data_type: "mediumblob".to_string(),
-                character_maximum_length: Some(16777215),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::MediumBlob.to_json()),
@@ -473,9 +414,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "longblob_col".to_string(),
             tpe: ColumnType {
-                data_type: "longblob".to_string(),
                 full_data_type: "longblob".to_string(),
-                character_maximum_length: Some(4294967295),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::LongBlob.to_json()),
@@ -487,9 +426,7 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "geometry_col".to_string(),
             tpe: ColumnType {
-                data_type: "geometry".to_string(),
                 full_data_type: "geometry".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("geometry".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -501,112 +438,88 @@ async fn all_mysql_column_types_must_work() {
         Column {
             name: "point_col".to_string(),
             tpe: ColumnType {
-                data_type: "point".to_string(),
                 full_data_type: "point".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("point".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
-
             default: None,
             auto_increment: false,
         },
         Column {
             name: "linestring_col".to_string(),
             tpe: ColumnType {
-                data_type: "linestring".to_string(),
                 full_data_type: "linestring".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("linestring".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
-
             default: None,
             auto_increment: false,
         },
         Column {
             name: "polygon_col".to_string(),
             tpe: ColumnType {
-                data_type: "polygon".to_string(),
                 full_data_type: "polygon".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("polygon".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
-
             default: None,
             auto_increment: false,
         },
         Column {
             name: "multipoint_col".to_string(),
             tpe: ColumnType {
-                data_type: "multipoint".to_string(),
                 full_data_type: "multipoint".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("multipoint".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
-
             default: None,
             auto_increment: false,
         },
         Column {
             name: "multilinestring_col".to_string(),
             tpe: ColumnType {
-                data_type: "multilinestring".to_string(),
                 full_data_type: "multilinestring".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("multilinestring".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
-
             default: None,
             auto_increment: false,
         },
         Column {
             name: "multipolygon_col".to_string(),
             tpe: ColumnType {
-                data_type: "multipolygon".to_string(),
                 full_data_type: "multipolygon".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("multipolygon".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
-
             default: None,
             auto_increment: false,
         },
         Column {
             name: "geometrycollection_col".to_string(),
             tpe: ColumnType {
-                data_type: "geometrycollection".to_string(),
                 full_data_type: "geometrycollection".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Unsupported("geometrycollection".into()),
                 arity: ColumnArity::Required,
                 native_type: None,
             },
-
             default: None,
             auto_increment: false,
         },
         Column {
             name: "json_col".to_string(),
             tpe: ColumnType {
-                data_type: "json".to_string(),
                 full_data_type: "json".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
                 native_type: Some(MySqlType::Json.to_json()),
             },
-
             default: None,
             auto_increment: false,
         },
@@ -660,23 +573,18 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "id".to_string(),
                     tpe: ColumnType {
-                        data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                         native_type: Some(MySqlType::Int.to_json()),
                     },
-
                     default: None,
                     auto_increment: true,
                 },
                 Column {
                     name: "city".to_string(),
                     tpe: ColumnType {
-                        data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(MySqlType::Int.to_json()),
@@ -687,9 +595,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_cascade".to_string(),
                     tpe: ColumnType {
-                        data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(MySqlType::Int.to_json()),
@@ -700,9 +606,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_restrict".to_string(),
                     tpe: ColumnType {
-                        data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(MySqlType::Int.to_json()),
@@ -713,9 +617,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_set_null".to_string(),
                     tpe: ColumnType {
-                        data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: Some(MySqlType::Int.to_json()),

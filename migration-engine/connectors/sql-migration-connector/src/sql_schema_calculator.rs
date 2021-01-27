@@ -5,10 +5,10 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 use crate::{flavour::SqlFlavour, sql_renderer::IteratorJoin};
 use datamodel::{
     walkers::{walk_models, walk_relations, ModelWalker, ScalarFieldWalker, TypeWalker},
-    Datamodel, FieldArity, IndexDefinition, IndexType, ScalarType,
+    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType,
 };
 use prisma_value::PrismaValue;
-use sql_schema_describer::{self as sql, walkers::SqlSchemaExt};
+use sql_schema_describer::{self as sql, walkers::SqlSchemaExt, ColumnType};
 
 pub(crate) fn calculate_sql_schema(datamodel: &Datamodel, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
     let mut schema = sql::SqlSchema::empty();
@@ -269,6 +269,19 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         }
         TypeWalker::Base(scalar_type) => (scalar_type, flavour.default_native_type_for_scalar_type(&scalar_type)),
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
+        TypeWalker::Unsupported(description) => {
+            return sql::Column {
+                name: field.db_name().to_owned(),
+                tpe: ColumnType {
+                    full_data_type: String::new(),
+                    native_type: None,
+                    family: sql::ColumnTypeFamily::Unsupported(description.clone()),
+                    arity: column_arity(field.arity()),
+                },
+                default: field.default_value().and_then(|v| db_generated(v)),
+                auto_increment: false,
+            }
+        }
     };
 
     let has_auto_increment_default = field
@@ -292,16 +305,14 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         auto_increment: has_auto_increment_default || flavour.field_is_implicit_autoincrement_primary_key(field),
         name: field.db_name().to_owned(),
         tpe: sql::ColumnType {
-            data_type: String::new(),
             full_data_type: String::new(),
-            character_maximum_length: None,
             native_type: Some(native_type),
             family,
             arity: column_arity(field.arity()),
         },
         default: field.default_value().and_then(|v| match v {
             datamodel::DefaultValue::Single(v) => Some(sql::DefaultValue::value(v.clone())),
-            default if default.is_dbgenerated() => Some(sql::DefaultValue::db_generated(String::new())),
+            default if default.is_dbgenerated() => db_generated(default),
             default if default.is_now() => Some(sql::DefaultValue::now()),
             default if default.is_autoincrement() => Some(sql::DefaultValue::sequence(String::new())),
             datamodel::DefaultValue::Expression(_) => None,
@@ -315,4 +326,10 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
         FieldArity::List => sql::ColumnArity::List,
         FieldArity::Optional => sql::ColumnArity::Nullable,
     }
+}
+
+fn db_generated(default: &DefaultValue) -> Option<sql::DefaultValue> {
+    default
+        .db_generated_description()
+        .map(|description| sql::DefaultValue::db_generated(description))
 }

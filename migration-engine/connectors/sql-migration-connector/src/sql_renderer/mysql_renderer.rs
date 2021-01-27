@@ -152,7 +152,7 @@ impl SqlRenderer for MysqlFlavour {
         let default_str = column
             .default()
             .filter(|default| {
-                !matches!(default.kind(), DefaultKind::DBGENERATED(_) | DefaultKind::SEQUENCE(_))
+                !matches!(default.kind(),  DefaultKind::SEQUENCE(_))
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
                     // We do not want to render binary defaults because they are not supported by MySQL.
@@ -392,6 +392,10 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
         let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
 
         return format!("ENUM({})", variants).into();
+    }
+
+    if let ColumnTypeFamily::Unsupported(description) = &column.column_type().family {
+        return format!("{}", description).into();
     }
 
     let native_type = column

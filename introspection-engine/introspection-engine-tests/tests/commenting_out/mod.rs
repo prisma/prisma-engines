@@ -5,6 +5,9 @@ use pretty_assertions::assert_eq;
 use serde_json::json;
 use test_macros::test_each_connector;
 
+//todo once we stabilize native types and with it unsupported,
+// a lot of the commented out testcases are going to become obsolete
+// this can then be the unsupported / ignore testfile
 #[test_each_connector]
 async fn a_table_without_uniques(api: &TestApi) -> crate::TestResult {
     api.barrel()
@@ -132,7 +135,7 @@ async fn commenting_out_an_unsupported_type_drops_its_usages(api: &TestApi) -> c
 
     let expected = json!([{
         "code": 3,
-        "message": "These fields were commented out because Prisma currently does not support their types.",
+        "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
         "affected": [
             {
                 "model": "Test",
@@ -148,12 +151,62 @@ async fn commenting_out_an_unsupported_type_drops_its_usages(api: &TestApi) -> c
         model Test {
           id        Int     @unique
           dummy     Int
-          // This type is currently not supported.
-          // broken macaddr
+          // This type is currently not supported by the Prisma Client.
+          // broken Unsupported("macaddr")
         }
     "#};
 
-    assert_eq!(dm, &api.introspect().await?);
+    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn unsupported_type_with_native_types_keeps_its_usages(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer().unique(true));
+                t.add_column("dummy", types::integer());
+                t.add_column("broken", types::custom("macaddr"));
+                t.add_index("unique", types::index(vec!["broken", "dummy"]).unique(true));
+                t.add_index("non_unique", types::index(vec!["broken", "dummy"]).unique(false));
+                t.set_primary_key(&["broken", "dummy"]);
+            });
+        })
+        .await?;
+
+    let expected = json!([{
+        "code": 3,
+        "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
+        "affected": [
+            {
+                "model": "Test",
+                "field": "broken",
+                "tpe": "macaddr"
+            }
+        ]
+    }]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let dm = indoc! {r#"
+        modelTest{
+            id          Int     @unique
+            dummy       Int
+            ///This type is currently not supported by the Prisma Client.
+            broken Unsupported("macaddr")
+        
+            @@id([broken, dummy])
+            @@unique([broken, dummy], name: "unique")
+            @@index([broken, dummy], name: "non_unique")
+        }
+    "#};
+
+    assert_eq!(
+        dm.replace(" ", ""),
+        api.introspect_with_native_types().await?.replace(" ", "")
+    );
 
     Ok(())
 }
@@ -179,7 +232,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
         },
         {
             "code": 3,
-            "message": "These fields were commented out because Prisma currently does not support their types.",
+            "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
             "affected": [{
                 "model": "Test",
                 "field": "network_mac",
@@ -194,12 +247,101 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
         // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
         // model Test {
           // dummy       Int
-          // This type is currently not supported.
-          // network_mac macaddr @id
+          // This type is currently not supported by the Prisma Client.
+          // network_mac Unsupported("macaddr") @id
         // }
     "#};
 
     assert_eq!(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn a_table_with_only_an_unsupported_id_with_native_types_is_still_invalid(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("dummy", types::integer());
+                t.add_column(
+                    "network_mac",
+                    types::custom("macaddr").primary(true).default("08:00:2b:01:02:03"),
+                );
+            });
+        })
+        .await?;
+
+    let expected = json!([
+        {
+            "code": 1,
+            "message": "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by Prisma.",
+            "affected": [{
+                "model": "Test"
+            }]
+        },
+        {
+            "code": 3,
+            "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
+            "affected": [{
+                "model": "Test",
+                "field": "network_mac",
+                "tpe": "macaddr"
+            }]
+        }
+    ]);
+
+    assert_eq_json!(expected, api.introspection_warnings().await?);
+
+    let dm = indoc! {r#"
+        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+        // model Test {
+          // dummy       Int
+          /// This type is currently not supported by the Prisma Client.
+          // network_mac Unsupported("macaddr") @id @default(dbgenerated("'08:00:2b:01:02:03'::macaddr"))
+        // }
+    "#};
+
+    assert_eq!(dm, &api.introspect_with_native_types().await?);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("balance money not null unique");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("user_balance money not null ");
+                t.add_foreign_key(&["user_balance"], "User", &["balance"]);
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+            model Post {
+              id            Int                     @id @default(autoincrement())
+              /// This type is currently not supported by the Prisma Client.
+              user_balance  Unsupported("money")
+              User          User                    @relation(fields: [user_balance], references: [balance])
+            }
+                    
+            model User {
+              id            Int                     @id @default(autoincrement())
+              /// This type is currently not supported by the Prisma Client.
+              balance       Unsupported("money")  @unique
+              Post          Post[]
+            }                
+        "#};
+
+    assert_eq!(
+        dm.replace(" ", ""),
+        api.introspect_with_native_types().await?.replace(" ", "")
+    );
 
     Ok(())
 }
@@ -229,7 +371,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn db_genererated_values_should_add_comments(api: &TestApi) -> crate::TestResult {
+async fn db_generated_values_should_add_comments(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute_with_schema(
             |migration| {
@@ -248,15 +390,13 @@ async fn db_genererated_values_should_add_comments(api: &TestApi) -> crate::Test
         model Blog {
           id            Int    @id @default(autoincrement())
           number        Int?   @default(1)
-          /// The value of this field is generated by the database as: `sqrt((4)::double precision)`.
-          bigger_number Int?   @default(dbgenerated())
-          // This type is currently not supported.
-          // The value of this field is generated by the database as: `point((0)::double precision, (0)::double precision)`.
-          // point      point? @default(dbgenerated())
+          bigger_number Int?   @default(dbgenerated("sqrt((4)::double precision)"))
+          // This type is currently not supported by the Prisma Client.
+          // point      Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
         }
     "##};
 
-    assert_eq!(dm, &api.introspect().await?);
+    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
 
     Ok(())
 }

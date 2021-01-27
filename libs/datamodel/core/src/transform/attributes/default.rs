@@ -1,6 +1,6 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::diagnostics::DatamodelError;
-use crate::{ast, dml, ValueGenerator};
+use crate::{ast, dml};
 use prisma_value::PrismaValue;
 
 /// Prismas builtin `@default` attribute.
@@ -41,11 +41,24 @@ impl AttributeValidator<dml::Field> for DefaultAttributeValidator {
                     Ok(value) => sf.default_value = Some(dml::DefaultValue::Single(PrismaValue::Enum(value))),
                     Err(err) => {
                         let generator = default_arg.as_value_generator()?;
-                        if generator == ValueGenerator::new_dbgenerated() {
+                        if generator.is_dbgenerated() {
                             sf.default_value = Some(dml::DefaultValue::Expression(generator));
                         } else {
                             return Err(self.wrap_in_attribute_validation_error(&err));
                         }
+                    }
+                }
+            } else if let dml::FieldType::Unsupported(_) = sf.field_type {
+                let default_arg = args.default_arg("value")?;
+
+                match default_arg.as_value_generator() {
+                    Ok(generator) if generator.is_dbgenerated() => {
+                        sf.default_value = Some(dml::DefaultValue::Expression(generator))
+                    }
+                    Err(e) => return Err(self.wrap_in_attribute_validation_error(&e)),
+                    _ => {
+                        return self
+                            .new_attribute_validation_error("Invalid default value on Unsupported type.", args.span())
                     }
                 }
             }

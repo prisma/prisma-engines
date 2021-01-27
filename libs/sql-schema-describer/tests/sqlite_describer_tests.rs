@@ -31,9 +31,7 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "int_col".to_string(),
             tpe: ColumnType {
-                data_type: "int".to_string(),
                 full_data_type: "int".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -44,9 +42,7 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "int4_col".to_string(),
             tpe: ColumnType {
-                data_type: "INTEGER".to_string(),
                 full_data_type: "INTEGER".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -57,9 +53,7 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "text_col".to_string(),
             tpe: ColumnType {
-                data_type: "TEXT".to_string(),
                 full_data_type: "TEXT".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -70,9 +64,7 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "real_col".to_string(),
             tpe: ColumnType {
-                data_type: "REAL".to_string(),
                 full_data_type: "REAL".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -83,9 +75,7 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "primary_col".to_string(),
             tpe: ColumnType {
-                data_type: "INTEGER".to_string(),
                 full_data_type: "INTEGER".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -96,9 +86,7 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "decimal_col".to_string(),
             tpe: ColumnType {
-                data_type: "decimal (5, 3)".to_string(),
                 full_data_type: "decimal (5, 3)".to_string(),
-                character_maximum_length: None,
                 family: ColumnTypeFamily::Decimal,
                 arity: ColumnArity::Required,
                 native_type: None,
@@ -150,9 +138,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "id".to_string(),
                     tpe: ColumnType {
-                        data_type: "INTEGER".to_string(),
                         full_data_type: "INTEGER".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                         native_type: None,
@@ -163,9 +149,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city".to_string(),
                     tpe: ColumnType {
-                        data_type: "INTEGER".to_string(),
                         full_data_type: "INTEGER".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: None,
@@ -176,9 +160,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_cascade".to_string(),
                     tpe: ColumnType {
-                        data_type: "INTEGER".to_string(),
                         full_data_type: "INTEGER".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: None,
@@ -189,9 +171,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_restrict".to_string(),
                     tpe: ColumnType {
-                        data_type: "INTEGER".to_string(),
                         full_data_type: "INTEGER".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: None,
@@ -202,9 +182,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_set_default".to_string(),
                     tpe: ColumnType {
-                        data_type: "INTEGER".to_string(),
                         full_data_type: "INTEGER".to_string(),
-                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: None,
@@ -215,10 +193,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_set_null".to_string(),
                     tpe: ColumnType {
-                        data_type: "INTEGER".to_string(),
                         full_data_type: "INTEGER".to_string(),
-                        character_maximum_length: None,
-
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                         native_type: None,

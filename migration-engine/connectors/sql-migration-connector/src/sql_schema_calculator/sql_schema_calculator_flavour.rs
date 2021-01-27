@@ -3,12 +3,26 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, ScalarType};
+use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, FieldArity, ScalarType};
 use sql_schema_describer as sql;
+use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
     fn calculate_enums(&self, _datamodel: &Datamodel) -> Vec<sql::Enum> {
         Vec::new()
+    }
+
+    fn column_type_for_unsupported_type(&self, field: &ScalarFieldWalker<'_>, description: String) -> sql::ColumnType {
+        ColumnType {
+            full_data_type: description.clone(),
+            family: ColumnTypeFamily::Unsupported(description),
+            arity: match field.arity() {
+                FieldArity::Required => ColumnArity::Required,
+                FieldArity::Optional => ColumnArity::Nullable,
+                FieldArity::List => ColumnArity::List,
+            },
+            native_type: None,
+        }
     }
 
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value;

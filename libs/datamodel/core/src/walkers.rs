@@ -169,7 +169,7 @@ impl<'a> ScalarFieldWalker<'a> {
             }),
             FieldType::Base(scalar_type, _) => TypeWalker::Base(*scalar_type),
             FieldType::NativeType(scalar_type, native_type) => TypeWalker::NativeType(*scalar_type, native_type),
-            FieldType::Unsupported(_) => todo!("Unsupported field type"),
+            FieldType::Unsupported(description) => TypeWalker::Unsupported(description.clone()),
             FieldType::Relation(_) => unreachable!("FieldType::Relation in ScalarFieldWalker"),
         }
     }
@@ -203,6 +203,7 @@ pub enum TypeWalker<'a> {
     Enum(EnumWalker<'a>),
     Base(ScalarType),
     NativeType(ScalarType, &'a NativeTypeInstance),
+    Unsupported(String),
 }
 
 impl<'a> TypeWalker<'a> {

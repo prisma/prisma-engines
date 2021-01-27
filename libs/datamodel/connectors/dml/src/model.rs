@@ -184,22 +184,38 @@ impl Model {
     /// optional unique fields are NOT considered a unique criteria
     /// used for: A Model must have at least one STRICT unique criteria.
     pub fn strict_unique_criterias(&self) -> Vec<UniqueCriteria> {
-        self.unique_criterias(false)
+        self.unique_criterias(false, false)
+    }
+
+    /// optional unique fields are NOT considered a unique criteria
+    /// used for: A Model must have at least one STRICT unique criteria.
+    /// Ignores unsupported, used for introspection to decide when to ignore
+    pub fn strict_unique_criterias_disregarding_unsupported(&self) -> Vec<UniqueCriteria> {
+        self.unique_criterias(false, true)
     }
 
     /// optional unique fields are considered a unique criteria
     /// used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
     pub fn loose_unique_criterias(&self) -> Vec<UniqueCriteria> {
-        self.unique_criterias(true)
+        self.unique_criterias(true, false)
     }
 
     /// returns the order of unique criterias ordered based on their precedence
-    fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriteria> {
+    fn unique_criterias(&self, allow_optional: bool, disregard_unsupported: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
+
+        let in_eligible = |field: &ScalarField| {
+            if disregard_unsupported {
+                field.is_commented_out || matches!(field.field_type, FieldType::Unsupported(_))
+            } else {
+                field.is_commented_out
+            }
+        };
+
         // first candidate: the singular id field
         {
             if let Some(x) = self.singular_id_fields().next() {
-                if !x.is_commented_out {
+                if !in_eligible(x) {
                     result.push(UniqueCriteria::new(vec![x]))
                 }
             }
@@ -213,7 +229,7 @@ impl Model {
                 .map(|f| self.find_scalar_field(&f).unwrap())
                 .collect();
 
-            if !id_fields.is_empty() && !id_fields.iter().any(|f| f.is_commented_out) {
+            if !id_fields.is_empty() && !id_fields.iter().any(|f| in_eligible(f)) {
                 result.push(UniqueCriteria::new(id_fields));
             }
         }
@@ -222,7 +238,7 @@ impl Model {
         {
             let mut unique_required_fields: Vec<_> = self
                 .scalar_fields()
-                .filter(|field| field.is_unique && (field.is_required() || allow_optional) && !field.is_commented_out)
+                .filter(|field| field.is_unique && (field.is_required() || allow_optional) && !in_eligible(field))
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
@@ -237,7 +253,7 @@ impl Model {
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
-                    let no_fields_are_commented_out = !fields.iter().any(|f| f.is_commented_out);
+                    let no_fields_are_commented_out = !fields.iter().any(|f| in_eligible(f));
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     if (all_fields_are_required || allow_optional) && no_fields_are_commented_out {
                         Some(UniqueCriteria::new(fields))

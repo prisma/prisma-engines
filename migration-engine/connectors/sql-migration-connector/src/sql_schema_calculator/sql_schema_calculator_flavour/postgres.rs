@@ -28,7 +28,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
             ScalarType::Json => PostgresType::JSONB,
         };
 
-        serde_json::to_value(ty).expect("PostgresType to JSON failed")
+        serde_json::to_value(ty).expect("PostgresType to json failed")
     }
 
     fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, db_name: &str) -> sql::ColumnType {

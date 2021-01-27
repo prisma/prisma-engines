@@ -199,7 +199,9 @@ impl SqlSchemaDescriber {
             };
 
             let tpe = get_column_type(&col, enums);
-            let default = Self::get_default_value(&col, &tpe, sequences);
+            let data_type = col.get_expect_string("data_type");
+
+            let default = Self::get_default_value(&col, &tpe, &data_type, sequences);
 
             let auto_increment =
                 is_identity || matches!(default.as_ref().map(|d| d.kind()), Some(DefaultKind::SEQUENCE(_)));
@@ -570,7 +572,12 @@ impl SqlSchemaDescriber {
         Ok(enums)
     }
 
-    fn get_default_value(col: &ResultRow, tpe: &ColumnType, sequences: &[Sequence]) -> Option<DefaultValue> {
+    fn get_default_value(
+        col: &ResultRow,
+        tpe: &ColumnType,
+        data_type: &str,
+        sequences: &[Sequence],
+    ) -> Option<DefaultValue> {
         match col.get("column_default") {
             None => None,
             Some(param_value) => match param_value.to_string() {
@@ -605,7 +612,7 @@ impl SqlSchemaDescriber {
                             None => DefaultValue::db_generated(default_string),
                         },
                         ColumnTypeFamily::String => {
-                            match unsuffix_default_literal(&default_string, &tpe.data_type, &tpe.full_data_type) {
+                            match unsuffix_default_literal(&default_string, data_type, &tpe.full_data_type) {
                                 Some(default_literal) => {
                                     DefaultValue::value(process_string_literal(default_literal.as_ref()).into_owned())
                                 }
@@ -676,12 +683,12 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
         "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
         "int8" | "_int8" => (BigInt, Some(PostgresType::BigInt)),
-        "oid" | "_oid" => (Int, None),
+        "oid" | "_oid" => (Int, None), //todo revisit these
         "float4" | "_float4" => (Float, Some(PostgresType::Real)),
         "float8" | "_float8" => (Float, Some(PostgresType::DoublePrecision)),
         "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
         "text" | "_text" => (String, Some(PostgresType::Text)),
-        "citext" | "_citext" => (String, None),
+        "citext" | "_citext" => (String, None), //todo revisit these
         "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_maximum_length))),
         "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
@@ -703,7 +710,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
                 },
             )),
         ),
-        "money" | "_money" => (Float, None),
+        "money" | "_money" => unsupported_type(), //todo revisit these
         "pg_lsn" | "_pg_lsn" => unsupported_type(),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
         "timetz" | "_timetz" => (DateTime, Some(PostgresType::Timetz(precision.time_precision))),
@@ -712,7 +719,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "tsquery" | "_tsquery" => unsupported_type(),
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
-        "inet" | "_inet" => (String, None),
+        "inet" | "_inet" => (String, None), //todo revisit these
         //geometric
         "box" | "_box" => unsupported_type(),
         "circle" | "_circle" => unsupported_type(),
@@ -724,9 +731,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
     };
 
     ColumnType {
-        data_type,
         full_data_type,
-        character_maximum_length: precision.character_maximum_length.map(|l| l as i64),
         family,
         arity,
         native_type: native_type.map(|x| x.to_json()),

@@ -101,7 +101,7 @@ fn db_generated_function_must_work_for_enum_fields() {
     let dml = r#"
     model Model {
         id Int @id
-        role Role @default(dbgenerated())
+        role Role @default(dbgenerated("ADMIN"))
     }
 
     enum Role {
@@ -115,5 +115,7 @@ fn db_generated_function_must_work_for_enum_fields() {
     user_model
         .assert_has_scalar_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_dbgenerated()));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_dbgenerated(
+            "ADMIN".to_string(),
+        )));
 }
