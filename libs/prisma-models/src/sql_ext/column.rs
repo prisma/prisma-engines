@@ -168,6 +168,7 @@ where
             TypeIdentifier::Xml => TypeFamily::Text,
             TypeIdentifier::DateTime => TypeFamily::DateTime,
             TypeIdentifier::Bytes => TypeFamily::Bytes,
+            TypeIdentifier::Unsupported => panic!("No unsupported field should reach that path"),
         };
 
         let column = Column::from(((db, table), col)).type_family(type_family);

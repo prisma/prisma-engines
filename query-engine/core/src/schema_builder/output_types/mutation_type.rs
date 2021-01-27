@@ -11,11 +11,15 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
     let mut fields: Vec<OutputField> = non_embedded_models
         .into_iter()
         .map(|model| {
-            let mut vec = vec![create_item_field(ctx, &model)];
+            let mut vec = vec![];
+
+            if model.supports_create_operation {
+                vec.push(create_item_field(ctx, &model));
+                append_opt(&mut vec, upsert_item_field(ctx, &model));
+            }
 
             append_opt(&mut vec, delete_item_field(ctx, &model));
             append_opt(&mut vec, update_item_field(ctx, &model));
-            append_opt(&mut vec, upsert_item_field(ctx, &model));
 
             vec.push(update_many_field(ctx, &model));
             vec.push(delete_many_field(ctx, &model));
