@@ -1,5 +1,5 @@
-use crate::database::operations::*;
 use crate::SqlError;
+use crate::{database::operations::*, sql_info::SqlInfo};
 use async_trait::async_trait;
 use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, QueryArguments, ReadOperations,
@@ -106,8 +106,17 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
     ) -> connector::Result<usize> {
-        self.catch(async move { write::create_records(&self.inner, model, args, skip_duplicates).await })
+        self.catch(async move {
+            write::create_records(
+                &self.inner,
+                SqlInfo::from(&self.connection_info),
+                model,
+                args,
+                skip_duplicates,
+            )
             .await
+        })
+        .await
     }
 
     async fn update_records(

@@ -144,7 +144,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "createMany" should "not error on duplicates with skipDuplicates true" taggedAs IgnoreSQLite in {
+  "createMany" should "not error on duplicates with skipDuplicates true" taggedAs (IgnoreSQLite, IgnoreMsSql) in {
     val project = ProjectDsl.fromString {
       """
         |model Test {
@@ -173,9 +173,8 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   // Covers: Batching by row number.
-  // 5000 params are allowed per single query, but only 2500 rows at once
+  // Each DB allows a certain amount of params per single query, and a certain number of rows.
   // Each created row has 1 param and we create 10000 records, so 4 queries will be fired.
-  // Note: Validation of the correct batching behavior is done manually.
   "createMany" should "allow creating a large number of records (horizontal partitioning check)" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
@@ -190,7 +189,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       s"""
         |mutation {
-        |  createManyTest(skipDuplicates: true, data: [${records.mkString(",")}]) {
+        |  createManyTest(data: [${records.mkString(",")}]) {
         |    count
         |  }
         |}
@@ -203,9 +202,8 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   // Covers: Batching by row number.
-  // 5000 params are allowed per single query, but only 2500 rows at once
-  // Each created row has 5 params and we create 2000 rows, so 2 queries will be fired.
-  // Note: Validation of the correct batching behavior is done manually.
+  // Each DB allows a certain amount of params per single query, and a certain number of rows.
+  // Each created row has 4 params and we create 2000 rows.
   "createMany" should "allow creating a large number of records (vertical partitioning check)" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
@@ -223,7 +221,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       s"""
          |mutation {
-         |  createManyTest(skipDuplicates: true, data: [${records.mkString(",")}]) {
+         |  createManyTest(data: [${records.mkString(",")}]) {
          |    count
          |  }
          |}

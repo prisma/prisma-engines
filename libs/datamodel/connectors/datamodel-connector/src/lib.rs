@@ -124,6 +124,7 @@ pub enum ConnectorCapability {
     InsensitiveFilters,
     CreateMany,
     WritableAutoincField,
+    CreateSkipDuplicates,
 }
 
 /// Contains all capabilities that the connector is able to serve.

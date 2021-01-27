@@ -1,5 +1,5 @@
 use super::transaction::SqlConnectorTransaction;
-use crate::{database::operations::*, QueryExt, SqlError};
+use crate::{database::operations::*, sql_info::SqlInfo, QueryExt, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
     self as connector, filter::Filter, AggregationRow, AggregationSelection, Connection, QueryArguments,
@@ -43,6 +43,7 @@ where
     async fn start_transaction<'a>(&'a self) -> connector::Result<Box<dyn Transaction + 'a>> {
         let fut_tx = self.inner.start_transaction();
         let connection_info = &self.connection_info;
+
         self.catch(async move {
             let tx: quaint::connector::Transaction = fut_tx.await.map_err(SqlError::from)?;
             Ok(Box::new(SqlConnectorTransaction::new(tx, &connection_info)) as Box<dyn Transaction>)
@@ -116,8 +117,17 @@ where
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
     ) -> connector::Result<usize> {
-        self.catch(async move { write::create_records(&self.inner, model, args, skip_duplicates).await })
+        self.catch(async move {
+            write::create_records(
+                &self.inner,
+                SqlInfo::from(&self.connection_info),
+                model,
+                args,
+                skip_duplicates,
+            )
             .await
+        })
+        .await
     }
 
     async fn update_records(

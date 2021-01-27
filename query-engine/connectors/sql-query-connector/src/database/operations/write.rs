@@ -1,14 +1,12 @@
-use crate::{error::SqlError, query_builder::write, QueryExt};
+use crate::{error::SqlError, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
 use std::{collections::HashMap, convert::TryFrom, usize};
+use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
-
-/// The maximum amount of rows that can be inserted at once in a batch.
-const MAX_ROWS: usize = 2100;
 
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
@@ -69,6 +67,7 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
 
 pub async fn create_records(
     conn: &dyn QueryExt,
+    sql_info: SqlInfo,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
@@ -77,62 +76,75 @@ pub async fn create_records(
         return Ok(0);
     }
 
-    // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
-    // -> Horizontal partitioning by row number, vertical by number of args.
-    let batches = args
-        .into_iter()
-        .peekable()
-        .batching(|iter| {
-            let mut param_count: usize = 0;
-            let mut batch = vec![];
+    let batches = if let Some(max_params) = sql_info.max_bind_values {
+        // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
+        // -> Horizontal partitioning by row number, vertical by number of args.
+        args.into_iter()
+            .peekable()
+            .batching(|iter| {
+                let mut param_count: usize = 0;
+                let mut batch = vec![];
 
-            while param_count < *connector_interface::MAX_BATCH_SIZE {
-                // If the param count _including_ the next item doens't exceed the limit,
-                // we continue filling up the current batch.
-                let proceed = match iter.peek() {
-                    Some(next) => (param_count + next.len()) <= *MAX_BATCH_SIZE,
-                    None => break,
-                };
-
-                if proceed {
-                    match iter.next() {
-                        Some(next) => {
-                            param_count += next.len();
-                            batch.push(next)
-                        }
+                while param_count < max_params {
+                    // If the param count _including_ the next item doens't exceed the limit,
+                    // we continue filling up the current batch.
+                    let proceed = match iter.peek() {
+                        Some(next) => (param_count + next.len()) <= max_params,
                         None => break,
+                    };
+
+                    if proceed {
+                        match iter.next() {
+                            Some(next) => {
+                                param_count += next.len();
+                                batch.push(next)
+                            }
+                            None => break,
+                        }
+                    } else {
+                        break;
                     }
-                } else {
-                    break;
                 }
-            }
 
-            if batch.is_empty() {
-                None
-            } else {
-                Some(batch)
-            }
-        })
-        .collect_vec();
+                if batch.is_empty() {
+                    None
+                } else {
+                    Some(batch)
+                }
+            })
+            .collect_vec()
+    } else {
+        vec![args]
+    };
 
-    let capacity = batches.len();
-    let partitioned_batches = batches
-        .into_iter()
-        .fold(Vec::with_capacity(capacity), |mut batches, next_batch| {
-            if next_batch.len() > MAX_ROWS {
-                batches.extend(
-                    next_batch
-                        .into_iter()
-                        .chunks(MAX_ROWS)
-                        .into_iter()
-                        .map(|chunk| chunk.into_iter().collect_vec()),
-                );
-            } else {
-                batches.push(next_batch);
-            }
+    let partitioned_batches = if let Some(max_rows) = sql_info.max_rows {
+        let capacity = batches.len();
+        batches
+            .into_iter()
+            .fold(Vec::with_capacity(capacity), |mut batches, next_batch| {
+                if next_batch.len() > max_rows {
+                    batches.extend(
+                        next_batch
+                            .into_iter()
+                            .chunks(max_rows)
+                            .into_iter()
+                            .map(|chunk| chunk.into_iter().collect_vec()),
+                    );
+                } else {
+                    batches.push(next_batch);
+                }
 
-            batches
-        });
+                batches
+            })
+    } else {
+        batches
+    };
+
+    trace!("Total of {} batches to be executed.", partitioned_batches.len());
+    trace!(
+        "Batch sizes: {:?}",
+        partitioned_batches.iter().map(|b| b.len()).collect_vec()
+    );
 
     let mut count = 0;
     for batch in partitioned_batches {
