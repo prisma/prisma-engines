@@ -1,3 +1,5 @@
+use crate::constants::inputs::args;
+
 use super::*;
 use constants::inputs::operations;
 use datamodel_connector::ConnectorCapability;
@@ -34,16 +36,39 @@ pub(crate) fn nested_create_many_input_field(
         && !parent_field.is_inlined_on_enclosing_model()
         && !parent_field.relation().is_many_to_many()
     {
-        let create_object_type = InputType::object(create_many_objects::create_many_object_type(
-            ctx,
-            &parent_field.related_model(),
-            Some(parent_field),
-        ));
-
-        Some(input_field("createMany", InputType::list(create_object_type), None).optional())
+        let envelope = nested_create_many_envelope(ctx, parent_field);
+        Some(input_field("createMany", InputType::object(envelope), None).optional())
     } else {
         None
     }
+}
+
+fn nested_create_many_envelope(ctx: &mut BuilderContext, parent_field: &RelationFieldRef) -> InputObjectTypeWeakRef {
+    let create_type =
+        create_many_objects::create_many_object_type(ctx, &parent_field.related_model(), Some(parent_field));
+
+    let nested_ident = &create_type.into_arc().identifier;
+    let name = format!("{}Envelope", nested_ident.name());
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let create_many_type = InputType::object(create_type);
+    let data_arg = input_field("data", InputType::list(create_many_type), None);
+
+    let fields = if ctx.capabilities.contains(ConnectorCapability::CreateSkipDuplicates) {
+        let skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), None).optional();
+
+        vec![data_arg, skip_arg]
+    } else {
+        vec![data_arg]
+    };
+
+    input_object.set_fields(fields);
+    Arc::downgrade(&input_object)
 }
 
 pub(crate) fn nested_connect_or_create_field(
