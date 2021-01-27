@@ -129,7 +129,7 @@ impl ObjectType {
     }
 
     pub fn find_field(&self, name: &str) -> Option<OutputFieldRef> {
-        self.get_fields().iter().find(|f| &f.name == name).cloned()
+        self.get_fields().iter().find(|f| f.name == name).cloned()
     }
 
     /// True if fields are empty, false otherwise.

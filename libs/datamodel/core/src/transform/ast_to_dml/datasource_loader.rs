@@ -242,3 +242,9 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(MsSqlDatasourceProvider::new()),
     ]
 }
+
+impl Default for DatasourceLoader {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -631,9 +631,7 @@ impl SqlSchemaDescriber {
         };
 
         ColumnType {
-            data_type: data_type.into(),
             full_data_type,
-            character_maximum_length,
             family,
             arity,
             native_type: native_type.map(|x| x.to_json()),

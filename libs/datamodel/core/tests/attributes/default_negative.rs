@@ -222,3 +222,26 @@ fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
         Span::new(131, 169),
     ));
 }
+
+#[test]
+fn must_error_if_scalar_default_on_unsupported() {
+    let dml = r#"
+    datasource db1 {
+        provider = "postgresql"
+        url = "postgresql://"
+    }
+
+    model Model {
+        id      Int @id
+        balance Unsupported("money") @default(12)
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "Expected a function value, but received numeric value \"12\".",
+        "default",
+        Span::new(179, 181),
+    ));
+}

@@ -343,7 +343,7 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_argument(target: &mut dyn LineWriteable, args: &ast::Argument) {
-        if args.name.name != "" {
+        if !args.name.name.is_empty() {
             target.write(&args.name.name);
             target.write(&": ");
         }

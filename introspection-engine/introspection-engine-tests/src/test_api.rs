@@ -78,6 +78,12 @@ impl TestApi {
         Ok(datamodel::render_datamodel_to_string(&introspection_result.data_model))
     }
 
+    pub async fn introspect_with_native_types(&self) -> Result<String> {
+        let introspection_result = self.introspection_connector.introspect(&Datamodel::new(), true).await?;
+
+        Ok(datamodel::render_datamodel_to_string(&introspection_result.data_model))
+    }
+
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
         let config = parse_configuration(data_model_string)?;
         let data_model = parse_datamodel(data_model_string, &config)?;

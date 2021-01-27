@@ -23,3 +23,9 @@ impl std::io::Write for WritableString {
         Ok(())
     }
 }
+
+impl Default for WritableString {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -33,7 +33,7 @@ tracing-subscriber = "0.2"
 tracing-futures = "0.2"
 
 [dependencies.tokio]
-version = "0.2"
+version = "1.0"
 features = ["macros"]
 
 [[bin]]

@@ -25,12 +25,10 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> crate::Tes
             Table {
                 name: "Blog",
             columns: [
-                    Column {
-                        name: "id",
+                 Column {
+                    name: "id",
                     tpe: ColumnType {
-                            data_type: "int",
                         full_data_type: "int(11)",
-                        character_maximum_length: None,
                         family: Int,
                         arity: Required,
                         native_type: Some(
@@ -43,13 +41,9 @@ async fn database_description_for_mysql_should_work(api: &TestApi) -> crate::Tes
                     auto_increment: true,
                 },
                 Column {
-                        name: "string",
+                    name: "string",
                     tpe: ColumnType {
-                            data_type: "text",
                         full_data_type: "text",
-                        character_maximum_length: Some(
-                                65535,
-                        ),
                         family: String,
                         arity: Required,
                         native_type: Some(
@@ -94,12 +88,10 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> crate::T
             Table {
                 name: "Blog",
             columns: [
-                    Column {
-                        name: "id",
+                 Column {
+                    name: "id",
                     tpe: ColumnType {
-                            data_type: "int",
                         full_data_type: "int",
-                        character_maximum_length: None,
                         family: Int,
                         arity: Required,
                         native_type: Some(
@@ -112,13 +104,9 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> crate::T
                     auto_increment: true,
                 },
                 Column {
-                        name: "string",
+                    name: "string",
                     tpe: ColumnType {
-                            data_type: "text",
                         full_data_type: "text",
-                        character_maximum_length: Some(
-                                65535,
-                        ),
                         family: String,
                         arity: Required,
                         native_type: Some(
@@ -163,12 +151,10 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> crate::
             Table {
                 name: "Blog",
             columns: [
-                    Column {
-                        name: "id",
+               Column {
+                    name: "id",
                     tpe: ColumnType {
-                            data_type: "integer",
                         full_data_type: "int4",
-                        character_maximum_length: None,
                         family: Int,
                         arity: Required,
                         native_type: Some(
@@ -188,11 +174,9 @@ async fn database_description_for_postgres_should_work(api: &TestApi) -> crate::
                     auto_increment: true,
                 },
                 Column {
-                        name: "string",
+                    name: "string",
                     tpe: ColumnType {
-                            data_type: "text",
                         full_data_type: "text",
-                        character_maximum_length: None,
                         family: String,
                         arity: Required,
                         native_type: Some(
@@ -247,12 +231,10 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> crate::Te
             Table {
                 name: "Blog",
             columns: [
-                    Column {
-                        name: "id",
+                 Column {
+                    name: "id",
                     tpe: ColumnType {
-                            data_type: "INTEGER",
                         full_data_type: "INTEGER",
-                        character_maximum_length: None,
                         family: Int,
                         arity: Required,
                         native_type: None,
@@ -261,11 +243,9 @@ async fn database_description_for_sqlite_should_work(api: &TestApi) -> crate::Te
                     auto_increment: true,
                 },
                 Column {
-                        name: "string",
+                    name: "string",
                     tpe: ColumnType {
-                            data_type: "TEXT",
                         full_data_type: "TEXT",
-                        character_maximum_length: None,
                         family: String,
                         arity: Required,
                         native_type: None,

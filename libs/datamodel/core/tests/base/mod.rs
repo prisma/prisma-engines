@@ -4,3 +4,4 @@ pub mod basic;
 pub mod comments;
 pub mod duplicates;
 pub mod preview_features;
+mod unsupported_type;

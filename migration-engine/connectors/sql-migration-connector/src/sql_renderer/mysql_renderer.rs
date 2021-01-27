@@ -9,6 +9,7 @@ use crate::{
     sql_migration::{AddColumn, AlterColumn, AlterEnum, AlterTable, DropColumn, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
+use native_types::MySqlType;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
@@ -18,8 +19,6 @@ use sql_schema_describer::{
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
 };
 use std::borrow::Cow;
-
-const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
 impl SqlRenderer for MysqlFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
@@ -153,7 +152,7 @@ impl SqlRenderer for MysqlFlavour {
         let default_str = column
             .default()
             .filter(|default| {
-                !matches!(default.kind(), DefaultKind::DBGENERATED(_) | DefaultKind::SEQUENCE(_))
+                !matches!(default.kind(),  DefaultKind::SEQUENCE(_))
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
                     // We do not want to render binary defaults because they are not supported by MySQL.
@@ -384,34 +383,73 @@ fn render_mysql_modify(
 }
 
 fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
-    if !column.column_type().full_data_type.is_empty() {
-        return column.column_type().full_data_type.clone().into();
+    if let ColumnTypeFamily::Enum(enum_name) = column.column_type_family() {
+        let r#enum = column
+            .schema()
+            .get_enum(&enum_name)
+            .unwrap_or_else(|| panic!("Could not render the variants of enum `{}`", enum_name));
+
+        let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
+
+        return format!("ENUM({})", variants).into();
     }
 
-    match &column.column_type().family {
-        ColumnTypeFamily::Boolean => "BOOLEAN".into(),
-        ColumnTypeFamily::DateTime => "DATETIME(3)".into(),
-        ColumnTypeFamily::Float => "DECIMAL(65,30)".into(),
-        ColumnTypeFamily::Decimal => "DECIMAL(65,30)".into(),
-        ColumnTypeFamily::Int => "INT".into(),
-        ColumnTypeFamily::BigInt => "BIGINT".into(),
-        // we use varchar right now as mediumtext doesn't allow default values
-        // a bigger length would not allow to use such a column as primary key
-        ColumnTypeFamily::String => format!("VARCHAR{}", VARCHAR_LENGTH_PREFIX).into(),
-        ColumnTypeFamily::Enum(enum_name) => {
-            let r#enum = column
-                .schema()
-                .get_enum(&enum_name)
-                .unwrap_or_else(|| panic!("Could not render the variants of enum `{}`", enum_name));
+    if let ColumnTypeFamily::Unsupported(description) = &column.column_type().family {
+        return format!("{}", description).into();
+    }
 
-            let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
+    let native_type = column
+        .column_native_type()
+        .expect("Column native type missing in mysql_renderer::render_column_type()");
 
-            format!("ENUM({})", variants).into()
+    fn render(input: Option<u32>) -> String {
+        match input {
+            None => "".to_string(),
+            Some(arg) => format!("({})", arg),
         }
-        ColumnTypeFamily::Json => "Json".into(),
-        ColumnTypeFamily::Binary => "LONGBLOB".into(),
-        ColumnTypeFamily::Uuid => unimplemented!("Uuid not handled yet"),
-        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
+    }
+
+    fn render_decimal(input: Option<(u32, u32)>) -> String {
+        match input {
+            None => "".to_string(),
+            Some((precision, scale)) => format!("({}, {})", precision, scale),
+        }
+    }
+
+    match native_type {
+        MySqlType::Int => "INTEGER".into(),
+        MySqlType::SmallInt => "SMALLINT".into(),
+        MySqlType::TinyInt if column.column_type_family().is_boolean() => "BOOLEAN".into(),
+        MySqlType::TinyInt => "TINYINT".into(),
+        MySqlType::MediumInt => "MEDIUMINT".into(),
+        MySqlType::BigInt => "BIGINT".into(),
+        MySqlType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)).into(),
+        MySqlType::Float => "FLOAT".into(),
+        MySqlType::Double => "DOUBLE".into(),
+        MySqlType::Bit(size) => format!("BIT({size})", size = size).into(),
+        MySqlType::Char(size) => format!("CHAR({size})", size = size).into(),
+        MySqlType::VarChar(size) => format!("VARCHAR({size})", size = size).into(),
+        MySqlType::Binary(size) => format!("BINARY({size})", size = size).into(),
+        MySqlType::VarBinary(size) => format!("VARBINARY({size})", size = size).into(),
+        MySqlType::TinyBlob => "TINYBLOB".into(),
+        MySqlType::Blob => "BLOB".into(),
+        MySqlType::MediumBlob => "MEDIUMBLOB".into(),
+        MySqlType::LongBlob => "LONGBLOB".into(),
+        MySqlType::TinyText => "TINYTEXT".into(),
+        MySqlType::Text => "TEXT".into(),
+        MySqlType::MediumText => "MEDIUMTEXT".into(),
+        MySqlType::LongText => "LONGTEXT".into(),
+        MySqlType::Date => "DATE".into(),
+        MySqlType::Time(precision) => format!("TIME{}", render(precision)).into(),
+        MySqlType::DateTime(precision) => format!("DATETIME{}", render(precision)).into(),
+        MySqlType::Timestamp(precision) => format!("TIMESTAMP{}", render(precision)).into(),
+        MySqlType::Year => "YEAR".into(),
+        MySqlType::Json => "JSON".into(),
+        MySqlType::UnsignedInt => "INTEGER UNSIGNED".into(),
+        MySqlType::UnsignedSmallInt => "SMALLINT UNSIGNED".into(),
+        MySqlType::UnsignedTinyInt => "TINYINT UNSIGNED".into(),
+        MySqlType::UnsignedMediumInt => "MEDIUMINT UNSIGNED".into(),
+        MySqlType::UnsignedBigInt => "BIGINT UNSIGNED".into(),
     }
 }
 

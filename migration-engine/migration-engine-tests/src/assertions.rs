@@ -351,6 +351,27 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_dbgenerated(self, expected: &str) -> AssertionResult<Self> {
+        let found = &self.0.default;
+
+        match found.as_ref().map(|d| d.kind()) {
+            Some(DefaultKind::DBGENERATED(val)) => anyhow::ensure!(
+                val == expected,
+                "Assertion failed. Expected the default value for `{}` to be dbgenerated with `{:?}`, got `{:?}`",
+                self.0.name,
+                expected,
+                val
+            ),
+            other => anyhow::bail!(
+                "Assertion failed. Expected default: {:?}, but found {:?}",
+                expected,
+                other
+            ),
+        }
+
+        Ok(self)
+    }
+
     pub fn assert_native_type(self, expected: &str, connector: &dyn Connector) -> AssertionResult<Self> {
         let found = connector.render_native_type(self.0.tpe.native_type.clone().unwrap());
         anyhow::ensure!(

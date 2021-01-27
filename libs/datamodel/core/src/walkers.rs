@@ -2,7 +2,8 @@
 //! The most prominent functionality is the pain free navigation of relations.
 use crate::{
     dml::{
-        Datamodel, DefaultValue, Enum, FieldArity, FieldType, IndexDefinition, Model, ScalarField, WithDatabaseName,
+        Datamodel, DefaultValue, Enum, EnumValue, FieldArity, FieldType, IndexDefinition, Model, ScalarField,
+        WithDatabaseName,
     },
     NativeTypeInstance, RelationField,
 };
@@ -168,7 +169,8 @@ impl<'a> ScalarFieldWalker<'a> {
             }),
             FieldType::Base(scalar_type, _) => TypeWalker::Base(*scalar_type),
             FieldType::NativeType(scalar_type, native_type) => TypeWalker::NativeType(*scalar_type, native_type),
-            _ => TypeWalker::Other,
+            FieldType::Unsupported(description) => TypeWalker::Unsupported(description.clone()),
+            FieldType::Relation(_) => unreachable!("FieldType::Relation in ScalarFieldWalker"),
         }
     }
 
@@ -201,7 +203,7 @@ pub enum TypeWalker<'a> {
     Enum(EnumWalker<'a>),
     Base(ScalarType),
     NativeType(ScalarType, &'a NativeTypeInstance),
-    Other,
+    Unsupported(String),
 }
 
 impl<'a> TypeWalker<'a> {
@@ -314,6 +316,10 @@ pub struct EnumWalker<'a> {
 impl<'a> EnumWalker<'a> {
     pub fn db_name(&self) -> &'a str {
         self.r#enum.final_database_name()
+    }
+
+    pub fn value(&self, name: &str) -> Option<&EnumValue> {
+        self.r#enum.values.iter().find(|val| val.name == name)
     }
 }
 

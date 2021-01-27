@@ -14,6 +14,13 @@ pub enum DefaultValue {
 }
 
 impl DefaultValue {
+    pub fn as_single(&self) -> Option<&PrismaValue> {
+        match self {
+            DefaultValue::Single(v) => Some(v),
+            _ => None,
+        }
+    }
+
     /// Returns either a copy of the contained single value or produces a new
     /// value as defined by the expression.
     pub fn get(&self) -> Option<PrismaValue> {
@@ -28,7 +35,7 @@ impl DefaultValue {
         matches!(self, DefaultValue::Expression(generator) if generator.name == "autoincrement")
     }
 
-    /// Does this match @default(dbgenerated())?
+    /// Does this match @default(dbgenerated(_))?
     pub fn is_dbgenerated(&self) -> bool {
         matches!(self, DefaultValue::Expression(generator) if generator.name == "dbgenerated")
     }
@@ -38,8 +45,19 @@ impl DefaultValue {
         matches!(self, DefaultValue::Expression(generator) if generator.name == "now")
     }
 
-    pub fn new_db_generated() -> Self {
-        DefaultValue::Expression(ValueGenerator::new_dbgenerated())
+    pub fn new_db_generated(description: String) -> Self {
+        DefaultValue::Expression(ValueGenerator::new_dbgenerated(description))
+    }
+
+    pub fn db_generated_description(&self) -> Option<String> {
+        match self {
+            DefaultValue::Expression(ValueGenerator {
+                name,
+                args,
+                generator: ValueGeneratorFn::DbGenerated,
+            }) if name == "dbgenerated" => args.first().map(|x| x.to_string()),
+            _ => None,
+        }
     }
 }
 
@@ -61,8 +79,8 @@ impl ValueGenerator {
         ValueGenerator::new("autoincrement".to_owned(), vec![]).unwrap()
     }
 
-    pub fn new_dbgenerated() -> Self {
-        ValueGenerator::new("dbgenerated".to_owned(), vec![]).unwrap()
+    pub fn new_dbgenerated(description: String) -> Self {
+        ValueGenerator::new("dbgenerated".to_owned(), vec![PrismaValue::String(description)]).unwrap()
     }
 
     pub fn new_now() -> Self {
@@ -99,6 +117,10 @@ impl ValueGenerator {
                 scalar_type.to_string()
             ))
         }
+    }
+
+    pub fn is_dbgenerated(&self) -> bool {
+        self.name == "dbgenerated"
     }
 }
 
@@ -168,7 +190,7 @@ impl fmt::Debug for DefaultValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Single(ref v) => write!(f, "DefaultValue::Single({:?})", v),
-            Self::Expression(g) => write!(f, "DefaultValue::Expression({})", g.name()),
+            Self::Expression(g) => write!(f, "DefaultValue::Expression({}(){:?})", g.name(), g.args),
         }
     }
 }
@@ -194,10 +216,10 @@ mod tests {
 
     #[test]
     fn default_value_is_dbgenerated() {
-        let auto_increment_default = DefaultValue::Expression(ValueGenerator::new_dbgenerated());
+        let db_generated_default = DefaultValue::Expression(ValueGenerator::new_dbgenerated("test".to_string()));
 
-        assert!(auto_increment_default.is_dbgenerated());
-        assert!(!auto_increment_default.is_now());
-        assert!(!auto_increment_default.is_autoincrement());
+        assert!(db_generated_default.is_dbgenerated());
+        assert!(!db_generated_default.is_now());
+        assert!(!db_generated_default.is_autoincrement());
     }
 }

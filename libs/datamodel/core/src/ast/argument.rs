@@ -67,6 +67,6 @@ impl Argument {
     }
 
     pub fn is_unnamed(&self) -> bool {
-        self.name.name == ""
+        self.name.name.is_empty()
     }
 }

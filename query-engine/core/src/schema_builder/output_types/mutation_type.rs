@@ -66,7 +66,10 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
         for (input_object, rf) in nested_update_inputs_queue.drain(..) {
             let mut fields = vec![input_fields::nested_create_one_input_field(ctx, &rf)];
 
-            append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+            if feature_flags::get().createMany {
+                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+            }
+
             append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_set_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_disconnect_input_field(ctx, &rf));

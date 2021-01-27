@@ -104,13 +104,14 @@ async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_each_connector(tags("postgres"), features("native_types"), log = "debug")]
 async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     let types = &[
         ("smallint", "Int", "SmallInt", "int2"),
         ("int", "Int", "Integer", "int4"),
         ("bigint", "BigInt", "BigInt", "int8"),
         ("decimal", "Decimal", "Decimal(4, 2)", "numeric"),
+        ("decimaldefault", "Decimal", "Decimal", "numeric"),
         ("real", "Float", "Real", "float4"),
         ("doublePrecision", "Float", "DoublePrecision", "float8"),
         ("varChar", "String", "VarChar(200)", "varchar"),
@@ -118,8 +119,13 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("text", "String", "Text", "text"),
         ("bytea", "Bytes", "ByteA", "bytea"),
         ("ts", "DateTime", "Timestamp(0)", "timestamp"),
+        ("tsdefault", "DateTime", "Timestamp", "timestamp"),
+        ("tstz", "DateTime", "Timestamptz", "timestamptz"),
         ("date", "DateTime", "Date", "date"),
         ("time", "DateTime", "Time(2)", "time"),
+        ("timedefault", "DateTime", "Time", "time"),
+        ("timetz", "DateTime", "Timetz(2)", "timetz"),
+        ("timetzdefault", "DateTime", "Timetz", "timetz"),
         ("bool", "Boolean", "Boolean", "bool"),
         ("bit", "String", "Bit(1)", "bit"),
         ("varbit", "String", "VarBit(1)", "varbit"),
@@ -151,7 +157,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
 
     dm.push_str("}\n");
 
-    api.schema_push(dm).send().await?.assert_green()?;
+    api.schema_push(&dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         types.iter().fold(
@@ -161,6 +167,8 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
             },
         )
     })?;
+
+    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }

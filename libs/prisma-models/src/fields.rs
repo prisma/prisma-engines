@@ -209,7 +209,7 @@ impl Fields {
         acc
     }
 
-    fn relation_filter<'a>(mut acc: Vec<Weak<RelationField>>, field: &'a Field) -> Vec<Weak<RelationField>> {
+    fn relation_filter(mut acc: Vec<Weak<RelationField>>, field: &Field) -> Vec<Weak<RelationField>> {
         if let Field::Relation(relation_field) = field {
             acc.push(Arc::downgrade(relation_field));
         };
@@ -244,7 +244,7 @@ impl Fields {
         }
     }
 
-    pub fn db_names<'a>(&'a self) -> impl Iterator<Item = String> + 'a {
+    pub fn db_names(&self) -> impl Iterator<Item = String> + '_ {
         self.all
             .iter()
             .flat_map(|field| field.scalar_fields().into_iter().map(|f| f.db_name().to_owned()))

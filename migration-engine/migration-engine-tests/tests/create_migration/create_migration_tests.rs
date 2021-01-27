@@ -37,7 +37,7 @@ async fn basic_create_migration_works(api: &TestApi) -> TestResult {
                         r#"
                         -- CreateTable
                         CREATE TABLE `Cat` (
-                            `id` INT NOT NULL,
+                            `id` INTEGER NOT NULL,
                             `name` VARCHAR(191) NOT NULL,
 
                             PRIMARY KEY (`id`)
@@ -128,7 +128,7 @@ async fn creating_a_second_migration_should_have_the_previous_sql_schema_as_base
                         r#"
                         -- CreateTable
                         CREATE TABLE `Dog` (
-                            `id` INT NOT NULL,
+                            `id` INTEGER NOT NULL,
                             `name` VARCHAR(191) NOT NULL,
 
                             PRIMARY KEY (`id`)
@@ -335,7 +335,7 @@ async fn create_enum_step_only_rendered_when_needed(api: &TestApi) -> TestResult
                         r#"
                         -- CreateTable
                         CREATE TABLE `Cat` (
-                            `id` INT NOT NULL,
+                            `id` INTEGER NOT NULL,
                             `mood` ENUM('HUNGRY', 'SLEEPY') NOT NULL,
 
                             PRIMARY KEY (`id`)
@@ -389,6 +389,50 @@ async fn create_enum_renders_correctly(api: &TestApi) -> TestResult {
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
                             "mood" "Mood" NOT NULL,
+
+                            PRIMARY KEY ("id")
+                        );
+                        "#
+                    }
+                }
+                _ => unreachable!(),
+            };
+
+            migration.assert_contents(expected_script)
+        })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
+    let dm = r#"
+        datasource test {
+          provider = "postgresql"
+          url = "postgresql://unreachable:unreachable@example.com/unreachable"
+        }
+
+        model Cat {
+            id      Int @id
+            home    Unsupported("point")
+        }
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("create-cats", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .assert_migration("create-cats", |migration| {
+            let expected_script = match api.sql_family() {
+                SqlFamily::Postgres => {
+                    indoc! {
+                        r#"
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                            "id" INTEGER NOT NULL,
+                            "home" point NOT NULL,
 
                             PRIMARY KEY ("id")
                         );

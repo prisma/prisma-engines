@@ -97,7 +97,7 @@ impl Standardiser {
                             for underlying_field in underlying_fields {
                                 let t = missing_field_names_to_field_names
                                     .entry(underlying_field.clone().name)
-                                    .or_insert(vec![]);
+                                    .or_insert_with(Vec::new);
 
                                 t.push(field.name.clone());
                                 let scalar_field = Field::ScalarField(underlying_field);
