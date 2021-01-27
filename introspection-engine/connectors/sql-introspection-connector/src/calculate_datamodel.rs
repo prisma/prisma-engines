@@ -84,7 +84,7 @@ mod tests {
             (
                 FieldType::Unsupported(family.to_string()),
                 true,
-                Some("This type is currently not supported.".to_string()),
+                Some("This type is currently not supported by the Prisma Client.".to_string()),
             )
         }
 
