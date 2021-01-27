@@ -131,6 +131,21 @@ pub struct CreateManyRecords {
     pub skip_duplicates: bool,
 }
 
+impl CreateManyRecords {
+    pub fn inject_all(&mut self, projection: RecordProjection) {
+        let keys: Vec<_> = projection.fields().map(|sf| sf.db_name().to_owned()).collect();
+        let values: Vec<_> = projection.values().collect();
+
+        let zipped = keys.into_iter().zip(values);
+
+        for arg in self.args.iter_mut() {
+            zipped
+                .clone()
+                .for_each(|(key, value)| arg.insert(DatasourceFieldName(key), value));
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
     pub model: ModelRef,

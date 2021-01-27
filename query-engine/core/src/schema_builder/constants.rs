@@ -33,6 +33,7 @@ pub mod inputs {
         // nested operations
         pub const CONNECT: &str = "connect";
         pub const CREATE: &str = "create";
+        pub const CREATE_MANY: &str = "createMany";
         pub const CONNECT_OR_CREATE: &str = "connectOrCreate";
         pub const DISCONNECT: &str = "disconnect";
         pub const UPDATE: &str = "update";

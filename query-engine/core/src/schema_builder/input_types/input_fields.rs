@@ -23,6 +23,8 @@ pub(crate) fn nested_create_one_input_field(ctx: &mut BuilderContext, parent_fie
 /// Nested create many calls can only ever be leaf operations because they can't return the ids of
 /// affected rows. This means that we can't allow nested creates if the relation is inlined on the
 /// parent, as this would require a flip in the order of operations that we can't do with no identifiers.
+/// It also means that we can't serve implicit m:n relations, as this would require a write to the join
+/// table, but we don't have the IDs.
 pub(crate) fn nested_create_many_input_field(
     ctx: &mut BuilderContext,
     parent_field: &RelationFieldRef,
@@ -30,6 +32,7 @@ pub(crate) fn nested_create_many_input_field(
     if ctx.capabilities.contains(ConnectorCapability::CreateMany)
         && parent_field.is_list
         && !parent_field.is_inlined_on_enclosing_model()
+        && !parent_field.relation().is_many_to_many()
     {
         let create_object_type = InputType::object(create_many_objects::create_many_object_type(
             ctx,

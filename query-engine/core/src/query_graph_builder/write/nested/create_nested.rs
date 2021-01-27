@@ -1,14 +1,16 @@
 use super::*;
 use crate::{
+    constants::inputs::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ParsedInputValue,
+    write::write_args_parser::WriteArgsParser,
+    ParsedInputList, ParsedInputValue,
 };
 use connector::{Filter, IdFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
-/// Handles nested create cases.
+/// Handles nested create one cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
 pub fn nested_create(
@@ -376,6 +378,73 @@ fn handle_one_to_one(
             })),
          )?;
     }
+
+    Ok(())
+}
+
+pub fn nested_create_many(
+    graph: &mut QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    value: ParsedInputValue,
+    child_model: &ModelRef,
+) -> QueryGraphBuilderResult<()> {
+    // let relation = parent_relation_field.relation();
+
+    // Nested input is an object of { data: [...], skipDuplicates: bool }
+    let mut obj: ParsedInputMap = value.try_into()?;
+
+    let data_list: ParsedInputList = obj.remove(args::DATA).unwrap().try_into()?;
+    let skip_duplicates: bool = match obj.remove(args::SKIP_DUPLICATES) {
+        Some(val) => val.try_into()?,
+        None => false,
+    };
+
+    let args = data_list
+        .into_iter()
+        .map(|data_value| {
+            let data_map = data_value.try_into()?;
+            let mut args = WriteArgsParser::from(&child_model, data_map)?.args;
+
+            args.add_datetimes(&child_model);
+            Ok(args)
+        })
+        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+    let query = CreateManyRecords {
+        model: Arc::clone(child_model),
+        args,
+        skip_duplicates,
+    };
+
+    let create_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
+
+    // We know that the id must be inlined on the child, so we need the parent link to inline it.
+    let linking_fields = parent_relation_field.linking_fields();
+
+    graph.create_edge(
+        &parent_node,
+        &create_node,
+        QueryGraphDependency::ParentProjection(
+            linking_fields,
+            Box::new(move |mut create_many_node, mut parent_links| {
+                // There can only be one parent.
+                let parent_link = match parent_links.pop() {
+                    Some(p) => Ok(p),
+                    None => Err(QueryGraphBuilderError::AssertionError(
+                        "[Query Graph] Expected a valid parent ID to be present for a nested createMany.".to_string(),
+                    )),
+                }?;
+
+                // Inject the parent id into all nested records.
+                if let Node::Query(Query::Write(WriteQuery::CreateManyRecords(ref mut cmr))) = create_many_node {
+                    cmr.inject_all(parent_link);
+                }
+
+                Ok(create_many_node)
+            }),
+        ),
+    )?;
 
     Ok(())
 }
