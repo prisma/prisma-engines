@@ -60,7 +60,10 @@ impl TypeIdentifier for Column<'_> {
     }
 
     fn is_datetime(&self) -> bool {
-        matches!(self.decl_type(), Some("DATETIME") | Some("datetime"))
+        matches!(
+            self.decl_type(),
+            Some("DATETIME") | Some("datetime") | Some("TIMESTAMP") | Some("timestamp")
+        )
     }
 
     fn is_time(&self) -> bool {
