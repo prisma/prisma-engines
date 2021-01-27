@@ -36,7 +36,6 @@ class NestedCreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBa
         |    id: 1,
         |    bs: {
         |      createMany: {
-        |        skipDuplicates: false,
         |        data: [
         |          { id: 1, str1: "1", str2: "1", str3: "1"},
         |          { id: 2, str1: "2",            str3: null},
