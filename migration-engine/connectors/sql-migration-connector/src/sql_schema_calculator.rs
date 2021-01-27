@@ -329,7 +329,7 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
 }
 
 fn db_generated(default: &DefaultValue) -> Option<sql::DefaultValue> {
-    Some(sql::DefaultValue::db_generated(
-        default.db_generated_description().unwrap(),
-    ))
+    default
+        .db_generated_description()
+        .map(|description| sql::DefaultValue::db_generated(description))
 }

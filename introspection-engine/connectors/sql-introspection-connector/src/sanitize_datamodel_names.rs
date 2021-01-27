@@ -9,7 +9,6 @@ use regex::Regex;
 use std::collections::HashMap;
 
 static EMPTY_ENUM_PLACEHOLDER: &str = "EMPTY_ENUM_VALUE";
-static EMPTY_STRING: &str = "";
 
 static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
@@ -76,13 +75,13 @@ fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<Str
                         // If the field also has an associated default enum value, we need to sanitize that enum value.
                         // The actual enum value renames _in the enum itself_ are done at a later stage.
                         if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut sf.default_value {
-                            let new_default = if EMPTY_STRING == value {
+                            let new_default = if value.is_empty() {
                                 DefaultValue::Single(PrismaValue::Enum(EMPTY_ENUM_PLACEHOLDER.to_string()))
                             } else {
                                 let sanitized_value = sanitize_string(value);
 
                                 match sanitized_value {
-                                    x if x == EMPTY_STRING => DefaultValue::new_db_generated(value.clone()),
+                                    x if x.is_empty() => DefaultValue::new_db_generated(value.clone()),
                                     _ => DefaultValue::Single(PrismaValue::Enum(sanitized_value)),
                                 }
                             };
@@ -115,9 +114,9 @@ fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (Str
         }
 
         for enum_value in enm.values_mut() {
-            if enum_value.name == EMPTY_STRING {
+            if enum_value.name.is_empty() {
                 enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
-                enum_value.database_name = Some(EMPTY_STRING.to_string());
+                enum_value.database_name = Some("".to_string());
             } else {
                 sanitize_name(enum_value);
             }

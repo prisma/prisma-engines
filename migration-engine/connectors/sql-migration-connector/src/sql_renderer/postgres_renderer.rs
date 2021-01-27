@@ -367,6 +367,10 @@ pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
         return format!("\"{}\"{}", name, if t.arity.is_list() { "[]" } else { "" }).into();
     }
 
+    if let ColumnTypeFamily::Unsupported(description) = &t.family {
+        return format!("{}{}", description, if t.arity.is_list() { "[]" } else { "" }).into();
+    }
+
     let native_type = col
         .column_native_type()
         .expect("Missing native type in postgres_renderer::render_column_type()");
