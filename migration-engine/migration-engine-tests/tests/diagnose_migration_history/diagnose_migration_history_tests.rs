@@ -811,9 +811,9 @@ async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) ->
     api.database()
         .raw_cmd(&format!(
             "
-            DROP USER IF EXISTS 'prismashadowdbtestuser';
-            CREATE USER 'prismashadowdbtestuser' IDENTIFIED by '1234batman';
-            GRANT ALL PRIVILEGES ON {}.* TO 'prismashadowdbtestuser';
+            DROP USER IF EXISTS 'prismashadowdbtestuser2';
+            CREATE USER 'prismashadowdbtestuser2' IDENTIFIED by '1234batman';
+            GRANT ALL PRIVILEGES ON {}.* TO 'prismashadowdbtestuser2';
             ",
             api.connection_info().dbname().unwrap(),
         ))
@@ -825,7 +825,7 @@ async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) ->
         r#"
         datasource db {{
             provider = "mysql"
-            url = "mysql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
+            url = "mysql://prismashadowdbtestuser2:1234batman@{dbhost}:{dbport}/{dbname}"
         }}
         "#,
         dbhost = host,
@@ -849,7 +849,7 @@ async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector(tags("postgres_12"), log = "debug")]
+#[test_each_connector(tags("postgres_12"))]
 async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -864,8 +864,8 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
     api.database()
         .raw_cmd(
             "
-            DROP USER IF EXISTS prismashadowdbtestuser;
-            CREATE USER prismashadowdbtestuser PASSWORD '1234batman' LOGIN;
+            DROP USER IF EXISTS prismashadowdbtestuser2;
+            CREATE USER prismashadowdbtestuser2 PASSWORD '1234batman' LOGIN;
             ",
         )
         .await?;
@@ -876,7 +876,7 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
         r#"
         datasource db {{
             provider = "postgresql"
-            url = "postgresql://prismashadowdbtestuser:1234batman@{dbhost}:{dbport}/{dbname}"
+            url = "postgresql://prismashadowdbtestuser2:1234batman@{dbhost}:{dbport}/{dbname}"
         }}
         "#,
         dbhost = host,
@@ -900,7 +900,7 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2019"))]
+#[test_each_connector(tags("mssql"))]
 async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -914,6 +914,9 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
 
     api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser;").await.ok();
 
+    // Sad but necessary, the test is flaky without.
+    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+
     api.database()
         .raw_cmd(
             "
@@ -923,9 +926,14 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
                 WITH PASSWORD = '1234batmanZ';
 
             CREATE USER prismashadowdbtestuser FOR LOGIN prismashadowdbtestuser;
+
+            GRANT SELECT TO prismashadowdbtestuser;
             ",
         )
         .await?;
+
+    // Sad but necessary, the test is flaky without.
+    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
     let (host, port) = db_host_and_port_mssql_2019();
 

@@ -92,7 +92,7 @@ async fn dev_diagnostic_detects_drift(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(ignore("postgres", "mssql_2017", "mssql_2019"))]
+#[test_each_connector(ignore("postgres", "mssql"))]
 async fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 
@@ -651,20 +651,28 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(ap
 
     api.create_migration("initial", dm1, &directory).send().await?;
 
-    api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser;").await.ok();
+    api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser2;").await.ok();
+
+    // Sad but necessary, the test is flaky without.
+    tokio::time::sleep(std::time::Duration::from_millis(400)).await;
 
     api.database()
         .raw_cmd(
             "
-            DROP USER IF EXISTS prismashadowdbtestuser;
+            DROP USER IF EXISTS prismashadowdbtestuser2;
 
-            CREATE LOGIN prismashadowdbtestuser
+            CREATE LOGIN prismashadowdbtestuser2
                 WITH PASSWORD = '1234batmanZ';
 
-            CREATE USER prismashadowdbtestuser FOR LOGIN prismashadowdbtestuser;
+            CREATE USER prismashadowdbtestuser2 FOR LOGIN prismashadowdbtestuser2;
+
+            GRANT SELECT TO prismashadowdbtestuser2;
             ",
         )
         .await?;
+
+    // Sad but necessary, the test is flaky without.
+    tokio::time::sleep(std::time::Duration::from_millis(400)).await;
 
     let (host, port) = db_host_and_port_mssql_2019();
 
@@ -672,7 +680,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(ap
         r#"
         datasource db {{
             provider = "sqlserver"
-            url = "sqlserver://{dbhost}:{dbport};database={dbname};user=prismashadowdbtestuser;password=1234batmanZ;trustservercertificate=true"
+            url = "sqlserver://{dbhost}:{dbport};database={dbname};user=prismashadowdbtestuser2;password=1234batmanZ;trustservercertificate=true"
         }}
         "#,
         dbhost = host,
