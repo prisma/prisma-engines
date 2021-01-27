@@ -20,7 +20,7 @@ pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
-    input_object.require_exactly_one_field();
+    input_object.allow_at_most_one_field();
 
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
