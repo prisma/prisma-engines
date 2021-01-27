@@ -3,9 +3,7 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use datamodel::{
-    walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, FieldArity, NativeTypeInstance, ScalarType,
-};
+use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, FieldArity, ScalarType};
 use sql_schema_describer as sql;
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily};
 
@@ -13,12 +11,6 @@ pub(crate) trait SqlSchemaCalculatorFlavour {
     fn calculate_enums(&self, _datamodel: &Datamodel) -> Vec<sql::Enum> {
         Vec::new()
     }
-
-    fn column_type_for_native_type(
-        &self,
-        field: &ScalarFieldWalker<'_>,
-        native_type_instance: &NativeTypeInstance,
-    ) -> sql::ColumnType;
 
     fn column_type_for_unsupported_type(&self, field: &ScalarFieldWalker<'_>, description: String) -> sql::ColumnType {
         ColumnType {
