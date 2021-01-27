@@ -421,6 +421,7 @@ pub fn nested_create_many(
 
     // We know that the id must be inlined on the child, so we need the parent link to inline it.
     let linking_fields = parent_relation_field.linking_fields();
+    let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
     graph.create_edge(
         &parent_node,
@@ -438,7 +439,7 @@ pub fn nested_create_many(
 
                 // Inject the parent id into all nested records.
                 if let Node::Query(Query::Write(WriteQuery::CreateManyRecords(ref mut cmr))) = create_many_node {
-                    cmr.inject_all(parent_link);
+                    cmr.inject_all(child_linking_fields.assimilate(parent_link)?);
                 }
 
                 Ok(create_many_node)
