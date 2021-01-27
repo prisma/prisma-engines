@@ -25,6 +25,9 @@ use std::{collections::HashMap, str::FromStr};
 
 static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
+        ("Oid", Value::integer(u8::MAX), &["VarChar(100)", "Integer", "BigInt"]),
+        ("Money", Value::integer(u8::MAX), &["VarChar(100)"]),
+        ("Inet", Value::text("10.1.2.3"), &["VarChar(100)"]),
         (
             "SmallInt",
             Value::integer(u8::MAX),
@@ -169,6 +172,7 @@ static SAFE_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
 
 static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
     vec![
+        ("Money", Value::integer(u8::MAX), &["Decimal"]),
         (
             "SmallInt",
             Value::integer(2),
@@ -771,6 +775,9 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
     maps.insert("Xml", "String");
     maps.insert("Json", "Json");
     maps.insert("JsonB", "Json");
+    maps.insert("Oid", "Int");
+    maps.insert("Money", "Decimal");
+    maps.insert("Inet", "String");
 
     maps
 });
@@ -780,11 +787,14 @@ fn prisma_type(native_type: &str) -> &str {
     TYPE_MAPS.get(kind).unwrap()
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"), features("native_types"), log = "debug")]
 async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
     for (from, seed, casts) in SAFE_CASTS.iter() {
+        let span = tracing::info_span!("SafeCasts", from = %from, to = ?casts, seed = ?seed);
+        let _span = span.enter();
+
         let mut previous_columns = "".to_string();
         let mut next_columns = "".to_string();
         let mut insert = Insert::single_into((api.schema_name(), "A"));
@@ -825,6 +835,8 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
                 "#,
             columns = previous_columns
         ));
+
+        tracing::info!(dm = dm1.as_str());
 
         api.schema_push(&dm1).send().await?.assert_green()?;
 

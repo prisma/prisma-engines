@@ -1796,7 +1796,7 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
 async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
-            id Int   @id    
+            id Int   @id
             box Box?
         }
 
@@ -2963,16 +2963,16 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
         model Post {
             id            Int                     @id @default(autoincrement())
             /// This type is currently not supported.
-            user_balance  Unsupported("money")
-            User          User                    @relation(fields: [user_balance], references: [balance])
+            user_ip  Unsupported("cidr")
+            User          User                    @relation(fields: [user_ip], references: [balance])
         }
-            
+
         model User {
             id            Int                     @id @default(autoincrement())
             /// This type is currently not supported.
-            balance       Unsupported("money")  @unique
+            balance       Unsupported("cidr")  @unique
             Post          Post[]
-        }   
+        }
     "#;
 
     api.schema_push(dm).send().await?.assert_green()?;
@@ -2983,9 +2983,9 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
             .assert_column("id", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
-            .assert_column("user_balance", |c| {
+            .assert_column("user_ip", |c| {
                 c.assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+                    .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
             })
     })?;
 
@@ -2997,7 +2997,7 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
             })?
             .assert_column("balance", |c| {
                 c.assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+                    .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
             })
     })?;
 
@@ -3063,15 +3063,15 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
     let dm1 = r#"
         model Post {
             id               Int    @id @default(autoincrement())
-            user_balance     Unsupported("money")
+            user_ip     Unsupported("cidr")
         }
-        
+
         model Blog {
           id            Int    @id              @default(autoincrement())
           number        Int?                    @default(1)
           bigger_number Int?                    @default(dbgenerated("sqrt((4)::double precision)"))
           point         Unsupported("point")?   @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
-        }   
+        }
     "#;
 
     api.schema_push(dm1).send().await?.assert_green()?;
@@ -3082,9 +3082,9 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
             .assert_column("id", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
-            .assert_column("user_balance", |c| {
+            .assert_column("user_ip", |c| {
                 c.assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+                    .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
             })
     })?;
 
@@ -3113,30 +3113,30 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
 
     let dm2 = r#"
         model Post {
-            id            Int                      @id @default(autoincrement())
-            user_balance  Unsupported("money")?    @unique
+            id            Int                     @id @default(autoincrement())
+            user_ip  Unsupported("cidr")?    @unique
         }
     "#;
 
-    api.schema_push(dm2).force(true).send().await?.assert_warnings(&["The migration will add a unique constraint covering the columns `[user_balance]` on the table `Post`. If there are existing duplicate values, the migration will fail.".into()])?;
+    api.schema_push(dm2).force(true).send().await?.assert_warnings(&["The migration will add a unique constraint covering the columns `[user_ip]` on the table `Post`. If there are existing duplicate values, the migration will fail.".into()])?;
 
     api.assert_schema().await?.assert_table("Post", |table| {
         table
             .assert_columns_count(2)?
-            .assert_index_on_columns(&["user_balance"], |index| index.assert_is_unique())?
+            .assert_index_on_columns(&["user_ip"], |index| index.assert_is_unique())?
             .assert_column("id", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
-            .assert_column("user_balance", |c| {
+            .assert_column("user_ip", |c| {
                 c.assert_is_nullable()?
-                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))
+                    .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
             })
     })?;
 
     let dm3 = r#"
         model Post {
             id               Int    @id @default(autoincrement())
-            user_balance     Unsupported("money") @default(dbgenerated("12"))
+            user_ip     Unsupported("cidr") @default(dbgenerated("'10.1.2.3/32'"))
         }
     "#;
 
@@ -3148,10 +3148,10 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
             .assert_column("id", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
-            .assert_column("user_balance", |c| {
+            .assert_column("user_ip", |c| {
                 c.assert_is_required()?
-                    .assert_type_family(ColumnTypeFamily::Unsupported("money".to_string()))?
-                    .assert_dbgenerated("12")
+                    .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))?
+                    .assert_dbgenerated("'10.1.2.3/32'::cidr")
             })
     })?;
 

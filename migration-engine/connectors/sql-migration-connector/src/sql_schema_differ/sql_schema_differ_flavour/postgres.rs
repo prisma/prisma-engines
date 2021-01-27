@@ -142,6 +142,26 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
 
     let cast = || {
         Some(match previous {
+            PostgresType::Inet => match next {
+                PostgresType::Citext | PostgresType::Text | PostgresType::VarChar(_) => ColumnTypeChange::SafeCast,
+                _ => NotCastable,
+            },
+            PostgresType::Money => match next {
+                PostgresType::Citext | PostgresType::Text | PostgresType::VarChar(_) => ColumnTypeChange::SafeCast,
+                PostgresType::Decimal(_) => ColumnTypeChange::RiskyCast,
+                _ => RiskyCast,
+            },
+            PostgresType::Citext => match next {
+                PostgresType::Text => SafeCast,
+                PostgresType::VarChar(_) => SafeCast,
+                _ => RiskyCast,
+            },
+            PostgresType::Oid => match next {
+                PostgresType::Text => SafeCast,
+                PostgresType::VarChar(_) => SafeCast,
+                PostgresType::BigInt | PostgresType::Integer => SafeCast,
+                _ => NotCastable,
+            },
             SmallInt => match next {
                 Integer => SafeCast,
                 BigInt => SafeCast,
