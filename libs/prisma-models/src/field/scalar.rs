@@ -30,7 +30,6 @@ pub struct ScalarFieldTemplate {
     pub arity: FieldArity,
     pub db_name: Option<String>,
     pub default_value: Option<DefaultValue>,
-    pub supports_create_operation: bool,
 }
 
 pub struct ScalarField {

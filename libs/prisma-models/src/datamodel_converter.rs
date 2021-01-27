@@ -117,7 +117,6 @@ impl<'a> DatamodelConverter<'a> {
                         db_name: sf.database_name.clone(),
                         arity: sf.arity,
                         default_value: sf.default_value.clone(),
-                        supports_create_operation: true,
                     }))
                 }
             })
