@@ -154,6 +154,6 @@ class NestedCreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBa
       legacy = false
     )
 
-    result.toString() should be("""{"data":{"aggregateModelB":{"count":{"_all":5000}}}}""")
+    result.toString() should be("""{"data":{"aggregateModelB":{"count":{"_all":1000}}}}""")
   }
 }

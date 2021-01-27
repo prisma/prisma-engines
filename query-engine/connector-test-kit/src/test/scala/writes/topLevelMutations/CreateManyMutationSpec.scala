@@ -199,7 +199,7 @@ class CreateManyMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    result.toString() should be("""{"data":{"createManyTest":{"count":10000}}}""")
+    result.toString() should be("""{"data":{"createManyTest":{"count":1000}}}""")
   }
 
   // Note: Checks were originally higher, but test method (command line args) blows up...
