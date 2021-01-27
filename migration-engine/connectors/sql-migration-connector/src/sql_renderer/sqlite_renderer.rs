@@ -213,7 +213,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 }
 
-fn render_column_type(t: &ColumnType) -> &'static str {
+fn render_column_type(t: &ColumnType) -> &str {
     match &t.family {
         ColumnTypeFamily::Boolean => "BOOLEAN",
         ColumnTypeFamily::DateTime => "DATETIME",
@@ -226,7 +226,7 @@ fn render_column_type(t: &ColumnType) -> &'static str {
         ColumnTypeFamily::Json => unreachable!("ColumnTypeFamily::Json on SQLite"),
         ColumnTypeFamily::Enum(_) => unreachable!("ColumnTypeFamily::Enum on SQLite"),
         ColumnTypeFamily::Uuid => unimplemented!("ColumnTypeFamily::Uuid on SQLite"),
-        ColumnTypeFamily::Unsupported(x) => unimplemented!("{} not handled yet", x),
+        ColumnTypeFamily::Unsupported(x) => x.as_ref(),
     }
 }
 

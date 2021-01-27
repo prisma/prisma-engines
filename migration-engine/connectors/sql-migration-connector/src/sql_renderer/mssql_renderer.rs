@@ -422,6 +422,10 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
         }
     }
 
+    if let ColumnTypeFamily::Unsupported(description) = &column.column_type().family {
+        return format!("{}", description).into();
+    }
+
     let native_type = column
         .column_native_type()
         .expect("Missing column native type in mssql_renderer::render_column_type()");

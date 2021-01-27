@@ -394,6 +394,10 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
         return format!("ENUM({})", variants).into();
     }
 
+    if let ColumnTypeFamily::Unsupported(description) = &column.column_type().family {
+        return format!("{}", description).into();
+    }
+
     let native_type = column
         .column_native_type()
         .expect("Column native type missing in mysql_renderer::render_column_type()");
