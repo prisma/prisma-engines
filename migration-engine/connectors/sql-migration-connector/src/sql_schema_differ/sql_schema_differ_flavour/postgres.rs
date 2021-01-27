@@ -307,9 +307,11 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 VarChar(Some(length)) | Char(Some(length)) if length > 2 => RiskyCast,
                 _ => NotCastable,
             },
-            Timestamp(_) => match next {
+            Timestamp(a) => match next {
                 Text | VarChar(None) => SafeCast,
                 Char(Some(len)) | VarChar(Some(len)) if len > 22 => SafeCast,
+                PostgresType::Timestamp(None) => return None,
+                PostgresType::Timestamp(Some(b)) if a.is_none() || a == Some(b) => return None,
                 Timestamp(_) | Timestamptz(_) | Date | Time(_) | Timetz(_) => SafeCast,
                 _ => NotCastable,
             },
@@ -327,15 +329,19 @@ fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> O
                 Timestamp(_) | Timestamptz(_) => SafeCast,
                 _ => NotCastable,
             },
-            Time(_) => match next {
+            Time(a) => match next {
                 Text | VarChar(None) => SafeCast,
                 Char(Some(len)) | VarChar(Some(len)) if len > 13 => SafeCast,
+                PostgresType::Time(None) => return None,
+                PostgresType::Time(Some(b)) if a.is_none() || a == Some(b) => return None,
                 Timetz(_) => SafeCast,
                 _ => NotCastable,
             },
-            Timetz(_) => match next {
+            Timetz(a) => match next {
                 Text | VarChar(None) => SafeCast,
                 Char(Some(len)) | VarChar(Some(len)) if len > 18 => SafeCast,
+                PostgresType::Timetz(None) => return None,
+                PostgresType::Timetz(Some(b)) if a.is_none() || a == Some(b) => return None,
                 Timetz(_) | Time(_) => SafeCast,
                 _ => NotCastable,
             },
