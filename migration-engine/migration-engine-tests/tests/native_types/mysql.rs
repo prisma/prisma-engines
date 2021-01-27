@@ -591,7 +591,7 @@ fn native_type_name_to_prisma_scalar_type_name(scalar_type: &str) -> &'static st
     const TYPES_MAP: &[(&str, &str)] = &[
         ("BigInt", "BigInt"),
         ("Binary", "Bytes"),
-        ("Bit", "Bytes"),
+        ("Bit", "String"),
         ("Blob", "Bytes"),
         ("Char", "String"),
         ("Date", "DateTime"),

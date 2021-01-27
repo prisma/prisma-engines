@@ -23,6 +23,7 @@ const TYPES: &[(&str, &str)] = &[
     ("numeric", "Decimal(4,1)"),
     ("float", "Float"),
     ("double", "Double"),
+    ("bit_bool", "Bit(1)"),
     ("bits", "Bit(64)"),
     ("chars", "Char(10)"),
     ("varchars", "VarChar(500)"),
@@ -102,7 +103,8 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             numeric                        Decimal  @mysql.Decimal(4, 1)
             float                          Float    @mysql.Float
             double                         Float    @mysql.Double
-            bits                           Bytes    @mysql.Bit(64)
+            bit_bool                       Boolean  @mysql.Bit(1)
+            bits                           String   @mysql.Bit(64)
             chars                          String   @mysql.Char(10)
             varchars                       String   @mysql.VarChar(500)
             binary                         Bytes    @mysql.Binary(230)
@@ -191,6 +193,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             numeric                        Float
             float                          Float
             double                         Float
+            bit_bool                       Int
             bits                           Int
             chars                          String
             varchars                       String

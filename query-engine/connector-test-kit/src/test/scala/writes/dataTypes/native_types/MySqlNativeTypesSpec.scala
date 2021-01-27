@@ -186,7 +186,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
       """
         |model Model {
         |  id    String @id @default(cuid())
-        |  bit   Bytes @test.Bit(8)
+        |  bit   String @test.Bit(8)
         |  bin   Bytes @test.Binary(4)
         |  vBin  Bytes @test.VarBinary(5)
         |  blob  Bytes @test.Blob
@@ -203,7 +203,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
          |mutation {
          |  createOneModel(
          |    data: {
-         |      bit: "dA=="
+         |      bit: "010001"
          |      bin: "dGVzdA=="
          |      vBin: "dGVzdA=="
          |      blob: "dGVzdA=="
@@ -226,7 +226,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
     )
 
     res.toString should be(
-      """{"data":{"createOneModel":{"bit":"dA==","bin":"dGVzdA==","vBin":"dGVzdA==","blob":"dGVzdA==","tBlob":"dGVzdA==","mBlob":"dGVzdA==","lBlob":"dGVzdA=="}}}""")
+      """{"data":{"createOneModel":{"bit":"010001","bin":"dGVzdA==","vBin":"dGVzdA==","blob":"dGVzdA==","tBlob":"dGVzdA==","mBlob":"dGVzdA==","lBlob":"dGVzdA=="}}}""")
   }
 
   "Other MySQL native types" should "work" in {

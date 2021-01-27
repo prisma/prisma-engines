@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 
 /// Prisma's builtin scalar types.
 #[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize, Eq, Hash)]
@@ -14,6 +13,12 @@ pub enum ScalarType {
     Json,
     Bytes,
     Decimal,
+}
+
+impl ScalarType {
+    pub fn is_boolean(&self) -> bool {
+        matches!(self, ScalarType::Boolean)
+    }
 }
 
 impl FromStr for ScalarType {
