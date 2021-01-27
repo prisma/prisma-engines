@@ -431,6 +431,7 @@ pub trait Visitor<'a> {
                 }
                 None => self.write("*")?,
             },
+            ExpressionKind::Default => self.write("DEFAULT")?,
         }
 
         if let Some(alias) = value.alias {

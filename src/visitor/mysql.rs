@@ -534,4 +534,15 @@ mod tests {
         assert_eq!(format!("SELECT '{}'", dt.to_rfc3339(),), sql);
         assert!(params.is_empty());
     }
+
+    #[test]
+    fn test_default_insert() {
+        let insert = Insert::single_into("foo")
+            .value("foo", "bar")
+            .value("baz", default_value());
+
+        let (sql, _) = Mysql::build(insert).unwrap();
+
+        assert_eq!("INSERT INTO `foo` (`foo`,`baz`) VALUES (?,DEFAULT)", sql);
+    }
 }

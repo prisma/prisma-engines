@@ -607,4 +607,15 @@ mod tests {
 
         assert_eq!(r#"SELECT "foo".* FROM "foo" WHERE "bar" ILIKE $1"#, sql);
     }
+
+    #[test]
+    fn test_default_insert() {
+        let insert = Insert::single_into("foo")
+            .value("foo", "bar")
+            .value("baz", default_value());
+
+        let (sql, _) = Postgres::build(insert).unwrap();
+
+        assert_eq!("INSERT INTO \"foo\" (\"foo\",\"baz\") VALUES ($1,DEFAULT)", sql);
+    }
 }

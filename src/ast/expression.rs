@@ -178,6 +178,8 @@ pub enum ExpressionKind<'a> {
     Compare(Compare<'a>),
     /// A single value, column, row or a nested select
     Value(Box<Expression<'a>>),
+    /// DEFAULT keyword, e.g. for `INSERT INTO ... VALUES (..., DEFAULT, ...)`
+    Default,
 }
 
 impl<'a> ExpressionKind<'a> {
@@ -194,6 +196,14 @@ impl<'a> ExpressionKind<'a> {
 pub fn asterisk() -> Expression<'static> {
     Expression {
         kind: ExpressionKind::Asterisk(None),
+        alias: None,
+    }
+}
+
+/// A quick alias to create a default value expression.
+pub fn default_value() -> Expression<'static> {
+    Expression {
+        kind: ExpressionKind::Default,
         alias: None,
     }
 }

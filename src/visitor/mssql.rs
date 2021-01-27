@@ -1646,4 +1646,15 @@ mod tests {
             params
         );
     }
+
+    #[test]
+    fn test_default_insert() {
+        let insert = Insert::single_into("foo")
+            .value("foo", "bar")
+            .value("baz", default_value());
+
+        let (sql, _) = Mssql::build(insert).unwrap();
+
+        assert_eq!("INSERT INTO [foo] ([foo],[baz]) VALUES (@P1,DEFAULT)", sql);
+    }
 }

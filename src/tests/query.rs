@@ -1596,3 +1596,22 @@ async fn join_with_non_matching_compound_columns(api: &mut dyn TestApi) -> crate
 
     Ok(())
 }
+
+#[test_each_connector(ignore("sqlite"))]
+async fn insert_default_keyword(api: &mut dyn TestApi) -> crate::Result<()> {
+    let table = api.create_table("id int, value int DEFAULT 1").await?;
+
+    let insert = Insert::single_into(&table)
+        .value("value", default_value())
+        .value("id", 4);
+
+    api.conn().execute(insert.into()).await?;
+
+    let select = Select::from_table(&table);
+    let row = api.conn().select(select).await?.into_single()?;
+
+    assert_eq!(Value::integer(4), row["id"]);
+    assert_eq!(Value::integer(1), row["value"]);
+
+    Ok(())
+}
