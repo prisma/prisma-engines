@@ -232,6 +232,7 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("float", "Float", "Float", "float"),
         ("double", "Float", "Double", "double"),
         ("bits", "Bytes", "Bit(10)", "bit(10)"),
+        ("bit", "Boolean", "Bit(1)", "bit(1)"),
         ("chars", "String", "Char(10)", "char(10)"),
         ("varchars", "String", "VarChar(500)", "varchar(500)"),
         ("binary", "Bytes", "Binary(230)", "binary(230)"),

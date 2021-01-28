@@ -164,6 +164,8 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             value if value.is_null() => PrismaValue::Null,
             Value::Integer(Some(i)) => PrismaValue::Boolean(i != 0),
             Value::Boolean(Some(b)) => PrismaValue::Boolean(b),
+            Value::Bytes(Some(bytes)) if bytes.as_ref() == &[0u8] => PrismaValue::Boolean(false),
+            Value::Bytes(Some(bytes)) if bytes.as_ref() == &[1u8] => PrismaValue::Boolean(true),
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Enum(_) => match p_value {
