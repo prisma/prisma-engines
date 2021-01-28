@@ -119,6 +119,18 @@ impl PostgresDatamodelConnector {
     }
 }
 
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
+    (ScalarType::Int, PostgresType::Integer),
+    (ScalarType::BigInt, PostgresType::BigInt),
+    (ScalarType::Float, PostgresType::Decimal(Some((65, 30)))),
+    (ScalarType::Decimal, PostgresType::Decimal(Some((65, 30)))),
+    (ScalarType::Boolean, PostgresType::Boolean),
+    (ScalarType::String, PostgresType::Text),
+    (ScalarType::DateTime, PostgresType::Timestamp(Some(3))),
+    (ScalarType::Bytes, PostgresType::ByteA),
+    (ScalarType::Json, PostgresType::JSONB),
+];
+
 impl Connector for PostgresDatamodelConnector {
     fn name(&self) -> String {
         "Postgres".to_string()
@@ -128,6 +140,24 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+        let native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
+            .unwrap();
+
+        serde_json::to_value(native_type).expect("PostgresType to JSON failed")
+    }
+
+    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
+        let native_type: PostgresType = serde_json::from_value(native_type).expect("PostgresType from JSON failed");
+
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .any(|(st, nt)| scalar_type == st && &native_type == nt)
+    }
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(_scalar_type, native_type_instance) => {
@@ -157,7 +187,7 @@ impl Connector for PostgresDatamodelConnector {
         Ok(())
     }
 
-    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
         &self.constructors
     }
 

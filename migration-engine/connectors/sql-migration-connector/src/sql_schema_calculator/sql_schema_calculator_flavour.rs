@@ -4,8 +4,7 @@ mod postgres;
 mod sqlite;
 
 use datamodel::{walkers::ModelWalker, walkers::ScalarFieldWalker, Datamodel, FieldArity, ScalarType};
-use sql_schema_describer as sql;
-use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily};
+use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 
 pub(crate) trait SqlSchemaCalculatorFlavour {
     fn calculate_enums(&self, _datamodel: &Datamodel) -> Vec<sql::Enum> {

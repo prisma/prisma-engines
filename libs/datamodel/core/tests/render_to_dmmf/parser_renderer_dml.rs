@@ -1,5 +1,6 @@
 use crate::common::*;
 use datamodel::Datamodel;
+use indoc::indoc;
 use pretty_assertions::assert_eq;
 
 #[test]
@@ -246,22 +247,26 @@ model User {
 
 #[test]
 fn test_parser_renderer_native_types_via_dml() {
-    let input = r#"generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["nativeTypes"]
-}
+    // Here BigInt is not rendered because it is the default.
+    let input = indoc!(
+        r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
+        }
 
-datasource pg {
-  provider = "postgresql"
-  url      = "postgresql://"
-}
+        datasource pg {
+          provider = "postgresql"
+          url      = "postgresql://"
+        }
 
-model Blog {
-  id     Int    @id
-  bigInt BigInt @pg.BigInt
-  foobar String @pg.VarChar(12)
-}
-"#;
+        model Blog {
+          id     Int    @id
+          bigInt BigInt
+          foobar String @pg.VarChar(12)
+        }
+        "#
+    );
 
     let dml = parse(input);
 
@@ -272,6 +277,62 @@ model Blog {
     let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config);
 
     assert_eq!(rendered, input);
+}
+
+#[test]
+fn test_parser_renderer_native_types_with_default_mappings() {
+    let dm1 = indoc!(
+        r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        datasource pg {
+          provider = "postgresql"
+          url      = "postgresql://"
+        }
+
+        model Blog {
+          id     Int    @id
+          bigInt BigInt
+          defaultString String @pg.Text
+          defaultInt Int @pg.Integer
+          foobar String @pg.VarChar(12)
+          otherFloat Float @pg.Real
+        }
+        "#
+    );
+
+    let dm2 = indoc!(
+        r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        datasource pg {
+          provider = "postgresql"
+          url      = "postgresql://"
+        }
+
+        model Blog {
+          id            Int    @id
+          bigInt        BigInt
+          defaultString String
+          defaultInt    Int
+          foobar        String @pg.VarChar(12)
+          otherFloat    Float  @pg.Real
+        }
+        "#
+    );
+
+    let config = parse_configuration(dm1);
+    let dml = parse(dm1);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config);
+
+    println!("{}\n\n{}", rendered, dm2);
+    assert_eq!(rendered, dm2);
 }
 
 #[test]

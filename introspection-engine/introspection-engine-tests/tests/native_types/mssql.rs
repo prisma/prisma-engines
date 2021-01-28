@@ -74,11 +74,11 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 
     let types = indoc! {r#"
         model Blog {
-          id          Int      @id @default(autoincrement()) @sqlserver.Int
-          int         Int      @sqlserver.Int
+          id          Int      @id @default(autoincrement())
+          int         Int
           smallint    Int      @sqlserver.SmallInt
           tinyint     Int      @sqlserver.TinyInt
-          bigint      BigInt   @sqlserver.BigInt
+          bigint      BigInt
           decimal     Decimal  @sqlserver.Decimal(5, 3)
           decimal_2   Decimal  @sqlserver.Decimal(18, 0)
           numeric     Decimal  @sqlserver.Decimal(4, 1)
@@ -87,7 +87,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
           smallmoney  Float    @sqlserver.SmallMoney
           float       Float    @sqlserver.Real
           double      Float    @sqlserver.Float(53)
-          bit         Boolean  @sqlserver.Bit
+          bit         Boolean
           chars       String   @sqlserver.Char(10)
           nchars      String   @sqlserver.NChar(10)
           varchars    String   @sqlserver.VarChar(500)
@@ -96,11 +96,11 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
           nvarchars_2 String   @sqlserver.NVarChar(Max)
           binary      Bytes    @sqlserver.Binary(230)
           varbinary   Bytes    @sqlserver.VarBinary(150)
-          varbinary_2 Bytes    @sqlserver.VarBinary(Max)
+          varbinary_2 Bytes
           date        DateTime @sqlserver.Date
           time        DateTime @sqlserver.Time
           datetime    DateTime @sqlserver.DateTime
-          datetime2   DateTime @sqlserver.DateTime2
+          datetime2   DateTime
           xml         String   @sqlserver.Xml
           image       Bytes    @sqlserver.Image
           text        String   @sqlserver.Text

@@ -66,7 +66,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let (json, default) = match api {
-        _ if api.tags.contains(Tags::Mysql8) => ("Json     @mysql.Json", ""),
+        _ if api.tags.contains(Tags::Mysql8) => ("Json", ""),
         _ if api.tags.contains(Tags::Mariadb) => ("String   @mysql.LongText", "@default(now())"),
         _ => unreachable!(),
     };
@@ -85,17 +85,17 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 
     let types = formatdoc! {r#"
         model Blog {{
-            int                            Int      @mysql.Int
+            int                            Int
             unsignedint                    Int      @mysql.UnsignedInt
             smallint                       Int      @mysql.SmallInt
             unsignedsmallint               Int      @mysql.UnsignedSmallInt
             tinyint                        Int      @mysql.TinyInt
             unsignedtinyint                Int      @mysql.UnsignedTinyInt
-            tinyint_bool                   Boolean  @mysql.TinyInt
+            tinyint_bool                   Boolean
             mediumint                      Int      @mysql.MediumInt
             unsignedmediumint              Int      @mysql.UnsignedMediumInt
-            bigint                         BigInt   @mysql.BigInt
-            bigint_autoincrement           BigInt   @id  @default(autoincrement()) @mysql.BigInt
+            bigint                         BigInt
+            bigint_autoincrement           BigInt   @id  @default(autoincrement())
             unsignedbigint                 BigInt   @mysql.UnsignedBigInt
             decimal                        Decimal  @mysql.Decimal(5, 3)
             decimal_2                      Decimal  @mysql.Decimal(10, 0)
@@ -110,7 +110,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             tinyBlob                       Bytes    @mysql.TinyBlob
             blob                           Bytes    @mysql.Blob
             mediumBlob                     Bytes    @mysql.MediumBlob
-            longBlob                       Bytes    @mysql.LongBlob
+            longBlob                       Bytes
             tinytext                       String   @mysql.TinyText
             text                           String   @mysql.Text
             mediumText                     String   @mysql.MediumText
@@ -118,7 +118,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             date                           DateTime @mysql.Date
             timeWithPrecision              DateTime @mysql.Time(3)
             timeWithPrecision_no_precision DateTime @mysql.DateTime(0)
-            dateTimeWithPrecision          DateTime @mysql.DateTime(3)
+            dateTimeWithPrecision          DateTime
             timestampWithPrecision         DateTime {default} @mysql.Timestamp(3)
             year                           Int      @mysql.Year
             json                           {json}
