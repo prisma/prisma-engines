@@ -9,33 +9,6 @@ use crate::{constants::inputs::ordering, schema::*};
 use objects::*;
 use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
-/// Builds "<Model>OrderByInput" object types.
-pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let enum_type = Arc::new(string_enum_type(
-        "SortOrder",
-        vec![ordering::ASC.to_owned(), ordering::DESC.to_owned()],
-    ));
-    let ident = Identifier::new(format!("{}OrderByInput", model.name), PRISMA_NAMESPACE);
-
-    return_cached_input!(ctx, &ident);
-
-    let mut input_object = init_input_object_type(ident.clone());
-    input_object.allow_at_most_one_field();
-
-    let input_object = Arc::new(input_object);
-    ctx.cache_input_type(ident, input_object.clone());
-
-    let fields = model
-        .fields()
-        .scalar()
-        .iter()
-        .map(|sf| input_field(sf.name.clone(), InputType::Enum(enum_type.clone()), None).optional())
-        .collect();
-
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
-}
-
 fn map_scalar_input_type_for_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> InputType {
     map_scalar_input_type(ctx, &field.type_identifier, field.is_list)
 }

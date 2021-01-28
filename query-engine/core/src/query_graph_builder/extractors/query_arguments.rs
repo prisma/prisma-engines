@@ -67,28 +67,14 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
     Ok(finalize_arguments(query_args, model))
 }
 
-/// Extracts order by conditions in order of appearance, as defined in
+/// Extracts order by conditions in order of appearance.
 fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<OrderBy>> {
     match value {
         ParsedInputValue::List(list) => list
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-
-                match object.into_iter().next() {
-                    None => Ok(None),
-                    Some((field_name, sort_order)) => {
-                        let field = model.fields().find_from_scalar(&field_name)?;
-                        let value: PrismaValue = sort_order.try_into()?;
-                        let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                            ordering::ASC => SortOrder::Ascending,
-                            ordering::DESC => SortOrder::Descending,
-                            _ => unreachable!(),
-                        };
-
-                        Ok(Some(OrderBy::new(field, sort_order)))
-                    }
-                }
+                Ok(process_order_object(model, object)?)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().filter_map(identity).collect()),
@@ -103,8 +89,6 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
 }
 
 fn process_order_object(model: &ModelRef, object: ParsedInputMap) -> QueryGraphBuilderResult<Option<OrderBy>> {
-    // let object: ParsedInputMap = list_value.try_into()?;
-
     match object.into_iter().next() {
         None => Ok(None),
         Some((field_name, sort_order)) => {
@@ -116,7 +100,7 @@ fn process_order_object(model: &ModelRef, object: ParsedInputMap) -> QueryGraphB
                 _ => unreachable!(),
             };
 
-            Ok(Some(OrderBy::new(field, sort_order)))
+            Ok(Some(OrderBy::new(field, None, sort_order)))
         }
     }
 }
