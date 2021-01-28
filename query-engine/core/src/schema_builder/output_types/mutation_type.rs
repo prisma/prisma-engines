@@ -15,7 +15,11 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
             if model.supports_create_operation {
                 vec.push(create_item_field(ctx, &model));
+
                 append_opt(&mut vec, upsert_item_field(ctx, &model));
+                if feature_flags::get().createMany {
+                    append_opt(&mut vec, create_many_field(ctx, &model));
+                }
             }
 
             append_opt(&mut vec, delete_item_field(ctx, &model));
@@ -23,10 +27,6 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
             vec.push(update_many_field(ctx, &model));
             vec.push(delete_many_field(ctx, &model));
-
-            if feature_flags::get().createMany {
-                append_opt(&mut vec, create_many_field(ctx, &model));
-            }
 
             vec
         })

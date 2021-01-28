@@ -88,7 +88,7 @@ fn relation_with_unsupported_fk_fields_should_be_filtered_from_input_output_type
         model Post {
           id                Int                              @id @default(autoincrement())
           /// This type is currently not supported.
-          unsupported_field  Unsupported("X") @default(dbgenerated("$defaultPerConnector"))
+          unsupported_field  Unsupported("X") @default(dbgenerated("X"))
           user              User                             @relation(fields: [unsupported_field], references: [balance])
         }
 
@@ -105,11 +105,17 @@ fn relation_with_unsupported_fk_fields_should_be_filtered_from_input_output_type
     let input_types = dmmf.schema.input_object_types.get(PRISMA_NAMESPACE).unwrap();
 
     for o in output_types {
-        iterate_output_type_fields(o, &dmmf, &|field, _| assert_ne!(field.name, "user"))
+        iterate_output_type_fields(o, &dmmf, &|field, _| {
+            assert_ne!(field.name, "user");
+            assert_ne!(field.name, "post");
+        })
     }
 
     for o in input_types {
-        iterate_input_type_fields(o, &dmmf, &|_, field, _| assert_ne!(field.name, "user"))
+        iterate_input_type_fields(o, &dmmf, &|_, field, _| {
+            assert_ne!(field.name, "user");
+            assert_ne!(field.name, "post");
+        })
     }
 }
 
@@ -127,13 +133,13 @@ fn no_find_unique_when_model_only_has_unsupported_index_or_compound() {
           /// This type is currently not supported.
           unsupported_index_a  Unsupported("X")  @id
           unsupported_index_c  Unsupported("X")  @unique
-          unsupported_index_d  Unsupported("X")  @unique @default(dbgenerated("$defaultPerConnector"))
+          unsupported_index_d  Unsupported("X")  @unique @default(dbgenerated("X"))
         }
 
         model ItemB {
           id                Int
           /// This type is currently not supported.
-          unsupported_index_a  Unsupported("X")  @id @default(dbgenerated("$defaultPerConnector"))
+          unsupported_index_a  Unsupported("X")  @id @default(dbgenerated("X"))
         }
         
         model ItemC {
@@ -194,14 +200,20 @@ fn no_create_or_upsert_should_exist_with_unsupported_field_without_default_value
 
     let field_names: Vec<&str> = mutation_type.fields.iter().map(|f| f.name.as_str()).collect();
 
-    let unsupported_ops: [&str; 2] = ["createOne", "upsertOne"];
+    let unsupported_ops: [&str; 3] = ["createOne", "createMany", "upsertOne"];
     unsupported_ops.iter().for_each(|op| {
-        assert!(field_names.contains(&format!("{}Item", *op).as_str()) == false);
+        assert!(
+            field_names.contains(&format!("{}Item", *op).as_str()) == false,
+            format!("operation '{}' should not be supported", op)
+        );
     });
 
     let supported_ops: [&str; 4] = ["deleteOne", "deleteMany", "updateOne", "updateMany"];
     supported_ops.iter().for_each(|op| {
-        assert!(field_names.contains(&format!("{}Item", *op).as_str()));
+        assert!(
+            field_names.contains(&format!("{}Item", *op).as_str()),
+            format!("operation '{}' should be supported", op)
+        );
     });
 }
 
