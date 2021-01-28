@@ -15,6 +15,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  int      Int    @test.Integer
         |  sInt     Int    @test.SmallInt
         |  bInt     BigInt @test.BigInt
+        |  oid      Int    @test.Oid
         |  inc_int  Int    @test.Integer     @default(autoincrement())
         |  inc_sInt Int    @test.SmallInt    @default(autoincrement())
         |  inc_bInt BigInt @test.BigInt      @default(autoincrement())
@@ -31,11 +32,13 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |      int: 2147483647
          |      sInt: 32767
          |      bInt: "9223372036854775807"
+         |      oid: 0
          |    }
          |  ) {
          |    int
          |    sInt
          |    bInt
+         |    oid
          |    inc_int
          |    inc_sInt
          |    inc_bInt
@@ -46,7 +49,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     )
 
     res.toString should be(
-      """{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"bInt":"9223372036854775807","inc_int":1,"inc_sInt":1,"inc_bInt":"1"}}}""")
+      """{"data":{"createOneModel":{"int":2147483647,"sInt":32767,"bInt":"9223372036854775807","oid":0,"inc_int":1,"inc_sInt":1,"inc_bInt":"1"}}}""")
   }
 
   "Postgres native decimal types" should "work" in {
@@ -57,6 +60,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  float    Float   @test.Real
         |  dfloat   Float   @test.DoublePrecision
         |  decFloat Decimal @test.Decimal(2, 1)
+        |  money    Decimal @test.Money
         |}"""
     }
 
@@ -70,11 +74,13 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
        |      float: 1.1
        |      dfloat: 2.2
        |      decFloat: 3.1234
+       |      money: 3.51
        |    }
        |  ) {
        |    float
        |    dfloat
        |    decFloat
+       |    money
        |  }
        |}""".stripMargin,
       project,
@@ -82,7 +88,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     )
 
     // decFloat is cut due to precision
-    res.toString should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"decFloat":"3.1"}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"decFloat":"3.1","money":"3.51"}}}""")
   }
 
   "Postgres native string types" should "work" in {
@@ -96,6 +102,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
         |  bit   String @test.Bit(4)
         |  vBit  String @test.VarBit(5)
         |  uuid  String @test.Uuid
+        |  ip    String @test.Inet
         |}"""
     }
 
@@ -112,6 +119,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
        |      bit: "1010"
        |      vBit: "00110"
        |      uuid: "123e4567-e89b-12d3-a456-426614174000"
+       |      ip: "127.0.0.1"
        |    }
        |  ) {
        |    char
@@ -120,6 +128,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
        |    bit
        |    vBit
        |    uuid
+       |    ip
        |  }
        |}""".stripMargin,
       project,
@@ -127,7 +136,7 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     )
 
     res.toString should be(
-      """{"data":{"createOneModel":{"char":"1234567890","vChar":"12345678910","text":"text","bit":"1010","vBit":"00110","uuid":"123e4567-e89b-12d3-a456-426614174000"}}}""")
+      """{"data":{"createOneModel":{"char":"1234567890","vChar":"12345678910","text":"text","bit":"1010","vBit":"00110","uuid":"123e4567-e89b-12d3-a456-426614174000","ip":"127.0.0.1"}}}""")
   }
 
   "Other Postgres native types" should "work" in {

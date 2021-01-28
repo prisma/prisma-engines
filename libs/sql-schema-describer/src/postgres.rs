@@ -683,12 +683,12 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "int2" | "_int2" => (Int, Some(PostgresType::SmallInt)),
         "int4" | "_int4" => (Int, Some(PostgresType::Integer)),
         "int8" | "_int8" => (BigInt, Some(PostgresType::BigInt)),
-        "oid" | "_oid" => (Int, None), //todo revisit these
+        "oid" | "_oid" => (Int, Some(PostgresType::Oid)),
         "float4" | "_float4" => (Float, Some(PostgresType::Real)),
         "float8" | "_float8" => (Float, Some(PostgresType::DoublePrecision)),
         "bool" | "_bool" => (Boolean, Some(PostgresType::Boolean)),
         "text" | "_text" => (String, Some(PostgresType::Text)),
-        "citext" | "_citext" => (String, None), //todo revisit these
+        "citext" | "_citext" => (String, Some(PostgresType::Citext)),
         "varchar" | "_varchar" => (String, Some(PostgresType::VarChar(precision.character_maximum_length))),
         "bpchar" | "_bpchar" => (String, Some(PostgresType::Char(precision.character_maximum_length))),
         "date" | "_date" => (DateTime, Some(PostgresType::Date)),
@@ -710,7 +710,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
                 },
             )),
         ),
-        "money" | "_money" => unsupported_type(), //todo revisit these
+        "money" | "_money" => (Decimal, Some(PostgresType::Money)),
         "pg_lsn" | "_pg_lsn" => unsupported_type(),
         "time" | "_time" => (DateTime, Some(PostgresType::Time(precision.time_precision))),
         "timetz" | "_timetz" => (DateTime, Some(PostgresType::Timetz(precision.time_precision))),
@@ -719,7 +719,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         "tsquery" | "_tsquery" => unsupported_type(),
         "tsvector" | "_tsvector" => unsupported_type(),
         "txid_snapshot" | "_txid_snapshot" => unsupported_type(),
-        "inet" | "_inet" => (String, None), //todo revisit these
+        "inet" | "_inet" => (String, Some(PostgresType::Inet)),
         //geometric
         "box" | "_box" => unsupported_type(),
         "circle" | "_circle" => unsupported_type(),
