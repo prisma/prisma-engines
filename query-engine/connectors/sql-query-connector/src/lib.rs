@@ -8,6 +8,7 @@ mod query_arguments_ext;
 mod query_builder;
 mod query_ext;
 mod row;
+mod sql_info;
 
 use column_metadata::*;
 use filter_conversion::*;

@@ -69,6 +69,18 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
+    async fn create_records(
+        &self,
+        model: &ModelRef,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+    ) -> crate::Result<usize> {
+        match self {
+            Self::Connection(c) => c.create_records(model, args, skip_duplicates).await,
+            Self::Transaction(tx) => tx.create_records(model, args, skip_duplicates).await,
+        }
+    }
+
     async fn update_records(
         &self,
         model: &ModelRef,

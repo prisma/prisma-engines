@@ -34,6 +34,7 @@ pub fn connect_nested_query(
     for (field_name, value) in data_map {
         match field_name.as_str() {
             operations::CREATE => nested_create(graph, parent, &parent_relation_field, value, &child_model)?,
+            operations::CREATE_MANY => nested_create_many(graph, parent, &parent_relation_field, value, &child_model)?,
             operations::UPDATE => nested_update(graph, &parent, &parent_relation_field, value, &child_model)?,
             operations::UPSERT => nested_upsert(graph, parent, &parent_relation_field, value)?,
             operations::DELETE => nested_delete(graph, &parent, &parent_relation_field, value, &child_model)?,

@@ -1,6 +1,7 @@
 use crate::constants::inputs::args;
 
 use super::*;
+use datamodel_connector::ConnectorCapability;
 use input_types::input_fields;
 use prisma_models::{dml, PrismaValue};
 
@@ -18,6 +19,10 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
             vec.push(update_many_field(ctx, &model));
             vec.push(delete_many_field(ctx, &model));
+
+            if feature_flags::get().createMany {
+                append_opt(&mut vec, create_many_field(ctx, &model));
+            }
 
             vec
         })
@@ -45,19 +50,25 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
     while !(nested_create_inputs_queue.is_empty() && nested_update_inputs_queue.is_empty()) {
         // Create inputs.
         for (input_object, rf) in nested_create_inputs_queue.drain(..) {
-            let mut fields = vec![input_fields::nested_create_input_field(ctx, &rf)];
-            let nested_connect = input_fields::nested_connect_input_field(ctx, &rf);
-            append_opt(&mut fields, nested_connect);
+            let mut fields = vec![input_fields::nested_create_one_input_field(ctx, &rf)];
 
-            let nested_connect_or_create = input_fields::nested_connect_or_create_field(ctx, &rf);
-            append_opt(&mut fields, nested_connect_or_create);
+            append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
+            append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
+
+            if feature_flags::get().createMany {
+                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+            }
 
             input_object.set_fields(fields);
         }
 
         // Update inputs.
         for (input_object, rf) in nested_update_inputs_queue.drain(..) {
-            let mut fields = vec![input_fields::nested_create_input_field(ctx, &rf)];
+            let mut fields = vec![input_fields::nested_create_one_input_field(ctx, &rf)];
+
+            if feature_flags::get().createMany {
+                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+            }
 
             append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_set_input_field(ctx, &rf));
@@ -119,7 +130,7 @@ fn create_query_raw_field() -> OutputField {
 
 /// Builds a create mutation field (e.g. createUser) for given model.
 fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::create_arguments(ctx, model).unwrap_or_else(Vec::new);
+    let args = arguments::create_one_arguments(ctx, model).unwrap_or_else(Vec::new);
     let field_name = ctx.pluralize_internal(format!("create{}", model.name), format!("createOne{}", model.name));
 
     field(
@@ -135,7 +146,7 @@ fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
 
 /// Builds a delete mutation field (e.g. deleteUser) for given model.
 fn delete_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
-    arguments::delete_arguments(ctx, model).map(|args| {
+    arguments::delete_one_arguments(ctx, model).map(|args| {
         let field_name = ctx.pluralize_internal(format!("delete{}", model.name), format!("deleteOne{}", model.name));
 
         field(
@@ -162,7 +173,7 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     field(
         field_name,
         arguments,
-        OutputType::object(output_objects::batch_payload_object_type(ctx)),
+        OutputType::object(output_objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::DeleteMany,
@@ -172,7 +183,7 @@ fn delete_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
 
 /// Builds an update mutation field (e.g. updateUser) for given model.
 fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
-    arguments::update_arguments(ctx, model).map(|args| {
+    arguments::update_one_arguments(ctx, model).map(|args| {
         let field_name = ctx.pluralize_internal(format!("update{}", model.name), format!("updateOne{}", model.name));
 
         field(
@@ -188,6 +199,26 @@ fn update_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
     })
 }
 
+/// Builds a create many mutation field (e.g. createManyUsers) for given model.
+fn create_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<OutputField> {
+    let arguments = arguments::create_many_arguments(ctx, model);
+    let field_name = format!("createMany{}", model.name);
+
+    if ctx.capabilities.contains(ConnectorCapability::CreateMany) {
+        Some(field(
+            field_name,
+            arguments,
+            OutputType::object(output_objects::affected_records_object_type(ctx)),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::CreateMany,
+            }),
+        ))
+    } else {
+        None
+    }
+}
+
 /// Builds an update many mutation field (e.g. updateManyUsers) for given model.
 fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let arguments = arguments::update_many_arguments(ctx, model);
@@ -199,7 +230,7 @@ fn update_many_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField 
     field(
         field_name,
         arguments,
-        OutputType::object(output_objects::batch_payload_object_type(ctx)),
+        OutputType::object(output_objects::affected_records_object_type(ctx)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::UpdateMany,

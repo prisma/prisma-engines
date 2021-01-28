@@ -33,6 +33,49 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
     )
 }
 
+/// `INSERT` new records into the database based on the given write arguments,
+/// where each `WriteArg` in the Vec is one row.
+pub fn create_records(model: &ModelRef, args: Vec<WriteArgs>, skip_duplicates: bool) -> Insert<'static> {
+    // We need to bring all write args into a uniform shape.
+    // The easiest way to do this is to take go over all fields of the batch and apply the following:
+    // All fields that have a default but are not explicitly provided are inserted with `DEFAULT`.
+    let fields = model.fields().scalar();
+
+    let values: Vec<_> = args
+        .into_iter()
+        .map(|mut arg| {
+            let mut row: Vec<Expression> = Vec::with_capacity(fields.len());
+
+            for field in fields.iter() {
+                let value = arg.take_field_value(field.db_name());
+                match value {
+                    Some(expr) => {
+                        let value: PrismaValue = expr
+                            .try_into()
+                            .expect("Create calls can only use PrismaValue write expressions (right now).");
+
+                        row.push(field.value(value).into());
+                    }
+
+                    None => row.push(default_value()),
+                }
+            }
+
+            row
+        })
+        .collect();
+
+    let insert = Insert::multi_into(model.as_table(), fields.as_columns());
+    let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
+    let insert: Insert = insert.into();
+
+    if skip_duplicates {
+        insert.on_conflict(OnConflict::DoNothing)
+    } else {
+        insert
+    }
+}
+
 pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());

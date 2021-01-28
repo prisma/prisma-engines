@@ -12,6 +12,7 @@ pub async fn execute<'a, 'b>(
 ) -> InterpretationResult<QueryResult> {
     match write_query {
         WriteQuery::CreateRecord(q) => create_one(tx, q).await,
+        WriteQuery::CreateManyRecords(q) => create_many(tx, q).await,
         WriteQuery::UpdateRecord(q) => update_one(tx, q).await,
         WriteQuery::DeleteRecord(q) => delete_one(tx, q).await,
         WriteQuery::UpdateManyRecords(q) => update_many(tx, q).await,
@@ -47,6 +48,15 @@ async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> 
     let res = tx.create_record(&q.model, q.args).await?;
 
     Ok(QueryResult::Id(Some(res)))
+}
+
+async fn create_many<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    q: CreateManyRecords,
+) -> InterpretationResult<QueryResult> {
+    let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates).await?;
+
+    Ok(QueryResult::Count(affected_records))
 }
 
 async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
