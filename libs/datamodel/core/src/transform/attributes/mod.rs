@@ -2,6 +2,7 @@ mod attribute_list_validator;
 mod attribute_validator;
 mod default;
 mod id;
+mod ignore;
 mod map;
 mod relation;
 mod unique_and_index;
@@ -52,6 +53,7 @@ fn new_builtin_model_attributes() -> AttributeListValidator<dml::Model> {
     validator.add(Box::new(unique_and_index::ModelLevelUniqueAttributeValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelIndexAttributeValidator {}));
     validator.add(Box::new(map::MapAttributeValidator {}));
+    validator.add(Box::new(ignore::IgnoreAttributeValidator {}));
 
     validator
 }

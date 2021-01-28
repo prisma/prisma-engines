@@ -61,6 +61,61 @@ async fn a_table_without_uniques(api: &TestApi) -> crate::TestResult {
 }
 
 #[test_each_connector]
+async fn a_table_without_uniques_using_native_types_should_ignore(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("user_id", types::integer().nullable(false));
+                t.add_foreign_key(&["user_id"], "User", &["id"]);
+            });
+        })
+        .await?;
+
+    let dm = if api.sql_family().is_mysql() {
+        indoc! {r#"
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model Post {
+              id      Int
+              user_id Int
+              User    User @relation(fields: [user_id], references: [id])
+
+              @@index([user_id], name: "user_id")
+              @@ignore
+            }
+
+            model User {
+              id      Int    @id @default(autoincrement())
+              // Post Post[]
+            }
+        "#}
+    } else {
+        indoc! {r#"
+            /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model Post {
+              id      Int
+              user_id Int
+              User    User @relation(fields: [user_id], references: [id])
+            
+              @@ignore
+            }
+
+            model User {
+              id      Int    @id @default(autoincrement())
+              // Post Post[]
+            }
+        "#}
+    };
+
+    assert_eq!(dm, &api.introspect_with_native_types().await?);
+
+    Ok(())
+}
+
+#[test_each_connector]
 async fn a_table_without_required_uniques(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {

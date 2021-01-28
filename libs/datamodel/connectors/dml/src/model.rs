@@ -1,6 +1,6 @@
 use crate::field::{Field, FieldType, RelationField, ScalarField};
 use crate::scalars::ScalarType;
-use crate::traits::{WithDatabaseName, WithName};
+use crate::traits::{Ignorable, WithDatabaseName, WithName};
 
 /// Represents a model in a prisma schema.
 #[derive(Debug, PartialEq, Clone)]
@@ -23,6 +23,8 @@ pub struct Model {
     pub is_generated: bool,
     /// Indicates if this model has to be commented out.
     pub is_commented_out: bool,
+    /// Indicates if this model has to be ignored by the Client.
+    pub is_ignored: bool,
 }
 
 /// Represents an index defined via `@@index` or `@@unique`.
@@ -70,6 +72,7 @@ impl Model {
             is_embedded: false,
             is_generated: false,
             is_commented_out: false,
+            is_ignored: false,
         }
     }
 
@@ -337,5 +340,11 @@ impl WithDatabaseName for Model {
 
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
+    }
+}
+
+impl Ignorable for Model {
+    fn is_ignored(&self) -> bool {
+        self.is_ignored
     }
 }

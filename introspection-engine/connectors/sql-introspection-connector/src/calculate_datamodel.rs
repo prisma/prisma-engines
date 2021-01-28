@@ -99,6 +99,7 @@ mod tests {
                 is_embedded: false,
                 is_generated: false,
                 is_commented_out: true,
+                is_ignored:false,
                 indices: vec![],
                 id_fields: vec![],
                 fields: col_types
@@ -172,6 +173,7 @@ mod tests {
                 documentation: None,
                 is_embedded: false,
                 is_commented_out: false,
+                is_ignored: false,
                 fields: vec![
                     Field::ScalarField(ScalarField::new(
                         "optional",
@@ -253,6 +255,7 @@ mod tests {
                 documentation: None,
                 is_embedded: false,
                 is_commented_out: false,
+                is_ignored: false,
                 fields: vec![
                     Field::ScalarField(ScalarField::new(
                         "no_default",
@@ -386,6 +389,7 @@ mod tests {
                     documentation: None,
                     is_embedded: false,
                     is_commented_out: false,
+                    is_ignored: false,
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
@@ -410,6 +414,7 @@ mod tests {
                     documentation: None,
                     is_embedded: false,
                     is_commented_out: false,
+                    is_ignored: false,
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
@@ -434,6 +439,7 @@ mod tests {
                     documentation: None,
                     is_embedded: false,
                     is_commented_out: false,
+                    is_ignored: false,
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
@@ -541,6 +547,7 @@ mod tests {
                 documentation: None,
                 is_embedded: false,
                 is_commented_out: false,
+                is_ignored: false,
                 fields: vec![
                     Field::ScalarField(ScalarField::new(
                         "non_unique",
@@ -612,6 +619,7 @@ mod tests {
                     documentation: None,
                     is_embedded: false,
                     is_commented_out: false,
+                    is_ignored: false,
                     fields: vec![
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
@@ -653,6 +661,7 @@ mod tests {
                     documentation: None,
                     is_embedded: false,
                     is_commented_out: false,
+                    is_ignored: false,
                     fields: vec![
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
@@ -821,6 +830,7 @@ mod tests {
                 documentation: None,
                 is_embedded: false,
                 is_commented_out: false,
+                is_ignored: false,
                 fields: vec![
                     Field::ScalarField(ScalarField {
                         name: "id".to_string(),
@@ -926,6 +936,7 @@ mod tests {
                     documentation: None,
                     is_embedded: false,
                     is_commented_out: false,
+                    is_ignored: false,
                     fields: vec![
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
@@ -967,6 +978,7 @@ mod tests {
                     documentation: None,
                     is_embedded: false,
                     is_commented_out: false,
+                    is_ignored: false,
                     fields: vec![
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
