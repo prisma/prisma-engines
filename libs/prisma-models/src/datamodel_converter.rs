@@ -376,16 +376,6 @@ impl ModelConverterUtilities for dml::Model {
             })
     }
 
-    fn is_compound_index_supported(&self, index: &dml::IndexDefinition) -> bool {
-        index
-            .fields
-            .iter()
-            .all(|field_name| match self.find_field(field_name).unwrap() {
-                dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
-                dml::Field::RelationField(_) => true,
-            })
-    }
-
     fn supports_create_operation(&self) -> bool {
         let has_unsupported_field = self.fields.iter().any(|field| match field {
             dml::Field::ScalarField(sf) => {
@@ -408,17 +398,18 @@ impl ModelConverterUtilities for dml::Model {
         })
     }
 
-    fn has_supported_compound_index(&self) -> bool {
-        self.indices.iter().any(|index| {
-            index.fields.iter().any(|field_name| {
-                let field = self.find_field(field_name).unwrap();
-
-                match field {
-                    dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
-                    dml::Field::RelationField(_) => false,
-                }
+    fn is_compound_index_supported(&self, index: &dml::IndexDefinition) -> bool {
+        index
+            .fields
+            .iter()
+            .all(|field_name| match self.find_field(field_name).unwrap() {
+                dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
+                dml::Field::RelationField(_) => true,
             })
-        })
+    }
+
+    fn has_supported_compound_index(&self) -> bool {
+        self.indices.iter().any(|index| self.is_compound_index_supported(index))
     }
 }
 
