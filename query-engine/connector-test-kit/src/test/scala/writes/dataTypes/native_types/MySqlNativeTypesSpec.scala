@@ -235,6 +235,7 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
         |model Model {
         |  id   String  @id @default(cuid())
         |  tInt Boolean @test.TinyInt
+        |  bit  Boolean @test.Bit(1)
         |}"""
     }
 
@@ -246,15 +247,17 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
          |  createOneModel(
          |    data: {
          |      tInt: true
+         |      bit: true
          |    }
          |  ) {
          |    tInt
+         |    bit
          |  }
          |}""".stripMargin,
       project,
       legacy = false
     )
 
-    res.toString should be("""{"data":{"createOneModel":{"tInt":true}}}""")
+    res.toString should be("""{"data":{"createOneModel":{"tInt":true,"bit":true}}}""")
   }
 }

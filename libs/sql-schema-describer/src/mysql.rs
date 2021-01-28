@@ -608,6 +608,10 @@ impl SqlSchemaDescriber {
                 Some(MySqlType::Timestamp(precision.time_precision)),
             ),
             "year" => (ColumnTypeFamily::Int, Some(MySqlType::Year)),
+            "bit" if precision.numeric_precision == Some(1) => (
+                ColumnTypeFamily::Boolean,
+                Some(MySqlType::Bit(precision.numeric_precision.unwrap())),
+            ),
             //01100010 01101001 01110100 01110011 00100110 01100010 01111001 01110100 01100101 01110011 00001010
             "bit" => (
                 ColumnTypeFamily::Binary,

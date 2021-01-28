@@ -86,7 +86,7 @@ impl MySqlDatamodelConnector {
         let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
         let float = NativeTypeConstructor::without_args(FLOAT_TYPE_NAME, vec![ScalarType::Float]);
         let double = NativeTypeConstructor::without_args(DOUBLE_TYPE_NAME, vec![ScalarType::Float]);
-        let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, vec![ScalarType::Bytes]);
+        let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, vec![ScalarType::Boolean, ScalarType::Bytes]);
         let char = NativeTypeConstructor::with_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
         let var_char = NativeTypeConstructor::with_args(VAR_CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
         let binary = NativeTypeConstructor::with_args(BINARY_TYPE_NAME, 1, vec![ScalarType::Bytes]);
@@ -159,7 +159,7 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
-            FieldType::NativeType(_, native_type_instance) => {
+            FieldType::NativeType(scalar_type, native_type_instance) => {
                 let native_type_name = native_type_instance.name.as_str();
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
                 let error = self.native_instance_error(native_type_instance.clone());
@@ -184,6 +184,9 @@ impl Connector for MySqlDatamodelConnector {
                     }
                     VarChar(length) if length > 65535 => {
                         error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.")
+                    }
+                    Bit(n) if n > 1 && scalar_type.is_boolean() => {
+                        error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.".into())
                     }
                     _ if field.is_unique() && incompatible_with_key => error.new_incompatible_native_type_with_unique(),
                     _ if field.is_id() && incompatible_with_key => error.new_incompatible_native_type_with_id(),
