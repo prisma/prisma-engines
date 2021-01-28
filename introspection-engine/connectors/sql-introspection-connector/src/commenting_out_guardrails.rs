@@ -109,7 +109,11 @@ pub fn commenting_out_guardrails(
         .filter(|model| !models_without_columns.iter().any(|m| m.model == model.name))
     {
         if model.strict_unique_criterias_disregarding_unsupported().is_empty() {
-            model.is_ignored = true;
+            if native_types_enabled {
+                model.is_ignored = true;
+            } else {
+                model.is_commented_out = true;
+            }
             model.documentation = Some(
                 "The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client."
                     .to_string(),

@@ -160,7 +160,11 @@ pub(crate) fn calculate_scalar_field(
     let (is_commented_out, documentation) = match &field_type {
         FieldType::Unsupported(_) => (
             false,
-            Some("This type is currently not supported by the Prisma Client.".to_string()),
+            if native_types {
+                None
+            } else {
+                Some("This type is currently not supported by the Prisma Client.".to_string())
+            },
         ),
         _ => (false, None),
     };

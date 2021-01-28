@@ -25,7 +25,7 @@ async fn a_table_without_uniques(api: &TestApi) -> crate::TestResult {
 
     let dm = if api.sql_family().is_mysql() {
         indoc! {r#"
-            // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+            // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
             // model Post {
               // id      Int
               // user_id Int
@@ -41,7 +41,7 @@ async fn a_table_without_uniques(api: &TestApi) -> crate::TestResult {
         "#}
     } else {
         indoc! {r#"
-            // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+            // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
             // model Post {
               // id      Int
               // user_id Int
@@ -127,7 +127,7 @@ async fn a_table_without_required_uniques(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let dm = indoc! {r#"
-        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         // model Post {
           // id         Int
           // opt_unique Int? @unique
@@ -157,7 +157,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate:
         .await?;
 
     let dm = indoc! {r#"
-        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         // model Post {
           // id         Int
           // opt_unique Int?
@@ -249,7 +249,6 @@ async fn unsupported_type_with_native_types_keeps_its_usages(api: &TestApi) -> c
         modelTest{
             id          Int     @unique
             dummy       Int
-            ///This type is currently not supported by the Prisma Client.
             broken Unsupported("macaddr")
         
             @@id([broken, dummy])
@@ -280,7 +279,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
     let expected = json!([
         {
             "code": 1,
-            "message": "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by Prisma.",
+            "message": "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
             "affected": [{
                 "model": "Test"
             }]
@@ -299,7 +298,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult
     assert_eq_json!(expected, api.introspection_warnings().await?);
 
     let dm = indoc! {r#"
-        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
+        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
         // model Test {
           // dummy       Int
           // This type is currently not supported by the Prisma Client.
@@ -329,7 +328,7 @@ async fn a_table_with_only_an_unsupported_id_with_native_types_is_still_invalid(
     let expected = json!([
         {
             "code": 1,
-            "message": "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by Prisma.",
+            "message": "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
             "affected": [{
                 "model": "Test"
             }]
@@ -348,12 +347,13 @@ async fn a_table_with_only_an_unsupported_id_with_native_types_is_still_invalid(
     assert_eq_json!(expected, api.introspection_warnings().await?);
 
     let dm = indoc! {r#"
-        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled.
-        // model Test {
-          // dummy       Int
-          /// This type is currently not supported by the Prisma Client.
-          // network_mac Unsupported("macaddr") @id @default(dbgenerated("'08:00:2b:01:02:03'::macaddr"))
-        // }
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Test {
+          dummy       Int
+          network_mac Unsupported("macaddr") @id @default(dbgenerated("'08:00:2b:01:02:03'::macaddr"))
+        
+          @@ignore
+        }
     "#};
 
     assert_eq!(dm, &api.introspect_with_native_types().await?);
@@ -380,15 +380,13 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::T
     let dm = indoc! {r#"
             model Post {
               id            Int                     @id @default(autoincrement())
-              /// This type is currently not supported by the Prisma Client.
               user_balance  Unsupported("money")
               User          User                    @relation(fields: [user_balance], references: [balance])
             }
                     
             model User {
               id            Int                     @id @default(autoincrement())
-              /// This type is currently not supported by the Prisma Client.
-              balance       Unsupported("money")  @unique
+              balance       Unsupported("money")    @unique
               Post          Post[]
             }                
         "#};
