@@ -144,7 +144,7 @@ fn non_list_scalar_update_field_mapper(
         TypeIdentifier::UUID => InputType::object(operations_object_type(ctx, "Uuid", field, false)),
         TypeIdentifier::Xml => InputType::object(operations_object_type(ctx, "Xml", field, false)),
         TypeIdentifier::Bytes => InputType::object(operations_object_type(ctx, "Bytes", field, false)),
-        TypeIdentifier::Unsupported => panic!("No unsupported field should reach that path"),
+        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
     let input_field = if field.type_identifier != TypeIdentifier::Json {

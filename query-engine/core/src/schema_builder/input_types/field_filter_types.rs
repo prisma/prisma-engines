@@ -165,7 +165,7 @@ fn full_scalar_filter_type(
         TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
             .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
             .collect(),
-        TypeIdentifier::Unsupported => panic!("No unsupported field should reach that path"),
+        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
     // Shorthand `not equals` filter, skips the nested object filter.
@@ -300,7 +300,7 @@ fn scalar_filter_name(
         TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}{}Filter", nested, e, nullable, list, aggregates),
         TypeIdentifier::Xml => format!("{}Xml{}{}{}Filter", nested, nullable, list, aggregates),
         TypeIdentifier::Bytes => format!("{}Bytes{}{}{}Filter", nested, nullable, list, aggregates),
-        TypeIdentifier::Unsupported => panic!("No unsupported field should reach that path"),
+        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     }
 }
 
