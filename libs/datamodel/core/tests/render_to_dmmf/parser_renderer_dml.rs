@@ -1,6 +1,5 @@
-extern crate datamodel;
-use self::datamodel::Datamodel;
 use crate::common::*;
+use datamodel::Datamodel;
 use pretty_assertions::assert_eq;
 
 #[test]
