@@ -9,14 +9,16 @@ impl From<my::Error> for Error {
             my::Error::Io(io_error) => Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
             my::Error::Driver(e) => Error::builder(ErrorKind::QueryError(e.into())).build(),
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1062 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
+                let constraint = message
+                    .split_whitespace()
+                    .last()
+                    .and_then(|s| s.split('\'').nth(1))
+                    .map(ToString::to_string)
+                    .map(DatabaseConstraint::Index)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let index = splitted[1].split('.').last().unwrap().to_string();
-
-                let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Index(index),
-                });
+                let kind = ErrorKind::UniqueConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
@@ -24,14 +26,15 @@ impl From<my::Error> for Error {
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1451 || code == 1452 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[17].split('`').collect();
+                let constraint = message
+                    .split_whitespace()
+                    .nth(17)
+                    .and_then(|s| s.split('`').nth(1))
+                    .map(|s| DatabaseConstraint::fields(Some(s)))
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let field = splitted[1].to_string();
-
-                let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(vec![field]),
-                });
+                let kind = ErrorKind::ForeignKeyConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
@@ -39,12 +42,16 @@ impl From<my::Error> for Error {
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1263 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
+                let constraint = message
+                    .split_whitespace()
+                    .last()
+                    .and_then(|s| s.split('\'').nth(1))
+                    .map(ToString::to_string)
+                    .map(DatabaseConstraint::Index)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let mut builder = Error::builder(ErrorKind::NullConstraintViolation {
-                    constraint: DatabaseConstraint::Index(splitted[1].to_string()),
-                });
+                let kind = ErrorKind::NullConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
@@ -62,12 +69,15 @@ impl From<my::Error> for Error {
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1364 || code == 1048 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.get(1).map(|s| s.split('\'').collect()).unwrap();
+                let constraint = message
+                    .split_whitespace()
+                    .nth(1)
+                    .and_then(|s| s.split('\'').nth(1))
+                    .map(|s| DatabaseConstraint::fields(Some(s)))
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let mut builder = Error::builder(ErrorKind::NullConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(vec![splitted[1].to_string()]),
-                });
+                let kind = ErrorKind::NullConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
@@ -75,11 +85,14 @@ impl From<my::Error> for Error {
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1049 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
-                let db_name: String = splitted[1].into();
+                let db_name = message
+                    .split_whitespace()
+                    .last()
+                    .and_then(|s| s.split('\'').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::DatabaseDoesNotExist { db_name });
+                let kind = ErrorKind::DatabaseDoesNotExist { db_name };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
@@ -87,11 +100,14 @@ impl From<my::Error> for Error {
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1007 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[3].split('\'').collect();
-                let db_name: String = splitted[1].into();
+                let db_name = message
+                    .split_whitespace()
+                    .nth(3)
+                    .and_then(|s| s.split('\'').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::DatabaseAlreadyExists { db_name });
+                let kind = ErrorKind::DatabaseAlreadyExists { db_name };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
@@ -99,11 +115,14 @@ impl From<my::Error> for Error {
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1044 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
-                let db_name: String = splitted[1].into();
+                let db_name = message
+                    .split_whitespace()
+                    .last()
+                    .and_then(|s| s.split('\'').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::DatabaseAccessDenied { db_name });
+                let kind = ErrorKind::DatabaseAccessDenied { db_name };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
@@ -111,12 +130,15 @@ impl From<my::Error> for Error {
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1045 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[4].split('@').collect();
-                let splitted: Vec<&str> = splitted[0].split('\'').collect();
-                let user: String = splitted[1].into();
+                let user = message
+                    .split_whitespace()
+                    .nth(4)
+                    .and_then(|s| s.split('@').nth(0))
+                    .and_then(|s| s.split('\'').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::AuthenticationFailed { user });
+                let kind = ErrorKind::AuthenticationFailed { user };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
@@ -124,23 +146,30 @@ impl From<my::Error> for Error {
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1146 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[1].split('\'').collect();
-                let splitted: Vec<&str> = splitted[1].split('.').collect();
-                let table = splitted.last().unwrap().to_string();
+                let table = message
+                    .split_whitespace()
+                    .nth(1)
+                    .and_then(|s| s.split('\'').nth(1))
+                    .and_then(|s| s.split('.').last())
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::TableDoesNotExist { table });
+                let kind = ErrorKind::TableDoesNotExist { table };
+                let mut builder = Error::builder(kind);
+
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
 
                 builder.build()
             }
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1054 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[2].split('\'').collect();
-                let column = splitted[1].into();
+                let column = message
+                    .split_whitespace()
+                    .nth(2)
+                    .and_then(|s| s.split('\'').nth(1))
+                    .into();
 
                 let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
+
                 builder.set_original_code(format!("{}", code));
                 builder.set_original_message(message);
 
@@ -151,13 +180,10 @@ impl From<my::Error> for Error {
                 code,
                 state: _,
             }) if code == 1406 => {
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.iter().flat_map(|s| s.split('\'')).collect();
-                let column_name = splitted[6];
+                let column = message.split_whitespace().flat_map(|s| s.split('\'')).nth(6).into();
 
-                let mut builder = Error::builder(ErrorKind::LengthMismatch {
-                    column: Some(column_name.to_owned()),
-                });
+                let kind = ErrorKind::LengthMismatch { column };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(code.to_string());
                 builder.set_original_message(message);

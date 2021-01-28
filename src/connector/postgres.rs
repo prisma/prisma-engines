@@ -700,7 +700,7 @@ mod tests {
                         Some("database \"this_does_not_exist\" does not exist"),
                         e.original_message()
                     );
-                    assert_eq!("this_does_not_exist", db_name.as_str())
+                    assert_eq!(&Name::available("this_does_not_exist"), db_name)
                 }
                 kind => panic!("Expected `DatabaseDoesNotExist`, got {:?}", kind),
             },
@@ -716,7 +716,7 @@ mod tests {
         assert!(res.is_err());
 
         let err = res.unwrap_err();
-        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == "WRONG"));
+        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == &Name::available("WRONG")));
     }
 
     #[tokio::test]

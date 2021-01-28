@@ -387,7 +387,7 @@ mod tests {
             ErrorKind::DatabaseDoesNotExist { db_name } => {
                 assert_eq!(Some("1049"), err.original_code());
                 assert_eq!(Some("Unknown database \'this_does_not_exist\'"), err.original_message());
-                assert_eq!("this_does_not_exist", db_name.as_str())
+                assert_eq!(&Name::available("this_does_not_exist"), db_name)
             }
             e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
@@ -402,6 +402,6 @@ mod tests {
         assert!(res.is_err());
 
         let err = res.unwrap_err();
-        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == "WRONG"));
+        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == &Name::available("WRONG")));
     }
 }

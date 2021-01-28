@@ -1,4 +1,4 @@
-use crate::error::{DatabaseConstraint, Error, ErrorKind};
+use crate::error::{DatabaseConstraint, Error, ErrorKind, Name};
 
 impl From<tokio_postgres::error::Error> for Error {
     fn from(e: tokio_postgres::error::Error) -> Error {
@@ -7,87 +7,104 @@ impl From<tokio_postgres::error::Error> for Error {
         match e.code().map(|c| c.code()) {
             Some(code) if code == "22001" => {
                 let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
 
-                let mut builder = Error::builder(ErrorKind::LengthMismatch { column: None });
-
-                builder.set_original_code(code);
-                builder.set_original_message(db_error.to_string());
-
-                builder.build()
-            }
-            // Don't look at me, I'm hideous ;((
-            Some(code) if code == "23505" => {
-                let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let detail = db_error.detail().unwrap(); // KA-BOOM
-
-                let splitted: Vec<&str> = detail.split(")=(").collect();
-                let splitted: Vec<&str> = splitted[0].split(" (").collect();
-
-                let field_names = splitted[1].replace("\"", "");
-                let field_names: Vec<String> = field_names.split(", ").map(|s| s.to_string()).collect();
-
-                let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(field_names),
+                let mut builder = Error::builder(ErrorKind::LengthMismatch {
+                    column: Name::Unavailable,
                 });
 
                 builder.set_original_code(code);
-                builder.set_original_message(detail);
+
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                if let Some(db_error) = db_error {
+                    builder.set_original_message(db_error.to_string());
+                }
+
+                builder.build()
+            }
+            Some(code) if code == "23505" => {
+                let code = code.to_string();
+
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let detail = db_error.as_ref().and_then(|e| e.detail()).map(ToString::to_string);
+
+                let constraint = detail
+                    .as_ref()
+                    .and_then(|d| d.split(")=(").nth(0))
+                    .and_then(|d| d.split(" (").nth(1).map(|s| s.replace("\"", "")))
+                    .map(|s| DatabaseConstraint::fields(s.split(", ")))
+                    .unwrap_or(DatabaseConstraint::CannotParse);
+
+                let kind = ErrorKind::UniqueConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
+
+                builder.set_original_code(code);
+
+                if let Some(detail) = detail {
+                    builder.set_original_message(detail);
+                }
 
                 builder.build()
             }
             // Even lipstick will not save this...
             Some(code) if code == "23502" => {
                 let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
 
-                let column_name = db_error
-                    .column()
-                    .expect("column on null constraint violation error")
-                    .to_owned();
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let detail = db_error.as_ref().and_then(|e| e.detail()).map(ToString::to_string);
 
-                let mut builder = Error::builder(ErrorKind::NullConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(vec![column_name]),
-                });
+                let constraint = db_error
+                    .as_ref()
+                    .map(|e| e.column())
+                    .map(DatabaseConstraint::fields)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
+
+                let kind = ErrorKind::NullConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(code);
-                builder.set_original_message(db_error.message());
+
+                if let Some(detail) = detail {
+                    builder.set_original_message(detail);
+                }
 
                 builder.build()
             }
             Some(code) if code == "23503" => {
                 let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
 
-                match db_error.column() {
+                match db_error.as_ref().and_then(|e| e.column()) {
                     Some(column) => {
-                        let column_name = column.to_owned();
-
                         let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
-                            constraint: DatabaseConstraint::Fields(vec![column_name]),
+                            constraint: DatabaseConstraint::fields(Some(column)),
                         });
 
                         builder.set_original_code(code);
-                        builder.set_original_message(db_error.message());
+
+                        if let Some(message) = db_error.as_ref().map(|e| e.message()) {
+                            builder.set_original_message(message);
+                        }
 
                         builder.build()
                     }
                     None => {
-                        let message = db_error.message();
-                        let mut splitted = message.split_whitespace();
-                        let constraint = splitted.nth(10).unwrap().split('"').nth(1).unwrap().to_string();
+                        let constraint = db_error
+                            .as_ref()
+                            .map(|e| e.message())
+                            .and_then(|e| e.split_whitespace().nth(10))
+                            .and_then(|s| s.split('"').nth(1))
+                            .map(ToString::to_string)
+                            .map(DatabaseConstraint::Index)
+                            .unwrap_or(DatabaseConstraint::CannotParse);
 
-                        let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
-                            constraint: DatabaseConstraint::Index(constraint),
-                        });
+                        let kind = ErrorKind::ForeignKeyConstraintViolation { constraint };
+                        let mut builder = Error::builder(kind);
 
                         builder.set_original_code(code);
-                        builder.set_original_message(message);
+
+                        if let Some(message) = db_error.as_ref().map(|e| e.message()) {
+                            builder.set_original_message(message);
+                        }
 
                         builder.build()
                     }
@@ -95,89 +112,116 @@ impl From<tokio_postgres::error::Error> for Error {
             }
             Some(code) if code == "3D000" => {
                 let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let message = db_error.message();
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let message = db_error.as_ref().map(|e| e.message());
 
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[1].split('"').collect();
-                let db_name = splitted[1].into();
+                let db_name = message
+                    .as_ref()
+                    .and_then(|s| s.split_whitespace().nth(1))
+                    .and_then(|s| s.split('"').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::DatabaseDoesNotExist { db_name });
+                let kind = ErrorKind::DatabaseDoesNotExist { db_name };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(code);
-                builder.set_original_message(message);
+
+                if let Some(message) = message {
+                    builder.set_original_message(message);
+                }
 
                 builder.build()
             }
             Some(code) if code == "28P01" => {
                 let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let message = db_error.message();
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let message = db_error.as_ref().map(|e| e.message());
 
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted.last().unwrap().split('"').collect();
-                let user = splitted[1].into();
+                let user = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().last())
+                    .and_then(|s| s.split('"').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::AuthenticationFailed { user });
+                let kind = ErrorKind::AuthenticationFailed { user };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(code);
-                builder.set_original_message(message);
+
+                if let Some(message) = message {
+                    builder.set_original_message(message);
+                }
 
                 builder.build()
             }
             Some(code) if code == "42P01" => {
                 let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let message = db_error.message();
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let message = db_error.as_ref().map(|e| e.message());
 
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[1].split('"').collect();
-                let table = splitted[1].into();
+                let table = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().nth(1))
+                    .and_then(|s| s.split('"').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::TableDoesNotExist { table });
+                let kind = ErrorKind::TableDoesNotExist { table };
+                let mut builder = Error::builder(kind);
+
                 builder.set_original_code(code);
-                builder.set_original_message(message);
+
+                if let Some(message) = message {
+                    builder.set_original_message(message);
+                }
 
                 builder.build()
             }
             Some(code) if code == "42703" => {
                 let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let message = db_error.message();
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let message = db_error.as_ref().map(|e| e.message());
 
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let column: Vec<&str> = splitted[1].split('\"').collect();
-                let column = if column.len() == 1 {
-                    column[0].into()
-                } else {
-                    column[1].into()
-                };
+                let column = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().nth(1))
+                    .map(|s| s.split('\"'))
+                    .and_then(|mut s| match (s.next(), s.next()) {
+                        (Some(column), _) | (_, Some(column)) => Some(column),
+                        (None, None) => None,
+                    })
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
+                let kind = ErrorKind::ColumnNotFound { column };
+                let mut builder = Error::builder(kind);
+
                 builder.set_original_code(code);
-                builder.set_original_message(message);
+
+                if let Some(message) = message {
+                    builder.set_original_message(message);
+                }
 
                 builder.build()
             }
 
             Some(code) if code == "42P04" => {
                 let code = code.to_string();
-                let error = e.into_source().unwrap(); // boom
-                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
-                let message = db_error.message();
+                let db_error = e.into_source().and_then(|e| e.downcast::<DbError>().ok());
+                let message = db_error.as_ref().map(|e| e.message());
 
-                let splitted: Vec<&str> = message.split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[1].split('"').collect();
-                let db_name = splitted[1].into();
+                let db_name = message
+                    .as_ref()
+                    .and_then(|m| m.split_whitespace().nth(1))
+                    .and_then(|s| s.split('"').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::DatabaseAlreadyExists { db_name });
+                let kind = ErrorKind::DatabaseAlreadyExists { db_name };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(code);
-                builder.set_original_message(message);
+
+                if let Some(message) = message {
+                    builder.set_original_message(message);
+                }
 
                 builder.build()
             }

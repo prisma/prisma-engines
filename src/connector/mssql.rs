@@ -470,6 +470,6 @@ mod tests {
         assert!(res.is_err());
 
         let err = res.unwrap_err();
-        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == "WRONG"));
+        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == &Name::available("WRONG")));
     }
 }

@@ -12,8 +12,10 @@ impl From<tiberius::error::Error> for Error {
                 Error::builder(ErrorKind::TlsError { message }).build()
             }
             tiberius::error::Error::Server(e) if e.code() == 18456 => {
-                let user = e.message().split('\'').nth(1).unwrap().to_string();
-                let mut builder = Error::builder(ErrorKind::AuthenticationFailed { user });
+                let user = e.message().split('\'').nth(1).into();
+                let kind = ErrorKind::AuthenticationFailed { user };
+
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -21,8 +23,9 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 4060 => {
-                let db_name = e.message().split('"').nth(1).unwrap().to_string();
-                let mut builder = Error::builder(ErrorKind::DatabaseDoesNotExist { db_name });
+                let db_name = e.message().split('"').nth(1).into();
+                let kind = ErrorKind::DatabaseDoesNotExist { db_name };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -30,13 +33,16 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 515 => {
-                let mut splitted = e.message().split_whitespace();
-                let mut splitted = splitted.nth(7).unwrap().split('\'');
-                let column = splitted.nth(1).unwrap().to_string();
+                let constraint = e
+                    .message()
+                    .split_whitespace()
+                    .nth(7)
+                    .and_then(|s| s.split('\'').nth(1))
+                    .map(|s| DatabaseConstraint::fields(Some(s)))
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let mut builder = Error::builder(ErrorKind::NullConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(vec![column]),
-                });
+                let kind = ErrorKind::NullConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -44,9 +50,10 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 1801 => {
-                let db_name = e.message().split('\'').nth(1).unwrap().to_string();
+                let db_name = e.message().split('\'').nth(1).into();
+                let kind = ErrorKind::DatabaseAlreadyExists { db_name };
 
-                let mut builder = Error::builder(ErrorKind::DatabaseAlreadyExists { db_name });
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -54,21 +61,18 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 2627 => {
-                let index = e
+                let constraint = e
                     .message()
                     .split(". ")
                     .nth(1)
-                    .unwrap()
-                    .split(' ')
-                    .last()
-                    .unwrap()
-                    .split('\'')
-                    .nth(1)
-                    .unwrap();
+                    .and_then(|s| s.split(' ').last())
+                    .and_then(|s| s.split('\'').nth(1))
+                    .map(ToString::to_string)
+                    .map(DatabaseConstraint::Index)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Index(index.to_string()),
-                });
+                let kind = ErrorKind::UniqueConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -76,21 +80,18 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 547 => {
-                let index = e
+                let constraint = e
                     .message()
                     .split('.')
                     .next()
-                    .unwrap()
-                    .split_whitespace()
-                    .last()
-                    .unwrap()
-                    .split('\"')
-                    .nth(1)
-                    .unwrap();
+                    .and_then(|s| s.split_whitespace().last())
+                    .and_then(|s| s.split('\"').nth(1))
+                    .map(ToString::to_string)
+                    .map(DatabaseConstraint::Index)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
-                    constraint: DatabaseConstraint::Index(index.to_string()),
-                });
+                let kind = ErrorKind::ForeignKeyConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -98,12 +99,16 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 1505 => {
-                let mut splitted = e.message().split('\'');
-                let index = splitted.nth(3).unwrap().to_string();
+                let constraint = e
+                    .message()
+                    .split('\'')
+                    .nth(3)
+                    .map(ToString::to_string)
+                    .map(DatabaseConstraint::Index)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Index(index),
-                });
+                let kind = ErrorKind::UniqueConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -111,13 +116,17 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 2601 => {
-                let mut splitted = e.message().split_whitespace();
-                let mut splitted = splitted.nth(11).unwrap().split('\'');
-                let index = splitted.nth(1).unwrap().to_string();
+                let constraint = e
+                    .message()
+                    .split_whitespace()
+                    .nth(11)
+                    .and_then(|s| s.split('\'').nth(1))
+                    .map(ToString::to_string)
+                    .map(DatabaseConstraint::Index)
+                    .unwrap_or(DatabaseConstraint::CannotParse);
 
-                let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
-                    constraint: DatabaseConstraint::Index(index),
-                });
+                let kind = ErrorKind::UniqueConstraintViolation { constraint };
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -125,8 +134,10 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 2714 => {
-                let db_name = e.message().split('\'').nth(1).unwrap().to_string();
-                let mut builder = Error::builder(ErrorKind::DatabaseAlreadyExists { db_name });
+                let db_name = e.message().split('\'').nth(1).into();
+                let kind = ErrorKind::DatabaseAlreadyExists { db_name };
+
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -134,11 +145,10 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 2628 => {
-                let column_name = e.message().split('\'').nth(3).unwrap().to_string();
+                let column = e.message().split('\'').nth(3).into();
+                let kind = ErrorKind::LengthMismatch { column };
 
-                let mut builder = Error::builder(ErrorKind::LengthMismatch {
-                    column: Some(column_name),
-                });
+                let mut builder = Error::builder(kind);
 
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
@@ -146,22 +156,32 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 208 => {
-                let splitted: Vec<&str> = e.message().split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[3].split('\'').collect();
-                let table = splitted[1].to_string();
+                let table = e
+                    .message()
+                    .split_whitespace()
+                    .nth(3)
+                    .and_then(|s| s.split('\'').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::TableDoesNotExist { table });
+                let kind = ErrorKind::TableDoesNotExist { table };
+                let mut builder = Error::builder(kind);
+
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
 
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 207 => {
-                let splitted: Vec<&str> = e.message().split_whitespace().collect();
-                let splitted: Vec<&str> = splitted[3].split('\'').collect();
-                let column = splitted[1].to_string();
+                let column = e
+                    .message()
+                    .split_whitespace()
+                    .nth(3)
+                    .and_then(|s| s.split('\'').nth(1))
+                    .into();
 
-                let mut builder = Error::builder(ErrorKind::ColumnNotFound { column });
+                let kind = ErrorKind::ColumnNotFound { column };
+                let mut builder = Error::builder(kind);
+
                 builder.set_original_code(format!("{}", e.code()));
                 builder.set_original_message(e.message().to_string());
 

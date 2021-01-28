@@ -7,6 +7,19 @@ pub enum DatabaseConstraint {
     Fields(Vec<String>),
     Index(String),
     ForeignKey,
+    CannotParse,
+}
+
+impl DatabaseConstraint {
+    pub(crate) fn fields<I, S>(names: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: ToString,
+    {
+        let fields = names.into_iter().map(|s| s.to_string()).collect();
+
+        Self::Fields(fields)
+    }
 }
 
 impl fmt::Display for DatabaseConstraint {
@@ -15,6 +28,40 @@ impl fmt::Display for DatabaseConstraint {
             Self::Fields(fields) => write!(f, "({})", fields.join(",")),
             Self::Index(index) => index.fmt(f),
             Self::ForeignKey => "FOREIGN KEY".fmt(f),
+            Self::CannotParse => "".fmt(f),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum Name {
+    Available(String),
+    Unavailable,
+}
+
+impl Name {
+    pub fn available(name: impl ToString) -> Self {
+        Self::Available(name.to_string())
+    }
+}
+
+impl fmt::Display for Name {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Available(name) => name.fmt(f),
+            Self::Unavailable => write!(f, "(not available)"),
+        }
+    }
+}
+
+impl<T> From<Option<T>> for Name
+where
+    T: ToString,
+{
+    fn from(name: Option<T>) -> Self {
+        match name {
+            Some(name) => Self::available(name),
+            None => Self::Unavailable,
         }
     }
 }
@@ -90,23 +137,23 @@ pub enum ErrorKind {
     #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync + 'static>),
 
-    #[error("Database '{}' does not exist.", db_name)]
-    DatabaseDoesNotExist { db_name: String },
+    #[error("Database does not exist: {}", db_name)]
+    DatabaseDoesNotExist { db_name: Name },
 
-    #[error("Access denied to database '{}'", db_name)]
-    DatabaseAccessDenied { db_name: String },
+    #[error("Access denied to database {}", db_name)]
+    DatabaseAccessDenied { db_name: Name },
 
-    #[error("Database '{}' already exists", db_name)]
-    DatabaseAlreadyExists { db_name: String },
+    #[error("Database already exists {}", db_name)]
+    DatabaseAlreadyExists { db_name: Name },
 
-    #[error("Authentication failed for user '{}'", user)]
-    AuthenticationFailed { user: String },
+    #[error("Authentication failed for user {}", user)]
+    AuthenticationFailed { user: Name },
 
     #[error("Query returned no data")]
     NotFound,
 
     #[error("No such table: {}", table)]
-    TableDoesNotExist { table: String },
+    TableDoesNotExist { table: Name },
 
     #[error("Unique constraint failed: {}", constraint)]
     UniqueConstraintViolation { constraint: DatabaseConstraint },
@@ -127,7 +174,7 @@ pub enum ErrorKind {
     ResultIndexOutOfBounds(usize),
 
     #[error("Error accessing result set, column not found: {}", column)]
-    ColumnNotFound { column: String },
+    ColumnNotFound { column: Name },
 
     #[error("Error accessing result set, type mismatch, expected: {}", _0)]
     ResultTypeMismatch(&'static str),
@@ -139,7 +186,7 @@ pub enum ErrorKind {
     ConversionError(Cow<'static, str>),
 
     #[error("The value provided for column {:?} is too long.", column)]
-    LengthMismatch { column: Option<String> },
+    LengthMismatch { column: Name },
 
     #[error("The provided arguments are not supported")]
     InvalidConnectionArguments,

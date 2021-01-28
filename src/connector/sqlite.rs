@@ -227,7 +227,11 @@ impl Queryable for Sqlite {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ast::*, connector::Queryable, error::ErrorKind};
+    use crate::{
+        ast::*,
+        connector::Queryable,
+        error::{ErrorKind, Name},
+    };
 
     #[test]
     fn sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme() {
@@ -259,7 +263,7 @@ mod tests {
 
         match err.kind() {
             ErrorKind::TableDoesNotExist { table } => {
-                assert_eq!("not_there", table.as_str());
+                assert_eq!(&Name::available("not_there"), table);
             }
             e => panic!("Expected error TableDoesNotExist, got {:?}", e),
         }

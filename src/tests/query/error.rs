@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     ast::*,
     connector::Queryable,
-    error::{DatabaseConstraint, ErrorKind},
+    error::{DatabaseConstraint, ErrorKind, Name},
 };
 use test_macros::test_each_connector;
 
@@ -14,7 +14,7 @@ async fn table_does_not_exist(api: &mut dyn TestApi) -> crate::Result<()> {
 
     match err.kind() {
         ErrorKind::TableDoesNotExist { table } => {
-            assert_eq!("not_there", table.as_str());
+            assert_eq!(&Name::available("not_there"), table);
         }
         e => panic!("Expected error TableDoesNotExist, got {:?}", e),
     }
@@ -35,7 +35,7 @@ async fn column_does_not_exist_on_write(api: &mut dyn TestApi) -> crate::Result<
 
     match err.kind() {
         ErrorKind::ColumnNotFound { column } => {
-            assert_eq!("does_not_exist", column.as_str());
+            assert_eq!(&Name::available("does_not_exist"), column);
         }
         e => panic!("Expected error ColumnNotFound, got {:?}", e),
     }
@@ -59,7 +59,7 @@ async fn column_does_not_exist_on_read(api: &mut dyn TestApi) -> crate::Result<(
 
     match err.kind() {
         ErrorKind::ColumnNotFound { column } => {
-            assert_eq!("does_not_exist", column.as_str());
+            assert_eq!(&Name::available("does_not_exist"), column);
         }
         e => panic!("Expected error ColumnNotFound, got {:?}", e),
     }
@@ -88,7 +88,8 @@ async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()>
                 let fields = fields.iter().map(|s| s.as_str()).collect::<Vec<_>>();
                 assert_eq!(vec!["id1", "id2"], fields)
             }
-            DatabaseConstraint::ForeignKey => assert!(false, "Expecting index or field constraints"),
+            DatabaseConstraint::ForeignKey => assert!(false, "Expecting index or field constraints."),
+            DatabaseConstraint::CannotParse => assert!(false, "Couldn't parse the error message."),
         },
         _ => panic!(err),
     }
@@ -105,7 +106,7 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
 
     match err.kind() {
         ErrorKind::NullConstraintViolation { constraint } => {
-            assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
+            assert_eq!(&DatabaseConstraint::fields(Some("id1")), constraint)
         }
         _ => panic!(err),
     }
@@ -122,7 +123,7 @@ async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
 
     match err.kind() {
         ErrorKind::NullConstraintViolation { constraint } => {
-            assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id2")]), constraint);
+            assert_eq!(&DatabaseConstraint::fields(Some("id2")), constraint);
         }
         _ => panic!(err),
     }
