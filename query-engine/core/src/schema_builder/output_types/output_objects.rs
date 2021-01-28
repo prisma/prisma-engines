@@ -86,6 +86,7 @@ pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentif
         TypeIdentifier::Xml => OutputType::xml(),
         TypeIdentifier::Bytes => OutputType::bytes(),
         TypeIdentifier::BigInt => OutputType::bigint(),
+        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
     if list {

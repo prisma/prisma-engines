@@ -121,7 +121,7 @@ fn get_field_kind(field: &dml::Field) -> String {
         dml::FieldType::Enum(_) => String::from("enum"),
         dml::FieldType::Base(_, _) => String::from("scalar"),
         dml::FieldType::NativeType(_, _) => String::from("scalar"),
-        tpe => unimplemented!("DMMF does not support field type {:?}", tpe),
+        dml::FieldType::Unsupported(_) => String::from("unsupported"),
     }
 }
 

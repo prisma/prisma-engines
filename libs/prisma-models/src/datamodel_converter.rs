@@ -55,6 +55,7 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_models(&self) -> Vec<ModelTemplate> {
         self.datamodel
             .models()
+            .filter(|model| model.is_supported())
             .map(|model| ModelTemplate {
                 name: model.name.clone(),
                 is_embedded: model.is_embedded,
@@ -62,6 +63,7 @@ impl<'a> DatamodelConverter<'a> {
                 manifestation: model.database_name().map(|s| s.to_owned()),
                 id_field_names: model.id_fields.clone(),
                 indexes: self.convert_indexes(&model),
+                supports_create_operation: model.supports_create_operation(),
                 dml_model: model.clone(),
             })
             .collect()
@@ -70,7 +72,7 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_fields(&self, model: &dml::Model) -> Vec<FieldTemplate> {
         model
             .fields()
-            .map(|field| match field {
+            .filter_map(|field| match field {
                 dml::Field::RelationField(rf) => {
                     let relation = self
                         .relations
@@ -80,30 +82,43 @@ impl<'a> DatamodelConverter<'a> {
                             panic!("Did not find a relation for model {} and field {}", model.name, rf.name)
                         });
 
-                    FieldTemplate::Relation(RelationFieldTemplate {
+                    // If one side of the relation is not supported, filter out the relation
+                    if relation.model_a.is_relation_supported(&relation.field_a) == false
+                        || relation.model_b.is_relation_supported(&relation.field_b) == false
+                    {
+                        return None;
+                    }
+
+                    Some(FieldTemplate::Relation(RelationFieldTemplate {
                         name: rf.name.clone(),
                         is_required: rf.is_required(),
                         is_list: rf.is_list(),
                         relation_name: relation.name.clone(),
                         relation_side: relation.relation_side(rf),
                         relation_info: rf.relation_info.clone(),
-                    })
+                    }))
                 }
-                dml::Field::ScalarField(sf) => FieldTemplate::Scalar(ScalarFieldTemplate {
-                    name: sf.name.clone(),
-                    type_identifier: sf.type_identifier(),
-                    is_required: sf.is_required(),
-                    is_list: sf.is_list(),
-                    is_unique: sf.is_unique(&model),
-                    is_id: sf.is_id(&model),
-                    is_auto_generated_int_id: sf.is_auto_generated_int_id(),
-                    is_autoincrement: sf.is_auto_increment(),
-                    behaviour: sf.behaviour(),
-                    internal_enum: sf.internal_enum(self.datamodel),
-                    db_name: sf.database_name.clone(),
-                    arity: sf.arity,
-                    default_value: sf.default_value.clone(),
-                }),
+                dml::Field::ScalarField(sf) => {
+                    if sf.type_identifier() == TypeIdentifier::Unsupported {
+                        return None;
+                    }
+
+                    Some(FieldTemplate::Scalar(ScalarFieldTemplate {
+                        name: sf.name.clone(),
+                        type_identifier: sf.type_identifier(),
+                        is_required: sf.is_required(),
+                        is_list: sf.is_list(),
+                        is_unique: sf.is_unique(&model),
+                        is_id: sf.is_id(&model),
+                        is_auto_generated_int_id: sf.is_auto_generated_int_id(),
+                        is_autoincrement: sf.is_auto_increment(),
+                        behaviour: sf.behaviour(),
+                        internal_enum: sf.internal_enum(self.datamodel),
+                        db_name: sf.database_name.clone(),
+                        arity: sf.arity,
+                        default_value: sf.default_value.clone(),
+                    }))
+                }
             })
             .collect()
     }
@@ -111,6 +126,7 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_relations(&self) -> Vec<RelationTemplate> {
         self.relations
             .iter()
+            .filter(|r| r.model_a.is_relation_supported(&r.field_a) && r.model_b.is_relation_supported(&r.field_b))
             .map(|r| RelationTemplate {
                 name: r.name(),
                 model_a_on_delete: OnDelete::SetNull,
@@ -126,7 +142,7 @@ impl<'a> DatamodelConverter<'a> {
         model
             .indices
             .iter()
-            .filter(|i| i.fields.len() > 1) // @@unique for 1 field are transformed to is_unique instead
+            .filter(|i| i.fields.len() > 1 && model.is_compound_index_supported(i)) // @@unique for 1 field are transformed to is_unique instead
             .map(|i| IndexTemplate {
                 name: i.name.clone(),
                 fields: i.fields.clone(),
@@ -327,6 +343,76 @@ impl TempRelationHolder {
     }
 }
 
+trait ModelConverterUtilities {
+    // A model is supported if it has at least one indexed/unique field or compound index that's supported.
+    fn is_supported(&self) -> bool;
+    // Checks if a model has an indexed/unique field that's supported
+    fn has_supported_indexed_field(&self) -> bool;
+    // Checks if a model has a compound index that's supported
+    fn has_supported_compound_index(&self) -> bool;
+    // Checks if a relation is supported.
+    // A relation is supported if none of its fk field are of type Unsupported
+    fn is_relation_supported(&self, rf: &dml::RelationField) -> bool;
+    // Checks if a compound index is supported
+    // A compound index is supported is none of its member are of type Unsupported
+    fn is_compound_index_supported(&self, index: &dml::IndexDefinition) -> bool;
+    // Checks if a model can support the create operation.
+    // It can't if it has a field of type `Unsupported` required and without a default value
+    fn supports_create_operation(&self) -> bool;
+}
+
+impl ModelConverterUtilities for dml::Model {
+    fn is_supported(&self) -> bool {
+        self.has_supported_indexed_field() || self.has_supported_compound_index()
+    }
+
+    fn is_relation_supported(&self, rf: &dml::RelationField) -> bool {
+        rf.relation_info
+            .fields
+            .iter()
+            .all(|fk_name| match self.find_field(fk_name).unwrap() {
+                dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
+                dml::Field::RelationField(_) => true,
+            })
+    }
+
+    fn supports_create_operation(&self) -> bool {
+        let has_unsupported_field = self.fields.iter().any(|field| match field {
+            dml::Field::ScalarField(sf) => {
+                sf.type_identifier() == TypeIdentifier::Unsupported && sf.is_required() && sf.default_value.is_none()
+            }
+            _ => false,
+        });
+
+        has_unsupported_field == false
+    }
+
+    fn has_supported_indexed_field(&self) -> bool {
+        self.fields.iter().any(|field| {
+            let is_supported_field = match field {
+                dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
+                _ => false,
+            };
+
+            self.field_is_indexed(field.name()) && is_supported_field == true
+        })
+    }
+
+    fn is_compound_index_supported(&self, index: &dml::IndexDefinition) -> bool {
+        index
+            .fields
+            .iter()
+            .all(|field_name| match self.find_field(field_name).unwrap() {
+                dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
+                dml::Field::RelationField(_) => true,
+            })
+    }
+
+    fn has_supported_compound_index(&self) -> bool {
+        self.indices.iter().any(|index| self.is_compound_index_supported(index))
+    }
+}
+
 trait DatamodelFieldExtensions {
     fn type_identifier(&self) -> TypeIdentifier;
     fn is_unique(&self, model: &dml::Model) -> bool;
@@ -353,7 +439,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
                 dml::ScalarType::Bytes => TypeIdentifier::Bytes,
                 dml::ScalarType::BigInt => TypeIdentifier::BigInt,
             },
-            dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
+            dml::FieldType::Unsupported(_) => TypeIdentifier::Unsupported,
             dml::FieldType::NativeType(scalar_type, _) => (*scalar_type).into(),
         }
     }
