@@ -380,24 +380,13 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::T
     let dm = indoc! {r#"
             model Post {
               id            Int                     @id @default(autoincrement())
-<<<<<<< HEAD
-              user_balance  Unsupported("money")
-              User          User                    @relation(fields: [user_balance], references: [balance])
-=======
-              /// This type is currently not supported by the Prisma Client.
               user_ip       Unsupported("cidr")
               User          User                    @relation(fields: [user_ip], references: [ip])
->>>>>>> master
             }
 
             model User {
               id            Int                     @id @default(autoincrement())
-<<<<<<< HEAD
-              balance       Unsupported("money")    @unique
-=======
-              /// This type is currently not supported by the Prisma Client.
               ip            Unsupported("cidr")  @unique
->>>>>>> master
               Post          Post[]
             }
         "#};
