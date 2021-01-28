@@ -167,19 +167,19 @@ impl From<QuaintKind> for SqlError {
     fn from(kind: QuaintKind) -> Self {
         match kind {
             QuaintKind::DatabaseDoesNotExist { ref db_name } => Self::DatabaseDoesNotExist {
-                db_name: db_name.clone(),
+                db_name: format!("{}", db_name),
                 cause: kind,
             },
             QuaintKind::DatabaseAlreadyExists { ref db_name } => Self::DatabaseAlreadyExists {
-                db_name: db_name.clone(),
+                db_name: format!("{}", db_name),
                 cause: kind,
             },
             QuaintKind::DatabaseAccessDenied { ref db_name } => Self::DatabaseAccessDenied {
-                db_name: db_name.clone(),
+                db_name: format!("{}", db_name),
                 cause: kind,
             },
             QuaintKind::AuthenticationFailed { ref user } => Self::AuthenticationFailed {
-                user: user.clone(),
+                user: format!("{}", user),
                 cause: kind,
             },
             QuaintKind::DatabaseUrlIsInvalid(reason) => Self::DatabaseUrlIsInvalid(reason),
