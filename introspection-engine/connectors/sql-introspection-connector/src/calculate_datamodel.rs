@@ -93,7 +93,7 @@ mod tests {
                 database_name: None,
                 name: "Table1".to_string(),
                 documentation: Some(
-                    "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."
+                    "The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client."
                         .to_string(),
                 ),
                 is_embedded: false,
