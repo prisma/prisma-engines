@@ -133,6 +133,9 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
         ("xml", "String", "Xml", "xml"),
         ("json", "Json", "Json", "json"),
         ("jsonb", "Json", "JsonB", "jsonb"),
+        ("money", "Decimal", "Money", "money"),
+        ("inet", "String", "Inet", "inet"),
+        ("oid", "Int", "Oid", "oid"),
     ];
 
     let mut dm = r#"

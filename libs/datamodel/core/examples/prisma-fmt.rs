@@ -1,7 +1,5 @@
-use std::fs;
-
-extern crate clap;
 use clap::{App, Arg};
+use std::fs;
 
 fn main() {
     let matches = App::new("Prisma Datamodel v2 formatter")

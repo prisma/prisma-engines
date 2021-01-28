@@ -31,6 +31,9 @@ const TYPES: &[(&str, &str)] = &[
     ("xml", "Xml"),
     ("json", "Json"),
     ("jsonb", "JsonB"),
+    ("money", "Money"),
+    ("oid", "Oid"),
+    ("inet", "Inet"),
 ];
 
 #[test_each_connector(tags("postgres"))]
@@ -94,6 +97,9 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             xml             String   @postgres.Xml
             json            Json     @postgres.Json
             jsonb           Json     @postgres.JsonB
+            money           Decimal  @postgres.Money
+            oid             Int      @postgres.Oid
+            inet            String   @postgres.Inet
           }
     "#};
 
@@ -167,6 +173,9 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             xml             String
             json            Json
             jsonb           Json
+            money           Float
+            oid             Int
+            inet            String
         }
     "#};
 

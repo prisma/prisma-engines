@@ -24,6 +24,7 @@ const TYPES: &[(&str, &str)] = &[
     ("float", "Float"),
     ("double", "Double"),
     ("bits", "Bit(64)"),
+    ("bit_bool", "Bit(1)"),
     ("chars", "Char(10)"),
     ("varchars", "VarChar(500)"),
     ("binary", "Binary(230)"),
@@ -103,6 +104,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             float                          Float    @mysql.Float
             double                         Float    @mysql.Double
             bits                           Bytes    @mysql.Bit(64)
+            bit_bool                       Boolean  @mysql.Bit(1)
             chars                          String   @mysql.Char(10)
             varchars                       String   @mysql.VarChar(500)
             binary                         Bytes    @mysql.Binary(230)
@@ -192,6 +194,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             float                          Float
             double                         Float
             bits                           Int
+            bit_bool                       Int
             chars                          String
             varchars                       String
             // This type is currently not supported by the Prisma Client.

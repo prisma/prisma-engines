@@ -13,6 +13,10 @@ const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
 const BIG_INT_TYPE_NAME: &str = "BigInt";
 const DECIMAL_TYPE_NAME: &str = "Decimal";
+const MONEY_TYPE_NAME: &str = "Money";
+const INET_TYPE_NAME: &str = "Inet";
+const CITEXT_TYPE_NAME: &str = "Citext";
+const OID_TYPE_NAME: &str = "Oid";
 const REAL_TYPE_NAME: &str = "Real";
 const DOUBLE_PRECISION_TYPE_NAME: &str = "DoublePrecision";
 const VARCHAR_TYPE_NAME: &str = "VarChar";
@@ -55,6 +59,10 @@ impl PostgresDatamodelConnector {
         let integer = NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, vec![ScalarType::Int]);
         let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, vec![ScalarType::BigInt]);
         let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
+        let money = NativeTypeConstructor::without_args(MONEY_TYPE_NAME, vec![ScalarType::Decimal]);
+        let inet = NativeTypeConstructor::without_args(INET_TYPE_NAME, vec![ScalarType::String]);
+        let citext = NativeTypeConstructor::without_args(CITEXT_TYPE_NAME, vec![ScalarType::String]);
+        let oid = NativeTypeConstructor::without_args(OID_TYPE_NAME, vec![ScalarType::Int]);
         let real = NativeTypeConstructor::without_args(REAL_TYPE_NAME, vec![ScalarType::Float]);
         let double_precision = NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, vec![ScalarType::Float]);
         let varchar = NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]);
@@ -80,6 +88,10 @@ impl PostgresDatamodelConnector {
             integer,
             big_int,
             decimal,
+            money,
+            inet,
+            citext,
+            oid,
             real,
             double_precision,
             varchar,
@@ -157,6 +169,10 @@ impl Connector for PostgresDatamodelConnector {
             INTEGER_TYPE_NAME => Integer,
             BIG_INT_TYPE_NAME => BigInt,
             DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            INET_TYPE_NAME => Inet,
+            MONEY_TYPE_NAME => Money,
+            CITEXT_TYPE_NAME => Citext,
+            OID_TYPE_NAME => Oid,
             REAL_TYPE_NAME => Real,
             DOUBLE_PRECISION_TYPE_NAME => DoublePrecision,
             VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME)?),
@@ -206,6 +222,10 @@ impl Connector for PostgresDatamodelConnector {
             Xml => (XML_TYPE_NAME, vec![]),
             JSON => (JSON_TYPE_NAME, vec![]),
             JSONB => (JSON_B_TYPE_NAME, vec![]),
+            Money => (MONEY_TYPE_NAME, vec![]),
+            Inet => (INET_TYPE_NAME, vec![]),
+            Citext => (CITEXT_TYPE_NAME, vec![]),
+            Oid => (OID_TYPE_NAME, vec![]),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {

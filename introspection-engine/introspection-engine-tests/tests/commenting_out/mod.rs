@@ -250,7 +250,7 @@ async fn unsupported_type_with_native_types_keeps_its_usages(api: &TestApi) -> c
             id          Int     @unique
             dummy       Int
             broken Unsupported("macaddr")
-        
+
             @@id([broken, dummy])
             @@unique([broken, dummy], name: "unique")
             @@index([broken, dummy], name: "non_unique")
@@ -367,12 +367,12 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::T
         .execute(|migration| {
             migration.create_table("User", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("balance money not null unique");
+                t.inject_custom("ip cidr not null unique");
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("user_balance money not null ");
-                t.add_foreign_key(&["user_balance"], "User", &["balance"]);
+                t.inject_custom("user_ip cidr not null ");
+                t.add_foreign_key(&["user_ip"], "User", &["ip"]);
             });
         })
         .await?;
@@ -380,15 +380,26 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::T
     let dm = indoc! {r#"
             model Post {
               id            Int                     @id @default(autoincrement())
+<<<<<<< HEAD
               user_balance  Unsupported("money")
               User          User                    @relation(fields: [user_balance], references: [balance])
+=======
+              /// This type is currently not supported by the Prisma Client.
+              user_ip       Unsupported("cidr")
+              User          User                    @relation(fields: [user_ip], references: [ip])
+>>>>>>> master
             }
-                    
+
             model User {
               id            Int                     @id @default(autoincrement())
+<<<<<<< HEAD
               balance       Unsupported("money")    @unique
+=======
+              /// This type is currently not supported by the Prisma Client.
+              ip            Unsupported("cidr")  @unique
+>>>>>>> master
               Post          Post[]
-            }                
+            }
         "#};
 
     assert_eq!(

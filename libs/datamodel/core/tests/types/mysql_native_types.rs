@@ -99,6 +99,14 @@ fn should_fail_on_argument_out_of_range_for_bit_type() {
 }
 
 #[test]
+fn should_only_allow_bit_one_for_booleans() {
+    let expected_error =
+        "Argument M is out of range for Native type Bit(2) of MySQL: only Bit(1) can be used as Boolean.";
+
+    test_native_types_without_attributes("Bit(2)", "Boolean", &expected_error, MYSQL_SOURCE);
+}
+
+#[test]
 fn should_fail_on_argument_out_of_range_for_char_type() {
     let error_msg = "Argument M is out of range for Native type Char(256) of MySQL: M can range from 0 to 255.";
 

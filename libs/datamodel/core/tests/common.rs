@@ -1,7 +1,8 @@
-extern crate datamodel;
-
-use self::datamodel::{IndexDefinition, StringFromEnvVar};
-use datamodel::{diagnostics::*, dml, dml::ScalarType, Configuration, Datamodel, NativeTypeInstance};
+use datamodel::{
+    diagnostics::*,
+    dml::{self, ScalarType},
+    Configuration, Datamodel, IndexDefinition, NativeTypeInstance, StringFromEnvVar,
+};
 use pretty_assertions::assert_eq;
 
 pub trait DatasourceAsserts {

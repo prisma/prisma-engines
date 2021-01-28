@@ -914,9 +914,6 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
 
     api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser;").await.ok();
 
-    // Sad but necessary, the test is flaky without.
-    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
-
     api.database()
         .raw_cmd(
             "
@@ -932,9 +929,6 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
         )
         .await?;
 
-    // Sad but necessary, the test is flaky without.
-    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
-
     let (host, port) = db_host_and_port_mssql_2019();
 
     let datamodel = format!(
@@ -949,7 +943,24 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
         dbport = port,
     );
 
-    let migration_api = migration_api(&datamodel).await?;
+    let mut tries = 0;
+
+    let migration_api = loop {
+        if tries > 5 {
+            panic!("Failed to connect to mssql more than five times.");
+        }
+
+        let result = migration_api(&datamodel).await;
+
+        match result {
+            Ok(api) => break api,
+            Err(err) => {
+                eprintln!("got err, sleeping\nerr:{:?}", err);
+                tries += 1;
+                tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+            }
+        }
+    };
 
     let output = migration_api
         .diagnose_migration_history(&DiagnoseMigrationHistoryInput {

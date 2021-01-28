@@ -1,4 +1,3 @@
-extern crate datamodel;
 use pretty_assertions::assert_eq;
 
 #[test]
@@ -374,12 +373,12 @@ fn must_add_relation_attribute_to_an_existing_field() {
       id    Int     @id
       posts Post[]
     }
-    
+
     model Post {
       id     Int   @id
       Blog   Blog? @relation(fields: [blogId])
       blogId Int?
-    }    
+    }
     "#;
 
     let expected = r#"model Blog {

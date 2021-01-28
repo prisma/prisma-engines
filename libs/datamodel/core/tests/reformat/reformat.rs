@@ -1,4 +1,4 @@
-extern crate datamodel;
+use indoc::indoc;
 use pretty_assertions::assert_eq;
 use std::str;
 
@@ -20,10 +20,13 @@ fn test_reformat_model_simple() {
         }
     "#;
 
-    let expected = r#"model User {
-  id Int @id
-}
-"#;
+    let expected = indoc!(
+        r#"
+        model User {
+          id Int @id
+        }
+        "#
+    );
 
     assert_reformat(input, expected);
 }
