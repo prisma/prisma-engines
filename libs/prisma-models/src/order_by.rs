@@ -4,12 +4,12 @@ use std::string::ToString;
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct OrderBy {
     pub field: ScalarFieldRef,
-    pub path: Option<Vec<RelationFieldRef>>,
+    pub path: Vec<RelationFieldRef>,
     pub sort_order: SortOrder,
 }
 
 impl OrderBy {
-    pub fn new(field: ScalarFieldRef, path: Option<Vec<RelationFieldRef>>, sort_order: SortOrder) -> Self {
+    pub fn new(field: ScalarFieldRef, path: Vec<RelationFieldRef>, sort_order: SortOrder) -> Self {
         Self {
             field,
             path,
@@ -41,7 +41,7 @@ impl From<ScalarFieldRef> for OrderBy {
     fn from(field: ScalarFieldRef) -> Self {
         Self {
             field,
-            path: None,
+            path: vec![],
             sort_order: SortOrder::Ascending,
         }
     }
