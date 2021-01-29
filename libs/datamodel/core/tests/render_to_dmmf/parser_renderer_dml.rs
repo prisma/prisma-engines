@@ -336,6 +336,62 @@ fn test_parser_renderer_native_types_with_default_mappings() {
 }
 
 #[test]
+fn test_parser_renderer_native_types_with_default_mappings_mysql() {
+    let dm1 = indoc!(
+        r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        datasource dolphin {
+          provider = "mysql"
+          url      = "mysql://"
+        }
+
+        model Blog {
+          id     Int    @id
+          bigInt BigInt
+          defaultString String @dolphin.VarChar(191)
+          defaultInt Int @dolphin.Int
+          foobar String @dolphin.VarChar(12)
+          otherFloat Float @dolphin.Float
+        }
+        "#
+    );
+
+    let dm2 = indoc!(
+        r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        datasource dolphin {
+          provider = "mysql"
+          url      = "mysql://"
+        }
+
+        model Blog {
+          id            Int    @id
+          bigInt        BigInt
+          defaultString String
+          defaultInt    Int
+          foobar        String @dolphin.VarChar(12)
+          otherFloat    Float  @dolphin.Float
+        }
+        "#
+    );
+
+    let config = parse_configuration(dm1);
+    let dml = parse(dm1);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config);
+
+    println!("{}\n\n{}", rendered, dm2);
+    assert_eq!(rendered, dm2);
+}
+
+#[test]
 fn preview_features_roundtrip() {
     // we keep the support for `experimentalFeatures` for backwards compatibility reasons
     let input_with_experimental = r#"generator client {

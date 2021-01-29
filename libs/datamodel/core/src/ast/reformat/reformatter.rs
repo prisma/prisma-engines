@@ -1,13 +1,10 @@
-use crate::{ast::parser::*, ast::renderer::*};
-use pest::Parser;
-
-// We have to use RefCell as rust cannot
-// do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
 use crate::common::WritableString;
 use crate::diagnostics::ValidatedMissingFields;
+use crate::{ast::parser::*, ast::renderer::*};
 use pest::iterators::Pair;
+use pest::Parser;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -151,8 +148,6 @@ impl<'a> Reformatter<'a> {
                 }
                 seen_at_least_one_top_level_element = true;
             }
-
-            //            println!("top level: {:?} |{:?}|", current.as_rule(), current.as_str());
 
             match current.as_rule() {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {

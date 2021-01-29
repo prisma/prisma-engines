@@ -4,6 +4,7 @@ use crate::types::helper::{
     test_native_types_without_attributes,
 };
 use datamodel::{ast, diagnostics::DatamodelError};
+use indoc::indoc;
 
 const BLOB_TYPES: &[&str] = &["Blob", "LongBlob", "MediumBlob", "TinyBlob"];
 const TEXT_TYPES: &[&str] = &["Text", "LongText", "MediumText", "TinyText"];
@@ -151,7 +152,8 @@ fn should_fail_on_argument_out_of_range_for_decimal_type() {
 
 #[test]
 fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
-    let dml = r#"
+    let dml = indoc!(
+        r#"
         datasource db {
           provider = "mysql"
           url      = "mysql://"
@@ -163,16 +165,17 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
         }
 
         model Blog {
-            id     Int   @id
+            id     Int  @id
             dec Decimal @db.Decimal(2, 4)
         }
-    "#;
+        "#
+    );
 
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
         "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.",
-        ast::Span::new(281, 311),
+        ast::Span::new(191, 221),
     ));
 }
 
