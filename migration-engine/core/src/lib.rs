@@ -20,7 +20,7 @@ use datamodel::{
     Configuration,
 };
 use migration_connector::{features, ConnectorError};
-use sql_migration_connector::SqlMigrationConnector;
+use sql_migration_connector::{SqlMigrationConnector, SqlMigrationConnectorParams};
 use std::sync::Arc;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
 
@@ -69,7 +69,12 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            SqlMigrationConnector::new(u.as_str(), features).await?
+            SqlMigrationConnector::new(SqlMigrationConnectorParams {
+                datasource_url: u.as_str(),
+                features,
+                datasource_shadow_database_url: (),
+            })
+            .await?
         }
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {

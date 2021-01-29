@@ -34,10 +34,22 @@ pub struct SqlMigrationConnector {
     features: BitFlags<MigrationFeature>,
 }
 
+/// All the parameters needed to initialize the SQL migration connector.
+#[derive(Debug, Default)]
+pub struct SqlMigrationConnectorParams<'a> {
+    /// The main `urL` from the datasource block.
+    pub datasource_url: &'a str,
+    /// The `shadowDatabaseUrl` from the datasource block.
+    pub datasource_shadow_database_url: Option<String>,
+    /// Features enabled with `previewFeatures`
+    pub features: BitFlags<MigrationFeature>,
+}
+
 impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
-    pub async fn new(database_str: &str, features: BitFlags<MigrationFeature>) -> ConnectorResult<Self> {
-        let connection = connect(database_str).await?;
+    pub async fn new(params: SqlMigrationConnectorParams<'_>) -> ConnectorResult<Self> {
+        let connection = connect(params.datasource_url).await?;
+        let features = params.features;
         let flavour = flavour::from_connection_info(connection.connection_info(), features);
 
         flavour.ensure_connection_validity(&connection).await?;
