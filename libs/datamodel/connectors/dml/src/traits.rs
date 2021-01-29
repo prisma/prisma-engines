@@ -13,3 +13,7 @@ pub trait WithDatabaseName: WithName {
 
     fn set_database_name(&mut self, database_name: Option<String>);
 }
+
+pub trait Ignorable {
+    fn is_ignored(&self) -> bool;
+}

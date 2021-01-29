@@ -28,7 +28,7 @@ pub fn commenting_out_guardrails(
         let model_name = model.name.clone();
 
         for field in model.scalar_fields_mut() {
-            if field.name == *"" {
+            if field.name.is_empty() {
                 field.documentation = Some(
                     "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*"
                         .to_string(),
@@ -46,7 +46,7 @@ pub fn commenting_out_guardrails(
         let enum_name = enm.name.clone();
         for enum_value in enm.values_mut() {
             if let Some(name) = &enum_value.database_name {
-                if enum_value.name == *"" {
+                if enum_value.name.is_empty() {
                     enum_value.name = name.clone();
                     enum_value.commented_out = true;
                     enum_values_with_empty_names.push(EnumAndValue::new(&enum_name, &enum_value.name))
@@ -109,9 +109,13 @@ pub fn commenting_out_guardrails(
         .filter(|model| !models_without_columns.iter().any(|m| m.model == model.name))
     {
         if model.strict_unique_criterias_disregarding_unsupported().is_empty() {
-            model.is_commented_out = true; //todo this becomes ignore later
+            if native_types_enabled {
+                model.is_ignored = true;
+            } else {
+                model.is_commented_out = true;
+            }
             model.documentation = Some(
-                "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."
+                "The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client."
                     .to_string(),
             );
             models_without_identifiers.push(Model {

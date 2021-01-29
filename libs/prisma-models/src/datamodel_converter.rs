@@ -55,6 +55,7 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_models(&self) -> Vec<ModelTemplate> {
         self.datamodel
             .models()
+            .filter(|model| !model.is_ignored)
             .filter(|model| model.is_supported())
             .map(|model| ModelTemplate {
                 name: model.name.clone(),

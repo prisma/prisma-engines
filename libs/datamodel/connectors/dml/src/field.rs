@@ -2,7 +2,7 @@ use super::*;
 use crate::default_value::{DefaultValue, ValueGenerator};
 use crate::native_type_instance::NativeTypeInstance;
 use crate::scalars::ScalarType;
-use crate::traits::{WithDatabaseName, WithName};
+use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use std::hash::Hash;
 
 /// Arity of a Field in a Model.
@@ -388,5 +388,11 @@ impl WithDatabaseName for ScalarField {
     }
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
+    }
+}
+
+impl Ignorable for Field {
+    fn is_ignored(&self) -> bool {
+        false
     }
 }
