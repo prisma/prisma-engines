@@ -511,7 +511,7 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
       """model TestModel {
           id        Int     @id
         |  optInt   Int?
-        |  optFloat Float?
+        |  optFloat Decimal?
         |}
       """.stripMargin
     }
@@ -522,23 +522,23 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     // Increment
     queryNumberOperation(project, 1, "optFloat", "increment", "4.6") should be("""{"optFloat":null}""")
-    queryNumberOperation(project, 2, "optFloat", "increment", "4.6") should be("""{"optFloat":10.1}""")
+    queryNumberOperation(project, 2, "optFloat", "increment", "4.6") should be("""{"optFloat":"10.1"}""")
 
     // Decrement
     queryNumberOperation(project, 1, "optFloat", "decrement", "4.6") should be("""{"optFloat":null}""")
-    queryNumberOperation(project, 2, "optFloat", "decrement", "4.6") should be("""{"optFloat":5.5}""")
+    queryNumberOperation(project, 2, "optFloat", "decrement", "4.6") should be("""{"optFloat":"5.5"}""")
 
     // Multiply
     queryNumberOperation(project, 1, "optFloat", "multiply", "2") should be("""{"optFloat":null}""")
-    queryNumberOperation(project, 2, "optFloat", "multiply", "2") should be("""{"optFloat":11}""")
+    queryNumberOperation(project, 2, "optFloat", "multiply", "2") should be("""{"optFloat":"11"}""")
 
     // Divide
     queryNumberOperation(project, 1, "optFloat", "divide", "2") should be("""{"optFloat":null}""")
-    queryNumberOperation(project, 2, "optFloat", "divide", "2") should be("""{"optFloat":5.5}""")
+    queryNumberOperation(project, 2, "optFloat", "divide", "2") should be("""{"optFloat":"5.5"}""")
 
     // Set
-    queryNumberOperation(project, 1, "optFloat", "set", "5.1") should be("""{"optFloat":5.1}""")
-    queryNumberOperation(project, 2, "optFloat", "set", "5.1") should be("""{"optFloat":5.1}""")
+    queryNumberOperation(project, 1, "optFloat", "set", "5.1") should be("""{"optFloat":"5.1"}""")
+    queryNumberOperation(project, 2, "optFloat", "set", "5.1") should be("""{"optFloat":"5.1"}""")
 
     // Set null
     queryNumberOperation(project, 1, "optFloat", "set", "null") should be("""{"optFloat":null}""")
