@@ -98,10 +98,12 @@ impl DatasourceLoader {
 
         let provider_arg = args.arg(PROVIDER_KEY)?;
         if provider_arg.is_from_env() {
-            return Err(diagnostics.merge_error(DatamodelError::new_functional_evaluation_error(
+            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
                 &"A datasource must not use the env() function in the provider argument.".to_string(),
                 ast_source.span,
-            )));
+            ));
+
+            return Err(diagnostics);
         }
 
         let providers = provider_arg.as_array().to_str_vec()?;
@@ -112,11 +114,13 @@ impl DatasourceLoader {
         }
 
         if providers.is_empty() {
-            return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
+            diagnostics.push_error(DatamodelError::new_source_validation_error(
                 "The provider argument in a datasource must not be empty",
                 source_name,
                 provider_arg.span(),
-            )));
+            ));
+
+            return Err(diagnostics);
         }
 
         let url_arg = args.arg(URL_KEY)?;
@@ -125,27 +129,26 @@ impl DatasourceLoader {
             ignore_datasource_urls,
             datasource_url_overrides,
             source_name,
-            &mut diagnostics,
             &providers,
         )?;
 
-        let shadow_database_url = args
-            .optional_arg(SHADOW_DATABASE_URL_KEY)
-            .map(|value| -> Result<StringFromEnvVar, Diagnostics> {
-                let (env_var_name, url) = value.as_str_from_env()?;
+        let shadow_database_url = if let Some(value) = args.optional_arg(SHADOW_DATABASE_URL_KEY) {
+            let (env_var_name, url) = value.as_str_from_env()?;
 
-                if let Err(err) = validate_datasource_url(env_var_name.as_deref(), &url, source_name, &value) {
-                    diagnostics = diagnostics.merge_error(err)
-                }
+            if let Err(err) = validate_datasource_url(env_var_name.as_deref(), &url, source_name, &value) {
+                diagnostics.push_error(err);
+                return Err(diagnostics);
+            }
 
-                Ok(StringFromEnvVar {
-                    from_env_var: env_var_name,
-                    value: url,
-                })
+            Some(StringFromEnvVar {
+                from_env_var: env_var_name,
+                value: url,
             })
-            .transpose()?;
+        } else {
+            None
+        };
 
-        self.preview_features_guardrail(&mut args, &mut diagnostics)?;
+        self.preview_features_guardrail(&mut args)?;
 
         let documentation = ast_source.documentation.clone().map(|comment| comment.text);
 
@@ -155,12 +158,12 @@ impl DatasourceLoader {
             .collect();
 
         if all_datasource_providers.is_empty() {
-            return Err(
-                diagnostics.merge_error(DatamodelError::new_datasource_provider_not_known_error(
-                    &providers.join(","),
-                    provider_arg.span(),
-                )),
-            );
+            diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
+                &providers.join(","),
+                provider_arg.span(),
+            ));
+
+            return Err(diagnostics);
         }
 
         let validated_providers: Vec<_> = all_datasource_providers
@@ -199,7 +202,9 @@ impl DatasourceLoader {
                 warnings: diagnostics.warnings,
             })
         } else {
-            Err(diagnostics.merge_error(errors.into_iter().next().unwrap().err().unwrap()))
+            diagnostics.push_error(errors.into_iter().next().unwrap().err().unwrap());
+
+            Err(diagnostics)
         }
     }
 
@@ -213,9 +218,8 @@ impl DatasourceLoader {
         ignore_datasource_urls: bool,
         datasource_url_overrides: &[(String, String)],
         source_name: &str,
-        diagnostics: &mut Diagnostics,
         providers: &[String],
-    ) -> Result<StringFromEnvVar, Diagnostics> {
+    ) -> Result<StringFromEnvVar, DatamodelError> {
         let override_url = datasource_url_overrides
             .iter()
             .find(|x| &x.0 == source_name)
@@ -225,7 +229,7 @@ impl DatasourceLoader {
             (Err(err), _)
                 if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
             {
-                return Err(diagnostics.merge_error(err));
+                return Err(err)
             }
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
@@ -237,11 +241,11 @@ impl DatasourceLoader {
             }
             (Ok((env_var, url)), _) => (env_var, url.trim().to_owned()),
             (Err(err), _) => {
-                return Err(diagnostics.merge_error(err));
+                return Err(err);
             }
         };
 
-        validate_datasource_url(env_var_for_url.as_deref(), &url, source_name, &mut diagnostics, url_arg)?;
+        validate_datasource_url(env_var_for_url.as_deref(), &url, source_name, url_arg)?;
 
         Ok(StringFromEnvVar {
             from_env_var: env_var_for_url,
@@ -249,11 +253,7 @@ impl DatasourceLoader {
         })
     }
 
-    fn preview_features_guardrail(
-        &self,
-        args: &mut Arguments,
-        diagnostics: &mut Diagnostics,
-    ) -> Result<(), Diagnostics> {
+    fn preview_features_guardrail(&self, args: &mut Arguments) -> Result<(), DatamodelError> {
         let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
         let (preview_features, span) = match preview_features_arg.ok() {
             Some(x) => (x.as_array().to_str_vec()?, x.span()),
@@ -264,7 +264,7 @@ impl DatasourceLoader {
             return Ok(());
         }
 
-        Err(diagnostics.merge_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block.", span)))
+        Err(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block.", span))
     }
 }
 
