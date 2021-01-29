@@ -34,7 +34,7 @@ use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
-use sql_migration_connector::SqlMigrationConnector;
+use sql_migration_connector::{SqlMigrationConnector, SqlMigrationConnectorParams};
 use sql_schema_describer::*;
 use std::fmt::Write;
 use tempfile::TempDir;
@@ -469,7 +469,14 @@ async fn mssql_test_api(connection_string: String, args: TestAPIArgs) -> TestApi
 
     let database = Quaint::new(&connection_string).await.unwrap();
     connectors::mssql::reset_schema(&database, schema).await.unwrap();
-    let connector = SqlMigrationConnector::new(&connection_string, features).await.unwrap();
+
+    let params = SqlMigrationConnectorParams {
+        datasource_url: &connection_string,
+        features,
+        datasource_shadow_database_url: None,
+    };
+
+    let connector = SqlMigrationConnector::new(params).await.unwrap();
 
     TestApi {
         database: connector.quaint().clone(),

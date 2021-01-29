@@ -42,43 +42,32 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
     let connector = match &source.active_provider {
         #[cfg(feature = "sql")]
         provider if POSTGRES_SOURCE_NAME == provider => {
-            let database_str = &source.url().value;
+            let datasource_url = parse_postgresql_uri(&source.url().value)?;
 
-            let mut u = url::Url::parse(database_str).map_err(|err| {
-                let details = user_facing_errors::quaint::invalid_url_description(
-                    database_str,
-                    &format!("Error parsing connection string: {}", err),
-                );
+            let datasource_shadow_database_url = match source.shadow_database_url() {
+                Some(ref database_str) => Some(parse_postgresql_uri(&database_str.value)?.to_string()),
+                None => None,
+            };
 
-                ConnectorError::from(KnownError::new(InvalidDatabaseString { details }))
-            })?;
-
-            let params: Vec<(String, String)> = u.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
-
-            u.query_pairs_mut().clear();
-
-            for (k, v) in params.into_iter() {
-                if k == "statement_cache_size" {
-                    u.query_pairs_mut().append_pair("statement_cache_size", "0");
-                } else {
-                    u.query_pairs_mut().append_pair(&k, &v);
-                }
-            }
-
-            if !u.query_pairs().any(|(k, _)| k == "statement_cache_size") {
-                u.query_pairs_mut().append_pair("statement_cache_size", "0");
-            }
-
-            SqlMigrationConnector::new(SqlMigrationConnectorParams {
-                datasource_url: u.as_str(),
+            let params = SqlMigrationConnectorParams {
+                datasource_url: datasource_url.as_str(),
                 features,
-                datasource_shadow_database_url: (),
-            })
-            .await?
+                datasource_shadow_database_url,
+            };
+
+            SqlMigrationConnector::new(params).await?
         }
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
-            SqlMigrationConnector::new(&source.url().value, features).await?
+            let datasource_shadow_database_url = source.shadow_database_url().as_ref().map(|s| s.value.to_string());
+
+            let params = SqlMigrationConnectorParams {
+                datasource_url: &source.url().value,
+                features,
+                datasource_shadow_database_url,
+            };
+
+            SqlMigrationConnector::new(params).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
@@ -160,7 +149,16 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
-            SqlMigrationConnector::new(&source.url().value, features).await?
+
+            let datasource_shadow_database_url = source.shadow_database_url().as_ref().map(|s| s.value.to_string());
+
+            let params = SqlMigrationConnectorParams {
+                datasource_url: &source.url().value,
+                features,
+                datasource_shadow_database_url,
+            };
+
+            SqlMigrationConnector::new(params).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
@@ -189,6 +187,35 @@ fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
     datamodel::parse_datamodel(&datamodel)
         .map(|d| d.subject)
         .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
+}
+
+fn parse_postgresql_uri(database_str: &str) -> CoreResult<url::Url> {
+    let mut u = url::Url::parse(database_str).map_err(|err| {
+        let details = user_facing_errors::quaint::invalid_url_description(
+            database_str,
+            &format!("Error parsing connection string: {}", err),
+        );
+
+        ConnectorError::from(KnownError::new(InvalidDatabaseString { details }))
+    })?;
+
+    let params: Vec<(String, String)> = u.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
+
+    u.query_pairs_mut().clear();
+
+    for (k, v) in params.into_iter() {
+        if k == "statement_cache_size" {
+            u.query_pairs_mut().append_pair("statement_cache_size", "0");
+        } else {
+            u.query_pairs_mut().append_pair(&k, &v);
+        }
+    }
+
+    if !u.query_pairs().any(|(k, _)| k == "statement_cache_size") {
+        u.query_pairs_mut().append_pair("statement_cache_size", "0");
+    }
+
+    Ok(u)
 }
 
 #[cfg(test)]

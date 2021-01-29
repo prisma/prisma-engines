@@ -36,6 +36,10 @@ impl Datasource {
         &self.url
     }
 
+    pub fn shadow_database_url(&self) -> &Option<StringFromEnvVar> {
+        &self.shadow_database_url
+    }
+
     pub fn capabilities(&self) -> ConnectorCapabilities {
         let capabilities = self.active_connector.capabilities().clone();
         ConnectorCapabilities::new(capabilities)

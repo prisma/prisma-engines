@@ -13,7 +13,7 @@ use quaint::{
     connector::ConnectionInfo,
     visitor::{self, Visitor},
 };
-use sql_migration_connector::SqlMigrationConnector;
+use sql_migration_connector::{SqlMigrationConnector, SqlMigrationConnectorParams};
 use std::sync::Arc;
 use test_setup::*;
 
@@ -276,23 +276,31 @@ pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
+fn migration_params(datasource_url: &str) -> SqlMigrationConnectorParams {
+    SqlMigrationConnectorParams {
+        datasource_url,
+        features: BitFlags::all(),
+        datasource_shadow_database_url: None,
+    }
+}
+
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
+    SqlMigrationConnector::new(migration_params(url_str)).await.unwrap()
 }
 
 pub(super) async fn mssql_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_mssql_database(url_str).await.unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
+    SqlMigrationConnector::new(migration_params(url_str)).await.unwrap()
 }
 
 pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationConnector {
     create_postgres_database(&url_str.parse().unwrap()).await.unwrap();
-    SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
+    SqlMigrationConnector::new(migration_params(url_str)).await.unwrap()
 }
 
 pub(super) async fn sqlite_migration_connector(db_name: &str) -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_url(db_name), BitFlags::all())
+    SqlMigrationConnector::new(migration_params(&sqlite_test_url(db_name)))
         .await
         .unwrap()
 }
