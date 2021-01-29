@@ -3175,3 +3175,27 @@ async fn creating_an_ignored_model_should_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn using_unsupported_and_ignore_should_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        generator client {
+            provider        = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
+        }
+        
+        datasource db {
+            provider = "postgresql"
+            url      = "postgresql://.."
+        }
+        
+        model UnsupportedModel {
+            polygonField Unsupported("macaddr")? @unique
+            @@ignore
+        }
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    Ok(())
+}

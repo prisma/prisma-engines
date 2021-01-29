@@ -426,7 +426,7 @@ impl<'a> Validator<'a> {
             ast_model.span,
         ));
 
-        if model.strict_unique_criterias().is_empty() {
+        if model.strict_unique_criterias().is_empty() && !model.is_ignored {
             return missing_id_criteria_error;
         }
 
