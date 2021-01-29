@@ -452,6 +452,7 @@ impl QueryDocumentParser {
                 Ok((k, parsed))
             })
             .collect::<QueryParserResult<ParsedInputMap>>()?;
+
         map.extend(defaults.into_iter());
 
         // Ensure the constraints are upheld.

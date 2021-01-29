@@ -68,7 +68,7 @@ impl TryInto<Option<ParsedInputMap>> for ParsedInputValue {
     }
 }
 
-impl TryInto<Vec<ParsedInputValue>> for ParsedInputValue {
+impl TryInto<ParsedInputList> for ParsedInputValue {
     type Error = QueryParserError;
 
     fn try_into(self) -> QueryParserResult<Vec<ParsedInputValue>> {

@@ -67,6 +67,9 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
+            ConnectorCapability::CreateMany,
+            ConnectorCapability::WritableAutoincField,
+            ConnectorCapability::CreateSkipDuplicates,
         ];
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -148,6 +151,18 @@ impl MySqlDatamodelConnector {
     }
 }
 
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
+    (ScalarType::Int, MySqlType::Int),
+    (ScalarType::BigInt, MySqlType::BigInt),
+    (ScalarType::Float, MySqlType::Decimal(Some((65, 30)))),
+    (ScalarType::Decimal, MySqlType::Decimal(Some((65, 30)))),
+    (ScalarType::Boolean, MySqlType::TinyInt),
+    (ScalarType::String, MySqlType::VarChar(191)),
+    (ScalarType::DateTime, MySqlType::DateTime(Some(3))),
+    (ScalarType::Bytes, MySqlType::LongBlob),
+    (ScalarType::Json, MySqlType::Json),
+];
+
 impl Connector for MySqlDatamodelConnector {
     fn name(&self) -> String {
         "MySQL".to_string()
@@ -155,6 +170,25 @@ impl Connector for MySqlDatamodelConnector {
 
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
+    }
+
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+        let native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
+            .unwrap();
+
+        serde_json::to_value(native_type).expect("MySqlType to JSON failed")
+    }
+
+    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
+        let native_type: MySqlType = serde_json::from_value(native_type).expect("MySqlType from JSON failed");
+
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
@@ -230,7 +264,7 @@ impl Connector for MySqlDatamodelConnector {
         Ok(())
     }
 
-    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
         &self.constructors
     }
 

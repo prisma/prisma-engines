@@ -1,22 +1,23 @@
 use super::super::attributes::AllAttributes;
-use crate::ast::Span;
+use crate::ast::{Attribute, Span};
 use crate::configuration::preview_features::PreviewFeatures;
-use crate::dml::FieldType::NativeType;
 use crate::{ast, dml, Datasource, Generator};
 
 pub struct LowerDmlToAst<'a> {
     attributes: AllAttributes,
     datasource: Option<&'a Datasource>,
-    generators: &'a Vec<Generator>,
+    native_types_enabled: bool,
 }
 
 impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(datasource: Option<&'a Datasource>, generators: &'a Vec<Generator>) -> Self {
+    pub fn new(datasource: Option<&'a Datasource>, generators: &[Generator]) -> Self {
+        let native_types_enabled = generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
+
         Self {
             attributes: AllAttributes::new(),
             datasource,
-            generators,
+            native_types_enabled,
         }
     }
 
@@ -74,21 +75,12 @@ impl<'a> LowerDmlToAst<'a> {
 
     pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> ast::Field {
         let mut attributes = self.attributes.field.serialize(field, datamodel);
-        if let (dml::Field::ScalarField(sf), Some(datasource)) = (field, self.datasource) {
-            if let NativeType(_prisma_tpe, native_tpe) = sf.clone().field_type {
-                if self.generators.iter().any(|g| g.has_preview_feature("nativeTypes")) {
-                    let new_attribute_name = format!("{}.{}", datasource.name, native_tpe.name);
-                    // lower native type arguments
-                    let mut arguments = vec![];
-                    for arg in native_tpe.args {
-                        arguments.push(ast::Argument::new_unnamed(ast::Expression::NumericValue(
-                            arg.to_string(),
-                            Span::empty(),
-                        )));
-                    }
-                    attributes.push(ast::Attribute::new(new_attribute_name.as_str(), arguments));
-                }
-            }
+
+        if let (Some((scalar_type, native_type)), Some(datasource)) = (
+            field.as_scalar_field().and_then(|sf| sf.field_type.as_native_type()),
+            self.datasource,
+        ) {
+            self.lower_native_type_attribute(scalar_type, native_type, &mut attributes, datasource);
         }
 
         ast::Field {
@@ -96,9 +88,7 @@ impl<'a> LowerDmlToAst<'a> {
             arity: self.lower_field_arity(field.arity()),
             attributes,
             field_type: self.lower_type(&field.field_type()),
-            documentation: field
-                .documentation()
-                .map(|text| ast::Comment { text: text.to_string() }),
+            documentation: field.documentation().map(|text| ast::Comment { text: text.to_owned() }),
             span: ast::Span::empty(),
             is_commented_out: field.is_commented_out(),
         }
@@ -119,10 +109,38 @@ impl<'a> LowerDmlToAst<'a> {
             dml::FieldType::Base(tpe, custom_type_name) => {
                 ast::Identifier::new(&custom_type_name.as_ref().unwrap_or(&tpe.to_string()))
             }
-            dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
+            dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe),
             dml::FieldType::Unsupported(tpe) => ast::Identifier::new(&format!("Unsupported(\"{}\")", tpe)),
             dml::FieldType::Relation(rel) => ast::Identifier::new(&rel.to),
             dml::FieldType::NativeType(prisma_tpe, _native_tpe) => ast::Identifier::new(&prisma_tpe.to_string()),
         }
+    }
+
+    fn lower_native_type_attribute(
+        &self,
+        scalar_type: &dml::ScalarType,
+        native_type: &dml::NativeTypeInstance,
+        attributes: &mut Vec<Attribute>,
+        datasource: &Datasource,
+    ) {
+        if !self.native_types_enabled {
+            return;
+        }
+
+        if datasource
+            .active_connector
+            .native_type_is_default_for_scalar_type(native_type.serialized_native_type.clone(), scalar_type)
+        {
+            return;
+        }
+
+        let new_attribute_name = format!("{}.{}", datasource.name, native_type.name);
+        let arguments = native_type
+            .args
+            .iter()
+            .map(|arg| ast::Argument::new_unnamed(ast::Expression::NumericValue(arg.to_owned(), Span::empty())))
+            .collect();
+
+        attributes.push(ast::Attribute::new(new_attribute_name.as_str(), arguments));
     }
 }

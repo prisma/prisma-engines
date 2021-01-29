@@ -45,6 +45,13 @@ pub enum FieldType {
 }
 
 impl FieldType {
+    pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
+        match self {
+            FieldType::NativeType(a, b) => Some((a, b)),
+            _ => None,
+        }
+    }
+
     pub fn is_compatible_with(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
@@ -76,6 +83,13 @@ pub enum Field {
 }
 
 impl Field {
+    pub fn as_scalar_field(&self) -> Option<&ScalarField> {
+        match self {
+            Field::ScalarField(sf) => Some(sf),
+            _ => None,
+        }
+    }
+
     pub fn is_relation(&self) -> bool {
         match self {
             Field::ScalarField(_) => false,

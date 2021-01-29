@@ -51,6 +51,7 @@ impl MsSqlDatamodelConnector {
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::AutoIncrementMultipleAllowed,
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
+            ConnectorCapability::CreateMany,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![
@@ -91,6 +92,24 @@ impl MsSqlDatamodelConnector {
     }
 }
 
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MsSqlType)] = &[
+    (ScalarType::Int, MsSqlType::Int),
+    (ScalarType::BigInt, MsSqlType::BigInt),
+    (ScalarType::Float, MsSqlType::Decimal(Some((32, 16)))),
+    (ScalarType::Decimal, MsSqlType::Decimal(Some((32, 16)))),
+    (ScalarType::Boolean, MsSqlType::Bit),
+    (
+        ScalarType::String,
+        MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
+    ),
+    (ScalarType::DateTime, MsSqlType::DateTime2),
+    (ScalarType::Bytes, MsSqlType::VarBinary(Some(MsSqlTypeParameter::Max))),
+    (
+        ScalarType::Json,
+        MsSqlType::NVarChar(Some(MsSqlTypeParameter::Number(1000))),
+    ),
+];
+
 impl Connector for MsSqlDatamodelConnector {
     fn name(&self) -> String {
         "SQL Server".to_string()
@@ -98,6 +117,25 @@ impl Connector for MsSqlDatamodelConnector {
 
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
+    }
+
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+        let native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
+            .unwrap();
+
+        serde_json::to_value(native_type).expect("MsSqlType to JSON failed")
+    }
+
+    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
+        let native_type: MsSqlType = serde_json::from_value(native_type).expect("MsSqlType from JSON failed");
+
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .any(|(st, nt)| scalar_type == st && &native_type == nt)
     }
 
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
@@ -182,7 +220,7 @@ impl Connector for MsSqlDatamodelConnector {
         Ok(())
     }
 
-    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
         &self.constructors
     }
 

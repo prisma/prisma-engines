@@ -1,7 +1,7 @@
 use super::*;
 use prisma_models::dml::DefaultValue;
 
-pub(crate) fn create_input_types(
+pub(crate) fn create_one_input_types(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
@@ -87,7 +87,7 @@ fn relation_input_fields_for_checked_create(
             let related_field = rf.related_field();
 
             // Compute input object name
-            let arity_part = if rf.is_list { "Many" } else { "One" };
+            let arity_part = if rf.is_list { "NestedMany" } else { "NestedOne" };
             let without_part = format!("Without{}", capitalize(&related_field.name));
             let ident = Identifier::new(
                 format!("{}Create{}{}Input", related_model.name, arity_part, without_part),
@@ -222,7 +222,7 @@ fn relation_input_fields_for_unchecked_create(
             let child_field = rf.related_field();
 
             // Compute input object name
-            let arity_part = if rf.is_list { "Many" } else { "One" };
+            let arity_part = if rf.is_list { "NestedMany" } else { "NestedOne" };
             let without_part = format!("Without{}", capitalize(&child_field.name));
             let ident = Identifier::new(
                 format!("{}UncheckedCreate{}{}Input", child_model.name, arity_part, without_part),
