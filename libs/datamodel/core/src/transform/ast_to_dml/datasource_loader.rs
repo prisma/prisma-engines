@@ -129,15 +129,7 @@ impl DatasourceLoader {
             &providers,
         )?;
 
-        let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
-        let (preview_features, span) = match preview_features_arg.ok() {
-            Some(x) => (x.as_array().to_str_vec()?, x.span()),
-            None => (Vec::new(), Span::empty()),
-        };
-
-        if !preview_features.is_empty() {
-            return Err(diagnostics.merge_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block.", span)));
-        }
+        self.preview_features_guardrail(&mut args, &mut diagnostics)?;
 
         let documentation = ast_source.documentation.clone().map(|comment| comment.text);
 
@@ -186,7 +178,6 @@ impl DatasourceLoader {
                     documentation,
                     combined_connector,
                     active_connector: first_successful_provider.connector(),
-                    preview_features,
                 },
                 warnings: diagnostics.warnings,
             })
@@ -258,6 +249,24 @@ impl DatasourceLoader {
             from_env_var: env_var_for_url,
             value: url,
         })
+    }
+
+    fn preview_features_guardrail(
+        &self,
+        args: &mut Arguments,
+        diagnostics: &mut Diagnostics,
+    ) -> Result<(), Diagnostics> {
+        let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
+        let (preview_features, span) = match preview_features_arg.ok() {
+            Some(x) => (x.as_array().to_str_vec()?, x.span()),
+            None => (Vec::new(), Span::empty()),
+        };
+
+        if preview_features.is_empty() {
+            return Ok(());
+        }
+
+        Err(diagnostics.merge_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block.", span)))
     }
 }
 
