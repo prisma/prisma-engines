@@ -13,6 +13,7 @@ impl From<my::Error> for Error {
                     .split_whitespace()
                     .last()
                     .and_then(|s| s.split('\'').nth(1))
+                    .and_then(|s| s.split('.').last())
                     .map(ToString::to_string)
                     .map(DatabaseConstraint::Index)
                     .unwrap_or(DatabaseConstraint::CannotParse);
