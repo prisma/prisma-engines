@@ -11,6 +11,9 @@ use crate::{ast, Datasource};
 use datamodel_connector::{CombinedConnector, Connector};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
+const PROVIDER_KEY: &str = "provider";
+const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
+const URL_KEY: &str = "url";
 
 /// Is responsible for loading and validating Datasources defined in an AST.
 pub struct DatasourceLoader {
@@ -93,7 +96,7 @@ impl DatasourceLoader {
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
         let mut diagnostics = Diagnostics::new();
 
-        let provider_arg = args.arg("provider")?;
+        let provider_arg = args.arg(PROVIDER_KEY)?;
         if provider_arg.is_from_env() {
             return Err(diagnostics.merge_error(DatamodelError::new_functional_evaluation_error(
                 &"A datasource must not use the env() function in the provider argument.".to_string(),
@@ -116,13 +119,101 @@ impl DatasourceLoader {
             )));
         }
 
-        let url_args = args.arg("url")?;
+        let url_arg = args.arg(URL_KEY)?;
+        let url = self.get_url(
+            &url_arg,
+            ignore_datasource_urls,
+            datasource_url_overrides,
+            source_name,
+            &mut diagnostics,
+            &providers,
+        )?;
+
+        let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
+        let (preview_features, span) = match preview_features_arg.ok() {
+            Some(x) => (x.as_array().to_str_vec()?, x.span()),
+            None => (Vec::new(), Span::empty()),
+        };
+
+        if !preview_features.is_empty() {
+            return Err(diagnostics.merge_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block.", span)));
+        }
+
+        let documentation = ast_source.documentation.clone().map(|comment| comment.text);
+
+        let all_datasource_providers: Vec<_> = providers
+            .iter()
+            .filter_map(|provider| self.get_datasource_provider(&provider))
+            .collect();
+
+        if all_datasource_providers.is_empty() {
+            return Err(
+                diagnostics.merge_error(DatamodelError::new_datasource_provider_not_known_error(
+                    &providers.join(","),
+                    provider_arg.span(),
+                )),
+            );
+        }
+
+        let validated_providers: Vec<_> = all_datasource_providers
+            .iter()
+            .map(|provider| {
+                let url_check_result = provider.can_handle_url(source_name, &url).map_err(|err_msg| {
+                    DatamodelError::new_source_validation_error(&err_msg, source_name, url_arg.span())
+                });
+                url_check_result.map(|_| provider)
+            })
+            .collect();
+
+        let combined_connector: Box<dyn Connector> = {
+            let connectors = all_datasource_providers.iter().map(|sd| sd.connector()).collect();
+            Box::new(CombinedConnector::new(connectors))
+        };
+
+        // The first provider that can handle the URL is used to construct the Datasource.
+        // If no provider can handle it, return the first error.
+        let (successes, errors): (Vec<_>, Vec<_>) = validated_providers.into_iter().partition(|result| result.is_ok());
+
+        if let Some(first_provider) = successes.into_iter().next() {
+            let first_successful_provider = first_provider?;
+
+            Ok(ValidatedDatasource {
+                subject: Datasource {
+                    name: source_name.to_string(),
+                    provider: providers,
+                    active_provider: first_successful_provider.canonical_name().to_string(),
+                    url,
+                    documentation,
+                    combined_connector,
+                    active_connector: first_successful_provider.connector(),
+                    preview_features,
+                },
+                warnings: diagnostics.warnings,
+            })
+        } else {
+            Err(diagnostics.merge_error(errors.into_iter().next().unwrap().err().unwrap()))
+        }
+    }
+
+    fn get_datasource_provider(&self, provider: &str) -> Option<&Box<dyn DatasourceProvider>> {
+        self.source_definitions.iter().find(|sd| sd.is_provider(provider))
+    }
+
+    fn get_url(
+        &self,
+        url_arg: &ValueValidator,
+        ignore_datasource_urls: bool,
+        datasource_url_overrides: &[(String, String)],
+        source_name: &str,
+        diagnostics: &mut Diagnostics,
+        providers: &[String],
+    ) -> Result<StringFromEnvVar, Diagnostics> {
         let override_url = datasource_url_overrides
             .iter()
             .find(|x| &x.0 == source_name)
             .map(|x| &x.1);
 
-        let (env_var_for_url, url) = match (url_args.as_str_from_env(), override_url) {
+        let (env_var_for_url, url) = match (url_arg.as_str_from_env(), override_url) {
             (Err(err), _)
                 if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
             {
@@ -150,87 +241,23 @@ impl DatasourceLoader {
                 ),
                 None => "".to_owned(),
             };
+
             let msg = format!(
                 "You must provide a nonempty URL for the datasource `{}`.{}",
                 source_name, &suffix
             );
+
             return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
                 &msg,
                 source_name,
-                url_args.span(),
+                url_arg.span(),
             )));
         }
 
-        let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
-        let (preview_features, span) = match preview_features_arg.ok() {
-            Some(x) => (x.as_array().to_str_vec()?, x.span()),
-            None => (Vec::new(), Span::empty()),
-        };
-
-        if !preview_features.is_empty() {
-            return Err(diagnostics.merge_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block.", span)));
-        }
-
-        let documentation = ast_source.documentation.clone().map(|comment| comment.text);
-        let url = StringFromEnvVar {
+        Ok(StringFromEnvVar {
             from_env_var: env_var_for_url,
             value: url,
-        };
-
-        let all_datasource_providers: Vec<_> = providers
-            .iter()
-            .filter_map(|provider| self.get_datasource_provider(&provider))
-            .collect();
-
-        if all_datasource_providers.is_empty() {
-            return Err(
-                diagnostics.merge_error(DatamodelError::new_datasource_provider_not_known_error(
-                    &providers.join(","),
-                    provider_arg.span(),
-                )),
-            );
-        }
-
-        let validated_providers: Vec<_> = all_datasource_providers
-            .iter()
-            .map(|provider| {
-                let url_check_result = provider.can_handle_url(source_name, &url).map_err(|err_msg| {
-                    DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
-                });
-                url_check_result.map(|_| provider)
-            })
-            .collect();
-
-        let combined_connector: Box<dyn Connector> = {
-            let connectors = all_datasource_providers.iter().map(|sd| sd.connector()).collect();
-            Box::new(CombinedConnector::new(connectors))
-        };
-
-        // The first provider that can handle the URL is used to construct the Datasource.
-        // If no provider can handle it, return the first error.
-        let (successes, errors): (Vec<_>, Vec<_>) = validated_providers.into_iter().partition(|result| result.is_ok());
-        if !successes.is_empty() {
-            let first_successful_provider = successes.into_iter().next().unwrap()?;
-            Ok(ValidatedDatasource {
-                subject: Datasource {
-                    name: source_name.to_string(),
-                    provider: providers,
-                    active_provider: first_successful_provider.canonical_name().to_string(),
-                    url,
-                    documentation,
-                    combined_connector,
-                    active_connector: first_successful_provider.connector(),
-                    preview_features,
-                },
-                warnings: diagnostics.warnings,
-            })
-        } else {
-            Err(diagnostics.merge_error(errors.into_iter().next().unwrap().err().unwrap()))
-        }
-    }
-
-    fn get_datasource_provider(&self, provider: &str) -> Option<&Box<dyn DatasourceProvider>> {
-        self.source_definitions.iter().find(|sd| sd.is_provider(provider))
+        })
     }
 }
 
@@ -241,10 +268,4 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(SqliteDatasourceProvider::new()),
         Box::new(MsSqlDatasourceProvider::new()),
     ]
-}
-
-impl Default for DatasourceLoader {
-    fn default() -> Self {
-        Self::new()
-    }
 }
