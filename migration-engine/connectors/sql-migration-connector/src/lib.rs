@@ -48,9 +48,16 @@ pub struct SqlMigrationConnectorParams<'a> {
 impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
     pub async fn new(params: SqlMigrationConnectorParams<'_>) -> ConnectorResult<Self> {
-        let connection = connect(params.datasource_url).await?;
-        let features = params.features;
-        let flavour = flavour::from_connection_info(connection.connection_info(), features);
+        let SqlMigrationConnectorParams {
+            datasource_url,
+            datasource_shadow_database_url,
+            features,
+        } = params;
+
+        let connection = connect(datasource_url).await?;
+
+        let flavour =
+            flavour::from_connection_info(connection.connection_info(), features, datasource_shadow_database_url);
 
         flavour.ensure_connection_validity(&connection).await?;
 
@@ -65,7 +72,7 @@ impl SqlMigrationConnector {
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty(), None);
         flavour.create_database(database_str).await
     }
 
@@ -73,7 +80,7 @@ impl SqlMigrationConnector {
     pub async fn drop_database(database_str: &str) -> ConnectorResult<()> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty(), None);
 
         flavour.drop_database(database_str).await
     }
@@ -83,7 +90,7 @@ impl SqlMigrationConnector {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty(), None);
 
         flavour.qe_setup(database_str).await
     }

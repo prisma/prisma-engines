@@ -18,6 +18,7 @@ use url::Url;
 #[derive(Debug)]
 pub(crate) struct MysqlFlavour {
     pub(super) url: MysqlUrl,
+    pub(super) shadow_database_url: Option<String>,
     /// See the [Circumstances] enum.
     pub(super) circumstances: AtomicU8,
     /// Relevant features enabled in the schema,

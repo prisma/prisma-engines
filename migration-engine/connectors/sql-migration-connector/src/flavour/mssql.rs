@@ -14,12 +14,17 @@ use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, Known
 #[derive(Debug)]
 pub(crate) struct MssqlFlavour {
     pub(crate) url: MssqlUrl,
+    shadow_database_url: Option<String>,
     features: BitFlags<MigrationFeature>,
 }
 
 impl MssqlFlavour {
-    pub fn new(url: MssqlUrl, features: BitFlags<MigrationFeature>) -> Self {
-        Self { url, features }
+    pub fn new(url: MssqlUrl, shadow_database_url: Option<String>, features: BitFlags<MigrationFeature>) -> Self {
+        Self {
+            url,
+            shadow_database_url,
+            features,
+        }
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -196,9 +201,11 @@ impl SqlFlavour for MssqlFlavour {
             .map_err(|err| err.into_shadow_db_creation_error())?;
 
         let mut jdbc_string: JdbcString = self.url.connection_string().parse().unwrap();
+
         jdbc_string
             .properties_mut()
             .insert("database".into(), database_name.clone());
+
         let temporary_database_url = jdbc_string.to_string();
 
         tracing::debug!("Connecting to temporary database at `{}`", temporary_database_url);

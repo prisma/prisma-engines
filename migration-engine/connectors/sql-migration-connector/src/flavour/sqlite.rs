@@ -9,6 +9,7 @@ use std::path::Path;
 #[derive(Debug)]
 pub(crate) struct SqliteFlavour {
     pub(super) file_path: String,
+    pub(super) shadow_database_url: Option<String>,
     pub(super) attached_name: String,
     pub(super) features: BitFlags<MigrationFeature>,
 }

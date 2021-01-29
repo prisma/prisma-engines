@@ -14,12 +14,17 @@ use user_facing_errors::{
 #[derive(Debug)]
 pub(crate) struct PostgresFlavour {
     pub(crate) url: PostgresUrl,
+    shadow_database_url: Option<String>,
     features: BitFlags<MigrationFeature>,
 }
 
 impl PostgresFlavour {
-    pub fn new(url: PostgresUrl, features: BitFlags<MigrationFeature>) -> Self {
-        Self { url, features }
+    pub fn new(url: PostgresUrl, shadow_database_url: Option<String>, features: BitFlags<MigrationFeature>) -> Self {
+        Self {
+            url,
+            shadow_database_url,
+            features,
+        }
     }
 
     pub(crate) fn schema_name(&self) -> &str {
