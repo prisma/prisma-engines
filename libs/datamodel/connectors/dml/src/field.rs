@@ -45,6 +45,13 @@ pub enum FieldType {
 }
 
 impl FieldType {
+    pub fn as_base(&self) -> Option<&ScalarType> {
+        match self {
+            FieldType::Base(scalar_type, _) => Some(scalar_type),
+            _ => None,
+        }
+    }
+
     pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
         match self {
             FieldType::NativeType(a, b) => Some((a, b)),
@@ -52,7 +59,7 @@ impl FieldType {
         }
     }
 
-    pub fn is_compatible_with(&self, other: &Self) -> bool {
+    pub fn is_compatible_with(&self, other: &FieldType) -> bool {
         match (self, other) {
             (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
             (a, b) => a == b,
