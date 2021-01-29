@@ -655,21 +655,44 @@ impl<'a> Validator<'a> {
                         let base_field = model.find_field(&base_field)?;
                         let referenced_field = related_model.find_field(&referenced_field)?;
 
-                        if !base_field.field_type().is_compatible_with(&referenced_field.field_type()) {
-                            Some(DatamodelError::new_attribute_validation_error(
-                                &format!(
-                                    "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
-                                    &base_field.name(),
-                                    &model.name,
-                                    &referenced_field.name(),
-                                    &related_model.name
-                                ),
-                                RELATION_ATTRIBUTE_NAME,
-                                ast_field.span,
-                            ))
-                        } else {
-                            None
+                        if base_field.field_type().is_compatible_with(&referenced_field.field_type()) {
+                            return None
                         }
+
+                        // Try harder to see if the final type is not the same.
+                        // This check needs the connector, so it can't be in the dml
+                        // crate.
+                        if let Some(connector) = self.source.map(|source| &source.active_connector) {
+                            let base_native_type = base_field.field_type().as_native_type().map(|(scalar, native)| (scalar.clone(), native.serialized_native_type.clone())).or_else(|| -> Option<_> {
+                                let field_type = base_field.field_type();
+                                let scalar_type = field_type.as_base()?;
+
+                                Some((scalar_type.clone(), connector.default_native_type_for_scalar_type(scalar_type, true)))
+                            });
+
+                            let referenced_native_type = referenced_field.field_type().as_native_type().map(|(scalar, native)| (scalar.clone(), native.serialized_native_type.clone())).or_else(|| -> Option<_> {
+                                let field_type = referenced_field.field_type();
+                                let scalar_type = field_type.as_base()?;
+
+                                Some((scalar_type.clone(), connector.default_native_type_for_scalar_type(scalar_type, true)))
+                            });
+
+                            if base_native_type.is_some() && base_native_type == referenced_native_type {
+                                return None
+                            }
+                        }
+
+                        Some(DatamodelError::new_attribute_validation_error(
+                            &format!(
+                                "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
+                                &base_field.name(),
+                                &model.name,
+                                &referenced_field.name(),
+                                &related_model.name
+                            ),
+                            RELATION_ATTRIBUTE_NAME,
+                            ast_field.span,
+                        ))
                     })
                     .collect();
 

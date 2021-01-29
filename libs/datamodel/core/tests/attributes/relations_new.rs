@@ -2,6 +2,7 @@ use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::diagnostics::DatamodelError;
 use datamodel::dml;
+use indoc::indoc;
 
 #[test]
 fn relation_happy_path() {
@@ -49,13 +50,13 @@ fn relation_must_error_when_base_field_does_not_exist() {
 
     model Post {
         id Int @id
-        text String        
+        text String
         user User @relation(fields: [userId], references: [id])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument fields must refer only to existing fields. The following fields do not exist in this model: userId", Span::new(162, 218)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument fields must refer only to existing fields. The following fields do not exist in this model: userId", Span::new(154, 210)));
 }
 
 #[test]
@@ -71,12 +72,12 @@ fn relation_must_error_when_base_field_is_not_scalar() {
         id Int @id
         text String
         userId Int
-        otherId Int        
-        
+        otherId Int
+
         user User @relation(fields: [other], references: [id])
         other OtherModel @relation(fields: [otherId], references: [id])
     }
-    
+
     model OtherModel {
         id Int @id
         posts Post[]
@@ -84,8 +85,8 @@ fn relation_must_error_when_base_field_is_not_scalar() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is_at(0,DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(210, 265)));
-    errors.assert_is_at(1,DatamodelError::new_attribute_validation_error("The type of the field `other` in the model `Post` is not matching the type of the referenced field `id` in model `User`.", "relation", Span::new(210, 265)));
+    errors.assert_is_at(0,DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(194, 249)));
+    errors.assert_is_at(1,DatamodelError::new_attribute_validation_error("The type of the field `other` in the model `Post` is not matching the type of the referenced field `id` in model `User`.", "relation", Span::new(194, 249)));
 }
 
 #[test]
@@ -96,7 +97,7 @@ fn optional_relation_field_must_succeed_when_all_underlying_fields_are_optional(
         firstName String?
         lastName  String?
         posts     Post[]
-        
+
         @@unique([firstName, lastName])
     }
 
@@ -105,7 +106,7 @@ fn optional_relation_field_must_succeed_when_all_underlying_fields_are_optional(
         text          String
         userFirstName String?
         userLastName  String?
-          
+
         user          User?   @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
     }
     "#;
@@ -122,7 +123,7 @@ fn optional_relation_field_must_error_when_one_underlying_field_is_required() {
         firstName String
         lastName  String?
         posts     Post[]
-        
+
         @@unique([firstName, lastName])
     }
 
@@ -131,13 +132,13 @@ fn optional_relation_field_must_error_when_one_underlying_field_is_required() {
         text          String
         userFirstName String
         userLastName  String?
-          
+
         user          User?   @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is required. Hence the relation field must be required as well.", Span::new(338, 444)));
+    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is required. Hence the relation field must be required as well.", Span::new(320, 426)));
 }
 
 #[test]
@@ -148,7 +149,7 @@ fn required_relation_field_must_succeed_when_at_least_one_underlying_fields_is_r
         firstName String
         lastName  String?
         posts     Post[]
-        
+
         @@unique([firstName, lastName])
     }
 
@@ -157,7 +158,7 @@ fn required_relation_field_must_succeed_when_at_least_one_underlying_fields_is_r
         text          String
         userFirstName String
         userLastName  String?
-          
+
         user          User    @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
     }
     "#;
@@ -174,7 +175,7 @@ fn required_relation_field_must_error_when_all_underlying_fields_are_optional() 
         firstName String?
         lastName  String?
         posts     Post[]
-        
+
         @@unique([firstName, lastName])
     }
 
@@ -183,13 +184,13 @@ fn required_relation_field_must_error_when_all_underlying_fields_are_optional() 
         text          String
         userFirstName String?
         userLastName  String?
-          
+
         user          User    @relation(fields: [userFirstName, userLastName], references: [firstName, lastName])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. All those fields are optional. Hence the relation field must be optional as well.", Span::new(340, 446)));
+    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. All those fields are optional. Hence the relation field must be optional as well.", Span::new(322, 428)));
 }
 
 #[test]
@@ -197,12 +198,12 @@ fn required_relation_field_must_error_if_it_is_virtual() {
     let dml = r#"
     model User {
         id      Int     @id
-        address Address       
+        address Address
     }
 
     model Address {
         id     Int     @id
-        userId Int          
+        userId Int
         user   User    @relation(fields: [userId], references: [id])
     }
     "#;
@@ -211,7 +212,7 @@ fn required_relation_field_must_error_if_it_is_virtual() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "The relation field `address` on Model `User` is required. This is no longer valid because it\'s not possible to enforce this constraint on the database level. Please change the field type from `Address` to `Address?` to fix this.",
         "relation",
-        Span::new(54, 77),
+        Span::new(54, 70),
     ));
 }
 
@@ -227,13 +228,13 @@ fn relation_must_error_when_referenced_field_does_not_exist() {
     model Post {
         id Int @id
         text String
-        userId Int        
+        userId Int
         user User @relation(fields: [userId], references: [fooBar])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(181, 241)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(173, 233)));
 }
 
 #[test]
@@ -248,13 +249,13 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
     model Post {
         id Int @id
         text String
-        userId Int        
+        userId Int
         user User @relation(fields: [userId], references: [posts])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(181, 240)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(173, 232)));
 }
 
 #[test]
@@ -269,13 +270,13 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     model Post {
         id       Int    @id
         text     String
-        userName String        
+        userName String
         user     User   @relation(fields: [userName], references: [firstName])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(213, 284)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(205, 276)));
 }
 
 #[allow(non_snake_case)]
@@ -288,7 +289,7 @@ fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_m
         provider = "mysql"
         url = "mysql://localhost:3306"
     }
-    
+
     model User {
         id        Int    @id
         firstName String
@@ -298,7 +299,7 @@ fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_m
     model Post {
         id       Int    @id
         text     String
-        userName String        
+        userName String
         user     User   @relation(fields: [userName], references: [firstName])
     }
     "#;
@@ -319,14 +320,14 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
         id       Int    @id
         text     String
         userId   Int
-        userName String        
+        userName String
         // the relation is referencing two uniques. That is too much.
         user User @relation(fields: [userId, userName], references: [id, firstName])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(298, 375)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(290, 367)));
 }
 
 #[test]
@@ -378,7 +379,7 @@ fn relation_must_error_when_number_of_fields_and_references_is_not_equal() {
 fn relation_must_succeed_when_type_alias_is_used_for_referenced_field() {
     let dml = r#"
     type CustomId = Int @id @default(autoincrement())
-    
+
     model User {
         id        CustomId
         firstName String
@@ -451,13 +452,13 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
             provider = "postgres"
             url = "postgresql://localhost:5432"
         }
-        
+
         model User {
           id     Int    @id
           postId Int[]
           posts  Post[] @relation(fields: [postId], references: [id])
         }
-        
+
         model Post {
           id     Int   @id
           userId Int?
@@ -469,7 +470,7 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
     errors.assert_is(
         DatamodelError::new_attribute_validation_error(
             "The relation field `posts` on Model `User` must not specify the `fields` or `references` argument in the @relation attribute. You must only specify it on the opposite field `user` on model `Post`.",
-            "relation", Span::new(208, 268)
+            "relation", Span::new(200, 260)
         ),
     );
 }
@@ -678,10 +679,10 @@ fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
     let dml = r#"
     model Post {
       id         Int        @id
-      slug       Int        @unique 
+      slug       Int        @unique
       categories Category[] @relation(references: [id])
    }
-   
+
    model Category {
      id    Int    @id @default(autoincrement())
      posts Post[] @relation(references: [slug])
@@ -691,8 +692,8 @@ fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
     errors.assert_is_at(
         0,
         DatamodelError::new_validation_error(
-            "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug",  
-            Span::new(225, 268)
+            "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug",
+            Span::new(221, 264)
         ),
     );
 }
@@ -702,13 +703,13 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
     // many 2 many is not possible because Post does not have a singular id field
     let dml = r#"
     model Post {
-      id         Int        
-      slug       Int        @unique 
+      id         Int
+      slug       Int        @unique
       categories Category[] @relation(references: [id])
-      
+
       @@id([id, slug])
    }
-   
+
    model Category {
      id    Int    @id @default(autoincrement())
      posts Post[] @relation(references: [slug])
@@ -719,7 +720,7 @@ fn must_error_nicely_when_a_many_to_many_is_not_possible() {
         "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
         "Category",
         "posts",
-        Span::new(252, 295)
+        Span::new(234, 277)
     ));
 }
 
@@ -728,10 +729,10 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
     let dml = r#"
     // Post does not have @id
     model Post {
-     slug       Int        @unique 
+     slug       Int        @unique
      categories Category[]
    }
-   
+
    model Category {
      id    Int    @id @default(autoincrement())
      posts Post[]
@@ -741,10 +742,93 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
     errors.assert_is_at(
         0,
         DatamodelError::new_field_validation_error(
-            "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.", 
+            "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
             "Category",
-            "posts", 
-            Span::new(193, 206)
+            "posts",
+            Span::new(189, 202)
         ),
     );
+}
+
+#[test]
+fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() {
+    let dm1 = indoc! {
+        r#"
+        datasource db {
+        provider = "mysql"
+        url      = "mysql://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id        Int   @id
+            authorId  Int @db.Int
+            author    User @relation(fields: [authorId], references: [id])
+        }
+
+        model User {
+            id Int @id
+        }
+        "#
+    };
+
+    let dm2 = indoc! {
+        r#"
+        datasource db {
+        provider = "mysql"
+        url      = "mysql://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id        Int   @id
+            authorId  Int
+            author    User @relation(fields: [authorId], references: [id])
+        }
+
+        model User {
+            id Int @id @db.Int
+        }
+        "#
+    };
+
+    let dm3 = indoc! {
+        r#"
+        datasource db {
+        provider = "mysql"
+        url      = "mysql://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id        Int   @id
+            authorId  Int?   @db.Int
+            author    User?  @relation(fields: [authorId], references: [id])
+        }
+
+        model User {
+            id Int @id @db.Int
+        }
+        "#
+    };
+
+    for dm in &[dm1, dm2, dm3] {
+        assert!(
+            datamodel::parse_datamodel(dm).is_ok(),
+            "{:?}",
+            datamodel::parse_datamodel(dm).unwrap_err()
+        );
+    }
 }
