@@ -75,7 +75,7 @@ where
     for field in &input_type.fields {
         for input_type_ref in &field.input_types {
             match input_type_ref.location {
-                TypeLocation::OutputObjectTypes => {
+                TypeLocation::InputObjectTypes => {
                     let namespace = input_type_ref
                         .namespace
                         .as_ref()

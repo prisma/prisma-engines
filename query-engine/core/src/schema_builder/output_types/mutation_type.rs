@@ -54,24 +54,36 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
     while !(nested_create_inputs_queue.is_empty() && nested_update_inputs_queue.is_empty()) {
         // Create inputs.
         for (input_object, rf) in nested_create_inputs_queue.drain(..) {
-            let mut fields = vec![input_fields::nested_create_one_input_field(ctx, &rf)];
+            let mut fields = vec![];
+
+            if rf.related_model().supports_create_operation == true {
+                fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
+
+                append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
+
+                if feature_flags::get().createMany {
+                    append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+                }
+            }
 
             append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
-            append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
-
-            if feature_flags::get().createMany {
-                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
-            }
 
             input_object.set_fields(fields);
         }
 
         // Update inputs.
         for (input_object, rf) in nested_update_inputs_queue.drain(..) {
-            let mut fields = vec![input_fields::nested_create_one_input_field(ctx, &rf)];
+            let mut fields = vec![];
 
-            if feature_flags::get().createMany {
-                append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+            if rf.related_model().supports_create_operation == true {
+                fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
+
+                append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
+                append_opt(&mut fields, input_fields::nested_upsert_field(ctx, &rf));
+
+                if feature_flags::get().createMany {
+                    append_opt(&mut fields, input_fields::nested_create_many_input_field(ctx, &rf));
+                }
             }
 
             append_opt(&mut fields, input_fields::nested_connect_input_field(ctx, &rf));
@@ -81,8 +93,6 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
             fields.push(input_fields::nested_update_input_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_update_many_field(ctx, &rf));
             append_opt(&mut fields, input_fields::nested_delete_many_field(ctx, &rf));
-            append_opt(&mut fields, input_fields::nested_upsert_field(ctx, &rf));
-            append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
 
             input_object.set_fields(fields);
         }
