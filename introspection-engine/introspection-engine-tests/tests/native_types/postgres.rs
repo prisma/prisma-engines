@@ -31,6 +31,9 @@ const TYPES: &[(&str, &str)] = &[
     ("xml", "Xml"),
     ("json", "Json"),
     ("jsonb", "JsonB"),
+    ("money", "Money"),
+    ("oid", "Oid"),
+    ("inet", "Inet"),
 ];
 
 #[test_each_connector(tags("postgres"))]
@@ -66,34 +69,37 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 
     let types = indoc! {r#"
         model Blog {
-            id              Int      @id @postgres.Integer
+            id              Int      @id
             smallint        Int      @postgres.SmallInt
-            int             Int      @postgres.Integer
-            bigint          BigInt   @postgres.BigInt
+            int             Int
+            bigint          BigInt
             decimal         Decimal  @postgres.Decimal(4, 2)
             numeric         Decimal  @postgres.Decimal(4, 2)
             real            Float    @postgres.Real
-            doublePrecision Float    @postgres.DoublePrecision
+            doublePrecision Float
             smallSerial     Int      @default(autoincrement()) @postgres.SmallInt
-            serial          Int      @default(autoincrement()) @postgres.Integer
-            bigSerial       BigInt   @default(autoincrement()) @postgres.BigInt
+            serial          Int      @default(autoincrement())
+            bigSerial       BigInt   @default(autoincrement())
             varChar         String   @postgres.VarChar(200)
             char            String   @postgres.Char(200)
-            text            String   @postgres.Text
-            bytea           Bytes    @postgres.ByteA
+            text            String
+            bytea           Bytes
             ts              DateTime @postgres.Timestamp(0)
             tstz            DateTime @postgres.Timestamptz(2)
             date            DateTime @postgres.Date
             time            DateTime @postgres.Time(2)
             time_2          DateTime @postgres.Time(6)
             timetz          DateTime @postgres.Timetz(2)
-            bool            Boolean  @postgres.Boolean
+            bool            Boolean
             bit             String   @postgres.Bit(1)
             varbit          String   @postgres.VarBit(1)
             uuid            String   @postgres.Uuid
             xml             String   @postgres.Xml
             json            Json     @postgres.Json
-            jsonb           Json     @postgres.JsonB
+            jsonb           Json
+            money           Decimal  @postgres.Money
+            oid             Int      @postgres.Oid
+            inet            String   @postgres.Inet
           }
     "#};
 
@@ -167,6 +173,9 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             xml             String
             json            Json
             jsonb           Json
+            money           Float
+            oid             Int
+            inet            String
         }
     "#};
 
@@ -218,7 +227,7 @@ async fn native_type_array_columns_feature_on(api: &TestApi) -> crate::TestResul
          }
 
          model Blog {
-          id                Int        @id @postgres.Integer
+          id                Int        @id
           decimal_array     Decimal[]  @postgres.Decimal(42, 0)
           decimal_array_2   Decimal[]  @postgres.Decimal
           numeric_array     Decimal[]  @postgres.Decimal(4, 2)

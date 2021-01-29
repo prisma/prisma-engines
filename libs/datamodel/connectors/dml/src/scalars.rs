@@ -16,6 +16,16 @@ pub enum ScalarType {
     Decimal,
 }
 
+impl ScalarType {
+    pub fn is_boolean(&self) -> bool {
+        matches!(self, ScalarType::Boolean)
+    }
+
+    pub fn is_float(&self) -> bool {
+        matches!(self, ScalarType::Float)
+    }
+}
+
 impl FromStr for ScalarType {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {

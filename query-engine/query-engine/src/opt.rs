@@ -52,7 +52,7 @@ pub struct PrismaOpt {
 
     /// The port the query engine should bind to.
     // NOTE: this is mutually exclusive with path
-    #[structopt(long, short, env, default_value = "4466")]
+    #[structopt(long, short, default_value = "4466")]
     pub port: u16,
 
     /// The unix socket path to listen on

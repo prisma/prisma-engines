@@ -164,6 +164,8 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             value if value.is_null() => PrismaValue::Null,
             Value::Integer(Some(i)) => PrismaValue::Boolean(i != 0),
             Value::Boolean(Some(b)) => PrismaValue::Boolean(b),
+            Value::Bytes(Some(bytes)) if bytes.as_ref() == &[0u8] => PrismaValue::Boolean(false),
+            Value::Bytes(Some(bytes)) if bytes.as_ref() == &[1u8] => PrismaValue::Boolean(true),
             _ => return Err(create_error(&p_value)),
         },
         TypeIdentifier::Enum(_) => match p_value {
@@ -227,7 +229,7 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
                 f if f.is_infinite() => return Err(create_error(&p_value)),
                 _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
             },
-            Value::Integer(Some(i)) => match BigDecimal::from_f64(i as f64) {
+            Value::Integer(Some(i)) => match BigDecimal::from_i64(i) {
                 Some(dec) => PrismaValue::Float(dec),
                 None => return Err(create_error(&p_value)),
             },
@@ -269,6 +271,7 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
             Value::Text(Some(s)) => PrismaValue::Xml(s.into_owned()),
             _ => return Err(create_error(&p_value)),
         },
+        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     })
 }
 

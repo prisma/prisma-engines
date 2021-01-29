@@ -2,7 +2,7 @@ use super::*;
 use crate::default_value::{DefaultValue, ValueGenerator};
 use crate::native_type_instance::NativeTypeInstance;
 use crate::scalars::ScalarType;
-use crate::traits::{WithDatabaseName, WithName};
+use crate::traits::{Ignorable, WithDatabaseName, WithName};
 use std::hash::Hash;
 
 /// Arity of a Field in a Model.
@@ -45,6 +45,13 @@ pub enum FieldType {
 }
 
 impl FieldType {
+    pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
+        match self {
+            FieldType::NativeType(a, b) => Some((a, b)),
+            _ => None,
+        }
+    }
+
     pub fn is_compatible_with(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
@@ -76,6 +83,13 @@ pub enum Field {
 }
 
 impl Field {
+    pub fn as_scalar_field(&self) -> Option<&ScalarField> {
+        match self {
+            Field::ScalarField(sf) => Some(sf),
+            _ => None,
+        }
+    }
+
     pub fn is_relation(&self) -> bool {
         match self {
             Field::ScalarField(_) => false,
@@ -374,5 +388,11 @@ impl WithDatabaseName for ScalarField {
     }
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
+    }
+}
+
+impl Ignorable for Field {
+    fn is_ignored(&self) -> bool {
+        false
     }
 }

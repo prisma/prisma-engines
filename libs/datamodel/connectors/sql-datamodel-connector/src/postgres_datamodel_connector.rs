@@ -13,6 +13,10 @@ const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
 const BIG_INT_TYPE_NAME: &str = "BigInt";
 const DECIMAL_TYPE_NAME: &str = "Decimal";
+const MONEY_TYPE_NAME: &str = "Money";
+const INET_TYPE_NAME: &str = "Inet";
+const CITEXT_TYPE_NAME: &str = "Citext";
+const OID_TYPE_NAME: &str = "Oid";
 const REAL_TYPE_NAME: &str = "Real";
 const DOUBLE_PRECISION_TYPE_NAME: &str = "DoublePrecision";
 const VARCHAR_TYPE_NAME: &str = "VarChar";
@@ -49,12 +53,19 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::AutoIncrementNonIndexedAllowed,
             ConnectorCapability::InsensitiveFilters,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
+            ConnectorCapability::CreateMany,
+            ConnectorCapability::WritableAutoincField,
+            ConnectorCapability::CreateSkipDuplicates,
         ];
 
         let small_int = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]);
         let integer = NativeTypeConstructor::without_args(INTEGER_TYPE_NAME, vec![ScalarType::Int]);
         let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, vec![ScalarType::BigInt]);
         let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
+        let money = NativeTypeConstructor::without_args(MONEY_TYPE_NAME, vec![ScalarType::Decimal]);
+        let inet = NativeTypeConstructor::without_args(INET_TYPE_NAME, vec![ScalarType::String]);
+        let citext = NativeTypeConstructor::without_args(CITEXT_TYPE_NAME, vec![ScalarType::String]);
+        let oid = NativeTypeConstructor::without_args(OID_TYPE_NAME, vec![ScalarType::Int]);
         let real = NativeTypeConstructor::without_args(REAL_TYPE_NAME, vec![ScalarType::Float]);
         let double_precision = NativeTypeConstructor::without_args(DOUBLE_PRECISION_TYPE_NAME, vec![ScalarType::Float]);
         let varchar = NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]);
@@ -80,6 +91,10 @@ impl PostgresDatamodelConnector {
             integer,
             big_int,
             decimal,
+            money,
+            inet,
+            citext,
+            oid,
             real,
             double_precision,
             varchar,
@@ -107,6 +122,18 @@ impl PostgresDatamodelConnector {
     }
 }
 
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, PostgresType)] = &[
+    (ScalarType::Int, PostgresType::Integer),
+    (ScalarType::BigInt, PostgresType::BigInt),
+    (ScalarType::Float, PostgresType::DoublePrecision),
+    (ScalarType::Decimal, PostgresType::Decimal(Some((65, 30)))),
+    (ScalarType::Boolean, PostgresType::Boolean),
+    (ScalarType::String, PostgresType::Text),
+    (ScalarType::DateTime, PostgresType::Timestamp(Some(3))),
+    (ScalarType::Bytes, PostgresType::ByteA),
+    (ScalarType::Json, PostgresType::JSONB),
+];
+
 impl Connector for PostgresDatamodelConnector {
     fn name(&self) -> String {
         "Postgres".to_string()
@@ -116,6 +143,34 @@ impl Connector for PostgresDatamodelConnector {
         &self.capabilities
     }
 
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarType,
+        temporary_native_types_on: bool,
+    ) -> serde_json::Value {
+        let scalar_type = if !temporary_native_types_on && scalar_type.is_float() {
+            &ScalarType::Decimal
+        } else {
+            scalar_type
+        };
+
+        let native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
+            .unwrap();
+
+        serde_json::to_value(native_type).expect("PostgresType to JSON failed")
+    }
+
+    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
+        let native_type: PostgresType = serde_json::from_value(native_type).expect("PostgresType from JSON failed");
+
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .any(|(st, nt)| scalar_type == st && &native_type == nt)
+    }
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
             FieldType::NativeType(_scalar_type, native_type_instance) => {
@@ -145,7 +200,7 @@ impl Connector for PostgresDatamodelConnector {
         Ok(())
     }
 
-    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
         &self.constructors
     }
 
@@ -157,6 +212,10 @@ impl Connector for PostgresDatamodelConnector {
             INTEGER_TYPE_NAME => Integer,
             BIG_INT_TYPE_NAME => BigInt,
             DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            INET_TYPE_NAME => Inet,
+            MONEY_TYPE_NAME => Money,
+            CITEXT_TYPE_NAME => Citext,
+            OID_TYPE_NAME => Oid,
             REAL_TYPE_NAME => Real,
             DOUBLE_PRECISION_TYPE_NAME => DoublePrecision,
             VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME)?),
@@ -206,6 +265,10 @@ impl Connector for PostgresDatamodelConnector {
             Xml => (XML_TYPE_NAME, vec![]),
             JSON => (JSON_TYPE_NAME, vec![]),
             JSONB => (JSON_B_TYPE_NAME, vec![]),
+            Money => (MONEY_TYPE_NAME, vec![]),
+            Inet => (INET_TYPE_NAME, vec![]),
+            Citext => (CITEXT_TYPE_NAME, vec![]),
+            Oid => (OID_TYPE_NAME, vec![]),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {

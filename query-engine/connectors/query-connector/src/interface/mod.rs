@@ -219,6 +219,14 @@ pub trait WriteOperations {
     /// Insert a single record to the database.
     async fn create_record(&self, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection>;
 
+    /// Inserts many records at once into the database.
+    async fn create_records(
+        &self,
+        model: &ModelRef,
+        args: Vec<WriteArgs>,
+        skip_duplicates: bool,
+    ) -> crate::Result<usize>;
+
     /// Update records in the `Model` with the given `WriteArgs` filtered by the
     /// `Filter`.
     async fn update_records(

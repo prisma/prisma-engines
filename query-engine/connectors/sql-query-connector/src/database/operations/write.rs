@@ -1,9 +1,11 @@
-use crate::{error::SqlError, query_builder::write, QueryExt};
+use crate::{error::SqlError, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
+use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::{collections::HashMap, convert::TryFrom};
+use std::{collections::HashMap, convert::TryFrom, usize};
+use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
 /// Create a single record to the database defined in `conn`, resulting into a
@@ -27,6 +29,10 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
                     let constraint = DatabaseConstraint::ForeignKey;
                     return Err(SqlError::UniqueConstraintViolation { constraint });
                 }
+                quaint::error::DatabaseConstraint::CannotParse => {
+                    let constraint = DatabaseConstraint::CannotParse;
+                    return Err(SqlError::UniqueConstraintViolation { constraint });
+                }
             },
             ErrorKind::NullConstraintViolation { constraint } => match constraint {
                 quaint::error::DatabaseConstraint::Index(name) => {
@@ -39,6 +45,10 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
                 }
                 quaint::error::DatabaseConstraint::ForeignKey => {
                     let constraint = DatabaseConstraint::ForeignKey;
+                    return Err(SqlError::UniqueConstraintViolation { constraint });
+                }
+                quaint::error::DatabaseConstraint::CannotParse => {
+                    let constraint = DatabaseConstraint::CannotParse;
                     return Err(SqlError::UniqueConstraintViolation { constraint });
                 }
             },
@@ -61,6 +71,96 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
 
         (_, _, _) => panic!("Could not figure out an ID in create"),
     }
+}
+
+pub async fn create_records(
+    conn: &dyn QueryExt,
+    sql_info: SqlInfo,
+    model: &ModelRef,
+    args: Vec<WriteArgs>,
+    skip_duplicates: bool,
+) -> crate::Result<usize> {
+    if args.is_empty() {
+        return Ok(0);
+    }
+
+    let batches = if let Some(max_params) = sql_info.max_bind_values {
+        // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
+        // -> Horizontal partitioning by row number, vertical by number of args.
+        args.into_iter()
+            .peekable()
+            .batching(|iter| {
+                let mut param_count: usize = 0;
+                let mut batch = vec![];
+
+                while param_count < max_params {
+                    // If the param count _including_ the next item doens't exceed the limit,
+                    // we continue filling up the current batch.
+                    let proceed = match iter.peek() {
+                        Some(next) => (param_count + next.len()) <= max_params,
+                        None => break,
+                    };
+
+                    if proceed {
+                        match iter.next() {
+                            Some(next) => {
+                                param_count += next.len();
+                                batch.push(next)
+                            }
+                            None => break,
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if batch.is_empty() {
+                    None
+                } else {
+                    Some(batch)
+                }
+            })
+            .collect_vec()
+    } else {
+        vec![args]
+    };
+
+    let partitioned_batches = if let Some(max_rows) = sql_info.max_rows {
+        let capacity = batches.len();
+        batches
+            .into_iter()
+            .fold(Vec::with_capacity(capacity), |mut batches, next_batch| {
+                if next_batch.len() > max_rows {
+                    batches.extend(
+                        next_batch
+                            .into_iter()
+                            .chunks(max_rows)
+                            .into_iter()
+                            .map(|chunk| chunk.into_iter().collect_vec()),
+                    );
+                } else {
+                    batches.push(next_batch);
+                }
+
+                batches
+            })
+    } else {
+        batches
+    };
+
+    trace!("Total of {} batches to be executed.", partitioned_batches.len());
+    trace!(
+        "Batch sizes: {:?}",
+        partitioned_batches.iter().map(|b| b.len()).collect_vec()
+    );
+
+    let mut count = 0;
+    for batch in partitioned_batches {
+        let stmt = write::create_records(model, batch, skip_duplicates);
+        count += conn.execute(stmt.into()).await?;
+    }
+
+    Ok(count as usize)
 }
 
 /// Update multiple records in a database defined in `conn` and the records

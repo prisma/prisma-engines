@@ -352,7 +352,7 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(features("native_types"))]
 async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
@@ -393,7 +393,7 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
     let final_result = api.assert_schema().await?.into_schema();
     let final_column = final_result.table_bang("Blog").column_bang("new_title");
 
-    assert_eq!(final_column.tpe.family, ColumnTypeFamily::Decimal);
+    assert_eq!(final_column.tpe.family, ColumnTypeFamily::Float);
     assert!(final_result.table_bang("Blog").column("title").is_none());
 
     Ok(())

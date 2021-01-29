@@ -86,6 +86,7 @@ pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentif
         TypeIdentifier::Xml => OutputType::xml(),
         TypeIdentifier::Bytes => OutputType::bytes(),
         TypeIdentifier::BigInt => OutputType::bigint(),
+        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
     };
 
     if list {
@@ -114,8 +115,8 @@ fn map_enum_type(ctx: &mut BuilderContext, enum_name: &str) -> EnumType {
     e.into()
 }
 
-pub(crate) fn batch_payload_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
-    let ident = Identifier::new("BatchPayload".to_owned(), PRISMA_NAMESPACE);
+pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
+    let ident = Identifier::new("AffectedRowsOutput".to_owned(), PRISMA_NAMESPACE);
     return_cached_output!(ctx, &ident);
 
     let object_type = Arc::new(object_type(

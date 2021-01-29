@@ -1,5 +1,3 @@
-extern crate datamodel;
-
 use crate::common::*;
 use pretty_assertions::assert_eq;
 use std::fs;
@@ -36,7 +34,6 @@ fn assert_eq_json(a: &str, b: &str, msg: &str) {
 }
 
 fn load_from_file(file: &str) -> String {
-    let server_root = std::env::var("SERVER_ROOT").expect("Env var SERVER_ROOT required but not found.");
-    let samples_folder_path = format!("{}/libs/datamodel/core/tests/render_to_dmmf/files", server_root);
+    let samples_folder_path = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/render_to_dmmf/files");
     fs::read_to_string(format!("{}/{}", samples_folder_path, file)).unwrap()
 }

@@ -67,6 +67,9 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::AutoIncrementAllowedOnNonId,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
+            ConnectorCapability::CreateMany,
+            ConnectorCapability::WritableAutoincField,
+            ConnectorCapability::CreateSkipDuplicates,
         ];
 
         let int = NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]);
@@ -86,7 +89,7 @@ impl MySqlDatamodelConnector {
         let decimal = NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]);
         let float = NativeTypeConstructor::without_args(FLOAT_TYPE_NAME, vec![ScalarType::Float]);
         let double = NativeTypeConstructor::without_args(DOUBLE_TYPE_NAME, vec![ScalarType::Float]);
-        let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, vec![ScalarType::Bytes]);
+        let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, vec![ScalarType::Boolean, ScalarType::Bytes]);
         let char = NativeTypeConstructor::with_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
         let var_char = NativeTypeConstructor::with_args(VAR_CHAR_TYPE_NAME, 1, vec![ScalarType::String]);
         let binary = NativeTypeConstructor::with_args(BINARY_TYPE_NAME, 1, vec![ScalarType::Bytes]);
@@ -148,6 +151,18 @@ impl MySqlDatamodelConnector {
     }
 }
 
+const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
+    (ScalarType::Int, MySqlType::Int),
+    (ScalarType::BigInt, MySqlType::BigInt),
+    (ScalarType::Float, MySqlType::Double),
+    (ScalarType::Decimal, MySqlType::Decimal(Some((65, 30)))),
+    (ScalarType::Boolean, MySqlType::TinyInt),
+    (ScalarType::String, MySqlType::VarChar(191)),
+    (ScalarType::DateTime, MySqlType::DateTime(Some(3))),
+    (ScalarType::Bytes, MySqlType::LongBlob),
+    (ScalarType::Json, MySqlType::Json),
+];
+
 impl Connector for MySqlDatamodelConnector {
     fn name(&self) -> String {
         "MySQL".to_string()
@@ -157,9 +172,38 @@ impl Connector for MySqlDatamodelConnector {
         &self.capabilities
     }
 
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarType,
+        temporary_native_types: bool,
+    ) -> serde_json::Value {
+        let scalar_type = if !temporary_native_types && scalar_type.is_float() {
+            &ScalarType::Decimal
+        } else {
+            scalar_type
+        };
+
+        let native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, _)| st == scalar_type)
+            .map(|(_, native_type)| native_type)
+            .ok_or_else(|| format!("Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS", scalar_type))
+            .unwrap();
+
+        serde_json::to_value(native_type).expect("MySqlType to JSON failed")
+    }
+
+    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
+        let native_type: MySqlType = serde_json::from_value(native_type).expect("MySqlType from JSON failed");
+
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .any(|(st, nt)| scalar_type == st && &native_type == nt)
+    }
+
     fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
         match field.field_type() {
-            FieldType::NativeType(_, native_type_instance) => {
+            FieldType::NativeType(scalar_type, native_type_instance) => {
                 let native_type_name = native_type_instance.name.as_str();
                 let native_type: MySqlType = native_type_instance.deserialize_native_type();
                 let error = self.native_instance_error(native_type_instance.clone());
@@ -184,6 +228,9 @@ impl Connector for MySqlDatamodelConnector {
                     }
                     VarChar(length) if length > 65535 => {
                         error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.")
+                    }
+                    Bit(n) if n > 1 && scalar_type.is_boolean() => {
+                        error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.".into())
                     }
                     _ if field.is_unique() && incompatible_with_key => error.new_incompatible_native_type_with_unique(),
                     _ if field.is_id() && incompatible_with_key => error.new_incompatible_native_type_with_id(),
@@ -227,7 +274,7 @@ impl Connector for MySqlDatamodelConnector {
         Ok(())
     }
 
-    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
         &self.constructors
     }
 

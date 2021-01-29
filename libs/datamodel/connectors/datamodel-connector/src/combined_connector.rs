@@ -1,8 +1,7 @@
 use super::Connector;
-use crate::connector_error::ConnectorError;
-use crate::{ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
-use dml::field::Field;
-use dml::model::Model;
+use crate::{connector_error::ConnectorError, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
+use dml::{field::Field, model::Model, scalars::ScalarType};
+use std::unimplemented;
 
 pub struct CombinedConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -46,7 +45,15 @@ impl Connector for CombinedConnector {
         Ok(())
     }
 
-    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
+    fn native_type_is_default_for_scalar_type(
+        &self,
+        _native_type: serde_json::Value,
+        _scalar_type: &ScalarType,
+    ) -> bool {
+        unimplemented!("A combined connector must not be used for native types")
+    }
+
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
         unimplemented!("A combined connector must not be used for native types")
     }
 
@@ -55,6 +62,10 @@ impl Connector for CombinedConnector {
     }
 
     fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+        unimplemented!("A combined connector must not be used for native types")
+    }
+
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType, _: bool) -> serde_json::Value {
         unimplemented!("A combined connector must not be used for native types")
     }
 }

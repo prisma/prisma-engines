@@ -3,7 +3,7 @@ use crate::{
     constants::inputs::args,
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    ArgumentListLookup, ParsedField, ParsedInputMap,
+    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
 use connector::IdFilter;
 use prisma_models::ModelRef;
@@ -51,6 +51,45 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     Ok(())
 }
 
+/// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
+pub fn create_many_records(
+    graph: &mut QueryGraph,
+    model: ModelRef,
+    mut field: ParsedField,
+) -> QueryGraphBuilderResult<()> {
+    graph.flag_transactional();
+
+    let data_list: ParsedInputList = match field.arguments.lookup(args::DATA) {
+        Some(data) => data.value.try_into()?,
+        None => vec![],
+    };
+
+    let skip_duplicates: bool = match field.arguments.lookup(args::SKIP_DUPLICATES) {
+        Some(arg) => arg.value.try_into()?,
+        None => false,
+    };
+
+    let args = data_list
+        .into_iter()
+        .map(|data_value| {
+            let data_map = data_value.try_into()?;
+            let mut args = WriteArgsParser::from(&model, data_map)?.args;
+
+            args.add_datetimes(&model);
+            Ok(args)
+        })
+        .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+    let query = CreateManyRecords {
+        model,
+        args,
+        skip_duplicates,
+    };
+
+    graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
+    Ok(())
+}
+
 pub fn create_record_node(
     graph: &mut QueryGraph,
     model: ModelRef,
@@ -59,7 +98,7 @@ pub fn create_record_node(
     let create_args = WriteArgsParser::from(&model, data_map)?;
     let mut args = create_args.args;
 
-    args.add_datetimes(Arc::clone(&model));
+    args.add_datetimes(&model);
 
     let cr = CreateRecord { model, args };
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));

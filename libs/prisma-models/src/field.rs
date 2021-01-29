@@ -70,7 +70,7 @@ pub enum TypeIdentifier {
     Xml,
     DateTime,
     Bytes,
-    // Unsupported todo
+    Unsupported,
 }
 
 impl TypeIdentifier {

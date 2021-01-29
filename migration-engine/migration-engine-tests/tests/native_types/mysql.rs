@@ -1,6 +1,5 @@
 use migration_engine_tests::sql::*;
 use quaint::prelude::Queryable;
-use sql_datamodel_connector::SqlDatamodelConnectors;
 use std::{borrow::Cow, fmt::Write};
 
 /// (source native type, test value to insert, target native type)
@@ -752,7 +751,7 @@ fn filter_to_types(api: &TestApi, to_types: &'static [&'static str]) -> Cow<'sta
 
 #[test_each_connector(tags("mysql"), features("native_types"), log = "debug")]
 async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
-    let connector = SqlDatamodelConnectors::mysql();
+    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(SAFE_CASTS);
@@ -803,7 +802,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
 
 #[test_each_connector(tags("mysql"), features("native_types"), log = "debug")]
 async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
-    let connector = SqlDatamodelConnectors::mysql();
+    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(RISKY_CASTS);
@@ -869,7 +868,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
 
 #[test_each_connector(tags("mysql"), features("native_types"), log = "debug")]
 async fn impossible_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
-    let connector = SqlDatamodelConnectors::mysql();
+    let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
     let mut dm2 = String::with_capacity(256);
     let colnames = colnames_for_cases(IMPOSSIBLE_CASTS);

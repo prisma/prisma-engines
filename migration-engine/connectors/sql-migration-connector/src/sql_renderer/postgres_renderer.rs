@@ -384,11 +384,15 @@ pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
     fn render_decimal(input: Option<(u32, u32)>) -> String {
         match input {
             None => "".to_string(),
-            Some((precision, scale)) => format!("({}, {})", precision, scale),
+            Some((precision, scale)) => format!("({},{})", precision, scale),
         }
     }
 
     let tpe: Cow<'_, str> = match native_type {
+        PostgresType::Citext => "CITEXT".into(),
+        PostgresType::Oid => "OID".into(),
+        PostgresType::Inet => "INET".into(),
+        PostgresType::Money => "MONEY".into(),
         PostgresType::SmallInt if is_autoincrement => "SMALLSERIAL".into(),
         PostgresType::SmallInt => "SMALLINT".into(),
         PostgresType::Integer if is_autoincrement => "SERIAL".into(),

@@ -1,4 +1,4 @@
-extern crate datamodel;
+use indoc::indoc;
 use pretty_assertions::assert_eq;
 use std::str;
 
@@ -20,10 +20,13 @@ fn test_reformat_model_simple() {
         }
     "#;
 
-    let expected = r#"model User {
-  id Int @id
-}
-"#;
+    let expected = indoc!(
+        r#"
+        model User {
+          id Int @id
+        }
+        "#
+    );
 
     assert_reformat(input, expected);
 }
@@ -817,6 +820,56 @@ model Bl"#;
   id Int @id
 }
 model Bl
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn unsupported_is_allowed() {
+    let input = r#"model Post {
+  id Int @id
+  aVeryLongName  Unsupported("some type")
+}
+"#;
+
+    let expected = r#"model Post {
+  id            Int                      @id
+  aVeryLongName Unsupported("some type")
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn ignore_is_allowed() {
+    let input = r#"model Post {
+  id Int @id
+  @@ignore  
+}
+"#;
+
+    let expected = r#"model Post {
+  id Int @id
+
+  @@ignore
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn db_generated_is_allowed() {
+    let input = r#"model Post {
+  id Int @id              @default(dbgenerated("something"))
+}
+"#;
+
+    let expected = r#"model Post {
+  id Int @id @default(dbgenerated("something"))
+}
 "#;
 
     assert_reformat(input, expected);

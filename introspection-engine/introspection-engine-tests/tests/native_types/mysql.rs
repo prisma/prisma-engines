@@ -24,6 +24,7 @@ const TYPES: &[(&str, &str)] = &[
     ("float", "Float"),
     ("double", "Double"),
     ("bits", "Bit(64)"),
+    ("bit_bool", "Bit(1)"),
     ("chars", "Char(10)"),
     ("varchars", "VarChar(500)"),
     ("binary", "Binary(230)"),
@@ -66,7 +67,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let (json, default) = match api {
-        _ if api.tags.contains(Tags::Mysql8) => ("Json     @mysql.Json", ""),
+        _ if api.tags.contains(Tags::Mysql8) => ("Json", ""),
         _ if api.tags.contains(Tags::Mariadb) => ("String   @mysql.LongText", "@default(now())"),
         _ => unreachable!(),
     };
@@ -85,24 +86,25 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
 
     let types = formatdoc! {r#"
         model Blog {{
-            int                            Int      @mysql.Int
+            int                            Int
             unsignedint                    Int      @mysql.UnsignedInt
             smallint                       Int      @mysql.SmallInt
             unsignedsmallint               Int      @mysql.UnsignedSmallInt
             tinyint                        Int      @mysql.TinyInt
             unsignedtinyint                Int      @mysql.UnsignedTinyInt
-            tinyint_bool                   Boolean  @mysql.TinyInt
+            tinyint_bool                   Boolean
             mediumint                      Int      @mysql.MediumInt
             unsignedmediumint              Int      @mysql.UnsignedMediumInt
-            bigint                         BigInt   @mysql.BigInt
-            bigint_autoincrement           BigInt   @id  @default(autoincrement()) @mysql.BigInt
+            bigint                         BigInt
+            bigint_autoincrement           BigInt   @id  @default(autoincrement())
             unsignedbigint                 BigInt   @mysql.UnsignedBigInt
             decimal                        Decimal  @mysql.Decimal(5, 3)
             decimal_2                      Decimal  @mysql.Decimal(10, 0)
             numeric                        Decimal  @mysql.Decimal(4, 1)
             float                          Float    @mysql.Float
-            double                         Float    @mysql.Double
+            double                         Float
             bits                           Bytes    @mysql.Bit(64)
+            bit_bool                       Boolean  @mysql.Bit(1)
             chars                          String   @mysql.Char(10)
             varchars                       String   @mysql.VarChar(500)
             binary                         Bytes    @mysql.Binary(230)
@@ -110,7 +112,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             tinyBlob                       Bytes    @mysql.TinyBlob
             blob                           Bytes    @mysql.Blob
             mediumBlob                     Bytes    @mysql.MediumBlob
-            longBlob                       Bytes    @mysql.LongBlob
+            longBlob                       Bytes
             tinytext                       String   @mysql.TinyText
             text                           String   @mysql.Text
             mediumText                     String   @mysql.MediumText
@@ -118,7 +120,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             date                           DateTime @mysql.Date
             timeWithPrecision              DateTime @mysql.Time(3)
             timeWithPrecision_no_precision DateTime @mysql.DateTime(0)
-            dateTimeWithPrecision          DateTime @mysql.DateTime(3)
+            dateTimeWithPrecision          DateTime
             timestampWithPrecision         DateTime {default} @mysql.Timestamp(3)
             year                           Int      @mysql.Year
             json                           {json}
@@ -192,6 +194,7 @@ async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
             float                          Float
             double                         Float
             bits                           Int
+            bit_bool                       Int
             chars                          String
             varchars                       String
             // This type is currently not supported by the Prisma Client.

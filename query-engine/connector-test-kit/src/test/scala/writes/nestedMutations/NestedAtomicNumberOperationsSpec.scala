@@ -257,21 +257,39 @@ class NestedAtomicNumberOperationsSpec extends FlatSpec with Matchers with ApiSp
     queryNestedNumberOperation(project, 1, "optFloat", "increment", "4.6") should be("""{"optFloat":null}""")
     queryNestedNumberOperation(project, 2, "optFloat", "increment", "4.6") should be("""{"optFloat":10.1}""")
 
+    val decrementFloatExpectation = if (connectorConfig.provider.contains("postgres")) {
+      5.500000000000001
+    } else {
+      5.5
+    }
+
     // Decrement
     queryNestedNumberOperation(project, 1, "optFloat", "decrement", "4.6") should be("""{"optFloat":null}""")
-    queryNestedNumberOperation(project, 2, "optFloat", "decrement", "4.6") should be("""{"optFloat":5.5}""")
+    queryNestedNumberOperation(project, 2, "optFloat", "decrement", "4.6") should be(s"""{"optFloat":$decrementFloatExpectation}""")
 
     // Multiply
     queryNestedNumberOperation(project, 1, "optFloat", "multiply", "2") should be("""{"optFloat":null}""")
     queryNestedNumberOperation(project, 2, "optFloat", "multiply", "2") should be("""{"optFloat":11}""")
 
+    val divideFloatExpectation = if (connectorConfig.provider.contains("postgres")) {
+      5.500000000000001
+    } else {
+      5.5
+    }
+
     // Divide
     queryNestedNumberOperation(project, 1, "optFloat", "divide", "2") should be("""{"optFloat":null}""")
-    queryNestedNumberOperation(project, 2, "optFloat", "divide", "2") should be("""{"optFloat":5.5}""")
+    queryNestedNumberOperation(project, 2, "optFloat", "divide", "2") should be(s"""{"optFloat":$divideFloatExpectation}""")
+
+    val setFloatExpectation = if (connectorConfig.provider.contains("postgres")) {
+      5.100000000000001
+    } else {
+      5.1
+    }
 
     // Set
-    queryNestedNumberOperation(project, 1, "optFloat", "set", "5.1") should be("""{"optFloat":5.1}""")
-    queryNestedNumberOperation(project, 2, "optFloat", "set", "5.1") should be("""{"optFloat":5.1}""")
+    queryNestedNumberOperation(project, 1, "optFloat", "set", "5.1") should be(s"""{"optFloat":$setFloatExpectation}""")
+    queryNestedNumberOperation(project, 2, "optFloat", "set", "5.1") should be(s"""{"optFloat":$setFloatExpectation}""")
 
     // Set null
     queryNestedNumberOperation(project, 1, "optFloat", "set", "null") should be("""{"optFloat":null}""")

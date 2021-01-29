@@ -41,7 +41,8 @@ impl ConnectorError {
                 let field_name = match constraint {
                     DatabaseConstraint::Fields(fields) => fields.join(","),
                     DatabaseConstraint::Index(index) => format!("{} (index)", index),
-                    DatabaseConstraint::ForeignKey => "N/A".to_string(),
+                    DatabaseConstraint::ForeignKey => "foreign key".to_string(),
+                    DatabaseConstraint::CannotParse => "(not available)".to_string(),
                 };
 
                 Some(KnownError::new(user_facing_errors::query_engine::ForeignKeyViolation {

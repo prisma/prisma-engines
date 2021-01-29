@@ -1,9 +1,8 @@
-use datamodel_connector::connector_error::ConnectorError;
-use datamodel_connector::{Connector, ConnectorCapability};
-use dml::field::Field;
+use datamodel_connector::{connector_error::ConnectorError, Connector, ConnectorCapability};
 use dml::model::Model;
 use dml::native_type_constructor::NativeTypeConstructor;
 use dml::native_type_instance::NativeTypeInstance;
+use dml::{field::Field, scalars::ScalarType};
 
 pub struct SqliteDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -30,6 +29,18 @@ impl Connector for SqliteDatamodelConnector {
         &self.capabilities
     }
 
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType, _: bool) -> serde_json::Value {
+        serde_json::Value::Null
+    }
+
+    fn native_type_is_default_for_scalar_type(
+        &self,
+        _native_type: serde_json::Value,
+        _scalar_type: &ScalarType,
+    ) -> bool {
+        false
+    }
+
     fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
         Ok(())
     }
@@ -38,7 +49,7 @@ impl Connector for SqliteDatamodelConnector {
         Ok(())
     }
 
-    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
         &self.constructors
     }
 

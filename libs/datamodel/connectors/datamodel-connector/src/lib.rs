@@ -3,12 +3,13 @@ mod combined_connector;
 pub mod connector_error;
 pub mod helper;
 
-use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 pub use combined_connector::CombinedConnector;
-use dml::field::Field;
-use dml::model::Model;
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
+
+use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
+use dml::{
+    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
+    native_type_instance::NativeTypeInstance, scalars::ScalarType,
+};
 
 pub trait Connector: Send + Sync {
     fn name(&self) -> String;
@@ -25,7 +26,18 @@ pub trait Connector: Send + Sync {
 
     /// Returns all available native type constructors available through this connector.
     /// Powers the auto completion of the vs code plugin.
-    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor>;
+    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor];
+
+    /// On each connector, each built-in Prisma scalar type (`Boolean`,
+    /// `String`, `Float`, etc.) has a corresponding native type.
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarType,
+        temporary_native_types_on: bool,
+    ) -> serde_json::Value;
+
+    /// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
+    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool;
 
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
@@ -122,6 +134,9 @@ pub enum ConnectorCapability {
     RelationFieldsInArbitraryOrder,
     // start of Query Engine Capabilities
     InsensitiveFilters,
+    CreateMany,
+    WritableAutoincField,
+    CreateSkipDuplicates,
 }
 
 /// Contains all capabilities that the connector is able to serve.

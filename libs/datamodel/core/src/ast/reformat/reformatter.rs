@@ -505,11 +505,27 @@ impl<'a> Reformatter<'a> {
         let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
-            builder.write(&Self::get_identifier(&current));
             match current.as_rule() {
-                Rule::optional_type => builder.write("?"),
-                Rule::base_type => {}
-                Rule::list_type => builder.write("[]"),
+                Rule::optional_type => {
+                    builder.write(&Self::get_identifier(&current));
+                    builder.write("?");
+                }
+                Rule::base_type => {
+                    builder.write(&Self::get_identifier(&current));
+                }
+                Rule::list_type => {
+                    builder.write(&Self::get_identifier(&current));
+                    builder.write("[]");
+                }
+                Rule::optional_unsupported_type => {
+                    builder.write(current.as_str());
+                    builder.write("?");
+                }
+                Rule::list_unsupported_type => {
+                    builder.write(current.as_str());
+                    builder.write("[]");
+                }
+                Rule::unsupported_type => builder.write(current.as_str()),
                 _ => Self::reformat_generic_token(&mut builder, &current),
             }
         }

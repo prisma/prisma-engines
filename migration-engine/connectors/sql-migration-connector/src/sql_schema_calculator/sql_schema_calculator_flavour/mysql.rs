@@ -1,10 +1,11 @@
 use super::SqlSchemaCalculatorFlavour;
-use crate::flavour::MysqlFlavour;
+use crate::flavour::{MysqlFlavour, SqlFlavour};
 use datamodel::{
     walkers::{walk_scalar_fields, ScalarFieldWalker},
     Datamodel, ScalarType,
 };
-use native_types::MySqlType;
+use datamodel_connector::Connector;
+use migration_connector::MigrationFeature;
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
@@ -32,6 +33,11 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         enums
     }
 
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+        sql_datamodel_connector::SqlDatamodelConnectors::mysql()
+            .default_native_type_for_scalar_type(scalar_type, self.features().contains(MigrationFeature::NativeTypes))
+    }
+
     fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {
         let arity = super::super::column_arity(field.arity());
 
@@ -39,21 +45,5 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().db_name(), field.db_name())),
             arity,
         )
-    }
-
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        let ty = match scalar_type {
-            ScalarType::Int => MySqlType::Int,
-            ScalarType::BigInt => MySqlType::BigInt,
-            ScalarType::Float => MySqlType::Decimal(Some((65, 30))),
-            ScalarType::Decimal => MySqlType::Decimal(Some((65, 30))),
-            ScalarType::Boolean => MySqlType::TinyInt,
-            ScalarType::String => MySqlType::VarChar(191),
-            ScalarType::DateTime => MySqlType::DateTime(Some(3)),
-            ScalarType::Bytes => MySqlType::LongBlob,
-            ScalarType::Json => MySqlType::Json,
-        };
-
-        serde_json::to_value(ty).expect("MySqlType to JSON failed")
     }
 }

@@ -24,12 +24,16 @@ pub mod inputs {
         pub const PARAMETERS: &str = "parameters";
 
         pub const DISTINCT: &str = "distinct";
+
+        // createMany-specific args
+        pub const SKIP_DUPLICATES: &str = "skipDuplicates";
     }
 
     pub mod operations {
         // nested operations
         pub const CONNECT: &str = "connect";
         pub const CREATE: &str = "create";
+        pub const CREATE_MANY: &str = "createMany";
         pub const CONNECT_OR_CREATE: &str = "connectOrCreate";
         pub const DISCONNECT: &str = "disconnect";
         pub const UPDATE: &str = "update";
