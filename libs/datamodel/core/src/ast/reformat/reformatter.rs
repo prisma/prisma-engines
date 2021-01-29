@@ -517,15 +517,9 @@ impl<'a> Reformatter<'a> {
                     builder.write(&Self::get_identifier(&current));
                     builder.write("[]");
                 }
-                Rule::optional_unsupported_type => {
+                Rule::optional_unsupported_type | Rule::list_unsupported_type | Rule::unsupported_type => {
                     builder.write(current.as_str());
-                    builder.write("?");
                 }
-                Rule::list_unsupported_type => {
-                    builder.write(current.as_str());
-                    builder.write("[]");
-                }
-                Rule::unsupported_type => builder.write(current.as_str()),
                 _ => Self::reformat_generic_token(&mut builder, &current),
             }
         }

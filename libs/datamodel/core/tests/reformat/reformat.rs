@@ -829,13 +829,17 @@ model Bl
 fn unsupported_is_allowed() {
     let input = r#"model Post {
   id Int @id
-  aVeryLongName  Unsupported("some type")
+  required Unsupported("some type")
+  optional Unsupported("some type")?
+  list Unsupported("some type")[]
 }
 "#;
 
     let expected = r#"model Post {
-  id            Int                      @id
-  aVeryLongName Unsupported("some type")
+  id       Int                        @id
+  required Unsupported("some type")
+  optional Unsupported("some type")?
+  list     Unsupported("some type")[]
 }
 "#;
 
