@@ -186,8 +186,9 @@ impl From<tokio_postgres::error::Error> for Error {
                     .and_then(|m| m.split_whitespace().nth(1))
                     .map(|s| s.split('\"'))
                     .and_then(|mut s| match (s.next(), s.next()) {
-                        (Some(column), _) | (_, Some(column)) => Some(column),
-                        (None, None) => None,
+                        (Some(column), _) if !column.is_empty() => Some(column),
+                        (_, Some(column)) if !column.is_empty() => Some(column),
+                        (_, _) => None,
                     })
                     .into();
 
