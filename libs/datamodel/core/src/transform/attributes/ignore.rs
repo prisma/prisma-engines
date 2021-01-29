@@ -12,7 +12,8 @@ impl AttributeValidator<dml::Model> for IgnoreAttributeValidator {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, _args: &mut Arguments, _obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+        obj.is_ignored = true;
         Ok(())
     }
 
