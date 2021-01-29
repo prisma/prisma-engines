@@ -8,6 +8,7 @@ pub enum DatabaseConstraint {
     Fields(Vec<String>),
     Index(String),
     ForeignKey,
+    CannotParse,
 }
 
 impl fmt::Display for DatabaseConstraint {
@@ -19,6 +20,7 @@ impl fmt::Display for DatabaseConstraint {
             }
             Self::Index(index) => write!(f, "constraint: `{}`", index),
             Self::ForeignKey => write!(f, "foreign key"),
+            Self::CannotParse => write!(f, "(not available)"),
         }
     }
 }

@@ -2,7 +2,10 @@ use crate::{error::quaint_error_to_connector_error, SqlMigrationConnector};
 use migration_connector::{
     ConnectorError, ConnectorResult, MigrationPersistence, MigrationRecord, PersistenceNotInitializedError,
 };
-use quaint::{ast::*, error::ErrorKind as QuaintKind};
+use quaint::{
+    ast::*,
+    error::{ErrorKind as QuaintKind, Name},
+};
 use uuid::Uuid;
 
 #[async_trait::async_trait]
@@ -137,7 +140,7 @@ impl MigrationPersistence for SqlMigrationConnector {
 
         let result = match self.conn().query(select).await {
             Ok(result) => result,
-            Err(err) if matches!(err.kind(), QuaintKind::TableDoesNotExist { table } if table.contains(self.flavour().imperative_migrations_table_name())) => {
+            Err(err) if matches!(err.kind(), QuaintKind::TableDoesNotExist { table: Name::Available(table) } if table.contains(self.flavour().imperative_migrations_table_name())) => {
                 return Ok(Err(PersistenceNotInitializedError))
             }
             err @ Err(_) => err?,
