@@ -129,6 +129,22 @@ impl DatasourceLoader {
             &providers,
         )?;
 
+        let shadow_database_url = args
+            .optional_arg(SHADOW_DATABASE_URL_KEY)
+            .map(|value| -> Result<StringFromEnvVar, Diagnostics> {
+                let (env_var_name, url) = value.as_str_from_env()?;
+
+                if let Err(err) = validate_datasource_url(env_var_name.as_deref(), &url, source_name, &value) {
+                    diagnostics = diagnostics.merge_error(err)
+                }
+
+                Ok(StringFromEnvVar {
+                    from_env_var: env_var_name,
+                    value: url,
+                })
+            })
+            .transpose()?;
+
         self.preview_features_guardrail(&mut args, &mut diagnostics)?;
 
         let documentation = ast_source.documentation.clone().map(|comment| comment.text);
@@ -175,6 +191,7 @@ impl DatasourceLoader {
                     provider: providers,
                     active_provider: first_successful_provider.canonical_name().to_string(),
                     url,
+                    shadow_database_url,
                     documentation,
                     combined_connector,
                     active_connector: first_successful_provider.connector(),
@@ -224,26 +241,7 @@ impl DatasourceLoader {
             }
         };
 
-        if url.is_empty() {
-            let suffix = match &env_var_for_url {
-                Some(env_var_name) => format!(
-                    " The environment variable `{}` resolved to an empty string.",
-                    env_var_name
-                ),
-                None => "".to_owned(),
-            };
-
-            let msg = format!(
-                "You must provide a nonempty URL for the datasource `{}`.{}",
-                source_name, &suffix
-            );
-
-            return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
-                &msg,
-                source_name,
-                url_arg.span(),
-            )));
-        }
+        validate_datasource_url(env_var_for_url.as_deref(), &url, source_name, &mut diagnostics, url_arg)?;
 
         Ok(StringFromEnvVar {
             from_env_var: env_var_for_url,
@@ -277,4 +275,34 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(SqliteDatasourceProvider::new()),
         Box::new(MsSqlDatasourceProvider::new()),
     ]
+}
+
+fn validate_datasource_url(
+    env_var_for_url: Option<&str>,
+    url: &str,
+    source_name: &str,
+    url_arg: &ValueValidator,
+) -> Result<(), DatamodelError> {
+    if !url.is_empty() {
+        return Ok(());
+    }
+
+    let suffix = match &env_var_for_url {
+        Some(env_var_name) => format!(
+            " The environment variable `{}` resolved to an empty string.",
+            env_var_name
+        ),
+        None => "".to_owned(),
+    };
+
+    let msg = format!(
+        "You must provide a nonempty URL for the datasource `{}`.{}",
+        source_name, &suffix
+    );
+
+    Err(DatamodelError::new_source_validation_error(
+        &msg,
+        source_name,
+        url_arg.span(),
+    ))
 }

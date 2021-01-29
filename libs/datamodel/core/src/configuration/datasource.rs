@@ -9,7 +9,8 @@ pub struct Datasource {
     /// the provider that was selected as active from all specified providers
     pub active_provider: String,
     pub url: StringFromEnvVar,
-    // pub shadow_database_url: StringFromEnvVar,
+    /// An optional second database URL to use as a shadow database in the migration engine.
+    pub shadow_database_url: Option<StringFromEnvVar>,
     pub documentation: Option<String>,
     /// a connector representing the intersection of all providers specified
     pub combined_connector: Box<dyn Connector>,
