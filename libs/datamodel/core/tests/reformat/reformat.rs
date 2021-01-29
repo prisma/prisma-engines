@@ -825,6 +825,56 @@ model Bl
     assert_reformat(input, expected);
 }
 
+#[test]
+fn unsupported_is_allowed() {
+    let input = r#"model Post {
+  id Int @id
+  aVeryLongName  Unsupported("some type")
+}
+"#;
+
+    let expected = r#"model Post {
+  id            Int                      @id
+  aVeryLongName Unsupported("some type")
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn ignore_is_allowed() {
+    let input = r#"model Post {
+  id Int @id
+  @@ignore  
+}
+"#;
+
+    let expected = r#"model Post {
+  id Int @id
+
+  @@ignore
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn db_generated_is_allowed() {
+    let input = r#"model Post {
+  id Int @id              @default(dbgenerated("something"))
+}
+"#;
+
+    let expected = r#"model Post {
+  id Int @id @default(dbgenerated("something"))
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
 fn assert_reformat(schema: &str, expected_result: &str) {
     println!("schema: {:?}", schema);
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
