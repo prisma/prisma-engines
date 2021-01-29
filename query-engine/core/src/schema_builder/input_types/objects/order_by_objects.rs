@@ -27,7 +27,7 @@ pub(crate) fn order_by_object_type(
         .iter()
         .filter_map(|field| match field {
             // Only allow to-one relation order-bys.
-            ModelField::Relation(rf) if !rf.is_list && !seen_relations.contains(dbg!(&rf.relation().name)) => {
+            ModelField::Relation(rf) if !rf.is_list && !seen_relations.contains(&rf.relation().name) => {
                 seen_relations.push(rf.relation().name.clone());
 
                 let related_model = rf.related_model();
