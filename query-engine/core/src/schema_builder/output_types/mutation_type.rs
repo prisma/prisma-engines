@@ -56,7 +56,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
         for (input_object, rf) in nested_create_inputs_queue.drain(..) {
             let mut fields = vec![];
 
-            if rf.related_model().supports_create_operation == true {
+            if rf.related_model().supports_create_operation {
                 fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
 
                 append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));
@@ -75,7 +75,7 @@ fn create_nested_inputs(ctx: &mut BuilderContext) {
         for (input_object, rf) in nested_update_inputs_queue.drain(..) {
             let mut fields = vec![];
 
-            if rf.related_model().supports_create_operation == true {
+            if rf.related_model().supports_create_operation {
                 fields.push(input_fields::nested_create_one_input_field(ctx, &rf));
 
                 append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, &rf));

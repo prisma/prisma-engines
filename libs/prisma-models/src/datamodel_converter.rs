@@ -395,7 +395,7 @@ impl ModelConverterUtilities for dml::Model {
                 _ => false,
             };
 
-            self.field_is_indexed(field.name()) && is_supported_field == true
+            self.field_is_indexed(field.name()) && is_supported_field
         })
     }
 
