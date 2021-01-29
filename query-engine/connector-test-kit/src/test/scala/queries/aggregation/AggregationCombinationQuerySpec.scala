@@ -245,8 +245,14 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
       project
     )
 
+    val floatExpectation = if (connectorConfig.provider.contains("postgres")) {
+      0.7500000000000001
+    } else {
+      0.75
+    }
+
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":{"_all":2},"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":0.75,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
+      s"""{"data":{"aggregateItem":{"count":{"_all":2},"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":$floatExpectation,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
 
     result = server.query(
       """{
@@ -279,7 +285,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":{"_all":2},"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":0.75,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
+      s"""{"data":{"aggregateItem":{"count":{"_all":2},"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":$floatExpectation,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
 
     result = server.query(
       s"""{
@@ -312,7 +318,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     result.toString should be(
-      """{"data":{"aggregateItem":{"count":{"_all":2},"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":0.75,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
+      s"""{"data":{"aggregateItem":{"count":{"_all":2},"sum":{"float":1.5,"int":3,"dec":"1.5"},"avg":{"float":$floatExpectation,"int":1.5,"dec":"0.75"},"min":{"float":0,"int":1,"dec":"0"},"max":{"float":1.5,"int":2,"dec":"1.5"}}}}""")
   }
 
   "Using any aggregation with an unstable cursor" should "fail" in {

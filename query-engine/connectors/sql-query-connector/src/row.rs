@@ -229,7 +229,7 @@ pub fn row_value_to_prisma_value(p_value: Value, meta: ColumnMetadata<'_>) -> Re
                 f if f.is_infinite() => return Err(create_error(&p_value)),
                 _ => PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
             },
-            Value::Integer(Some(i)) => match BigDecimal::from_f64(i as f64) {
+            Value::Integer(Some(i)) => match BigDecimal::from_i64(i) {
                 Some(dec) => PrismaValue::Float(dec),
                 None => return Err(create_error(&p_value)),
             },

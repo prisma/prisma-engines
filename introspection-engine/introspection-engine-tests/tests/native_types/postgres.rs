@@ -76,7 +76,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
             decimal         Decimal  @postgres.Decimal(4, 2)
             numeric         Decimal  @postgres.Decimal(4, 2)
             real            Float    @postgres.Real
-            doublePrecision Float    @postgres.DoublePrecision
+            doublePrecision Float
             smallSerial     Int      @default(autoincrement()) @postgres.SmallInt
             serial          Int      @default(autoincrement())
             bigSerial       BigInt   @default(autoincrement())

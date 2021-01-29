@@ -154,7 +154,7 @@ impl MySqlDatamodelConnector {
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, MySqlType)] = &[
     (ScalarType::Int, MySqlType::Int),
     (ScalarType::BigInt, MySqlType::BigInt),
-    (ScalarType::Float, MySqlType::Decimal(Some((65, 30)))),
+    (ScalarType::Float, MySqlType::Double),
     (ScalarType::Decimal, MySqlType::Decimal(Some((65, 30)))),
     (ScalarType::Boolean, MySqlType::TinyInt),
     (ScalarType::String, MySqlType::VarChar(191)),
@@ -172,7 +172,17 @@ impl Connector for MySqlDatamodelConnector {
         &self.capabilities
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(
+        &self,
+        scalar_type: &ScalarType,
+        temporary_native_types: bool,
+    ) -> serde_json::Value {
+        let scalar_type = if !temporary_native_types && scalar_type.is_float() {
+            &ScalarType::Decimal
+        } else {
+            scalar_type
+        };
+
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)

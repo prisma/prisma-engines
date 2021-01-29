@@ -1,4 +1,5 @@
 use migration_engine_tests::sql::*;
+use sql_schema_describer::ColumnTypeFamily;
 
 #[test_each_connector]
 async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
@@ -50,7 +51,7 @@ async fn float_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(features("native_types"))]
 async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
@@ -80,8 +81,8 @@ async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
-async fn float_to_decimal_is_noop(api: &TestApi) -> TestResult {
+#[test_each_connector(features("native_types"))]
+async fn float_to_decimal_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -92,7 +93,7 @@ async fn float_to_decimal_is_noop(api: &TestApi) -> TestResult {
     api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
-        table.assert_column("meowFrequency", |col| col.assert_type_is_decimal())
+        table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Float))
     })?;
 
     let dm2 = format!(
@@ -112,13 +113,21 @@ async fn float_to_decimal_is_noop(api: &TestApi) -> TestResult {
         datasource = api.datasource()
     );
 
-    api.schema_push(&dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(&dm2)
+        .send()
+        .await?
+        .assert_green()?
+        .assert_has_executed_steps()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Decimal))
+    })?;
 
     Ok(())
 }
 
-#[test_each_connector]
-async fn decimal_to_float_is_noop(api: &TestApi) -> TestResult {
+#[test_each_connector(features("native_types"), log = "debug")]
+async fn decimal_to_float_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"
         {datasource}
@@ -139,7 +148,7 @@ async fn decimal_to_float_is_noop(api: &TestApi) -> TestResult {
     api.schema_push(&dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
-        table.assert_column("meowFrequency", |col| col.assert_type_is_decimal())
+        table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Decimal))
     })?;
 
     let dm2 = r#"
@@ -149,7 +158,15 @@ async fn decimal_to_float_is_noop(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send().await?.assert_green()?.assert_no_steps()?;
+    api.schema_push(dm2)
+        .send()
+        .await?
+        .assert_green()?
+        .assert_has_executed_steps()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table.assert_column("meowFrequency", |col| col.assert_type_family(ColumnTypeFamily::Float))
+    })?;
 
     Ok(())
 }

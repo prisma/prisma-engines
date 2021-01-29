@@ -48,9 +48,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::BigInt)
             })?
             .assert_column("float", |c| {
-                //The native types work made the inferrence more correct on the describer level.
-                // But unless the feature is activated, this will be mapped to float like before in the datamodel level
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Float)
             })?
             .assert_column("boolean", |c| {
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Boolean)
@@ -97,8 +95,6 @@ async fn adding_a_scalar_field_must_work_with_native_types_off(api: &TestApi) ->
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
             })?
             .assert_column("float", |c| {
-                //The native types work made the inferrence more correct on the describer level.
-                // But unless the feature is activated, this will be mapped to float like before in the datamodel level
                 c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
             })?
             .assert_column("boolean", |c| {

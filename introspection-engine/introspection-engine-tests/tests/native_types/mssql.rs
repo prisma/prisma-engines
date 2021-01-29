@@ -86,7 +86,7 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
           money       Float    @sqlserver.Money
           smallmoney  Float    @sqlserver.SmallMoney
           float       Float    @sqlserver.Real
-          double      Float    @sqlserver.Float(53)
+          double      Float
           bit         Boolean
           chars       String   @sqlserver.Char(10)
           nchars      String   @sqlserver.NChar(10)
