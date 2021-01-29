@@ -1,6 +1,5 @@
 use crate::query_arguments_ext::QueryArgumentsExt;
 use connector_interface::QueryArguments;
-use datamodel::ScalarField;
 use prisma_models::*;
 use quaint::ast::*;
 
