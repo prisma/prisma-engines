@@ -112,7 +112,7 @@ fn relation_with_unsupported_fk_fields_should_be_filtered_from_input_output_type
     }
 
     for o in input_types {
-        iterate_input_type_fields(o, &dmmf, &|_, field, parent_type| {
+        iterate_input_type_fields(o, &dmmf, &|_, field, _| {
             assert_ne!(field.name, "user");
             assert_ne!(field.name, "post");
         })
