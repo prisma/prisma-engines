@@ -88,8 +88,8 @@ async fn a_table_without_uniques_using_native_types_should_ignore(api: &TestApi)
             }
 
             model User {
-              id      Int    @id @default(autoincrement())
-              // Post Post[]
+              id   Int    @id @default(autoincrement())
+              Post Post[] @ignore
             }
         "#}
     } else {
@@ -104,8 +104,8 @@ async fn a_table_without_uniques_using_native_types_should_ignore(api: &TestApi)
             }
 
             model User {
-              id      Int    @id @default(autoincrement())
-              // Post Post[]
+              id   Int    @id @default(autoincrement())
+              Post Post[] @ignore
             }
         "#}
     };
@@ -486,7 +486,7 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> crate::TestRes
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn ignore_on_relation_field_if_pointing_to_ignored_model(api: &TestApi) -> crate::TestResult {
+async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
