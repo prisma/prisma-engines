@@ -3176,24 +3176,24 @@ async fn creating_an_ignored_model_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_each_connector]
 async fn using_unsupported_and_ignore_should_work(api: &TestApi) -> TestResult {
-    let dm = r#"
-        generator client {
-            provider        = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }
-        
-        datasource db {
-            provider = "postgresql"
-            url      = "postgresql://.."
-        }
-        
-        model UnsupportedModel {
-            polygonField Unsupported("macaddr")? @unique
-            @@ignore
-        }
-    "#;
+    let unsupported_type = match api.sql_family() {
+        SqlFamily::Sqlite => "some random string",
+        SqlFamily::Postgres => "macaddr",
+        SqlFamily::Mssql => "money",
+        SqlFamily::Mysql => "point",
+    };
+
+    let dm = api.native_types_datamodel(&format!(
+        r#"
+            model UnsupportedModel {{
+                field Unsupported("{}")?
+                @@ignore
+        }}
+     "#,
+        unsupported_type
+    ));
 
     api.schema_push(dm).send().await?.assert_green()?;
 
