@@ -226,6 +226,7 @@ impl Standardiser {
                     };
                     let mut back_relation_field = dml::RelationField::new_generated(&model.name, relation_info);
                     back_relation_field.arity = dml::FieldArity::List;
+                    back_relation_field.is_ignored = model.is_ignored;
 
                     result.push(AddMissingBackRelationField {
                         model: rel_info.to.clone(),

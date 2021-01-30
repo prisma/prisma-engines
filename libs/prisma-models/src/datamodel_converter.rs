@@ -1,5 +1,5 @@
 use crate::*;
-use datamodel::{dml, DefaultValue, WithDatabaseName};
+use datamodel::{dml, DefaultValue, Ignorable, WithDatabaseName};
 use itertools::Itertools;
 
 pub struct DatamodelConverter<'a> {
@@ -73,6 +73,7 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_fields(&self, model: &dml::Model) -> Vec<FieldTemplate> {
         model
             .fields()
+            .filter(|field| !field.is_ignored())
             .filter_map(|field| match field {
                 dml::Field::RelationField(rf) => {
                     let relation = self
@@ -157,8 +158,8 @@ impl<'a> DatamodelConverter<'a> {
 
     pub fn calculate_relations(datamodel: &dml::Datamodel) -> Vec<TempRelationHolder> {
         let mut result = Vec::new();
-        for model in datamodel.models() {
-            for field in model.relation_fields() {
+        for model in datamodel.models().filter(|model| !model.is_ignored) {
+            for field in model.relation_fields().filter(|field| !field.is_ignored) {
                 let dml::RelationInfo {
                     to, references, name, ..
                 } = &field.relation_info;

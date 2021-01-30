@@ -129,7 +129,11 @@ pub fn commenting_out_guardrails(
         for model in datamodel.models_mut() {
             for field in model.relation_fields_mut() {
                 if field.points_to_model(&model_without_identifier.model) {
-                    field.is_commented_out = true;
+                    if native_types_enabled {
+                        field.is_ignored = true;
+                    } else {
+                        field.is_commented_out = true;
+                    }
                 }
             }
         }

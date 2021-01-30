@@ -883,7 +883,6 @@ fn db_generated_is_allowed() {
 fn reformatting_ignore_with_relations_works() {
     let input = r#"model client {
   client_id                 Int                         @id
-   // order                 order[]
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
@@ -905,7 +904,8 @@ model bill {
 
     let expected = r#"model client {
   client_id Int     @id
-  // order                 order[]
+  order     order[] @ignore
+  bill      bill[]  @ignore
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.

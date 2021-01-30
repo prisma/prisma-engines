@@ -1,7 +1,9 @@
 use super::{super::helpers::*, AttributeValidator};
 use crate::diagnostics::DatamodelError;
+use crate::Field::{RelationField, ScalarField};
 use crate::Ignorable;
 use crate::{ast, dml, Datamodel};
+
 /// Prismas builtin `@ignore` attribute.
 pub struct IgnoreAttributeValidator {}
 
@@ -28,15 +30,10 @@ impl AttributeValidator<dml::Field> for IgnoreAttributeValidatorForField {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        if obj.is_relation() {
-            return self.new_attribute_validation_error(
-                &format!(
-                    "The attribute `@{}` can not be used on relation fields.",
-                    ATTRIBUTE_NAME
-                ),
-                args.span(),
-            );
+    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+        match obj {
+            ScalarField(sf) => sf.is_ignored = true,
+            RelationField(rf) => rf.is_ignored = true,
         }
         Ok(())
     }

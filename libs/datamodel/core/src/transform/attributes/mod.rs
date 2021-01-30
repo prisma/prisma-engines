@@ -41,6 +41,7 @@ fn new_builtin_field_attributes() -> AttributeListValidator<dml::Field> {
     validator.add(Box::new(updated_at::UpdatedAtAttributeValidator {}));
     validator.add(Box::new(map::MapAttributeValidatorForField {}));
     validator.add(Box::new(relation::RelationAttributeValidator {}));
+    validator.add(Box::new(ignore::IgnoreAttributeValidatorForField {}));
 
     validator
 }
