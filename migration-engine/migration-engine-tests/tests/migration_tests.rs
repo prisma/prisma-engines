@@ -3154,28 +3154,6 @@ async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
-async fn creating_an_ignored_model_should_work(api: &TestApi) -> TestResult {
-    let dm = r#"
-        model Post {
-            user_ip  Unsupported("cidr") @id
-            
-            @@ignore
-         }
-    "#;
-
-    api.schema_push(dm).send().await?.assert_green()?;
-
-    api.assert_schema().await?.assert_table("Post", |table| {
-        table.assert_columns_count(1)?.assert_column("user_ip", |c| {
-            c.assert_is_required()?
-                .assert_type_family(ColumnTypeFamily::Unsupported("cidr".to_string()))
-        })
-    })?;
-
-    Ok(())
-}
-
 #[test_each_connector]
 async fn using_unsupported_and_ignore_should_work(api: &TestApi) -> TestResult {
     let unsupported_type = match api.sql_family() {
