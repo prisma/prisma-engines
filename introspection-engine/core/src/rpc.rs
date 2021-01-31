@@ -132,7 +132,7 @@ impl RpcImpl {
     }
 
     /// This function parses the provided schema and returns the contained Datamodel.
-    pub fn parse_datamodel(schema: &str, config: &Configuration) -> RpcResult<Datamodel> {
+    pub fn parse_datamodel(schema: &str, _config: &Configuration) -> RpcResult<Datamodel> {
         let final_dm = datamodel::parse_datamodel(&schema).map(|d| d.subject).map_err(|err| {
             Error::from(CommandError::ReceivedBadDatamodel(
                 err.to_pretty_string("schema.prisma", &schema),
