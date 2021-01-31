@@ -1,6 +1,5 @@
 use barrel::types;
 use indoc::indoc;
-use introspection_core::RpcImpl;
 use introspection_engine_tests::{assert_eq_datamodels, assert_eq_json, test_api::*};
 use quaint::prelude::Queryable;
 use serde_json::json;
