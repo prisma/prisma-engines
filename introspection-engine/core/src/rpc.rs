@@ -1,7 +1,7 @@
 use crate::command_error::CommandError;
 use crate::error::Error;
 use datamodel::configuration::preview_features::PreviewFeatures;
-use datamodel::{Configuration, Datamodel, FieldArity};
+use datamodel::{Configuration, Datamodel};
 use futures::{FutureExt, TryFutureExt};
 use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
 use jsonrpc_derive::rpc;
