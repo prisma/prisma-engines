@@ -1508,66 +1508,6 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> c
     Ok(())
 }
 
-// This test is different from the others in that it does not test against the SQL connector but against the RpcImpl in the core.
-// Therefore a valid datasource must be present in the input schema.
-// The easiest way to accomplish this was to hard code a specific db version and call the url helper for that version directly.
-#[test_each_connector(tags("mysql_8"))]
-async fn schemas_with_required_virtual_relation_fields_must_be_handlded_gracefully(api: &TestApi) -> crate::TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("AccountInfo", |t| {
-                t.add_column("id", types::primary());
-            });
-
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.add_column("accountInfoId", types::integer().nullable(false));
-                t.add_foreign_key(&["accountInfoId"], "AccountInfo", &["id"]);
-                t.add_index("uniqueIndex", types::index(vec!["accountInfoId"]).unique(true))
-            });
-        })
-        .await?;
-
-    let input_dm = format!(
-        r#"
-        datasource db {{
-            provider = "mysql"
-            url      = "{}"        
-        }}
-        
-        model User {{
-            id            Int         @id @default(autoincrement())
-            accountInfoId Int 
-            accountInfo   AccountInfo @relation(fields: accountInfoId, references: id)
-        }}
-        
-        model AccountInfo {{
-            id   Int  @id @default(autoincrement())
-            user User
-        }}
-    "#,
-        mysql_8_url(&api.db_name)
-    );
-
-    let final_dm = indoc! {r#"
-        model User {
-            id            Int         @id @default(autoincrement())
-            accountInfoId Int         @unique
-            accountInfo   AccountInfo @relation(fields: accountInfoId, references: id)
-        }
-        
-        model AccountInfo {
-            id   Int   @id @default(autoincrement())
-            user User?
-        }
-    "#};
-
-    let introspection_result = RpcImpl::introspect_internal(input_dm.to_string(), false).await?;
-    assert_eq_datamodels!(final_dm, introspection_result.datamodel.as_ref());
-
-    Ok(())
-}
-
 #[test_each_connector(tags("postgres"))]
 async fn custom_repro(api: &TestApi) -> crate::TestResult {
     api.barrel()
