@@ -879,6 +879,55 @@ fn db_generated_is_allowed() {
     assert_reformat(input, expected);
 }
 
+#[test]
+fn reformatting_ignore_with_relations_works() {
+    let input = r#"model client {
+  client_id                 Int                         @id
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model order {
+  client_id                  Int?
+  client                     client?  @relation(fields: [client_id], references: [client_id])
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model bill {
+  client_id                  Int?
+  client                     client?  @relation(fields: [client_id], references: [client_id])
+
+  @@ignore
+}
+"#;
+
+    let expected = r#"model client {
+  client_id Int     @id
+  order     order[] @ignore
+  bill      bill[]  @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model order {
+  client_id Int?
+  client    client? @relation(fields: [client_id], references: [client_id])
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model bill {
+  client_id Int?
+  client    client? @relation(fields: [client_id], references: [client_id])
+
+  @@ignore
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
 fn assert_reformat(schema: &str, expected_result: &str) {
     println!("schema: {:?}", schema);
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();

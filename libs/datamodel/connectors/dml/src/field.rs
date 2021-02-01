@@ -233,6 +233,9 @@ pub struct RelationField {
 
     /// Indicates if this field has to be commented out.
     pub is_commented_out: bool,
+
+    /// Indicates if this field has to be ignored by the Client.
+    pub is_ignored: bool,
 }
 
 impl RelationField {
@@ -245,6 +248,7 @@ impl RelationField {
             documentation: None,
             is_generated: false,
             is_commented_out: false,
+            is_ignored: false,
         }
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
@@ -318,6 +322,9 @@ pub struct ScalarField {
 
     /// Indicates if this field has to be commented out.
     pub is_commented_out: bool,
+
+    /// Indicates if this field is ignored by the Client.
+    pub is_ignored: bool,
 }
 
 impl ScalarField {
@@ -335,6 +342,7 @@ impl ScalarField {
             is_generated: false,
             is_updated_at: false,
             is_commented_out: false,
+            is_ignored: false,
         }
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
@@ -400,6 +408,9 @@ impl WithDatabaseName for ScalarField {
 
 impl Ignorable for Field {
     fn is_ignored(&self) -> bool {
-        false
+        match self {
+            Field::RelationField(rf) => rf.is_ignored,
+            Field::ScalarField(sf) => sf.is_ignored,
+        }
     }
 }

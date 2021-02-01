@@ -88,8 +88,8 @@ async fn a_table_without_uniques_using_native_types_should_ignore(api: &TestApi)
             }
 
             model User {
-              id      Int    @id @default(autoincrement())
-              // Post Post[]
+              id   Int    @id @default(autoincrement())
+              Post Post[] @ignore
             }
         "#}
     } else {
@@ -104,8 +104,8 @@ async fn a_table_without_uniques_using_native_types_should_ignore(api: &TestApi)
             }
 
             model User {
-              id      Int    @id @default(autoincrement())
-              // Post Post[]
+              id   Int    @id @default(autoincrement())
+              Post Post[] @ignore
             }
         "#}
     };
@@ -481,6 +481,47 @@ async fn commenting_out_a_table_without_columns(api: &TestApi) -> crate::TestRes
     "#};
 
     assert_eq!(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("ip integer not null unique");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer());
+                t.inject_custom("user_ip integer not null ");
+                t.add_foreign_key(&["user_ip"], "User", &["ip"]);
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+            ///The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+            model Post {
+                id      Int
+                user_ip Int
+                User    User @relation(fields: [user_ip], references: [ip])
+            
+                @@ignore
+            }
+            
+            model User {
+                id      Int  @id @default(autoincrement())
+                ip      Int  @unique
+                Post  Post[] @ignore
+            }
+        "#};
+
+    assert_eq!(
+        dm.replace(" ", ""),
+        api.introspect_with_native_types().await?.replace(" ", "")
+    );
 
     Ok(())
 }

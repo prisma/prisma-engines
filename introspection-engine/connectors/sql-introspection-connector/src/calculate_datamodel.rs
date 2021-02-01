@@ -128,6 +128,7 @@ mod tests {
                             is_generated: false,
                             is_updated_at: false,
                             is_commented_out,
+                            is_ignored: false,
                         })
                     })
                     .collect(),
@@ -192,6 +193,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     }),
                     Field::ScalarField(ScalarField::new(
                         "list",
@@ -274,6 +276,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     }),
                     Field::ScalarField(ScalarField {
                         name: "bool_default".to_string(),
@@ -287,6 +290,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     }),
                     Field::ScalarField(ScalarField {
                         name: "float_default".to_string(),
@@ -300,6 +304,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     }),
                     Field::ScalarField(ScalarField {
                         name: "string_default".to_string(),
@@ -313,6 +318,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     }),
                 ],
                 is_generated: false,
@@ -402,6 +408,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     })],
                     is_generated: false,
                     indices: vec![],
@@ -427,6 +434,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     })],
                     is_generated: false,
                     indices: vec![],
@@ -452,6 +460,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     })],
                     is_generated: false,
                     indices: vec![],
@@ -566,6 +575,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     }),
                 ],
                 is_generated: false,
@@ -633,6 +643,7 @@ mod tests {
                             is_generated: false,
                             is_updated_at: false,
                             is_commented_out: false,
+                            is_ignored: false,
                         }),
                         Field::ScalarField(ScalarField::new(
                             "name",
@@ -675,6 +686,7 @@ mod tests {
                             is_generated: false,
                             is_updated_at: false,
                             is_commented_out: false,
+                            is_ignored: false,
                         }),
                         Field::ScalarField(ScalarField {
                             name: "city_id".to_string(),
@@ -688,6 +700,7 @@ mod tests {
                             is_generated: false,
                             is_updated_at: false,
                             is_commented_out: false,
+                            is_ignored: false,
                         }),
                         Field::ScalarField(ScalarField {
                             name: "city_name".to_string(),
@@ -701,6 +714,7 @@ mod tests {
                             is_generated: false,
                             is_updated_at: false,
                             is_commented_out: false,
+                            is_ignored: false,
                         }),
                         Field::RelationField(RelationField::new(
                             "City",
@@ -844,6 +858,7 @@ mod tests {
                         is_generated: false,
                         is_updated_at: false,
                         is_commented_out: false,
+                        is_ignored: false,
                     }),
                     Field::ScalarField(ScalarField::new(
                         "name",
@@ -950,6 +965,7 @@ mod tests {
                             is_generated: false,
                             is_updated_at: false,
                             is_commented_out: false,
+                            is_ignored: false,
                         }),
                         Field::ScalarField(ScalarField::new(
                             "name",
@@ -992,6 +1008,7 @@ mod tests {
                             is_generated: false,
                             is_updated_at: false,
                             is_commented_out: false,
+                            is_ignored: false,
                         }),
                         Field::ScalarField(ScalarField::new(
                             "city_id",
