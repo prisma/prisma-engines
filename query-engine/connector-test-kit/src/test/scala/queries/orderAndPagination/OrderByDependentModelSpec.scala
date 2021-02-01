@@ -22,8 +22,10 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
       |}
       |
       |model ModelC {
-      |  id Int @id
-      |  b ModelB?
+      |  id   Int     @id
+      |  b    ModelB?
+      |  a_id Int?
+      |  a    ModelA? @relation(fields: [a_id], references: [id])
       |}
     """
   }
@@ -174,15 +176,185 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     // Depends on how null values are handled.
     val possibleResults = Seq(
       """{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}""",
-      """{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"""
+      """{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"""
     )
 
     possibleResults should contain(result.toString)
   }
 
-  def createRecord(a_id: Int, b_id: Option[Int], c_id: Option[Int]): Unit = {
+  "[Circular] Ordering by related record field ascending" should "work" in {
+    // Records form circles with their relations
+    createRecord(1, Some(1), Some(1), Some(1))
+    createRecord(2, Some(2), Some(2), Some(2))
+
+    val result = server.query(
+      """
+        |{
+        |  findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}) {
+        |    id
+        |    b {
+        |      c {
+        |        a {
+        |          id
+        |        }
+        |      }
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString() should be("""{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":1}}}},{"id":2,"b":{"c":{"a":{"id":2}}}}]}}""")
+  }
+
+  "[Circular] Ordering by related record field descending" should "work" in {
+    // Records form circles with their relations
+    createRecord(1, Some(1), Some(1), Some(1))
+    createRecord(2, Some(2), Some(2), Some(2))
+
+    val result = server.query(
+      """
+        |{
+        |  findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}) {
+        |    id
+        |    b {
+        |      c {
+        |        a {
+        |          id
+        |        }
+        |      }
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString() should be("""{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":2}}}},{"id":1,"b":{"c":{"a":{"id":1}}}}]}}""")
+  }
+
+  "[Circular with differing records] Ordering by related record field ascending" should "work" in {
+    // Records form circles with their relations
+    createRecord(1, Some(1), Some(1), Some(3))
+    createRecord(2, Some(2), Some(2), Some(4))
+
+    val result = server.query(
+      """
+        |{
+        |  findManyModelA(orderBy: { b: { c: { a: { id: asc }}}}) {
+        |    id
+        |    b {
+        |      c {
+        |        a {
+        |          id
+        |        }
+        |      }
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    // Depends on how null values are handled.
+    val possibleResults = Seq(
+      """{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}""",
+      """{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"""
+    )
+
+    possibleResults should contain(result.toString)
+  }
+
+  "[Circular with differing records] Ordering by related record field descending" should "work" in {
+    // Records form circles with their relations
+    createRecord(1, Some(1), Some(1), Some(3))
+    createRecord(2, Some(2), Some(2), Some(4))
+
+    val result = server.query(
+      """
+        |{
+        |  findManyModelA(orderBy: { b: { c: { a: { id: desc }}}}) {
+        |    id
+        |    b {
+        |      c {
+        |        a {
+        |          id
+        |        }
+        |      }
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    // Depends on how null values are handled.
+    val possibleResults = Seq(
+      """{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}""",
+      """{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"""
+    )
+
+    possibleResults should contain(result.toString)
+  }
+
+  "Multiple relations to the same model and orderBy" should "work" in {
+    val project = SchemaDsl.fromStringV11() {
+      """
+        |model ModelA {
+        |  id    Int     @id
+        |
+        |  b1_id Int?
+        |  b1    ModelB? @relation(fields: [b1_id], references: [id], name: "1")
+        |
+        |  b2_id Int?
+        |  b2    ModelB? @relation(fields: [b2_id], references: [id], name: "2")
+        |}
+        |
+        |model ModelB {
+        |  id Int     @id
+        |
+        |  a1 ModelA[] @relation("1")
+        |  a2 ModelA[] @relation("2")
+        |}
+      """
+    }
+    database.setup(project)
+
+    server.query(s"""mutation { createOneModelA(data: { id: 1, b1: { create: { id: 1 } }, b2: { create: { id: 10 } } }) { id }}""".stripMargin, project, legacy = false)
+    server.query(s"""mutation { createOneModelA(data: { id: 2, b1: { connect: { id: 1 } }, b2: { create: { id: 5 } } }) { id }}""".stripMargin, project, legacy = false)
+    server.query(s"""mutation { createOneModelA(data: { id: 3, b1: { create: { id: 2 } }, b2: { create: { id: 7 } } }) { id }}""".stripMargin, project, legacy = false)
+
+    val result = server.query(
+      """
+        |{
+        |  findManyModelA(orderBy: [{ b1: { id: asc } }, { b2: { id: desc } }]) {
+        |    id
+        |    b1 { id }
+        |    b2 { id }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString() should be("""{"data":{"findManyModelA":[{"id":1,"b1":{"id":1},"b2":{"id":10}},{"id":2,"b1":{"id":1},"b2":{"id":5}},{"id":3,"b1":{"id":2},"b2":{"id":7}}]}}""")
+  }
+
+  def createRecord(a_id: Int, b_id: Option[Int], c_id: Option[Int], cToA: Option[Int] = None): Unit = {
+    val (followUp, inline) = cToA match {
+      case Some(id) if id != a_id => (None, Some(s"a: { create: { id: $id }}"))
+      case Some(id)               => (Some(s"mutation { updateOneModelC(where: { id: ${c_id.get} }, data: { a_id: $id }) { id }}"), None)
+      case None                   => (None, None)
+    }
+
     val modelC = c_id match {
-      case Some(id) => s"c: { create: { id: $id }}"
+      case Some(id) => s"""c: { create: { id: $id \n ${inline.getOrElse("")} }}"""
       case None     => ""
     }
 
@@ -193,5 +365,10 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val modelA = s"{ id: $a_id \n $modelB }"
     server.query(s"""mutation { createOneModelA(data: $modelA) { id }}""".stripMargin, project, legacy = false)
+
+    followUp match {
+      case Some(query) => server.query(query, project, legacy = false)
+      case None => ()
+    }
   }
 }

@@ -13,12 +13,22 @@ pub fn build(
     let mut order_definitions = vec![];
     let mut joins = vec![];
 
-    for order_by in query_arguments.order_by.iter() {
-        let target_model = order_by
-            .path
-            .last()
-            .map(|rf| rf.related_model())
-            .unwrap_or(base_model.clone());
+    // The index is used to differentiate potentially separate relations to the same model.
+    for (index, order_by) in query_arguments.order_by.iter().enumerate() {
+        // This is the final column identifier to be used for the scalar field to order by.
+        // - If it's on the base model with no hops, it's for example `modelTable.field`.
+        // - If it is with several hops, it's the alias used for the last join, e.g.
+        //   `orderby_{modelname}_{index}.field`
+        let order_by_column = if order_by.path.len() > 0 {
+            let last_rf = order_by.path.last().unwrap();
+
+            Column::from((
+                format!("orderby_{}_{}", &last_rf.related_model().name, index),
+                order_by.field.db_name().to_owned(),
+            ))
+        } else {
+            order_by.field.as_column()
+        };
 
         for rf in order_by.path.iter() {
             let (left_fields, right_fields) = if rf.is_inlined_on_enclosing_model() {
@@ -32,12 +42,12 @@ pub fn build(
 
             // `rf` is always the relation field on the left model in the join (parent).
             let left_table_alias = if rf.model().name != base_model.name {
-                Some(format!("orderby_{}", &rf.model().name))
+                Some(format!("orderby_{}_{}", &rf.model().name, index))
             } else {
                 None
             };
 
-            let right_table_alias = format!("orderby_{}", &rf.related_model().name);
+            let right_table_alias = format!("orderby_{}_{}", &rf.related_model().name, index);
 
             let related_model = rf.related_model();
             let pairs = left_fields
@@ -68,20 +78,11 @@ pub fn build(
             );
         }
 
-        let col = if joins.len() > 0 {
-            Column::from((
-                format!("orderby_{}", &target_model.name),
-                order_by.field.db_name().to_owned(),
-            ))
-        } else {
-            order_by.field.as_column()
-        };
-
         match (order_by.sort_order, needs_reversed_order) {
-            (SortOrder::Ascending, true) => order_definitions.push(col.descend()),
-            (SortOrder::Descending, true) => order_definitions.push(col.ascend()),
-            (SortOrder::Ascending, false) => order_definitions.push(col.ascend()),
-            (SortOrder::Descending, false) => order_definitions.push(col.descend()),
+            (SortOrder::Ascending, true) => order_definitions.push(order_by_column.descend()),
+            (SortOrder::Descending, true) => order_definitions.push(order_by_column.ascend()),
+            (SortOrder::Ascending, false) => order_definitions.push(order_by_column.ascend()),
+            (SortOrder::Descending, false) => order_definitions.push(order_by_column.descend()),
         }
     }
 
