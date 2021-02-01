@@ -100,11 +100,11 @@ pub trait ToSqlRow {
     /// Conversion from a database specific row to an allocated `SqlRow`. To
     /// help deciding the right types, the provided `ColumnMetadata`s should map
     /// to the returned columns in the right order.
-    fn to_sql_row<'b>(self, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow>;
+    fn to_sql_row(self, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow>;
 }
 
 impl ToSqlRow for ResultRow {
-    fn to_sql_row<'b>(self, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow> {
+    fn to_sql_row(self, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow> {
         let mut row = SqlRow::default();
         let row_width = meta.len();
 

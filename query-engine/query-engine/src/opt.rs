@@ -110,7 +110,7 @@ impl PrismaOpt {
         let res = self
             .datamodel
             .as_deref()
-            .or(self.datamodel_path.as_deref())
+            .or_else(|| self.datamodel_path.as_deref())
             .ok_or_else(|| {
                 PrismaError::ConfigurationError(
                     "Datamodel should be provided either as path or base64-encoded string.".into(),

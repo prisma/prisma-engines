@@ -256,7 +256,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 
     let expected = json!({
         "is_panic": false,
-        "message": err_message.clone(),
+        "message": err_message,
         "meta": {
             "full_error": err_message,
         },
@@ -315,7 +315,7 @@ async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) {
     let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m 4 | \u{1b}[0m            post \u{1b}[1;91mPost[]\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n";
 
     let expected_error = user_facing_errors::Error::from(user_facing_errors::KnownError {
-        error_code: "P1012".into(),
+        error_code: "P1012",
         message: expected_msg.into(),
         meta: serde_json::json!({ "full_error": expected_msg }),
     });

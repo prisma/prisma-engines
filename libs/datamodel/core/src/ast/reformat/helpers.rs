@@ -9,15 +9,15 @@ pub trait TokenExtensions {
 
 impl TokenExtensions for Token<'_> {
     fn is_top_level_element(&self) -> bool {
-        match self.as_rule() {
-            Rule::model_declaration => true,
-            Rule::enum_declaration => true,
-            Rule::source_block => true,
-            Rule::generator_block => true,
-            Rule::type_alias => true,
-            Rule::comment_block => true,
-            _ => false,
-        }
+        matches!(
+            self.as_rule(),
+            Rule::model_declaration
+                | Rule::enum_declaration
+                | Rule::source_block
+                | Rule::generator_block
+                | Rule::type_alias
+                | Rule::comment_block
+        )
     }
 }
 

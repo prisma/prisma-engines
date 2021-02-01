@@ -822,7 +822,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
 
             insert = insert.value(column_name.clone(), seed.clone());
 
-            previous_assertions.push((column_name.clone(), from.clone()));
+            previous_assertions.push((column_name.clone(), *from));
             next_assertions.push((column_name, to).clone());
         }
 
@@ -925,8 +925,8 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
                 to = to,
             ).into());
 
-            previous_assertions.push((column_name.clone(), from.clone()));
-            next_assertions.push((column_name.clone(), to.clone()));
+            previous_assertions.push((column_name.clone(), *from));
+            next_assertions.push((column_name.clone(), *to));
         }
 
         let dm1 = api.native_types_datamodel(&format!(

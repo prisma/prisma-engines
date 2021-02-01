@@ -1019,7 +1019,7 @@ impl<'a> Validator<'a> {
                             if field_a != field_c && field_b != field_c {
                                 let rel_c = &field_c.relation_info;
                                 if rel_c.to == model.name && rel_a.name == rel_b.name && rel_a.name == rel_c.name {
-                                    if rel_a.name == "" {
+                                    if rel_a.name.is_empty() {
                                         // unnamed relation
                                         return Err(DatamodelError::new_model_validation_error(
                                                         &format!(

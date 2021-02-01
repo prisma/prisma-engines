@@ -3,7 +3,7 @@ use indexmap::IndexMap;
 use prisma_value::{stringify_date, PrismaValue};
 use std::hash::Hash;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Clone, Eq)]
 pub enum QueryValue {
     Int(i64),
     Float(BigDecimal),

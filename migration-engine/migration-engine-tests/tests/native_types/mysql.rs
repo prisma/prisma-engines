@@ -146,7 +146,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Double",
-        quaint::Value::Float(Some(3.14)),
+        quaint::Value::Float(Some(3.20)),
         &[
             "Float",
             "Bit(64)",
@@ -171,7 +171,7 @@ const SAFE_CASTS: Cases = &[
     ),
     (
         "Float",
-        quaint::Value::Float(Some(3.14)),
+        quaint::Value::Float(Some(3.20)),
         &[
             "Double",
             "Bit(32)",
@@ -463,12 +463,12 @@ const IMPOSSIBLE_CASTS: Cases = &[
     ),
     (
         "Double",
-        quaint::Value::Float(Some(3.14)),
+        quaint::Value::Float(Some(3.20)),
         &["Binary(10)", "Date", "Timestamp(0)", "DateTime(0)"],
     ),
     (
         "Float",
-        quaint::Value::Float(Some(3.14)),
+        quaint::Value::Float(Some(3.20)),
         &["Binary(10)", "Date", "Timestamp(0)", "DateTime(0)"],
     ),
     (
