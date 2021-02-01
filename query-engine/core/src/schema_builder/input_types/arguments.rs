@@ -118,7 +118,7 @@ pub(crate) fn many_records_arguments(
 
     let mut args = vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, &model),
+        order_by_argument(ctx, &model, feature_flags::get().orderByRelation),
         input_field(args::CURSOR, unique_input_type, None).optional(),
         input_field(args::TAKE, InputType::int(), None).optional(),
         input_field(args::SKIP, InputType::int(), None).optional(),
@@ -139,8 +139,13 @@ pub(crate) fn many_records_arguments(
 }
 
 // Builds "orderBy" argument.
-pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
-    let order_object_type = InputType::object(order_by_object_type(ctx, model));
+pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef, include_relations: bool) -> InputField {
+    let order_object_type = InputType::object(order_by_objects::order_by_object_type(
+        ctx,
+        model,
+        include_relations,
+        &mut vec![],
+    ));
 
     input_field(
         args::ORDER_BY,
@@ -155,7 +160,7 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
 
     vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, &model),
+        order_by_argument(ctx, &model, false),
         input_field(
             args::BY,
             vec![InputType::list(field_enum_type.clone()), field_enum_type],

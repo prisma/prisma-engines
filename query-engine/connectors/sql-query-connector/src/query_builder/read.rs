@@ -30,7 +30,7 @@ impl SelectDefinition for Select<'static> {
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
         let (table_opt, cursor_condition) = cursor_condition::build(&self, &model);
-        let orderings = ordering::build(&self);
+        let (orderings, joins) = ordering::build(&self, &model);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
@@ -57,6 +57,7 @@ impl SelectDefinition for QueryArguments {
         };
 
         let select_ast = orderings.into_iter().fold(select_ast, |acc, ord| acc.order_by(ord));
+        let select_ast = joins.into_iter().fold(select_ast, |acc, join| acc.left_join(join));
 
         match limit {
             Some(limit) => select_ast.limit(limit as usize),

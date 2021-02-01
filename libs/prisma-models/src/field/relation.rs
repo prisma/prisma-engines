@@ -252,6 +252,14 @@ impl RelationField {
             .collect()
     }
 
+    pub fn referenced_fields(&self) -> Vec<ScalarFieldRef> {
+        self.relation_info
+            .references
+            .iter()
+            .map(|field_name| self.related_model().fields().find_from_scalar(field_name).unwrap())
+            .collect()
+    }
+
     pub fn db_names(&self) -> impl Iterator<Item = String> {
         self.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
     }

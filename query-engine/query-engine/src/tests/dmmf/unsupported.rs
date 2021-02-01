@@ -56,7 +56,7 @@ fn unsupported_compound_indices_should_be_filtered_from_input_and_output_types()
           b Unsupported("X")
           c Unsupported("X")
           d Unsupported("X")
-        
+
           @@index([a, b])
           @@unique([c, d])
         }
@@ -141,14 +141,14 @@ fn no_find_unique_when_model_only_has_unsupported_index_or_compound() {
           /// This type is currently not supported.
           unsupported_index_a  Unsupported("X")  @id @default(dbgenerated("X"))
         }
-        
+
         model ItemC {
           id Int
           unsupported_index_a Unsupported("X")
           unsupported_index_b Unsupported("X")
           unsupported_index_c Unsupported("X")
           unsupported_index_d Unsupported("X")
-        
+
           @@index([unsupported_index_a, unsupported_index_b])
           @@unique([unsupported_index_c, unsupported_index_d])
         }

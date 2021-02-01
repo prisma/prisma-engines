@@ -55,7 +55,8 @@ macro_rules! flags {
 // `microsoftSqlServer`: Support for Microsoft SQL Server databases
 // `groupBy`: Group-By aggregations in the QE.
 // `createMany`: Create many (bulk insert) API operation.
-flags!(microsoftSqlServer, groupBy, createMany);
+// `orderByRelation`: Allows ordering by to-one relation in the QE API.
+flags!(microsoftSqlServer, groupBy, createMany, orderByRelation);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.

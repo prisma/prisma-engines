@@ -7,7 +7,8 @@ use crate::{
 };
 use connector::QueryArguments;
 use prisma_models::{
-    Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder,
+    Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, RelationFieldRef, ScalarFieldRef,
+    SortOrder,
 };
 use std::convert::{identity, TryInto};
 
@@ -67,33 +68,19 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
     Ok(finalize_arguments(query_args, model))
 }
 
-/// Extracts order by conditions in order of appearance, as defined in
+/// Extracts order by conditions in order of appearance.
 fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<OrderBy>> {
     match value {
         ParsedInputValue::List(list) => list
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-
-                match object.into_iter().next() {
-                    None => Ok(None),
-                    Some((field_name, sort_order)) => {
-                        let field = model.fields().find_from_scalar(&field_name)?;
-                        let value: PrismaValue = sort_order.try_into()?;
-                        let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                            ordering::ASC => SortOrder::Ascending,
-                            ordering::DESC => SortOrder::Descending,
-                            _ => unreachable!(),
-                        };
-
-                        Ok(Some(OrderBy::new(field, sort_order)))
-                    }
-                }
+                Ok(process_order_object(model, object, vec![])?)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().filter_map(identity).collect()),
 
-        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map)? {
+        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![])? {
             Some(order) => vec![order],
             None => vec![],
         }),
@@ -102,21 +89,33 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
     }
 }
 
-fn process_order_object(model: &ModelRef, object: ParsedInputMap) -> QueryGraphBuilderResult<Option<OrderBy>> {
-    // let object: ParsedInputMap = list_value.try_into()?;
-
+fn process_order_object(
+    model: &ModelRef,
+    object: ParsedInputMap,
+    mut path: Vec<RelationFieldRef>,
+) -> QueryGraphBuilderResult<Option<OrderBy>> {
     match object.into_iter().next() {
         None => Ok(None),
-        Some((field_name, sort_order)) => {
-            let field = model.fields().find_from_scalar(&field_name)?;
-            let value: PrismaValue = sort_order.try_into()?;
-            let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
-                ordering::ASC => SortOrder::Ascending,
-                ordering::DESC => SortOrder::Descending,
-                _ => unreachable!(),
-            };
+        Some((field_name, field_value)) => {
+            let field = model.fields().find_from_all(&field_name)?;
+            match field {
+                Field::Relation(rf) => {
+                    path.push(rf.clone());
 
-            Ok(Some(OrderBy::new(field, sort_order)))
+                    let object: ParsedInputMap = field_value.try_into()?;
+                    process_order_object(&rf.related_model(), object, path)
+                }
+                Field::Scalar(sf) => {
+                    let value: PrismaValue = field_value.try_into()?;
+                    let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
+                        ordering::ASC => SortOrder::Ascending,
+                        ordering::DESC => SortOrder::Descending,
+                        _ => unreachable!(),
+                    };
+
+                    Ok(Some(OrderBy::new(sf.clone(), path, sort_order)))
+                }
+            }
         }
     }
 }

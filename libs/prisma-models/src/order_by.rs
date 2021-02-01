@@ -1,15 +1,20 @@
-use crate::{ModelRef, ScalarFieldRef};
+use crate::{ModelRef, RelationFieldRef, ScalarFieldRef};
 use std::string::ToString;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct OrderBy {
     pub field: ScalarFieldRef,
+    pub path: Vec<RelationFieldRef>,
     pub sort_order: SortOrder,
 }
 
 impl OrderBy {
-    pub fn new(field: ScalarFieldRef, sort_order: SortOrder) -> Self {
-        Self { field, sort_order }
+    pub fn new(field: ScalarFieldRef, path: Vec<RelationFieldRef>, sort_order: SortOrder) -> Self {
+        Self {
+            field,
+            path,
+            sort_order,
+        }
     }
 }
 
@@ -36,6 +41,7 @@ impl From<ScalarFieldRef> for OrderBy {
     fn from(field: ScalarFieldRef) -> Self {
         Self {
             field,
+            path: vec![],
             sort_order: SortOrder::Ascending,
         }
     }

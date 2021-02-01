@@ -105,6 +105,7 @@ pub mod inputs {
     }
 
     pub mod ordering {
+        pub const SORT_ORDER: &str = "SortOrder";
         pub const ASC: &str = "asc";
         pub const DESC: &str = "desc";
     }
