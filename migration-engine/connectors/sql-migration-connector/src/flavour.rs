@@ -35,23 +35,20 @@ pub(crate) const MYSQL_IDENTIFIER_SIZE_LIMIT: usize = 64;
 pub(crate) fn from_connection_info(
     connection_info: &ConnectionInfo,
     features: BitFlags<MigrationFeature>,
-    shadow_database_url: Option<String>,
 ) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     match connection_info {
         ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour {
             url: url.clone(),
-            shadow_database_url,
             circumstances: Default::default(),
             features,
         }),
-        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone(), shadow_database_url, features)),
+        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone(), features)),
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
-            shadow_database_url,
-            attached_name: db_name.clone(),
+            attached_name: db_name.into(),
             features,
         }),
-        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone(), shadow_database_url, features)),
+        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone(), features)),
         ConnectionInfo::InMemorySqlite { .. } => unreachable!("SqlFlavour for in-memory SQLite"),
     }
 }

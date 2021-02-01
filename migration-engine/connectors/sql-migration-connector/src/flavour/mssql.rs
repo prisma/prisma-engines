@@ -14,17 +14,12 @@ use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, Known
 #[derive(Debug)]
 pub(crate) struct MssqlFlavour {
     pub(crate) url: MssqlUrl,
-    shadow_database_url: Option<String>,
     features: BitFlags<MigrationFeature>,
 }
 
 impl MssqlFlavour {
-    pub fn new(url: MssqlUrl, shadow_database_url: Option<String>, features: BitFlags<MigrationFeature>) -> Self {
-        Self {
-            url,
-            shadow_database_url,
-            features,
-        }
+    pub fn new(url: MssqlUrl, features: BitFlags<MigrationFeature>) -> Self {
+        Self { url, features }
     }
 
     pub(crate) fn schema_name(&self) -> &str {

@@ -30,8 +30,9 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
     ) -> ConnectorResult<SqlMigration> {
         let current_database_schema = self
             .flavour()
-            .sql_schema_from_migration_history(previous_migrations, self.conn())
+            .sql_schema_from_migration_history(previous_migrations, self.shadow_db_conn())
             .await?;
+
         let expected_database_schema = sql_schema_calculator::calculate_sql_schema(target_schema, self.flavour());
 
         Ok(infer(current_database_schema, expected_database_schema, self.flavour()))
@@ -41,7 +42,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
     async fn calculate_drift(&self, applied_migrations: &[MigrationDirectory]) -> ConnectorResult<Option<String>> {
         let expected_schema = self
             .flavour()
-            .sql_schema_from_migration_history(applied_migrations, self.conn())
+            .sql_schema_from_migration_history(applied_migrations, self.shadow_db_conn())
             .await?;
 
         let actual_schema = self.describe_schema().await?;
@@ -70,7 +71,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlMigrationConnector {
     #[tracing::instrument(skip(self, migrations))]
     async fn validate_migrations(&self, migrations: &[MigrationDirectory]) -> ConnectorResult<()> {
         self.flavour()
-            .sql_schema_from_migration_history(migrations, self.conn())
+            .sql_schema_from_migration_history(migrations, self.shadow_db_conn())
             .await?;
 
         Ok(())

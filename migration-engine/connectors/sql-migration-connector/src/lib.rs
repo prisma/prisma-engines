@@ -30,6 +30,7 @@ use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
     connection: Connection,
+    shadow_database_connection: Option<Connection>,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
     features: BitFlags<MigrationFeature>,
 }
@@ -55,14 +56,17 @@ impl SqlMigrationConnector {
         } = params;
 
         let connection = connect(datasource_url).await?;
-
-        let flavour =
-            flavour::from_connection_info(connection.connection_info(), features, datasource_shadow_database_url);
-
+        let flavour = flavour::from_connection_info(connection.connection_info(), features);
         flavour.ensure_connection_validity(&connection).await?;
+
+        let shadow_database_connection = match datasource_shadow_database_url {
+            Some(ref url) => Some(connect(url).await?),
+            None => None,
+        };
 
         Ok(Self {
             flavour,
+            shadow_database_connection,
             connection,
             features,
         })
@@ -72,7 +76,7 @@ impl SqlMigrationConnector {
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty(), None);
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
         flavour.create_database(database_str).await
     }
 
@@ -80,8 +84,7 @@ impl SqlMigrationConnector {
     pub async fn drop_database(database_str: &str) -> ConnectorResult<()> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty(), None);
-
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
         flavour.drop_database(database_str).await
     }
 
@@ -89,14 +92,19 @@ impl SqlMigrationConnector {
     pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty(), None);
-
+        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
         flavour.qe_setup(database_str).await
     }
 
     fn conn(&self) -> &Connection {
         &self.connection
+    }
+
+    fn shadow_db_conn(&self) -> &Connection {
+        match self.shadow_database_connection {
+            Some(ref conn) => conn,
+            None => self.conn(),
+        }
     }
 
     fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync) {
