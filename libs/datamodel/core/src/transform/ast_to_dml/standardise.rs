@@ -369,7 +369,7 @@ impl Standardiser {
                         .collect();
 
                     let rel_name = match related_fields.as_slice() {
-                        [rf] if !rf.name.is_empty() => rf.relation_info.name.clone(),
+                        [rf] if !rf.relation_info.name.is_empty() => rf.relation_info.name.clone(),
                         _ => RelationNames::name_for_unambiguous_relation(&model.name, &field.relation_info.to),
                     };
 
