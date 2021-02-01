@@ -1,5 +1,6 @@
 use super::common::*;
 use crate::diagnostics::DatamodelError;
+use crate::dml::RelationField;
 use crate::{
     ast,
     common::{NameNormalizer, RelationNames},
@@ -357,14 +358,18 @@ impl Standardiser {
         for model in datamodel.models() {
             for field in model.relation_fields() {
                 if field.relation_info.name.is_empty() {
-                    let related_field = datamodel
+                    let related_fields: Vec<&RelationField> = datamodel
                         .find_model(&field.relation_info.to)
                         .expect("The model referred to by a RelationInfo should always exist.")
                         .relation_fields()
-                        .find(|f| !f.relation_info.name.is_empty() && f.relation_info.to == model.name);
+                        .filter(|f| {
+                            f.relation_info.to == model.name
+                                && (f.name != field.name || model.name != field.relation_info.to)
+                        })
+                        .collect();
 
-                    let rel_name = match related_field {
-                        Some(rf) if !rf.name.is_empty() => rf.relation_info.name.clone(),
+                    let rel_name = match related_fields.as_slice() {
+                        [rf] if !rf.name.is_empty() => rf.relation_info.name.clone(),
                         _ => RelationNames::name_for_unambiguous_relation(&model.name, &field.relation_info.to),
                     };
 
