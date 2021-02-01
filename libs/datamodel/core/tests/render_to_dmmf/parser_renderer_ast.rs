@@ -1,3 +1,4 @@
+use indoc::indoc;
 use pretty_assertions::assert_eq;
 
 #[test]
@@ -293,6 +294,39 @@ model Author {
     // replaces \t placeholder with a real tab
     let tabbed_dm = input.replace("\\t", "\t");
     assert_rendered(&tabbed_dm, &expected.replace("\\t", "\t"));
+}
+
+#[test]
+fn test_parser_renderer_with_ignore() {
+    let input = indoc!(
+        r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        datasource pg {
+          provider = "postgresql"
+          url      = "postgresql://"
+        }
+
+        model Post {
+          id      Int
+          user_ip Int
+          User    User @relation(fields: [user_ip], references: [ip])
+        
+          @@ignore
+        }
+        
+        model User {
+          id   Int    @id @default(autoincrement())
+          ip   Int    @unique
+          Post Post[] @ignore
+        }
+        "#
+    );
+
+    assert_rendered(input, input);
 }
 
 fn assert_rendered(input: &str, expected: &str) {

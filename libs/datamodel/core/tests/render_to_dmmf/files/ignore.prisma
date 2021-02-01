@@ -1,0 +1,14 @@
+model Post {
+  id            Int
+  user_ip       Int
+  User          User @relation(fields: [user_ip], references: [ip])
+
+  @@ignore
+}
+
+model User {
+  id   Int    @id @default(autoincrement())
+  ip   Int    @unique @default(dbgenerated("sqrt(4)"))
+  usp  Unsupported("something")
+  Post Post[] @ignore
+}

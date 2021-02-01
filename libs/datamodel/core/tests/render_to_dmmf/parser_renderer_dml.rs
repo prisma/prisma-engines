@@ -375,3 +375,41 @@ datasource db {
         assert_eq!(rendered, input_with_preview);
     }
 }
+
+#[test]
+fn test_parser_renderer_ignored_via_dml() {
+    let input = indoc!(
+        r#"
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        datasource pg {
+          provider = "postgresql"
+          url      = "postgresql://"
+        }
+
+        model Post {
+          id      Int
+          user_ip Int
+          User    User @relation(fields: [user_ip], references: [ip])
+        
+          @@ignore
+        }
+        
+        model User {
+          id   Int    @id @default(autoincrement())
+          ip   Int    @unique
+          Post Post[] @ignore
+        }
+        "#
+    );
+
+    let config = parse_configuration(input);
+    let dml = parse(input);
+    println!("{:?}", dml);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config);
+
+    assert_eq!(rendered, input);
+}
