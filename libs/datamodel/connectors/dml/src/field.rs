@@ -66,6 +66,14 @@ impl FieldType {
         }
     }
 
+    pub fn is_datetime(&self) -> bool {
+        self.scalar_type().map(|st| st.is_datetime()).unwrap_or(false)
+    }
+
+    pub fn is_string(&self) -> bool {
+        self.scalar_type().map(|st| st.is_string()).unwrap_or(false)
+    }
+
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
             FieldType::NativeType(st, _) => Some(*st),

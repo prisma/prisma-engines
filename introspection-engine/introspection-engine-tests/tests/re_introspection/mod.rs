@@ -1317,6 +1317,67 @@ async fn updated_at(api: &TestApi) -> crate::TestResult {
     Ok(())
 }
 
+#[test_each_connector(tags("mssql"), log = "debug")]
+async fn updated_at_with_native_types_on(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", move |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("lastupdated", types::datetime().nullable(true));
+                t.inject_custom("lastupdated2 DATETIME");
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await?;
+
+    let input_dm = indoc! {r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes", "microsoftSqlServer"]
+        }
+
+        model User {
+            id           String    @id
+            lastupdated  DateTime? @updatedAt
+            lastupdated2 DateTime? @db.DateTime @updatedAt
+        }
+    "#};
+
+    let final_dm = indoc! {r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["nativeTypes", "microsoftSqlServer"]
+        }
+
+        model User {
+            id           String    @id
+            lastupdated  DateTime? @updatedAt
+            lastupdated2 DateTime? @db.DateTime @updatedAt
+        }
+
+        model Unrelated {
+            id               Int @id @default(autoincrement())
+        }
+    "#};
+
+    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn multiple_many_to_many_on_same_model(api: &TestApi) -> crate::TestResult {
     api.barrel()
@@ -1491,7 +1552,7 @@ async fn re_introspecting_mysql_enum_names_if_enum_is_reused(api: &TestApi) -> c
                 black
                 white
             }
-            
+
             enum User_color2{
                 black
                 white
@@ -1533,11 +1594,11 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
           tag_id    Int
           tag       Tag       @relation("post_to_tag", fields:[tag_id])
         }
-               
+
         model Tag {
           id        Int       @id @default(autoincrement())
           name      String    @unique
-          posts     Post[]    @relation("post_to_tag")  
+          posts     Post[]    @relation("post_to_tag")
           @@map("tag")
         }
     "#};
@@ -1548,11 +1609,11 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
           tag_id    Int
           tag       Tag       @relation("post_to_tag", fields:[tag_id])
         }
-               
+
         model Tag {
           id        Int       @id @default(autoincrement())
           name      String    @unique
-          posts     Post[]    @relation("post_to_tag")  
+          posts     Post[]    @relation("post_to_tag")
           @@map("tag")
         }
 

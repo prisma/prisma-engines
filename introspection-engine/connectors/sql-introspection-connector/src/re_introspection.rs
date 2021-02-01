@@ -1,6 +1,6 @@
 use crate::introspection_helpers::replace_field_names;
 use crate::warnings::*;
-use datamodel::{Datamodel, DefaultValue, FieldType, ScalarType, ValueGenerator};
+use datamodel::{Datamodel, DefaultValue, FieldType, ValueGenerator};
 use introspection_connector::Warning;
 use prisma_value::PrismaValue;
 use quaint::connector::SqlFamily;
@@ -297,9 +297,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
             for field in model.scalar_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     if let Some(old_field) = old_model.find_scalar_field(&field.name) {
-                        if field.default_value.is_none()
-                            && field.field_type == FieldType::Base(ScalarType::String, None)
-                        {
+                        if field.default_value.is_none() && field.field_type.is_string() {
                             if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_cuid())) {
                                 re_introspected_prisma_level_cuids.push(ModelAndField::new(&model.name, &field.name));
                             }
@@ -309,7 +307,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                             }
                         }
 
-                        if field.field_type == FieldType::Base(ScalarType::DateTime, None) && old_field.is_updated_at {
+                        if field.field_type.is_datetime() && old_field.is_updated_at {
                             re_introspected_updated_at.push(ModelAndField::new(&model.name, &field.name));
                         }
                     }

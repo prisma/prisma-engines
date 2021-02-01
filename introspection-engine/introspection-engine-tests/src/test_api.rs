@@ -11,8 +11,8 @@ use quaint::{
 };
 use sql_introspection_connector::SqlIntrospectionConnector;
 use sql_schema_describer::{mssql, mysql, postgres, sqlite, SqlSchema, SqlSchemaDescriberBackend};
-use test_setup::connectors::Tags;
-use test_setup::*;
+use test_setup::{connectors::Tags, *};
+use tracing::Instrument;
 
 pub struct TestApi {
     pub db_name: &'static str,
@@ -84,16 +84,21 @@ impl TestApi {
         Ok(datamodel::render_datamodel_to_string(&introspection_result.data_model))
     }
 
+    #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
         let config = parse_configuration(data_model_string)?;
         let data_model = parse_datamodel(data_model_string)?;
         let native_types = config.generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
+        tracing::debug!("Native types enabled: {:?}", native_types);
 
         let introspection_result = self
             .introspection_connector
             .introspect(&data_model, native_types)
+            .instrument(tracing::info_span!("introspect"))
             .await?;
 
+        let rendering_span = tracing::info_span!("render_datamodel after introspection");
+        let _span = rendering_span.enter();
         let dm = datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config);
 
         Ok(dm)

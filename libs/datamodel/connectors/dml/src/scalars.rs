@@ -21,8 +21,16 @@ impl ScalarType {
         matches!(self, ScalarType::Boolean)
     }
 
+    pub fn is_datetime(&self) -> bool {
+        matches!(self, ScalarType::DateTime)
+    }
+
     pub fn is_float(&self) -> bool {
         matches!(self, ScalarType::Float)
+    }
+
+    pub fn is_string(&self) -> bool {
+        matches!(self, ScalarType::String)
     }
 }
 
