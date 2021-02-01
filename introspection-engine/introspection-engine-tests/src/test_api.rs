@@ -86,7 +86,7 @@ impl TestApi {
 
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
         let config = parse_configuration(data_model_string)?;
-        let data_model = parse_datamodel(data_model_string, &config)?;
+        let data_model = parse_datamodel(data_model_string)?;
         let native_types = config.generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
 
         let introspection_result = self
@@ -100,8 +100,7 @@ impl TestApi {
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
-        let config = parse_configuration(data_model_string)?;
-        let data_model = parse_datamodel(data_model_string, &config)?;
+        let data_model = parse_datamodel(data_model_string)?;
         let introspection_result = self.introspection_connector.introspect(&data_model, false).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
@@ -163,8 +162,8 @@ impl TestApi {
     }
 }
 
-fn parse_datamodel(dm: &str, config: &Configuration) -> Result<Datamodel> {
-    match RpcImpl::parse_datamodel(dm, config) {
+fn parse_datamodel(dm: &str) -> Result<Datamodel> {
+    match RpcImpl::parse_datamodel(dm) {
         Ok(dm) => Ok(dm),
         Err(e) => Err(Report::msg(e.message)),
     }
