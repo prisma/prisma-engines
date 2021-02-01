@@ -4,7 +4,6 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase {
-
   val project = SchemaDsl.fromStringV11() {
     """
       |model ModelA {
@@ -29,9 +28,10 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     """
   }
 
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
     database.setup(project)
+    database.truncateProjectTables(project)
   }
 
   "[Hops: 1] Ordering by related record field ascending" should "work" in {
