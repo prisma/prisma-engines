@@ -1682,7 +1682,6 @@ async fn custom_relation_names(api: &TestApi) -> crate::TestResult {
 
     let result = api.re_introspect(input_dm).await?;
 
-
     assert_eq_datamodels!(final_dm, &result);
 
     Ok(())
