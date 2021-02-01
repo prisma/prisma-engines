@@ -913,12 +913,14 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
     api.create_migration("initial", dm1, &directory).send().await?;
 
     api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser;").await.ok();
+    api.database()
+        .raw_cmd("DROP USER IF EXISTS prismashadowdbtestuser;")
+        .await
+        .ok();
 
     api.database()
         .raw_cmd(
             "
-            DROP USER IF EXISTS prismashadowdbtestuser;
-
             CREATE LOGIN prismashadowdbtestuser
                 WITH PASSWORD = '1234batmanZ';
 
