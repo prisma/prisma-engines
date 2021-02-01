@@ -270,7 +270,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     possibleResults should contain(result.toString)
   }
 
-  "[Circular with differing records] Ordering by related record field descending" should "work" taggedAs IgnoreMsSql in {
+  "[Circular with differing records] Ordering by related record field descending" should "work" taggedAs (IgnoreMsSql, IgnoreMySql) in {
     // Records form circles with their relations
     createRecord(1, Some(1), Some(1), Some(3))
     createRecord(2, Some(2), Some(2), Some(4))
