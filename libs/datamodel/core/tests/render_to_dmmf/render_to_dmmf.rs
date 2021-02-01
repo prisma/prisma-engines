@@ -11,6 +11,7 @@ fn test_dmmf_rendering() {
         "source_with_comments",
         "source_with_generator",
         "without_relation_name",
+        "ignore",
     ];
 
     for test_case in test_cases {

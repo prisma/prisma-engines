@@ -1,5 +1,5 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
-use crate::{dml, IndexType, ScalarType};
+use crate::{dml, FieldType, Ignorable, IndexType, ScalarType};
 use bigdecimal::ToPrimitive;
 use prisma_value::PrismaValue;
 
@@ -23,7 +23,7 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
         datamodel.enums.push(enum_to_dmmf(&enum_model));
     }
 
-    for model in schema.models() {
+    for model in schema.models().filter(|model| !model.is_ignored) {
         datamodel.models.push(model_to_dmmf(&model));
     }
 
@@ -57,7 +57,11 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
         name: model.name.clone(),
         db_name: model.database_name.clone(),
         is_embedded: model.is_embedded,
-        fields: model.fields().map(|f| field_to_dmmf(model, f)).collect(),
+        fields: model
+            .fields()
+            .filter(|field| !field.is_ignored() && !matches!(field.field_type(), FieldType::Unsupported(_)))
+            .map(|f| field_to_dmmf(model, f))
+            .collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
         id_fields: model.id_fields.clone(),
