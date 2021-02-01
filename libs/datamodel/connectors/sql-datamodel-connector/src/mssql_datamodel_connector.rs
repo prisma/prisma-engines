@@ -173,18 +173,18 @@ impl Connector for MsSqlDatamodelConnector {
                     typ if heap_allocated_types().contains(&typ) && field.is_id() => {
                         error.new_incompatible_native_type_with_id()
                     }
-                    NVarChar(Some(Number(p))) if p > 2000 => error.new_argument_m_out_of_range_error(
-                        "Length can range from 1 to 2000. For larger sizes, use the `Max` variant.",
+                    NVarChar(Some(Number(p))) if p > 4000 => error.new_argument_m_out_of_range_error(
+                        "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
                     ),
-                    VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 4000 => error
+                    VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 8000 => error
                         .new_argument_m_out_of_range_error(
-                            r#"Length can range from 1 to 4000. For larger sizes, use the `Max` variant."#,
+                            r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
                         ),
-                    NChar(Some(p)) if p > 2000 => {
-                        error.new_argument_m_out_of_range_error("Length can range from 1 to 2000.")
-                    }
-                    Char(Some(p)) | Binary(Some(p)) if p > 4000 => {
+                    NChar(Some(p)) if p > 4000 => {
                         error.new_argument_m_out_of_range_error("Length can range from 1 to 4000.")
+                    }
+                    Char(Some(p)) | Binary(Some(p)) if p > 8000 => {
+                        error.new_argument_m_out_of_range_error("Length can range from 1 to 8000.")
                     }
                     _ => Ok(()),
                 }

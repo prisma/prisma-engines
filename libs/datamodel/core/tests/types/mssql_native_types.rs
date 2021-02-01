@@ -124,46 +124,46 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 #[test]
 fn should_fail_on_argument_out_of_range_for_char_type() {
     let error_msg =
-        "Argument M is out of range for Native type Char(4001) of SQL Server: Length can range from 1 to 4000.";
+        "Argument M is out of range for Native type Char(8001) of SQL Server: Length can range from 1 to 8000.";
 
-    test_native_types_without_attributes("Char(4001)", "String", error_msg, MSSQL_SOURCE);
+    test_native_types_without_attributes("Char(8001)", "String", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_nchar_type() {
     let error_msg =
-        "Argument M is out of range for Native type NChar(2001) of SQL Server: Length can range from 1 to 2000.";
+        "Argument M is out of range for Native type NChar(4001) of SQL Server: Length can range from 1 to 4000.";
 
-    test_native_types_without_attributes("NChar(2001)", "String", error_msg, MSSQL_SOURCE);
+    test_native_types_without_attributes("NChar(4001)", "String", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_varchar_type() {
-    let error_msg = "Argument M is out of range for Native type VarChar(4001) of SQL Server: Length can range from 1 to 4000. For larger sizes, use the `Max` variant.";
+    let error_msg = "Argument M is out of range for Native type VarChar(8001) of SQL Server: Length can range from 1 to 8000. For larger sizes, use the `Max` variant.";
 
-    test_native_types_without_attributes("VarChar(4001)", "String", error_msg, MSSQL_SOURCE);
+    test_native_types_without_attributes("VarChar(8001)", "String", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_nvarchar_type() {
-    let error_msg = "Argument M is out of range for Native type NVarChar(2001) of SQL Server: Length can range from 1 to 2000. For larger sizes, use the `Max` variant.";
+    let error_msg = "Argument M is out of range for Native type NVarChar(4001) of SQL Server: Length can range from 1 to 4000. For larger sizes, use the `Max` variant.";
 
-    test_native_types_without_attributes("NVarChar(2001)", "String", error_msg, MSSQL_SOURCE);
+    test_native_types_without_attributes("NVarChar(4001)", "String", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_varbinary_type() {
-    let error_msg = "Argument M is out of range for Native type VarBinary(4001) of SQL Server: Length can range from 1 to 4000. For larger sizes, use the `Max` variant.";
+    let error_msg = "Argument M is out of range for Native type VarBinary(8001) of SQL Server: Length can range from 1 to 8000. For larger sizes, use the `Max` variant.";
 
-    test_native_types_without_attributes("VarBinary(4001)", "Bytes", error_msg, MSSQL_SOURCE);
+    test_native_types_without_attributes("VarBinary(8001)", "Bytes", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
 fn should_fail_on_argument_out_of_range_for_binary_type() {
     let error_msg =
-        "Argument M is out of range for Native type Binary(4001) of SQL Server: Length can range from 1 to 4000.";
+        "Argument M is out of range for Native type Binary(8001) of SQL Server: Length can range from 1 to 8000.";
 
-    test_native_types_without_attributes("Binary(4001)", "Bytes", error_msg, MSSQL_SOURCE);
+    test_native_types_without_attributes("Binary(8001)", "Bytes", error_msg, MSSQL_SOURCE);
 }
 
 #[test]
@@ -273,18 +273,18 @@ test_type!(char(
 
 test_type!(nchar(
     ("String @db.NChar", MsSqlType::NChar(None)),
-    ("String @db.NChar(2000)", MsSqlType::NChar(Some(2000)))
+    ("String @db.NChar(4000)", MsSqlType::NChar(Some(4000)))
 ));
 
 test_type!(varchar(
     ("String @db.VarChar", MsSqlType::VarChar(None)),
-    ("String @db.VarChar(4000)", MsSqlType::VarChar(Some(Number(4000)))),
+    ("String @db.VarChar(8000)", MsSqlType::VarChar(Some(Number(8000)))),
     ("String @db.VarChar(Max)", MsSqlType::VarChar(Some(Max))),
 ));
 
 test_type!(nvarchar(
     ("String @db.NVarChar", MsSqlType::NVarChar(None)),
-    ("String @db.NVarChar(2000)", MsSqlType::NVarChar(Some(Number(2000)))),
+    ("String @db.NVarChar(4000)", MsSqlType::NVarChar(Some(Number(4000)))),
     ("String @db.NVarChar(Max)", MsSqlType::NVarChar(Some(Max))),
 ));
 
