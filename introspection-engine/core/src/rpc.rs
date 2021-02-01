@@ -96,7 +96,7 @@ impl RpcImpl {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
         let input_data_model = if !force {
-            Self::parse_datamodel(&schema, &config)?
+            Self::parse_datamodel(&schema)?
         } else {
             Datamodel::new()
         };
@@ -132,7 +132,7 @@ impl RpcImpl {
     }
 
     /// This function parses the provided schema and returns the contained Datamodel.
-    pub fn parse_datamodel(schema: &str, _config: &Configuration) -> RpcResult<Datamodel> {
+    pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
         let final_dm = datamodel::parse_datamodel(&schema).map(|d| d.subject).map_err(|err| {
             Error::from(CommandError::ReceivedBadDatamodel(
                 err.to_pretty_string("schema.prisma", &schema),
