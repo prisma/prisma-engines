@@ -11,12 +11,6 @@ pub enum Subcommand {
     Cli(CliOpt),
 }
 
-// #[derive(Debug, Clone, StructOpt)]
-// pub struct DmmfToDmlInput {
-//     #[structopt(name = "path")]
-//     pub path: String,
-// }
-
 #[derive(Debug, Clone, StructOpt)]
 pub struct ExecuteRequestInput {
     /// GraphQL query to execute
