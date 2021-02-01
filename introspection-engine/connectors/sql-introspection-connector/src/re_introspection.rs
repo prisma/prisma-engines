@@ -112,7 +112,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
                         let old_related_field = &old_data_model.find_related_field_bang(&old_field);
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
-
                         let relation_info_partial_eq = old_field.relation_info == field.relation_info
                             && old_related_field.relation_info == related_field.relation_info;
                         let many_to_many = old_field.is_list() && old_related_field.is_list();
@@ -140,7 +139,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
 
     //keep old virtual relation names on non M:N relations
     // M:N relations cannot be uniquely identified without ignoring the relationname and their relationnames cant
-    // be changed without necessitation db changes since RelationName -> Join table name
+    // be changed without necessitating db changes since RelationName -> Join table name
 
     let mut changed_relation_names = vec![];
     {

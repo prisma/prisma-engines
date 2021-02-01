@@ -1629,3 +1629,61 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"), log = "debug")]
+async fn custom_relation_names(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer().nullable(false).unique(true));
+                t.add_foreign_key(&["user_id"], "User", &["id"]);
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await?;
+
+    let input_dm = indoc! {r#"
+        model Post {
+            id               Int @id @default(autoincrement())
+            user_id          Int  @unique
+            custom_User      User @relation("CustomName", fields: [user_id], references: [id])
+        }
+
+        model User {
+            id               Int @id @default(autoincrement())
+            custom_Post      Post?
+        }
+    "#};
+
+    let final_dm = indoc! {r#"
+        model Post {
+          id          Int    @id @default(autoincrement())
+          user_id     Int    @unique
+          custom_User User   @relation("CustomName", fields: [user_id], references: [id])
+        }
+                
+        model User {
+          id          Int    @id @default(autoincrement())
+          custom_Post Post?  @relation("CustomName")
+        }
+                        
+        model Unrelated {
+          id Int @id @default(autoincrement())
+        }
+    "#};
+
+    let result = api.re_introspect(input_dm).await?;
+
+
+    assert_eq_datamodels!(final_dm, &result);
+
+    Ok(())
+}

@@ -40,6 +40,7 @@ impl<'a, 'b> ValidationPipeline<'a, 'b> {
         if let Err(mut err) = precheck::Precheck::precheck(&ast_schema) {
             diagnostics.append(&mut err);
         }
+        tracing::debug!("Prechecked AST: {:#?}", ast_schema);
 
         // Early return so that the validator does not have to deal with invalid schemas
         if diagnostics.has_errors() {
@@ -55,6 +56,7 @@ impl<'a, 'b> ValidationPipeline<'a, 'b> {
             }
             Ok(schema) => schema,
         };
+        tracing::debug!("AST lifted to DML: {:#?}", schema);
 
         // Phase 4: Validation
         if let Err(mut err) = self.validator.validate(ast_schema, &mut schema) {
@@ -71,6 +73,7 @@ impl<'a, 'b> ValidationPipeline<'a, 'b> {
         if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema) {
             diagnostics.append(&mut err);
         }
+        tracing::debug!("Standardized DML: {:#?}", schema);
 
         // Early return so that the post validation does not have to deal with invalid schemas
         if diagnostics.has_errors() {

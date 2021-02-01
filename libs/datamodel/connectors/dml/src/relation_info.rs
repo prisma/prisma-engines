@@ -15,7 +15,7 @@ pub struct RelationInfo {
 }
 
 impl PartialEq for RelationInfo {
-    //ignores the relation name for reintrospection
+    //ignores the relation name for re-introspection
     fn eq(&self, other: &Self) -> bool {
         self.to == other.to
             && self.fields == other.fields

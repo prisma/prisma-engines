@@ -343,21 +343,32 @@ impl Standardiser {
     fn name_unnamed_relations(&self, datamodel: &mut dml::Datamodel) {
         let unnamed_relations = self.find_unnamed_relations(&datamodel);
 
-        for (model_name, field_name, rel_info) in unnamed_relations {
+        for (model_name, field_name, name) in unnamed_relations {
             // Embedding side.
             let field = datamodel.find_relation_field_mut(&model_name, &field_name);
-            field.relation_info.name = RelationNames::name_for_unambiguous_relation(&model_name, &rel_info.to);
+            field.relation_info.name = name;
         }
     }
 
-    // Returns list of model name, field name and relation info.
-    fn find_unnamed_relations(&self, datamodel: &dml::Datamodel) -> Vec<(String, String, dml::RelationInfo)> {
+    // Returns list of model name, field name and relationname.
+    fn find_unnamed_relations(&self, datamodel: &dml::Datamodel) -> Vec<(String, String, String)> {
         let mut rels = Vec::new();
 
         for model in datamodel.models() {
             for field in model.relation_fields() {
                 if field.relation_info.name.is_empty() {
-                    rels.push((model.name.clone(), field.name.clone(), field.relation_info.clone()))
+                    let related_field = datamodel
+                        .find_model(&field.relation_info.to)
+                        .expect("The model referred to by a RelationInfo should always exist.")
+                        .relation_fields()
+                        .find(|f| !f.relation_info.name.is_empty() && f.relation_info.to == model.name);
+
+                    let rel_name = match related_field {
+                        Some(rf) if !rf.name.is_empty() => rf.relation_info.name.clone(),
+                        _ => RelationNames::name_for_unambiguous_relation(&model.name, &field.relation_info.to),
+                    };
+
+                    rels.push((model.name.clone(), field.name.clone(), rel_name))
                 }
             }
         }
