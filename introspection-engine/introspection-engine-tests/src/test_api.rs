@@ -2,7 +2,7 @@ use crate::BarrelMigrationExecutor;
 use datamodel::Configuration;
 use datamodel::{preview_features::PreviewFeatures, Datamodel};
 use enumflags2::BitFlags;
-use eyre::{Report, Result};
+use eyre::{Context, Report, Result};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use introspection_core::rpc::RpcImpl;
 use quaint::{
@@ -86,8 +86,8 @@ impl TestApi {
 
     #[tracing::instrument(skip(self, data_model_string))]
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
-        let config = parse_configuration(data_model_string)?;
-        let data_model = parse_datamodel(data_model_string)?;
+        let config = parse_configuration(data_model_string).context("parsing configuration")?;
+        let data_model = parse_datamodel(data_model_string).context("parsing datamodel")?;
         let native_types = config.generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
         tracing::debug!("Native types enabled: {:?}", native_types);
 
@@ -170,7 +170,7 @@ impl TestApi {
 fn parse_datamodel(dm: &str) -> Result<Datamodel> {
     match RpcImpl::parse_datamodel(dm) {
         Ok(dm) => Ok(dm),
-        Err(e) => Err(Report::msg(e.message)),
+        Err(e) => Err(Report::msg(serde_json::to_string_pretty(&e.data).unwrap())),
     }
 }
 
