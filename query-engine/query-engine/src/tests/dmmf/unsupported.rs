@@ -216,6 +216,73 @@ fn no_create_or_upsert_should_exist_with_unsupported_field_without_default_value
         );
     });
 }
+#[test]
+#[serial]
+fn no_nested_create_upsert_exist_with_unsupported_field_without_default_value() {
+    let dm = r#"
+    datasource pg {
+        provider = "postgresql"
+        url = "postgresql://"
+    }
+
+    model User {
+      id       Int              @id
+      /// This type is currently not supported.
+      postId Int
+      post Post @relation(fields: [postId], references: [id])
+    }
+
+    model Post {
+        id Int @id
+        title String
+        unsupported Unsupported("X")
+    }
+"#;
+    let (query_schema, datamodel) = get_query_schema(dm);
+    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+
+    let post_nested_create_input = find_input_type(&dmmf, PRISMA_NAMESPACE, "UserCreateInput");
+    iterate_input_type_fields(&post_nested_create_input, &dmmf, &|_, field, parent_type| {
+        if parent_type.name.contains("Post") {
+            assert_ne!(
+                field.name, "create",
+                "nested operation '{}.{}' should not be available",
+                parent_type.name, field.name
+            );
+            assert_ne!(
+                field.name, "connectOrCreate",
+                "nested operation '{}.{}' should not be available",
+                parent_type.name, field.name
+            );
+        }
+    });
+
+    let post_nested_update_input = find_input_type(&dmmf, PRISMA_NAMESPACE, "UserUpdateInput");
+    iterate_input_type_fields(&post_nested_update_input, &dmmf, &|_, field, parent_type| {
+        if parent_type.name.contains("Post") {
+            assert_ne!(
+                field.name, "create",
+                "nested operation '{}.{}' should not be available",
+                parent_type.name, field.name
+            );
+            assert_ne!(
+                field.name, "createMany",
+                "nested operation '{}.{}' should not be available",
+                parent_type.name, field.name
+            );
+            assert_ne!(
+                field.name, "upsert",
+                "nested operation '{}.{}' should not be available",
+                parent_type.name, field.name
+            );
+            assert_ne!(
+                field.name, "connectOrCreate",
+                "nested operation '{}.{}' should not be available",
+                parent_type.name, field.name
+            );
+        }
+    });
+}
 
 #[test]
 #[serial]

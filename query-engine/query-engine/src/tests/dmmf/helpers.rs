@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::dmmf::{schema::*, DataModelMetaFormat};
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
@@ -68,27 +70,38 @@ where
     }
 }
 
-pub fn iterate_input_type_fields<P>(input_type: &DmmfInputType, dmmf: &DataModelMetaFormat, iteratee: &P)
+pub fn iterate_input_type_fields<P>(root: &DmmfInputType, dmmf: &DataModelMetaFormat, iteratee: &P)
 where
     P: Fn(&DmmfTypeReference, &DmmfInputField, &DmmfInputType),
 {
-    for field in &input_type.fields {
-        for input_type_ref in &field.input_types {
-            match input_type_ref.location {
-                TypeLocation::OutputObjectTypes => {
-                    let namespace = input_type_ref
-                        .namespace
-                        .as_ref()
-                        .expect("a namespace is required to iterate over a nested output type but could not find one");
-                    let nested_input_type = find_input_type(dmmf, namespace, input_type_ref.typ.as_str());
+    let mut stack: Vec<&DmmfInputType> = vec![root];
+    let mut visited: HashMap<&str, bool> = HashMap::new();
 
-                    iteratee(&input_type_ref, &field, nested_input_type);
-                    iterate_input_type_fields(nested_input_type, dmmf, iteratee)
+    while !stack.is_empty() {
+        let input_type = stack.pop().unwrap();
+
+        visited.insert(input_type.name.as_str(), true);
+
+        for field in &input_type.fields {
+            for input_type_ref in &field.input_types {
+                match input_type_ref.location {
+                    TypeLocation::InputObjectTypes => {
+                        let namespace = input_type_ref.namespace.as_ref().expect(
+                            "a namespace is required to iterate over a nested output type but could not find one",
+                        );
+                        let nested_input_type = find_input_type(dmmf, namespace, input_type_ref.typ.as_str());
+
+                        iteratee(&input_type_ref, &field, nested_input_type);
+
+                        if visited.get(nested_input_type.name.as_str()).is_none() {
+                            stack.push(nested_input_type);
+                        }
+                    }
+                    TypeLocation::Scalar | TypeLocation::EnumTypes => {
+                        iteratee(&input_type_ref, &field, input_type);
+                    }
+                    _ => (),
                 }
-                TypeLocation::Scalar | TypeLocation::EnumTypes => {
-                    iteratee(&input_type_ref, &field, input_type);
-                }
-                _ => (),
             }
         }
     }
