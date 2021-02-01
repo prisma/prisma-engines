@@ -23,7 +23,7 @@ macro_rules! assert_eq_datamodels {
         let reformatted_expected = datamodel::render_datamodel_to_string(&parsed_expected);
         let reformatted_result = datamodel::render_datamodel_to_string(&parsed_result);
 
-        pretty_assertions::assert_eq!(reformatted_result, reformatted_expected);
+        pretty_assertions::assert_eq!(reformatted_expected, reformatted_result);
     };
 }
 
