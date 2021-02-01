@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase {
-  val project = SchemaDsl.fromStringV11() {
+  implicit val project: Project = SchemaDsl.fromStringV11() {
     """
       |model ModelA {
       |  id   Int     @id
@@ -36,7 +36,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     database.truncateProjectTables(project)
   }
 
-  "[Hops: 1] Ordering by related record field ascending" should "work" in {
+  "[Hops: 1] Ordering by related record field ascending" should "work" taggedAs IgnoreMsSql in {
     createRecord(1, Some(2), Some(3))
     createRecord(4, Some(5), Some(6))
 
@@ -58,7 +58,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     result.toString should be("""{"data":{"findManyModelA":[{"id":1,"b":{"id":2}},{"id":4,"b":{"id":5}}]}}""")
   }
 
-  "[Hops: 1] Ordering by related record field descending" should "work" in {
+  "[Hops: 1] Ordering by related record field descending" should "work" taggedAs IgnoreMsSql in {
     createRecord(1, Some(2), Some(3))
     createRecord(4, Some(5), Some(6))
 
@@ -80,7 +80,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     result.toString should be("""{"data":{"findManyModelA":[{"id":4,"b":{"id":5}},{"id":1,"b":{"id":2}}]}}""")
   }
 
-  "[Hops: 1] Ordering by related record field ascending with nulls" should "work" in {
+  "[Hops: 1] Ordering by related record field ascending with nulls" should "work" taggedAs IgnoreMsSql in {
     // 1 record has the "full chain", one half, one none
     createRecord(1, Some(1), Some(1))
     createRecord(2, Some(2), None)
@@ -110,7 +110,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     possibleResults should contain(result.toString)
   }
 
-  "[Hops: 2] Ordering by related record field ascending" should "work" in {
+  "[Hops: 2] Ordering by related record field ascending" should "work" taggedAs IgnoreMsSql in {
     createRecord(1, Some(2), Some(3))
     createRecord(4, Some(5), Some(6))
 
@@ -130,7 +130,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     result.toString should be("""{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":3}}},{"id":4,"b":{"c":{"id":6}}}]}}""")
   }
 
-  "[Hops: 2] Ordering by related record field descending" should "work" in {
+  "[Hops: 2] Ordering by related record field descending" should "work" taggedAs IgnoreMsSql in {
     createRecord(1, Some(2), Some(3))
     createRecord(4, Some(5), Some(6))
 
@@ -150,7 +150,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     result.toString should be("""{"data":{"findManyModelA":[{"id":4,"b":{"c":{"id":6}}},{"id":1,"b":{"c":{"id":3}}}]}}""")
   }
 
-  "[Hops: 2] Ordering by related record field ascending with nulls" should "work" in {
+  "[Hops: 2] Ordering by related record field ascending with nulls" should "work" taggedAs IgnoreMsSql in {
     // 1 record has the "full chain", one half, one none
     createRecord(1, Some(1), Some(1))
     createRecord(2, Some(2), None)
@@ -175,6 +175,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
 
     // Depends on how null values are handled.
     val possibleResults = Seq(
+      """{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}""",
       """{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}""",
       """{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"""
     )
@@ -182,7 +183,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     possibleResults should contain(result.toString)
   }
 
-  "[Circular] Ordering by related record field ascending" should "work" in {
+  "[Circular] Ordering by related record field ascending" should "work" taggedAs IgnoreMsSql in {
     // Records form circles with their relations
     createRecord(1, Some(1), Some(1), Some(1))
     createRecord(2, Some(2), Some(2), Some(2))
@@ -209,7 +210,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     result.toString() should be("""{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":1}}}},{"id":2,"b":{"c":{"a":{"id":2}}}}]}}""")
   }
 
-  "[Circular] Ordering by related record field descending" should "work" in {
+  "[Circular] Ordering by related record field descending" should "work" taggedAs IgnoreMsSql in {
     // Records form circles with their relations
     createRecord(1, Some(1), Some(1), Some(1))
     createRecord(2, Some(2), Some(2), Some(2))
@@ -236,7 +237,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     result.toString() should be("""{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":2}}}},{"id":1,"b":{"c":{"a":{"id":1}}}}]}}""")
   }
 
-  "[Circular with differing records] Ordering by related record field ascending" should "work" in {
+  "[Circular with differing records] Ordering by related record field ascending" should "work" taggedAs IgnoreMsSql in {
     // Records form circles with their relations
     createRecord(1, Some(1), Some(1), Some(3))
     createRecord(2, Some(2), Some(2), Some(4))
@@ -269,7 +270,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     possibleResults should contain(result.toString)
   }
 
-  "[Circular with differing records] Ordering by related record field descending" should "work" in {
+  "[Circular with differing records] Ordering by related record field descending" should "work" taggedAs IgnoreMsSql in {
     // Records form circles with their relations
     createRecord(1, Some(1), Some(1), Some(3))
     createRecord(2, Some(2), Some(2), Some(4))
@@ -302,7 +303,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     possibleResults should contain(result.toString)
   }
 
-  "Multiple relations to the same model and orderBy" should "work" in {
+  "Multiple relations to the same model and orderBy" should "work" taggedAs IgnoreMsSql in {
     val project = SchemaDsl.fromStringV11() {
       """
         |model ModelA {
@@ -346,7 +347,98 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     result.toString() should be("""{"data":{"findManyModelA":[{"id":1,"b1":{"id":1},"b2":{"id":10}},{"id":2,"b1":{"id":1},"b2":{"id":5}},{"id":3,"b1":{"id":2},"b2":{"id":7}}]}}""")
   }
 
-  def createRecord(a_id: Int, b_id: Option[Int], c_id: Option[Int], cToA: Option[Int] = None): Unit = {
+  // Minimal tests specifically for covering the basics in SQL server (no double nulls allowed).
+  "Simple orderBy relation" should "work" in {
+    implicit val project: Project = SchemaDsl.fromStringV11() {
+      """
+       |model ModelA {
+       |  id   Int     @id
+       |  b_id Int?
+       |  b    ModelB? @relation(fields: [b_id], references: [id])
+       |}
+       |
+       |model ModelB {
+       |  id Int     @id
+       |  a  ModelA?
+       |
+       |  c_id Int?
+       |  c    ModelC? @relation(fields: [c_id], references: [id])
+       |}
+       |
+       |model ModelC {
+       |  id   Int     @id
+       |  b    ModelB?
+       |}
+      """
+    }
+    database.setup(project)
+
+    createRecord(1, Some(2), Some(3))
+    createRecord(4, Some(5), Some(6))
+
+    val result = server.query(
+      """
+        |{
+        |  findManyModelA(orderBy: { b: { id: asc }}) {
+        |    id
+        |    b {
+        |      id
+        |    }
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be("""{"data":{"findManyModelA":[{"id":1,"b":{"id":2}},{"id":4,"b":{"id":5}}]}}""")
+  }
+
+  "Simple orderBy relation with two hops" should "work" in {
+    implicit val project: Project = SchemaDsl.fromStringV11() {
+      """
+        |model ModelA {
+        |  id   Int     @id
+        |  b_id Int?
+        |  b    ModelB? @relation(fields: [b_id], references: [id])
+        |}
+        |
+        |model ModelB {
+        |  id Int     @id
+        |  a  ModelA?
+        |
+        |  c_id Int?
+        |  c    ModelC? @relation(fields: [c_id], references: [id])
+        |}
+        |
+        |model ModelC {
+        |  id   Int     @id
+        |  b    ModelB?
+        |}
+      """
+    }
+    database.setup(project)
+
+    createRecord(1, Some(2), Some(3))
+    createRecord(4, Some(5), Some(6))
+
+    val result = server.query(
+      """
+        |{
+        |  findManyModelA(orderBy: { b: { c: { id: asc }}}) {
+        |    id
+        |    b { c { id }}
+        |  }
+        |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString should be("""{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":3}}},{"id":4,"b":{"c":{"id":6}}}]}}""")
+  }
+
+  def createRecord(a_id: Int, b_id: Option[Int], c_id: Option[Int], cToA: Option[Int] = None)(implicit project: Project): Unit = {
     val (followUp, inline) = cToA match {
       case Some(id) if id != a_id => (None, Some(s"a: { create: { id: $id }}"))
       case Some(id)               => (Some(s"mutation { updateOneModelC(where: { id: ${c_id.get} }, data: { a_id: $id }) { id }}"), None)
