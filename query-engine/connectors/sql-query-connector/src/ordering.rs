@@ -19,7 +19,7 @@ pub fn build(
         // - If it's on the base model with no hops, it's for example `modelTable.field`.
         // - If it is with several hops, it's the alias used for the last join, e.g.
         //   `orderby_{modelname}_{index}.field`
-        let order_by_column = if order_by.path.len() > 0 {
+        let order_by_column = if !order_by.path.is_empty() {
             let last_rf = order_by.path.last().unwrap();
 
             Column::from((
@@ -50,13 +50,9 @@ pub fn build(
             let right_table_alias = format!("orderby_{}_{}", &rf.related_model().name, index);
 
             let related_model = rf.related_model();
-            let pairs = left_fields
-                .into_iter()
-                .zip(right_fields.into_iter())
-                .collect::<Vec<_>>();
+            let pairs = left_fields.into_iter().zip(right_fields.into_iter());
 
             let on_conditions = pairs
-                .into_iter()
                 .map(|(a, b)| {
                     let a_col = if let Some(alias) = left_table_alias.clone() {
                         Column::from((alias, a.db_name().to_owned()))

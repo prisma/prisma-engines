@@ -230,7 +230,7 @@ impl Connector for MySqlDatamodelConnector {
                         error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.")
                     }
                     Bit(n) if n > 1 && scalar_type.is_boolean() => {
-                        error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.".into())
+                        error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.")
                     }
                     _ if field.is_unique() && incompatible_with_key => error.new_incompatible_native_type_with_unique(),
                     _ if field.is_id() && incompatible_with_key => error.new_incompatible_native_type_with_id(),
