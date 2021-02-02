@@ -1,5 +1,4 @@
 use crate::field::{Field, FieldType, RelationField, ScalarField};
-use crate::scalars::ScalarType;
 use crate::traits::{Ignorable, WithDatabaseName, WithName};
 
 /// Represents a model in a prisma schema.
@@ -315,7 +314,7 @@ impl Model {
                 .find_scalar_field(name)
                 .or_else(|| model.find_scalar_field(name.to_lowercase().as_ref()))
             {
-                Some(f) => f.field_type == FieldType::Base(ScalarType::DateTime, None),
+                Some(f) => f.field_type.is_datetime(),
                 None => false,
             }
         }
