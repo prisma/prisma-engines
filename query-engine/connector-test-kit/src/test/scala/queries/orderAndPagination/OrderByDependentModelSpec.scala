@@ -237,7 +237,7 @@ class OrderByDependentModelSpec extends FlatSpec with Matchers with ApiSpecBase 
     result.toString() should be("""{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":2}}}},{"id":1,"b":{"c":{"a":{"id":1}}}}]}}""")
   }
 
-  "[Circular with differing records] Ordering by related record field ascending" should "work" taggedAs IgnoreMsSql in {
+  "[Circular with differing records] Ordering by related record field ascending" should "work" taggedAs (IgnoreMsSql, IgnoreMySql) in {
     // Records form circles with their relations
     createRecord(1, Some(1), Some(1), Some(3))
     createRecord(2, Some(2), Some(2), Some(4))
