@@ -108,15 +108,6 @@ impl<'a> Validator<'a> {
                 errors_for_model.append(the_errors);
             }
 
-            //            if !errors_for_model.has_errors() {
-            //                let mut new_errors = self.validate_relation_arguments_bla(
-            //                    schema,
-            //                    ast_schema.find_model(&model.name).expect(STATE_ERROR),
-            //                    model,
-            //                );
-            //                errors_for_model.append(&mut new_errors);
-            //            }
-
             all_errors.append(&mut errors_for_model);
         }
 

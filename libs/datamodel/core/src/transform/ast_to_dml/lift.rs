@@ -337,28 +337,8 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
-            } else if let Some(native_type_attribute) = ast_field.attributes.iter().find(|d| d.name.name.contains('.'))
-            {
-                Err(DatamodelError::new_connector_error(
-                    &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
-                    native_type_attribute.span,
-                ))
             } else {
-                match scalar_type {
-                    ScalarType::Decimal if !supports_native_types => Err(DatamodelError::new_connector_error(
-                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
-                        ast_field.span,
-                    )),
-                    ScalarType::Bytes if !supports_native_types => Err(DatamodelError::new_connector_error(
-                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
-                        ast_field.span,
-                    )),
-                    ScalarType::BigInt if !supports_native_types => Err(DatamodelError::new_connector_error(
-                        &ConnectorError::from_kind(ErrorKind::NativeFlagsPreviewFeatureDisabled).to_string(),
-                        ast_field.span,
-                    )),
-                    _ => Ok((dml::FieldType::Base(scalar_type, type_alias), vec![])),
-                }
+                Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
