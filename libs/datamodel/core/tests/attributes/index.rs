@@ -186,6 +186,41 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
         id Int @id
         optionId Int
 
+        @@index([id], name: "MyIndexName")
+     }
+    "#;
+
+    let errors = parse_error(dml);
+    for error in errors.errors.iter() {
+        println!("DATAMODEL ERROR: {:?}", error);
+    }
+
+    errors.assert_length(1);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(285, 317)),
+    );
+}
+
+#[test]
+fn unique_insert_with_same_name_are_not_supported_by_postgres() {
+    let dml = r#"
+    datasource postgres {
+        provider = "postgres"
+        url = "postgres://asdlj"
+    }
+
+    model User {
+        id         Int @id
+        neighborId Int
+
+        @@index([id], name: "MyIndexName")
+     }
+
+     model Post {
+        id Int @id
+        optionId Int
+
         @@unique([id], name: "MyIndexName")
      }
     "#;
