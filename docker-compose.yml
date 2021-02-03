@@ -157,5 +157,16 @@ services:
     networks:
       - databases
 
+  mongo4:
+    image: mongo:4.4.3-bionic
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+    ports:
+      - "27017:27017"
+    networks:
+      - databases
+
 networks:
   databases:
