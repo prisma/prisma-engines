@@ -937,7 +937,7 @@ async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -993,7 +993,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
