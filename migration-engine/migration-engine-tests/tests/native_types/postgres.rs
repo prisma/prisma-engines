@@ -200,7 +200,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Real",
-            Value::float(3 as f32),
+            Value::float(3.0),
             &[
                 "SmallInt",
                 "Integer",
@@ -212,7 +212,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "DoublePrecision",
-            Value::double(3 as f64),
+            Value::double(3.0),
             &[
                 "SmallInt",
                 "Integer",

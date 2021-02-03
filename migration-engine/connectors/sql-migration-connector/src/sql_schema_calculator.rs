@@ -275,7 +275,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                 tpe: ColumnType {
                     full_data_type: String::new(),
                     native_type: None,
-                    family: sql::ColumnTypeFamily::Unsupported(description.clone()),
+                    family: sql::ColumnTypeFamily::Unsupported(description),
                     arity: column_arity(field.arity()),
                 },
                 default: field.default_value().and_then(|v| db_generated(v)),
