@@ -197,7 +197,7 @@ impl<'a> AlterTableConstructor<'a> {
                     // drop the constraint before we can drop the column.
                     let prev_constraints = self
                         .tables
-                        .next()
+                        .previous()
                         .indexes()
                         .filter(|index| index.index_type().is_unique())
                         .filter(|index| index.contains_column(columns.previous().name()))

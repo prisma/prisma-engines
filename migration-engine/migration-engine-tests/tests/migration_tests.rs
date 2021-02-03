@@ -993,13 +993,14 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
             b  String
         }
+
         model B {
             id Int @id
         }
@@ -1013,6 +1014,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
     assert_eq!(table.foreign_keys, vec![]);
+    assert!(table.indices.is_empty(), "{:?}", table.indices);
 
     let dm2 = r#"
         model A {
@@ -1020,6 +1022,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
             b Int
             b_rel B @relation(fields: [b], references: [id])
         }
+
         model B {
             id Int @id
             a  A?
@@ -1033,27 +1036,11 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
         .assert_executable()?
         .assert_has_executed_steps()?;
 
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("A");
-    let column = result.table_bang("A").column_bang("b");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
-                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => Some("A_b_fkey".to_owned()),
-            },
-            columns: vec![column.name.clone()],
-            referenced_table: "B".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-            on_update_action: ForeignKeyAction::NoAction,
-        }]
-    );
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b", |col| col.assert_type_is_int())?
+            .assert_fk_on_columns(&["b"], |fk| fk.assert_references("B", &["id"]))
+    })?;
 
     Ok(())
 }
