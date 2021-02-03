@@ -15,6 +15,10 @@ impl Attribute {
             span: Span::empty(),
         }
     }
+
+    pub fn is_index(&self) -> bool {
+        matches!(self.name.name.as_str(), "index" | "unique")
+    }
 }
 
 impl WithIdentifier for Attribute {
