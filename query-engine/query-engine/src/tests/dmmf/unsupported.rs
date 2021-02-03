@@ -165,9 +165,9 @@ fn no_find_unique_when_model_only_has_unsupported_index_or_compound() {
         .unwrap();
     let field_names: Vec<&str> = query_type.fields.iter().map(|f| f.name.as_str()).collect();
 
-    assert!(field_names.contains(&"findUniqueItemA") == false);
-    assert!(field_names.contains(&"findUniqueItemB") == false);
-    assert!(field_names.contains(&"findUniqueItemC") == false);
+    assert!(!field_names.contains(&"findUniqueItemA"));
+    assert!(!field_names.contains(&"findUniqueItemB"));
+    assert!(!field_names.contains(&"findUniqueItemC"));
 }
 
 // Write
@@ -203,7 +203,7 @@ fn no_create_or_upsert_should_exist_with_unsupported_field_without_default_value
     let unsupported_ops: [&str; 3] = ["createOne", "createMany", "upsertOne"];
     unsupported_ops.iter().for_each(|op| {
         assert!(
-            field_names.contains(&format!("{}Item", *op).as_str()) == false,
+            !field_names.contains(&format!("{}Item", *op).as_str()),
             format!("operation '{}' should not be supported", op)
         );
     });
