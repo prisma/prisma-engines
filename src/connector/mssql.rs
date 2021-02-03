@@ -239,13 +239,25 @@ impl Mssql {
     /// Creates a new connection to SQL Server.
     pub async fn new(url: MssqlUrl) -> crate::Result<Self> {
         let config = Config::from_jdbc_string(&url.connection_string)?;
-
         let tcp = TcpStream::connect_named(&config).await?;
-
-        let client =
-            super::timeout::connect(url.connect_timeout(), Client::connect(config, tcp.compat_write())).await?;
-
         let socket_timeout = url.socket_timeout();
+
+        let connecting = async {
+            match Client::connect(config, tcp.compat_write()).await {
+                Ok(client) => Ok(client),
+                Err(tiberius::error::Error::Routing { host, port }) => {
+                    let mut config = Config::from_jdbc_string(&url.connection_string)?;
+                    config.host(host);
+                    config.port(port);
+
+                    let tcp = TcpStream::connect_named(&config).await?;
+                    Client::connect(config, tcp.compat_write()).await
+                }
+                Err(e) => Err(e),
+            }
+        };
+
+        let client = super::timeout::connect(url.connect_timeout(), connecting).await?;
 
         let this = Self {
             client: Mutex::new(client),
