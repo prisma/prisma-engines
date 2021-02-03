@@ -68,10 +68,9 @@ impl ExpressionResult {
             _ => None,
         };
 
-        converted.ok_or(InterpreterError::InterpretationError(
-            "Unable to convert result into a set of projections".to_owned(),
-            None,
-        ))
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError("Unable to convert result into a set of projections".to_owned(), None)
+        })
     }
 
     pub fn as_query_result(&self) -> InterpretationResult<&QueryResult> {
@@ -80,10 +79,9 @@ impl ExpressionResult {
             _ => None,
         };
 
-        converted.ok_or(InterpreterError::InterpretationError(
-            "Unable to convert result into a query result".to_owned(),
-            None,
-        ))
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError("Unable to convert result into a query result".to_owned(), None)
+        })
     }
 
     pub fn as_diff_result(&self) -> InterpretationResult<&DiffResult> {
@@ -92,10 +90,9 @@ impl ExpressionResult {
             _ => None,
         };
 
-        converted.ok_or(InterpreterError::InterpretationError(
-            "Unable to convert result into a computation result".to_owned(),
-            None,
-        ))
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError("Unable to convert result into a computation result".to_owned(), None)
+        })
     }
 }
 

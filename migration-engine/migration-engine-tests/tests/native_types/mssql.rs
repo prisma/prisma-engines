@@ -2033,7 +2033,7 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
         for to in *casts {
             println!("From `{}` to `{}` with seed `{:?}`", from, to, seed);
 
-            let kind = match from.split("(").next() {
+            let kind = match from.split('(').next() {
                 Some(a) => a,
                 _ => unreachable!(),
             };

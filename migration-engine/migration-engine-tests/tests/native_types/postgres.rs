@@ -783,7 +783,7 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
 });
 
 fn prisma_type(native_type: &str) -> &str {
-    let kind = native_type.split("(").next().unwrap();
+    let kind = native_type.split('(').next().unwrap();
     TYPE_MAPS.get(kind).unwrap()
 }
 
@@ -1100,7 +1100,10 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
     Ok(())
 }
 
-static SAFE_CASTS_NON_LIST_TO_STRING: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = Lazy::new(|| {
+/// A list of casts which can safely be performed.
+type CastList = Lazy<Vec<(&'static str, Vec<(&'static str, Value<'static>)>)>>;
+
+static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
     vec![
         (
             "Text",
@@ -1215,7 +1218,7 @@ async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> 
 
             insert = insert.value(column_name.clone(), seed.clone());
 
-            previous_assertions.push((column_name.clone(), from.clone()));
+            previous_assertions.push((column_name.clone(), from));
             next_assertions.push((column_name, to).clone());
         }
 
