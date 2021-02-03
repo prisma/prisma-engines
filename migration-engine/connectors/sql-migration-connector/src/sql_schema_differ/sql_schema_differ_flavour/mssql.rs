@@ -1,6 +1,7 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
     flavour::MssqlFlavour,
+    sql_migration::{AlterTable, CreateIndex, DropIndex},
     sql_schema_differ::{
         column::{ColumnDiffer, ColumnTypeChange},
         SqlSchemaDiffer,
@@ -49,6 +50,52 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
         match (previous_type, next_type) {
             (None, _) | (_, None) => family_change_riskyness(previous_family, next_family),
             (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
+        }
+    }
+
+    fn push_index_changes_for_column_changes(
+        &self,
+        alter_tables: &[AlterTable],
+        drop_indexes: &mut Vec<DropIndex>,
+        create_indexes: &mut Vec<CreateIndex>,
+        differ: &SqlSchemaDiffer<'_>,
+    ) {
+        for table in alter_tables {
+            for column in table.changes.iter().filter_map(|change| change.as_alter_column()) {
+                if !column.changes.type_changed() {
+                    continue;
+                }
+
+                let table = differ
+                    .table_pairs()
+                    .find(|tables| {
+                        (&tables.previous().table_index(), &tables.next().table_index()) == table.table_index.as_tuple()
+                    })
+                    .expect("Invariant violation: no table pair found for AlterTable");
+
+                for dropped_index in table.index_pairs().filter(|pair| {
+                    pair.previous()
+                        .columns()
+                        .any(|col| col.column_index() == *column.column_index.previous())
+                }) {
+                    drop_indexes.push(DropIndex {
+                        table_index: table.previous().table_index(),
+                        index_index: dropped_index.previous().index(),
+                    })
+                }
+
+                for created_index in table.index_pairs().filter(|pair| {
+                    pair.next()
+                        .columns()
+                        .any(|col| col.column_index() == *column.column_index.next())
+                }) {
+                    create_indexes.push(CreateIndex {
+                        table_index: table.next().table_index(),
+                        index_index: created_index.next().index(),
+                        caused_by_create_table: true,
+                    })
+                }
+            }
         }
     }
 }
