@@ -2779,7 +2779,7 @@ async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_each_connector(tags("mssql"), log = "debug")]
 async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
@@ -2798,10 +2798,12 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
         }
     "#;
 
+    api.insert("Blog").value("title", "3.14").result_raw().await?;
+
     api.schema_push(dm2)
         .send()
         .await?
-        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table. The data in that column will be cast from `String` to `Float`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.".into()])?;
+        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table, which contains 1 non-null values. The data in that column will be cast from `String` to `Float`.".into()])?;
 
     Ok(())
 }

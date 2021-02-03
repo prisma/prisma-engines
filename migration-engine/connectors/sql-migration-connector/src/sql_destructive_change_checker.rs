@@ -188,8 +188,8 @@ impl SqlMigrationConnector {
                                         SqlMigrationWarningCheck::RiskyCast {
                                             table: columns.previous().table().name().to_owned(),
                                             column: columns.previous().name().to_owned(),
-                                            previous_type: columns.previous().column_type().full_data_type.to_string(),
-                                            next_type: columns.next().column_type().full_data_type.to_string(),
+                                            previous_type: format!("{:?}", columns.previous().column_type_family()),
+                                            next_type: format!("{:?}", columns.next().column_type_family()),
                                         },
                                         step_index,
                                     );
