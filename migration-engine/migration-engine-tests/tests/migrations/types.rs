@@ -51,7 +51,7 @@ async fn float_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(features("native_types"))]
+#[test_each_connector]
 async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
@@ -81,7 +81,7 @@ async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(features("native_types"))]
+#[test_each_connector]
 async fn float_to_decimal_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -126,7 +126,7 @@ async fn float_to_decimal_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(features("native_types"), log = "debug")]
+#[test_each_connector]
 async fn decimal_to_float_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"

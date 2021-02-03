@@ -352,7 +352,7 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector(features("native_types"))]
+#[test_each_connector]
 async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {

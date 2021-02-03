@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::{MssqlFlavour, SqlFlavour},
+    flavour::MssqlFlavour,
     pair::Pair,
     sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
@@ -10,7 +10,6 @@ use crate::{
     sql_schema_differ::ColumnChanges,
 };
 use datamodel_connector::Connector;
-use migration_connector::MigrationFeature;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultKind, DefaultValue};
 
@@ -47,15 +46,14 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         match type_change {
             Some(ColumnTypeChange::SafeCast) | None => (),
             Some(ColumnTypeChange::RiskyCast) => {
-                let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
                 let datamodel_connector = SqlDatamodelConnectors::mssql();
                 let previous_type = match &columns.previous().column_type().native_type {
-                    Some(tpe) if native_types_enabled => datamodel_connector.render_native_type(tpe.clone()),
+                    Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
                     _ => format!("{:?}", columns.previous().column_type_family()),
                 };
 
                 let next_type = match &columns.next().column_type().native_type {
-                    Some(tpe) if native_types_enabled => datamodel_connector.render_native_type(tpe.clone()),
+                    Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
                     _ => format!("{:?}", columns.next().column_type_family()),
                 };
 

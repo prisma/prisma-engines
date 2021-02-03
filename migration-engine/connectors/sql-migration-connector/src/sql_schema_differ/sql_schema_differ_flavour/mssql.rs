@@ -1,12 +1,11 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::{MssqlFlavour, SqlFlavour},
+    flavour::MssqlFlavour,
     sql_schema_differ::{
         column::{ColumnDiffer, ColumnTypeChange},
         SqlSchemaDiffer,
     },
 };
-use migration_connector::MigrationFeature;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
 use std::collections::HashSet;
@@ -42,14 +41,12 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     }
 
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
-        let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
         let previous_type: Option<MsSqlType> = differ.previous.column_native_type();
         let next_type: Option<MsSqlType> = differ.next.column_native_type();
 
         match (previous_type, next_type) {
-            _ if !native_types_enabled => family_change_riskyness(previous_family, next_family),
             (None, _) | (_, None) => family_change_riskyness(previous_family, next_family),
             (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
         }

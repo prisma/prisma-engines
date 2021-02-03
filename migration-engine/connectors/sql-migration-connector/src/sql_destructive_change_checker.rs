@@ -30,7 +30,7 @@ use crate::{
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
-use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationFeature};
+use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
 use sql_schema_describer::{
     walkers::{ColumnWalker, SqlSchemaExt},
     ColumnArity, SqlSchema,
@@ -184,31 +184,15 @@ impl SqlMigrationConnector {
                             match type_change {
                                 Some(ColumnTypeChange::SafeCast) | None => (),
                                 Some(ColumnTypeChange::RiskyCast) => {
-                                    if self.features.contains(MigrationFeature::NativeTypes) {
-                                        plan.push_warning(
-                                            SqlMigrationWarningCheck::RiskyCast {
-                                                table: columns.previous().table().name().to_owned(),
-                                                column: columns.previous().name().to_owned(),
-                                                previous_type: columns
-                                                    .previous()
-                                                    .column_type()
-                                                    .full_data_type
-                                                    .to_string(),
-                                                next_type: columns.next().column_type().full_data_type.to_string(),
-                                            },
-                                            step_index,
-                                        );
-                                    } else {
-                                        plan.push_warning(
-                                            SqlMigrationWarningCheck::RiskyCast {
-                                                table: columns.previous().table().name().to_owned(),
-                                                column: columns.previous().name().to_owned(),
-                                                previous_type: format!("{:?}", columns.previous().column_type_family()),
-                                                next_type: format!("{:?}", columns.next().column_type_family()),
-                                            },
-                                            step_index,
-                                        );
-                                    }
+                                    plan.push_warning(
+                                        SqlMigrationWarningCheck::RiskyCast {
+                                            table: columns.previous().table().name().to_owned(),
+                                            column: columns.previous().name().to_owned(),
+                                            previous_type: columns.previous().column_type().full_data_type.to_string(),
+                                            next_type: columns.next().column_type().full_data_type.to_string(),
+                                        },
+                                        step_index,
+                                    );
                                 }
                                 //todo why no precise type warnings here if native types are on?
                                 Some(ColumnTypeChange::NotCastable) => plan.push_warning(

@@ -199,7 +199,7 @@ async fn arity_is_preserved_by_alter_enum(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), features("native_types"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     let types = &[
         ("int", "Int", "Int", if api.is_mysql_8() { "int" } else { "int(11)" }),

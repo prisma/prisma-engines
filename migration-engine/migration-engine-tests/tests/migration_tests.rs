@@ -18,7 +18,7 @@ use prisma_value::PrismaValue;
 use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
 
-#[test_each_connector(features("native_types"), log = "debug")]
+#[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
@@ -73,48 +73,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
-async fn adding_a_scalar_field_must_work_with_native_types_off(api: &TestApi) -> TestResult {
-    let dm = r#"
-        model Test {
-            id String @id @default(cuid())
-            int Int
-            float Float
-            boolean Boolean
-            string String
-            dateTime DateTime
-        }
-    "#;
-
-    api.schema_push(dm).send().await?.assert_green()?;
-
-    api.assert_schema().await?.assert_table("Test", |table| {
-        table
-            .assert_columns_count(6)?
-            .assert_column("int", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
-            })?
-            .assert_column("float", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
-            })?
-            .assert_column("boolean", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Boolean)
-            })?
-            .assert_column("string", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
-            })?
-            .assert_column("dateTime", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
-            })
-    })?;
-
-    // Check that the migration is idempotent.
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
-
-    Ok(())
-}
-
-#[test_each_connector(features("native_types"), capabilities("enums"))]
+#[test_each_connector(capabilities("enums"))]
 async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -3000,7 +2959,7 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -3054,7 +3013,7 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {

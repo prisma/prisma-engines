@@ -1,12 +1,8 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::MYSQL_IDENTIFIER_SIZE_LIMIT,
-    flavour::{MysqlFlavour, SqlFlavour},
-    pair::Pair,
-    sql_schema_differ::column::ColumnDiffer,
+    flavour::MysqlFlavour, flavour::MYSQL_IDENTIFIER_SIZE_LIMIT, pair::Pair, sql_schema_differ::column::ColumnDiffer,
     sql_schema_differ::ColumnTypeChange,
 };
-use migration_connector::MigrationFeature;
 use native_types::MySqlType;
 use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
 
@@ -50,21 +46,13 @@ impl SqlSchemaDifferFlavour for MysqlFlavour {
             };
         }
 
-        if self.features().contains(MigrationFeature::NativeTypes) {
-            if let Some(change) = differ
-                .as_pair()
-                .map(|walker| walker.column_native_type())
-                .transpose()
-                .and_then(native_type_change)
-            {
-                return Some(change);
-            }
-        } else if differ.previous.column_type_family() != differ.next.column_type_family() {
-            return match (differ.previous.column_type_family(), differ.next.column_type_family()) {
-                (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
-                (ColumnTypeFamily::String, ColumnTypeFamily::Int) => Some(ColumnTypeChange::RiskyCast),
-                (_, _) => Some(ColumnTypeChange::RiskyCast),
-            };
+        if let Some(change) = differ
+            .as_pair()
+            .map(|walker| walker.column_native_type())
+            .transpose()
+            .and_then(native_type_change)
+        {
+            return Some(change);
         }
 
         None
