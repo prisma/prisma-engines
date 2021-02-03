@@ -261,26 +261,16 @@ async fn string_to_bytes_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"))]
+#[test_each_connector(capabilities("scalar_lists"), log = "debug")]
 async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
-    let dm1 = format!(
-        r#"
-            {datasource}
+    let dm1 = r#"
+        model Test {
+            id       String    @id @default(cuid())
+            decFloat Decimal
+        }
+    "#;
 
-            generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
-
-            model Test {{
-                id       String    @id @default(cuid())
-                decFloat Decimal
-            }}
-        "#,
-        datasource = api.datasource()
-    );
-
-    api.schema_push(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())
@@ -288,19 +278,14 @@ async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
 
     let dm2 = format!(
         r#"
-            {datasource}
+        {}
 
-            generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
+        model Test {{
+            id       String    @id @default(cuid())
+            decFloat Decimal[]
         }}
-
-            model Test {{
-                id       String    @id @default(cuid())
-                decFloat Decimal[]
-            }}
         "#,
-        datasource = api.datasource()
+        api.datasource()
     );
 
     api.schema_push(dm2)
@@ -313,7 +298,7 @@ async fn decimal_to_decimal_array_works(api: &TestApi) -> TestResult {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_list())
     })?;
 
-    api.schema_push(&dm1).send().await?.assert_green()?;
+    api.schema_push(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("decFloat", |col| col.assert_type_is_decimal()?.assert_is_required())

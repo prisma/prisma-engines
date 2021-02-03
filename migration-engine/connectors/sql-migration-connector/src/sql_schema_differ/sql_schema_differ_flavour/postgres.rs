@@ -85,7 +85,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
             (_, Some(PostgresType::VarChar(None))) if from_list_to_scalar => Some(SafeCast),
             (_, Some(PostgresType::VarChar(_))) if from_list_to_scalar => Some(RiskyCast),
             (_, Some(PostgresType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
-            (_, _) if from_scalar_to_list => Some(NotCastable),
+            (_, _) if from_scalar_to_list || from_list_to_scalar => Some(NotCastable),
             (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
             // Unsupported types will have None as Native type
             (None, Some(_)) => Some(RiskyCast),
