@@ -5,7 +5,10 @@ mod type_migration_tests;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use quaint::{ast::*, prelude::Queryable};
+use quaint::{
+    ast::*,
+    prelude::{Queryable, SqlFamily},
+};
 use sql_schema_describer::DefaultValue;
 
 #[test_each_connector]
@@ -115,7 +118,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     let dm = r#"
         model Test {
             id String @id @default(cuid())
-            age Int?
+            age String?
         }
     "#;
 
@@ -131,12 +134,17 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     let dm2 = r#"
         model Test {
             id String @id @default(cuid())
-            age Float?
+            age Int?
         }
     "#;
 
     api.schema_push(dm2).send().await?.assert_warnings(&[
-        "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `Int` to `Float`."
+        match api.sql_family() {
+            SqlFamily::Postgres => "The `age` column on the `Test` table would be dropped and recreated. This will lead to data loss.".into(),
+            SqlFamily::Mssql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.",
+            SqlFamily::Mysql => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.",
+            _ => "You are about to alter the column `age` on the `Test` table, which contains 2 non-null values. The data in that column will be cast from `String` to `Int`.",
+        }
             .into(),
     ])?;
 
