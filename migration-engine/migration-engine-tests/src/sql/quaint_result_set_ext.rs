@@ -84,6 +84,7 @@ impl<'a> RowAssertion<'a> {
         Ok(self)
     }
 
+    #[allow(clippy::float_cmp)]
     pub fn assert_float_value(self, column_name: &str, expected_value: f64) -> AssertionResult<Self> {
         let actual_value = self
             .0
