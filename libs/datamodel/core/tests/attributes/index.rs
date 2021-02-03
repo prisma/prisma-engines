@@ -186,7 +186,7 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
         id Int @id
         optionId Int
 
-        @@index([id], name: "MyIndexName")
+        @@unique([id], name: "MyIndexName")
      }
     "#;
 
@@ -198,7 +198,7 @@ fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
     errors.assert_length(1);
     errors.assert_is_at(
         0,
-        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(285, 317)),
+        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(285, 318)),
     );
 }
 

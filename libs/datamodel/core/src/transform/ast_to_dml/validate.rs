@@ -218,8 +218,9 @@ impl<'a> Validator<'a> {
                             let ast_index = ast_model
                                 .attributes
                                 .iter()
-                                .find(|attribute| attribute.name.name == "index")
+                                .find(|attribute| attribute.is_index())
                                 .unwrap();
+
                             errors.push_error(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
                                 index_name,
                                 ast_index.span,
