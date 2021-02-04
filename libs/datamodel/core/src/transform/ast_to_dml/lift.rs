@@ -3,7 +3,6 @@ use std::str::FromStr;
 use super::super::attributes::AllAttributes;
 use crate::diagnostics::{DatamodelError, Diagnostics};
 use crate::dml::ScalarType;
-use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
 use crate::{ast, configuration, dml, Field, FieldType};
 use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
@@ -13,28 +12,22 @@ use regex::Regex;
 
 /// Helper for lifting a datamodel.
 ///
-/// When lifting, the
-/// AST is converted to the real datamodel, and
-/// additional semantics are attached.
-pub struct LiftAstToDml<'a, 'b> {
+/// When lifting, the AST is converted to the real datamodel, and additional
+/// semantics are attached.
+pub struct LiftAstToDml<'a> {
     attributes: AllAttributes,
     source: Option<&'a configuration::Datasource>,
-    generators: &'b [configuration::Generator],
 }
 
-impl<'a, 'b> LiftAstToDml<'a, 'b> {
+impl<'a> LiftAstToDml<'a> {
     /// Creates a new instance, with all builtin attributes and
     /// the attributes defined by the given sources registered.
     ///
     /// The attributes defined by the given sources will be namespaced.
-    pub fn new(
-        source: Option<&'a configuration::Datasource>,
-        generators: &'b [configuration::Generator],
-    ) -> LiftAstToDml<'a, 'b> {
+    pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml<'a> {
         LiftAstToDml {
             attributes: AllAttributes::new(),
             source,
-            generators,
         }
     }
 
@@ -211,10 +204,8 @@ impl<'a, 'b> LiftAstToDml<'a, 'b> {
             _ => "",
         };
 
-        let supports_native_types = self.generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
-
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
-            if supports_native_types && !datasource_name.is_empty() {
+            if !datasource_name.is_empty() {
                 let (connector_string, connector) = (
                     &self.source.unwrap().active_provider,
                     &self.source.unwrap().active_connector,
