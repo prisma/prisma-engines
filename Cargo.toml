@@ -89,7 +89,7 @@ bytes = { version = "1.0", optional = true }
 mobc = { version = "0.7.0", optional = true }
 serde = { version = "1.0", optional = true }
 connection-string = "0.1.10"
-tiberius = { version = "0.5.7", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal"]}
+tiberius = { version = "0.5.8", optional = true, features = ["sql-browser-tokio", "chrono", "bigdecimal"]}
 
 [dev-dependencies]
 indoc = "0.3"
