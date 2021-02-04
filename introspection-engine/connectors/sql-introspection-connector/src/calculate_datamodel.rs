@@ -58,111 +58,12 @@ pub fn calculate_datamodel(
 mod tests {
     use super::*;
     use datamodel::{
-        dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, Model,
+        dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, Model, NativeTypeInstance,
         OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
     };
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
-    use prisma_value::PrismaValue;
     use quaint::connector::SqlFamily;
-
-    #[test]
-    fn a_data_model_can_be_generated_from_a_schema() {
-        let col_types = &[
-            ColumnTypeFamily::Int,
-            ColumnTypeFamily::Float,
-            ColumnTypeFamily::Boolean,
-            ColumnTypeFamily::String,
-            ColumnTypeFamily::DateTime,
-            ColumnTypeFamily::Binary,
-            ColumnTypeFamily::Json,
-            ColumnTypeFamily::Uuid,
-        ];
-
-        fn unsupported(family: ColumnTypeFamily) -> (FieldType, bool, Option<String>) {
-            (
-                FieldType::Unsupported(family.to_string()),
-                true,
-                Some("This type is currently not supported by the Prisma Client.".to_string()),
-            )
-        }
-
-        let ref_data_model = Datamodel {
-            models: vec![Model {
-                database_name: None,
-                name: "Table1".to_string(),
-                documentation: Some(
-                    "The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client."
-                        .to_string(),
-                ),
-                is_embedded: false,
-                is_generated: false,
-                is_commented_out: true,
-                is_ignored:false,
-                indices: vec![],
-                id_fields: vec![],
-                fields: col_types
-                    .iter()
-                    .map(|col_type| {
-                        let (field_type, is_commented_out, documentation) = match col_type {
-                            ColumnTypeFamily::Boolean => (FieldType::Base(ScalarType::Boolean, None), false, None),
-                            ColumnTypeFamily::DateTime => (FieldType::Base(ScalarType::DateTime, None), false, None),
-                            ColumnTypeFamily::Float => (FieldType::Base(ScalarType::Float, None), false, None),
-                            ColumnTypeFamily::Int => (FieldType::Base(ScalarType::Int, None), false, None),
-                            ColumnTypeFamily::String => (FieldType::Base(ScalarType::String, None), false, None),
-                            ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
-                            ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
-                            ColumnTypeFamily::Json => (FieldType::Base(ScalarType::Json, None), false, None),
-                            x => unsupported(x.to_owned()),
-                        };
-                        Field::ScalarField(ScalarField {
-                            name: col_type.to_string(),
-                            arity: FieldArity::Optional,
-                            field_type,
-                            database_name: None,
-                            default_value: None,
-                            is_unique: false,
-                            is_id: false,
-                            documentation,
-                            is_generated: false,
-                            is_updated_at: false,
-                            is_commented_out,
-                            is_ignored: false,
-                        })
-                    })
-                    .collect(),
-            }],
-            enums: vec![],
-        };
-
-        let schema = SqlSchema {
-            tables: vec![Table {
-                name: "Table1".to_string(),
-                columns: col_types
-                    .iter()
-                    .map(|family| Column {
-                        name: family.to_string(),
-                        tpe: ColumnType::with_full_data_type(
-                            family.to_owned(),
-                            ColumnArity::Nullable,
-                            family.to_string(),
-                        ),
-                        default: None,
-                        auto_increment: false,
-                    })
-                    .collect(),
-                indices: vec![],
-                primary_key: None,
-                foreign_keys: vec![],
-            }],
-            enums: vec![],
-            sequences: vec![],
-        };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
-
-        assert_eq!(introspection_result.data_model, ref_data_model);
-    }
 
     #[test]
     fn arity_is_preserved_when_generating_data_model_from_a_schema() {
@@ -248,142 +149,6 @@ mod tests {
     }
 
     #[test]
-    fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
-        let ref_data_model = Datamodel {
-            models: vec![Model {
-                database_name: None,
-                name: "Table1".to_string(),
-                documentation: None,
-                is_embedded: false,
-                is_commented_out: false,
-                is_ignored: false,
-                fields: vec![
-                    Field::ScalarField(ScalarField::new(
-                        "no_default",
-                        FieldArity::Required,
-                        FieldType::Base(ScalarType::Int, None),
-                    )),
-                    Field::ScalarField(ScalarField {
-                        name: "int_default".to_string(),
-                        arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int, None),
-                        database_name: None,
-                        default_value: Some(dml::DefaultValue::Single(PrismaValue::Int(1))),
-                        is_unique: false,
-                        is_id: false,
-                        documentation: None,
-                        is_generated: false,
-                        is_updated_at: false,
-                        is_commented_out: false,
-                        is_ignored: false,
-                    }),
-                    Field::ScalarField(ScalarField {
-                        name: "bool_default".to_string(),
-                        arity: FieldArity::Optional,
-                        field_type: FieldType::Base(ScalarType::Boolean, None),
-                        database_name: None,
-                        default_value: Some(dml::DefaultValue::Single(PrismaValue::Boolean(true))),
-                        is_unique: false,
-                        is_id: false,
-                        documentation: None,
-                        is_generated: false,
-                        is_updated_at: false,
-                        is_commented_out: false,
-                        is_ignored: false,
-                    }),
-                    Field::ScalarField(ScalarField {
-                        name: "float_default".to_string(),
-                        arity: FieldArity::Optional,
-                        field_type: FieldType::Base(ScalarType::Float, None),
-                        database_name: None,
-                        default_value: Some(dml::DefaultValue::Single(PrismaValue::Float(1.into()))),
-                        is_unique: false,
-                        is_id: false,
-                        documentation: None,
-                        is_generated: false,
-                        is_updated_at: false,
-                        is_commented_out: false,
-                        is_ignored: false,
-                    }),
-                    Field::ScalarField(ScalarField {
-                        name: "string_default".to_string(),
-                        arity: FieldArity::Optional,
-                        field_type: FieldType::Base(ScalarType::String, None),
-                        database_name: None,
-                        default_value: Some(dml::DefaultValue::Single(PrismaValue::String("default".to_string()))),
-                        is_unique: false,
-                        is_id: false,
-                        documentation: None,
-                        is_generated: false,
-                        is_updated_at: false,
-                        is_commented_out: false,
-                        is_ignored: false,
-                    }),
-                ],
-                is_generated: false,
-                indices: vec![IndexDefinition {
-                    name: Some("unique".into()),
-                    fields: vec!["no_default".into(), "int_default".into()],
-                    tpe: dml::IndexType::Unique,
-                }],
-                id_fields: vec![],
-            }],
-            enums: vec![],
-        };
-
-        let schema = SqlSchema {
-            tables: vec![Table {
-                name: "Table1".to_string(),
-                columns: vec![
-                    Column {
-                        name: "no_default".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
-                        default: None,
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "int_default".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
-                        default: Some(DefaultValue::value(PrismaValue::Int(1))),
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "bool_default".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Boolean, ColumnArity::Nullable),
-                        default: Some(DefaultValue::value(PrismaValue::Boolean(true))),
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "float_default".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Nullable),
-                        default: Some(DefaultValue::value(PrismaValue::new_float(1.0))),
-                        auto_increment: false,
-                    },
-                    Column {
-                        name: "string_default".to_string(),
-                        tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Nullable),
-                        default: Some(DefaultValue::value(PrismaValue::String("default".to_string()))),
-                        auto_increment: false,
-                    },
-                ],
-                indices: vec![Index {
-                    name: "unique".to_string(),
-                    columns: vec!["no_default".into(), "int_default".into()],
-                    tpe: IndexType::Unique,
-                }],
-                primary_key: None,
-                foreign_keys: vec![],
-            }],
-            enums: vec![],
-            sequences: vec![],
-        };
-        let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
-
-        assert_eq!(introspection_result.data_model, ref_data_model);
-    }
-
-    #[test]
     fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
         let ref_data_model = Datamodel {
             models: vec![
@@ -398,7 +163,14 @@ mod tests {
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int, None),
+                        field_type: FieldType::NativeType(
+                            ScalarType::Int,
+                            NativeTypeInstance {
+                                name: "Integer".into(),
+                                serialized_native_type: PostgresType::Integer.to_json(),
+                                args: Vec::new(),
+                            },
+                        ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
@@ -424,7 +196,14 @@ mod tests {
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int, None),
+                        field_type: FieldType::NativeType(
+                            ScalarType::Int,
+                            NativeTypeInstance {
+                                name: "Integer".into(),
+                                serialized_native_type: PostgresType::Integer.to_json(),
+                                args: Vec::new(),
+                            },
+                        ),
                         database_name: None,
                         default_value: None,
                         is_unique: false,
@@ -450,7 +229,14 @@ mod tests {
                     fields: vec![Field::ScalarField(ScalarField {
                         name: "primary".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int, None),
+                        field_type: FieldType::NativeType(
+                            ScalarType::Int,
+                            NativeTypeInstance {
+                                name: "Integer".into(),
+                                serialized_native_type: PostgresType::Integer.to_json(),
+                                args: Vec::new(),
+                            },
+                        ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
@@ -633,7 +419,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::Base(ScalarType::Int, None),
+                            field_type: FieldType::NativeType(
+                                ScalarType::Int,
+                                NativeTypeInstance {
+                                    name: "Integer".into(),
+                                    serialized_native_type: PostgresType::Integer.to_json(),
+                                    args: Vec::new(),
+                                },
+                            ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                             is_unique: false,
@@ -647,7 +440,14 @@ mod tests {
                         Field::ScalarField(ScalarField::new(
                             "name",
                             FieldArity::Required,
-                            FieldType::Base(ScalarType::String, None),
+                            FieldType::NativeType(
+                                ScalarType::String,
+                                NativeTypeInstance {
+                                    name: "Text".into(),
+                                    args: Vec::new(),
+                                    serialized_native_type: PostgresType::Text.to_json(),
+                                },
+                            ),
                         )),
                         Field::RelationField(RelationField::new(
                             "User",
@@ -676,7 +476,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::Base(ScalarType::Int, None),
+                            field_type: FieldType::NativeType(
+                                ScalarType::Int,
+                                NativeTypeInstance {
+                                    name: "Integer".into(),
+                                    serialized_native_type: PostgresType::Integer.to_json(),
+                                    args: Vec::new(),
+                                },
+                            ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                             is_unique: false,
@@ -690,7 +497,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "city_id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::Base(ScalarType::Int, None),
+                            field_type: FieldType::NativeType(
+                                ScalarType::Int,
+                                NativeTypeInstance {
+                                    name: "Integer".into(),
+                                    serialized_native_type: PostgresType::Integer.to_json(),
+                                    args: Vec::new(),
+                                },
+                            ),
                             database_name: Some("city-id".to_string()),
                             default_value: None,
                             is_unique: false,
@@ -703,7 +517,14 @@ mod tests {
                         }),
                         Field::ScalarField(ScalarField {
                             name: "city_name".to_string(),
-                            field_type: FieldType::Base(ScalarType::String, None),
+                            field_type: FieldType::NativeType(
+                                ScalarType::String,
+                                NativeTypeInstance {
+                                    name: "Text".into(),
+                                    args: Vec::new(),
+                                    serialized_native_type: PostgresType::Text.to_json(),
+                                },
+                            ),
                             arity: FieldArity::Required,
                             database_name: Some("city-name".to_string()),
                             default_value: None,
@@ -848,7 +669,14 @@ mod tests {
                     Field::ScalarField(ScalarField {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int, None),
+                        field_type: FieldType::NativeType(
+                            ScalarType::Int,
+                            NativeTypeInstance {
+                                name: "Integer".into(),
+                                serialized_native_type: PostgresType::Integer.to_json(),
+                                args: Vec::new(),
+                            },
+                        ),
                         database_name: None,
                         default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
@@ -862,12 +690,26 @@ mod tests {
                     Field::ScalarField(ScalarField::new(
                         "name",
                         FieldArity::Required,
-                        FieldType::Base(ScalarType::String, None),
+                        FieldType::NativeType(
+                            ScalarType::String,
+                            NativeTypeInstance {
+                                name: "Text".into(),
+                                args: Vec::new(),
+                                serialized_native_type: PostgresType::Text.to_json(),
+                            },
+                        ),
                     )),
                     Field::ScalarField(ScalarField::new(
                         "lastname",
                         FieldArity::Required,
-                        FieldType::Base(ScalarType::String, None),
+                        FieldType::NativeType(
+                            ScalarType::String,
+                            NativeTypeInstance {
+                                name: "Text".into(),
+                                args: Vec::new(),
+                                serialized_native_type: PostgresType::Text.to_json(),
+                            },
+                        ),
                     )),
                 ],
                 is_generated: false,
@@ -955,7 +797,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::Base(ScalarType::Int, None),
+                            field_type: FieldType::NativeType(
+                                ScalarType::Int,
+                                NativeTypeInstance {
+                                    name: "Integer".into(),
+                                    serialized_native_type: PostgresType::Integer.to_json(),
+                                    args: Vec::new(),
+                                },
+                            ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                             is_unique: false,
@@ -969,7 +818,14 @@ mod tests {
                         Field::ScalarField(ScalarField::new(
                             "name",
                             FieldArity::Required,
-                            FieldType::Base(ScalarType::String, None),
+                            FieldType::NativeType(
+                                ScalarType::String,
+                                NativeTypeInstance {
+                                    name: "Text".into(),
+                                    args: Vec::new(),
+                                    serialized_native_type: PostgresType::Text.to_json(),
+                                },
+                            ),
                         )),
                         Field::RelationField(RelationField::new(
                             "User",
@@ -998,7 +854,14 @@ mod tests {
                         Field::ScalarField(ScalarField {
                             name: "id".to_string(),
                             arity: FieldArity::Required,
-                            field_type: FieldType::Base(ScalarType::Int, None),
+                            field_type: FieldType::NativeType(
+                                ScalarType::Int,
+                                NativeTypeInstance {
+                                    name: "Integer".into(),
+                                    serialized_native_type: PostgresType::Integer.to_json(),
+                                    args: Vec::new(),
+                                },
+                            ),
                             database_name: None,
                             default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                             is_unique: false,
@@ -1012,7 +875,14 @@ mod tests {
                         Field::ScalarField(ScalarField::new(
                             "city_id",
                             FieldArity::Required,
-                            FieldType::Base(ScalarType::Int, None),
+                            FieldType::NativeType(
+                                ScalarType::Int,
+                                NativeTypeInstance {
+                                    name: "Integer".into(),
+                                    serialized_native_type: PostgresType::Integer.to_json(),
+                                    args: Vec::new(),
+                                },
+                            ),
                         )),
                         Field::RelationField(RelationField::new(
                             "City",
