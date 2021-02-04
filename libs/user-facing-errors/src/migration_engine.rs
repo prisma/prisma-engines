@@ -31,7 +31,7 @@ struct MigrationRollback {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3003",
-    message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate#troubleshooting"
+    message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate"
 )]
 pub struct DatabaseMigrationFormatChanged;
 
