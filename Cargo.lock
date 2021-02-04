@@ -1770,9 +1770,9 @@ dependencies = [
 
 [[package]]
 name = "lru"
-version = "0.6.3"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3aae342b73d57ad0b8b364bd12584819f2c1fe9114285dfcf8b0722607671635"
+checksum = "fe2382d8ed3918ea4ba70d98d5b74e47a168e0331965f3f17cdbc748bdebc5a3"
 dependencies = [
  "hashbrown",
 ]
@@ -2661,7 +2661,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#ccde9d632be2ea8a13afd8e06e56d90d31e421c0"
+source = "git+https://github.com/prisma/quaint#0c10720b7ec37f714d0f4c9430de0ec3e268aafb"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3602,18 +3602,18 @@ dependencies = [
 
 [[package]]
 name = "thread_local"
-version = "1.1.2"
+version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8208a331e1cb318dd5bd76951d2b8fc48ca38a69f5f4e4af1b6a9f8c6236915"
+checksum = "8018d24e04c95ac8790716a5987d0fec4f8b27249ffa0f7d33f1369bdfb88cbd"
 dependencies = [
  "once_cell",
 ]
 
 [[package]]
 name = "tiberius"
-version = "0.5.7"
+version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9bfc297a54e820330bd0100c5f76e1e65c55e7dd0a8a0d903d3f0e5794ad3a4a"
+checksum = "668fbe3b735034470545b219da784979cbb2e4d8dcdc03d90ed367f9d3e622bd"
 dependencies = [
  "async-native-tls",
  "async-stream",
