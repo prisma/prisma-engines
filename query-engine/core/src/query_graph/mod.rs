@@ -523,13 +523,10 @@ impl QueryGraph {
                 {
                     // Exception rule: Only swap `Then` and `Else` edges.
                     Node::Flow(Flow::If(_)) => {
-                        let do_swap = match self.edge_content(&parent_edge) {
-                            Some(QueryGraphDependency::Then) => true,
-                            Some(QueryGraphDependency::Else) => true,
-                            _ => false,
-                        };
-
-                        if do_swap {
+                        if matches!(
+                            self.edge_content(&parent_edge),
+                            Some(QueryGraphDependency::Then) | Some(QueryGraphDependency::Else)
+                        ) {
                             let content = self
                                 .remove_edge(parent_edge)
                                 .expect("Expected edges between marked nodes to be non-empty.");

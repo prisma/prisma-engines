@@ -38,24 +38,25 @@ fn read_one<'conn, 'tx>(
                 let records: ManyRecords = record.into();
                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
 
-                Ok(QueryResult::RecordSelection(RecordSelection {
+                Ok(RecordSelection {
                     name: query.name,
                     fields: query.selection_order,
                     scalars: records,
                     nested,
                     model_id,
                     query_arguments: QueryArguments::new(model),
-                }))
+                }
+                .into())
             }
 
-            None => Ok(QueryResult::RecordSelection(RecordSelection {
+            None => Ok(QueryResult::RecordSelection(Box::new(RecordSelection {
                 name: query.name,
                 fields: query.selection_order,
                 model_id,
                 scalars: ManyRecords::default(),
                 nested: vec![],
                 query_arguments: QueryArguments::new(model),
-            })),
+            }))),
         }
     };
 
@@ -88,14 +89,15 @@ fn read_many<'a, 'b>(
         let model_id = query.model.primary_identifier();
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
-        Ok(QueryResult::RecordSelection(RecordSelection {
+        Ok(RecordSelection {
             name: query.name,
             fields: query.selection_order,
             query_arguments: query.args,
             model_id,
             scalars,
             nested,
-        }))
+        }
+        .into())
     };
 
     fut.boxed()
@@ -131,14 +133,15 @@ fn read_related<'a, 'b>(
         let model_id = model.primary_identifier();
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
-        Ok(QueryResult::RecordSelection(RecordSelection {
+        Ok(RecordSelection {
             name: query.name,
             fields: query.selection_order,
             query_arguments: query.args,
             model_id,
             scalars,
             nested,
-        }))
+        }
+        .into())
     };
 
     fut.boxed()

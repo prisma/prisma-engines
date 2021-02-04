@@ -1,3 +1,4 @@
+#![allow(clippy::module_inception)]
 #![warn(warnings)] // Todo deny warnings once done
 
 #[macro_use]
