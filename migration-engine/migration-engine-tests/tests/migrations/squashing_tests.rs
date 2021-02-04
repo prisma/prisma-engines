@@ -35,19 +35,17 @@ async fn squashing_whole_migration_history_works(api: &TestApi) -> TestResult {
             }
         "#;
 
-        let mut migrations_counter: i32 = 0;
         let mut initial_migration_names: Vec<String> = Vec::with_capacity(3);
 
-        for schema in &[dm1, dm2, dm3] {
+        for (count, schema) in [dm1, dm2, dm3].iter().enumerate() {
             let name = api
-                .create_migration(&format!("migration{}", migrations_counter), schema, &directory)
+                .create_migration(&format!("migration{}", count), schema, &directory)
                 .send()
                 .await?
                 .into_output()
                 .generated_migration_name
                 .unwrap();
 
-            migrations_counter += 1;
             initial_migration_names.push(name);
         }
 
@@ -396,19 +394,17 @@ async fn squashing_migrations_history_at_the_end_works(api: &TestApi) -> TestRes
             }
         "#;
 
-        let mut migrations_counter: i32 = 0;
         let mut initial_migration_names: Vec<String> = Vec::with_capacity(3);
 
-        for schema in &[dm1, dm2, dm3] {
+        for (count, schema) in [dm1, dm2, dm3].iter().enumerate() {
             let name = api
-                .create_migration(&format!("migration{}", migrations_counter), schema, &directory)
+                .create_migration(&format!("migration{}", count), schema, &directory)
                 .send()
                 .await?
                 .into_output()
                 .generated_migration_name
                 .unwrap();
 
-            migrations_counter += 1;
             initial_migration_names.push(name);
         }
 

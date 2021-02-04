@@ -705,7 +705,7 @@ fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
     if api.is_mariadb() {
         return Cow::Owned(
             cases
-                .into_iter()
+                .iter()
                 .cloned()
                 .filter(|(ty, _, _)| !type_is_unsupported_mariadb(ty))
                 .collect(),
@@ -715,7 +715,7 @@ fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
     if api.is_mysql_5_6() {
         return Cow::Owned(
             cases
-                .into_iter()
+                .iter()
                 .cloned()
                 .filter(|(ty, _, _)| !type_is_unsupported_mysql_5_6(ty))
                 .collect(),
