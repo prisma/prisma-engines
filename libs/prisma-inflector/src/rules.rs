@@ -8,7 +8,7 @@ pub trait Pluralize {
 #[derive(Debug)]
 pub enum Rule {
     Category(CategoryRule),
-    Regex(RegexRule),
+    Regex(Box<RegexRule>),
 }
 
 impl Rule {
@@ -21,7 +21,7 @@ impl Rule {
     }
 
     pub fn regex(singular: Regex, plural: String) -> Rule {
-        Rule::Regex(RegexRule { singular, plural })
+        Rule::Regex(Box::new(RegexRule { singular, plural }))
     }
 }
 

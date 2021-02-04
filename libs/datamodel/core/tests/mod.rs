@@ -1,3 +1,5 @@
+#![allow(clippy::module_inception)]
+
 pub mod attributes;
 pub mod base;
 pub mod capabilities;

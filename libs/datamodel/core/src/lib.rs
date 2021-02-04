@@ -70,6 +70,9 @@
 //!                       └──────────────────┘
 //!</pre>
 //!
+
+#![allow(clippy::module_inception)]
+
 #[macro_use]
 extern crate tracing;
 

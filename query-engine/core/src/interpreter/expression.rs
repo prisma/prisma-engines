@@ -11,7 +11,7 @@ pub enum Expression {
     },
 
     Query {
-        query: Query,
+        query: Box<Query>,
     },
 
     Let {
@@ -34,7 +34,7 @@ pub enum Expression {
     },
 
     Return {
-        result: ExpressionResult,
+        result: Box<ExpressionResult>,
     },
 }
 
