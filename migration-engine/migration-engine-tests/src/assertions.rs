@@ -399,6 +399,18 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_type_is_bigint(self) -> AssertionResult<Self> {
+        let found = &self.0.tpe.family;
+
+        anyhow::ensure!(
+            found == &sql_schema_describer::ColumnTypeFamily::BigInt,
+            "Assertion failed. Expected a BigInt column, got {:?}.",
+            found
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_type_is_bytes(self) -> AssertionResult<Self> {
         let found = &self.0.tpe.family;
 

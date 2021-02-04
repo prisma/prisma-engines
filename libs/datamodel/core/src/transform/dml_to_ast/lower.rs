@@ -1,23 +1,20 @@
 use super::super::attributes::AllAttributes;
-use crate::ast::{Attribute, Span};
-use crate::configuration::preview_features::PreviewFeatures;
-use crate::{ast, dml, Datasource, Generator};
+use crate::{
+    ast::{self, Attribute, Span},
+    dml, Datasource,
+};
 
 pub struct LowerDmlToAst<'a> {
     attributes: AllAttributes,
     datasource: Option<&'a Datasource>,
-    native_types_enabled: bool,
 }
 
 impl<'a> LowerDmlToAst<'a> {
     /// Creates a new instance, with all builtin attributes registered.
-    pub fn new(datasource: Option<&'a Datasource>, generators: &[Generator]) -> Self {
-        let native_types_enabled = generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
-
+    pub fn new(datasource: Option<&'a Datasource>) -> Self {
         Self {
             attributes: AllAttributes::new(),
             datasource,
-            native_types_enabled,
         }
     }
 
@@ -122,10 +119,6 @@ impl<'a> LowerDmlToAst<'a> {
         attributes: &mut Vec<Attribute>,
         datasource: &Datasource,
     ) {
-        if !self.native_types_enabled {
-            return;
-        }
-
         if datasource
             .active_connector
             .native_type_is_default_for_scalar_type(native_type.serialized_native_type.clone(), scalar_type)

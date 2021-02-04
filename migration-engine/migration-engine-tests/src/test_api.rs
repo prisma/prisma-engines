@@ -61,6 +61,10 @@ impl TestApi {
         self.tags.contains(Tags::Sqlite)
     }
 
+    pub fn is_mssql(&self) -> bool {
+        self.tags.contains(Tags::Mssql)
+    }
+
     pub fn is_mysql(&self) -> bool {
         self.tags.contains(Tags::Mysql)
     }
@@ -75,6 +79,10 @@ impl TestApi {
 
     pub fn is_mysql_5_6(&self) -> bool {
         self.tags.contains(Tags::Mysql56)
+    }
+
+    pub fn is_postgres(&self) -> bool {
+        self.tags.contains(Tags::Postgres)
     }
 
     pub fn migration_persistence<'a>(&'a self) -> &(dyn MigrationPersistence + 'a) {
@@ -479,14 +487,10 @@ async fn mssql_test_api(connection_string: String, args: TestAPIArgs) -> TestApi
 }
 
 fn preview_features(features: BitFlags<Features>) -> BitFlags<MigrationFeature> {
-    features.iter().fold(BitFlags::empty(), |mut acc, feature| {
-        let feature = match feature {
-            Features::NativeTypes => MigrationFeature::NativeTypes,
+    features.iter().fold(BitFlags::empty(), |acc, feature| {
+        match feature {
+            Features::Other => return acc,
         };
-
-        acc.insert(feature);
-
-        acc
     })
 }
 

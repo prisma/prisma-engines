@@ -787,7 +787,7 @@ fn prisma_type(native_type: &str) -> &str {
     TYPE_MAPS.get(kind).unwrap()
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"), log = "debug")]
+#[test_each_connector(tags("postgres"))]
 async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
@@ -885,7 +885,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
@@ -993,7 +993,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
@@ -1186,7 +1186,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
     ]
 });
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
@@ -1279,7 +1279,7 @@ async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
@@ -1344,7 +1344,7 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector(log = "debug", tags("postgres"), features("native_types"))]
+#[test_each_connector(log = "debug", tags("postgres"))]
 async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"

@@ -134,19 +134,11 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     }
 }
 
-pub(crate) fn calculate_scalar_field(
-    table: &Table,
-    column: &Column,
-    family: &SqlFamily,
-    native_types: bool,
-) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, family: &SqlFamily) -> ScalarField {
     debug!("Handling column {:?}", column);
 
-    let field_type = if native_types {
-        calculate_scalar_field_type_with_native_types(column, family)
-    } else {
-        calculate_scalar_field_type(column, family)
-    };
+    let field_type = calculate_scalar_field_type_with_native_types(column, family);
+
     let is_id = is_id(&column, &table);
     let arity = match column.tpe.arity {
         _ if is_id && column.auto_increment => FieldArity::Required,
@@ -156,18 +148,6 @@ pub(crate) fn calculate_scalar_field(
     };
 
     let default_value = calculate_default(table, &column, &arity);
-
-    let (is_commented_out, documentation) = match &field_type {
-        FieldType::Unsupported(_) => (
-            false,
-            if native_types {
-                None
-            } else {
-                Some("This type is currently not supported by the Prisma Client.".to_string())
-            },
-        ),
-        _ => (false, None),
-    };
 
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
@@ -179,10 +159,10 @@ pub(crate) fn calculate_scalar_field(
         default_value,
         is_unique,
         is_id,
-        documentation,
+        documentation: None,
         is_generated: false,
         is_updated_at: false,
-        is_commented_out,
+        is_commented_out: false,
         is_ignored: false,
     }
 }
@@ -330,60 +310,6 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
 
             Ok(name)
         }
-    }
-}
-
-pub(crate) fn calculate_scalar_field_type(column: &Column, family: &SqlFamily) -> FieldType {
-    debug!("Calculating field type for '{}'", column.name);
-    let fdt = column.tpe.full_data_type.to_owned();
-
-    let is_mysql_bit = {
-        if family.is_mysql() {
-            let datamodel_connector = SqlDatamodelConnectors::mysql();
-
-            match &column.tpe.native_type {
-                None => false,
-                Some(native_type) => {
-                    let tpe = datamodel_connector.introspect_native_type(native_type.clone()).unwrap();
-                    tpe.name == "Bit"
-                }
-            }
-        } else {
-            false
-        }
-    };
-
-    let is_postgres_interval = {
-        if family.is_postgres() {
-            let datamodel_connector = SqlDatamodelConnectors::postgres();
-
-            match &column.tpe.native_type {
-                None => false,
-                Some(native_type) => {
-                    let tpe = datamodel_connector.introspect_native_type(native_type.clone()).unwrap();
-                    tpe.name == "Interval"
-                }
-            }
-        } else {
-            false
-        }
-    };
-
-    match &column.tpe.family {
-        _ if is_mysql_bit => FieldType::Base(ScalarType::Int, None),
-        _ if is_postgres_interval => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
-        ColumnTypeFamily::BigInt => FieldType::Base(ScalarType::Int, None),
-        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
-        ColumnTypeFamily::Decimal => FieldType::Base(ScalarType::Float, None),
-        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
-        ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-        ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
-        ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.to_owned()),
-        ColumnTypeFamily::Binary => FieldType::Unsupported(fdt),
-        ColumnTypeFamily::Unsupported(_) => FieldType::Unsupported(fdt),
     }
 }
 

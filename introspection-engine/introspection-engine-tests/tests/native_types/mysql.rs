@@ -1,6 +1,6 @@
 use indoc::formatdoc;
 use indoc::indoc;
-use introspection_engine_tests::{assert_eq_datamodels, test_api::*};
+use introspection_engine_tests::test_api::*;
 use test_macros::test_each_connector;
 use test_setup::connectors::Tags;
 
@@ -138,95 +138,6 @@ async fn native_type_columns_feature_on(api: &TestApi) -> crate::TestResult {
     println!("RESULT: \n {:#}", result);
 
     assert!(result.replace(" ", "").contains(&types.replace(" ", "")));
-
-    Ok(())
-}
-
-#[test_each_connector(tags("mariadb", "mysql_8"))]
-async fn native_type_columns_feature_off(api: &TestApi) -> crate::TestResult {
-    let columns: Vec<String> = TYPES
-        .iter()
-        .map(|(name, data_type)| format!("`{}` {} Not Null", name, data_type))
-        .collect();
-
-    api.barrel()
-        .execute_with_schema(
-            move |migration| {
-                migration.create_table("Blog", move |t| {
-                    for column in &columns {
-                        t.inject_custom(column);
-                    }
-                });
-            },
-            api.db_name(),
-        )
-        .await?;
-
-    let (json, default) = match api {
-        _ if api.tags.contains(Tags::Mysql8) => ("Json", ""),
-        _ if api.tags.contains(Tags::Mariadb) => ("String", "@default(now())"),
-        _ => unreachable!(),
-    };
-
-    let dm = formatdoc! {r#"
-        datasource mysql {{
-            provider        = "mysql"
-            url             = "mysql://localhost/test"
-        }}
-
-
-        model Blog {{
-            int                            Int
-            unsignedint                    Int
-            smallint                       Int
-            unsignedsmallint               Int
-            tinyint                        Int
-            unsignedtinyint                Int
-            tinyint_bool                   Boolean
-            mediumint                      Int
-            unsignedmediumint              Int
-            bigint                         Int
-            bigint_autoincrement           Int       @id  @default(autoincrement())
-            unsignedbigint                 Int
-            decimal                        Float
-            decimal_2                      Float
-            numeric                        Float
-            float                          Float
-            double                         Float
-            bits                           Int
-            bit_bool                       Int
-            chars                          String
-            varchars                       String
-            // This type is currently not supported by the Prisma Client.
-            // binary                      Unsupported("binary(230)")
-            // This type is currently not supported by the Prisma Client.
-            // varbinary                   Unsupported("varbinary(150)")
-            // This type is currently not supported by the Prisma Client.
-            // tinyBlob                    Unsupported("tinyblob")
-            // This type is currently not supported by the Prisma Client.
-            // blob                        Unsupported("blob")
-            // This type is currently not supported by the Prisma Client.
-            // mediumBlob                  Unsupported("mediumblob")
-            // This type is currently not supported by the Prisma Client.
-            // longBlob                    Unsupported("longblob")
-            tinytext                       String
-            text                           String
-            mediumText                     String
-            longText                       String
-            date                           DateTime
-            timeWithPrecision              DateTime
-            timeWithPrecision_no_precision DateTime
-            dateTimeWithPrecision          DateTime
-            timestampWithPrecision         DateTime       {default}
-            year                           Int
-            json                           {json}
-        }}
-        "#,
-        default = default,
-        json = json
-    };
-
-    assert_eq_datamodels!(&dm, &api.re_introspect(&dm).await?);
 
     Ok(())
 }

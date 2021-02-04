@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 #[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
 #[repr(u8)]
 pub enum Features {
-    NativeTypes = 0b0001,
+    Other = 0b1,
 }
 
 impl Features {
@@ -39,5 +39,4 @@ impl std::fmt::Display for UnknownFeatureError {
 impl std::error::Error for UnknownFeatureError {}
 
 /// All the features, sorted by name.
-static FEATURE_NAMES: Lazy<Vec<(&str, BitFlags<Features>)>> =
-    Lazy::new(|| vec![("native_types", Features::NativeTypes.into())]);
+static FEATURE_NAMES: Lazy<Vec<(&str, BitFlags<Features>)>> = Lazy::new(|| Vec::new());

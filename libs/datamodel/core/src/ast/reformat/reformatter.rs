@@ -31,8 +31,7 @@ impl<'a> Reformatter<'a> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
-        let generators = &vec![];
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, generators);
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
         diagnostics.append_warning_vec(validated_datamodel.warnings);
@@ -65,8 +64,7 @@ impl<'a> Reformatter<'a> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         diagnostics.append_warning_vec(validated_datamodel.warnings);
-        let generators = &vec![];
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, generators);
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut missing_field_attributes = Vec::new();
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
