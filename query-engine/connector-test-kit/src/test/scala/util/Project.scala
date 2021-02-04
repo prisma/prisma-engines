@@ -32,7 +32,7 @@ case class Project(
     s"""
        |generator client {
        |  provider = "prisma-client-js"
-       |  previewFeatures = ["nativeTypes", "microsoftSqlServer"]
+       |  previewFeatures = ["microsoftSqlServer"]
        |}
     """.stripMargin
   }

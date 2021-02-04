@@ -1,14 +1,12 @@
 use super::SqlSchemaCalculatorFlavour;
-use crate::flavour::{MssqlFlavour, SqlFlavour};
+use crate::flavour::MssqlFlavour;
 use datamodel::{walkers::ModelWalker, ScalarType};
 use datamodel_connector::Connector;
-use migration_connector::MigrationFeature;
 use sql_schema_describer::ForeignKeyAction;
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        sql_datamodel_connector::SqlDatamodelConnectors::mssql()
-            .default_native_type_for_scalar_type(scalar_type, self.features().contains(MigrationFeature::NativeTypes))
+        sql_datamodel_connector::SqlDatamodelConnectors::mssql().default_native_type_for_scalar_type(scalar_type)
     }
 
     fn m2m_foreign_key_action(&self, model_a: &ModelWalker<'_>, model_b: &ModelWalker<'_>) -> ForeignKeyAction {

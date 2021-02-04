@@ -18,7 +18,7 @@ use prisma_value::PrismaValue;
 use quaint::prelude::{Queryable, SqlFamily};
 use sql_schema_describer::*;
 
-#[test_each_connector(features("native_types"), log = "debug")]
+#[test_each_connector]
 async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
@@ -73,48 +73,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
-async fn adding_a_scalar_field_must_work_with_native_types_off(api: &TestApi) -> TestResult {
-    let dm = r#"
-        model Test {
-            id String @id @default(cuid())
-            int Int
-            float Float
-            boolean Boolean
-            string String
-            dateTime DateTime
-        }
-    "#;
-
-    api.schema_push(dm).send().await?.assert_green()?;
-
-    api.assert_schema().await?.assert_table("Test", |table| {
-        table
-            .assert_columns_count(6)?
-            .assert_column("int", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
-            })?
-            .assert_column("float", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Decimal)
-            })?
-            .assert_column("boolean", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Boolean)
-            })?
-            .assert_column("string", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
-            })?
-            .assert_column("dateTime", |c| {
-                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
-            })
-    })?;
-
-    // Check that the migration is idempotent.
-    api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
-
-    Ok(())
-}
-
-#[test_each_connector(features("native_types"), capabilities("enums"))]
+#[test_each_connector(capabilities("enums"))]
 async fn adding_an_enum_field_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -901,7 +860,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -978,7 +937,7 @@ async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {
@@ -1041,6 +1000,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
             id Int @id
             b  String
         }
+
         model B {
             id Int @id
         }
@@ -1054,6 +1014,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
     let column = table.column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
     assert_eq!(table.foreign_keys, vec![]);
+    assert!(table.indices.is_empty(), "{:?}", table.indices);
 
     let dm2 = r#"
         model A {
@@ -1061,6 +1022,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
             b Int
             b_rel B @relation(fields: [b], references: [id])
         }
+
         model B {
             id Int @id
             a  A?
@@ -1074,27 +1036,11 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) ->
         .assert_executable()?
         .assert_has_executed_steps()?;
 
-    let result = api.describe_database().await?;
-
-    let table = result.table_bang("A");
-    let column = result.table_bang("A").column_bang("b");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
-                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => Some("A_b_fkey".to_owned()),
-            },
-            columns: vec![column.name.clone()],
-            referenced_table: "B".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-            on_update_action: ForeignKeyAction::NoAction,
-        }]
-    );
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b", |col| col.assert_type_is_int())?
+            .assert_fk_on_columns(&["b"], |fk| fk.assert_references("B", &["id"]))
+    })?;
 
     Ok(())
 }
@@ -2820,7 +2766,7 @@ async fn changing_all_referenced_columns_of_foreign_key_works(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("mssql_2017", "mssql_2019"))]
+#[test_each_connector(tags("mssql"), log = "debug")]
 async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Blog {
@@ -2839,10 +2785,12 @@ async fn a_table_recreation_with_noncastable_columns_should_trigger_warnings(api
         }
     "#;
 
+    api.insert("Blog").value("title", "3.14").result_raw().await?;
+
     api.schema_push(dm2)
         .send()
         .await?
-        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table. The data in that column will be cast from `String` to `Float`. This cast may fail and the migration will stop. Please make sure the data in the column can be cast.".into()])?;
+        .assert_warnings(&["You are about to alter the column `title` on the `Blog` table, which contains 1 non-null values. The data in that column will be cast from `String` to `Float`.".into()])?;
 
     Ok(())
 }
@@ -3000,7 +2948,7 @@ async fn adding_an_unsupported_type_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -3054,7 +3002,7 @@ async fn switching_an_unsupported_type_to_supported_must_work(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn adding_and_removing_properties_on_unsupported_should_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {

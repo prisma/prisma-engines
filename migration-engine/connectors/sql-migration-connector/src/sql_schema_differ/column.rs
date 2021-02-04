@@ -1,8 +1,7 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
 use enumflags2::BitFlags;
-use migration_connector::MigrationFeature;
 use prisma_value::PrismaValue;
-use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultKind};
+use sql_schema_describer::{walkers::ColumnWalker, DefaultKind};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
@@ -14,7 +13,7 @@ pub(crate) struct ColumnDiffer<'a> {
 impl<'a> ColumnDiffer<'a> {
     pub(crate) fn all_changes(&self) -> (ColumnChanges, Option<ColumnTypeChange>) {
         let mut changes = BitFlags::empty();
-        let column_type_change = self.column_type_change();
+        let column_type_change = self.flavour.column_type_change(self);
 
         if self.previous.name() != self.next.name() {
             changes |= ColumnChange::Renaming;
@@ -49,23 +48,6 @@ impl<'a> ColumnDiffer<'a> {
 
     pub(crate) fn autoincrement_changed(&self) -> bool {
         self.previous.is_autoincrement() != self.next.is_autoincrement()
-    }
-
-    fn column_type_change(&self) -> Option<ColumnTypeChange> {
-        if self.flavour.features().contains(MigrationFeature::NativeTypes) {
-            self.flavour.column_type_change(self)
-        } else {
-            match (self.previous.column_type_family(), self.next.column_type_family()) {
-                (_, _) if self.arity_changed() => self.flavour.column_type_change(self),
-                (ColumnTypeFamily::Decimal, ColumnTypeFamily::Decimal) => None,
-                (ColumnTypeFamily::Decimal, ColumnTypeFamily::Float) => None,
-                (ColumnTypeFamily::Float, ColumnTypeFamily::Decimal) => None,
-                (ColumnTypeFamily::Float, ColumnTypeFamily::Float) => None,
-                (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => None,
-                (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => None,
-                (_, _) => self.flavour.column_type_change(self),
-            }
-        }
     }
 
     /// There are workarounds to cope with current migration and introspection limitations.

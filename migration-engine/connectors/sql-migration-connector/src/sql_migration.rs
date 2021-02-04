@@ -95,6 +95,15 @@ pub(crate) enum TableChange {
     },
 }
 
+impl TableChange {
+    pub(crate) fn as_alter_column(&self) -> Option<&AlterColumn> {
+        match self {
+            TableChange::AlterColumn(col) => Some(col),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub(crate) struct AddColumn {
     pub column_index: usize,

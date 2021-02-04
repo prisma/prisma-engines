@@ -31,7 +31,6 @@ use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 pub struct SqlMigrationConnector {
     connection: Connection,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
-    features: BitFlags<MigrationFeature>,
 }
 
 impl SqlMigrationConnector {
@@ -42,11 +41,7 @@ impl SqlMigrationConnector {
 
         flavour.ensure_connection_validity(&connection).await?;
 
-        Ok(Self {
-            flavour,
-            connection,
-            features,
-        })
+        Ok(Self { flavour, connection })
     }
 
     /// Create the database corresponding to the connection string, without initializing the connector.

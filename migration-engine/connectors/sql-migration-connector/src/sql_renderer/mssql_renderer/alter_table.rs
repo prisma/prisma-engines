@@ -193,23 +193,6 @@ impl<'a> AlterTableConstructor<'a> {
                         "NULL"
                     };
 
-                    // If the column is part of a `UNIQUE` constraint, we must
-                    // drop the constraint before we can drop the column.
-                    let prev_constraints = self
-                        .tables
-                        .next()
-                        .indexes()
-                        .filter(|index| index.index_type().is_unique())
-                        .filter(|index| index.contains_column(columns.previous().name()))
-                        .collect::<Vec<_>>();
-
-                    if !prev_constraints.is_empty() {
-                        for constraint in prev_constraints {
-                            self.drop_constraints
-                                .insert(format!("{}", self.renderer.quote(constraint.name())));
-                        }
-                    }
-
                     self.column_mods.push(format!(
                         "ALTER TABLE {table} ALTER COLUMN {column_name} {column_type} {nullability}",
                         table = self.renderer.quote_with_schema(self.tables.previous().name()),
@@ -217,35 +200,6 @@ impl<'a> AlterTableConstructor<'a> {
                         column_type = super::render_column_type(columns.next()),
                         nullability = nullability,
                     ));
-
-                    let next_constraints = self
-                        .tables
-                        .next()
-                        .indexes()
-                        .filter(|index| index.index_type().is_unique())
-                        .filter(|index| index.contains_column(columns.previous().name()))
-                        .collect::<Vec<_>>();
-
-                    // Re-creating the `UNIQUE` constraint for the new column,
-                    // if needed.
-                    if !next_constraints.is_empty() {
-                        for constraint in next_constraints {
-                            let non_quoted_columns = constraint.column_names();
-
-                            let quoted_columns = non_quoted_columns
-                                .iter()
-                                .map(|c| self.renderer.quote(c))
-                                .map(|c| format!("{}", c))
-                                .collect::<Vec<_>>();
-
-                            self.add_constraints.insert(format!(
-                                "CONSTRAINT PK__{}__{} UNIQUE ({})",
-                                self.tables.next().name(),
-                                non_quoted_columns.join("__"),
-                                quoted_columns.join(","),
-                            ));
-                        }
-                    }
                 }
             }
         }

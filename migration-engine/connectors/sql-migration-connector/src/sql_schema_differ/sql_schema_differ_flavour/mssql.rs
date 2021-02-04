@@ -1,12 +1,12 @@
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::{MssqlFlavour, SqlFlavour},
+    flavour::MssqlFlavour,
+    sql_migration::{AlterTable, CreateIndex, DropIndex},
     sql_schema_differ::{
         column::{ColumnDiffer, ColumnTypeChange},
         SqlSchemaDiffer,
     },
 };
-use migration_connector::MigrationFeature;
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{walkers::IndexWalker, ColumnTypeFamily};
 use std::collections::HashSet;
@@ -42,16 +42,60 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
     }
 
     fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
-        let native_types_enabled = self.features().contains(MigrationFeature::NativeTypes);
         let previous_family = differ.previous.column_type_family();
         let next_family = differ.next.column_type_family();
         let previous_type: Option<MsSqlType> = differ.previous.column_native_type();
         let next_type: Option<MsSqlType> = differ.next.column_native_type();
 
         match (previous_type, next_type) {
-            _ if !native_types_enabled => family_change_riskyness(previous_family, next_family),
             (None, _) | (_, None) => family_change_riskyness(previous_family, next_family),
             (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
+        }
+    }
+
+    fn push_index_changes_for_column_changes(
+        &self,
+        alter_tables: &[AlterTable],
+        drop_indexes: &mut Vec<DropIndex>,
+        create_indexes: &mut Vec<CreateIndex>,
+        differ: &SqlSchemaDiffer<'_>,
+    ) {
+        for table in alter_tables {
+            for column in table.changes.iter().filter_map(|change| change.as_alter_column()) {
+                if !column.changes.type_changed() {
+                    continue;
+                }
+
+                let table = differ
+                    .table_pairs()
+                    .find(|tables| {
+                        (&tables.previous().table_index(), &tables.next().table_index()) == table.table_index.as_tuple()
+                    })
+                    .expect("Invariant violation: no table pair found for AlterTable");
+
+                for dropped_index in table.index_pairs().filter(|pair| {
+                    pair.previous()
+                        .columns()
+                        .any(|col| col.column_index() == *column.column_index.previous())
+                }) {
+                    drop_indexes.push(DropIndex {
+                        table_index: table.previous().table_index(),
+                        index_index: dropped_index.previous().index(),
+                    })
+                }
+
+                for created_index in table.index_pairs().filter(|pair| {
+                    pair.next()
+                        .columns()
+                        .any(|col| col.column_index() == *column.column_index.next())
+                }) {
+                    create_indexes.push(CreateIndex {
+                        table_index: table.next().table_index(),
+                        index_index: created_index.next().index(),
+                        caused_by_create_table: true,
+                    })
+                }
+            }
         }
     }
 }

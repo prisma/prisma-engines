@@ -18,16 +18,7 @@ pub struct Generator {
 }
 
 impl PreviewFeatures for Generator {
-    fn preview_features(&self) -> &Vec<String> {
+    fn preview_features(&self) -> &[String] {
         &self.preview_features
-    }
-}
-
-impl PreviewFeatures for Option<&Generator> {
-    fn preview_features(&self) -> &Vec<String> {
-        match self {
-            Some(dat) => &dat.preview_features,
-            _ => panic!(""),
-        }
     }
 }

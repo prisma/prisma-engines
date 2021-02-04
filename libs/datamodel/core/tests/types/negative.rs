@@ -54,7 +54,7 @@ fn should_fail_on_endless_recursive_type_def() {
     type ID = MyStringWithDefault
 
     model Model {
-        id ID 
+        id ID
     }
     "#;
 
@@ -74,7 +74,7 @@ fn shound_fail_on_unresolvable_type() {
     type ID = MyStringWithDefault
 
     model Model {
-        id ID 
+        id ID
     }
     "#;
 
@@ -165,56 +165,6 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 }
 
 #[test]
-fn should_fail_on_decimal_scalar_type_used_without_preview_feature() {
-    let dml = r#"
-        model Blog {
-            id     Int    @id
-            foo Decimal
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
-        ast::Span::new(64, 76),
-    ));
-}
-
-#[test]
-fn should_fail_on_bytes_scalar_type_used_without_preview_feature() {
-    let dml = r#"
-        model Blog {
-            id     Int    @id
-            foo Bytes
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
-        ast::Span::new(64, 74),
-    ));
-}
-#[test]
-fn should_fail_on_big_int_scalar_type_used_without_preview_feature() {
-    let dml = r#"
-        model Blog {
-            id     Int    @id
-            foo BigInt
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
-        ast::Span::new(64, 75),
-    ));
-}
-
-#[test]
 fn should_fail_on_native_type_with_unknown_type() {
     let dml = r#"
         datasource pg {
@@ -239,28 +189,6 @@ fn should_fail_on_native_type_with_unknown_type() {
     error.assert_is(DatamodelError::new_connector_error(
         "Native type Numerical is not supported for postgresql connector.",
         ast::Span::new(300, 318),
-    ));
-}
-
-#[test]
-fn should_fail_on_missing_native_types_feature_flag() {
-    let dml = r#"
-        datasource pg {
-          provider = "postgres"
-          url = "postgresql://"
-        }
-
-        model Blog {
-            id     Int    @id
-            bigInt Int    @pg.Numerical(3, 4)
-        }
-    "#;
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`",
-        ast::Span::new(178, 196),
     ));
 }
 

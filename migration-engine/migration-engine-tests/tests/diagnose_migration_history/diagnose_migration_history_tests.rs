@@ -1,4 +1,3 @@
-use crate::*;
 use migration_core::{
     commands::{
         CreateMigrationOutput, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
@@ -6,7 +5,9 @@ use migration_core::{
     },
     migration_api,
 };
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use user_facing_errors::{migration_engine::ShadowDbCreationError, UserFacingError};
 
 #[test_each_connector]
@@ -637,9 +638,8 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
         .unwrap_err()
         .to_string();
 
-    match api.sql_family() {
-        SqlFamily::Mssql => assert!(err.contains("Could not find stored procedure"), err),
-        _ => assert!(&err.contains("syntax"), err),
+    if api.is_mssql() {
+        assert!(err.contains("Could not find stored procedure"), err)
     }
 
     let DiagnoseMigrationHistoryOutput {
@@ -917,6 +917,8 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
         .raw_cmd("DROP USER IF EXISTS prismashadowdbtestuser;")
         .await
         .ok();
+
+    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
     api.database()
         .raw_cmd(

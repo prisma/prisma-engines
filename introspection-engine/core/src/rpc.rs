@@ -1,6 +1,5 @@
 use crate::command_error::CommandError;
 use crate::error::Error;
-use datamodel::configuration::preview_features::PreviewFeatures;
 use datamodel::{Configuration, Datamodel};
 use futures::{FutureExt, TryFutureExt};
 use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
@@ -101,16 +100,7 @@ impl RpcImpl {
             Datamodel::new()
         };
 
-        let native_types = match datamodel::parse_configuration(&schema) {
-            Ok(config) => config
-                .subject
-                .generators
-                .iter()
-                .any(|g| g.has_preview_feature("nativeTypes")),
-            Err(_) => false,
-        };
-
-        let result = match connector.introspect(&input_data_model, native_types).await {
+        let result = match connector.introspect(&input_data_model).await {
             Ok(introspection_result) => {
                 if introspection_result.data_model.is_empty() {
                     Err(Error::from(CommandError::IntrospectionResultEmpty(url.to_string())))

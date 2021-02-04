@@ -108,15 +108,6 @@ impl<'a> Validator<'a> {
                 errors_for_model.append(the_errors);
             }
 
-            //            if !errors_for_model.has_errors() {
-            //                let mut new_errors = self.validate_relation_arguments_bla(
-            //                    schema,
-            //                    ast_schema.find_model(&model.name).expect(STATE_ERROR),
-            //                    model,
-            //                );
-            //                errors_for_model.append(&mut new_errors);
-            //            }
-
             all_errors.append(&mut errors_for_model);
         }
 
@@ -634,14 +625,14 @@ impl<'a> Validator<'a> {
                                 let field_type = base_field.field_type();
                                 let scalar_type = field_type.as_base()?;
 
-                                Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type, true)))
+                                Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
                             let referenced_native_type = referenced_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = referenced_field.field_type();
                                 let scalar_type = field_type.as_base()?;
 
-                                Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type, true)))
+                                Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
                             if base_native_type.is_some() && base_native_type == referenced_native_type {

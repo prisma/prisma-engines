@@ -135,7 +135,7 @@ fn parse_datamodel_internal(
     let ast = ast::parser::parse_schema(datamodel_string)?;
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let validator = ValidationPipeline::new(&sources.subject, &generators.subject);
+    let validator = ValidationPipeline::new(&sources.subject);
 
     diagnostics.append_warning_vec(sources.warnings);
     diagnostics.append_warning_vec(generators.warnings);
@@ -159,7 +159,7 @@ pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<ValidatedDatamodel,
     // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
     let sources = load_sources(ast, true, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let validator = ValidationPipeline::new(&sources.subject, &generators.subject);
+    let validator = ValidationPipeline::new(&sources.subject);
 
     diagnostics.append_warning_vec(sources.warnings);
     diagnostics.append_warning_vec(generators.warnings);
@@ -270,7 +270,7 @@ pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
 
 /// Renders as a string into the stream.
 pub fn render_datamodel_to(stream: &mut dyn std::io::Write, datamodel: &dml::Datamodel) {
-    let lowered = LowerDmlToAst::new(None, &[]).lower(datamodel);
+    let lowered = LowerDmlToAst::new(None).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 
@@ -290,7 +290,7 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) {
-    let mut lowered = LowerDmlToAst::new(config.datasources.first(), &config.generators).lower(datamodel);
+    let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel);
 
     DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
