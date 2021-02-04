@@ -2,12 +2,12 @@ use crate::*;
 use quaint::Value;
 
 #[test_each_connector]
-async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &TestApi) -> TestResult {
+async fn altering_the_type_of_a_column_in_a_non_empty_table_warns(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
             id String @id @default(cuid())
             name String
-            dogs Int
+            dogs BigInt
         }
     "#;
 
@@ -24,12 +24,16 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         model User {
             id String @id @default(cuid())
             name String
-            dogs Boolean
+            dogs Int
         }
     "#;
 
     api.schema_push(dm2).send().await?.assert_warnings(&[
-        "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `Int` to `Boolean`.".into()
+        if api.is_postgres() {
+            "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Integer`.".into()
+        } else {
+            "You are about to alter the column `dogs` on the `User` table, which contains 1 non-null values. The data in that column will be cast from `BigInt` to `Int`.".into()
+        }
     ])?;
 
     let rows = api.select("User").column("dogs").send().await?;
@@ -37,7 +41,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
     rows.assert_single_row(|row| row.assert_int_value("dogs", 7))?;
 
     api.assert_schema().await?.assert_table("User", |table| {
-        table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
+        table.assert_column("dogs", |col| col.assert_type_is_bigint()?.assert_is_required())
     })?;
 
     Ok(())
@@ -322,7 +326,7 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
 
     match api.sql_family() {
         // Not executable
-        SqlFamily::Postgres | SqlFamily::Mssql => {
+        SqlFamily::Postgres => {
             api.schema_push(dm2)
                 .force(true)
                 .send()
@@ -331,7 +335,37 @@ async fn string_to_int_conversions_are_risky(api: &TestApi) -> TestResult {
                 .assert_unexecutable(&["Changed the type of `tag` on the `Cat` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.".into()])?;
         }
         // Executable, conditionally.
-        SqlFamily::Sqlite | SqlFamily::Mysql => {
+        SqlFamily::Mysql => {
+            api.schema_push(dm2)
+            .force(true)
+            .send()
+            .await?
+            .assert_warnings(&[
+                "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `VarChar(191)` to `Int`.".into()
+            ])?
+            .assert_executable()?
+            .assert_has_executed_steps()?;
+
+            api.dump_table("Cat")
+                .await?
+                .assert_single_row(|row| row.assert_int_value("tag", 20))?;
+        }
+        SqlFamily::Mssql => {
+            api.schema_push(dm2)
+            .force(true)
+            .send()
+            .await?
+            .assert_warnings(&[
+                "You are about to alter the column `tag` on the `Cat` table, which contains 1 non-null values. The data in that column will be cast from `NVarChar(1000)` to `Int`.".into()
+            ])?
+            .assert_executable()?
+            .assert_has_executed_steps()?;
+
+            api.dump_table("Cat")
+                .await?
+                .assert_single_row(|row| row.assert_int_value("tag", 20))?;
+        }
+        SqlFamily::Sqlite => {
             api.schema_push(dm2)
                 .force(true)
                 .send()
