@@ -209,68 +209,6 @@ async fn changing_an_int_array_column_to_scalar_is_not_possible(api: &TestApi) -
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"))]
-async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> TestResult {
-    let datasource_block = api.datasource();
-
-    let dm1 = format!(
-        r#"
-        {datasource_block}
-
-        model Film {{
-            id String @id
-            mainProtagonist String
-        }}
-        "#,
-        datasource_block = datasource_block,
-    );
-
-    api.schema_push(&dm1).send().await?.assert_green()?;
-
-    api.insert("Film")
-        .value("id", "film1")
-        .value("mainProtagonist", "left shark")
-        // .value("mainProtagonist", Value::array(vec!["giant shark", "jason statham"]))
-        .result_raw()
-        .await?;
-
-    let dm2 = format!(
-        r#"
-            {datasource_block}
-
-            model Film {{
-                id String @id
-                mainProtagonist String[]
-            }}
-            "#,
-        datasource_block = datasource_block,
-    );
-
-    api.schema_push(&dm2)
-        .send()
-        .await?
-        .assert_unexecutable(&[
-            "Changed the column `mainProtagonist` on the `Film` table from a scalar field to a list field. There are 1 existing non-null values in that column, this migration step cannot be executed.".into(),
-        ])?
-        .assert_no_warning()?;
-
-    api.assert_schema().await?.assert_table("Film", |table| {
-        table.assert_column("mainProtagonist", |column| column.assert_is_required())
-    })?;
-
-    api.select("Film")
-        .column("id")
-        .column("mainProtagonist")
-        .send()
-        .await?
-        .assert_single_row(|row| {
-            row.assert_text_value("id", "film1")?
-                .assert_text_value("mainProtagonist", "left shark")
-        })?;
-
-    Ok(())
-}
-
 #[test_each_connector]
 async fn int_to_string_conversions_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
