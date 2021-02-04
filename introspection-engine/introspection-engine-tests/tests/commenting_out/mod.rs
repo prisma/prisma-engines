@@ -5,63 +5,8 @@ use pretty_assertions::assert_eq;
 use serde_json::json;
 use test_macros::test_each_connector;
 
-//todo once we stabilize native types and with it unsupported,
-// a lot of the commented out testcases are going to become obsolete
-// this can then be the unsupported / ignore testfile
 #[test_each_connector]
-async fn a_table_without_uniques(api: &TestApi) -> crate::TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-            });
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::integer());
-                t.add_column("user_id", types::integer().nullable(false));
-                t.add_foreign_key(&["user_id"], "User", &["id"]);
-            });
-        })
-        .await?;
-
-    let dm = if api.sql_family().is_mysql() {
-        indoc! {r#"
-            // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            // model Post {
-              // id      Int
-              // user_id Int
-              // User    User @relation(fields: [user_id], references: [id])
-
-              // @@index([user_id], name: "user_id")
-            // }
-
-            model User {
-              id      Int    @id @default(autoincrement())
-              // Post Post[]
-            }
-        "#}
-    } else {
-        indoc! {r#"
-            // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-            // model Post {
-              // id      Int
-              // user_id Int
-              // User    User @relation(fields: [user_id], references: [id])
-            // }
-
-            model User {
-              id      Int    @id @default(autoincrement())
-              // Post Post[]
-            }
-        "#}
-    };
-
-    assert_eq!(dm, &api.introspect().await?);
-
-    Ok(())
-}
-
-#[test_each_connector]
-async fn a_table_without_uniques_using_native_types_should_ignore(api: &TestApi) -> crate::TestResult {
+async fn a_table_without_uniques_should_ignore(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -99,7 +44,7 @@ async fn a_table_without_uniques_using_native_types_should_ignore(api: &TestApi)
               id      Int
               user_id Int
               User    User @relation(fields: [user_id], references: [id])
-            
+
               @@ignore
             }
 
@@ -110,7 +55,7 @@ async fn a_table_without_uniques_using_native_types_should_ignore(api: &TestApi)
         "#}
     };
 
-    assert_eq!(dm, &api.introspect_with_native_types().await?);
+    assert_eq!(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -127,11 +72,13 @@ async fn a_table_without_required_uniques(api: &TestApi) -> crate::TestResult {
         .await?;
 
     let dm = indoc! {r#"
-        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-        // model Post {
-          // id         Int
-          // opt_unique Int? @unique
-        // }
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Post {
+          id         Int
+          opt_unique Int? @unique
+
+          @@ignore
+        }
     "#};
 
     assert_eq!(dm, &api.introspect().await?);
@@ -157,14 +104,15 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate:
         .await?;
 
     let dm = indoc! {r#"
-        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-        // model Post {
-          // id         Int
-          // opt_unique Int?
-          // req_unique Int
+        /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+        model Post {
+          id         Int
+          opt_unique Int?
+          req_unique Int
 
-          // @@unique([opt_unique, req_unique], name: "sqlite_autoindex_Post_1")
-        // }
+          @@unique([opt_unique, req_unique], name: "sqlite_autoindex_Post_1")
+          @@ignore
+        }
     "#};
 
     assert_eq!(dm, &api.introspect().await?);
@@ -173,51 +121,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> crate:
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn commenting_out_an_unsupported_type_drops_its_usages(api: &TestApi) -> crate::TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Test", |t| {
-                t.add_column("id", types::integer().unique(true));
-                t.add_column("dummy", types::integer());
-                t.add_column("broken", types::custom("macaddr"));
-
-                t.add_index("unique", types::index(vec!["broken", "dummy"]).unique(true));
-                t.add_index("non_unique", types::index(vec!["broken", "dummy"]).unique(false));
-                t.set_primary_key(&["broken", "dummy"]);
-            });
-        })
-        .await?;
-
-    let expected = json!([{
-        "code": 3,
-        "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
-        "affected": [
-            {
-                "model": "Test",
-                "field": "broken",
-                "tpe": "macaddr"
-            }
-        ]
-    }]);
-
-    assert_eq_json!(expected, api.introspection_warnings().await?);
-
-    let dm = indoc! {r#"
-        model Test {
-          id        Int     @unique
-          dummy     Int
-          // This type is currently not supported by the Prisma Client.
-          // broken Unsupported("macaddr")
-        }
-    "#};
-
-    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
-
-    Ok(())
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn unsupported_type_with_native_types_keeps_its_usages(api: &TestApi) -> crate::TestResult {
+async fn unsupported_type_keeps_its_usages(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -257,62 +161,13 @@ async fn unsupported_type_with_native_types_keeps_its_usages(api: &TestApi) -> c
         }
     "#};
 
-    assert_eq!(
-        dm.replace(" ", ""),
-        api.introspect_with_native_types().await?.replace(" ", "")
-    );
+    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
 
     Ok(())
 }
 
 #[test_each_connector(tags("postgres"))]
 async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> crate::TestResult {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Test", |t| {
-                t.add_column("dummy", types::integer());
-                t.add_column("network_mac", types::custom("macaddr").primary(true));
-            });
-        })
-        .await?;
-
-    let expected = json!([
-        {
-            "code": 1,
-            "message": "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by the Prisma Client.",
-            "affected": [{
-                "model": "Test"
-            }]
-        },
-        {
-            "code": 3,
-            "message": "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
-            "affected": [{
-                "model": "Test",
-                "field": "network_mac",
-                "tpe": "macaddr"
-            }]
-        }
-    ]);
-
-    assert_eq_json!(expected, api.introspection_warnings().await?);
-
-    let dm = indoc! {r#"
-        // The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-        // model Test {
-          // dummy       Int
-          // This type is currently not supported by the Prisma Client.
-          // network_mac Unsupported("macaddr") @id
-        // }
-    "#};
-
-    assert_eq!(dm, &api.introspect().await?);
-
-    Ok(())
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn a_table_with_only_an_unsupported_id_with_native_types_is_still_invalid(api: &TestApi) -> crate::TestResult {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Test", |t| {
@@ -351,12 +206,12 @@ async fn a_table_with_only_an_unsupported_id_with_native_types_is_still_invalid(
         model Test {
           dummy       Int
           network_mac Unsupported("macaddr") @id @default(dbgenerated("'08:00:2b:01:02:03'::macaddr"))
-        
+
           @@ignore
         }
     "#};
 
-    assert_eq!(dm, &api.introspect_with_native_types().await?);
+    assert_eq!(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -391,10 +246,7 @@ async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> crate::T
             }
         "#};
 
-    assert_eq!(
-        dm.replace(" ", ""),
-        api.introspect_with_native_types().await?.replace(" ", "")
-    );
+    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
 
     Ok(())
 }
@@ -444,8 +296,7 @@ async fn db_generated_values_should_add_comments(api: &TestApi) -> crate::TestRe
           id            Int    @id @default(autoincrement())
           number        Int?   @default(1)
           bigger_number Int?   @default(dbgenerated("sqrt((4)::double precision)"))
-          // This type is currently not supported by the Prisma Client.
-          // point      Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
+          point      Unsupported("point")? @default(dbgenerated("point((0)::double precision, (0)::double precision)"))
         }
     "##};
 
@@ -507,10 +358,10 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
                 id      Int
                 user_ip Int
                 User    User @relation(fields: [user_ip], references: [ip])
-            
+
                 @@ignore
             }
-            
+
             model User {
                 id      Int  @id @default(autoincrement())
                 ip      Int  @unique
@@ -518,10 +369,7 @@ async fn ignore_on_back_relation_field_if_pointing_to_ignored_model(api: &TestAp
             }
         "#};
 
-    assert_eq!(
-        dm.replace(" ", ""),
-        api.introspect_with_native_types().await?.replace(" ", "")
-    );
+    assert_eq!(dm.replace(" ", ""), api.introspect().await?.replace(" ", ""));
 
     Ok(())
 }

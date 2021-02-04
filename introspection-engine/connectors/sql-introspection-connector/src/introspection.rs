@@ -6,7 +6,7 @@ use crate::introspection_helpers::{
 use crate::version_checker::VersionChecker;
 use crate::Dedup;
 use crate::SqlError;
-use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, FieldType, Model, RelationField};
+use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, Model, RelationField};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
@@ -16,7 +16,6 @@ pub fn introspect(
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
     sql_family: SqlFamily,
-    native_types: bool,
 ) -> Result<(), SqlError> {
     for table in schema
         .tables
@@ -32,23 +31,14 @@ pub fn introspect(
 
         for column in &table.columns {
             version_check.check_column_for_type_and_default_value(&column);
-            let field = calculate_scalar_field(&table, &column, &sql_family, native_types);
+            let field = calculate_scalar_field(&table, &column, &sql_family);
             model.add_field(Field::ScalarField(field));
         }
 
         let mut foreign_keys_copy = table.foreign_keys.clone();
         foreign_keys_copy.clear_duplicates();
-        let model_copy = model.clone();
 
-        for foreign_key in foreign_keys_copy.iter().filter(|fk| {
-            native_types
-                || !fk.columns.iter().any(|c| {
-                    matches!(
-                        model_copy.find_scalar_field(c).unwrap().field_type,
-                        FieldType::Unsupported(_)
-                    )
-                })
-        }) {
+        for foreign_key in &foreign_keys_copy {
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
             let relation_field = calculate_relation_field(schema, table, foreign_key)?;

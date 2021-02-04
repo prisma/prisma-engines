@@ -7,11 +7,7 @@ use datamodel::{Datamodel, FieldType};
 use introspection_connector::Warning;
 use quaint::connector::SqlFamily;
 
-pub fn commenting_out_guardrails(
-    datamodel: &mut Datamodel,
-    family: &SqlFamily,
-    native_types_enabled: bool,
-) -> Vec<Warning> {
+pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
     let mut models_without_columns = vec![];
     let mut fields_with_empty_names = vec![];
@@ -61,26 +57,12 @@ pub fn commenting_out_guardrails(
 
         for field in model.scalar_fields_mut() {
             if let FieldType::Unsupported(tpe) = &field.field_type {
-                if !native_types_enabled {
-                    field.is_commented_out = true;
-                }
                 unsupported_types.push(ModelAndFieldAndType {
                     model: model_name.clone(),
                     field: field.name.clone(),
                     tpe: tpe.clone(),
                 })
             }
-        }
-    }
-
-    // use unsupported types to drop @@id / @@unique /@@index
-    for mf in &unsupported_types {
-        if !native_types_enabled {
-            let model = datamodel.find_model_mut(&mf.model);
-            model.indices.retain(|i| !i.fields.contains(&mf.field));
-            if model.id_fields.contains(&mf.field) {
-                model.id_fields = vec![]
-            };
         }
     }
 
@@ -109,11 +91,7 @@ pub fn commenting_out_guardrails(
         .filter(|model| !models_without_columns.iter().any(|m| m.model == model.name))
     {
         if model.strict_unique_criterias_disregarding_unsupported().is_empty() {
-            if native_types_enabled {
-                model.is_ignored = true;
-            } else {
-                model.is_commented_out = true;
-            }
+            model.is_ignored = true;
             model.documentation = Some(
                 "The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client."
                     .to_string(),
@@ -129,11 +107,7 @@ pub fn commenting_out_guardrails(
         for model in datamodel.models_mut() {
             for field in model.relation_fields_mut() {
                 if field.points_to_model(&model_without_identifier.model) {
-                    if native_types_enabled {
-                        field.is_ignored = true;
-                    } else {
-                        field.is_commented_out = true;
-                    }
+                    field.is_ignored = true;
                 }
             }
         }

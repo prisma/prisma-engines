@@ -17,7 +17,6 @@ pub fn calculate_datamodel(
     schema: &SqlSchema,
     family: &SqlFamily,
     previous_data_model: &Datamodel,
-    native_types: bool,
 ) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
@@ -25,7 +24,7 @@ pub fn calculate_datamodel(
     let mut data_model = Datamodel::new();
 
     // 1to1 translation of the sql schema
-    introspect(schema, &mut version_check, &mut data_model, *family, native_types)?;
+    introspect(schema, &mut version_check, &mut data_model, *family)?;
 
     // our opinionation about valid names
     sanitize_datamodel_names(&mut data_model, family);
@@ -38,7 +37,7 @@ pub fn calculate_datamodel(
     tracing::debug!("Enriching datamodel is done: {:?}", data_model);
 
     // commenting out models, fields, enums, enum values
-    warnings.append(&mut commenting_out_guardrails(&mut data_model, family, native_types));
+    warnings.append(&mut commenting_out_guardrails(&mut data_model, family));
 
     // try to identify whether the schema was created by a previous Prisma version
     let version = version_check.version(&warnings, &data_model);
@@ -160,7 +159,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -243,7 +242,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -379,7 +378,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -542,7 +541,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -614,7 +613,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -830,7 +829,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, expected_data_model);
     }
@@ -936,7 +935,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -1117,7 +1116,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }
@@ -1158,7 +1157,7 @@ mod tests {
             sequences: vec![],
         };
         let introspection_result =
-            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
+            calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new()).expect("calculate data model");
 
         assert_eq!(introspection_result.data_model, ref_data_model);
     }

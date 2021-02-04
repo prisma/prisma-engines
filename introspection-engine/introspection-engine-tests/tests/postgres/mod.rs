@@ -24,18 +24,18 @@ async fn sequences_should_work(api: &TestApi) -> crate::TestResult {
         generator client {
           provider = "prisma-client-js"
         }
-       
+
         datasource postgres {
             provider        = "postgres"
             url             = "postgres://localhost/test"
         }
 
         model Test {
-          id     Int  @id
-          serial Int  @default(autoincrement())
-          first  Int  @default(autoincrement())
-          second Int? @default(autoincrement())
-          third  Int  @default(autoincrement())
+          id     Int        @id
+          serial Int        @default(autoincrement())
+          first  BigInt     @default(autoincrement())
+          second BigInt?    @default(autoincrement())
+          third  BigInt     @default(autoincrement())
         }
     "#}
     .to_string();
