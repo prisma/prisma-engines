@@ -10,4 +10,8 @@ pub fn from_config(_config: &Configuration) -> BitFlags<MigrationFeature> {
 
 #[derive(BitFlags, Copy, Clone, Debug, PartialEq)]
 /// Feature flags to enable in the migration engine
-pub enum MigrationFeature {}
+#[repr(u8)]
+pub enum MigrationFeature {
+    /// Placeholder.
+    Other = 0b1,
+}
