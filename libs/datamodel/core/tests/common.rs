@@ -44,6 +44,7 @@ pub trait ModelAsserts {
     fn assert_with_documentation(&self, t: &str) -> &Self;
     fn assert_has_index(&self, def: IndexDefinition) -> &Self;
     fn assert_has_id_fields(&self, fields: &[&str]) -> &Self;
+    fn assert_is_ignored(&self) -> &Self;
 }
 
 pub trait EnumAsserts {
@@ -260,6 +261,11 @@ impl ModelAsserts for dml::Model {
 
     fn assert_has_id_fields(&self, fields: &[&str]) -> &Self {
         assert_eq!(self.id_fields, fields);
+        self
+    }
+
+    fn assert_is_ignored(&self) -> &Self {
+        assert_eq!(self.is_ignored, true);
         self
     }
 }
