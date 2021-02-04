@@ -12,14 +12,16 @@ use anyhow::anyhow;
 pub use api::GenericApi;
 use api::MigrationApi;
 pub use commands::SchemaPushInput;
-use commands::{MigrationCommand, SchemaPushCommand};
 pub use core_error::{CoreError, CoreResult};
 use datamodel::{
-    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::provider_names::{
+        MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
+    },
     dml::Datamodel,
     Configuration,
 };
 use migration_connector::{features, ConnectorError};
+use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
@@ -39,7 +41,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
         })
         .unwrap_or_else(|| Err(CoreError::Generic(anyhow!("There is no datasource in the schema."))))?;
 
-    let connector = match &source.active_provider {
+    match &source.active_provider {
         #[cfg(feature = "sql")]
         provider if POSTGRES_SOURCE_NAME == provider => {
             let database_str = &source.url().value;
@@ -69,18 +71,21 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
                 u.query_pairs_mut().append_pair("statement_cache_size", "0");
             }
 
-            SqlMigrationConnector::new(u.as_str(), features).await?
+            let connector = SqlMigrationConnector::new(u.as_str(), features).await?;
+            Ok(Arc::new(api::MigrationApi::new(connector)))
         }
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME, MSSQL_SOURCE_NAME].contains(&provider.as_str()) => {
-            SqlMigrationConnector::new(&source.url().value, features).await?
+            let connector = SqlMigrationConnector::new(&source.url().value, features).await?;
+            Ok(Arc::new(api::MigrationApi::new(connector)))
+        }
+        #[cfg(feature = "mongodb")]
+        provider if provider.as_str() == MONGODB_SOURCE_NAME => {
+            let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
+            Ok(Arc::new(api::MigrationApi::new(connector)))
         }
         x => unimplemented!("Connector {} is not supported yet", x),
-    };
-
-    let api = api::MigrationApi::new(connector);
-
-    Ok(Arc::new(api))
+    }
 }
 
 /// Create the database referenced by the passed in Prisma schema.
@@ -143,7 +148,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         .first()
         .ok_or_else(|| CoreError::Generic(anyhow!("There is no datasource in the schema.")))?;
 
-    let connector = match &source.active_provider {
+    let api: Box<dyn GenericApi> = match &source.active_provider {
         provider
             if [
                 MYSQL_SOURCE_NAME,
@@ -155,12 +160,17 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         {
             // 1. creates schema & database
             SqlMigrationConnector::qe_setup(&source.url().value).await?;
-            SqlMigrationConnector::new(&source.url().value, features).await?
+
+            let connector = SqlMigrationConnector::new(&source.url().value, features).await?;
+            Box::new(MigrationApi::new(connector))
+        }
+        provider if provider == MONGODB_SOURCE_NAME => {
+            MongoDbMigrationConnector::qe_setup(&source.url().value).await?;
+            let connector = MongoDbMigrationConnector::new(&source.url().value, features).await?;
+            Box::new(MigrationApi::new(connector))
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
-
-    let engine = MigrationApi::new(connector);
 
     // 2. create the database schema for given Prisma schema
     let schema_push_input = SchemaPushInput {
@@ -169,7 +179,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         force: true,
     };
 
-    SchemaPushCommand::execute(&schema_push_input, &engine).await?;
+    api.schema_push(&schema_push_input).await?;
 
     Ok(())
 }

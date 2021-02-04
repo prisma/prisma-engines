@@ -1,6 +1,6 @@
 datasource chinook {
-  provider = "sqlite"
-  url      = "file:./db/Chinook.db?connection_limit=1&socket_timeout=20"
+  provider = "mongodb"
+  url      = "mongodb://prisma:prisma@127.0.0.1:27017/testdb?authSource=admin"
 }
 
 model Album {

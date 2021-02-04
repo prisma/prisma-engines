@@ -1,7 +1,9 @@
-use super::builtin_datasource_providers::MsSqlDatasourceProvider;
 use super::{
     super::helpers::*,
-    builtin_datasource_providers::{MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider},
+    builtin_datasource_providers::{
+        MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider, PostgresDatasourceProvider,
+        SqliteDatasourceProvider,
+    },
     datasource_provider::DatasourceProvider,
 };
 use crate::ast::Span;
@@ -240,6 +242,7 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(PostgresDatasourceProvider::new()),
         Box::new(SqliteDatasourceProvider::new()),
         Box::new(MsSqlDatasourceProvider::new()),
+        Box::new(MongoDbDatasourceProvider::new()),
     ]
 }
 
