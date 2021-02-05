@@ -52,7 +52,7 @@ impl<'a> Validator<'a> {
                         .fields
                         .iter()
                         .find(|f| f.name.name == sf.name)
-                        .map(|f| f.span)
+                        .map(|f| f.attributes.iter().find(|att| att.name.name == "id").unwrap().span)
                         .unwrap_or_else(ast::Span::empty);
 
                     all_errors.push_error(DatamodelError::new_attribute_validation_error(

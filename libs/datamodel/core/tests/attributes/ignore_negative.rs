@@ -48,7 +48,7 @@ fn disallow_ignore_missing_from_model_with_optional_id() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Fields that are marked as id must be required.",
         "id",
-        Span::new(40, 57),
+        Span::new(54, 56),
     ));
 }
 
