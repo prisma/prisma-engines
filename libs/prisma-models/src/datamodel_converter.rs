@@ -369,6 +369,10 @@ impl ModelConverterUtilities for dml::Model {
     }
 
     fn is_relation_supported(&self, rf: &dml::RelationField) -> bool {
+        if rf.is_ignored {
+            return false;
+        }
+
         rf.relation_info.fields.iter().all(|fk_name| {
             let field = self.find_field(fk_name).unwrap();
             let is_supported = match field {
@@ -376,7 +380,7 @@ impl ModelConverterUtilities for dml::Model {
                 dml::Field::RelationField(_) => true,
             };
 
-            return is_supported && !field.is_ignored();
+            is_supported && !field.is_ignored()
         })
     }
 
