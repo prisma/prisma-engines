@@ -51,7 +51,7 @@ fn unsupported_compound_indices_should_be_filtered_from_input_and_output_types()
         }
 
         model Item {
-          id Int
+          id Int @id
           a Unsupported("X")
           b Unsupported("X")
           c Unsupported("X")
@@ -121,6 +121,8 @@ fn relation_with_unsupported_fk_fields_should_be_filtered_from_input_output_type
 
 #[test]
 #[serial]
+
+//todo does this test even make sense anymore? schemavalidation now always requires the ignore
 fn no_find_unique_when_model_only_has_unsupported_index_or_compound() {
     let dm = r#"
         datasource pg {
@@ -130,16 +132,18 @@ fn no_find_unique_when_model_only_has_unsupported_index_or_compound() {
 
         model ItemA {
           id                Int
-          /// This type is currently not supported.
           unsupported_index_a  Unsupported("X")  @id
           unsupported_index_c  Unsupported("X")  @unique
           unsupported_index_d  Unsupported("X")  @unique @default(dbgenerated("X"))
+          
+          @@ignore
         }
 
         model ItemB {
           id                Int
-          /// This type is currently not supported.
           unsupported_index_a  Unsupported("X")  @id @default(dbgenerated("X"))
+        
+          @@ignore
         }
 
         model ItemC {
@@ -151,6 +155,8 @@ fn no_find_unique_when_model_only_has_unsupported_index_or_compound() {
 
           @@index([unsupported_index_a, unsupported_index_b])
           @@unique([unsupported_index_c, unsupported_index_d])
+        
+          @@ignore
         }
     "#;
     let (query_schema, datamodel) = get_query_schema(dm);
