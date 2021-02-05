@@ -92,22 +92,31 @@ pub fn nested_delete(
 
             utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_record_node)?;
 
+            let relation_name = parent_relation_field.relation().name.clone();
+            let child_model_name = child_model.name.clone();
+
             graph.create_edge(
-                 &find_child_records_node,
-                 &delete_record_node,
-                 QueryGraphDependency::ParentProjection(child_model_identifier, Box::new(move |mut delete_record_node, mut child_ids| {
-                     let child_id = match child_ids.pop() {
-                         Some(pid) => Ok(pid),
-                         None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation.".to_string())),
-                     }?;
+                &find_child_records_node,
+                &delete_record_node,
+                QueryGraphDependency::ParentProjection(
+                    child_model_identifier,
+                    Box::new(move |mut delete_record_node, mut child_ids| {
+                        let child_id = match child_ids.pop() {
+                            Some(pid) => Ok(pid),
+                            None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                                "No '{}' record was found for a nested delete on relation '{}'.",
+                                child_model_name, relation_name
+                            ))),
+                        }?;
 
-                     if let Node::Query(Query::Write(WriteQuery::DeleteRecord(ref mut dq))) = delete_record_node {
-                         dq.record_filter = Some(child_id.into());
-                     }
+                        if let Node::Query(Query::Write(WriteQuery::DeleteRecord(ref mut dq))) = delete_record_node {
+                            dq.record_filter = Some(child_id.into());
+                        }
 
-                     Ok(delete_record_node)
-                 })),
-             )?;
+                        Ok(delete_record_node)
+                    }),
+                ),
+            )?;
         }
     }
 
