@@ -139,6 +139,12 @@ impl From<CoreError> for user_facing_errors::Error {
             }
             CoreError::InterpreterError(InterpreterError::InterpretationError(msg, Some(cause))) => {
                 match cause.as_ref() {
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(cause)) => {
+                        user_facing_errors::KnownError::new(
+                            user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
+                        )
+                        .into()
+                    }
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(
                         RelationViolation {
                             model_a_name,

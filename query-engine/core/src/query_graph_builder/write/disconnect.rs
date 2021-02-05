@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use prisma_models::RelationFieldRef;
+use prisma_models::{Record, RelationFieldRef};
 use std::sync::Arc;
 
 /// Only for many to many relations.
@@ -41,6 +41,7 @@ pub fn disconnect_records_node(
     expected_disconnects: usize,
 ) -> QueryGraphBuilderResult<NodeRef> {
     assert!(parent_relation_field.relation().is_many_to_many());
+
     let parent_model_id = parent_relation_field.model().primary_identifier();
     let child_model_id = parent_relation_field.related_model().primary_identifier();
 
@@ -51,23 +52,30 @@ pub fn disconnect_records_node(
     });
 
     let disconnect_node = graph.create_node(Query::Write(disconnect));
+    let relation_name = parent_relation_field.relation().name.clone();
 
     // Edge from parent to disconnect.
     graph.create_edge(
         parent_node,
         &disconnect_node,
-        QueryGraphDependency::ParentProjection(parent_model_id, Box::new(|mut disconnect_node, mut parent_ids| {
-            let parent_id = match parent_ids.pop() {
-                Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError("[Query Graph] Expected a valid parent ID to be present for a nested disconnect on a many-to-many relation.".to_string())),
-            }?;
+        QueryGraphDependency::ParentProjection(
+            parent_model_id,
+            Box::new(move |mut disconnect_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                        "No parent record was found for a nested disconnect on relation '{}'.",
+                        relation_name
+                    ))),
+                }?;
 
-            if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
-                c.parent_id = Some(parent_id);
-            }
+                if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
+                    c.parent_id = Some(parent_id);
+                }
 
-            Ok(disconnect_node)
-        })),
+                Ok(disconnect_node)
+            }),
+        ),
     )?;
 
     let relation_name = parent_relation_field.relation().name.clone();
