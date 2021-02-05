@@ -260,4 +260,76 @@ class MySqlNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase with 
 
     res.toString should be("""{"data":{"createOneModel":{"tInt":true,"bit":true}}}""")
   }
+
+  "MySQL fixed-size char native type" should "be handled correctly wrt. padding" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model ModelA {
+        |  id   String  @id @test.Char(16)
+        |  b_id String? @test.Char(16)
+        |  b    ModelB? @relation(fields: [b_id], references: [id])
+        |}
+        |
+        |model ModelB {
+        |  id String @id @test.Char(16)
+        |  a  ModelA?
+        |}
+        |"""
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      s"""
+         |mutation {
+         |  createOneModelA(data: {
+         |    id: "1234"
+         |     b: { create: { id: "4321" } }
+         |  }) {
+         |    id
+         |    b { id }
+         |  }
+         |}""".stripMargin,
+      project,
+      legacy = false
+    )
+
+    res.toString should be("""{"data":{"createOneModelA":{"id":"1234","b":{"id":"4321"}}}}""")
+  }
+
+  "MySQL fixed-size binary native type" should "be handled correctly wrt. padding" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model ModelA {
+        |  id   Bytes  @id @test.Bit(16)
+        |  b_id Bytes? @test.Bit(16)
+        |  b    ModelB? @relation(fields: [b_id], references: [id])
+        |}
+        |
+        |model ModelB {
+        |  id Bytes @id @test.Bit(16)
+        |  a  ModelA?
+        |}
+        |"""
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      s"""
+         |mutation {
+         |  createOneModelA(data: {
+         |    id: "UA=="
+         |     b: { create: { id: "UA==" } }
+         |  }) {
+         |    id
+         |    b { id }
+         |  }
+         |}""".stripMargin,
+      project,
+      legacy = false
+    )
+
+    res.toString should be("""{"data":{"createOneModelA":{"id":"1234","b":{"id":"4321"}}}}""")
+  }
 }

@@ -104,10 +104,7 @@ impl<'a> TryFrom<Value<'a>> for PrismaValue {
                 .unwrap_or(PrismaValue::Null),
 
             Value::Bytes(bytes) => bytes
-                .map(|bytes| {
-                    let s = String::from_utf8(bytes.into_owned()).expect("PrismaValue::String from Value::Bytes");
-                    PrismaValue::String(s)
-                })
+                .map(|b| PrismaValue::Bytes(b.into_owned()))
                 .unwrap_or(PrismaValue::Null),
 
             Value::Xml(s) => s.map(|s| PrismaValue::Xml(s.into_owned())).unwrap_or(PrismaValue::Null),
