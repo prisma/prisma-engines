@@ -446,7 +446,7 @@ impl SqlSchemaDescriber {
         WHERE
             kcu.table_schema = ?
             AND rc.constraint_schema = ?
-            AND referenced_column_name IS NOT NULL
+            AND kcu.referenced_column_name IS NOT NULL
         ORDER BY ordinal_position
     ";
 
