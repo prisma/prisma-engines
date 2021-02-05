@@ -163,9 +163,7 @@ impl SqlFlavour for MysqlFlavour {
             }
         }
 
-        let result_set = connection
-            .query_raw("SHOW VARIABLES WHERE variable_name = 'lower_case_table_names'", &[])
-            .await?;
+        let result_set = connection.query_raw("SELECT @@lower_case_table_names", &[]).await?;
 
         if let Some((setting_name, setting_value)) = result_set.into_single().ok().and_then(|row| {
             let setting_name = row.at(0).and_then(|row| row.to_string())?;
