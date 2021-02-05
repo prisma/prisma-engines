@@ -3,7 +3,7 @@
 use crate::migrations_directory::ReadMigrationScriptError;
 use std::{error::Error as StdError, fmt::Display};
 use tracing_error::SpanTrace;
-use user_facing_errors::{KnownError, UserFacingError};
+use user_facing_errors::{migration_engine::MigrationFileNotFound, KnownError, UserFacingError};
 
 /// The general error reporting type for migration connectors.
 #[derive(Debug)]
@@ -123,7 +123,9 @@ impl From<ReadMigrationScriptError> for ConnectorError {
         let context = err.1.clone();
 
         ConnectorError {
-            user_facing_error: None,
+            user_facing_error: Some(KnownError::new(MigrationFileNotFound {
+                migration_file_path: err.2.clone(),
+            })),
             report: err.into(),
             context,
         }
