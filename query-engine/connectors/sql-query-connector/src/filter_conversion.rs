@@ -310,8 +310,21 @@ impl AliasedCondition for OneRelationIsNullFilter {
                         }
                     });
 
+            // If the table is aliased, we need to use that alias in the SELECT too
+            // eg: SELECT <alias>.x FROM table AS <alias>
+            let columns: Vec<_> = self
+                .field
+                .related_field()
+                .scalar_fields()
+                .iter()
+                .map(|f| match alias.as_ref() {
+                    Some(a) => Column::from((a.clone(), f.db_name().to_owned())),
+                    None => f.as_column(),
+                })
+                .collect();
+
             let sub_select = Select::from_table(relation_table)
-                .columns(self.field.related_field().as_columns())
+                .columns(columns)
                 .and_where(columns_not_null);
 
             let id_columns: Vec<Column<'static>> = self
