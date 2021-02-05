@@ -1,5 +1,4 @@
-use std::io;
-use std::io::Read;
+use std::io::{self, Read};
 
 pub fn run() {
     let mut datamodel_string = String::new();
