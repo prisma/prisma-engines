@@ -48,7 +48,7 @@ fn disallow_ignore_missing_from_model_with_optional_id() {
     errors.assert_is(DatamodelError::new_attribute_validation_error(
         "Fields that are marked as id must be required.",
         "id",
-        Span::new(54, 56),
+        Span::new(40, 57),
     ));
 }
 
@@ -109,9 +109,9 @@ fn disallow_ignore_on_models_with_relations_pointing_to_them() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+        "The relation field `rel_d` on Model `ModelValidC` must specify the `@ignore` attribute, because the model ModelValidD it is pointing to is marked ignored.",
+        "ignore",
+        Span::new(64, 130),
     ));
 }
 
@@ -135,9 +135,9 @@ fn disallow_ignore_on_models_with_back_relations_pointing_to_them() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+        "The relation field `rel_a` on Model `ModelValidB` must specify the `@ignore` attribute, because the model ModelValidA it is pointing to is marked ignored.",
+        "ignore",
+        Span::new(182, 228),
     ));
 }
 

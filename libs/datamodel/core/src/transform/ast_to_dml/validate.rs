@@ -42,7 +42,26 @@ impl<'a> Validator<'a> {
             // Having a separate error collection allows checking whether any error has occurred for a model.
             let mut errors_for_model = Diagnostics::new();
 
-            //todo move the error for optional id here
+            if let Some(sf) = model.scalar_fields().find(|f| f.is_id && !f.is_required()) {
+                if !model.is_ignored {
+                    let span = ast_schema
+                        .models()
+                        .iter()
+                        .find(|ast_model| ast_model.name.name == model.name)
+                        .unwrap()
+                        .fields
+                        .iter()
+                        .find(|f| f.name.name == sf.name)
+                        .map(|f| f.span)
+                        .unwrap_or_else(ast::Span::empty);
+
+                    all_errors.push_error(DatamodelError::new_attribute_validation_error(
+                        "Fields that are marked as id must be required.",
+                        "id",
+                        span,
+                    ));
+                }
+            }
 
             if let Err(err) = self.validate_model_has_strict_unique_criteria(
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
@@ -800,6 +819,17 @@ impl<'a> Validator<'a> {
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
             let related_field = datamodel.find_related_field_bang(&field);
             let related_field_rel_info = &related_field.relation_info;
+
+            if related_model.is_ignored && !field.is_ignored && !model.is_ignored {
+                errors.push_error(DatamodelError::new_attribute_validation_error(
+                    &format!(
+                        "The relation field `{}` on Model `{}` must specify the `@ignore` attribute, because the model {} it is pointing to is marked ignored.",
+                        &field.name, &model.name, &related_model.name
+                    ),
+                    "ignore",
+                    field_span,
+                ));
+            }
 
             // ONE TO MANY
             if field.is_singular() && related_field.is_list() {

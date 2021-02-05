@@ -13,12 +13,8 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         //todo move this
         if let dml::Field::ScalarField(sf) = obj {
-            if sf.arity == dml::FieldArity::Required {
-                sf.is_id = true;
-                Ok(())
-            } else {
-                self.new_attribute_validation_error(" Fields that are marked as id must be required.", args.span())
-            }
+            sf.is_id = true;
+            Ok(())
         } else {
             self.new_attribute_validation_error(
                 &format!(

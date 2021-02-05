@@ -81,7 +81,7 @@ fn allow_ignore_on_invalid_models() {
     datamodel.assert_has_model("ModelOptionalId").assert_ignored(true);
     datamodel.assert_has_model("ModelUnsupportedId").assert_ignored(true);
     datamodel
-        .assert_has_model("ModelModelCompoundUnsupportedId")
+        .assert_has_model("ModelCompoundUnsupportedId")
         .assert_ignored(true);
 }
 
