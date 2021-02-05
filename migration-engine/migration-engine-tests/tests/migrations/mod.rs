@@ -13,3 +13,4 @@ mod sql;
 mod sqlite;
 mod squashing_tests;
 mod types;
+mod unsupported_types;
