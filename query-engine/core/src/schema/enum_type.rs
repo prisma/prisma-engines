@@ -99,7 +99,13 @@ impl DatabaseEnumType {
         self.internal_enum
             .values
             .iter()
-            .map(|v| v.name.to_string())
+            .map(|v| {
+                if v.database_name.is_some() {
+                    return v.database_name.as_ref().unwrap().to_string();
+                }
+
+                v.name.to_string()
+            })
             .collect::<Vec<String>>()
     }
 }
