@@ -1,28 +1,7 @@
 use crate::common::*;
 
-// @@ignore
-// can be on any model in a relation
-// holding the fk -> backrelation ignored
-// having relation pointing to it -> rf ignored
-
-//@ignore
-// can be on any relation field
-// should we then ignore also the opposite side???
-// can be on any scalar field
-// if it is in a relation
-// not in a relation
-// unique
-// optional
-// required
-// not null
-// has a default
-// index
-// id without other unique -> invalid model needs to be ignored as well
-// id with other unique
-// compound
-
 #[test]
-fn allow_ignored_on_valid_model() {
+fn allow_ignore_on_valid_model() {
     let dml = r#"
     model ModelId {
       a String @id
@@ -54,14 +33,14 @@ fn allow_ignored_on_valid_model() {
     "#;
 
     let datamodel = parse(dml);
-    datamodel.assert_has_model("ModelId").assert_is_ignored();
-    datamodel.assert_has_model("ModelUnique").assert_is_ignored();
-    datamodel.assert_has_model("ModelCompoundId").assert_is_ignored();
-    datamodel.assert_has_model("ModelCompoundUnique").assert_is_ignored();
+    datamodel.assert_has_model("ModelId").assert_ignored(true);
+    datamodel.assert_has_model("ModelUnique").assert_ignored(true);
+    datamodel.assert_has_model("ModelCompoundId").assert_ignored(true);
+    datamodel.assert_has_model("ModelCompoundUnique").assert_ignored(true);
 }
 
 #[test]
-fn allow_ignored_on_invalid_models() {
+fn allow_ignore_on_invalid_models() {
     let dml = r#"
     model ModelNoFields {
      
@@ -74,6 +53,8 @@ fn allow_ignored_on_invalid_models() {
       @@ignore
     }
     
+    
+    /// this does not work yet
     model ModelOptionalId {
       text String? @id 
      
@@ -96,11 +77,226 @@ fn allow_ignored_on_invalid_models() {
     "#;
 
     let datamodel = parse(dml);
-    datamodel.assert_has_model("ModelNoFields").assert_is_ignored();
-    datamodel.assert_has_model("ModelNoId").assert_is_ignored();
-    datamodel.assert_has_model("ModelOptionalId").assert_is_ignored();
-    datamodel.assert_has_model("ModelUnsupportedId").assert_is_ignored();
+    datamodel.assert_has_model("ModelNoFields").assert_ignored(true);
+    datamodel.assert_has_model("ModelNoId").assert_ignored(true);
+    datamodel.assert_has_model("ModelOptionalId").assert_ignored(true);
+    datamodel.assert_has_model("ModelUnsupportedId").assert_ignored(true);
     datamodel
         .assert_has_model("ModelModelCompoundUnsupportedId")
-        .assert_is_ignored();
+        .assert_ignored(true);
+}
+
+#[test]
+fn allow_ignore_on_valid_models_in_relations() {
+    let dml = r#"
+    model ModelValidA {
+      id Int @id
+      b  Int
+      rel_b  ModelValidB @relation(fields:[b]) 
+     
+      @@ignore
+    }
+    
+    model ModelValidB {
+      id Int @id
+      rel_a  ModelValidA[] @ignore
+    }
+    
+    model ModelValidC {
+      id Int @id
+      d  Int
+      rel_d  ModelValidD @relation(fields:[d]) @ignore
+    }
+    
+    model ModelValidD {
+      id Int @id
+      rel_c  ModelValidC[] 
+      
+      @@ignore
+    }   
+    "#;
+
+    let datamodel = parse(dml);
+    datamodel
+        .assert_has_model("ModelValidA")
+        .assert_ignored(true)
+        .assert_has_relation_field("rel_b")
+        .assert_ignored(false);
+    datamodel
+        .assert_has_model("ModelValidB")
+        .assert_ignored(false)
+        .assert_has_relation_field("rel_a")
+        .assert_ignored(true);
+    datamodel
+        .assert_has_model("ModelValidC")
+        .assert_ignored(false)
+        .assert_has_relation_field("rel_d")
+        .assert_ignored(true);
+    datamodel
+        .assert_has_model("ModelValidD")
+        .assert_ignored(true)
+        .assert_has_relation_field("rel_c")
+        .assert_ignored(false);
+}
+
+#[test]
+fn allow_ignore_on_invalid_models_in_relations() {
+    let dml = r#"
+    model ModelInvalidA {
+      id Unsupported("something") @id
+      b  Int
+      rel_b  ModelValidB @relation(fields:[b]) 
+     
+      @@ignore
+    }
+    
+    model ModelValidB {
+      id Int @id
+      rel_a  ModelInvalidA[] @ignore
+    }
+    
+    model ModelInvalidC {
+      id Unsupported("something") @id
+      d  Int
+      rel_d  ModelValidD @relation(fields:[d])
+      
+      @@ignore
+    }
+    
+    model ModelValidD {
+      id Int @id
+      rel_c  ModelInvalidC[] 
+      
+      @@ignore
+    }   
+    "#;
+
+    let datamodel = parse(dml);
+    datamodel
+        .assert_has_model("ModelInvalidA")
+        .assert_ignored(true)
+        .assert_has_relation_field("rel_b")
+        .assert_ignored(false);
+    datamodel
+        .assert_has_model("ModelValidB")
+        .assert_ignored(false)
+        .assert_has_relation_field("rel_a")
+        .assert_ignored(true);
+    datamodel
+        .assert_has_model("ModelInvalidC")
+        .assert_ignored(true)
+        .assert_has_relation_field("rel_d")
+        .assert_ignored(false);
+    datamodel
+        .assert_has_model("ModelValidD")
+        .assert_ignored(true)
+        .assert_has_relation_field("rel_c")
+        .assert_ignored(false);
+}
+
+#[test]
+fn allow_ignore_on_scalar_fields() {
+    let dml = r#"
+    model ModelA {
+      id Int   @id
+      b  Int   @ignore
+      c  Int   @unique @ignore  // required + unique                           => probably a problem
+      e  Int   @unique @default(1) @ignore // unique + required + default      => probably a problem 
+      f  Int   @default(1) @ignore  //                                         => probably a problem
+      g  Int?  @unique @ignore
+      h  Int?  @unique @default(1) @ignore //                                  => probably a problem
+      i  Int[] @unique @ignore      //                                         => probably a problem   
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    datamodel
+        .assert_has_model("ModelInvalidA")
+        .assert_has_scalar_field("b")
+        .assert_ignored(true);
+}
+
+#[test]
+fn allow_ignore_on_scalar_fields_that_are_used() {
+    let dml = r#"
+    model ModelA {
+      id Int   @unique
+      a  Int   
+      b  Int   @ignore
+      
+      @@id([a,b])   
+      @@unique([a,b])
+      @@index([b])
+    }
+    "#;
+
+    let datamodel = parse(dml);
+    datamodel
+        .assert_has_model("ModelInvalidA")
+        .assert_has_scalar_field("b")
+        .assert_ignored(true);
+}
+
+#[test]
+fn allow_ignore_on_relation_fields_on_valid_models() {
+    let dml = r#"
+    model ModelValidA {
+      id Int @id
+      b  Int
+      rel_b  ModelValidB @relation(fields:[b]) 
+    }
+    
+    model ModelValidB {
+      id Int @id
+      rel_a  ModelValidA[] @ignore
+    }
+    
+    model ModelValidC {
+      id Int @id
+      d  Int
+      rel_d  ModelValidD @relation(fields:[d]) @ignore
+    }
+    
+    model ModelValidD {
+      id Int @id
+      rel_c  ModelValidC[] 
+    }   
+    
+    model ModelValidE {
+      id Int @id
+      e  Int
+      rel_e  ModelValidF @relation(fields:[e]) @ignore
+    }
+    
+    model ModelValidF {
+      id Int @id
+      rel_e  ModelValidE[] @ignore
+    } 
+    "#;
+
+    let datamodel = parse(dml);
+    datamodel
+        .assert_has_model("ModelValidA")
+        .assert_has_relation_field("rel_b")
+        .assert_ignored(false);
+    datamodel
+        .assert_has_model("ModelValidB")
+        .assert_has_relation_field("rel_a")
+        .assert_ignored(true);
+    datamodel
+        .assert_has_model("ModelValidC")
+        .assert_has_relation_field("rel_d")
+        .assert_ignored(true);
+    datamodel
+        .assert_has_model("ModelValidD")
+        .assert_has_relation_field("rel_c")
+        .assert_ignored(false);
+    datamodel
+        .assert_has_model("ModelValidE")
+        .assert_has_relation_field("rel_f")
+        .assert_ignored(true);
+    datamodel
+        .assert_has_model("ModelValidF")
+        .assert_has_relation_field("rel_e")
+        .assert_ignored(true);
 }
