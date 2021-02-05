@@ -353,37 +353,3 @@ fn ignored_models_should_be_filtered() {
     assert_eq!(query.fields.len(), 0);
     assert_eq!(mutation.fields.len(), 0);
 }
-
-#[test]
-#[serial]
-fn ignored_models_should_be_filtered() {
-    let dm = r#"
-      datasource pg {
-          provider = "postgresql"
-          url = "postgresql://"
-      }
-
-      model ModelValidA {
-        id Int @id
-        b  Int
-        rel_b  ModelValidB @relation(fields:[b]) 
-       
-        @@ignore
-      }
-
-      model ModelValidB {
-        id Int @id
-        rel_a  ModelValidA[] @ignore
-      }
-  "#;
-    let (query_schema, datamodel) = get_query_schema(dm);
-    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
-
-    let query = find_output_type(&dmmf, PRISMA_NAMESPACE, "Query");
-    let mutation = find_output_type(&dmmf, PRISMA_NAMESPACE, "Mutation");
-    let has_no_inputs = dmmf.schema.input_object_types.get(PRISMA_NAMESPACE).is_none();
-
-    assert_eq!(has_no_inputs, true);
-    assert_eq!(query.fields.len(), 0);
-    assert_eq!(mutation.fields.len(), 0);
-}
