@@ -180,7 +180,7 @@ fn handle_one_to_many(
                     let child_link = match child_links.pop() {
                         Some(cl) => Ok(cl),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record(s) (needed to inline the relation on '{}' record(s)) was found for a nested connect on on-to-many relation '{}'.",
+                            "No '{}' record(s) (needed to inline the relation on '{}' record(s)) was found for a nested connect on one-to-many relation '{}'.",
                             child_model_name, parent_model_name, relation_name
                         ))),
                     }?;
@@ -210,7 +210,7 @@ fn handle_one_to_many(
                     let parent_link = match parent_links.pop() {
                         Some(pl) => Ok(pl),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record(s) (needed to inline the relation on '{}' record(s)) was found for a nested connect on on-to-many relation '{}'.",
+                            "No '{}' record(s) (needed to inline the relation on '{}' record(s)) was found for a nested connect on one-to-many relation '{}'.",
                             parent_model_name, child_model_name, relation_name
                         ))),
                     }?;
@@ -388,7 +388,7 @@ fn handle_one_to_one(
                     let child_link = match child_links.pop() {
                         Some(link) => Ok(link),
                         None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                            "No '{}' record (needed to inline connect on create for '{}' record) was found for a nested connect on on-to-one relation '{}'.",
+                            "No '{}' record (needed to inline connect on create for '{}' record) was found for a nested connect on one-to-one relation '{}'.",
                             child_model_name, parent_model_name, relation_name
                         ))),
                     }?;
