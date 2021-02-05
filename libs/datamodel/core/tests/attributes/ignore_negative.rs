@@ -11,10 +11,10 @@ fn disallow_ignore_missing_from_model_without_fields() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.",
+        "ModelNoFields",
+        Span::new(8, 35),
     ));
 }
 
@@ -28,10 +28,10 @@ fn disallow_ignore_missing_from_model_without_id() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.",
+        "ModelNoId",
+        Span::new(8, 51),
     ));
 }
 
@@ -46,9 +46,9 @@ fn disallow_ignore_missing_from_model_with_optional_id() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+        "Fields that are marked as id must be required.",
+        "id",
+        Span::new(54, 56),
     ));
 }
 
@@ -62,10 +62,10 @@ fn disallow_ignore_missing_from_model_with_unsupported_id() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model. The following unique criterias were not considered as they contain fields that are not required:\n- text",
+        "ModelUnsupportedId",
+        Span::new(8, 82),
     ));
 }
 
@@ -82,10 +82,10 @@ fn disallow_ignore_missing_from_model_with_compound_unsupported_id() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model. The following unique criterias were not considered as they contain fields that are not required:\n- text, int",
+        "ModelCompoundUnsupportedId",
+        Span::new(8, 130),
     ));
 }
 
@@ -153,9 +153,9 @@ fn disallow_ignore_on_unsupported() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+        "Fields of type `Unsupported` cannot take an `@ignore` attribute. They are already treated as ignored by the client due to their type.",
+        "ignore",
+        Span::new(77, 83),
     ));
 }
 
@@ -173,8 +173,8 @@ fn disallow_ignore_on_ignored_model() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Cannot set a default value on a relation field.",
-        "default",
-        Span::new(53, 64),
+        "Fields on an already ignored Model do not need an `@ignore` annotation.",
+        "ignore",
+        Span::new(81, 87),
     ));
 }

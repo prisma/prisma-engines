@@ -42,6 +42,8 @@ impl<'a> Validator<'a> {
             // Having a separate error collection allows checking whether any error has occurred for a model.
             let mut errors_for_model = Diagnostics::new();
 
+            //todo move the error for optional id here
+
             if let Err(err) = self.validate_model_has_strict_unique_criteria(
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
                 model,
@@ -405,17 +407,16 @@ impl<'a> Validator<'a> {
                 criteria_descriptions.join("\n")
             )
         };
-        let missing_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            &format!(
-                "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.{suffix}",
-                suffix = suffix
-            ),
-            &model.name,
-            ast_model.span,
-        ));
 
-        if model.strict_unique_criterias().is_empty() && !model.is_ignored {
-            return missing_id_criteria_error;
+        if model.strict_unique_criterias_disregarding_unsupported().is_empty() && !model.is_ignored {
+            return Err(DatamodelError::new_model_validation_error(
+                &format!(
+                    "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.{suffix}",
+                    suffix = suffix
+                ),
+                &model.name,
+                ast_model.span,
+            ));
         }
 
         Ok(())

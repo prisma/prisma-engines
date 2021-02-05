@@ -52,8 +52,7 @@ fn allow_ignore_on_invalid_models() {
      
       @@ignore
     }
-    
-    
+
     /// this does not work yet
     model ModelOptionalId {
       text String? @id 
@@ -197,21 +196,26 @@ fn allow_ignore_on_invalid_models_in_relations() {
 #[test]
 fn allow_ignore_on_scalar_fields() {
     let dml = r#"
+    datasource test {
+        provider = "postgresql"
+        url = "postgresql://"
+    }
+    
     model ModelA {
       id Int   @id
       b  Int   @ignore
-      c  Int   @unique @ignore  // required + unique                           => probably a problem
-      e  Int   @unique @default(1) @ignore // unique + required + default      => probably a problem 
-      f  Int   @default(1) @ignore  //                                         => probably a problem
+      c  Int   @unique @ignore  // required + unique                           => client api adjustment?
+      e  Int   @unique @default(1) @ignore // unique + required + default      => client api adjustment? 
+      f  Int   @default(1) @ignore  //                                         => client api adjustment?
       g  Int?  @unique @ignore
-      h  Int?  @unique @default(1) @ignore //                                  => probably a problem
-      i  Int[] @unique @ignore      //                                         => probably a problem   
+      h  Int?  @unique @default(1) @ignore //                                  => client api adjustment?
+      i  Int[] @unique @ignore      //                                         => client api adjustment?   
     }
     "#;
 
     let datamodel = parse(dml);
     datamodel
-        .assert_has_model("ModelInvalidA")
+        .assert_has_model("ModelA")
         .assert_has_scalar_field("b")
         .assert_ignored(true);
 }
@@ -232,7 +236,7 @@ fn allow_ignore_on_scalar_fields_that_are_used() {
 
     let datamodel = parse(dml);
     datamodel
-        .assert_has_model("ModelInvalidA")
+        .assert_has_model("ModelA")
         .assert_has_scalar_field("b")
         .assert_ignored(true);
 }
@@ -265,7 +269,7 @@ fn allow_ignore_on_relation_fields_on_valid_models() {
     model ModelValidE {
       id Int @id
       e  Int
-      rel_e  ModelValidF @relation(fields:[e]) @ignore
+      rel_f  ModelValidF @relation(fields:[e]) @ignore
     }
     
     model ModelValidF {
