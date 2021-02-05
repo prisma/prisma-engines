@@ -17,7 +17,10 @@ use crate::{
 };
 use column::ColumnTypeChange;
 use enums::EnumDiffer;
-use sql_schema_describer::walkers::{EnumWalker, ForeignKeyWalker, TableWalker};
+use sql_schema_describer::{
+    walkers::{EnumWalker, ForeignKeyWalker, TableWalker},
+    ColumnTypeFamily,
+};
 use std::collections::HashSet;
 use table::TableDiffer;
 
@@ -563,7 +566,13 @@ fn foreign_keys_match(previous: &ForeignKeyWalker<'_>, next: &ForeignKeyWalker<'
             .constrained_columns()
             .zip(next.constrained_columns())
             .all(|(previous, next)| {
-                previous.name() == next.name() && previous.column_type_family() == next.column_type_family()
+                let families_match = match (previous.column_type_family(), next.column_type_family()) {
+                    (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => true,
+                    (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => true,
+                    (x, y) => x == y,
+                };
+
+                previous.name() == next.name() && families_match
             });
 
     // Foreign key references different columns or the same columns in a different order.
