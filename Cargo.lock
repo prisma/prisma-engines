@@ -2001,8 +2001,9 @@ dependencies = [
 
 [[package]]
 name = "mysql_async"
-version = "0.26.0"
-source = "git+https://github.com/prisma/mysql_async?branch=try-out-all-resolved-ips#159fdd3a1786a60a55785ecde56784f45d7c3f4b"
+version = "0.27.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9aeff5e5c76df07ad00ce5e2654d503516d1576343aa6c5553f6b7dc8f885c58"
 dependencies = [
  "bytes",
  "futures-core",
@@ -2660,7 +2661,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#79432ef726a68d3f8123f5177538cd05c3279def"
+source = "git+https://github.com/prisma/quaint#72f660da64eb57ff96c810cd31420bebf9bc0f88"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
@@ -3112,7 +3113,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.11.1",
+ "parking_lot 0.10.2",
  "serial_test_derive",
 ]
 
