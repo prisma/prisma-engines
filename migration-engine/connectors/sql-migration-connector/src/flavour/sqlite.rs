@@ -15,7 +15,9 @@ pub(crate) struct SqliteFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for SqliteFlavour {
-    async fn acquire_lock(&self, _connection: &Connection) -> ConnectorResult<()> {
+    async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("PRAGMA main.locking_mode=EXCLUSIVE").await?;
+
         Ok(())
     }
 
@@ -100,7 +102,13 @@ impl SqlFlavour for SqliteFlavour {
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let file_path = connection.connection_info().file_path().unwrap();
 
+        connection.raw_cmd("PRAGMA main.locking_mode=NORMAL").await?;
+        connection.raw_cmd("PRAGMA main.quick_check").await?;
+
+        tracing::debug!("Truncating {:?}", file_path);
         std::fs::File::create(file_path).expect("failed to truncate sqlite file");
+
+        self.acquire_lock(connection).await?;
 
         Ok(())
     }

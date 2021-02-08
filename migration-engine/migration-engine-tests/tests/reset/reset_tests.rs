@@ -30,7 +30,7 @@ async fn reset_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn reset_then_apply_with_migrations_directory_works(api: &TestApi) -> TestResult {
     let dm = r#"
         model Cat {
