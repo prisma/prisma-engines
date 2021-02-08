@@ -1,11 +1,11 @@
 use super::common::*;
-use crate::diagnostics::DatamodelError;
 use crate::{
     ast,
     common::{NameNormalizer, RelationNames},
-    diagnostics::Diagnostics,
-    dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
+    diagnostics::{DatamodelError, Diagnostics},
+    dml, Field, OnDeleteStrategy, ScalarField, UniqueCriteria, ValidationFeature,
 };
+use enumflags2::BitFlags;
 use itertools::Itertools;
 use std::collections::HashMap;
 
@@ -13,23 +13,35 @@ use std::collections::HashMap;
 ///
 /// When standardsing, datamodel will be made consistent.
 /// Implicit back relation fields, relation names and `references` will be generated.
-pub struct Standardiser {}
+pub struct Standardiser;
 
 impl Standardiser {
     /// Creates a new instance, with all builtin attributes registered.
     pub fn new() -> Self {
-        Standardiser {}
+        Self
     }
 
-    pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), Diagnostics> {
+    pub fn standardise(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        schema: &mut dml::Datamodel,
+        flags: BitFlags<ValidationFeature>,
+    ) -> Result<(), Diagnostics> {
         self.name_unnamed_relations(schema);
-
         self.add_missing_back_relations(ast_schema, schema)?;
 
         // This is intentionally disabled for now, since the generated types would surface in the
         // client schema.
         // self.add_missing_relation_tables(ast_schema, schema)?;
-        self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
+
+        // TODO: This is not the right way to go. If you don't do this on
+        // migrate, there's a high possibility we create either misleading or
+        // wrong migrations.
+        //
+        // This is again needed when we lint in prisma-fmt.
+        if flags.contains(ValidationFeature::StandardizeModels) {
+            self.set_relation_to_field_to_id_if_missing(ast_schema, schema)?;
+        }
 
         Ok(())
     }
@@ -111,6 +123,7 @@ impl Standardiser {
                     }
                 }
             }
+
             for field in fields_to_add {
                 match missing_field_names_to_field_names.get(field.name()) {
                     Some(field_names) if field_names.len() > 1 => {

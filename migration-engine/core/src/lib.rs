@@ -16,6 +16,7 @@ use commands::{MigrationCommand, SchemaPushCommand};
 pub use core_error::{CoreError, CoreResult};
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    diagnostics::Validator,
     dml::Datamodel,
     Configuration,
 };
@@ -175,13 +176,15 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
 }
 
 fn parse_configuration(datamodel: &str) -> CoreResult<Configuration> {
-    datamodel::parse_configuration(&datamodel)
+    Validator::<Configuration>::new()
+        .parse_str(datamodel)
         .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
 }
 
 fn parse_datamodel(datamodel: &str) -> CoreResult<Datamodel> {
-    datamodel::parse_datamodel(&datamodel)
+    Validator::<Datamodel>::new()
+        .parse_str(datamodel)
         .map(|d| d.subject)
         .map_err(|err| CoreError::ReceivedBadDatamodel(err.to_pretty_string("schema.prisma", datamodel)))
 }

@@ -1,6 +1,6 @@
 use crate::command_error::CommandError;
 use crate::error::Error;
-use datamodel::{Configuration, Datamodel};
+use datamodel::{diagnostics::Validator, Configuration, Datamodel};
 use futures::{FutureExt, TryFutureExt};
 use introspection_connector::{ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
 use jsonrpc_derive::rpc;
@@ -66,7 +66,8 @@ impl RpcImpl {
     }
 
     async fn load_connector(schema: &str) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
-        let config = datamodel::parse_configuration(&schema)?;
+        let validator = Validator::<Configuration>::new();
+        let config = validator.parse_str(schema)?;
 
         let url = config
             .subject
@@ -123,7 +124,9 @@ impl RpcImpl {
 
     /// This function parses the provided schema and returns the contained Datamodel.
     pub fn parse_datamodel(schema: &str) -> RpcResult<Datamodel> {
-        let final_dm = datamodel::parse_datamodel(&schema).map(|d| d.subject).map_err(|err| {
+        let validator = Validator::<Datamodel>::new();
+
+        let final_dm = validator.parse_str(schema).map(|d| d.subject).map_err(|err| {
             Error::from(CommandError::ReceivedBadDatamodel(
                 err.to_pretty_string("schema.prisma", &schema),
             ))

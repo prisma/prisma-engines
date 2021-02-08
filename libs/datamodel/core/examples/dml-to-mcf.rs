@@ -1,6 +1,7 @@
 use std::fs;
 
 use clap::{App, Arg};
+use datamodel::{Configuration, Validator};
 
 fn main() {
     let matches = App::new("Prisma Datamodel v2 to DMMF")
@@ -17,10 +18,9 @@ fn main() {
 
     let file_name = matches.value_of("INPUT").unwrap();
     let file = fs::read_to_string(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name));
+    let validator = Validator::<Configuration>::new();
 
-    let res = datamodel::parse_configuration(&file);
-
-    match &res {
+    match validator.parse_str(&file) {
         Err(errors) => {
             for error in errors.to_error_iter() {
                 println!();

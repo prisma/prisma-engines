@@ -151,3 +151,36 @@ fn resolve_enum_field() {
     role_enum.assert_has_value("PRO");
     role_enum.assert_has_value("USER");
 }
+
+#[test]
+fn must_error_missing_relation_attributes_issue_5069() {
+    let dml = r#"
+    model Code {
+        id     String  @id
+        userId String?
+        user   User?
+    }
+
+    model User {
+        id     String  @id
+        name   String?
+        codes  Code[]
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_length(2);
+
+    errors.assert_is_at(0, DatamodelError::new_attribute_validation_error(
+        "The relation field `user` on Model `Code` must specify the `fields` argument in the @relation attribute. You can run `prisma format` to fix this automatically.",
+        "relation",
+        Span::new(76, 89),
+    ));
+
+    errors.assert_is_at(1, DatamodelError::new_attribute_validation_error(
+        "The relation field `user` on Model `Code` must specify the `references` argument in the @relation attribute.",
+        "relation",
+        Span::new(76, 89),
+    ));
+}

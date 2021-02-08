@@ -1,7 +1,9 @@
 use crate::common::*;
-use datamodel::ast::Span;
-use datamodel::diagnostics::DatamodelError;
-use datamodel::dml;
+use datamodel::{
+    ast::Span,
+    diagnostics::{DatamodelError, Validator},
+    dml, Datamodel,
+};
 use indoc::indoc;
 
 #[test]
@@ -824,11 +826,10 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         "#
     };
 
+    let validator = Validator::<Datamodel>::new();
+
     for dm in &[dm1, dm2, dm3] {
-        assert!(
-            datamodel::parse_datamodel(dm).is_ok(),
-            "{:?}",
-            datamodel::parse_datamodel(dm).unwrap_err()
-        );
+        let validated = validator.parse_str(dm);
+        assert!(validated.is_ok(), "{:?}", validated.unwrap_err(),);
     }
 }

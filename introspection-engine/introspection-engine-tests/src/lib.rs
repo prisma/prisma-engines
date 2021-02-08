@@ -17,8 +17,10 @@ macro_rules! assert_eq_schema {
 #[macro_export]
 macro_rules! assert_eq_datamodels {
     ($left:expr, $right:expr) => {
-        let parsed_expected = datamodel::parse_datamodel($left).unwrap().subject;
-        let parsed_result = datamodel::parse_datamodel($right).unwrap().subject;
+        let validator = datamodel::diagnostics::Validator::<datamodel::dml::Datamodel>::new();
+
+        let parsed_expected = validator.parse_str($left).unwrap().subject;
+        let parsed_result = validator.parse_str($right).unwrap().subject;
 
         let reformatted_expected = datamodel::render_datamodel_to_string(&parsed_expected);
         let reformatted_result = datamodel::render_datamodel_to_string(&parsed_result);

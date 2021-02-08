@@ -1,5 +1,7 @@
+use enumflags2::BitFlags;
+
 use super::*;
-use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
+use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel, ValidationFeature};
 
 /// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
@@ -7,15 +9,18 @@ pub struct ValidationPipeline<'a> {
     lifter: LiftAstToDml<'a>,
     validator: Validator<'a>,
     standardiser: Standardiser,
+    flags: BitFlags<ValidationFeature>,
 }
 
 impl<'a, 'b> ValidationPipeline<'a> {
-    pub fn new(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
+    pub fn new(sources: &'a [configuration::Datasource], flags: BitFlags<ValidationFeature>) -> ValidationPipeline<'a> {
         let source = sources.first();
+
         ValidationPipeline {
             lifter: LiftAstToDml::new(source),
             validator: Validator::new(source),
             standardiser: Standardiser::new(),
+            flags,
         }
     }
 
@@ -65,7 +70,7 @@ impl<'a, 'b> ValidationPipeline<'a> {
 
         // TODO: Move consistency stuff into different module.
         // Phase 5: Consistency fixes. These don't fail.
-        if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema) {
+        if let Err(mut err) = self.standardiser.standardise(ast_schema, &mut schema, self.flags) {
             diagnostics.append(&mut err);
         }
 

@@ -1,10 +1,12 @@
 use super::helpers::*;
-use crate::ast::helper::get_sort_index_of_attribute;
-use crate::common::WritableString;
-use crate::diagnostics::ValidatedMissingFields;
-use crate::{ast::parser::*, ast::renderer::*};
-use pest::iterators::Pair;
-use pest::Parser;
+use crate::{
+    ast::{helper::get_sort_index_of_attribute, parser::*, renderer::*, SchemaAst},
+    common::WritableString,
+    diagnostics::ValidatedMissingFields,
+    Validator,
+};
+use dml::datamodel::Datamodel;
+use pest::{iterators::Pair, Parser};
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -16,6 +18,7 @@ impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
         let missing_field_attributes = Self::find_all_missing_attributes(&input);
+
         Reformatter {
             input,
             missing_fields,
@@ -26,8 +29,13 @@ impl<'a> Reformatter<'a> {
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
     fn find_all_missing_fields(schema_string: &str) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
+        let schema_ast: SchemaAst = schema_string.parse()?;
+
+        let mut validator = Validator::<Datamodel>::new();
+        validator.ignore_datasource_urls();
+        validator.standardize_models();
+
+        let validated_datamodel = validator.parse_str(schema_string)?;
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
@@ -58,16 +66,26 @@ impl<'a> Reformatter<'a> {
         schema_string: &str,
     ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
+        let schema_ast: SchemaAst = schema_string.parse()?;
+
+        let mut validator = Validator::<Datamodel>::new();
+        validator.ignore_datasource_urls();
+        validator.standardize_models();
+
+        let validated_datamodel = validator.parse_str(schema_string)?;
+
         diagnostics.append_warning_vec(validated_datamodel.warnings);
+
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut missing_field_attributes = Vec::new();
+
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
+
             for field in model.fields() {
                 let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
                 let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+
                 if original_ast_field.is_some() {
                     for attribute in new_ast_field.attributes {
                         if let Some(original_field) = original_ast_field {
@@ -104,8 +122,10 @@ impl<'a> Reformatter<'a> {
         let mut ast = PrismaDatamodelParser::parse(Rule::schema, self.input).unwrap(); // TODO: Handle error.
         let mut target_string = WritableString::new();
         let mut renderer = Renderer::new(&mut target_string, ident_width);
+
         self.reformat_top(&mut renderer, &ast.next().unwrap());
         let result = target_string.into();
+
         // all schemas must end with a newline
         if result.ends_with('\n') {
             result

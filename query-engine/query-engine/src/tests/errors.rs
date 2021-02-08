@@ -1,3 +1,4 @@
+use datamodel::{diagnostics::Validator, Configuration, Datamodel};
 use indoc::formatdoc;
 use serde_json::json;
 
@@ -32,10 +33,10 @@ async fn connection_string_problems_give_a_nice_error() {
             provider.1
         );
 
-        let dml = datamodel::parse_datamodel(&dm).unwrap().subject;
-        let config = datamodel::parse_configuration(&dm).unwrap();
+        let dml = Validator::<Datamodel>::new().parse_str(&dm).unwrap().subject;
+        let config = Validator::<Configuration>::new().parse_str(&dm).unwrap().subject;
 
-        let error = PrismaContext::builder(config.subject, dml)
+        let error = PrismaContext::builder(config, dml)
             .enable_raw_queries(true)
             .build()
             .await

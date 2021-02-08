@@ -1,4 +1,4 @@
-use datamodel::{ast::Span, diagnostics::*, render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, diagnostics::*, render_datamodel_to_string, Datamodel, IndexDefinition, IndexType};
 
 use crate::common::*;
 
@@ -296,7 +296,9 @@ fn index_attributes_must_serialize_to_valid_dml() {
             @@index([firstName,lastName], name: "customName")
         }
     "#;
-    let schema = parse(dml);
 
-    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema)).is_ok());
+    let schema = parse(dml);
+    let dml_str = render_datamodel_to_string(&schema);
+
+    assert!(Validator::<Datamodel>::new().parse_str(&dml_str).is_ok());
 }

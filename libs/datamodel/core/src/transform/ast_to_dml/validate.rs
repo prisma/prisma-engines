@@ -797,7 +797,7 @@ impl<'a> Validator<'a> {
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-            let related_field = datamodel.find_related_field_bang(&field);
+            let related_field = datamodel.find_related_field_bang(dbg!(&field));
             let related_field_rel_info = &related_field.relation_info;
 
             // ONE TO MANY

@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use datamodel::{ast::Span, diagnostics::*, render_datamodel_to_string, IndexDefinition, IndexType};
+use datamodel::{ast::Span, diagnostics::*, render_datamodel_to_string, Datamodel, IndexDefinition, IndexType};
 
 use crate::common::*;
 
@@ -270,7 +270,10 @@ fn unique_attributes_must_serialize_to_valid_dml() {
             @@unique([firstName,lastName], name: "customName")
         }
     "#;
-    let schema = parse(dml);
 
-    assert!(datamodel::parse_datamodel(&render_datamodel_to_string(&schema)).is_ok());
+    let schema = parse(dml);
+    let validator = Validator::<Datamodel>::new();
+    let dml_string = render_datamodel_to_string(&schema);
+
+    assert!(validator.parse_str(&dml_string).is_ok());
 }

@@ -3,6 +3,7 @@ use crate::{
     request_handlers::{graphql, GraphQlBody, SingleQuery},
     PrismaResponse,
 };
+use datamodel::{diagnostics::Validator, Configuration, Datamodel};
 use enumflags2::BitFlags;
 use migration_core::{
     api::{GenericApi, MigrationApi},
@@ -48,8 +49,13 @@ impl TestApi {
         feature_flags::initialize(&[String::from("all")]).unwrap();
 
         let datamodel_string = format!("{}\n\n{}", self.config, datamodel);
-        let dml = datamodel::parse_datamodel(&datamodel_string).unwrap().subject;
-        let config = datamodel::parse_configuration(&datamodel_string).unwrap();
+
+        let dml = Validator::<Datamodel>::new()
+            .parse_str(&datamodel_string)
+            .unwrap()
+            .subject;
+
+        let config = Validator::<Configuration>::new().parse_str(&datamodel_string).unwrap();
 
         self.migration_api
             .schema_push(&SchemaPushInput {

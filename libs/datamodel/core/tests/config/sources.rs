@@ -1,5 +1,9 @@
 use crate::common::*;
-use datamodel::{ast::Span, diagnostics::DatamodelError, StringFromEnvVar};
+use datamodel::{
+    ast::Span,
+    diagnostics::{DatamodelError, Validator},
+    Configuration, StringFromEnvVar,
+};
 use pretty_assertions::assert_eq;
 use serial_test::serial;
 
@@ -39,11 +43,16 @@ fn must_forbid_env_functions_in_provider_field() {
             url = env("DB_URL")
         }
     "#;
+
     std::env::set_var("DB_PROVIDER", "postgresql");
     std::env::set_var("DB_URL", "https://localhost");
-    let config = datamodel::parse_configuration(schema);
+
+    let config = Validator::<Configuration>::new().parse_str(schema);
+
     assert!(config.is_err());
+
     let diagnostics = config.err().expect("This must error");
+
     diagnostics.assert_is(DatamodelError::new_functional_evaluation_error(
         "A datasource must not use the env() function in the provider argument.",
         Span::new(9, 108),
@@ -59,10 +68,14 @@ fn must_forbid_env_functions_in_provider_field_even_if_missing() {
             url = env("DB_URL")
         }
     "#;
+
     std::env::set_var("DB_URL", "https://localhost");
-    let config = datamodel::parse_configuration(schema);
+
+    let config = Validator::<Configuration>::new().parse_str(schema);
+
     assert!(config.is_err());
     let diagnostics = config.err().expect("This must error");
+
     diagnostics.assert_is(DatamodelError::new_functional_evaluation_error(
         "A datasource must not use the env() function in the provider argument.",
         Span::new(9, 108),
@@ -77,9 +90,12 @@ fn must_error_for_empty_urls() {
             url = ""
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
+
+    let config = Validator::<Configuration>::new().parse_str(schema);
+
     assert!(config.is_err());
     let diagnostics = config.err().expect("This must error");
+
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
         "You must provide a nonempty URL for the datasource `myds`.",
         "myds",
@@ -96,7 +112,8 @@ fn must_error_for_empty_provider_arrays() {
         }
     "#;
 
-    let config = datamodel::parse_configuration(schema);
+    let config = Validator::<Configuration>::new().parse_str(schema);
+
     assert!(config.is_err());
     let diagnostics = config.err().expect("This must error");
     diagnostics.assert_is(DatamodelError::new_validation_error(
@@ -115,7 +132,7 @@ fn must_error_for_empty_urls_derived_from_env_vars() {
             url = env("DB_URL")
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
+    let config = Validator::<Configuration>::new().parse_str(schema);
     assert!(config.is_err());
     let diagnostics = config.err().expect("This must error");
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
@@ -133,7 +150,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
             url = "postgresql://"
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
+    let config = Validator::<Configuration>::new().parse_str(schema);
     assert!(config.is_err());
     let diagnostics = config.err().expect("This must error");
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
@@ -151,7 +168,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
             url = "mysql://"
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
+    let config = Validator::<Configuration>::new().parse_str(schema);
     assert!(config.is_err());
     let diagnostics = config.err().expect("This must error");
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
@@ -169,7 +186,7 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
             url = "mysql://"
         }
     "#;
-    let config = datamodel::parse_configuration(schema);
+    let config = Validator::<Configuration>::new().parse_str(schema);
     assert!(config.is_err());
     let diagnostics = config.err().expect("This must error");
     diagnostics.assert_is(DatamodelError::new_source_validation_error(
@@ -189,7 +206,7 @@ fn new_lines_in_source_must_work() {
         }
     "#;
 
-    let config = parse_configuration(schema);
+    let config = Validator::<Configuration>::new().parse_str(schema).unwrap().subject;
     let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
 
     let expected = r#"[
@@ -219,7 +236,7 @@ fn must_error_if_env_var_is_missing() {
         }
     "#;
 
-    let result = datamodel::parse_configuration(schema);
+    let result = Validator::<Configuration>::new().parse_str(schema);
     assert!(result.is_err());
     let diagnostics = result.err().unwrap();
     diagnostics.assert_is(DatamodelError::new_environment_functional_evaluation_error(
@@ -307,7 +324,8 @@ fn fail_to_load_sources_for_invalid_source() {
             url = "https://localhost/postgres1"
         }
     "#;
-    let res = datamodel::parse_configuration(invalid_datamodel);
+
+    let res = Validator::<Configuration>::new().parse_str(invalid_datamodel);
 
     if let Err(diagnostics) = res {
         diagnostics.assert_is(DatamodelError::DatasourceProviderNotKnownError {

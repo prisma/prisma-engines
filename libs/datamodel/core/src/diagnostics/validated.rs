@@ -1,6 +1,29 @@
-use crate::ast::reformat::MissingField;
-use crate::diagnostics::DatamodelWarning;
-use crate::{Configuration, Datamodel, Datasource, Generator};
+use crate::{
+    ast::reformat::MissingField,
+    diagnostics::{DatamodelWarning, Diagnostics},
+    Configuration, Datamodel, Datasource, Generator, ValidationFeature,
+};
+use enumflags2::BitFlags;
+
+pub trait ParseDatamodel {
+    fn parse_datamodel_with_flags<T>(&self, flags: T) -> Result<Validated<Datamodel>, Diagnostics>
+    where
+        T: Into<BitFlags<ValidationFeature>>;
+
+    fn parse_datamodel(&self) -> Result<Validated<Datamodel>, Diagnostics> {
+        self.parse_datamodel_with_flags(BitFlags::empty())
+    }
+}
+
+pub trait ParseConfiguration {
+    fn parse_config_with_flags<T>(&self, flags: T) -> Result<Validated<Configuration>, Diagnostics>
+    where
+        T: Into<BitFlags<ValidationFeature>>;
+
+    fn parse_config(&self) -> Result<Validated<Configuration>, Diagnostics> {
+        self.parse_config_with_flags(BitFlags::empty())
+    }
+}
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Validated<T> {

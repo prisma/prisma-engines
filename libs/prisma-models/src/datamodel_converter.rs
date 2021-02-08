@@ -1,5 +1,5 @@
 use crate::*;
-use datamodel::{dml, DefaultValue, Ignorable, WithDatabaseName};
+use datamodel::{diagnostics::Validator, dml, Datamodel, DefaultValue, Ignorable, WithDatabaseName};
 use itertools::Itertools;
 
 pub struct DatamodelConverter<'a> {
@@ -9,8 +9,10 @@ pub struct DatamodelConverter<'a> {
 
 impl<'a> DatamodelConverter<'a> {
     pub fn convert_string(datamodel: String) -> InternalDataModelTemplate {
-        let datamodel = datamodel::parse_datamodel(&datamodel).unwrap().subject;
-        Self::convert(&datamodel)
+        let validator = Validator::<Datamodel>::new();
+        let datamodel = validator.parse_str(&datamodel).unwrap();
+
+        Self::convert(&datamodel.subject)
     }
 
     pub fn convert(datamodel: &dml::Datamodel) -> InternalDataModelTemplate {

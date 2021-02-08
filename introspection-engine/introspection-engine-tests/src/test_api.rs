@@ -1,5 +1,5 @@
 use crate::BarrelMigrationExecutor;
-use datamodel::{Configuration, Datamodel};
+use datamodel::{diagnostics::Validator, Configuration, Datamodel};
 use enumflags2::BitFlags;
 use eyre::{Context, Report, Result};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
@@ -157,7 +157,7 @@ fn parse_datamodel(dm: &str) -> Result<Datamodel> {
 }
 
 fn parse_configuration(dm: &str) -> Result<Configuration> {
-    match datamodel::parse_configuration(dm) {
+    match Validator::<Configuration>::new().parse_str(dm) {
         Ok(dm) => Ok(dm.subject),
         Err(e) => Err(Report::msg(e.to_pretty_string("schema.prisma", dm))),
     }

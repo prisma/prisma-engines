@@ -1,7 +1,12 @@
-use datamodel::DefaultValue;
+use datamodel::{diagnostics::Validator, Datamodel, DefaultValue};
 use indoc::indoc;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
+
+fn parse_datamodel(input: &str) -> Datamodel {
+    let validator = Validator::<Datamodel>::new();
+    validator.parse_str(input).unwrap().subject
+}
 
 #[test]
 fn strings_with_quotes_render_as_escaped_literals() {
@@ -22,7 +27,7 @@ fn strings_with_quotes_render_as_escaped_literals() {
         "#
     );
 
-    let mut dml = datamodel::parse_datamodel(input).unwrap().subject;
+    let mut dml = parse_datamodel(input);
     let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
     let name = cat.scalar_fields_mut().find(|f| f.name == "name").unwrap();
     name.default_value = Some(DefaultValue::Single(PrismaValue::String("a \" b\"c d".into())));
@@ -43,7 +48,7 @@ fn strings_with_quotes_roundtrip() {
         "#
     );
 
-    let dml = datamodel::parse_datamodel(input).unwrap().subject;
+    let dml = parse_datamodel(input);
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
     assert_eq!(input, rendered);
@@ -68,7 +73,7 @@ fn strings_with_newlines_render_as_escaped_literals() {
         "#
     );
 
-    let mut dml = datamodel::parse_datamodel(input).unwrap().subject;
+    let mut dml = parse_datamodel(input);
     let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
     let name = cat.scalar_fields_mut().find(|f| f.name == "name").unwrap();
     name.default_value = Some(DefaultValue::Single(PrismaValue::String(
@@ -91,7 +96,7 @@ fn strings_with_newlines_roundtrip() {
         "#
     );
 
-    let dml = datamodel::parse_datamodel(input).unwrap().subject;
+    let dml = parse_datamodel(input);
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
     assert_eq!(input, rendered);
@@ -108,7 +113,7 @@ fn strings_with_backslashes_roundtrip() {
         "#
     );
 
-    let dml = datamodel::parse_datamodel(input).unwrap().subject;
+    let dml = parse_datamodel(input);
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
     assert_eq!(input, rendered);
@@ -125,7 +130,7 @@ fn strings_with_multiple_escaped_characters_roundtrip() {
         "#
     );
 
-    let dml = datamodel::parse_datamodel(dm).unwrap().subject;
+    let dml = parse_datamodel(dm);
     let rendered = datamodel::render_datamodel_to_string(&dml);
 
     assert_eq!(dm, rendered);
@@ -148,7 +153,7 @@ fn internal_escaped_values_are_rendered_correctly() {
         "#
     );
 
-    let mut dml = datamodel::parse_datamodel(dm).unwrap().subject;
+    let mut dml = parse_datamodel(dm);
 
     let model = dml.models_mut().find(|m| m.name == "FilmQuote").unwrap();
     let field = model.scalar_fields_mut().find(|f| f.name == "id").unwrap();

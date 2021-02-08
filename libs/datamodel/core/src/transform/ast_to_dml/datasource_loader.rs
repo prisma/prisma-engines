@@ -1,26 +1,32 @@
-use super::builtin_datasource_providers::MsSqlDatasourceProvider;
 use super::{
     super::helpers::*,
-    builtin_datasource_providers::{MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider},
+    builtin_datasource_providers::{
+        MsSqlDatasourceProvider, MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider,
+    },
     datasource_provider::DatasourceProvider,
 };
-use crate::ast::Span;
-use crate::configuration::StringFromEnvVar;
-use crate::diagnostics::{DatamodelError, DatamodelWarning, Diagnostics, ValidatedDatasource, ValidatedDatasources};
-use crate::{ast, Datasource};
+use crate::{
+    ast::{self, Span},
+    configuration::StringFromEnvVar,
+    diagnostics::{DatamodelError, DatamodelWarning, Diagnostics, ValidatedDatasource, ValidatedDatasources},
+    Datasource, ValidationFeature,
+};
 use datamodel_connector::{CombinedConnector, Connector};
+use enumflags2::BitFlags;
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 
 /// Is responsible for loading and validating Datasources defined in an AST.
 pub struct DatasourceLoader {
     source_definitions: Vec<Box<dyn DatasourceProvider>>,
+    validation_features: BitFlags<ValidationFeature>,
 }
 
 impl DatasourceLoader {
-    pub fn new() -> Self {
+    pub fn new(validation_features: BitFlags<ValidationFeature>) -> Self {
         Self {
             source_definitions: get_builtin_datasource_providers(),
+            validation_features,
         }
     }
 
@@ -30,14 +36,13 @@ impl DatasourceLoader {
     pub fn load_datasources_from_ast(
         &self,
         ast_schema: &ast::SchemaAst,
-        ignore_datasource_urls: bool,
         datasource_url_overrides: Vec<(String, String)>,
     ) -> Result<ValidatedDatasources, Diagnostics> {
         let mut sources = vec![];
         let mut diagnostics = Diagnostics::new();
 
         for src in &ast_schema.sources() {
-            match self.lift_datasource(&src, ignore_datasource_urls, &datasource_url_overrides) {
+            match self.lift_datasource(&src, &datasource_url_overrides) {
                 Ok(loaded_src) => {
                     diagnostics.append_warning_vec(loaded_src.warnings);
                     sources.push(loaded_src.subject)
@@ -86,7 +91,6 @@ impl DatasourceLoader {
     fn lift_datasource(
         &self,
         ast_source: &ast::SourceConfig,
-        ignore_datasource_urls: bool,
         datasource_url_overrides: &[(String, String)],
     ) -> Result<ValidatedDatasource, Diagnostics> {
         let source_name = &ast_source.name.name;
@@ -121,6 +125,10 @@ impl DatasourceLoader {
             .iter()
             .find(|x| &x.0 == source_name)
             .map(|x| &x.1);
+
+        let ignore_datasource_urls = self
+            .validation_features
+            .contains(ValidationFeature::IgnoreDatasourceUrls);
 
         let (env_var_for_url, url) = match (url_args.as_str_from_env(), override_url) {
             (Err(err), _)
@@ -241,10 +249,4 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(SqliteDatasourceProvider::new()),
         Box::new(MsSqlDatasourceProvider::new()),
     ]
-}
-
-impl Default for DatasourceLoader {
-    fn default() -> Self {
-        Self::new()
-    }
 }

@@ -1,4 +1,5 @@
 use clap::{App, Arg};
+use datamodel::{diagnostics::Validator, Datamodel};
 use std::fs;
 
 fn main() {
@@ -17,11 +18,11 @@ fn main() {
     let file_name = matches.value_of("INPUT").unwrap();
     let file = fs::read_to_string(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name));
 
-    let validated = datamodel::parse_datamodel_or_pretty_error(&file, &file_name);
+    let validator = Validator::<Datamodel>::new();
 
-    match &validated {
+    match validator.parse_str(&file) {
         Err(formatted) => {
-            println!("{}", formatted);
+            println!("{}", formatted.to_pretty_string(file_name, &file));
         }
         Ok(dml) => {
             let json = datamodel::json::dmmf::render_to_dmmf(&dml.subject);

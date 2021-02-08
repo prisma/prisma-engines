@@ -22,6 +22,8 @@ pub mod parser;
 pub mod reformat;
 pub mod renderer;
 
+use std::str::FromStr;
+
 pub use argument::Argument;
 pub use attribute::Attribute;
 pub use comment::Comment;
@@ -35,6 +37,8 @@ pub use source_config::SourceConfig;
 pub use span::Span;
 pub use top::Top;
 pub use traits::{ArgumentContainer, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
+
+use crate::diagnostics::Diagnostics;
 
 /// AST representation of a prisma schema.
 ///
@@ -50,6 +54,14 @@ pub use traits::{ArgumentContainer, WithAttributes, WithDocumentation, WithIdent
 pub struct SchemaAst {
     /// All models, enums, datasources, generators or type aliases
     pub tops: Vec<Top>,
+}
+
+impl FromStr for SchemaAst {
+    type Err = Diagnostics;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        crate::ast::parser::parse_schema(s)
+    }
 }
 
 impl SchemaAst {
@@ -73,9 +85,11 @@ impl SchemaAst {
     }
 
     pub fn find_model_mut(&mut self, model_name: &str) -> Option<&mut Model> {
-        self.tops.iter_mut().find_map(|top| match top {
-            Top::Model(model) if model.name.name == model_name => Some(model),
-            _ => None,
+        self.tops.iter_mut().find_map(|top| -> Option<&mut Model> {
+            match top {
+                Top::Model(model) if model.name.name == model_name => Some(model),
+                _ => None,
+            }
         })
     }
 

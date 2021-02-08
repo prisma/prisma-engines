@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+use datamodel::{diagnostics::Validator, Datamodel};
 use prisma_models::*;
 use std::sync::Arc;
 
@@ -490,7 +491,8 @@ fn implicit_many_to_many_relation() {
 }
 
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
-    let datamodel = datamodel::parse_datamodel(datamodel).unwrap().subject;
+    let validator = Validator::<Datamodel>::new();
+    let datamodel = validator.parse_str(datamodel).unwrap().subject;
     let template = DatamodelConverter::convert(&datamodel);
     template.build("not_important".to_string())
 }

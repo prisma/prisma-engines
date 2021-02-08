@@ -1,5 +1,7 @@
 use std::io::{self, Read};
 
+use datamodel::{diagnostics::Validator, Configuration};
+
 pub fn run() {
     let mut datamodel_string = String::new();
 
@@ -7,9 +9,9 @@ pub fn run() {
         .read_to_string(&mut datamodel_string)
         .expect("Unable to read from stdin.");
 
-    let datamodel_result = datamodel::parse_configuration_and_ignore_datasource_urls(&datamodel_string);
+    let validator = Validator::<Configuration>::new();
 
-    match datamodel_result {
+    match validator.parse_str(&datamodel_string) {
         Ok(validated_configuration) => {
             if validated_configuration.subject.datasources.len() != 1 {
                 print!("[]")

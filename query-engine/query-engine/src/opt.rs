@@ -1,6 +1,8 @@
 use crate::{error::PrismaError, PrismaResult};
-use datamodel::diagnostics::ValidatedConfiguration;
-use datamodel::Datamodel;
+use datamodel::{
+    diagnostics::{ValidatedConfiguration, Validator},
+    Configuration, Datamodel,
+};
 use serde::Deserialize;
 use std::{ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
@@ -116,35 +118,37 @@ impl PrismaOpt {
 
     pub fn datamodel(&self, ignore_data_sources: bool) -> PrismaResult<Datamodel> {
         let datamodel_str = self.datamodel_str()?;
+        let mut validator = Validator::<Datamodel>::new();
 
-        let datamodel = if ignore_data_sources {
-            datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_str)
-        } else {
-            datamodel::parse_datamodel(datamodel_str)
-        };
+        if ignore_data_sources {
+            validator.ignore_datasource_urls();
+        }
 
-        match datamodel {
+        match validator.parse_str(datamodel_str) {
+            Ok(validated) => Ok(validated.subject),
             Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
-            _ => Ok(datamodel.unwrap().subject),
         }
     }
 
     pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<ValidatedConfiguration> {
         let datamodel_str = self.datamodel_str()?;
+        let mut validator = Validator::<Configuration>::new();
 
-        let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
-            let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(&json)?;
-            datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
-        } else {
-            vec![]
-        };
+        if let Some(ref json) = self.overwrite_datasources {
+            let overrides: Vec<SourceOverride> = serde_json::from_str(&json)?;
 
-        let config_result = if ignore_env_errors {
-            datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_str)
-        } else {
-            datamodel::parse_configuration_with_url_overrides(datamodel_str, datasource_url_overrides)
-        };
-        config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
+            for ds in overrides {
+                validator.datasource_url_override(ds.name, ds.url);
+            }
+        }
+
+        if ignore_env_errors {
+            validator.ignore_datasource_urls();
+        }
+
+        Ok(validator
+            .parse_str(self.datamodel_str()?)
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))?)
     }
 
     /// Extract the log format from on the RUST_LOG_FORMAT env var.

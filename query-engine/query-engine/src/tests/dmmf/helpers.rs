@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::dmmf::{schema::*, DataModelMetaFormat};
+use datamodel::{diagnostics::Validator, Configuration, Datamodel};
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::DatamodelConverter;
 use query_core::{schema_builder, BuildMode, QuerySchema};
@@ -8,20 +9,27 @@ use query_core::{schema_builder, BuildMode, QuerySchema};
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
     feature_flags::initialize(&[String::from("all")]).unwrap();
 
-    let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string)
-        .unwrap()
-        .subject;
-    let config = datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_string).unwrap();
+    let mut validator = Validator::<Datamodel>::new();
+    validator.ignore_datasource_urls();
+
+    let dm = validator.parse_str(datamodel_string).unwrap();
+
+    let mut validator = Validator::<Configuration>::new();
+    validator.ignore_datasource_urls();
+
+    let config = validator.parse_str(datamodel_string).unwrap();
+
     let capabilities = match config.subject.datasources.first() {
         Some(ds) => ds.capabilities(),
         None => ConnectorCapabilities::empty(),
     };
-    let internal_dm_template = DatamodelConverter::convert(&dm);
+
+    let internal_dm_template = DatamodelConverter::convert(&dm.subject);
     let internal_ref = internal_dm_template.build("db".to_owned());
 
     (
         schema_builder::build(internal_ref, BuildMode::Modern, false, capabilities),
-        dm,
+        dm.subject,
     )
 }
 
