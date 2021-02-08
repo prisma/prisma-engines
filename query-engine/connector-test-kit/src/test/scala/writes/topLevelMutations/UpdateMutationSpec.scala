@@ -283,8 +283,8 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""".stripMargin,
       project,
       legacy = false,
-      errorCode = 2016,
-      errorContains = """Query interpretation error. Error for binding '0': RecordNotFound(\"Record to update not found.\"""
+      errorCode = 2025,
+      errorContains = """An operation failed because it depends on one or more records that were required but not found. Record to update not found."""
     )
   }
 
