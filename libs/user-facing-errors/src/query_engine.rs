@@ -258,3 +258,12 @@ pub struct InconsistentColumnData {
 pub struct PoolTimeout {
     pub connection_limit: u64,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2025",
+    message = "An operation failed because it depends on one or more records that were required but not found. {cause}"
+)]
+pub struct RecordRequiredButNotFound {
+    pub cause: String,
+}

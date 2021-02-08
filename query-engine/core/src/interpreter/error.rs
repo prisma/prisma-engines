@@ -63,9 +63,3 @@ impl From<ConnectorError> for InterpreterError {
         InterpreterError::ConnectorError(e)
     }
 }
-
-// impl From<InterpreterError> for ConnectorError {
-//     fn from(e: InterpreterError) -> Self {
-//         ConnectorError::QueryError(e.into())
-//     }
-// }

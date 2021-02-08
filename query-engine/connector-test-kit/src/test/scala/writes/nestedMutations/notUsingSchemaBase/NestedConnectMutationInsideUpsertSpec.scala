@@ -61,7 +61,6 @@ class NestedConnectMutationInsideUpsertSpec extends FlatSpec with Matchers with 
   }
 
   "a one to many relation" should "throw the correct error for a connect by unique field within an upsert in the update case" in {
-
     schemaP1optToCM.testV11 { project =>
       server.query("""mutation { createChild(data: {c:"c1"}){ id } }""", project)
       server.query("""mutation { createParent(data: {p:"p1"}){ id } }""", project)
@@ -73,10 +72,9 @@ class NestedConnectMutationInsideUpsertSpec extends FlatSpec with Matchers with 
            |}
       """,
         project,
-        errorCode = 2016, // 3039
+        errorCode = 2025,
         errorContains =
-          """Query interpretation error. Error for binding '3': AssertionError(\"[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."""
-        // Error occurred during query execution:\nInterpretationError(\"Error for binding \\'3\\': AssertionError(\\\"[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation.
+          """An operation failed because it depends on one or more records that were required but not found. No 'Child' record(s) (needed to inline the relation on 'Parent' record(s)) was found for a nested connect on one-to-many relation 'ChildToParent'."""
       )
     }
   }

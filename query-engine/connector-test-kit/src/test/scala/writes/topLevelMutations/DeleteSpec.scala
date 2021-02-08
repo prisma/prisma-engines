@@ -53,9 +53,8 @@ class DeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
         |}
       """.stripMargin,
       project,
-      errorCode = 2016, // 3039,
-      errorContains = """Query interpretation error. Error for binding '0': RecordNotFound(\"Record to delete does not exist.\""""
-      // """No Node for the model Todo with value does not exist for title found."""
+      errorCode = 2025,
+      errorContains = """An operation failed because it depends on one or more records that were required but not found. Record to delete does not exist."""
     )
 
     todoCountShouldBe(project, 3)
