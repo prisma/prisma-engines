@@ -1,3 +1,5 @@
+#![allow(clippy::clippy::trivial_regex)]
+
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;

@@ -487,10 +487,8 @@ async fn mssql_test_api(connection_string: String, args: TestAPIArgs) -> TestApi
 }
 
 fn preview_features(features: BitFlags<Features>) -> BitFlags<MigrationFeature> {
-    features.iter().fold(BitFlags::empty(), |acc, feature| {
-        match feature {
-            Features::Other => return acc,
-        };
+    features.iter().fold(BitFlags::empty(), |acc, feature| match feature {
+        Features::Other => acc,
     })
 }
 

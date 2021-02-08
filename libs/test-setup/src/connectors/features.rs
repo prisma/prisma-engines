@@ -39,4 +39,4 @@ impl std::fmt::Display for UnknownFeatureError {
 impl std::error::Error for UnknownFeatureError {}
 
 /// All the features, sorted by name.
-static FEATURE_NAMES: Lazy<Vec<(&str, BitFlags<Features>)>> = Lazy::new(|| Vec::new());
+static FEATURE_NAMES: Lazy<Vec<(&str, BitFlags<Features>)>> = Lazy::new(Vec::new);
