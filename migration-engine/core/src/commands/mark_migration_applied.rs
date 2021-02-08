@@ -30,7 +30,6 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
         let connector = engine.connector();
         let persistence = engine.connector().migration_persistence();
 
-        //Validate Provider
         migration_connector::error_on_changed_provider(
             &input.migrations_directory_path,
             engine.connector().connector_type(),

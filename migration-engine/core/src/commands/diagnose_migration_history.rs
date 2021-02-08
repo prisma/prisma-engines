@@ -76,7 +76,6 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
 
         tracing::debug!("Diagnosing migration history");
 
-        //Validate Provider
         migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
         // Load the migrations.

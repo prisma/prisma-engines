@@ -176,7 +176,7 @@ async fn advisory_locking_works(api: &TestApi) -> TestResult {
     };
 
     let (result_1, result_2, result_3) = tokio::join!(
-        // We move the engines in the async block so they get dropped when they
+        // We move the engines into the async block so they get dropped when they
         // are done with the request, releasing the lock as a consequence.
         async move { second_me.apply_migrations(&input_1).await },
         async move { first_me.apply_migrations(&input_2).await },
