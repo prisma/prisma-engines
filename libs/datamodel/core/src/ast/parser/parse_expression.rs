@@ -73,6 +73,7 @@ fn parse_string_literal(token: &Token) -> String {
     }
 }
 
+#[allow(clippy::trivial_regex)]
 fn unescape_string_literal(original: &str) -> Cow<'_, str> {
     static STRING_LITERAL_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(")"#).unwrap());
     static STRING_LITERAL_BACKSLASHES_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\\\"#).unwrap());

@@ -12,7 +12,7 @@ pub enum PrismaError {
     SerializationError(String),
 
     #[error("{}", _0)]
-    CoreError(CoreError),
+    CoreError(Box<CoreError>),
 
     #[error("{}", _0)]
     JsonDecodeError(anyhow::Error),
@@ -21,7 +21,7 @@ pub enum PrismaError {
     ConfigurationError(String),
 
     #[error("{}", _0)]
-    ConnectorError(ConnectorError),
+    ConnectorError(Box<ConnectorError>),
 
     #[error("{}", _0)]
     ConversionError(Diagnostics, String),
@@ -51,10 +51,16 @@ impl From<PrismaError> for user_facing_errors::Error {
         use std::fmt::Write as _;
 
         match err {
-            PrismaError::ConnectorError(ConnectorError {
-                user_facing_error: Some(err),
-                ..
-            }) => err.into(),
+            PrismaError::ConnectorError(connector_err) => match *connector_err {
+                ConnectorError {
+                    user_facing_error: Some(err),
+                    ..
+                } => err.into(),
+                other => {
+                    let err = PrismaError::ConnectorError(Box::new(other));
+                    user_facing_errors::Error::new_non_panic_with_current_backtrace(err.to_string())
+                }
+            },
             PrismaError::ConversionError(errors, dml_string) => {
                 let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
                 write!(full_error, "\nValidation Error Count: {}", errors.errors.len()).unwrap();
@@ -88,7 +94,7 @@ impl PrismaError {
 
 impl From<CoreError> for PrismaError {
     fn from(e: CoreError) -> Self {
-        PrismaError::CoreError(e)
+        PrismaError::CoreError(Box::new(e))
     }
 }
 
@@ -142,7 +148,7 @@ impl From<GqlParseError> for PrismaError {
 
 impl From<ConnectorError> for PrismaError {
     fn from(e: ConnectorError) -> PrismaError {
-        PrismaError::ConnectorError(e)
+        PrismaError::ConnectorError(Box::new(e))
     }
 }
 

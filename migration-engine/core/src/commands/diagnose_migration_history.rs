@@ -2,7 +2,9 @@ use std::path::Path;
 
 use super::MigrationCommand;
 use crate::{api::MigrationApi, CoreResult};
-use migration_connector::{MigrationConnector, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError};
+use migration_connector::{
+    ConnectorError, MigrationConnector, MigrationDirectory, MigrationRecord, PersistenceNotInitializedError,
+};
 use serde::{Deserialize, Serialize};
 
 /// The input to the `DiagnoseMigrationHistory` command.
@@ -98,7 +100,7 @@ impl<'a> MigrationCommand for DiagnoseMigrationHistoryCommand {
                 Some(db_migration)
                     if !fs_migration
                         .matches_checksum(&db_migration.checksum)
-                        .expect("Failed to read migration script") =>
+                        .map_err(ConnectorError::from)? =>
                 {
                     diagnostics.edited_migrations.push(db_migration);
                 }

@@ -107,7 +107,8 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
     )
 
     // decFloat is cut due to precision
-    res should be("""{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"money":22.14,"smallMoney":22.12,"decFloat":"3.1","decFloat2":"4.12345"}}}""".parseJson)
+    res should be(
+      """{"data":{"createOneModel":{"float":1.1,"dfloat":2.2,"money":22.14,"smallMoney":22.12,"decFloat":"3.1","decFloat2":"4.12345"}}}""".parseJson)
   }
 
   "SQL Server native string types" should "work" in {
@@ -265,5 +266,79 @@ class SqlServerNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase w
     )
 
     res should be("""{"data":{"createOneModel":{"xml":"<meow>purr</meow>","uuid":"ab309dfd-d041-4110-b162-75d7b95fe989"}}}""".parseJson)
+  }
+
+  "Sql server native fixed-size char type" should "be handled correctly wrt. padding for comparisons" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model ModelA {
+        |  id   String  @id @test.Char(16)
+        |  b_id String? @test.Char(16)
+        |  b    ModelB? @relation(fields: [b_id], references: [id])
+        |}
+        |
+        |model ModelB {
+        |  id String @id @test.Char(16)
+        |  a  ModelA?
+        |}
+        |"""
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      s"""
+         |mutation {
+         |  createOneModelA(data: {
+         |    id: "1234"
+         |     b: { create: { id: "4321" } }
+         |  }) {
+         |    id
+         |    b { id }
+         |  }
+         |}""".stripMargin,
+      project,
+      legacy = false
+    )
+
+    // This is correct - sql server returns padded strings (as opposed to MySQL for example, where it's trimmed).
+    res.toString should be("""{"data":{"createOneModelA":{"id":"1234            ","b":{"id":"4321            "}}}}""")
+  }
+
+  "Sql server native fixed-size nchar type" should "be handled correctly wrt. padding for comparisons" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model ModelA {
+        |  id   String  @id @test.NChar(16)
+        |  b_id String? @test.NChar(16)
+        |  b    ModelB? @relation(fields: [b_id], references: [id])
+        |}
+        |
+        |model ModelB {
+        |  id String @id @test.NChar(16)
+        |  a  ModelA?
+        |}
+        |"""
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      s"""
+         |mutation {
+         |  createOneModelA(data: {
+         |    id: "1234"
+         |     b: { create: { id: "4321" } }
+         |  }) {
+         |    id
+         |    b { id }
+         |  }
+         |}""".stripMargin,
+      project,
+      legacy = false
+    )
+
+    // This is correct - sql server returns padded strings (as opposed to MySQL for example, where it's trimmed).
+    res.toString should be("""{"data":{"createOneModelA":{"id":"1234            ","b":{"id":"4321            "}}}}""")
   }
 }

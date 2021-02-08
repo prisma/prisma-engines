@@ -229,6 +229,7 @@ impl DatasourceLoader {
         }
     }
 
+    #[allow(clippy::borrowed_box)]
     fn get_datasource_provider(&self, provider: &str) -> Option<&Box<dyn DatasourceProvider>> {
         self.source_definitions.iter().find(|sd| sd.is_provider(provider))
     }
