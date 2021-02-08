@@ -6,7 +6,7 @@ use super::{
 use crate::{Query, QueryResult};
 use connector::ConnectionLike;
 use crossbeam_queue::SegQueue;
-use futures::future::{BoxFuture, FutureExt};
+use futures::future::BoxFuture;
 use im::HashMap;
 use prisma_models::prelude::*;
 
@@ -68,10 +68,9 @@ impl ExpressionResult {
             _ => None,
         };
 
-        converted.ok_or(InterpreterError::InterpretationError(
-            "Unable to convert result into a set of projections".to_owned(),
-            None,
-        ))
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError("Unable to convert result into a set of projections".to_owned(), None)
+        })
     }
 
     pub fn as_query_result(&self) -> InterpretationResult<&QueryResult> {
@@ -80,10 +79,9 @@ impl ExpressionResult {
             _ => None,
         };
 
-        converted.ok_or(InterpreterError::InterpretationError(
-            "Unable to convert result into a query result".to_owned(),
-            None,
-        ))
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError("Unable to convert result into a query result".to_owned(), None)
+        })
     }
 
     pub fn as_diff_result(&self) -> InterpretationResult<&DiffResult> {
@@ -92,10 +90,9 @@ impl ExpressionResult {
             _ => None,
         };
 
-        converted.ok_or(InterpreterError::InterpretationError(
-            "Unable to convert result into a computation result".to_owned(),
-            None,
-        ))
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError("Unable to convert result into a computation result".to_owned(), None)
+        })
     }
 }
 
@@ -153,13 +150,13 @@ where
             Expression::Func { func } => {
                 let expr = func(env.clone());
 
-                async move { self.interpret(expr?, env, level).await }.boxed()
+                Box::pin(async move { self.interpret(expr?, env, level).await })
             }
 
-            Expression::Sequence { seq } if seq.is_empty() => async { Ok(ExpressionResult::Empty) }.boxed(),
+            Expression::Sequence { seq } if seq.is_empty() => Box::pin(async { Ok(ExpressionResult::Empty) }),
 
             Expression::Sequence { seq } => {
-                let fut = async move {
+                Box::pin(async move {
                     self.log_line(level, || "SEQ");
 
                     let mut results = Vec::with_capacity(seq.len());
@@ -170,16 +167,14 @@ where
 
                     // Last result gets returned
                     Ok(results.pop().unwrap())
-                };
-
-                fut.boxed()
+                })
             }
 
             Expression::Let {
                 bindings,
                 mut expressions,
             } => {
-                let fut = async move {
+                Box::pin(async move {
                     let mut inner_env = env.clone();
                     self.log_line(level, || "LET");
 
@@ -198,75 +193,60 @@ where
                     };
 
                     self.interpret(next_expression, inner_env, level + 1).await
-                };
-
-                fut.boxed()
+                })
             }
 
-            Expression::Query { query } => {
-                let fut = async move {
-                    match query {
-                        Query::Read(read) => {
-                            self.log_line(level, || format!("READ {}", read));
-                            Ok(read::execute(&self.conn, read, None)
-                                .await
-                                .map(ExpressionResult::Query)?)
-                        }
-
-                        Query::Write(write) => {
-                            self.log_line(level, || format!("WRITE {}", write));
-                            Ok(write::execute(&self.conn, write).await.map(ExpressionResult::Query)?)
-                        }
+            Expression::Query { query } => Box::pin(async move {
+                match *query {
+                    Query::Read(read) => {
+                        self.log_line(level, || format!("READ {}", read));
+                        Ok(read::execute(&self.conn, read, None)
+                            .await
+                            .map(ExpressionResult::Query)?)
                     }
-                };
-                fut.boxed()
-            }
 
-            Expression::Get { binding_name } => async move {
+                    Query::Write(write) => {
+                        self.log_line(level, || format!("WRITE {}", write));
+                        Ok(write::execute(&self.conn, write).await.map(ExpressionResult::Query)?)
+                    }
+                }
+            }),
+
+            Expression::Get { binding_name } => Box::pin(async move {
                 self.log_line(level, || format!("GET {}", binding_name));
                 env.clone().remove(&binding_name)
-            }
-            .boxed(),
+            }),
 
-            Expression::GetFirstNonEmpty { binding_names } => {
-                let fut = async move {
-                    self.log_line(level, || format!("GET FIRST NON EMPTY {:?}", binding_names));
+            Expression::GetFirstNonEmpty { binding_names } => Box::pin(async move {
+                self.log_line(level, || format!("GET FIRST NON EMPTY {:?}", binding_names));
 
-                    Ok(binding_names
-                        .into_iter()
-                        .find_map(|binding_name| match env.get(&binding_name) {
-                            Some(_) => Some(env.clone().remove(&binding_name).unwrap()),
-                            None => None,
-                        })
-                        .unwrap())
-                };
-
-                fut.boxed()
-            }
+                Ok(binding_names
+                    .into_iter()
+                    .find_map(|binding_name| match env.get(&binding_name) {
+                        Some(_) => Some(env.clone().remove(&binding_name).unwrap()),
+                        None => None,
+                    })
+                    .unwrap())
+            }),
 
             Expression::If {
                 func,
                 then,
                 else_: elze,
-            } => {
-                let fut = async move {
-                    self.log_line(level, || "IF");
+            } => Box::pin(async move {
+                self.log_line(level, || "IF");
 
-                    if func() {
-                        self.interpret(Expression::Sequence { seq: then }, env, level + 1).await
-                    } else {
-                        self.interpret(Expression::Sequence { seq: elze }, env, level + 1).await
-                    }
-                };
+                if func() {
+                    self.interpret(Expression::Sequence { seq: then }, env, level + 1).await
+                } else {
+                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1).await
+                }
+            }),
 
-                fut.boxed()
-            }
-
-            Expression::Return { result } => async move {
+            Expression::Return { result } => Box::pin(async move {
                 self.log_line(level, || "RETURN");
-                Ok(result)
-            }
-            .boxed(),
+                Ok(*result)
+            }),
         }
     }
 

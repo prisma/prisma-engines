@@ -11,12 +11,12 @@ use dml::scalars::ScalarType;
 use itertools::Itertools;
 
 /// Iterator over all the models in the schema.
-pub fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelWalker<'a>> + 'a {
+pub fn walk_models(datamodel: &Datamodel) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
     datamodel.models().map(move |model| ModelWalker { datamodel, model })
 }
 
 /// Iterator to walk all the scalar fields in the schema, associating them with their parent model.
-pub fn walk_scalar_fields<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'a {
+pub fn walk_scalar_fields(datamodel: &Datamodel) -> impl Iterator<Item = ScalarFieldWalker<'_>> + '_ {
     datamodel.models().flat_map(move |model| {
         model.scalar_fields().map(move |field| ScalarFieldWalker {
             datamodel,

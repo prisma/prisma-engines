@@ -60,7 +60,7 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> crate::TestResult 
                     t.add_column("applied", types::text());
                     t.add_column("rolled_back", types::text());
                     t.add_column("datamodel_steps", types::text());
-                    t.add_column("database_migrations", types::text());
+                    t.add_column("database_migration", types::text());
                     t.add_column("errors", types::text());
                     t.add_column("started_at", types::text());
                     t.add_column("finished_at", types::text());
@@ -647,8 +647,8 @@ async fn negative_default_values_should_work(api: &TestApi) -> crate::TestResult
           neg_int                Int     @default(-1)
           float                  Float   @default(2.1)
           neg_float              Float   @default(-2.1)
-          big_int                Int     @default(3)
-          neg_big_int            Int     @default(-3)
+          big_int                BigInt  @default(3)
+          neg_big_int            BigInt  @default(-3)
         }
     "##};
 

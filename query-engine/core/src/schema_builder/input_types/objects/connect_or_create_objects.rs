@@ -17,7 +17,7 @@ pub(crate) fn nested_connect_or_create_input_object(
         format!(
             "{}CreateOrConnectWithout{}Input",
             related_model.name,
-            parent_field.related_field().name
+            capitalize(parent_field.related_field().name.as_str())
         ),
         PRISMA_NAMESPACE,
     );

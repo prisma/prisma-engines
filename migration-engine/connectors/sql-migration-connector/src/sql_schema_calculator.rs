@@ -257,12 +257,12 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                 default: field
                     .default_value()
                     .and_then(|default| default.as_single().and_then(|v| v.as_enum_value()))
-                    .and_then(|value| {
+                    .map(|value| {
                         let corresponding_value = r#enum.value(value).expect("Could not find enum value");
 
-                        Some(sql::DefaultValue::value(PrismaValue::Enum(
+                        sql::DefaultValue::value(PrismaValue::Enum(
                             corresponding_value.final_database_name().to_owned(),
-                        )))
+                        ))
                     }),
                 auto_increment: false,
             }
@@ -275,7 +275,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                 tpe: ColumnType {
                     full_data_type: String::new(),
                     native_type: None,
-                    family: sql::ColumnTypeFamily::Unsupported(description.clone()),
+                    family: sql::ColumnTypeFamily::Unsupported(description),
                     arity: column_arity(field.arity()),
                 },
                 default: field.default_value().and_then(|v| db_generated(v)),
@@ -329,7 +329,5 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
 }
 
 fn db_generated(default: &DefaultValue) -> Option<sql::DefaultValue> {
-    default
-        .db_generated_description()
-        .map(|description| sql::DefaultValue::db_generated(description))
+    default.db_generated_description().map(sql::DefaultValue::db_generated)
 }

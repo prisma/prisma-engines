@@ -56,7 +56,7 @@ where
 }
 
 /// Create a set of metadata objects.
-pub fn create_anonymous<'a>(idents: &'a [(TypeIdentifier, FieldArity)]) -> Vec<ColumnMetadata<'a>> {
+pub fn create_anonymous(idents: &[(TypeIdentifier, FieldArity)]) -> Vec<ColumnMetadata<'_>> {
     idents
         .iter()
         .map(|(identifier, arity)| ColumnMetadata::new(identifier, *arity))

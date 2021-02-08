@@ -57,7 +57,7 @@ impl Expressionista {
         let node_id = node.id();
         let node = graph.pluck_node(&node);
         let into_expr = Box::new(|node: Node| {
-            let query: Query = node.try_into()?;
+            let query: Box<Query> = Box::new(node.try_into()?);
             Ok(Expression::Query { query })
         });
 
@@ -172,10 +172,10 @@ impl Expressionista {
                         let right_diff: Vec<&RecordProjection> = right.difference(&left).collect();
 
                         Ok(Expression::Return {
-                            result: ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
+                            result: Box::new(ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
                                 left: left_diff.into_iter().map(Clone::clone).collect(),
                                 right: right_diff.into_iter().map(Clone::clone).collect(),
-                            })),
+                            }))),
                         })
                     }
                     _ => unreachable!(),
@@ -290,8 +290,8 @@ impl Expressionista {
 
             if let Flow::Return(result) = flow {
                 let result = match result {
-                    Some(r) => ExpressionResult::RawProjections(r),
-                    None => ExpressionResult::Empty,
+                    Some(r) => Box::new(ExpressionResult::RawProjections(r)),
+                    None => Box::new(ExpressionResult::Empty),
                 };
 
                 Ok(Expression::Return { result })

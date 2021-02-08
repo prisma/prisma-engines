@@ -236,4 +236,41 @@ class PostgresNativeTypesSpec extends FlatSpec with Matchers with ApiSpecBase wi
     res.toString should be(
       """{"data":{"createOneModel":{"date":"2016-09-24T00:00:00+00:00","date_2":"2016-09-23T00:00:00+00:00","time":"1970-01-01T13:02:20.321+00:00","time_2":"1970-01-01T10:02:20.321+00:00","time_tz":"1970-01-01T13:02:20.321+00:00","time_tz_2":"1970-01-01T10:02:20.321+00:00","ts":"2016-09-24T14:01:30.213+00:00","ts_2":"2016-09-24T11:01:30.213+00:00","ts_tz":"2016-09-24T14:01:30.213+00:00","ts_tz_2":"2016-09-24T11:01:30.213+00:00"}}}""")
   }
+
+  "Postgres native fixed-size char type" should "be handled correctly wrt. padding for comparisons" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model ModelA {
+        |  id   String  @id @test.Char(16)
+        |  b_id String? @test.Char(16)
+        |  b    ModelB? @relation(fields: [b_id], references: [id])
+        |}
+        |
+        |model ModelB {
+        |  id String @id @test.Char(16)
+        |  a  ModelA?
+        |}
+        |"""
+    }
+
+    database.setup(project)
+
+    val res = server.query(
+      s"""
+         |mutation {
+         |  createOneModelA(data: {
+         |    id: "1234"
+         |     b: { create: { id: "4321" } }
+         |  }) {
+         |    id
+         |    b { id }
+         |  }
+         |}""".stripMargin,
+      project,
+      legacy = false
+    )
+
+    // This is correct - postgres returns padded strings (as opposed to MySQL for example, where it's trimmed).
+    res.toString should be("""{"data":{"createOneModelA":{"id":"1234            ","b":{"id":"4321            "}}}}""")
+  }
 }

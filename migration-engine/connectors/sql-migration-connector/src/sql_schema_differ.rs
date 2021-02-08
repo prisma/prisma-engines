@@ -17,7 +17,10 @@ use crate::{
 };
 use column::ColumnTypeChange;
 use enums::EnumDiffer;
-use sql_schema_describer::walkers::{EnumWalker, ForeignKeyWalker, TableWalker};
+use sql_schema_describer::{
+    walkers::{EnumWalker, ForeignKeyWalker, TableWalker},
+    ColumnTypeFamily,
+};
 use std::collections::HashSet;
 use table::TableDiffer;
 
@@ -36,8 +39,12 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
     let (drop_tables, mut drop_foreign_keys) = differ.drop_tables();
     differ.drop_foreign_keys(&mut drop_foreign_keys, &tables_to_redefine);
 
-    let drop_indexes = differ.drop_indexes(&tables_to_redefine);
-    let create_indexes = differ.create_indexes(&tables_to_redefine);
+    let mut drop_indexes = differ.drop_indexes(&tables_to_redefine);
+    let mut create_indexes = differ.create_indexes(&tables_to_redefine);
+
+    let alter_tables = differ.alter_tables(&tables_to_redefine).collect::<Vec<_>>();
+
+    flavour.push_index_changes_for_column_changes(&alter_tables, &mut drop_indexes, &mut create_indexes, &differ);
 
     let redefine_tables = differ.redefine_tables(&tables_to_redefine);
     let add_foreign_keys = differ.add_foreign_keys(&tables_to_redefine);
@@ -51,13 +58,9 @@ pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavou
         .into_iter()
         .map(SqlMigrationStep::CreateEnum)
         .chain(differ.alter_enums().into_iter().map(SqlMigrationStep::AlterEnum))
-        .chain(drop_indexes.into_iter().map(SqlMigrationStep::DropIndex))
         .chain(drop_foreign_keys.into_iter().map(SqlMigrationStep::DropForeignKey))
-        .chain(
-            differ
-                .alter_tables(&tables_to_redefine)
-                .map(SqlMigrationStep::AlterTable),
-        )
+        .chain(drop_indexes.into_iter().map(SqlMigrationStep::DropIndex))
+        .chain(alter_tables.into_iter().map(SqlMigrationStep::AlterTable))
         // Order matters: we must drop enums before we create tables,
         // because the new tables might be named the same as the dropped
         // enum, and that conflicts on postgres.
@@ -563,7 +566,13 @@ fn foreign_keys_match(previous: &ForeignKeyWalker<'_>, next: &ForeignKeyWalker<'
             .constrained_columns()
             .zip(next.constrained_columns())
             .all(|(previous, next)| {
-                previous.name() == next.name() && previous.column_type_family() == next.column_type_family()
+                let families_match = match (previous.column_type_family(), next.column_type_family()) {
+                    (ColumnTypeFamily::Uuid, ColumnTypeFamily::String) => true,
+                    (ColumnTypeFamily::String, ColumnTypeFamily::Uuid) => true,
+                    (x, y) => x == y,
+                };
+
+                previous.name() == next.name() && families_match
             });
 
     // Foreign key references different columns or the same columns in a different order.

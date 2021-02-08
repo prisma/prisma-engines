@@ -108,15 +108,6 @@ impl<'a> Validator<'a> {
                 errors_for_model.append(the_errors);
             }
 
-            //            if !errors_for_model.has_errors() {
-            //                let mut new_errors = self.validate_relation_arguments_bla(
-            //                    schema,
-            //                    ast_schema.find_model(&model.name).expect(STATE_ERROR),
-            //                    model,
-            //                );
-            //                errors_for_model.append(&mut new_errors);
-            //            }
-
             all_errors.append(&mut errors_for_model);
         }
 
@@ -218,8 +209,9 @@ impl<'a> Validator<'a> {
                             let ast_index = ast_model
                                 .attributes
                                 .iter()
-                                .find(|attribute| attribute.name.name == "index")
+                                .find(|attribute| attribute.is_index())
                                 .unwrap();
+
                             errors.push_error(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
                                 index_name,
                                 ast_index.span,
@@ -629,18 +621,18 @@ impl<'a> Validator<'a> {
                         // This check needs the connector, so it can't be in the dml
                         // crate.
                         if let Some(connector) = self.source.map(|source| &source.active_connector) {
-                            let base_native_type = base_field.field_type().as_native_type().map(|(scalar, native)| (scalar.clone(), native.serialized_native_type.clone())).or_else(|| -> Option<_> {
+                            let base_native_type = base_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = base_field.field_type();
                                 let scalar_type = field_type.as_base()?;
 
-                                Some((scalar_type.clone(), connector.default_native_type_for_scalar_type(scalar_type, true)))
+                                Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
-                            let referenced_native_type = referenced_field.field_type().as_native_type().map(|(scalar, native)| (scalar.clone(), native.serialized_native_type.clone())).or_else(|| -> Option<_> {
+                            let referenced_native_type = referenced_field.field_type().as_native_type().map(|(scalar, native)| (*scalar, native.serialized_native_type.clone())).or_else(|| -> Option<_> {
                                 let field_type = referenced_field.field_type();
                                 let scalar_type = field_type.as_base()?;
 
-                                Some((scalar_type.clone(), connector.default_native_type_for_scalar_type(scalar_type, true)))
+                                Some((*scalar_type, connector.default_native_type_for_scalar_type(scalar_type)))
                             });
 
                             if base_native_type.is_some() && base_native_type == referenced_native_type {

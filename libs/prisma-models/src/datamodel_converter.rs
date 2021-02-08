@@ -85,8 +85,8 @@ impl<'a> DatamodelConverter<'a> {
                         });
 
                     // If one side of the relation is not supported, filter out the relation
-                    if relation.model_a.is_relation_supported(&relation.field_a) == false
-                        || relation.model_b.is_relation_supported(&relation.field_b) == false
+                    if !relation.model_a.is_relation_supported(&relation.field_a)
+                        || !relation.model_b.is_relation_supported(&relation.field_b)
                     {
                         return None;
                     }
@@ -386,7 +386,7 @@ impl ModelConverterUtilities for dml::Model {
             _ => false,
         });
 
-        has_unsupported_field == false
+        !has_unsupported_field
     }
 
     fn has_supported_indexed_field(&self) -> bool {

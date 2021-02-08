@@ -423,7 +423,7 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
     }
 
     if let ColumnTypeFamily::Unsupported(description) = &column.column_type().family {
-        return format!("{}", description).into();
+        return description.to_string().into();
     }
 
     let native_type = column

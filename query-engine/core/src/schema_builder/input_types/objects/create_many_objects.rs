@@ -40,9 +40,13 @@ pub(crate) fn create_many_object_type(
         .scalar()
         .into_iter()
         .filter(|sf| {
-            !linking_fields.contains(sf)
-                && (!sf.is_autoincrement
-                    || (sf.is_autoincrement && ctx.capabilities.contains(ConnectorCapability::WritableAutoincField)))
+            if linking_fields.contains(sf) {
+                false
+            } else if sf.is_autoincrement {
+                ctx.capabilities.contains(ConnectorCapability::WritableAutoincField)
+            } else {
+                true
+            }
         })
         .collect();
 

@@ -104,7 +104,7 @@ async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"), log = "debug")]
+#[test_each_connector(tags("postgres"), log = "debug")]
 async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     let types = &[
         ("smallint", "Int", "SmallInt", "int2"),
@@ -172,6 +172,40 @@ async fn native_type_columns_can_be_created(api: &TestApi) -> TestResult {
     })?;
 
     api.schema_push(dm).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn uuids_do_not_generate_drift_issue_5282(api: &TestApi) -> TestResult {
+    api.database().raw_cmd(
+        r#"
+        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+        CREATE TABLE a (id uuid DEFAULT uuid_generate_v4() primary key);
+        CREATE TABLE b (id uuid DEFAULT uuid_generate_v4() primary key, a_id uuid, CONSTRAINT aaa FOREIGN KEY (a_id) REFERENCES a(id));
+        "#
+    ).await?;
+
+    let dm = api.native_types_datamodel(
+        r#"
+        model a {
+            id String @id @default(dbgenerated("uuid_generate_v4()")) @test_db.Uuid
+        }
+
+        model b {
+            id   String  @id @default(dbgenerated("uuid_generate_v4()")) @test_db.Uuid
+            a_id String? @test_db.Uuid
+            a    a?      @relation(fields: [a_id], references: [id])
+        }
+        "#,
+    );
+
+    api.schema_push(&dm)
+        .migration_id(Some("first"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
 
     Ok(())
 }

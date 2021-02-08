@@ -168,11 +168,6 @@ pub enum ErrorKind {
         given_count: usize,
     },
 
-    #[error(
-    "Native types can only be used if the corresponding feature flag is enabled. Please add this field in your generator block: `previewFeatures = [\"nativeTypes\"]`"
-    )]
-    NativeFlagsPreviewFeatureDisabled,
-
     #[error("Native type {} can not be unique in {}.", native_type, connector_name)]
     IncompatibleNativeTypeWithUniqueAttribute {
         native_type: String,

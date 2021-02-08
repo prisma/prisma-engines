@@ -3,7 +3,8 @@ use crate::{query_ast::*, query_graph::*, ParsedInputValue};
 use connector::Filter;
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
-use std::{collections::HashSet, convert::TryInto, iter::FromIterator, sync::Arc};
+use std::convert::TryInto;
+use std::sync::Arc;
 
 /// Only for x-to-many relations.
 ///
@@ -229,7 +230,7 @@ fn handle_one_to_many(
             child_model_identifier.clone(),
             Box::new(move |mut diff_node, child_ids| {
                 if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                    diff.left = HashSet::from_iter(child_ids.into_iter());
+                    diff.left = child_ids.into_iter().collect();
                 }
 
                 Ok(diff_node)
@@ -245,7 +246,7 @@ fn handle_one_to_many(
             child_model_identifier,
             Box::new(move |mut diff_node, child_ids| {
                 if let Node::Computation(Computation::Diff(ref mut diff)) = diff_node {
-                    diff.right = HashSet::from_iter(child_ids.into_iter());
+                    diff.right = child_ids.into_iter().collect();
                 }
 
                 Ok(diff_node)

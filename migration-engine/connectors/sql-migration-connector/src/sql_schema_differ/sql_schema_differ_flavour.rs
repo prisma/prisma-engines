@@ -1,5 +1,8 @@
 use super::{column::ColumnDiffer, ColumnTypeChange, SqlSchemaDiffer};
-use crate::{pair::Pair, sql_migration::AlterEnum};
+use crate::{
+    pair::Pair,
+    sql_migration::{AlterEnum, AlterTable, CreateIndex, DropIndex},
+};
 use sql_schema_describer::walkers::IndexWalker;
 use std::collections::HashSet;
 
@@ -34,6 +37,16 @@ pub(crate) trait SqlSchemaDifferFlavour {
     /// Return whether an index should be renamed by the migration.
     fn index_should_be_renamed(&self, indexes: &Pair<IndexWalker<'_>>) -> bool {
         indexes.previous().name() != indexes.next().name()
+    }
+
+    /// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema
+    fn push_index_changes_for_column_changes(
+        &self,
+        _alter_tables: &[AlterTable],
+        _drop_indexes: &mut Vec<DropIndex>,
+        _create_indexes: &mut Vec<CreateIndex>,
+        _differ: &SqlSchemaDiffer<'_>,
+    ) {
     }
 
     /// Whether the differ should produce CreateIndex steps for the indexes of

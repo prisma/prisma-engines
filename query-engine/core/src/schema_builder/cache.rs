@@ -70,9 +70,8 @@ impl<T> From<Vec<(Identifier, Arc<T>)>> for TypeRefCache<T> {
 /// Convenience cache utility to load and return immediately if an input object type is already cached.
 macro_rules! return_cached_input {
     ($ctx:expr, $ident:expr) => {
-        let existing_type = $ctx.get_input_type($ident);
-        if existing_type.is_some() {
-            return existing_type.unwrap();
+        if let Some(existing_type) = $ctx.get_input_type($ident) {
+            return existing_type;
         }
     };
 }
@@ -80,9 +79,8 @@ macro_rules! return_cached_input {
 /// Convenience cache utility to load and return immediately if an output object type is already cached.
 macro_rules! return_cached_output {
     ($ctx:ident, $name:expr) => {
-        let existing_type = $ctx.get_output_type($name);
-        if existing_type.is_some() {
-            return existing_type.unwrap();
+        if let Some(existing_type) = $ctx.get_output_type($name) {
+            return existing_type;
         }
     };
 }

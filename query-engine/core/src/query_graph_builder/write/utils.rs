@@ -49,15 +49,12 @@ where
 fn get_selected_fields(model: &ModelRef, projection: ModelProjection) -> ModelProjection {
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();
-    let mismatches = projection != primary_model_id;
 
-    let projection = if mismatches {
+    if projection != primary_model_id {
         primary_model_id.merge(projection)
     } else {
         projection
-    };
-
-    projection
+    }
 }
 
 /// Adds a read query to the query graph that finds related records by parent ID.

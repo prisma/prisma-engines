@@ -1,4 +1,3 @@
-use crate::*;
 use migration_core::{
     commands::{
         CreateMigrationOutput, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
@@ -6,7 +5,9 @@ use migration_core::{
     },
     migration_api,
 };
+use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
+use quaint::prelude::Queryable;
 use user_facing_errors::{migration_engine::ShadowDbCreationError, UserFacingError};
 
 #[test_each_connector]
@@ -637,9 +638,8 @@ async fn with_a_failed_migration(api: &TestApi) -> TestResult {
         .unwrap_err()
         .to_string();
 
-    match api.sql_family() {
-        SqlFamily::Mssql => assert!(err.contains("Could not find stored procedure"), err),
-        _ => assert!(&err.contains("syntax"), err),
+    if api.is_mssql() {
+        assert!(err.contains("Could not find stored procedure"), err)
     }
 
     let DiagnoseMigrationHistoryOutput {
@@ -918,6 +918,8 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
         .await
         .ok();
 
+    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+
     api.database()
         .raw_cmd(
             "
@@ -973,6 +975,61 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
 
     assert!(
         matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
+    );
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn empty_migration_directories_should_cause_known_errors(api: &TestApi) -> TestResult {
+    let migrations_directory = api.create_migrations_directory()?;
+
+    let dm = r#"
+        model Cat {
+            id      Int @id
+            hasBox  Boolean
+        }
+    "#;
+
+    let output = api
+        .create_migration("01init", dm, &migrations_directory)
+        .send()
+        .await?
+        .assert_migration("01init", |migration| Ok(migration))?
+        .into_output();
+
+    api.apply_migrations(&migrations_directory)
+        .send()
+        .await?
+        .assert_applied_migrations(&["01init"])?;
+
+    let dirname = output.generated_migration_name.unwrap();
+    let dirpath = migrations_directory.path().join(dirname);
+
+    assert!(dirpath.exists());
+
+    let filepath = dirpath.join("migration.sql");
+
+    assert!(filepath.exists());
+
+    std::fs::remove_file(&filepath)?;
+
+    let err = api
+        .diagnose_migration_history(&migrations_directory)
+        .send()
+        .await
+        .unwrap_err()
+        .render_user_facing()
+        .unwrap_known();
+
+    assert_eq!(
+        err.error_code,
+        user_facing_errors::migration_engine::MigrationFileNotFound::ERROR_CODE
+    );
+
+    assert_eq!(
+        err.meta,
+        serde_json::json!({ "migration_file_path": filepath.to_string_lossy(), })
     );
 
     Ok(())

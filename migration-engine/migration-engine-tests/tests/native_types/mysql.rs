@@ -705,7 +705,7 @@ fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
     if api.is_mariadb() {
         return Cow::Owned(
             cases
-                .into_iter()
+                .iter()
                 .cloned()
                 .filter(|(ty, _, _)| !type_is_unsupported_mariadb(ty))
                 .collect(),
@@ -715,7 +715,7 @@ fn filter_from_types(api: &TestApi, cases: Cases) -> Cow<'static, [Case]> {
     if api.is_mysql_5_6() {
         return Cow::Owned(
             cases
-                .into_iter()
+                .iter()
                 .cloned()
                 .filter(|(ty, _, _)| !type_is_unsupported_mysql_5_6(ty))
                 .collect(),
@@ -749,7 +749,7 @@ fn filter_to_types(api: &TestApi, to_types: &'static [&'static str]) -> Cow<'sta
     to_types.into()
 }
 
-#[test_each_connector(tags("mysql"), features("native_types"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
     let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
@@ -800,7 +800,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), features("native_types"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
@@ -866,7 +866,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), features("native_types"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn impossible_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     let connector = sql_datamodel_connector::MySqlDatamodelConnector::new();
     let mut dm1 = String::with_capacity(256);
@@ -932,7 +932,7 @@ async fn impossible_casts_with_existing_data_should_warn(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), features("native_types"))]
+#[test_each_connector(tags("mysql"))]
 async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
@@ -997,7 +997,7 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector(log = "debug", tags("mysql"), features("native_types"))]
+#[test_each_connector(log = "debug", tags("mysql"))]
 async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"

@@ -249,15 +249,14 @@ impl QueryGraph {
 
     /// Checks if the subgraph starting at the given node contains the node designated as the overall result.
     pub fn subgraph_contains_result(&self, node: &NodeRef) -> bool {
-        self.is_result_node(node)
-            || self
-                .outgoing_edges(node)
-                .into_iter()
-                .find(|edge| {
-                    let child_node = self.edge_target(edge);
-                    self.subgraph_contains_result(&child_node)
-                })
-                .is_some()
+        if self.is_result_node(node) {
+            true
+        } else {
+            self.outgoing_edges(node).into_iter().any(|edge| {
+                let child_node = self.edge_target(&edge);
+                self.subgraph_contains_result(&child_node)
+            })
+        }
     }
 
     /// Returns all root nodes of the graph.
@@ -524,13 +523,10 @@ impl QueryGraph {
                 {
                     // Exception rule: Only swap `Then` and `Else` edges.
                     Node::Flow(Flow::If(_)) => {
-                        let do_swap = match self.edge_content(&parent_edge) {
-                            Some(QueryGraphDependency::Then) => true,
-                            Some(QueryGraphDependency::Else) => true,
-                            _ => false,
-                        };
-
-                        if do_swap {
+                        if matches!(
+                            self.edge_content(&parent_edge),
+                            Some(QueryGraphDependency::Then) | Some(QueryGraphDependency::Else)
+                        ) {
                             let content = self
                                 .remove_edge(parent_edge)
                                 .expect("Expected edges between marked nodes to be non-empty.");
@@ -616,16 +612,10 @@ impl QueryGraph {
 
                     for (_, sibling) in siblings {
                         let possible_edge = self.graph.find_edge(node.node_ix, sibling.node_ix);
-                        let is_if_node_child = self
-                            .incoming_edges(&sibling)
-                            .into_iter()
-                            .find(|edge| {
-                                matches!(
-                                    self.edge_content(&edge).unwrap(),
-                                    QueryGraphDependency::Then | QueryGraphDependency::Else
-                                )
-                            })
-                            .is_some();
+                        let is_if_node_child = self.incoming_edges(&sibling).into_iter().any(|edge| {
+                            let content = self.edge_content(&edge).unwrap();
+                            matches!(content, QueryGraphDependency::Then | QueryGraphDependency::Else)
+                        });
 
                         if sibling != node
                             && possible_edge.is_none()

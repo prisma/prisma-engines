@@ -1,6 +1,5 @@
 use crate::{LintOpts, MiniError};
 use datamodel::diagnostics::{DatamodelError, DatamodelWarning};
-
 use std::io::{self, Read};
 
 pub fn run(opts: LintOpts) {

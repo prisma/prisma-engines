@@ -88,7 +88,7 @@ impl VersionChecker {
                     }
                 }
             }
-            SqlFamily::Sqlite if !SQLITE_TYPES.contains(&&**&column.tpe.full_data_type) => {
+            SqlFamily::Sqlite if !SQLITE_TYPES.contains(&&*column.tpe.full_data_type) => {
                 self.uses_non_prisma_types = true
             }
             _ => (),

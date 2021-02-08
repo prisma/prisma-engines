@@ -172,17 +172,7 @@ impl Connector for MySqlDatamodelConnector {
         &self.capabilities
     }
 
-    fn default_native_type_for_scalar_type(
-        &self,
-        scalar_type: &ScalarType,
-        temporary_native_types: bool,
-    ) -> serde_json::Value {
-        let scalar_type = if !temporary_native_types && scalar_type.is_float() {
-            &ScalarType::Decimal
-        } else {
-            scalar_type
-        };
-
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = SCALAR_TYPE_DEFAULTS
             .iter()
             .find(|(st, _)| st == scalar_type)
@@ -230,7 +220,7 @@ impl Connector for MySqlDatamodelConnector {
                         error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.")
                     }
                     Bit(n) if n > 1 && scalar_type.is_boolean() => {
-                        error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.".into())
+                        error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.")
                     }
                     _ if field.is_unique() && incompatible_with_key => error.new_incompatible_native_type_with_unique(),
                     _ if field.is_id() && incompatible_with_key => error.new_incompatible_native_type_with_id(),

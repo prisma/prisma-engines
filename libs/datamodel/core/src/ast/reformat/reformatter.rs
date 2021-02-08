@@ -1,13 +1,10 @@
-use crate::{ast::parser::*, ast::renderer::*};
-use pest::Parser;
-
-// We have to use RefCell as rust cannot
-// do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::ast::helper::get_sort_index_of_attribute;
 use crate::common::WritableString;
 use crate::diagnostics::ValidatedMissingFields;
+use crate::{ast::parser::*, ast::renderer::*};
 use pest::iterators::Pair;
+use pest::Parser;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -31,8 +28,7 @@ impl<'a> Reformatter<'a> {
         let mut diagnostics = crate::diagnostics::Diagnostics::new();
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
-        let generators = &vec![];
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, generators);
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut result = Vec::new();
 
         diagnostics.append_warning_vec(validated_datamodel.warnings);
@@ -65,8 +61,7 @@ impl<'a> Reformatter<'a> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let validated_datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         diagnostics.append_warning_vec(validated_datamodel.warnings);
-        let generators = &vec![];
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None, generators);
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
         let mut missing_field_attributes = Vec::new();
         for model in validated_datamodel.subject.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
@@ -153,8 +148,6 @@ impl<'a> Reformatter<'a> {
                 }
                 seen_at_least_one_top_level_element = true;
             }
-
-            //            println!("top level: {:?} |{:?}|", current.as_rule(), current.as_str());
 
             match current.as_rule() {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {

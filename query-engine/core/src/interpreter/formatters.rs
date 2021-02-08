@@ -9,7 +9,7 @@ pub fn format_expression(expr: &Expression, indent: usize) -> String {
             .collect::<Vec<String>>()
             .join("\n"),
 
-        Expression::Query { query } => match query {
+        Expression::Query { query } => match &**query {
             Query::Read(rq) => add_indent(indent, format!("{}", rq)),
             Query::Write(wq) => add_indent(indent, format!("{}", wq)),
         },

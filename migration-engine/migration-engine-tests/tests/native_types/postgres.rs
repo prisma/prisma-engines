@@ -200,7 +200,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "Real",
-            Value::float(3 as f32),
+            Value::float(3.0),
             &[
                 "SmallInt",
                 "Integer",
@@ -212,7 +212,7 @@ static RISKY_CASTS: Lazy<Vec<(&str, Value, &[&str])>> = Lazy::new(|| {
         ),
         (
             "DoublePrecision",
-            Value::double(3 as f64),
+            Value::double(3.0),
             &[
                 "SmallInt",
                 "Integer",
@@ -783,11 +783,11 @@ static TYPE_MAPS: Lazy<HashMap<&'static str, &'static str>> = Lazy::new(|| {
 });
 
 fn prisma_type(native_type: &str) -> &str {
-    let kind = native_type.split("(").next().unwrap();
+    let kind = native_type.split('(').next().unwrap();
     TYPE_MAPS.get(kind).unwrap()
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"), log = "debug")]
+#[test_each_connector(tags("postgres"))]
 async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
@@ -885,7 +885,7 @@ async fn safe_casts_with_existing_data_should_work(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
@@ -993,7 +993,7 @@ async fn risky_casts_with_existing_data_should_warn(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
@@ -1100,7 +1100,10 @@ async fn not_castable_with_existing_data_should_warn(api: &TestApi) -> TestResul
     Ok(())
 }
 
-static SAFE_CASTS_NON_LIST_TO_STRING: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = Lazy::new(|| {
+/// A list of casts which can safely be performed.
+type CastList = Lazy<Vec<(&'static str, Vec<(&'static str, Value<'static>)>)>>;
+
+static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
     vec![
         (
             "Text",
@@ -1183,7 +1186,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: Lazy<Vec<(&str, Vec<(&str, Value)>)>> = La
     ]
 });
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> TestResult {
     let connector = SqlDatamodelConnectors::postgres();
 
@@ -1215,7 +1218,7 @@ async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> 
 
             insert = insert.value(column_name.clone(), seed.clone());
 
-            previous_assertions.push((column_name.clone(), from.clone()));
+            previous_assertions.push((column_name.clone(), from));
             next_assertions.push((column_name, to).clone());
         }
 
@@ -1276,7 +1279,7 @@ async fn safe_casts_from_array_with_existing_data_should_work(api: &TestApi) -> 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), features("native_types"))]
+#[test_each_connector(tags("postgres"))]
 async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"
@@ -1341,7 +1344,7 @@ async fn typescript_starter_schema_with_native_types_is_idempotent(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector(log = "debug", tags("postgres"), features("native_types"))]
+#[test_each_connector(log = "debug", tags("postgres"))]
 async fn typescript_starter_schema_with_differnt_native_types_is_idempotent(api: &TestApi) -> TestResult {
     let dm = api.native_types_datamodel(
         r#"

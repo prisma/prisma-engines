@@ -1,6 +1,5 @@
 use crate::BarrelMigrationExecutor;
-use datamodel::Configuration;
-use datamodel::{preview_features::PreviewFeatures, Datamodel};
+use datamodel::{Configuration, Datamodel};
 use enumflags2::BitFlags;
 use eyre::{Context, Report, Result};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
@@ -70,16 +69,7 @@ impl TestApi {
     }
 
     pub async fn introspect(&self) -> Result<String> {
-        let introspection_result = self
-            .introspection_connector
-            .introspect(&Datamodel::new(), false)
-            .await?;
-
-        Ok(datamodel::render_datamodel_to_string(&introspection_result.data_model))
-    }
-
-    pub async fn introspect_with_native_types(&self) -> Result<String> {
-        let introspection_result = self.introspection_connector.introspect(&Datamodel::new(), true).await?;
+        let introspection_result = self.introspection_connector.introspect(&Datamodel::new()).await?;
 
         Ok(datamodel::render_datamodel_to_string(&introspection_result.data_model))
     }
@@ -88,12 +78,10 @@ impl TestApi {
     pub async fn re_introspect(&self, data_model_string: &str) -> Result<String> {
         let config = parse_configuration(data_model_string).context("parsing configuration")?;
         let data_model = parse_datamodel(data_model_string).context("parsing datamodel")?;
-        let native_types = config.generators.iter().any(|g| g.has_preview_feature("nativeTypes"));
-        tracing::debug!("Native types enabled: {:?}", native_types);
 
         let introspection_result = self
             .introspection_connector
-            .introspect(&data_model, native_types)
+            .introspect(&data_model)
             .instrument(tracing::info_span!("introspect"))
             .await?;
 
@@ -106,25 +94,19 @@ impl TestApi {
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> Result<String> {
         let data_model = parse_datamodel(data_model_string)?;
-        let introspection_result = self.introspection_connector.introspect(&data_model, false).await?;
+        let introspection_result = self.introspection_connector.introspect(&data_model).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }
 
     pub async fn introspect_version(&self) -> Result<Version> {
-        let introspection_result = self
-            .introspection_connector
-            .introspect(&Datamodel::new(), false)
-            .await?;
+        let introspection_result = self.introspection_connector.introspect(&Datamodel::new()).await?;
 
         Ok(introspection_result.version)
     }
 
     pub async fn introspection_warnings(&self) -> Result<String> {
-        let introspection_result = self
-            .introspection_connector
-            .introspect(&Datamodel::new(), false)
-            .await?;
+        let introspection_result = self.introspection_connector.introspect(&Datamodel::new()).await?;
 
         Ok(serde_json::to_string(&introspection_result.warnings)?)
     }

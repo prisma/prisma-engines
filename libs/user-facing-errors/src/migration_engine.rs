@@ -31,7 +31,7 @@ struct MigrationRollback {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3003",
-    message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate#troubleshooting"
+    message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate"
 )]
 pub struct DatabaseMigrationFormatChanged;
 
@@ -181,6 +181,15 @@ impl crate::UserFacingError for ShadowDbCreationError {
             error_code = error_code
         )
     }
+}
+
+#[derive(Debug, Serialize, UserFacingError)]
+#[user_facing(
+    code = "P3015",
+    message = "Could not find the migration file at {migration_file_path}. Please delete the directory or restore the migration file."
+)]
+pub struct MigrationFileNotFound {
+    pub migration_file_path: String,
 }
 
 #[cfg(test)]

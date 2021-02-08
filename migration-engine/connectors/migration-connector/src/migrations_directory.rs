@@ -154,17 +154,17 @@ pub struct MigrationDirectory {
 }
 
 #[derive(Debug)]
-pub struct ReadMigrationScriptError(pub(crate) io::Error, pub(crate) SpanTrace);
+pub struct ReadMigrationScriptError(pub(crate) io::Error, pub(crate) SpanTrace, pub(crate) String);
 
-impl Display for ReadMigrationScriptError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Failed to read migration script")
+impl ReadMigrationScriptError {
+    fn new(err: io::Error, file_path: &Path) -> Self {
+        ReadMigrationScriptError(err, SpanTrace::capture(), file_path.to_string_lossy().into_owned())
     }
 }
 
-impl From<io::Error> for ReadMigrationScriptError {
-    fn from(err: io::Error) -> Self {
-        ReadMigrationScriptError(err, SpanTrace::capture())
+impl Display for ReadMigrationScriptError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Failed to read migration script at {}", self.2)
     }
 }
 
@@ -232,7 +232,8 @@ impl MigrationDirectory {
     /// Read the migration script to a string.
     #[tracing::instrument]
     pub fn read_migration_script(&self) -> Result<String, ReadMigrationScriptError> {
-        Ok(std::fs::read_to_string(&self.path.join("migration.sql"))?) //todo why is it hardcoded here?
+        let path = self.path.join("migration.sql"); // todo why is it hardcoded here?
+        Ok(std::fs::read_to_string(&path).map_err(|ioerr| ReadMigrationScriptError::new(ioerr, &path))?)
     }
 
     /// The filesystem path to the directory.

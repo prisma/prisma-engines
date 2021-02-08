@@ -5,7 +5,7 @@ use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
 pub enum QueryResult {
     Id(Option<RecordProjection>),
     Count(usize),
-    RecordSelection(RecordSelection),
+    RecordSelection(Box<RecordSelection>),
     Json(serde_json::Value),
     RecordAggregations(RecordAggregations),
     Unit,
@@ -32,6 +32,12 @@ pub struct RecordSelection {
 
     /// Model projection that can be used to retrieve the IDs of the contained records.
     pub model_id: ModelProjection,
+}
+
+impl From<RecordSelection> for QueryResult {
+    fn from(selection: RecordSelection) -> Self {
+        QueryResult::RecordSelection(Box::new(selection))
+    }
 }
 
 #[derive(Debug, Clone)]
