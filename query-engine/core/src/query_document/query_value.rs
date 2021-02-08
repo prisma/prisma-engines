@@ -3,7 +3,7 @@ use indexmap::IndexMap;
 use prisma_value::{stringify_date, PrismaValue};
 use std::hash::Hash;
 
-#[derive(Debug, PartialEq, Clone, Eq)]
+#[derive(Debug, Clone, Eq)]
 pub enum QueryValue {
     Int(i64),
     Float(BigDecimal),
@@ -13,6 +13,22 @@ pub enum QueryValue {
     Enum(String),
     List(Vec<QueryValue>),
     Object(IndexMap<String, QueryValue>),
+}
+
+impl PartialEq for QueryValue {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (QueryValue::Int(n1), QueryValue::Int(n2)) => n1 == n2,
+            (QueryValue::Float(n1), QueryValue::Float(n2)) => n1 == n2,
+            (QueryValue::String(s1), QueryValue::String(s2)) => s1 == s2,
+            (QueryValue::Boolean(b1), QueryValue::Boolean(b2)) => b1 == b2,
+            (QueryValue::Null, QueryValue::Null) => true,
+            (QueryValue::Enum(kind1), QueryValue::Enum(kind2)) => kind1 == kind2,
+            (QueryValue::List(list1), QueryValue::List(list2)) => list1 == list2,
+            (QueryValue::Object(t1), QueryValue::Object(t2)) => t1 == t2,
+            _ => false,
+        }
+    }
 }
 
 impl Hash for QueryValue {
