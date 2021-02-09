@@ -651,22 +651,19 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mssql(ap
 
     api.create_migration("initial", dm1, &directory).send().await?;
 
-    api.database().raw_cmd("DROP LOGIN prismashadowdbtestuser2;").await.ok();
-
     api.database()
         .raw_cmd(
             "
-            DROP USER IF EXISTS prismashadowdbtestuser2;
-
             CREATE LOGIN prismashadowdbtestuser2
                 WITH PASSWORD = '1234batmanZ';
 
-            CREATE USER prismashadowdbtestuser2 FOR LOGIN prismashadowdbtestuser2;
+            CREATE USER prismashadowdbuser2 FOR LOGIN prismashadowdbtestuser2;
 
-            GRANT SELECT TO prismashadowdbtestuser2;
+            GRANT SELECT TO prismashadowdbuser2;
             ",
         )
-        .await?;
+        .await
+        .ok();
 
     let (host, port) = db_host_and_port_mssql_2019();
 
