@@ -3,10 +3,7 @@ use connection_string::JdbcString;
 use enumflags2::BitFlags;
 use indoc::formatdoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
-use quaint::{
-    connector::MssqlUrl,
-    prelude::{SqlFamily, Table},
-};
+use quaint::{connector::MssqlUrl, prelude::Table};
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::str::FromStr;
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
@@ -175,10 +172,6 @@ impl SqlFlavour for MssqlFlavour {
         connection.raw_cmd("SELECT 1").await?;
 
         Ok(())
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Mssql
     }
 
     async fn sql_schema_from_migration_history(

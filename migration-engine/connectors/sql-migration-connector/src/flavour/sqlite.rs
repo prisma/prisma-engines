@@ -2,7 +2,7 @@ use crate::{connect, connection_wrapper::Connection, error::quaint_error_to_conn
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
-use quaint::prelude::{ConnectionInfo, SqlFamily};
+use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::path::Path;
 
@@ -99,10 +99,6 @@ impl SqlFlavour for SqliteFlavour {
         std::fs::File::create(file_path).expect("failed to truncate sqlite file");
 
         Ok(())
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Sqlite
     }
 
     #[tracing::instrument(skip(self, migrations, _connection))]

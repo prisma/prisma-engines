@@ -9,7 +9,7 @@ use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{ConnectorError, ConnectorResult, MigrationDirectory, MigrationFeature};
 use once_cell::sync::Lazy;
-use quaint::{connector::MysqlUrl, prelude::SqlFamily};
+use quaint::connector::MysqlUrl;
 use regex::RegexSet;
 use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::atomic::{AtomicU8, Ordering};
@@ -210,10 +210,6 @@ impl SqlFlavour for MysqlFlavour {
         connection.raw_cmd(&format!("USE `{}`", db_name)).await?;
 
         Ok(())
-    }
-
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Mysql
     }
 
     #[tracing::instrument(skip(self, migrations, connection))]

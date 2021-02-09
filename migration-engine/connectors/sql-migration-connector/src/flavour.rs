@@ -20,10 +20,7 @@ use crate::{
 use datamodel::Datamodel;
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorResult, MigrationDirectory, MigrationFeature};
-use quaint::{
-    connector::ConnectionInfo,
-    prelude::{SqlFamily, Table},
-};
+use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
 
@@ -86,9 +83,6 @@ pub(crate) trait SqlFlavour:
 
     /// Drop the database and recreate it empty.
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;
-
-    /// This should be considered deprecated.
-    fn sql_family(&self) -> SqlFamily;
 
     /// Apply the given migration history to a temporary database, and return
     /// the final introspected SQL schema.
