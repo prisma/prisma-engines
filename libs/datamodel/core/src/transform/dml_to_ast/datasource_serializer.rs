@@ -21,6 +21,7 @@ impl DatasourceSerializer {
         let mut arguments: Vec<ast::Argument> = Vec::new();
 
         arguments.push(ast::Argument::new_string("provider", &source.active_provider));
+
         match source.url.from_env_var {
             Some(ref env_var) => {
                 let values = vec![ast::Expression::StringValue(env_var.to_string(), ast::Span::empty())];
@@ -29,16 +30,6 @@ impl DatasourceSerializer {
             None => {
                 arguments.push(ast::Argument::new_string("url", &source.url.value));
             }
-        }
-
-        if !&source.preview_features.is_empty() {
-            let features: Vec<ast::Expression> = source
-                .preview_features
-                .iter()
-                .map(|f| ast::Expression::StringValue(f.to_owned(), ast::Span::empty()))
-                .collect::<Vec<ast::Expression>>();
-
-            arguments.push(ast::Argument::new_array("previewFeatures", features));
         }
 
         ast::SourceConfig {

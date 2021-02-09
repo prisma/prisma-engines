@@ -33,9 +33,10 @@ impl Diagnostics {
         }
     }
 
-    pub fn merge_error(&mut self, err: DatamodelError) -> Diagnostics {
+    pub fn merge_error(mut self, err: DatamodelError) -> Diagnostics {
         self.push_error(err);
-        self.clone()
+
+        self
     }
 
     /// Returns true, if there is at least one error
