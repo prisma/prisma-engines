@@ -1,7 +1,8 @@
 mod connection;
 
+pub use connection::*;
+
 use async_trait::async_trait;
-use connection::MongoDbConnection;
 use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connector,

@@ -1,9 +1,11 @@
 use std::unimplemented;
 
+use crate::{error::MongoError, queries::read};
 use async_trait::async_trait;
 use connector_interface::{Connection, ReadOperations, WriteOperations};
 use mongodb::Database;
 use prisma_models::prelude::*;
+use std::future::Future;
 
 pub struct MongoDbConnection {
     /// Handle to a mongo database.
@@ -16,6 +18,18 @@ impl Connection for MongoDbConnection {
         &'a self,
     ) -> connector_interface::Result<Box<dyn connector_interface::Transaction + 'a>> {
         unimplemented!("Unsupported MongoDB feature: Transactions.");
+    }
+}
+
+impl MongoDbConnection {
+    async fn catch<O>(
+        &self,
+        fut: impl Future<Output = Result<O, MongoError>>,
+    ) -> Result<O, connector_interface::error::ConnectorError> {
+        match fut.await {
+            Ok(o) => Ok(o),
+            Err(err) => Err(err.into_connector_error()),
+        }
     }
 }
 
@@ -98,7 +112,8 @@ impl ReadOperations for MongoDbConnection {
         filter: &connector_interface::Filter,
         selected_fields: &ModelProjection,
     ) -> connector_interface::Result<Option<SingleRecord>> {
-        todo!()
+        self.catch(async move { read::get_single_record(&self.database, model, filter, selected_fields).await })
+            .await
     }
 
     async fn get_many_records(
