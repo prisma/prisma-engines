@@ -3,7 +3,7 @@ package queries.simple
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
-class findUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
+class FindUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   "Fetching a unique record" should "work by id" in {
     val project = SchemaDsl.fromStringV11() {
       """model TestModel {
