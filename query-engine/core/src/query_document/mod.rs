@@ -97,7 +97,7 @@ pub struct CompactedDocument {
 
 impl CompactedDocument {
     pub fn single_name(&self) -> String {
-        format!("findOne{}", self.name)
+        format!("findUnique{}", self.name)
     }
 
     pub fn plural_name(&self) -> String {
@@ -115,10 +115,10 @@ impl From<Vec<Operation>> for CompactedDocument {
             .map(|op| op.into_read().expect("Trying to compact a write operation."))
             .collect();
 
-        // This block creates the findMany query from the separate findOne queries.
+        // This block creates the findMany query from the separate findUnique queries.
         let selection = {
             // The name of the query should be findManyX if the first query
-            // here is findOneX. We took care earlier the queries are all the
+            // here is findUniqueX. We took care earlier the queries are all the
             // same. Otherwise we fail hard here.
             let mut builder = Selection::builder(selections[0].name().replacen("findUnique", "findMany", 1));
 
@@ -130,8 +130,7 @@ impl From<Vec<Operation>> for CompactedDocument {
             // The query arguments are extracted here. Combine all query
             // arguments from the different queries into a one large argument.
             let selection_set = selections.iter().fold(SelectionSet::new(), |acc, selection| {
-                // findOne always has only one argument. We know it must be an
-                // object, otherwise this will panic.
+                // findUnique always has only one argument. We know it must be an object, otherwise this will panic.
                 let obj = selection.arguments()[0]
                     .1
                     .clone()

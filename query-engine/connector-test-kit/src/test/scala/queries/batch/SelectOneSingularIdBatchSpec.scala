@@ -55,7 +55,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
   }
 
-  "two successful queries and one failing with same selection set" should "work" in {
+  "two successful queries and   one failing with same selection set" should "work" in {
     val queries = Seq(
       """query {findUniqueArtist(where:{ArtistId: 1}){Name, ArtistId}}""",
       """query {findUniqueArtist(where:{ArtistId: 420}){Name, ArtistId}}""",
