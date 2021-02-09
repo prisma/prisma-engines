@@ -17,7 +17,7 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let filter = extract_unique_filter(where_arg.value.try_into()?, &model)?;
 
     // Prefetch read query for the delete
-    let mut read_query = read::find_one(field, Arc::clone(&model))?;
+    let mut read_query = read::find_unique(field, Arc::clone(&model))?;
     read_query.add_filter(filter.clone());
 
     let read_node = graph.create_node(Query::Read(read_query));

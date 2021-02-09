@@ -7,9 +7,9 @@ pub enum Operation {
 }
 
 impl Operation {
-    pub fn is_find_one(&self) -> bool {
+    pub fn is_find_unique(&self) -> bool {
         match self {
-            Self::Read(selection) => selection.is_find_one(),
+            Self::Read(selection) => selection.is_find_unique(),
             _ => false,
         }
     }

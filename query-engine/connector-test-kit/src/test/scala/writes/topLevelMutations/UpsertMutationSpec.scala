@@ -396,7 +396,7 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server
       .query(
         s"""{
-        |  findOneTodo(where: {id: "$todoId"}){
+        |  findUniqueTodo(where: {id: "$todoId"}){
         |    title
         |  }
         |}
@@ -404,7 +404,7 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
         project,
         legacy = false,
       )
-      .pathAsString("data.findOneTodo.title") should equal("updated title")
+      .pathAsString("data.findUniqueTodo.title") should equal("updated title")
   }
 
   "An upsert" should "perform only an update if the update changes nothing" in {
@@ -456,7 +456,7 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server
       .query(
         s"""{
-           |  findOneTodo(where: {id: "$todoId"}){
+           |  findUniqueTodo(where: {id: "$todoId"}){
            |    title
            |  }
            |}
@@ -464,7 +464,7 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
         project,
         legacy = false,
       )
-      .pathAsString("data.findOneTodo.title") should equal("title")
+      .pathAsString("data.findUniqueTodo.title") should equal("title")
   }
 
   "An upsertOne mutation" should "correctly apply all number operations for Int on update" in {

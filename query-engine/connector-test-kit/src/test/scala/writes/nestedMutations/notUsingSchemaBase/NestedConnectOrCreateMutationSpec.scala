@@ -262,7 +262,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
 
     result = server.query(
       s"""{
-         |  findOneModelA(where: { id: "A1" }) {
+         |  findUniqueModelA(where: { id: "A1" }) {
          |    oneB {
          |      b_u
          |    }
@@ -273,7 +273,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
       legacy = false,
     )
 
-    result.toString() should be("{\"data\":{\"findOneModelA\":{\"oneB\":{\"b_u\":\"B2\"}}}}")
+    result.toString() should be("{\"data\":{\"findUniqueModelA\":{\"oneB\":{\"b_u\":\"B2\"}}}}")
   }
 
   "A 1:m relation connectOrCreate" should "work" in {
@@ -423,7 +423,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
 
     result = server.query(
       s"""{
-         |  findOneModelA(where: { id: "A1" }) {
+         |  findUniqueModelA(where: { id: "A1" }) {
          |    oneB {
          |      b_u
          |    }
@@ -434,7 +434,7 @@ class NestedConnectOrCreateMutationSpec extends FlatSpec with Matchers with ApiS
       legacy = false,
     )
 
-    result.toString() should be("{\"data\":{\"findOneModelA\":{\"oneB\":{\"b_u\":\"B2\"}}}}")
+    result.toString() should be("{\"data\":{\"findUniqueModelA\":{\"oneB\":{\"b_u\":\"B2\"}}}}")
   }
 
   // Regression test for failing internal graph transformations.
