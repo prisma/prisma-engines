@@ -3,7 +3,7 @@ package queries.simple
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
-class FindOneQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
+class findUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   "Fetching a unique record" should "work by id" in {
     val project = SchemaDsl.fromStringV11() {
       """model TestModel {
@@ -26,7 +26,7 @@ class FindOneQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val result = server.query(
       """{
-        |  findOneTestModel(where: { id: 1 }) {
+        |  findUniqueTestModel(where: { id: 1 }) {
         |    id
         |  }
         |}""".stripMargin,
@@ -34,7 +34,7 @@ class FindOneQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    result.toString should be("""{"data":{"findOneTestModel":{"id":1}}}""")
+    result.toString should be("""{"data":{"findUniqueTestModel":{"id":1}}}""")
   }
 
   "Fetching a unique record" should "work by any unique field" in {
@@ -59,7 +59,7 @@ class FindOneQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val result = server.query(
       """{
-          |  findOneTestModel(where: { uniq: "uniq" }) {
+          |  findUniqueTestModel(where: { uniq: "uniq" }) {
           |    id
           |    uniq
           |  }
@@ -68,6 +68,6 @@ class FindOneQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false,
     )
 
-    result.toString() should be("""{"data":{"findOneTestModel":{"id":1,"uniq":"uniq"}}}""")
+    result.toString() should be("""{"data":{"findUniqueTestModel":{"id":1,"uniq":"uniq"}}}""")
   }
 }
