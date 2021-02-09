@@ -10,7 +10,6 @@ mod core_error;
 
 use anyhow::anyhow;
 pub use api::GenericApi;
-use api::MigrationApi;
 pub use commands::SchemaPushInput;
 use commands::{MigrationCommand, SchemaPushCommand};
 pub use core_error::{CoreError, CoreResult};
@@ -78,9 +77,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
         x => unimplemented!("Connector {} is not supported yet", x),
     };
 
-    let api = api::MigrationApi::new(connector);
-
-    Ok(Arc::new(api))
+    Ok(Arc::new(connector))
 }
 
 /// Create the database referenced by the passed in Prisma schema.
@@ -160,8 +157,6 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         x => unimplemented!("Connector {} is not supported yet", x),
     };
 
-    let engine = MigrationApi::new(connector);
-
     // 2. create the database schema for given Prisma schema
     let schema_push_input = SchemaPushInput {
         schema: prisma_schema.to_string(),
@@ -169,7 +164,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         force: true,
     };
 
-    SchemaPushCommand::execute(&schema_push_input, engine.connector()).await?;
+    SchemaPushCommand::execute(&schema_push_input, &connector).await?;
 
     Ok(())
 }

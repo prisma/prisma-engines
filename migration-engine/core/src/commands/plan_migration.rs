@@ -24,7 +24,6 @@ pub struct PlanMigrationCommand;
 #[async_trait::async_trait]
 impl<'a> MigrationCommand for PlanMigrationCommand {
     type Input = PlanMigrationInput;
-
     type Output = PlanMigrationOutput;
 
     async fn execute<C: MigrationConnector>(_input: &Self::Input, _engine: &C) -> CoreResult<Self::Output> {
