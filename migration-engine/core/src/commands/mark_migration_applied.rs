@@ -27,14 +27,15 @@ impl MigrationCommand for MarkMigrationAppliedCommand {
     type Output = MarkMigrationAppliedOutput;
 
     async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
-        // We should take a lock on the migrations table.
+        let connector = engine.connector();
+        let persistence = engine.connector().migration_persistence();
 
-        //Validate Provider
         migration_connector::error_on_changed_provider(
             &input.migrations_directory_path,
             engine.connector().connector_type(),
         )?;
-        let persistence = engine.connector().migration_persistence();
+
+        connector.acquire_lock().await?;
 
         let migration_directory =
             MigrationDirectory::new(Path::new(&input.migrations_directory_path).join(&input.migration_name));

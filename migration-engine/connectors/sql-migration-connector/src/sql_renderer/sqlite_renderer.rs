@@ -213,7 +213,7 @@ impl SqlRenderer for SqliteFlavour {
     }
 }
 
-fn render_column_type<'a>(t: &'a ColumnType) -> &'a str {
+fn render_column_type(t: &ColumnType) -> &str {
     match &t.family {
         ColumnTypeFamily::Boolean => "BOOLEAN",
         ColumnTypeFamily::DateTime => "DATETIME",

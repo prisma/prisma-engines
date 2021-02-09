@@ -40,8 +40,9 @@ impl<'a> MigrationCommand for ApplyMigrationsCommand {
         let applier = connector.database_migration_step_applier();
         let migration_persistence = connector.migration_persistence();
 
-        //Validate Provider
         migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
+
+        connector.acquire_lock().await?;
 
         migration_persistence.initialize().await?;
 

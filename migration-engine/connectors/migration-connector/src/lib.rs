@@ -37,6 +37,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// For example, in the SQL connector, a step would represent an SQL statement like `CREATE TABLE`.
     type DatabaseMigration: DatabaseMigrationMarker + Send + Sync + 'static;
 
+    /// If possible on the target connector, acquire an advisory lock, so multiple instances of migrate do not run concurrently.
+    async fn acquire_lock(&self) -> ConnectorResult<()>;
+
     /// A string that should identify what database backend is being used. Note that this is not necessarily
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;

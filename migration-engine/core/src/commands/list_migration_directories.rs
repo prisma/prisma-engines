@@ -28,13 +28,10 @@ impl<'a> MigrationCommand for ListMigrationDirectoriesCommand {
     type Input = ListMigrationDirectoriesInput;
     type Output = ListMigrationDirectoriesOutput;
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
-        //Validate Provider
-        migration_connector::error_on_changed_provider(
-            &input.migrations_directory_path,
-            engine.connector().connector_type(),
-        )?;
-
+    async fn execute<C: MigrationConnector>(
+        input: &Self::Input,
+        _engine: &MigrationApi<C>,
+    ) -> CoreResult<Self::Output> {
         let migrations_from_filesystem =
             migration_connector::list_migrations(&Path::new(&input.migrations_directory_path))?;
 

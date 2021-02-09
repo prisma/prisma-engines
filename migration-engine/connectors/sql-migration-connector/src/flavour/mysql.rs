@@ -15,6 +15,8 @@ use sql_schema_describer::{DescriberErrorKind, SqlSchema, SqlSchemaDescriberBack
 use std::sync::atomic::{AtomicU8, Ordering};
 use url::Url;
 
+const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
+
 #[derive(Debug)]
 pub(crate) struct MysqlFlavour {
     pub(super) url: MysqlUrl,
@@ -46,6 +48,12 @@ impl MysqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
+    async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        // https://dev.mysql.com/doc/refman/8.0/en/locking-functions.html
+        let query = format!("SELECT GET_LOCK('prisma_migrate', {})", ADVISORY_LOCK_TIMEOUT.as_secs());
+        Ok(connection.raw_cmd(&query).await?)
+    }
+
     fn check_database_version_compatibility(
         &self,
         datamodel: &Datamodel,

@@ -36,6 +36,16 @@ impl MssqlFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for MssqlFlavour {
+    async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        // see
+        // https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-getapplock-transact-sql?view=sql-server-ver15
+        // We don't set an explicit timeout because we want to respect the
+        // server-set default.
+        Ok(connection
+            .raw_cmd("sp_getapplock @Resource = 'prisma_migrate', @LockMode = 'Exclusive', @LockOwner = 'Session'")
+            .await?)
+    }
+
     fn imperative_migrations_table(&self) -> Table<'_> {
         (self.schema_name(), self.imperative_migrations_table_name()).into()
     }

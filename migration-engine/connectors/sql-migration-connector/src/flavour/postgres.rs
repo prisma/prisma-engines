@@ -11,6 +11,8 @@ use user_facing_errors::{
     UserFacingError,
 };
 
+const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
+
 #[derive(Debug)]
 pub(crate) struct PostgresFlavour {
     pub(crate) url: PostgresUrl,
@@ -29,6 +31,28 @@ impl PostgresFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
+    async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        // https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS
+
+        tokio::time::timeout(
+            ADVISORY_LOCK_TIMEOUT,
+            connection.raw_cmd("SELECT pg_advisory_lock(72707369)"),
+        )
+        .await
+        .map_err(|_elapsed| {
+            ConnectorError::user_facing_error(user_facing_errors::common::DatabaseTimeout {
+                database_host: connection.connection_info().host().to_owned(),
+                database_port: connection
+                    .connection_info()
+                    .port()
+                    .map(|port| port.to_string())
+                    .unwrap_or_else(|| "<unknown>".into()),
+            })
+        })??;
+
+        Ok(())
+    }
+
     #[tracing::instrument(skip(database_str))]
     async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
         let mut url = Url::parse(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
