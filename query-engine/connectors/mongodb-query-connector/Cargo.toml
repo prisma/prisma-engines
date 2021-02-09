@@ -17,7 +17,11 @@ thiserror = "1.0"
 tokio = "1.0"
 tracing = "0.1.22"
 tracing-futures = "0.2.4"
+url = "2.1.1"
 uuid = "0.8"
+
+[dependencies.prisma-models]
+path = "../../../libs/prisma-models"
 
 [dependencies.connector-interface]
 package = "query-connector"

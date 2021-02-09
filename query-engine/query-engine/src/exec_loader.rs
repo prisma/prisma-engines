@@ -1,10 +1,13 @@
 use crate::{PrismaError, PrismaResult};
 use connection_string::JdbcString;
 use connector::Connector;
+use mongodb_connector::MongoDb;
 use std::str::FromStr;
 
 use datamodel::{
-    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME, MONGODB_SOURCE_NAME},
+    common::provider_names::{
+        MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
+    },
     Datasource,
 };
 use query_core::executor::{InterpretingExecutor, QueryExecutor};
@@ -40,18 +43,16 @@ pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
 
         #[cfg(feature = "mongodb")]
         MONGODB_SOURCE_NAME => {
-            {
-                if !feature_flags::get().mongoDb {
-                    let error = query_core::CoreError::UnsupportedFeatureError(
-                        "MongoDB query connector (experimental feature, needs to be enabled)".into(),
-                    );
+            if !feature_flags::get().mongoDb {
+                let error = query_core::CoreError::UnsupportedFeatureError(
+                    "MongoDB query connector (experimental feature, needs to be enabled)".into(),
+                );
 
-                    return Err(error.into());
-                }
-
-                mongodb(source).await
+                return Err(error.into());
             }
-        },
+
+            mongodb(source).await
+        }
 
         x => Err(PrismaError::ConfigurationError(format!(
             "Unsupported connector type: {}",
@@ -144,15 +145,9 @@ where
 async fn mongodb(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading MongoDB query connector...");
 
-    // let mssql = Mssql::from_source(source).await?;
-
-    // let mut conn = JdbcString::from_str(&format!("jdbc:{}", &source.url().value))?;
-    // let db_name = conn
-    //     .properties_mut()
-    //     .remove("schema")
-    //     .unwrap_or_else(|| String::from("dbo"));
+    let mongo = MongoDb::new(source).await?;
+    let db_name = mongo.db_name();
 
     trace!("Loaded MongoDB query connector.");
-    // Ok((db_name, sql_executor(mssql, false)))
-    todo!()
+    Ok((db_name.to_owned(), Box::new(InterpretingExecutor::new(mongo, false))))
 }
