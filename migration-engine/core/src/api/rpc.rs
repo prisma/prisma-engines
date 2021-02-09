@@ -7,7 +7,7 @@ use std::sync::Arc;
 /// A JSON-RPC ready migration API.
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
-    executor: Arc<dyn GenericApi>,
+    executor: Arc<Box<dyn GenericApi>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -71,7 +71,7 @@ impl RpcApi {
     pub async fn new(datamodel: &str) -> CoreResult<Self> {
         let mut rpc_api = Self {
             io_handler: IoHandler::default(),
-            executor: crate::migration_api(datamodel).await?,
+            executor: Arc::new(crate::migration_api(datamodel).await?),
         };
 
         for cmd in AVAILABLE_COMMANDS {
@@ -96,11 +96,11 @@ impl RpcApi {
     }
 
     async fn create_handler(
-        executor: Arc<dyn GenericApi>,
+        executor: Arc<Box<dyn GenericApi>>,
         cmd: RpcCommand,
         params: Params,
     ) -> Result<serde_json::Value, JsonRpcError> {
-        let result: Result<serde_json::Value, RunCommandError> = Self::run_command(&executor, cmd, params).await;
+        let result: Result<serde_json::Value, RunCommandError> = Self::run_command(&**executor, cmd, params).await;
 
         match result {
             Ok(result) => Ok(result),
@@ -110,7 +110,7 @@ impl RpcApi {
     }
 
     async fn run_command(
-        executor: &Arc<dyn GenericApi>,
+        executor: &dyn GenericApi,
         cmd: RpcCommand,
         params: Params,
     ) -> Result<serde_json::Value, RunCommandError> {

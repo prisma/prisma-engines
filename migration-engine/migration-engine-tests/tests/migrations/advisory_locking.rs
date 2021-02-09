@@ -2,7 +2,6 @@ use migration_core::{
     commands::{ApplyMigrationsInput, CreateMigrationInput},
     GenericApi,
 };
-use std::sync::Arc;
 use tempfile::TempDir;
 use test_macros::test_each_connector;
 use test_setup::{connectors::Tags, TestAPIArgs};
@@ -21,7 +20,7 @@ impl TestApi {
         Ok(tempfile::tempdir()?)
     }
 
-    async fn new_engine(&self) -> anyhow::Result<Arc<dyn GenericApi>> {
+    async fn new_engine(&self) -> anyhow::Result<Box<dyn GenericApi>> {
         Ok(migration_core::migration_api(&self.source).await?)
     }
 
