@@ -79,7 +79,7 @@ impl SqlMigrationConnector {
         self.flavour.as_ref()
     }
 
-    /// For tests.
+    /// Made public for tests.
     pub fn quaint(&self) -> &Quaint {
         self.connection.quaint()
     }

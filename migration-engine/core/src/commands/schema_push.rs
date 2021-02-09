@@ -30,24 +30,24 @@ impl MigrationCommand for SchemaPushCommand {
 
         let checks = checker.check(&database_migration).await?;
 
-        let mut step = 0u32;
-
-        match (checks.unexecutable_migrations.len(), checks.warnings.len(), input.force) {
+        let executed_steps = match (checks.unexecutable_migrations.len(), checks.warnings.len(), input.force) {
             (unexecutable, _, _) if unexecutable > 0 => {
-                tracing::warn!(unexecutable = ?checks.unexecutable_migrations, "Aborting migration because at least one unexecutable step was detected.")
+                tracing::warn!(unexecutable = ?checks.unexecutable_migrations, "Aborting migration because at least one unexecutable step was detected.");
+
+                0
             }
-            (0, 0, _) | (0, _, true) => {
-                while applier.apply_step(&database_migration, step as usize).await? {
-                    step += 1
-                }
+            (0, 0, _) | (0, _, true) => applier.apply_migration(&database_migration).await?,
+            _ => {
+                tracing::info!(
+                    "The migration was not applied because it triggered warnings and the force flag was not passed."
+                );
+
+                0
             }
-            _ => tracing::info!(
-                "The migration was not applied because it triggered warnings and the force flag was not passed."
-            ),
-        }
+        };
 
         Ok(SchemaPushOutput {
-            executed_steps: step,
+            executed_steps,
             warnings: checks.warnings.into_iter().map(|warning| warning.description).collect(),
             unexecutable: checks
                 .unexecutable_migrations
