@@ -14,7 +14,14 @@ impl AttributeValidator<dml::Model> for IgnoreAttributeValidator {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+        if obj.fields().find(|f| f.is_ignored()).is_some() {
+            return self.new_attribute_validation_error(
+                "Fields on an already ignored Model do not need an `@ignore` annotation.",
+                args.span(),
+            );
+        }
+
         obj.is_ignored = true;
         Ok(())
     }
@@ -30,12 +37,21 @@ impl AttributeValidator<dml::Field> for IgnoreAttributeValidatorForField {
         ATTRIBUTE_NAME
     }
 
-    fn validate_and_apply(&self, _args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         match obj {
-            ScalarField(sf) => sf.is_ignored = true,
-            RelationField(rf) => rf.is_ignored = true,
+            ScalarField(sf) if matches!(sf.field_type, dml::FieldType::Unsupported(_)) => {
+                self.new_attribute_validation_error("Fields of type `Unsupported` cannot take an `@ignore` attribute. They are already treated as ignored by the client due to their type.", args.span())
+            }
+
+            ScalarField(sf) => {
+                sf.is_ignored = true;
+                Ok(())
+            }
+            RelationField(rf) => {
+                rf.is_ignored = true;
+                Ok(())
+            }
         }
-        Ok(())
     }
 
     fn serialize(&self, obj: &dml::Field, _datamodel: &Datamodel) -> Vec<ast::Attribute> {
