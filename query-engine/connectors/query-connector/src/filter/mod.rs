@@ -65,11 +65,11 @@ impl Filter {
         }
     }
 
-    pub fn can_batch(&self) -> bool {
+    pub fn should_batch(&self) -> bool {
         match self {
-            Self::Scalar(sf) => sf.can_batch(),
-            Self::And(filters) => filters.iter().any(|f| f.can_batch()),
-            Self::Or(filters) => filters.iter().any(|f| f.can_batch()),
+            Self::Scalar(sf) => sf.should_batch(),
+            Self::And(filters) => filters.iter().any(|f| f.should_batch()),
+            Self::Or(filters) => filters.iter().any(|f| f.should_batch()),
             _ => false,
         }
     }
@@ -85,7 +85,7 @@ impl Filter {
                         let previous = longest.replace(sf);
                         other.push(Filter::Scalar(previous.unwrap()));
                     }
-                    (Filter::Scalar(sf), None) if sf.can_batch() => {
+                    (Filter::Scalar(sf), None) if sf.should_batch() => {
                         longest = Some(sf);
                     }
                     (filter, _) => other.push(filter),

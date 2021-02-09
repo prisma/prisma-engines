@@ -53,8 +53,8 @@ pub async fn get_many_records(
 
     // Todo: This can't work for all cases. Cursor-based pagination will not work, because it relies on the ordering
     // to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.
-    // The can_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
-    if query_arguments.can_batch() {
+    // The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
+    if query_arguments.should_batch() {
         // We don't need to order in the database due to us ordering in this function.
         let order = std::mem::replace(&mut query_arguments.order_by, vec![]);
 
