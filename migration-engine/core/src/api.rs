@@ -1,3 +1,5 @@
+//! The external facing programmatic API to the migration engine.
+
 mod error_rendering;
 mod rpc;
 
@@ -7,6 +9,7 @@ use crate::{commands::*, CoreResult};
 use migration_connector::MigrationConnector;
 use tracing_futures::Instrument;
 
+#[allow(missing_docs)]
 #[async_trait::async_trait]
 pub trait GenericApi: Send + Sync + 'static {
     async fn version(&self, input: &serde_json::Value) -> CoreResult<String>;

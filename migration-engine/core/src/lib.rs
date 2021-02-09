@@ -2,17 +2,17 @@
 
 //! The top-level library crate for the migration engine.
 
-#[allow(missing_docs)]
 pub mod api;
 pub mod commands;
 
 mod core_error;
 
-use anyhow::anyhow;
 pub use api::GenericApi;
 pub use commands::SchemaPushInput;
-use commands::{MigrationCommand, SchemaPushCommand};
 pub use core_error::{CoreError, CoreResult};
+
+use anyhow::anyhow;
+use commands::{MigrationCommand, SchemaPushCommand};
 use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,

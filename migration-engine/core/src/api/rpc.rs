@@ -4,6 +4,7 @@ use futures::{FutureExt, TryFutureExt};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
 
+/// A JSON-RPC ready migration API.
 pub struct RpcApi {
     io_handler: jsonrpc_core::IoHandler<()>,
     executor: Arc<dyn GenericApi>,
@@ -66,6 +67,7 @@ const AVAILABLE_COMMANDS: &[RpcCommand] = &[
 ];
 
 impl RpcApi {
+    /// Initialize a migration engine API. This entails starting a database connection.
     pub async fn new(datamodel: &str) -> CoreResult<Self> {
         let mut rpc_api = Self {
             io_handler: IoHandler::default(),
@@ -79,6 +81,7 @@ impl RpcApi {
         Ok(rpc_api)
     }
 
+    /// The JSON-RPC IO handler. This is what you can plug onto a transport.
     pub fn io_handler(&self) -> &IoHandler {
         &self.io_handler
     }
