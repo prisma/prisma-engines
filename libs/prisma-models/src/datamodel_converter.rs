@@ -369,19 +369,27 @@ impl ModelConverterUtilities for dml::Model {
     }
 
     fn is_relation_supported(&self, rf: &dml::RelationField) -> bool {
-        rf.relation_info
-            .fields
-            .iter()
-            .all(|fk_name| match self.find_field(fk_name).unwrap() {
+        if rf.is_ignored {
+            return false;
+        }
+
+        rf.relation_info.fields.iter().all(|fk_name| {
+            let field = self.find_field(fk_name).unwrap();
+            let is_supported = match field {
                 dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
                 dml::Field::RelationField(_) => true,
-            })
+            };
+
+            is_supported && !field.is_ignored()
+        })
     }
 
     fn supports_create_operation(&self) -> bool {
         let has_unsupported_field = self.fields.iter().any(|field| match field {
             dml::Field::ScalarField(sf) => {
-                sf.type_identifier() == TypeIdentifier::Unsupported && sf.is_required() && sf.default_value.is_none()
+                (sf.type_identifier() == TypeIdentifier::Unsupported || field.is_ignored())
+                    && sf.is_required()
+                    && sf.default_value.is_none()
             }
             _ => false,
         });
@@ -396,18 +404,20 @@ impl ModelConverterUtilities for dml::Model {
                 _ => false,
             };
 
-            self.field_is_indexed(field.name()) && is_supported_field
+            self.field_is_indexed(field.name()) && !field.is_ignored() && is_supported_field
         })
     }
 
     fn is_compound_index_supported(&self, index: &dml::IndexDefinition) -> bool {
-        index
-            .fields
-            .iter()
-            .all(|field_name| match self.find_field(field_name).unwrap() {
+        index.fields.iter().all(|field_name| {
+            let field = self.find_field(field_name).unwrap();
+            let is_supported = match field {
                 dml::Field::ScalarField(sf) => sf.type_identifier() != TypeIdentifier::Unsupported,
                 dml::Field::RelationField(_) => true,
-            })
+            };
+
+            is_supported && !field.is_ignored()
+        })
     }
 
     fn has_supported_compound_index(&self) -> bool {
