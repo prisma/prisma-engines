@@ -45,11 +45,7 @@ impl Connector for MongoDbDatamodelConnector {
         &[]
     }
 
-    fn default_native_type_for_scalar_type(
-        &self,
-        _scalar_type: &dml::scalars::ScalarType,
-        _temporary_native_types_on: bool,
-    ) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &dml::scalars::ScalarType) -> serde_json::Value {
         todo!()
     }
 

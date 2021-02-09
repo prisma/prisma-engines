@@ -15,6 +15,7 @@ members = [
   "migration-engine/migration-engine-tests",
   "query-engine/connectors/query-connector",
   "query-engine/connectors/sql-query-connector",
+  "query-engine/connectors/mongodb-query-connector",
   "query-engine/core",
   "query-engine/query-engine",
   "prisma-fmt",

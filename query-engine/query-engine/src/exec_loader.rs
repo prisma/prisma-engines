@@ -4,7 +4,7 @@ use connector::Connector;
 use std::str::FromStr;
 
 use datamodel::{
-    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME, MONGODB_SOURCE_NAME},
     Datasource,
 };
 use query_core::executor::{InterpretingExecutor, QueryExecutor};
@@ -38,6 +38,21 @@ pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
             mssql(source).await
         }
 
+        #[cfg(feature = "mongodb")]
+        MONGODB_SOURCE_NAME => {
+            {
+                if !feature_flags::get().mongoDb {
+                    let error = query_core::CoreError::UnsupportedFeatureError(
+                        "MongoDB query connector (experimental feature, needs to be enabled)".into(),
+                    );
+
+                    return Err(error.into());
+                }
+
+                mongodb(source).await
+            }
+        },
+
         x => Err(PrismaError::ConfigurationError(format!(
             "Unsupported connector type: {}",
             x
@@ -47,19 +62,19 @@ pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
 
 #[cfg(feature = "sql")]
 async fn sqlite(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
-    trace!("Loading SQLite connector...");
+    trace!("Loading SQLite query connector...");
 
     let sqlite = Sqlite::from_source(source).await?;
     let path = PathBuf::from(sqlite.file_path());
     let db_name = path.file_stem().unwrap().to_str().unwrap().to_owned(); // Safe due to previous validations.
 
-    trace!("Loaded SQLite connector.");
+    trace!("Loaded SQLite query connector.");
     Ok((db_name, sql_executor(sqlite, false)))
 }
 
 #[cfg(feature = "sql")]
 async fn postgres(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
-    trace!("Loading Postgres connector...");
+    trace!("Loading Postgres query connector...");
 
     let database_str = &source.url().value;
     let psql = PostgreSql::from_source(source).await?;
@@ -77,13 +92,13 @@ async fn postgres(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExe
         .and_then(|flag| flag.parse().ok())
         .unwrap_or(false);
 
-    trace!("Loaded Postgres connector.");
+    trace!("Loaded Postgres query connector.");
     Ok((db_name, sql_executor(psql, force_transactions)))
 }
 
 #[cfg(feature = "sql")]
 async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
-    trace!("Loading MySQL connector...");
+    trace!("Loading MySQL query connector...");
 
     let mysql = Mysql::from_source(source).await?;
     let database_str = &source.url().value;
@@ -97,13 +112,13 @@ async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
 
     let db_name = db_name.next().expect(err_str).to_owned();
 
-    trace!("Loaded MySQL connector.");
+    trace!("Loaded MySQL query connector.");
     Ok((db_name, sql_executor(mysql, false)))
 }
 
 #[cfg(feature = "sql")]
 async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
-    trace!("Loading SQL Server connector...");
+    trace!("Loading SQL Server query connector...");
 
     let mssql = Mssql::from_source(source).await?;
 
@@ -113,7 +128,7 @@ async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
         .remove("schema")
         .unwrap_or_else(|| String::from("dbo"));
 
-    trace!("Loaded SQL Server connector.");
+    trace!("Loaded SQL Server query connector.");
     Ok((db_name, sql_executor(mssql, false)))
 }
 
@@ -123,4 +138,21 @@ where
     T: Connector + Send + Sync + 'static,
 {
     Box::new(InterpretingExecutor::new(connector, force_transactions))
+}
+
+#[cfg(feature = "mongodb")]
+async fn mongodb(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+    trace!("Loading MongoDB query connector...");
+
+    // let mssql = Mssql::from_source(source).await?;
+
+    // let mut conn = JdbcString::from_str(&format!("jdbc:{}", &source.url().value))?;
+    // let db_name = conn
+    //     .properties_mut()
+    //     .remove("schema")
+    //     .unwrap_or_else(|| String::from("dbo"));
+
+    trace!("Loaded MongoDB query connector.");
+    // Ok((db_name, sql_executor(mssql, false)))
+    todo!()
 }
