@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{api::MigrationApi, parse_datamodel, CoreResult};
+use crate::{parse_datamodel, CoreResult};
 use migration_connector::{list_migrations, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
@@ -50,8 +50,7 @@ impl MigrationCommand for EvaluateDataLoss {
     type Input = EvaluateDataLossInput;
     type Output = EvaluateDataLossOutput;
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
-        let connector = engine.connector();
+    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
         let inferrer = connector.database_migration_inferrer();
         let applier = connector.database_migration_step_applier();
         let checker = connector.destructive_change_checker();

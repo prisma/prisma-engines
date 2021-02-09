@@ -2,7 +2,7 @@ use super::{
     DiagnoseMigrationHistoryCommand, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
     HistoryDiagnostic, MigrationCommand,
 };
-use crate::{api::MigrationApi, core_error::CoreResult, CoreError};
+use crate::{core_error::CoreResult, CoreError};
 use migration_connector::MigrationConnector;
 use serde::{Deserialize, Serialize};
 
@@ -30,18 +30,15 @@ impl<'a> MigrationCommand for DevDiagnosticCommand {
     type Input = DevDiagnosticInput;
     type Output = DevDiagnosticOutput;
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
-        migration_connector::error_on_changed_provider(
-            &input.migrations_directory_path,
-            engine.connector().connector_type(),
-        )?;
+    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
+        migration_connector::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
-        let diagnose_migration_history_output = engine
-            .handle_command::<DiagnoseMigrationHistoryCommand>(&DiagnoseMigrationHistoryInput {
-                migrations_directory_path: input.migrations_directory_path.clone(),
-                opt_in_to_shadow_database: true,
-            })
-            .await?;
+        let diagnose_input = DiagnoseMigrationHistoryInput {
+            migrations_directory_path: input.migrations_directory_path.clone(),
+            opt_in_to_shadow_database: true,
+        };
+        let diagnose_migration_history_output =
+            DiagnoseMigrationHistoryCommand::execute(&diagnose_input, connector).await?;
 
         check_for_broken_migrations(&diagnose_migration_history_output)?;
 
