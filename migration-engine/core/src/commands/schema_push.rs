@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{api::MigrationApi, parse_datamodel, CoreResult};
+use crate::{parse_datamodel, CoreResult};
 use migration_connector::{ConnectorError, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
@@ -12,8 +12,7 @@ impl MigrationCommand for SchemaPushCommand {
     type Input = SchemaPushInput;
     type Output = SchemaPushOutput;
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
-        let connector = engine.connector();
+    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
         let schema = parse_datamodel(&input.schema)?;
         let inferrer = connector.database_migration_inferrer();
         let applier = connector.database_migration_step_applier();

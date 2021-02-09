@@ -169,7 +169,7 @@ pub async fn qe_setup(prisma_schema: &str) -> CoreResult<()> {
         force: true,
     };
 
-    SchemaPushCommand::execute(&schema_push_input, &engine).await?;
+    SchemaPushCommand::execute(&schema_push_input, engine.connector()).await?;
 
     Ok(())
 }

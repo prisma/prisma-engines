@@ -23,7 +23,7 @@ impl<C: MigrationConnector> MigrationApi<C> {
     where
         E: MigrationCommand,
     {
-        Ok(E::execute(input, self).await?)
+        Ok(E::execute(input, self.connector()).await?)
     }
 
     pub fn connector(&self) -> &C {

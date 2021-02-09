@@ -1,5 +1,5 @@
 use super::MigrationCommand;
-use crate::{api::MigrationApi, parse_datamodel, CoreError, CoreResult};
+use crate::{parse_datamodel, CoreError, CoreResult};
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -36,24 +36,26 @@ impl<'a> MigrationCommand for CreateMigrationCommand {
 
     type Output = CreateMigrationOutput;
 
-    async fn execute<C: MigrationConnector>(input: &Self::Input, engine: &MigrationApi<C>) -> CoreResult<Self::Output> {
-        let database_migration_inferrer = engine.connector().database_migration_inferrer();
-        let applier = engine.connector().database_migration_step_applier();
-        let checker = engine.connector().destructive_change_checker();
+    async fn execute<C: MigrationConnector>(input: &Self::Input, connector: &C) -> CoreResult<Self::Output> {
+        let database_migration_inferrer = connector.database_migration_inferrer();
+        let applier = connector.database_migration_step_applier();
+        let checker = connector.destructive_change_checker();
+        let connector_type = connector.connector_type();
 
         if input.migration_name.len() > 200 {
             return Err(CoreError::user_facing(MigrationNameTooLong));
         }
 
-        //check for provider switch
-        let connector_type = engine.connector().connector_type();
-        if matches!(
-            migration_connector::match_provider_in_lock_file(&input.migrations_directory_path, connector_type),
-            Some(false)
-        ) {
-            return Err(CoreError::user_facing(ProviderSwitchedError {
-                provider: connector_type.into(),
-            }));
+        // Check for provider switch
+        {
+            if matches!(
+                migration_connector::match_provider_in_lock_file(&input.migrations_directory_path, connector_type),
+                Some(false)
+            ) {
+                return Err(CoreError::user_facing(ProviderSwitchedError {
+                    provider: connector_type.into(),
+                }));
+            }
         }
 
         // Infer the migration.
