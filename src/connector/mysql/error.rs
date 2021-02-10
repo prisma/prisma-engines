@@ -6,6 +6,10 @@ impl From<my::Error> for Error {
         use my::ServerError;
 
         match e {
+            my::Error::Io(my::IoError::Tls(err)) => Error::builder(ErrorKind::TlsError {
+                message: err.to_string(),
+            })
+            .build(),
             my::Error::Io(io_error) => Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
             my::Error::Driver(e) => Error::builder(ErrorKind::QueryError(e.into())).build(),
             my::Error::Server(ServerError { ref message, code, .. }) if code == 1062 => {

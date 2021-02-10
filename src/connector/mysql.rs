@@ -115,8 +115,10 @@ impl MysqlUrl {
     }
 
     fn parse_query_params(url: &Url) -> Result<MysqlUrlQueryParams, Error> {
-        let mut connection_limit = None;
         let mut ssl_opts = my::SslOpts::default();
+        ssl_opts = ssl_opts.with_danger_accept_invalid_certs(true);
+
+        let mut connection_limit = None;
         let mut use_ssl = false;
         let mut socket = None;
         let mut socket_timeout = None;
@@ -175,16 +177,19 @@ impl MysqlUrl {
                 }
                 "sslaccept" => {
                     match v.as_ref() {
-                        "strict" => {}
-                        "accept_invalid_certs" => {
-                            ssl_opts = ssl_opts.with_danger_accept_invalid_certs(true);
+                        "strict" => {
+                            ssl_opts = ssl_opts.with_danger_accept_invalid_certs(false);
                         }
+                        "accept_invalid_certs" => {}
                         _ => {
                             #[cfg(not(feature = "tracing-log"))]
-                            debug!("Unsupported SSL accept mode {}, defaulting to `strict`", v);
+                            debug!(
+                                "Unsupported SSL accept mode {}, defaulting to `accept_invalid_certs`",
+                                v
+                            );
                             #[cfg(feature = "tracing-log")]
                             tracing::debug!(
-                                message = "Unsupported SSL accept mode, defaulting to `strict`",
+                                message = "Unsupported SSL accept mode, defaulting to `accept_invalid_certs`",
                                 mode = &*v
                             );
                         }
