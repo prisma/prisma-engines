@@ -499,12 +499,29 @@ impl<'a> ToSql for Value<'a> {
         let res = match (self, ty) {
             (Value::Integer(integer), &PostgresType::INT2) => integer.map(|integer| (integer as i16).to_sql(ty, out)),
             (Value::Integer(integer), &PostgresType::INT4) => integer.map(|integer| (integer as i32).to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Integer(integer), &PostgresType::NUMERIC) => integer
+                .map(|integer| BigDecimal::from_i64(integer).unwrap())
+                .map(|bd| DecimalWrapper(bd))
+                .map(|dw| dw.to_sql(ty, out)),
             (Value::Integer(integer), &PostgresType::TEXT) => {
                 integer.map(|integer| format!("{}", integer).to_sql(ty, out))
             }
             (Value::Integer(integer), &PostgresType::OID) => integer.map(|integer| (integer as u32).to_sql(ty, out)),
             (Value::Integer(integer), _) => integer.map(|integer| (integer as i64).to_sql(ty, out)),
+            (Value::Float(float), &PostgresType::FLOAT8) => float.map(|float| (float as f64).to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Float(float), &PostgresType::NUMERIC) => float
+                .map(|float| BigDecimal::from_f32(float).unwrap())
+                .map(DecimalWrapper)
+                .map(|dw| dw.to_sql(ty, out)),
             (Value::Float(float), _) => float.map(|float| float.to_sql(ty, out)),
+            (Value::Double(double), &PostgresType::FLOAT4) => double.map(|double| (double as f32).to_sql(ty, out)),
+            #[cfg(feature = "bigdecimal")]
+            (Value::Double(double), &PostgresType::NUMERIC) => double
+                .map(|double| BigDecimal::from_f64(double).unwrap())
+                .map(DecimalWrapper)
+                .map(|dw| dw.to_sql(ty, out)),
             (Value::Double(double), _) => double.map(|double| double.to_sql(ty, out)),
             #[cfg(feature = "bigdecimal")]
             (Value::Numeric(decimal), &PostgresType::FLOAT4) => decimal.as_ref().map(|decimal| {

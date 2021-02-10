@@ -173,7 +173,7 @@ async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn TestApi) -> c
     Ok(())
 }
 
-#[test_each_connector(tags("mysql", "mssql", "postgres"))]
+#[test_each_connector(tags("mysql", "mssql", "postgresql"))]
 async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_table("value varchar(3)").await?;
     let insert = Insert::single_into(&table).value("value", "fooo");
@@ -187,7 +187,7 @@ async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres", "sqlite"))]
+#[test_each_connector(tags("postgresql", "sqlite"))]
 async fn foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let parent = api.create_table("id smallint not null primary key").await?;
     let foreign_key = api.foreign_key(&parent, "id", "parent_id");

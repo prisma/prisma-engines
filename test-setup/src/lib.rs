@@ -16,7 +16,7 @@ fn connector_names() -> Vec<(&'static str, Tags)> {
         ("mssql", Tags::MSSQL),
         ("mysql", Tags::MYSQL),
         ("mysql8", Tags::MYSQL8),
-        ("postgres", Tags::POSTGRES),
+        ("postgresql", Tags::POSTGRES),
         ("sqlite", Tags::SQLITE),
     ]
 }
@@ -57,6 +57,7 @@ impl Connectors {
 }
 
 /// Represents a connector to be tested.
+#[derive(Debug)]
 pub struct ConnectorDefinition {
     name: String,
     test_api_factory_name: String,

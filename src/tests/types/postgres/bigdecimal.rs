@@ -2,14 +2,14 @@ use super::*;
 use crate::bigdecimal::BigDecimal;
 
 test_type!(decimal(
-    postgres,
+    postgresql,
     "decimal(10,2)",
     Value::Numeric(None),
     Value::numeric(BigDecimal::from_str("3.14")?)
 ));
 
 test_type!(decimal_10_2(
-    postgres,
+    postgresql,
     "decimal(10, 2)",
     (
         Value::numeric(BigDecimal::from_str("3950.123456")?),
@@ -18,7 +18,7 @@ test_type!(decimal_10_2(
 ));
 
 test_type!(decimal_35_6(
-    postgres,
+    postgresql,
     "decimal(35, 6)",
     (
         Value::numeric(BigDecimal::from_str("3950")?),
@@ -99,7 +99,7 @@ test_type!(decimal_35_6(
 ));
 
 test_type!(decimal_35_2(
-    postgres,
+    postgresql,
     "decimal(35, 2)",
     (
         Value::numeric(BigDecimal::from_str("3950.123456")?),
@@ -112,13 +112,13 @@ test_type!(decimal_35_2(
 ));
 
 test_type!(decimal_4_0(
-    postgres,
+    postgresql,
     "decimal(4, 0)",
     Value::numeric(BigDecimal::from_str("3950")?)
 ));
 
 test_type!(decimal_65_30(
-    postgres,
+    postgresql,
     "decimal(65, 30)",
     (
         Value::numeric(BigDecimal::from_str("1.2")?),
@@ -131,7 +131,7 @@ test_type!(decimal_65_30(
 ));
 
 test_type!(decimal_65_34(
-    postgres,
+    postgresql,
     "decimal(65, 34)",
     (
         Value::numeric(BigDecimal::from_str("3.1415926535897932384626433832795028")?),
@@ -148,13 +148,13 @@ test_type!(decimal_65_34(
 ));
 
 test_type!(decimal_35_0(
-    postgres,
+    postgresql,
     "decimal(35, 0)",
     Value::numeric(BigDecimal::from_str("79228162514264337593543950335")?),
 ));
 
 test_type!(decimal_35_1(
-    postgres,
+    postgresql,
     "decimal(35, 1)",
     (
         Value::numeric(BigDecimal::from_str("79228162514264337593543950335")?),
@@ -167,28 +167,28 @@ test_type!(decimal_35_1(
 ));
 
 test_type!(decimal_array(
-    postgres,
+    postgresql,
     "decimal(10,2)[]",
     Value::Array(None),
     Value::array(vec![BigDecimal::from_str("3.14")?, BigDecimal::from_str("5.12")?])
 ));
 
 test_type!(money(
-    postgres,
+    postgresql,
     "money",
     Value::Numeric(None),
     Value::numeric(BigDecimal::from_str("1.12")?)
 ));
 
 test_type!(money_array(
-    postgres,
+    postgresql,
     "money[]",
     Value::Array(None),
     Value::array(vec![BigDecimal::from_str("1.12")?, BigDecimal::from_str("1.12")?])
 ));
 
 test_type!(float4(
-    postgres,
+    postgresql,
     "float4",
     (Value::Numeric(None), Value::Float(None)),
     (
@@ -198,7 +198,7 @@ test_type!(float4(
 ));
 
 test_type!(float8(
-    postgres,
+    postgresql,
     "float8",
     (Value::Numeric(None), Value::Double(None)),
     (

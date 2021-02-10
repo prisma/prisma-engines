@@ -41,6 +41,6 @@ const TAG_NAMES: &[(&str, Tags)] = &[
     ("mssql", Tags::MSSQL),
     ("mysql", Tags::MYSQL),
     ("mysql8", Tags::MYSQL),
-    ("postgres", Tags::POSTGRES),
+    ("postgresql", Tags::POSTGRES),
     ("sqlite", Tags::SQLITE),
 ];

@@ -6,7 +6,7 @@ use std::env;
 
 pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_PSQL").expect("TEST_PSQL env var"));
 
-pub(crate) async fn postgres_test_api<'a>() -> crate::Result<PostgreSql<'a>> {
+pub(crate) async fn postgresql_test_api<'a>() -> crate::Result<PostgreSql<'a>> {
     PostgreSql::new().await
 }
 

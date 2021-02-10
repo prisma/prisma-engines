@@ -502,7 +502,7 @@ async fn single_default_value_insert(api: &mut dyn TestApi) -> crate::Result<()>
 }
 
 #[cfg(any(feature = "mssql", feature = "postgresql"))]
-#[test_each_connector(tags("mssql", "postgres"))]
+#[test_each_connector(tags("mssql", "postgresql"))]
 async fn returning_insert(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_table("id int, name varchar(255)").await?;
     let insert = Insert::single_into(&table).value("id", 2).value("name", "Naukio");
@@ -647,7 +647,7 @@ async fn single_insert_conflict_do_nothing_single_unique_with_autogen_default(
 }
 
 #[cfg(any(feature = "mssql", feature = "postgresql"))]
-#[test_each_connector(tags("postgres", "mssql"))]
+#[test_each_connector(tags("postgresql", "mssql"))]
 async fn single_insert_conflict_do_nothing_with_returning(api: &mut dyn TestApi) -> crate::Result<()> {
     let constraint = api.unique_constraint("id");
 
@@ -1073,7 +1073,7 @@ async fn unsigned_integers_are_handled(api: &mut dyn TestApi) -> crate::Result<(
 }
 
 #[cfg(feature = "json")]
-#[test_each_connector(tags("mysql", "postgres"))]
+#[test_each_connector(tags("mysql", "postgresql"))]
 async fn json_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
     let json_type = match api.system() {
         "postgres" => "jsonb",
@@ -1117,7 +1117,7 @@ async fn json_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
     Ok(())
 }
 
-#[test_each_connector(tags("mssql", "postgres"))]
+#[test_each_connector(tags("mssql", "postgresql"))]
 async fn xml_filtering_works(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
         .create_table(&format!("{}, xmlfield {}", api.autogen_id("id"), "xml"))
@@ -1306,14 +1306,14 @@ async fn op_test_div_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
     let row = api.conn().select(q).await?.into_single()?;
 
     match api.system() {
-        "mssql" => assert_eq!(Some(2.0), row[0].as_f32()),
+        "mssql" | "postgres" => assert_eq!(Some(2.0), row[0].as_f32()),
         _ => assert_eq!(Some(2.0), row[0].as_f64()),
     }
 
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_each_connector(tags("postgresql"))]
 async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
     let type_name = api.get_name();
     let create_type = format!("CREATE TYPE {} AS ENUM ('A', 'B')", &type_name);
@@ -1612,6 +1612,35 @@ async fn insert_default_keyword(api: &mut dyn TestApi) -> crate::Result<()> {
 
     assert_eq!(Value::integer(4), row["id"]);
     assert_eq!(Value::integer(1), row["value"]);
+
+    Ok(())
+}
+
+#[cfg(feature = "bigdecimal")]
+#[test_each_connector(tags("postgresql"))]
+async fn ints_read_write_to_numeric(api: &mut dyn TestApi) -> crate::Result<()> {
+    use bigdecimal::BigDecimal;
+    use std::str::FromStr;
+
+    let table = api.create_table("id int, value numeric(12,2)").await?;
+
+    let insert = Insert::multi_into(&table, &["id", "value"])
+        .values(vec![Value::integer(1), Value::double(1234.5)])
+        .values(vec![Value::integer(2), Value::integer(1234)])
+        .values(vec![Value::integer(3), Value::integer(12345)]);
+
+    api.conn().execute(insert.into()).await?;
+
+    let select = Select::from_table(&table);
+    let rows = api.conn().select(select).await?;
+
+    for (i, row) in rows.into_iter().enumerate() {
+        match i {
+            0 => assert_eq!(Value::numeric(BigDecimal::from_str("1234.5").unwrap()), row["value"]),
+            1 => assert_eq!(Value::numeric(BigDecimal::from_str("1234.0").unwrap()), row["value"]),
+            _ => assert_eq!(Value::numeric(BigDecimal::from_str("12345.0").unwrap()), row["value"]),
+        }
+    }
 
     Ok(())
 }
