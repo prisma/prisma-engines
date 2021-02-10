@@ -116,6 +116,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel, family: &SqlFamily) 
     let mut warnings = vec![];
 
     //extra warning about missing columns
+    //todo instead of commenting out use @@ignore here
     if !models_without_columns.is_empty() {
         warnings.push(warning_models_without_columns(&models_without_columns))
     }

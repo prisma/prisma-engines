@@ -346,4 +346,8 @@ impl Ignorable for Model {
     fn is_ignored(&self) -> bool {
         self.is_ignored
     }
+
+    fn ignore(&mut self) {
+        self.is_ignored = true;
+    }
 }

@@ -53,7 +53,6 @@ fn allow_ignore_on_invalid_models() {
       @@ignore
     }
 
-    /// this does not work yet
     model ModelOptionalId {
       text String? @id 
      

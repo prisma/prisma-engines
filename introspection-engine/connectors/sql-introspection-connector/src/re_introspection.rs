@@ -1,6 +1,6 @@
 use crate::introspection_helpers::replace_field_names;
 use crate::warnings::*;
-use datamodel::{Datamodel, DefaultValue, FieldType, ValueGenerator};
+use datamodel::{Datamodel, DefaultValue, FieldType, Ignorable, ValueGenerator};
 use introspection_connector::Warning;
 use prisma_value::PrismaValue;
 use quaint::connector::SqlFamily;
@@ -334,6 +334,36 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
         }
     }
 
+    //@@ignore on models
+    //@ignore on fields
+    let mut re_introspected_model_ignores = vec![];
+    let mut re_introspected_field_ignores = vec![];
+    {
+        for model in new_data_model.models() {
+            if let Some(old_model) = old_data_model.find_model(&model.name) {
+                if old_model.is_ignored {
+                    re_introspected_model_ignores.push(Model::new(&model.name));
+                }
+
+                for field in model.scalar_fields() {
+                    if let Some(old_field) = old_model.find_scalar_field(&field.name) {
+                        if old_field.is_ignored {
+                            re_introspected_field_ignores.push(ModelAndField::new(&model.name, &field.name));
+                        }
+                    }
+                }
+            }
+        }
+
+        for ignore in &re_introspected_model_ignores {
+            new_data_model.find_model_mut(&ignore.model).is_ignored = true;
+        }
+
+        for ignore in &re_introspected_field_ignores {
+            new_data_model.find_field_mut(&ignore.model, &ignore.field).ignore();
+        }
+    }
+
     // comments - we do NOT generate warnings for comments
     {
         let mut re_introspected_model_comments = vec![];
@@ -457,6 +487,14 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel, family
 
     if !re_introspected_updated_at.is_empty() {
         warnings.push(warning_enriched_with_updated_at(&re_introspected_updated_at));
+    }
+
+    if !re_introspected_model_ignores.is_empty() {
+        warnings.push(warning_enriched_models_with_ignore(&re_introspected_model_ignores));
+    }
+
+    if !re_introspected_field_ignores.is_empty() {
+        warnings.push(warning_enriched_fields_with_ignore(&re_introspected_field_ignores));
     }
 
     warnings

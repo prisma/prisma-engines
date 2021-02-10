@@ -415,4 +415,11 @@ impl Ignorable for Field {
             Field::ScalarField(sf) => sf.is_ignored,
         }
     }
+
+    fn ignore(&mut self) {
+        match self {
+            Field::RelationField(rf) => rf.is_ignored = true,
+            Field::ScalarField(sf) => sf.is_ignored = true,
+        }
+    }
 }
