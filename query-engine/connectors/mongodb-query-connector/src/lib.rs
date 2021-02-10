@@ -5,8 +5,6 @@ mod projection;
 mod queries;
 mod value;
 
-use std::convert::TryInto;
-
 use error::MongoError;
 pub use interface::*;
 use mongodb::bson::{Bson, Document};

@@ -1,3 +1,5 @@
+use std::unimplemented;
+
 use connector_interface::{Filter, ScalarCondition, ScalarFilter};
 use mongodb::bson::{doc, Bson, Document};
 use prisma_models::PrismaValue;
@@ -35,41 +37,47 @@ impl IntoBson for Filter {
                 Ok(doc! { "$not": Bson::Array(filters) }.into())
             }
 
-            // Filter::Scalar(sf) => {}
+            Filter::Scalar(sf) => sf.into_bson(),
+            Filter::Empty => Ok(Document::new().into()),
             // Filter::ScalarList(slf) => {}
             // Filter::OneRelationIsNull(_) => {}
             // Filter::Relation(_) => {}
-            // Filter::BoolFilter(_) => {}
+            // Filter::BoolFilter(b) => {} // Potentially not doable.
             // Filter::Aggregation(_) => {}
-            // Filter::Empty => {}
-            _ => todo!(),
+            _ => todo!("Incomplete filter implementation."),
         }
     }
 }
 
 // Todo:
-// - case insensitive
+// - case insensitive (probably regex or text search?)
 impl IntoBson for ScalarFilter {
     fn into_bson(self) -> crate::Result<Bson> {
-        let cond = match &self.condition {
-            ScalarCondition::Equals(PrismaValue::Null) => doc! { "eq": Bson::Null },
-            ScalarCondition::NotEquals(PrismaValue::Null) => doc! { "ne": Bson::Null },
-            ScalarCondition::Equals(val) => doc! { "eq": Bson::Null },
-            ScalarCondition::NotEquals(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::Contains(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::NotContains(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::StartsWith(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::NotStartsWith(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::EndsWith(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::NotEndsWith(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::LessThan(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::LessThanOrEquals(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::GreaterThan(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::GreaterThanOrEquals(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::In(_) => doc! { "ne": Bson::Null },
-            ScalarCondition::NotIn(_) => doc! { "ne": Bson::Null },
+        // Todo: Find out what Compound cases are
+        let field = match self.projection {
+            connector_interface::ScalarProjection::Single(sf) => sf,
+            connector_interface::ScalarProjection::Compound(_) => unimplemented!("Compound filter case."),
         };
 
-        Ok(cond.into())
+        // let mode = self.mode;
+
+        let filter = match self.condition {
+            ScalarCondition::Equals(val) => doc! { "eq": val.into_bson()? },
+            ScalarCondition::NotEquals(val) => doc! { "ne": val.into_bson()? },
+            ScalarCondition::Contains(_val) => todo!(),
+            ScalarCondition::NotContains(_val) => todo!(),
+            ScalarCondition::StartsWith(_val) => todo!(),
+            ScalarCondition::NotStartsWith(_val) => todo!(),
+            ScalarCondition::EndsWith(_val) => todo!(),
+            ScalarCondition::NotEndsWith(_val) => todo!(),
+            ScalarCondition::LessThan(val) => doc! { "lt": val.into_bson()? },
+            ScalarCondition::LessThanOrEquals(val) => doc! { "lte": val.into_bson()? },
+            ScalarCondition::GreaterThan(val) => doc! { "gt": val.into_bson()? },
+            ScalarCondition::GreaterThanOrEquals(val) => doc! { "gte": val.into_bson()? },
+            ScalarCondition::In(vals) => doc! { "in": PrismaValue::List(vals).into_bson()? },
+            ScalarCondition::NotIn(vals) => doc! { "nin": PrismaValue::List(vals).into_bson()? },
+        };
+
+        Ok(doc! { field.db_name(): filter }.into())
     }
 }

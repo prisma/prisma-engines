@@ -1,8 +1,8 @@
-use crate::{BsonTransform, IntoBson};
+use crate::{value::value_from_bson, BsonTransform, IntoBson};
 use connector_interface::Filter;
 use futures::stream::StreamExt;
-use mongodb::Database;
-use mongodb::{bson::doc, options::FindOptions};
+use mongodb::{bson::Bson, options::FindOptions};
+use mongodb::{bson::Document, Cursor, Database};
 use prisma_models::*;
 
 pub async fn get_single_record(
@@ -19,32 +19,47 @@ pub async fn get_single_record(
         .projection(selected_fields.clone().into_bson()?.into_document()?)
         .build();
 
-    let mut cursor = coll.find(Some(filter), Some(find_options)).await?;
-    let mut results = vec![];
+    let cursor = coll.find(Some(filter), Some(find_options)).await?;
+    let docs = vacuum_cursor(cursor).await?;
+
+    if docs.len() == 0 {
+        Ok(None)
+    } else {
+        let field_names = selected_fields
+            .scalar_fields()
+            .map(|sf| sf.db_name().to_owned())
+            .collect::<Vec<_>>();
+
+        let doc = docs.into_iter().next().unwrap();
+        let record = document_to_record(doc, &field_names)?;
+
+        Ok(Some(SingleRecord { record, field_names }))
+    }
+}
+
+/// Transforms a document to a `Record`, fields ordered as defined in `fields`.
+fn document_to_record(mut doc: Document, fields: &[String]) -> crate::Result<Record> {
+    let mut values: Vec<PrismaValue> = Vec::with_capacity(fields.len());
+
+    for field in fields {
+        let bson = doc.remove(field).unwrap_or(Bson::Null);
+        let val = value_from_bson(bson)?;
+
+        values.push(val);
+    }
+
+    Ok(Record::new(values))
+}
+
+async fn vacuum_cursor(mut cursor: Cursor) -> crate::Result<Vec<Document>> {
+    let mut docs = vec![];
 
     while let Some(result) = cursor.next().await {
         match result {
-            Ok(document) => results.push(document),
+            Ok(document) => docs.push(document),
             Err(e) => return Err(e.into()),
         }
     }
 
-    // let query = read::get_records(&model, selected_fields.as_columns(), filter);
-
-    // let field_names: Vec<_> = selected_fields.db_names().collect();
-    // let idents = selected_fields.type_identifiers_with_arities();
-    // let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
-
-    // let record = (match conn.find(query, meta.as_slice()).await {
-    //     Ok(result) => Ok(Some(result)),
-    //     Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
-    //     Err(_e @ SqlError::RecordDoesNotExist) => Ok(None),
-    //     Err(e) => Err(e),
-    // })?
-    // .map(Record::from)
-    // .map(|record| SingleRecord { record, field_names });
-
-    // Ok(record)
-
-    todo!()
+    Ok(docs)
 }
