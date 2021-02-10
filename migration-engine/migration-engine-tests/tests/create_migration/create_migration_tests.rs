@@ -447,3 +447,63 @@ async fn unsupported_type_renders_correctly(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn no_additional_unique_created(api: &TestApi) -> TestResult {
+    let dm = r#"
+        datasource test {
+          provider = "postgresql"
+          url = "postgresql://unreachable:unreachable@example.com/unreachable"
+        }
+
+        model Cat {
+            id      Int @id
+            collar  Collar?
+        }
+        
+        model Collar {
+            id      Int @id
+            cat     Cat @relation(fields:[id], references: [id])
+        }
+        
+        
+    "#;
+
+    let dir = api.create_migrations_directory()?;
+
+    api.create_migration("create-cats", dm, &dir)
+        .send()
+        .await?
+        .assert_migration_directories_count(1)?
+        .assert_migration("create-cats", |migration| {
+            let expected_script = match api.sql_family() {
+                SqlFamily::Postgres => {
+                    indoc! {
+                        r#"
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                            "id" INTEGER NOT NULL,
+                        
+                            PRIMARY KEY ("id")
+                        );
+                        
+                        -- CreateTable
+                        CREATE TABLE "Collar" (
+                            "id" INTEGER NOT NULL,
+                        
+                            PRIMARY KEY ("id")
+                        );
+                        
+                        -- AddForeignKey
+                        ALTER TABLE "Collar" ADD FOREIGN KEY ("id") REFERENCES "Cat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+                        "#
+                    }
+                }
+                _ => unreachable!(),
+            };
+
+            migration.assert_contents(expected_script)
+        })?;
+
+    Ok(())
+}
