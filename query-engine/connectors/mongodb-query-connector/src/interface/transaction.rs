@@ -1,30 +1,24 @@
+use super::*;
 use crate::{
     error::MongoError,
     queries::{read, write},
-    MongoDbTransaction,
 };
-use async_trait::async_trait;
-use connector_interface::{Connection, ReadOperations, Transaction, WriteOperations};
+use connector_interface::{ReadOperations, Transaction, WriteOperations};
+use futures::Future;
 use mongodb::Database;
-use prisma_models::prelude::*;
-use std::future::Future;
 
-pub struct MongoDbConnection {
+/// Not really a transaction right now, just something to
+/// satisfy the core interface until we figure something out.
+pub struct MongoDbTransaction {
     /// Handle to a mongo database.
     pub(crate) database: Database,
 }
 
-#[async_trait]
-impl Connection for MongoDbConnection {
-    async fn start_transaction<'a>(
-        &'a self,
-    ) -> connector_interface::Result<Box<dyn connector_interface::Transaction + 'a>> {
-        self.catch(async move { Ok(Box::new(MongoDbTransaction::new(self.database.clone())) as Box<dyn Transaction>) })
-            .await
+impl MongoDbTransaction {
+    pub(crate) fn new(database: Database) -> Self {
+        Self { database }
     }
-}
 
-impl MongoDbConnection {
     async fn catch<O>(
         &self,
         fut: impl Future<Output = Result<O, MongoError>>,
@@ -37,7 +31,20 @@ impl MongoDbConnection {
 }
 
 #[async_trait]
-impl WriteOperations for MongoDbConnection {
+impl Transaction for MongoDbTransaction {
+    async fn commit(&self) -> connector_interface::Result<()> {
+        // Totally commited.
+        Ok(())
+    }
+
+    async fn rollback(&self) -> connector_interface::Result<()> {
+        // Totally rolled back.
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl WriteOperations for MongoDbTransaction {
     async fn create_record(
         &self,
         model: &ModelRef,
@@ -109,7 +116,7 @@ impl WriteOperations for MongoDbConnection {
 }
 
 #[async_trait]
-impl ReadOperations for MongoDbConnection {
+impl ReadOperations for MongoDbTransaction {
     async fn get_single_record(
         &self,
         model: &ModelRef,

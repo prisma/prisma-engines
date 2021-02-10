@@ -105,6 +105,6 @@ model InvoiceLine {
 }
 
 model Playlist {
-  id   Int     @id @map("PlaylistId")
+  id   Int     @id @map("_id")
   Name String?
 }

@@ -53,7 +53,7 @@ impl IntoBson for Filter {
 // - case insensitive (probably regex or text search?)
 impl IntoBson for ScalarFilter {
     fn into_bson(self) -> crate::Result<Bson> {
-        // Todo: Find out what Compound cases are
+        // Todo: Find out what Compound cases are.
         let field = match self.projection {
             connector_interface::ScalarProjection::Single(sf) => sf,
             connector_interface::ScalarProjection::Compound(_) => unimplemented!("Compound filter case."),
@@ -62,20 +62,20 @@ impl IntoBson for ScalarFilter {
         // let mode = self.mode;
 
         let filter = match self.condition {
-            ScalarCondition::Equals(val) => doc! { "eq": val.into_bson()? },
-            ScalarCondition::NotEquals(val) => doc! { "ne": val.into_bson()? },
+            ScalarCondition::Equals(val) => doc! { "$eq": val.into_bson()? },
+            ScalarCondition::NotEquals(val) => doc! { "$ne": val.into_bson()? },
             ScalarCondition::Contains(_val) => todo!(),
             ScalarCondition::NotContains(_val) => todo!(),
             ScalarCondition::StartsWith(_val) => todo!(),
             ScalarCondition::NotStartsWith(_val) => todo!(),
             ScalarCondition::EndsWith(_val) => todo!(),
             ScalarCondition::NotEndsWith(_val) => todo!(),
-            ScalarCondition::LessThan(val) => doc! { "lt": val.into_bson()? },
-            ScalarCondition::LessThanOrEquals(val) => doc! { "lte": val.into_bson()? },
-            ScalarCondition::GreaterThan(val) => doc! { "gt": val.into_bson()? },
-            ScalarCondition::GreaterThanOrEquals(val) => doc! { "gte": val.into_bson()? },
-            ScalarCondition::In(vals) => doc! { "in": PrismaValue::List(vals).into_bson()? },
-            ScalarCondition::NotIn(vals) => doc! { "nin": PrismaValue::List(vals).into_bson()? },
+            ScalarCondition::LessThan(val) => doc! { "$lt": val.into_bson()? },
+            ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": val.into_bson()? },
+            ScalarCondition::GreaterThan(val) => doc! { "$gt": val.into_bson()? },
+            ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": val.into_bson()? },
+            ScalarCondition::In(vals) => doc! { "$in": PrismaValue::List(vals).into_bson()? },
+            ScalarCondition::NotIn(vals) => doc! { "$nin": PrismaValue::List(vals).into_bson()? },
         };
 
         Ok(doc! { field.db_name(): filter }.into())

@@ -1,6 +1,8 @@
 mod connection;
+mod transaction;
 
 pub use connection::*;
+pub use transaction::*;
 
 use async_trait::async_trait;
 use connector_interface::{
@@ -9,6 +11,7 @@ use connector_interface::{
 };
 use datamodel::Datasource;
 use mongodb::{options::ClientOptions, Client};
+use prisma_models::prelude::*;
 use url::Url;
 
 /// The MongoDB connector struct.
@@ -23,7 +26,7 @@ pub struct MongoDb {
 impl MongoDb {
     pub async fn new(source: &Datasource) -> connector_interface::Result<Self> {
         let database_str = &source.url().value;
-        let url = Url::parse(database_str).map_err(|err| {
+        let url = Url::parse(database_str).map_err(|_err| {
             ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
                 details: "Unable to parse URL.".to_owned(),
                 url: source.url().value.clone(),
