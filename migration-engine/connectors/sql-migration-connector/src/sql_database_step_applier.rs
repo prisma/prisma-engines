@@ -12,14 +12,19 @@ use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
     #[tracing::instrument(skip(self, database_migration))]
-    async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        self.apply_next_step(
-            &database_migration.steps,
-            index,
-            self.flavour(),
-            database_migration.schemas(),
-        )
-        .await
+    async fn apply_migration(&self, database_migration: &SqlMigration) -> ConnectorResult<u32> {
+        for (index, step) in database_migration.steps.iter().enumerate() {
+            for sql_string in render_raw_sql(
+                &step,
+                self.flavour(),
+                Pair::new(&database_migration.before, &database_migration.after),
+            ) {
+                tracing::debug!(index, %sql_string);
+                self.conn().raw_cmd(&sql_string).await?;
+            }
+        }
+
+        Ok(database_migration.steps.len() as u32)
     }
 
     fn render_steps_pretty(
@@ -105,32 +110,6 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
 
     async fn apply_script(&self, script: &str) -> ConnectorResult<()> {
         Ok(self.conn().raw_cmd(script).await?)
-    }
-}
-
-impl SqlMigrationConnector {
-    async fn apply_next_step(
-        &self,
-        steps: &[SqlMigrationStep],
-        index: usize,
-        renderer: &(dyn SqlFlavour + Send + Sync),
-        schemas: Pair<&SqlSchema>,
-    ) -> ConnectorResult<bool> {
-        let has_this_one = steps.get(index).is_some();
-
-        if !has_this_one {
-            return Ok(false);
-        }
-
-        let step = &steps[index];
-        tracing::debug!(?step);
-
-        for sql_string in render_raw_sql(&step, renderer, schemas) {
-            tracing::debug!(index, %sql_string);
-            self.conn().raw_cmd(&sql_string).await?;
-        }
-
-        Ok(true)
     }
 }
 

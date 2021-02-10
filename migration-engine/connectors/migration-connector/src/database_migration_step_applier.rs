@@ -4,9 +4,8 @@ use crate::{destructive_change_checker::DestructiveChangeDiagnostics, ConnectorR
 /// i.e. the [associated type on MigrationConnector](trait.MigrationConnector.html#associatedtype.DatabaseMigration).
 #[async_trait::async_trait]
 pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
-    /// Applies the step to the database
-    /// Returns true to signal to the caller that the step was applied, and there could be a next one.
-    async fn apply_step(&self, database_migration: &T, step: usize) -> ConnectorResult<bool>;
+    /// Applies the migration to the database. Returns the number of executed steps.
+    async fn apply_migration(&self, database_migration: &T) -> ConnectorResult<u32>;
 
     /// Render steps for the CLI. Each step will contain the raw field.
     fn render_steps_pretty(&self, database_migration: &T) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>>;

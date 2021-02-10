@@ -22,6 +22,7 @@ use enumflags2::BitFlags;
 use error::quaint_error_to_connector_error;
 use flavour::SqlFlavour;
 use migration_connector::*;
+use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use sql_migration::SqlMigration;
 use sql_schema_describer::SqlSchema;
@@ -79,7 +80,7 @@ impl SqlMigrationConnector {
         self.flavour.as_ref()
     }
 
-    /// For tests.
+    /// Made public for tests.
     pub fn quaint(&self) -> &Quaint {
         self.connection.quaint()
     }
@@ -87,6 +88,29 @@ impl SqlMigrationConnector {
     /// Made public for tests.
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
         self.flavour.describe_schema(&self.connection).await
+    }
+
+    /// Try to reset the database to an empty state. This should only be used
+    /// when we don't have the permissions to do a full reset.
+    #[tracing::instrument(skip(self))]
+    async fn best_effort_reset(&self) -> ConnectorResult<()> {
+        tracing::info!("Attempting best_effort_reset");
+
+        let source_schema = self.describe_schema().await?;
+        let target_schema = SqlSchema::empty();
+
+        let steps =
+            sql_schema_differ::calculate_steps(Pair::new(&source_schema, &target_schema), self.flavour.as_ref());
+
+        let migration = SqlMigration {
+            before: source_schema,
+            after: target_schema,
+            steps,
+        };
+
+        self.apply_migration(&migration).await?;
+
+        Ok(())
     }
 }
 
@@ -115,7 +139,11 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        self.flavour.reset(self.conn()).await
+        if let Err(_) = self.flavour.reset(self.conn()).await {
+            self.best_effort_reset().await?;
+        }
+
+        Ok(())
     }
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with

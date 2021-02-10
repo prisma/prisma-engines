@@ -20,11 +20,10 @@ use datamodel::{
 };
 use migration_connector::{features, ConnectorError};
 use sql_migration_connector::SqlMigrationConnector;
-use std::sync::Arc;
 use user_facing_errors::{common::InvalidDatabaseString, migration_engine::DeprecatedProviderArray, KnownError};
 
 /// Top-level constructor for the migration engine API.
-pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericApi>> {
+pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
     let config = parse_configuration(datamodel)?;
     let features = features::from_config(&config);
 
@@ -77,7 +76,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
         x => unimplemented!("Connector {} is not supported yet", x),
     };
 
-    Ok(Arc::new(connector))
+    Ok(Box::new(connector))
 }
 
 /// Create the database referenced by the passed in Prisma schema.
