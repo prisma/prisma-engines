@@ -4,7 +4,7 @@ datasource chinook {
 }
 
 model Album {
-  id       Int     @id @map("AlbumId")
+  id       Int     @id @map("_id")
   Title    String  @default("TestDefaultTitle")
   ArtistId Int
   Tracks   Track[]
@@ -12,7 +12,7 @@ model Album {
 }
 
 model Track {
-  id           Int           @id @map("TrackId")
+  id           Int           @id @map("_id")
   Name         String
   Composer     String?
   Milliseconds Int
@@ -27,25 +27,25 @@ model Track {
 }
 
 model MediaType {
-  id    Int     @id @map("MediaTypeId")
+  id    Int     @id @map("_id")
   Name  String?
   Track Track[]
 }
 
 model Genre {
-  id     Int     @id @map("GenreId")
+  id     Int     @id @map("_id")
   Name   String?
   Tracks Track[]
 }
 
 model Artist {
-  id     Int     @id @map("ArtistId")
+  id     Int     @id @map("_id")
   Name   String?
   Albums Album[]
 }
 
 model Customer {
-  id           Int       @id @map("CustomerId")
+  id           Int       @id @map("_id")
   FirstName    String
   LastName     String
   Company      String?
@@ -63,7 +63,7 @@ model Customer {
 }
 
 model Employee {
-  id         Int        @id @map("EmployeeId")
+  id         Int        @id @map("_id")
   FirstName  String
   LastName   String
   Title      String?
@@ -81,7 +81,7 @@ model Employee {
 }
 
 model Invoice {
-  id                Int           @id @map("InvoiceId")
+  id                Int           @id @map("_id")
   InvoiceDate       DateTime
   BillingAddress    String?
   BillingCity       String?
@@ -95,7 +95,7 @@ model Invoice {
 }
 
 model InvoiceLine {
-  id        Int     @id @map("InvoiceLineId")
+  id        Int     @id @map("_id")
   UnitPrice Float
   Quantity  Int
   InvoiceId Int

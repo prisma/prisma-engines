@@ -4,7 +4,7 @@ use migration_core::commands::SchemaPushInput;
 use std::{fs::File, io::Read};
 use structopt::*;
 
-#[derive(StructOpt)]
+#[derive(Debug, StructOpt)]
 #[structopt(version = env!("GIT_HASH"))]
 enum Command {
     /// Introspect a database
@@ -22,7 +22,7 @@ enum Command {
     SchemaPush(SchemaPush),
 }
 
-#[derive(StructOpt)]
+#[derive(Debug, StructOpt)]
 struct DmmfCommand {
     /// The path to the `query-engine` binary. Defaults to the value of the `PRISMA_BINARY_PATH`
     /// env var, or just `query-engine`.
@@ -36,11 +36,13 @@ struct DmmfCommand {
     file_path: Option<String>,
 }
 
-#[derive(StructOpt)]
+#[derive(Debug, StructOpt)]
 struct SchemaPush {
     schema_path: String,
     #[structopt(long)]
     force: bool,
+    #[structopt(long)]
+    recreate: bool,
 }
 
 #[tokio::main]
@@ -163,11 +165,15 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
     let api = migration_core::migration_api(&schema).await?;
 
+    if cmd.recreate {
+        api.reset(&()).await?;
+    }
+
     let response = api
         .schema_push(&SchemaPushInput {
             schema,
             force: cmd.force,
-            assume_empty: false,
+            assume_empty: cmd.recreate,
         })
         .await?;
 

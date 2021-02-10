@@ -126,7 +126,8 @@ impl ReadOperations for MongoDbConnection {
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &ModelProjection,
     ) -> connector_interface::Result<ManyRecords> {
-        todo!()
+        self.catch(async move { read::get_many_records(&self.database, model, query_arguments, selected_fields).await })
+            .await
     }
 
     async fn get_related_m2m_record_ids(

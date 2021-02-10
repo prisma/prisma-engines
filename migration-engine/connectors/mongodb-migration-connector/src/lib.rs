@@ -64,7 +64,12 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     async fn reset(&self) -> migration_connector::ConnectorResult<()> {
-        todo!()
+        println!("Dropping");
+        self.client
+            .database(&self.db_name)
+            .drop(None)
+            .await
+            .into_connector_result()
     }
 
     fn migration_persistence(&self) -> &dyn migration_connector::MigrationPersistence {

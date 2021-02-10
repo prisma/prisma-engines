@@ -1,7 +1,7 @@
 use std::unimplemented;
 
 use connector_interface::{Filter, ScalarCondition, ScalarFilter};
-use mongodb::bson::{doc, Bson, Document};
+use mongodb::bson::{de::Result, doc, Bson, Document};
 use prisma_models::PrismaValue;
 
 use crate::IntoBson;
@@ -53,9 +53,10 @@ impl IntoBson for Filter {
 // - case insensitive (probably regex or text search?)
 impl IntoBson for ScalarFilter {
     fn into_bson(self) -> crate::Result<Bson> {
-        // Todo: Find out what Compound cases are.
+        // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
         let field = match self.projection {
             connector_interface::ScalarProjection::Single(sf) => sf,
+            connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
             connector_interface::ScalarProjection::Compound(_) => unimplemented!("Compound filter case."),
         };
 
@@ -74,8 +75,12 @@ impl IntoBson for ScalarFilter {
             ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": val.into_bson()? },
             ScalarCondition::GreaterThan(val) => doc! { "$gt": val.into_bson()? },
             ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": val.into_bson()? },
-            ScalarCondition::In(vals) => doc! { "$in": PrismaValue::List(vals).into_bson()? },
-            ScalarCondition::NotIn(vals) => doc! { "$nin": PrismaValue::List(vals).into_bson()? },
+            ScalarCondition::In(vals) => {
+                doc! { "$in": dbg!(vals).into_iter().map(|val| dbg!(val.into_bson())).collect::<crate::Result<Vec<_>>>()? }
+            }
+            ScalarCondition::NotIn(vals) => {
+                doc! { "$nin": vals.into_iter().map(|val| val.into_bson()).collect::<crate::Result<Vec<_>>>()? }
+            }
         };
 
         Ok(doc! { field.db_name(): filter }.into())
