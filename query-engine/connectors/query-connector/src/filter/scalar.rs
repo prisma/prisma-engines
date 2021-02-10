@@ -56,9 +56,9 @@ impl ScalarFilter {
         self.len() == 0
     }
 
-    /// If `true`, the filter can be split into smaller filters executed in
+    /// If `true`, the filter should be split into smaller filters executed in
     /// separate queries.
-    pub fn can_batch(&self) -> bool {
+    pub fn should_batch(&self) -> bool {
         self.len() > *MAX_BATCH_SIZE
     }
 
