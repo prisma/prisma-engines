@@ -15,7 +15,7 @@ impl AttributeValidator<dml::Model> for IgnoreAttributeValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
-        if obj.fields().find(|f| f.is_ignored()).is_some() {
+        if obj.fields().any(|f| f.is_ignored()) {
             return self.new_attribute_validation_error(
                 "Fields on an already ignored Model do not need an `@ignore` annotation.",
                 args.span(),

@@ -139,7 +139,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn reset(&self) -> ConnectorResult<()> {
-        if let Err(_) = self.flavour.reset(self.conn()).await {
+        if self.flavour.reset(self.conn()).await.is_err() {
             self.best_effort_reset().await?;
         }
 
