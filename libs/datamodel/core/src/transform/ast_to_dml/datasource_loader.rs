@@ -18,6 +18,7 @@ pub struct DatasourceLoader {
 }
 
 impl DatasourceLoader {
+    #[allow(clippy::clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             source_definitions: get_builtin_datasource_providers(),
