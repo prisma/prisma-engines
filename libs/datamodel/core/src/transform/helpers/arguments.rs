@@ -84,22 +84,18 @@ impl<'a> Arguments<'a> {
     }
 
     pub fn optional_arg(&mut self, name: &str) -> Option<ValueValidator> {
-        match self.arg_internal(name) {
-            None => None,
-            Some(arg) => Some(ValueValidator::new(&arg.value)),
-        }
+        let arg = self.arg_internal(name)?;
+
+        Some(ValueValidator::new(&arg.value))
     }
 
     /// Gets the full argument span for an argument, used to generate errors.
     fn arg_internal(&mut self, name: &str) -> Option<&'a ast::Argument> {
-        for arg in self.arguments {
-            if arg.name.name == name {
-                self.used_arguments.insert(&arg.name.name as &str);
-                return Some(&arg);
-            }
-        }
+        let arg = self.arguments.iter().find(|arg| arg.name.name == name)?;
 
-        None
+        self.used_arguments.insert(arg.name.name.as_str());
+
+        Some(arg)
     }
 
     /// Gets the arg with the given name, or if it is not found, the first unnamed argument.

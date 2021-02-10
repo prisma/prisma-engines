@@ -14,7 +14,6 @@ pub struct Datasource {
     pub combined_connector: Box<dyn Connector>,
     /// the connector of the active provider
     pub active_connector: Box<dyn Connector>,
-    pub preview_features: Vec<String>,
 }
 
 impl std::fmt::Debug for Datasource {

@@ -94,6 +94,7 @@ impl DatasourceLoader {
         let mut diagnostics = Diagnostics::new();
 
         let provider_arg = args.arg("provider")?;
+
         if provider_arg.is_from_env() {
             return Err(diagnostics.merge_error(DatamodelError::new_functional_evaluation_error(
                 &"A datasource must not use the env() function in the provider argument.".to_string(),
@@ -102,6 +103,7 @@ impl DatasourceLoader {
         }
 
         let providers = provider_arg.as_array().to_str_vec()?;
+
         if provider_arg.is_array() {
             diagnostics.push_warning(DatamodelWarning::new_deprecated_provider_array_warning(
                 provider_arg.span(),
@@ -116,13 +118,13 @@ impl DatasourceLoader {
             )));
         }
 
-        let url_args = args.arg("url")?;
+        let url_arg = args.arg("url")?;
         let override_url = datasource_url_overrides
             .iter()
             .find(|x| &x.0 == source_name)
             .map(|x| &x.1);
 
-        let (env_var_for_url, url) = match (url_args.as_str_from_env(), override_url) {
+        let url = match (url_arg.as_str_from_env(), override_url) {
             (Err(err), _)
                 if ignore_datasource_urls && err.description().contains("Expected a String value, but received") =>
             {
@@ -130,52 +132,31 @@ impl DatasourceLoader {
             }
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
-                (None, format!("{}://", providers.first().unwrap()))
+                StringFromEnvVar {
+                    from_env_var: None,
+                    value: format!("{}://", providers.first().unwrap()),
+                }
             }
             (_, Some(url)) => {
                 debug!("overwriting datasource `{}` with url '{}'", &source_name, &url);
-                (None, url.to_owned())
+                StringFromEnvVar {
+                    from_env_var: None,
+                    value: url.to_owned(),
+                }
             }
-            (Ok((env_var, url)), _) => (env_var, url.trim().to_owned()),
+            (Ok((env_var, url)), _) => StringFromEnvVar {
+                from_env_var: env_var,
+                value: url.trim().to_owned(),
+            },
             (Err(err), _) => {
                 return Err(diagnostics.merge_error(err));
             }
         };
 
-        if url.is_empty() {
-            let suffix = match &env_var_for_url {
-                Some(env_var_name) => format!(
-                    " The environment variable `{}` resolved to an empty string.",
-                    env_var_name
-                ),
-                None => "".to_owned(),
-            };
-            let msg = format!(
-                "You must provide a nonempty URL for the datasource `{}`.{}",
-                source_name, &suffix
-            );
-            return Err(diagnostics.merge_error(DatamodelError::new_source_validation_error(
-                &msg,
-                source_name,
-                url_args.span(),
-            )));
-        }
+        validate_datasource_url(&url, source_name, &url_arg)?;
+        preview_features_guardrail(&mut args)?;
 
-        let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
-        let (preview_features, span) = match preview_features_arg.ok() {
-            Some(x) => (x.as_array().to_str_vec()?, x.span()),
-            None => (Vec::new(), Span::empty()),
-        };
-
-        if !preview_features.is_empty() {
-            return Err(diagnostics.merge_error(DatamodelError::new_connector_error("Preview features are only supported in the generator block. Please move this field to the generator block.", span)));
-        }
-
-        let documentation = ast_source.documentation.clone().map(|comment| comment.text);
-        let url = StringFromEnvVar {
-            from_env_var: env_var_for_url,
-            value: url,
-        };
+        let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
 
         let all_datasource_providers: Vec<_> = providers
             .iter()
@@ -195,7 +176,7 @@ impl DatasourceLoader {
             .iter()
             .map(|provider| {
                 let url_check_result = provider.can_handle_url(source_name, &url).map_err(|err_msg| {
-                    DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
+                    DatamodelError::new_source_validation_error(&err_msg, source_name, url_arg.span())
                 });
                 url_check_result.map(|_| provider)
             })
@@ -209,8 +190,10 @@ impl DatasourceLoader {
         // The first provider that can handle the URL is used to construct the Datasource.
         // If no provider can handle it, return the first error.
         let (successes, errors): (Vec<_>, Vec<_>) = validated_providers.into_iter().partition(|result| result.is_ok());
-        if !successes.is_empty() {
-            let first_successful_provider = successes.into_iter().next().unwrap()?;
+
+        if let Some(first_provider) = successes.into_iter().next() {
+            let first_successful_provider = first_provider?;
+
             Ok(ValidatedDatasource {
                 subject: Datasource {
                     name: source_name.to_string(),
@@ -220,7 +203,6 @@ impl DatasourceLoader {
                     documentation,
                     combined_connector,
                     active_connector: first_successful_provider.connector(),
-                    preview_features,
                 },
                 warnings: diagnostics.warnings,
             })
@@ -246,8 +228,48 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
     ]
 }
 
-impl Default for DatasourceLoader {
-    fn default() -> Self {
-        Self::new()
+fn preview_features_guardrail(args: &mut Arguments) -> Result<(), DatamodelError> {
+    let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY);
+    let (preview_features, span) = match preview_features_arg.ok() {
+        Some(x) => (x.as_array().to_str_vec()?, x.span()),
+        None => (Vec::new(), Span::empty()),
+    };
+
+    if preview_features.is_empty() {
+        return Ok(());
     }
+
+    Err(DatamodelError::new_connector_error(
+        "Preview features are only supported in the generator block. Please move this field to the generator block.",
+        span,
+    ))
+}
+
+fn validate_datasource_url(
+    url: &StringFromEnvVar,
+    source_name: &str,
+    url_arg: &ValueValidator,
+) -> Result<(), DatamodelError> {
+    if !url.value.is_empty() {
+        return Ok(());
+    }
+
+    let suffix = match &url.from_env_var {
+        Some(env_var_name) => format!(
+            " The environment variable `{}` resolved to an empty string.",
+            env_var_name
+        ),
+        None => "".to_owned(),
+    };
+
+    let msg = format!(
+        "You must provide a nonempty URL for the datasource `{}`.{}",
+        source_name, &suffix
+    );
+
+    Err(DatamodelError::new_source_validation_error(
+        &msg,
+        source_name,
+        url_arg.span(),
+    ))
 }
