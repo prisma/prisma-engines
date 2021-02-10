@@ -4,8 +4,11 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum MongoError {
-    #[error("Test")]
-    Test,
+    #[error("Unsupported MongoDB feature: {0}.")]
+    Unsupported(String),
+
+    #[error("Failed to convert '{}' to '{}'.", from, to)]
+    ConversionError { from: String, to: String },
 }
 
 impl From<DriverError> for MongoError {

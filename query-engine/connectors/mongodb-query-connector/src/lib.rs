@@ -3,12 +3,33 @@ mod filter;
 mod interface;
 mod projection;
 mod queries;
+mod value;
 
+use std::convert::TryInto;
+
+use error::MongoError;
 pub use interface::*;
-use mongodb::bson::Document;
+use mongodb::bson::{Bson, Document};
 
-type Result<T> = std::result::Result<T, error::MongoError>;
+type Result<T> = std::result::Result<T, MongoError>;
 
-trait IntoBsonDocument {
-    fn into_bson(&self) -> Result<Document>;
+trait IntoBson {
+    fn into_bson(self) -> Result<Bson>;
+}
+
+trait BsonTransform {
+    fn into_document(self) -> Result<Document>;
+}
+
+impl BsonTransform for Bson {
+    fn into_document(self) -> Result<Document> {
+        if let Bson::Document(doc) = self {
+            Ok(doc)
+        } else {
+            Err(MongoError::ConversionError {
+                from: format!("{:?}", self),
+                to: "Bson::Document".to_string(),
+            })
+        }
+    }
 }

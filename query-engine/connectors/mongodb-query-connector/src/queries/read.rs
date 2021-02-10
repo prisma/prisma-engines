@@ -1,4 +1,4 @@
-use crate::IntoBsonDocument;
+use crate::{BsonTransform, IntoBson};
 use connector_interface::Filter;
 use futures::stream::StreamExt;
 use mongodb::Database;
@@ -13,10 +13,13 @@ pub async fn get_single_record(
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
 
-    let filter = filter.into_bson()?;
-    let find_options = FindOptions::builder().projection(selected_fields.into_bson()?).build();
+    // Todo look at interfaces (req clones).
+    let filter = filter.clone().into_bson()?.into_document()?;
+    let find_options = FindOptions::builder()
+        .projection(selected_fields.clone().into_bson()?.into_document()?)
+        .build();
 
-    let mut cursor = coll.find(filter, find_options).await?;
+    let mut cursor = coll.find(Some(filter), Some(find_options)).await?;
     let mut results = vec![];
 
     while let Some(result) = cursor.next().await {
