@@ -16,4 +16,5 @@ pub trait WithDatabaseName: WithName {
 
 pub trait Ignorable {
     fn is_ignored(&self) -> bool;
+    fn ignore(&mut self);
 }

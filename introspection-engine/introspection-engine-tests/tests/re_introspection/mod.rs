@@ -1629,3 +1629,60 @@ async fn custom_repro(api: &TestApi) -> crate::TestResult {
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn re_introspecting_ignore(api: &TestApi) -> crate::TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", move |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("test", types::integer().nullable(true));
+            });
+
+            migration.create_table("Ignored", move |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+                t.add_column("test", types::integer().nullable(true));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await?;
+
+    let input_dm = indoc! {r#"
+        model User {
+            id           String    @id
+            test         Int?      @ignore
+        }
+        
+        model Ignored {
+            id           String    @id
+            test         Int?
+        
+            @@ignore
+        }        
+    "#};
+
+    let final_dm = indoc! {r#"
+        model User {
+            id           String    @id
+            test         Int?      @ignore
+        }
+        
+        model Ignored {
+            id           String    @id
+            test         Int?
+        
+            @@ignore
+        }
+
+        model Unrelated {
+            id               Int @id @default(autoincrement())
+        }
+    "#};
+
+    assert_eq_datamodels!(final_dm, &api.re_introspect(input_dm).await?);
+
+    Ok(())
+}

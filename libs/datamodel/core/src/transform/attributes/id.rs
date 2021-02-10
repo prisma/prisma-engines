@@ -11,7 +11,6 @@ impl AttributeValidator<dml::Field> for IdAttributeValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        //todo move this
         if let dml::Field::ScalarField(sf) = obj {
             sf.is_id = true;
             Ok(())
