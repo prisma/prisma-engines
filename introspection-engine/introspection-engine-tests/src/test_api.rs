@@ -15,14 +15,55 @@ use tracing::Instrument;
 
 pub struct TestApi {
     pub db_name: &'static str,
-    connection_info: ConnectionInfo,
-    sql_family: SqlFamily,
     database: Quaint,
     introspection_connector: SqlIntrospectionConnector,
     pub tags: BitFlags<Tags>,
 }
 
 impl TestApi {
+    pub async fn new(args: TestApiArgs) -> Self {
+        let tags = args.connector_tags;
+        let db_name = if args.connector_tags.contains(Tags::Mysql) {
+            test_setup::mysql_safe_identifier(args.test_function_name)
+        } else {
+            args.test_function_name
+        };
+
+        let url = (args.url_fn)(db_name);
+        let url = if tags.contains(Tags::Mssql) {
+            format!("{};schema={}", url, db_name)
+        } else {
+            url
+        };
+
+        let conn = if tags.contains(Tags::Mysql) {
+            create_mysql_database(&url.parse().unwrap()).await.unwrap()
+        } else if tags.contains(Tags::Postgres) {
+            create_postgres_database(&url.parse().unwrap()).await.unwrap()
+        } else if tags.contains(Tags::Mssql) {
+            let conn = create_mssql_database(&url).await.unwrap();
+
+            test_setup::connectors::mssql::reset_schema(&conn, db_name)
+                .await
+                .unwrap();
+
+            conn
+        } else if tags.contains(Tags::Sqlite) {
+            Quaint::new(&url).await.unwrap()
+        } else {
+            unreachable!()
+        };
+
+        let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
+
+        TestApi {
+            db_name,
+            tags: args.connector_tags,
+            database: conn,
+            introspection_connector,
+        }
+    }
+
     pub async fn list_databases(&self) -> Result<Vec<String>> {
         Ok(self.introspection_connector.list_databases().await?)
     }
@@ -32,7 +73,7 @@ impl TestApi {
     }
 
     pub async fn describe_schema(&self) -> Result<SqlSchema> {
-        match &self.connection_info {
+        match &self.database.connection_info() {
             ConnectionInfo::Mssql(url) => {
                 let sql_schema = mssql::SqlSchemaDescriber::new(self.database.clone())
                     .describe(url.schema())
@@ -49,7 +90,7 @@ impl TestApi {
             }
             ConnectionInfo::Mysql(_url) => {
                 let sql_schema = mysql::SqlSchemaDescriber::new(self.database.clone())
-                    .describe(self.connection_info.schema_name())
+                    .describe(self.database.connection_info().schema_name())
                     .await?;
 
                 Ok(sql_schema)
@@ -60,7 +101,7 @@ impl TestApi {
             }
             | ConnectionInfo::InMemorySqlite { .. } => {
                 let sql_schema = sqlite::SqlSchemaDescriber::new(self.database.clone())
-                    .describe(self.connection_info.schema_name())
+                    .describe(self.database.connection_info().schema_name())
                     .await?;
 
                 Ok(sql_schema)
@@ -124,18 +165,18 @@ impl TestApi {
     }
 
     pub fn sql_family(&self) -> SqlFamily {
-        self.sql_family
+        self.database.connection_info().sql_family()
     }
 
     pub fn schema_name(&self) -> &str {
-        self.connection_info.schema_name()
+        self.database.connection_info().schema_name()
     }
 
     pub fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
             schema_name: self.schema_name().to_owned(),
             database: self.database.clone(),
-            sql_variant: match self.sql_family {
+            sql_variant: match self.sql_family() {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
@@ -160,155 +201,5 @@ fn parse_configuration(dm: &str) -> Result<Configuration> {
     match datamodel::parse_configuration(dm) {
         Ok(dm) => Ok(dm.subject),
         Err(e) => Err(Report::msg(e.to_pretty_string("schema.prisma", dm))),
-    }
-}
-
-pub async fn mysql_test_api(args: TestApiArgs) -> TestApi {
-    let db_name = test_setup::mysql_safe_identifier(args.test_function_name);
-    let url = mysql_url(db_name);
-    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
-    let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
-
-    TestApi {
-        connection_info: conn.connection_info().to_owned(),
-        database: conn,
-        sql_family: SqlFamily::Mysql,
-        introspection_connector,
-        db_name,
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mysql_8_test_api(args: TestApiArgs) -> TestApi {
-    let db_name = test_setup::mysql_safe_identifier(args.test_function_name);
-    let url = mysql_8_url(db_name);
-    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
-
-    let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
-
-    TestApi {
-        connection_info: conn.connection_info().to_owned(),
-        db_name,
-        tags: args.test_tag,
-        database: conn,
-        sql_family: SqlFamily::Mysql,
-        introspection_connector,
-    }
-}
-
-pub async fn mysql_5_6_test_api(args: TestApiArgs) -> TestApi {
-    let db_name = test_setup::mysql_safe_identifier(args.test_function_name);
-    let url = mysql_5_6_url(db_name);
-    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
-
-    let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
-
-    TestApi {
-        connection_info: conn.connection_info().to_owned(),
-        db_name,
-        tags: args.test_tag,
-        database: conn,
-        sql_family: SqlFamily::Mysql,
-        introspection_connector,
-    }
-}
-
-pub async fn mysql_mariadb_test_api(args: TestApiArgs) -> TestApi {
-    let db_name = test_setup::mysql_safe_identifier(args.test_function_name);
-    let url = mariadb_url(db_name);
-    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
-
-    let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
-
-    TestApi {
-        db_name,
-        tags: args.test_tag,
-        connection_info: conn.connection_info().to_owned(),
-        database: conn,
-        sql_family: SqlFamily::Mysql,
-        introspection_connector,
-    }
-}
-
-pub async fn postgres_test_api(args: TestApiArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_10_url(args.test_function_name), args).await
-}
-
-pub async fn postgres9_test_api(args: TestApiArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_9_url(args.test_function_name), args).await
-}
-
-pub async fn postgres11_test_api(args: TestApiArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_11_url(args.test_function_name), args).await
-}
-
-pub async fn postgres12_test_api(args: TestApiArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_12_url(args.test_function_name), args).await
-}
-
-pub async fn postgres13_test_api(args: TestApiArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_13_url(args.test_function_name), args).await
-}
-
-pub async fn test_api_helper_for_postgres(url: String, args: TestApiArgs) -> TestApi {
-    let database = test_setup::create_postgres_database(&url.parse().unwrap())
-        .await
-        .unwrap();
-    let connection_info = database.connection_info().to_owned();
-    let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
-
-    TestApi {
-        connection_info,
-        db_name: args.test_function_name,
-        tags: args.test_tag,
-        database,
-        sql_family: SqlFamily::Postgres,
-        introspection_connector,
-    }
-}
-
-pub async fn sqlite_test_api(args: TestApiArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    sqlite_test_file(db_name);
-    let connection_string = sqlite_test_url(db_name);
-    let database = Quaint::new(&connection_string).await.unwrap();
-    let introspection_connector = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
-
-    TestApi {
-        db_name,
-        tags: args.test_tag,
-        connection_info: database.connection_info().to_owned(),
-        database,
-        sql_family: SqlFamily::Sqlite,
-        introspection_connector,
-    }
-}
-
-pub async fn mssql_2017_test_api(args: TestApiArgs) -> TestApi {
-    mssql_test_api(mssql_2017_url("master"), args).await
-}
-
-pub async fn mssql_2019_test_api(args: TestApiArgs) -> TestApi {
-    mssql_test_api(mssql_2019_url("master"), args).await
-}
-
-pub async fn mssql_test_api(connection_string: String, args: TestApiArgs) -> TestApi {
-    use test_setup::connectors::mssql;
-    let schema = args.test_function_name;
-    let connection_string = format!("{};schema={}", connection_string, schema);
-    let database = Quaint::new(&connection_string).await.unwrap();
-    let connection_info = database.connection_info().to_owned();
-
-    mssql::reset_schema(&database, schema).await.unwrap();
-
-    let introspection_connector = SqlIntrospectionConnector::new(&connection_string).await.unwrap();
-
-    TestApi {
-        db_name: schema,
-        tags: args.test_tag,
-        connection_info,
-        database,
-        sql_family: SqlFamily::Mssql,
-        introspection_connector,
     }
 }

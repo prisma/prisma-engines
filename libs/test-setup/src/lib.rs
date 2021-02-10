@@ -27,22 +27,72 @@ type AnyError = Box<dyn std::error::Error + Send + Sync>;
 const SCHEMA_NAME: &str = "prisma-tests";
 
 pub struct TestApiArgs {
+    pub connector_tags: BitFlags<Tags>,
     pub test_function_name: &'static str,
-    pub test_tag: BitFlags<Tags>,
     pub test_features: BitFlags<Features>,
+    pub url_fn: &'static (dyn Fn(&str) -> String + Send + Sync),
+    pub provider: &'static str,
 }
 
-impl TestApiArgs {
-    pub fn new(name: &'static str, tags: u16, features: u8) -> Self {
-        let tags: BitFlags<Tags> = BitFlags::from_bits(tags).unwrap();
-        let features: BitFlags<Features> = BitFlags::from_bits(features).unwrap();
+macro_rules! test_api_constructors {
+    ($(($connector:ident, $provider:literal),)*) => {
+        impl TestApiArgs {
+            $(
+                pub fn $connector(name: &'static str, tags: u16, features: u8) -> Self {
+                    let tags: BitFlags<Tags> = BitFlags::from_bits(tags).unwrap();
+                    let features: BitFlags<Features> = BitFlags::from_bits(features).unwrap();
 
-        TestApiArgs {
-            test_function_name: name,
-            test_tag: tags,
-            test_features: features,
+                    TestApiArgs {
+                        connector_tags: tags,
+                        test_function_name: name,
+                        test_features: features,
+                        url_fn: &urls::$connector,
+                        provider: $provider,
+                    }
+                }
+            )*
         }
     }
+}
+
+test_api_constructors!(
+    (mssql_2017, "sqlserver"),
+    (mssql_2019, "sqlserver"),
+    (mysql_5_6, "mysql"),
+    (mysql, "mysql"),
+    (mysql_8, "mysql"),
+    (mysql_mariadb, "mysql"),
+    (postgres9, "postgresql"),
+    (postgres, "postgresql"),
+    (postgres11, "postgresql"),
+    (postgres12, "postgresql"),
+    (postgres13, "postgresql"),
+    (sqlite, "sqlite"),
+);
+
+impl TestApiArgs {
+    pub fn datasource_block(&self, url: &str) -> String {
+        format!(
+            "datasource db {{\nprovider = \"{provider}\"\nurl = \"{url}\"\ndefault = true\n}}\n\n",
+            provider = self.provider,
+            url = url
+        )
+    }
+}
+
+mod urls {
+    pub use super::mariadb_url as mysql_mariadb;
+    pub use super::mssql_2017_url as mssql_2017;
+    pub use super::mssql_2019_url as mssql_2019;
+    pub use super::mysql_5_6_url as mysql_5_6;
+    pub use super::mysql_8_url as mysql_8;
+    pub use super::mysql_url as mysql;
+    pub use super::postgres_10_url as postgres;
+    pub use super::postgres_11_url as postgres11;
+    pub use super::postgres_12_url as postgres12;
+    pub use super::postgres_13_url as postgres13;
+    pub use super::postgres_9_url as postgres9;
+    pub use super::sqlite_test_url as sqlite;
 }
 
 pub fn sqlite_test_url(db_name: &str) -> String {
@@ -286,175 +336,6 @@ pub fn db_host_and_port_mssql_2019() -> (&'static str, usize) {
     }
 }
 
-pub fn postgres_9_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "postgresql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        postgres_9_url(db_name)
-    )
-}
-
-pub fn pgbouncer_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "postgresql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        pgbouncer_url(db_name)
-    )
-}
-
-pub fn postgres_10_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "postgresql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        postgres_10_url(db_name)
-    )
-}
-
-pub fn postgres_11_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "postgresql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        postgres_11_url(db_name)
-    )
-}
-
-pub fn postgres_12_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "postgresql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        postgres_12_url(db_name)
-    )
-}
-
-pub fn postgres_13_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "postgresql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        postgres_13_url(db_name)
-    )
-}
-
-pub fn mysql_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "mysql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        mysql_url(db_name)
-    )
-}
-
-pub fn mysql_8_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "mysql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        mysql_8_url(db_name)
-    )
-}
-
-pub fn mysql_5_6_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "mysql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        mysql_5_6_url(db_name)
-    )
-}
-
-pub fn mariadb_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "mysql"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        mariadb_url(db_name),
-    )
-}
-
-pub fn sqlite_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "sqlite"
-            url = "file:{}"
-            default = true
-        }}
-    "#,
-        sqlite_test_file(db_name)
-    )
-}
-
-pub fn mssql_2017_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "sqlserver"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        mssql_2017_url(db_name),
-    )
-}
-
-pub fn mssql_2019_test_config(db_name: &str) -> String {
-    format!(
-        r#"
-        datasource my_db {{
-            provider = "sqlserver"
-            url = "{}"
-            default = true
-        }}
-    "#,
-        mssql_2019_url(db_name),
-    )
-}
-
 /// The maximum length of identifiers on mysql is 64 bytes.
 ///
 /// Source: https://dev.mysql.com/doc/mysql-reslimits-excerpt/5.5/en/identifier-length.html
@@ -542,11 +423,12 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
     Ok(conn)
 }
 
-/// Create an MSSQL database from a JDBC connection string..
+/// Create an MSSQL database from a JDBC connection string.
 pub async fn create_mssql_database(jdbc_string: &str) -> Result<Quaint, AnyError> {
     let mut conn = connection_string::JdbcString::from_str(&format!("jdbc:{}", jdbc_string))?;
 
     let params = conn.properties_mut();
+
     match params.remove("database") {
         Some(ref db_name) if db_name != "master" => {
             params.insert("database".into(), "master".into());
@@ -558,7 +440,7 @@ pub async fn create_mssql_database(jdbc_string: &str) -> Result<Quaint, AnyError
     }
 
     let conn = Quaint::new(jdbc_string).await?;
-    conn.query_raw("select db_name() as name", &[]).await?;
+    conn.query_raw("SELECT db_name() AS name", &[]).await?;
 
     Ok(conn)
 }

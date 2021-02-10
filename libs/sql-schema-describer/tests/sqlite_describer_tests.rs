@@ -8,7 +8,7 @@ use pretty_assertions::assert_eq;
 use quaint::prelude::Queryable;
 use sql_schema_describer::*;
 use sqlite::*;
-use test_api::{sqlite_test_api, TestApi, TestResult};
+use test_api::{TestApi, TestResult};
 use test_macros::test_each_connector;
 
 #[tokio::test]

@@ -7,6 +7,7 @@ use quaint::prelude::{Queryable, SqlFamily};
 use serde_json::Value;
 use sql_schema_describer::*;
 use test_macros::test_each_connector;
+use test_setup::connectors::Tags;
 
 mod common;
 mod mssql;
@@ -15,43 +16,43 @@ mod postgres;
 mod sqlite;
 mod test_api;
 
-fn int_full_data_type(api: &TestApi) -> String {
-    match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => "int4".to_string(),
-        (SqlFamily::Sqlite, _) => "INTEGER".to_string(),
-        (SqlFamily::Mysql, "mysql8") => "int".to_string(),
-        (SqlFamily::Mysql, _) => "int(11)".to_string(),
-        (SqlFamily::Mssql, _) => "int".to_string(),
+fn int_full_data_type(api: &TestApi) -> &'static str {
+    match api.sql_family() {
+        SqlFamily::Postgres => "int4",
+        SqlFamily::Sqlite => "INTEGER",
+        SqlFamily::Mysql if api.connector_tags().contains(Tags::Mysql8) => "int",
+        SqlFamily::Mysql => "int(11)",
+        SqlFamily::Mssql => "int",
     }
 }
 
 fn int_native_type(api: &TestApi) -> Option<Value> {
-    match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => Some(PostgresType::Integer.to_json()),
-        (SqlFamily::Sqlite, _) => None,
-        (SqlFamily::Mysql, "mysql8") => Some(MySqlType::Int.to_json()),
-        (SqlFamily::Mysql, _) => Some(MySqlType::Int.to_json()),
-        (SqlFamily::Mssql, _) => Some(MsSqlType::Int.to_json()),
+    match api.sql_family() {
+        SqlFamily::Postgres => Some(PostgresType::Integer.to_json()),
+        SqlFamily::Sqlite => None,
+        SqlFamily::Mysql if api.connector_tags().contains(Tags::Mysql8) => Some(MySqlType::Int.to_json()),
+        SqlFamily::Mysql => Some(MySqlType::Int.to_json()),
+        SqlFamily::Mssql => Some(MsSqlType::Int.to_json()),
     }
 }
 
 fn varchar_full_data_type(api: &TestApi, length: u64) -> String {
-    match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => "varchar".to_string(),
-        (SqlFamily::Sqlite, _) => format!("VARCHAR({})", length),
-        (SqlFamily::Mysql, "mysql8") => format!("varchar({})", length),
-        (SqlFamily::Mysql, _) => format!("varchar({})", length),
-        (SqlFamily::Mssql, _) => format!("varchar({})", length),
+    match api.sql_family() {
+        SqlFamily::Postgres => "varchar".to_string(),
+        SqlFamily::Sqlite => format!("VARCHAR({})", length),
+        SqlFamily::Mysql if api.connector_tags().contains(Tags::Mysql8) => format!("varchar({})", length),
+        SqlFamily::Mysql => format!("varchar({})", length),
+        SqlFamily::Mssql => format!("varchar({})", length),
     }
 }
 
 fn varchar_native_type(api: &TestApi, length: u32) -> Option<Value> {
-    match (api.sql_family(), api.connector_name()) {
-        (SqlFamily::Postgres, _) => Some(PostgresType::VarChar(Some(length)).to_json()),
-        (SqlFamily::Sqlite, _) => None,
-        (SqlFamily::Mysql, "mysql8") => Some(MySqlType::VarChar(length).to_json()),
-        (SqlFamily::Mysql, _) => Some(MySqlType::VarChar(length).to_json()),
-        (SqlFamily::Mssql, _) => Some(MsSqlType::VarChar(Some(MsSqlTypeParameter::Number(length as u16))).to_json()),
+    match api.sql_family() {
+        SqlFamily::Postgres => Some(PostgresType::VarChar(Some(length)).to_json()),
+        SqlFamily::Sqlite => None,
+        SqlFamily::Mysql if api.connector_tags().contains(Tags::Mysql8) => Some(MySqlType::VarChar(length).to_json()),
+        SqlFamily::Mysql => Some(MySqlType::VarChar(length).to_json()),
+        SqlFamily::Mssql => Some(MsSqlType::VarChar(Some(MsSqlTypeParameter::Number(length as u16))).to_json()),
     }
 }
 
@@ -72,7 +73,7 @@ async fn is_required_must_work(api: &TestApi) {
         Column {
             name: "column1".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api),
+                full_data_type: int_full_data_type(api).into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -83,7 +84,7 @@ async fn is_required_must_work(api: &TestApi) {
         Column {
             name: "column2".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api),
+                full_data_type: int_full_data_type(api).into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Nullable,
                 native_type: int_native_type(api),
@@ -123,7 +124,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
     let expected_columns = vec![Column {
         name: "city".to_string(),
         tpe: ColumnType {
-            full_data_type: int_full_data_type(api),
+            full_data_type: int_full_data_type(api).into(),
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
             native_type: int_native_type(api),
@@ -215,7 +216,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
         Column {
             name: "city".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api),
+                full_data_type: int_full_data_type(api).into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -259,12 +260,13 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             indices: expected_indexes,
             primary_key: None,
             foreign_keys: vec![ForeignKey {
-                constraint_name: match (api.sql_family(), api.connector_name()) {
-                    (SqlFamily::Postgres, "postgres12") => Some("User_city_name_city_fkey".to_owned()),
-                    (SqlFamily::Postgres, _) => Some("User_city_name_fkey".to_owned()),
-                    (SqlFamily::Mysql, _) => Some("User_ibfk_1".to_owned()),
-                    (SqlFamily::Sqlite, _) => None,
-                    (SqlFamily::Mssql, _) => Some("User_city_name_fkey".to_owned()),
+                constraint_name: match api.sql_family() {
+                    SqlFamily::Postgres if api.connector_tags().contains(Tags::Postgres12) =>
+                        Some("User_city_name_city_fkey".to_owned()),
+                    SqlFamily::Postgres => Some("User_city_name_fkey".to_owned()),
+                    SqlFamily::Mysql => Some("User_ibfk_1".to_owned()),
+                    SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => Some("User_city_name_fkey".to_owned()),
                 },
                 columns: vec!["city_name".to_string(), "city".to_string()],
                 referenced_columns: vec!["name".to_string(), "id".to_string(),],
@@ -290,7 +292,7 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
     let expected_columns = vec![Column {
         name: "column-1".to_string(),
         tpe: ColumnType {
-            full_data_type: int_full_data_type(api),
+            full_data_type: int_full_data_type(api).into(),
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
             native_type: int_native_type(api),
@@ -338,7 +340,7 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
         Column {
             name: "id".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api),
+                full_data_type: int_full_data_type(api).into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -401,7 +403,7 @@ async fn indices_must_work(api: &TestApi) {
         Column {
             name: "id".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api),
+                full_data_type: int_full_data_type(api).into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -413,7 +415,7 @@ async fn indices_must_work(api: &TestApi) {
         Column {
             name: "count".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api),
+                full_data_type: int_full_data_type(api).into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -478,7 +480,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         Column {
             name: "uniq1".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api),
+                full_data_type: int_full_data_type(api).into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -489,7 +491,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         Column {
             name: "uniq2".to_string(),
             tpe: ColumnType {
-                full_data_type: int_full_data_type(api),
+                full_data_type: int_full_data_type(api).into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(api),
@@ -598,7 +600,7 @@ async fn defaults_must_work(api: &TestApi) {
     assert_eq!(false, id.auto_increment);
 
     let expected_type = ColumnType {
-        full_data_type: int_full_data_type(api),
+        full_data_type: int_full_data_type(api).into(),
         family: ColumnTypeFamily::Int,
         arity: ColumnArity::Nullable,
         native_type: int_native_type(api),

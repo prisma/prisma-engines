@@ -819,7 +819,7 @@ async fn shadow_database_creation_error_is_special_cased_mysql(api: &TestApi) ->
         ))
         .await?;
 
-    let (host, port) = db_host_and_port_mysql_8_0();
+    let (host, port) = test_setup::db_host_and_port_mysql_8_0();
 
     let datamodel = format!(
         r#"
@@ -870,7 +870,7 @@ async fn shadow_database_creation_error_is_special_cased_postgres(api: &TestApi)
         )
         .await?;
 
-    let (host, port) = db_host_and_port_postgres_12();
+    let (host, port) = test_setup::db_host_and_port_postgres_12();
 
     let datamodel = format!(
         r#"
@@ -926,7 +926,7 @@ async fn shadow_database_creation_error_is_special_cased_mssql(api: &TestApi) ->
         .await
         .ok();
 
-    let (host, port) = db_host_and_port_mssql_2019();
+    let (host, port) = test_setup::db_host_and_port_mssql_2019();
 
     let datamodel = format!(
         r#"
