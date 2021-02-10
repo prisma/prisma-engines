@@ -4,12 +4,12 @@ use migration_core::{
 };
 use tempfile::TempDir;
 use test_macros::test_each_connector;
-use test_setup::{connectors::Tags, TestAPIArgs};
+use test_setup::{connectors::Tags, TestApiArgs};
 
 type TestResult = Result<(), anyhow::Error>;
 
 struct TestApi {
-    args: TestAPIArgs,
+    args: TestApiArgs,
     source: String,
     url: String,
 }
@@ -37,7 +37,7 @@ impl TestApi {
     }
 }
 
-async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
+async fn mysql_8_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::mysql_8_test_config(&args.test_function_name),
         url: test_setup::mysql_8_url(&args.test_function_name),
@@ -45,7 +45,7 @@ async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
+async fn mysql_5_6_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::mysql_5_6_test_config(&args.test_function_name),
         url: test_setup::mysql_5_6_url(&args.test_function_name),
@@ -53,7 +53,7 @@ async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
+async fn mysql_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::mysql_test_config(&args.test_function_name),
         url: test_setup::mysql_url(&args.test_function_name),
@@ -61,7 +61,7 @@ async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
+async fn mysql_mariadb_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::mariadb_test_config(&args.test_function_name),
         url: test_setup::mariadb_url(&args.test_function_name),
@@ -69,7 +69,7 @@ async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
+async fn sqlite_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::sqlite_test_config(&args.test_function_name),
         url: test_setup::sqlite_test_file(&args.test_function_name),
@@ -77,7 +77,7 @@ async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
+async fn mssql_2019_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::mssql_2019_test_config(&args.test_function_name),
         url: test_setup::mssql_2019_url(&args.test_function_name),
@@ -85,7 +85,7 @@ async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
+async fn mssql_2017_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::mssql_2017_test_config(&args.test_function_name),
         url: test_setup::mssql_2017_url(&args.test_function_name),
@@ -93,7 +93,7 @@ async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
+async fn postgres9_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::postgres_9_test_config(&args.test_function_name),
         url: test_setup::postgres_9_url(&args.test_function_name),
@@ -101,7 +101,7 @@ async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
+async fn postgres_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::postgres_10_test_config(&args.test_function_name),
         url: test_setup::postgres_10_url(&args.test_function_name),
@@ -109,7 +109,7 @@ async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
+async fn postgres11_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::postgres_11_test_config(&args.test_function_name),
         url: test_setup::postgres_11_url(&args.test_function_name),
@@ -117,7 +117,7 @@ async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
+async fn postgres12_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::postgres_12_test_config(&args.test_function_name),
         url: test_setup::postgres_12_url(&args.test_function_name),
@@ -125,7 +125,7 @@ async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
     }
 }
 
-async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
+async fn postgres13_test_api(args: TestApiArgs) -> TestApi {
     TestApi {
         source: test_setup::postgres_13_test_config(&args.test_function_name),
         url: test_setup::postgres_13_url(&args.test_function_name),

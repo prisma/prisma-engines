@@ -26,18 +26,18 @@ type AnyError = Box<dyn std::error::Error + Send + Sync>;
 
 const SCHEMA_NAME: &str = "prisma-tests";
 
-pub struct TestAPIArgs {
+pub struct TestApiArgs {
     pub test_function_name: &'static str,
     pub test_tag: BitFlags<Tags>,
     pub test_features: BitFlags<Features>,
 }
 
-impl TestAPIArgs {
+impl TestApiArgs {
     pub fn new(name: &'static str, tags: u16, features: u8) -> Self {
         let tags: BitFlags<Tags> = BitFlags::from_bits(tags).unwrap();
         let features: BitFlags<Features> = BitFlags::from_bits(features).unwrap();
 
-        TestAPIArgs {
+        TestApiArgs {
             test_function_name: name,
             test_tag: tags,
             test_features: features,
