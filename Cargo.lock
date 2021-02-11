@@ -628,9 +628,9 @@ dependencies = [
 
 [[package]]
 name = "connection-string"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c1a568f363cf011eacfb755d3d47f99859dfd4fcd6717b6d5739fd7d58388c3"
+checksum = "b97faeec45f49581c458f8bf81992c5e3ec17d82cda99f59d3cea14eff62698d"
 dependencies = [
  "wasm-bindgen",
 ]
@@ -2661,7 +2661,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#7eec54b53266d8e01c0b72486e346fff7a60b970"
+source = "git+https://github.com/prisma/quaint#7752f13ab707d1f91942669e16089553e5adced7"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
