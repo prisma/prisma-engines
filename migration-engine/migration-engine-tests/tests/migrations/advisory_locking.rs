@@ -2,19 +2,31 @@ use migration_core::{
     commands::{ApplyMigrationsInput, CreateMigrationInput},
     GenericApi,
 };
+use quaint::single::Quaint;
 use tempfile::TempDir;
 use test_macros::test_each_connector;
-use test_setup::{connectors::Tags, TestAPIArgs};
+use test_setup::{connectors::Tags, TestApiArgs};
 
 type TestResult = Result<(), anyhow::Error>;
 
 struct TestApi {
-    args: TestAPIArgs,
+    args: TestApiArgs,
     source: String,
     url: String,
 }
 
 impl TestApi {
+    async fn new(args: TestApiArgs) -> Self {
+        let connection_string = (args.url_fn)(args.test_function_name);
+        let source = args.datasource_block(&connection_string);
+
+        TestApi {
+            args,
+            url: connection_string,
+            source,
+        }
+    }
+
     /// Create a temporary directory to serve as a test migrations directory.
     pub fn create_migrations_directory(&self) -> anyhow::Result<TempDir> {
         Ok(tempfile::tempdir()?)
@@ -25,111 +37,18 @@ impl TestApi {
     }
 
     async fn initialize(&self) -> anyhow::Result<()> {
-        if self.args.test_tag.contains(Tags::Postgres) {
+        if self.args.connector_tags.contains(Tags::Postgres) {
             test_setup::create_postgres_database(&self.url.parse()?).await.unwrap();
-        } else if self.args.test_tag.contains(Tags::Mysql) {
+        } else if self.args.connector_tags.contains(Tags::Mysql) {
             test_setup::create_mysql_database(&self.url.parse()?).await.unwrap();
-        } else if self.args.test_tag.contains(Tags::Mssql) {
-            test_setup::create_mssql_database(&self.url).await.unwrap();
+        } else if self.args.connector_tags.contains(Tags::Mssql) {
+            let conn = Quaint::new(&self.url).await.unwrap();
+            test_setup::connectors::mssql::reset_schema(&conn, self.args.test_function_name)
+                .await
+                .unwrap();
         }
 
         Ok(())
-    }
-}
-
-async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::mysql_8_test_config(&args.test_function_name),
-        url: test_setup::mysql_8_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::mysql_5_6_test_config(&args.test_function_name),
-        url: test_setup::mysql_5_6_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::mysql_test_config(&args.test_function_name),
-        url: test_setup::mysql_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::mariadb_test_config(&args.test_function_name),
-        url: test_setup::mariadb_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::sqlite_test_config(&args.test_function_name),
-        url: test_setup::sqlite_test_file(&args.test_function_name),
-        args,
-    }
-}
-
-async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::mssql_2019_test_config(&args.test_function_name),
-        url: test_setup::mssql_2019_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::mssql_2017_test_config(&args.test_function_name),
-        url: test_setup::mssql_2017_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::postgres_9_test_config(&args.test_function_name),
-        url: test_setup::postgres_9_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::postgres_10_test_config(&args.test_function_name),
-        url: test_setup::postgres_10_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::postgres_11_test_config(&args.test_function_name),
-        url: test_setup::postgres_11_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::postgres_12_test_config(&args.test_function_name),
-        url: test_setup::postgres_12_url(&args.test_function_name),
-        args,
-    }
-}
-
-async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
-    TestApi {
-        source: test_setup::postgres_13_test_config(&args.test_function_name),
-        url: test_setup::postgres_13_url(&args.test_function_name),
-        args,
     }
 }
 

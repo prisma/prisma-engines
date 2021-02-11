@@ -3,7 +3,7 @@
 use barrel::Migration;
 use enumflags2::BitFlags;
 use quaint::{
-    prelude::{Queryable, SqlFamily},
+    prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
 use sql_schema_describer::*;
@@ -13,16 +13,55 @@ use test_setup::*;
 pub type TestResult = anyhow::Result<()>;
 
 pub struct TestApi {
-    /// More precise than SqlFamily.
-    connector_name: &'static str,
     db_name: &'static str,
-    connection_info: quaint::prelude::ConnectionInfo,
-    sql_family: SqlFamily,
     database: Quaint,
     tags: BitFlags<Tags>,
 }
 
 impl TestApi {
+    pub(crate) async fn new(args: TestApiArgs) -> Self {
+        let tags = args.connector_tags;
+        let db_name = if args.connector_tags.contains(Tags::Mysql) {
+            test_setup::mysql_safe_identifier(args.test_function_name)
+        } else {
+            args.test_function_name
+        };
+
+        let url = (args.url_fn)(db_name);
+
+        let conn = if tags.contains(Tags::Mysql) {
+            create_mysql_database(&url.parse().unwrap()).await.unwrap()
+        } else if tags.contains(Tags::Postgres) {
+            create_postgres_database(&url.parse().unwrap()).await.unwrap()
+        } else if tags.contains(Tags::Mssql) {
+            let conn = Quaint::new(&url).await.unwrap();
+
+            test_setup::connectors::mssql::reset_schema(&conn, args.test_function_name)
+                .await
+                .unwrap();
+
+            conn
+        } else if tags.contains(Tags::Sqlite) {
+            Quaint::new(&url).await.unwrap()
+        } else {
+            unreachable!()
+        };
+
+        TestApi {
+            db_name,
+            tags: args.connector_tags,
+            database: conn,
+        }
+    }
+
+    fn connection_info(&self) -> &ConnectionInfo {
+        self.database.connection_info()
+    }
+
+    pub(crate) fn connector_tags(&self) -> BitFlags<Tags> {
+        self.tags
+    }
+
     pub(crate) async fn describe(&self) -> Result<SqlSchema, anyhow::Error> {
         let db = self.database.clone();
         let describer: Box<dyn sql_schema_describer::SqlSchemaDescriberBackend> = match self.sql_family() {
@@ -44,181 +83,29 @@ impl TestApi {
     }
 
     pub(crate) fn schema_name(&self) -> &str {
-        match self.sql_family {
+        match self.sql_family() {
             // It is not possible to connect to a specific schema in MSSQL. The
             // user has a dedicated schema from the admin, that's all.
             SqlFamily::Mssql => self.db_name(),
-            _ => self.connection_info.schema_name(),
+            _ => self.connection_info().schema_name(),
         }
     }
 
     pub(crate) fn sql_family(&self) -> SqlFamily {
-        self.sql_family
+        self.connection_info().sql_family()
     }
 
     pub(crate) fn barrel(&self) -> BarrelMigrationExecutor {
         BarrelMigrationExecutor {
             schema_name: self.schema_name().to_owned(),
             database: self.database.clone(),
-            sql_variant: match self.sql_family {
+            sql_variant: match self.sql_family() {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
                 SqlFamily::Mssql => barrel::SqlVariant::Mssql,
             },
         }
-    }
-
-    pub(crate) fn connector_name(&self) -> &'static str {
-        self.connector_name
-    }
-}
-
-pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_url(db_name);
-    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
-
-    TestApi {
-        connector_name: "mysql5.7",
-        connection_info: conn.connection_info().to_owned(),
-        db_name,
-        database: conn,
-        sql_family: SqlFamily::Mysql,
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_8_url(db_name);
-    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
-
-    TestApi {
-        connector_name: "mysql8",
-        connection_info: conn.connection_info().to_owned(),
-        db_name,
-        database: conn,
-        sql_family: SqlFamily::Mysql,
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mysql_5_6_url(db_name);
-    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
-
-    TestApi {
-        connector_name: "mysql_5_6",
-        connection_info: conn.connection_info().to_owned(),
-        db_name,
-        database: conn,
-        sql_family: SqlFamily::Mysql,
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let db_name = test_setup::mysql_safe_identifier(db_name);
-    let url = mariadb_url(db_name);
-    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
-
-    TestApi {
-        connector_name: "mysql_mariadb",
-        db_name,
-        connection_info: conn.connection_info().to_owned(),
-        database: conn,
-        sql_family: SqlFamily::Mysql,
-        tags: args.test_tag,
-    }
-}
-
-pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_10_url(args.test_function_name), args, "postgres10").await
-}
-
-pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_9_url(args.test_function_name), args, "postgres9").await
-}
-
-pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_11_url(args.test_function_name), args, "postgres11").await
-}
-
-pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_12_url(args.test_function_name), args, "postgres12").await
-}
-
-pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
-    test_api_helper_for_postgres(postgres_13_url(args.test_function_name), args, "postgres13").await
-}
-
-pub async fn test_api_helper_for_postgres(url: String, args: TestAPIArgs, connector_name: &'static str) -> TestApi {
-    let database = test_setup::create_postgres_database(&url.parse().unwrap())
-        .await
-        .unwrap();
-    let connection_info = database.connection_info().to_owned();
-    let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", connection_info.schema_name());
-    database.query_raw(&drop_schema, &[]).await.ok();
-
-    let create_schema = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", connection_info.schema_name());
-
-    database.query_raw(&create_schema, &[]).await.ok();
-
-    TestApi {
-        connector_name,
-        connection_info,
-        db_name: args.test_function_name,
-        database,
-        sql_family: SqlFamily::Postgres,
-        tags: args.test_tag,
-    }
-}
-
-pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let connection_string = sqlite_test_url(db_name);
-    let database = Quaint::new(&connection_string).await.unwrap();
-
-    TestApi {
-        connector_name: "sqlite3",
-        db_name,
-        connection_info: database.connection_info().to_owned(),
-        database,
-        sql_family: SqlFamily::Sqlite,
-        tags: args.test_tag,
-    }
-}
-
-pub async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
-    mssql_test_api(mssql_2017_url("master"), args, "mssql2017").await
-}
-
-pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
-    mssql_test_api(mssql_2019_url("master"), args, "mssql2017").await
-}
-
-pub async fn mssql_test_api(connection_string: String, args: TestAPIArgs, connector_name: &'static str) -> TestApi {
-    use test_setup::connectors::mssql;
-
-    let schema = args.test_function_name;
-    let database = Quaint::new(&connection_string).await.unwrap();
-    let connection_info = database.connection_info().to_owned();
-
-    mssql::reset_schema(&database, schema).await.unwrap();
-
-    TestApi {
-        connector_name,
-        db_name: schema,
-        connection_info,
-        database,
-        sql_family: SqlFamily::Mssql,
-        tags: args.test_tag,
     }
 }
 

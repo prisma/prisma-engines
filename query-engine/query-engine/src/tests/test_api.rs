@@ -8,22 +8,18 @@ use migration_core::{api::GenericApi, commands::SchemaPushInput};
 use quaint::{
     ast::*,
     connector::ConnectionInfo,
+    single::Quaint,
     visitor::{self, Visitor},
 };
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
-use test_setup::*;
+use test_setup::{connectors::Tags, create_mysql_database, create_postgres_database, sqlite_test_url, TestApiArgs};
 
 pub struct QueryEngine {
     context: Arc<PrismaContext>,
 }
 
 impl QueryEngine {
-    #[allow(dead_code)]
-    pub fn new(ctx: PrismaContext) -> Self {
-        QueryEngine { context: Arc::new(ctx) }
-    }
-
     pub async fn request(&self, body: impl Into<SingleQuery>) -> serde_json::Value {
         let body = GraphQlBody::Single(body.into());
         let cx = self.context.clone();
@@ -35,12 +31,33 @@ impl QueryEngine {
 }
 
 pub struct TestApi {
-    connection_info: ConnectionInfo,
     migration_api: SqlMigrationConnector,
     config: String,
 }
 
 impl TestApi {
+    pub async fn new(args: TestApiArgs) -> Self {
+        let tags = args.connector_tags;
+        let connection_string = (args.url_fn)(args.test_function_name);
+
+        let migration_api = if tags.contains(Tags::Mysql) {
+            mysql_migration_connector(&connection_string).await
+        } else if tags.contains(Tags::Postgres) {
+            postgres_migration_connector(&connection_string).await
+        } else if tags.contains(Tags::Sqlite) {
+            sqlite_migration_connector(args.test_function_name).await
+        } else if tags.contains(Tags::Mssql) {
+            mssql_migration_connector(&connection_string, &args).await
+        } else {
+            unreachable!()
+        };
+
+        TestApi {
+            migration_api,
+            config: args.datasource_block(&connection_string),
+        }
+    }
+
     pub async fn create_engine(&self, datamodel: &str) -> anyhow::Result<QueryEngine> {
         feature_flags::initialize(&[String::from("all")]).unwrap();
 
@@ -68,7 +85,7 @@ impl TestApi {
     }
 
     pub fn connection_info(&self) -> &ConnectionInfo {
-        &self.connection_info
+        self.migration_api.quaint().connection_info()
     }
 
     pub fn to_sql_string<'a>(&'a self, query: impl Into<Query<'a>>) -> quaint::Result<(String, Vec<Value>)> {
@@ -79,197 +96,12 @@ impl TestApi {
             ConnectionInfo::Mssql(_) => visitor::Mssql::build(query),
         }
     }
-}
 
-pub async fn mysql_8_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mysql_8_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = mysql_migration_connector(&url).await;
-
-    let config = mysql_8_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn mysql_5_6_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mysql_5_6_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = mysql_migration_connector(&url).await;
-
-    let config = mysql_5_6_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn mysql_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mysql_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = mysql_migration_connector(&url).await;
-
-    let config = mysql_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn mysql_mariadb_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mariadb_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = mysql_migration_connector(&url).await;
-
-    let config = mariadb_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn postgres9_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_9_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = postgres_migration_connector(&url).await;
-
-    let config = postgres_9_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn postgres_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_10_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = postgres_migration_connector(&url).await;
-
-    let config = postgres_10_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn postgres11_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_11_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = postgres_migration_connector(&url).await;
-
-    let config = postgres_11_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn postgres12_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_12_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = postgres_migration_connector(&url).await;
-
-    let config = postgres_12_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn postgres13_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = postgres_13_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = postgres_migration_connector(&url).await;
-
-    let config = postgres_13_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn sqlite_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = sqlite_test_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = sqlite_migration_connector(db_name).await;
-
-    let config = sqlite_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn mssql_2017_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mssql_2017_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = mssql_migration_connector(&url).await;
-
-    let config = mssql_2017_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
-    }
-}
-
-pub async fn mssql_2019_test_api(args: TestAPIArgs) -> TestApi {
-    let db_name = args.test_function_name;
-    let url = mssql_2019_url(db_name);
-    let connection_info = ConnectionInfo::from_url(&url).unwrap();
-
-    let migration_api = mssql_migration_connector(&url).await;
-
-    let config = mssql_2019_test_config(db_name);
-
-    TestApi {
-        connection_info,
-        migration_api,
-        config,
+    pub fn table_name<'a>(&'a self, name: &'a str) -> quaint::ast::Table<'a> {
+        match self.connection_info() {
+            ConnectionInfo::Mssql(url) => (url.schema(), name).into(),
+            _ => name.into(),
+        }
     }
 }
 
@@ -278,8 +110,11 @@ pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConn
     SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
 }
 
-pub(super) async fn mssql_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    create_mssql_database(url_str).await.unwrap();
+pub(super) async fn mssql_migration_connector(url_str: &str, args: &TestApiArgs) -> SqlMigrationConnector {
+    let conn = Quaint::new(url_str).await.unwrap();
+    test_setup::connectors::mssql::reset_schema(&conn, args.test_function_name)
+        .await
+        .unwrap();
     SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
 }
 

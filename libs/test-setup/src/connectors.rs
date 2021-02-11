@@ -77,7 +77,6 @@ pub static CONNECTORS: Lazy<Connectors> = Lazy::new(|| {
         .iter()
         .map(|(name, tags)| Connector {
             name: (*name).to_owned(),
-            test_api_factory_name: format!("{}_test_api", name),
             capabilities: infer_capabilities(*tags),
             tags: *tags,
         })
@@ -111,7 +110,6 @@ impl Connectors {
 /// Represents a connector to be tested.
 pub struct Connector {
     name: String,
-    test_api_factory_name: String,
     pub capabilities: BitFlags<Capabilities>,
     pub tags: BitFlags<Tags>,
 }
@@ -120,10 +118,5 @@ impl Connector {
     /// The name of the connector.
     pub fn name(&self) -> &str {
         &self.name
-    }
-
-    /// The name of the API factory function for that connector.
-    pub fn test_api(&self) -> &str {
-        &self.test_api_factory_name
     }
 }

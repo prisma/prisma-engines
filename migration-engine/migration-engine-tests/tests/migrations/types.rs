@@ -7,11 +7,6 @@ async fn bytes_columns_are_idempotent(api: &TestApi) -> TestResult {
         r#"
         {datasource}
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
-
         model Cat {{
             id String @id
             chipData Bytes
@@ -57,16 +52,11 @@ async fn decimal_columns_are_idempotent(api: &TestApi) -> TestResult {
         r#"
         {datasource}
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
-
         model Cat {{
             id String @id
             meowFrequency Decimal
         }}
-    "#,
+        "#,
         datasource = api.datasource()
     );
 
@@ -100,11 +90,6 @@ async fn float_to_decimal_works(api: &TestApi) -> TestResult {
         r#"
         {datasource}
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
-
         model Cat {{
             id String @id
             meowFrequency Decimal
@@ -131,11 +116,6 @@ async fn decimal_to_float_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"
         {datasource}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
 
         model Cat {{
             id String @id
@@ -177,11 +157,6 @@ async fn bytes_to_string_works(api: &TestApi) -> TestResult {
         r#"
         {datasource}
 
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
-
         model Cat {{
             id String @id
             meowData Bytes
@@ -220,12 +195,7 @@ async fn bytes_to_string_works(api: &TestApi) -> TestResult {
 async fn string_to_bytes_works(api: &TestApi) -> TestResult {
     let dm1 = format!(
         r#"
-    {datasource}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
+        {datasource}
 
         model Cat {{
             id String @id
@@ -313,11 +283,6 @@ async fn bytes_to_bytes_array_works(api: &TestApi) -> TestResult {
         r#"
             {datasource}
 
-            generator client {{
-              provider = "prisma-client-js"
-              previewFeatures = ["nativeTypes"]
-            }}
-
             model Test {{
                 id       String    @id @default(cuid())
                 bytesCol Bytes
@@ -335,11 +300,6 @@ async fn bytes_to_bytes_array_works(api: &TestApi) -> TestResult {
     let dm2 = format!(
         r#"
             {datasource}
-
-        generator client {{
-            provider = "prisma-client-js"
-            previewFeatures = ["nativeTypes"]
-        }}
 
             model Test {{
                 id       String    @id @default(cuid())
