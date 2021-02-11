@@ -245,3 +245,39 @@ fn must_error_if_scalar_default_on_unsupported() {
         Span::new(179, 181),
     ));
 }
+
+#[test]
+fn must_error_if_non_string_expression_in_function_default() {
+    let dml = r#"
+    model Model {
+        id      Int @id
+        balance Int @default(autoincrement(cuid()))
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `[Function(\"cuid\", [], Span { start: 86, end: 92 })]`",
+        "default",
+        Span::new(72, 93),
+    ));
+}
+
+#[test]
+fn must_error_if_non_string_expression_in_function_default_2() {
+    let dml = r#"
+    model Model {
+        id      Int @id
+        balance Int @default(dbgenerated(5))
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_attribute_validation_error(
+        "Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `[NumericValue(\"5\", Span { start: 84, end: 85 })]`",
+        "default",
+        Span::new(72, 86),
+    ));
+}
