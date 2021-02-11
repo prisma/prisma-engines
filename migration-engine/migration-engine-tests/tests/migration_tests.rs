@@ -9,7 +9,6 @@ mod initialization;
 mod list_migration_directories;
 mod migrations;
 mod native_types;
-mod reset;
 mod schema_push;
 
 use migration_engine_tests::{sql::*, TestResult};
