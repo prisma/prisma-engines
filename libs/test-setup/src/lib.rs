@@ -95,7 +95,7 @@ mod urls {
 }
 
 pub fn sqlite_test_url(db_name: &str) -> String {
-    format!("file:{}?db_name={}", sqlite_test_file(db_name), SCHEMA_NAME)
+    format!("file:{}", sqlite_test_file(db_name))
 }
 
 pub fn sqlite_test_file(db_name: &str) -> String {

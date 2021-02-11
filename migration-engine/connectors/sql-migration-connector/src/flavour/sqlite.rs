@@ -130,7 +130,7 @@ impl SqlFlavour for SqliteFlavour {
         _connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
         tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
-        let quaint = quaint::single::Quaint::new_in_memory(Some(self.attached_name.clone())).map_err(|err| {
+        let quaint = quaint::single::Quaint::new_in_memory().map_err(|err| {
             quaint_error_to_connector_error(
                 err,
                 &ConnectionInfo::InMemorySqlite {
