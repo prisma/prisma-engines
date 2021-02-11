@@ -10,10 +10,12 @@ use datamodel::{
     common::provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Datasource,
 };
-use std::{collections::HashMap, path::PathBuf};
+use std::collections::HashMap;
 use url::Url;
 
 use sql_connector::*;
+
+const DEFAULT_SQLITE_DB_NAME: &str = "main";
 
 pub async fn load(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExecutor + Send + Sync>)> {
     match source.active_provider.as_str() {
@@ -44,8 +46,7 @@ async fn sqlite(source: &Datasource) -> crate::Result<(String, Box<dyn QueryExec
     trace!("Loading SQLite connector...");
 
     let sqlite = Sqlite::from_source(source).await?;
-    let path = PathBuf::from(sqlite.file_path());
-    let db_name = path.file_stem().unwrap().to_str().unwrap().to_owned(); // Safe due to previous validations.
+    let db_name = DEFAULT_SQLITE_DB_NAME.to_owned();
 
     trace!("Loaded SQLite connector.");
     Ok((db_name, sql_executor(sqlite, false)))
