@@ -75,9 +75,28 @@ impl IntoBson for ScalarFilter {
             ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": val.into_bson()? },
             ScalarCondition::GreaterThan(val) => doc! { "$gt": val.into_bson()? },
             ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": val.into_bson()? },
-            ScalarCondition::In(vals) => {
-                doc! { "$in": dbg!(vals).into_iter().map(|val| dbg!(val.into_bson())).collect::<crate::Result<Vec<_>>>()? }
-            }
+            // Todo: The nested list unpack looks like a bug somewhere.
+            //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
+            ScalarCondition::In(vals) => match vals.split_first() {
+                // List is list of lists, we need to flatten.
+                Some((PrismaValue::List(_), _)) => {
+                    let mut bson_values = Vec::with_capacity(vals.len());
+
+                    for pv in vals {
+                        if let PrismaValue::List(inner) = pv {
+                            bson_values.extend(
+                                inner
+                                    .into_iter()
+                                    .map(|val| val.into_bson())
+                                    .collect::<crate::Result<Vec<_>>>()?,
+                            )
+                        }
+                    }
+
+                    doc! { "$in": bson_values }
+                }
+                _ => doc! { "$in": PrismaValue::List(vals).into_bson()? },
+            },
             ScalarCondition::NotIn(vals) => {
                 doc! { "$nin": vals.into_iter().map(|val| val.into_bson()).collect::<crate::Result<Vec<_>>>()? }
             }
