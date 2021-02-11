@@ -8,8 +8,6 @@ use prisma_models::PrismaValue;
 
 impl IntoBson for PrismaValue {
     fn into_bson(self) -> crate::Result<Bson> {
-        dbg!(&self);
-
         match self {
             PrismaValue::String(s) => Ok(Bson::String(s)),
             PrismaValue::Boolean(b) => Ok(Bson::Boolean(b)),

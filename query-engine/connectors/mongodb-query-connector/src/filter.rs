@@ -1,7 +1,7 @@
 use std::unimplemented;
 
 use connector_interface::{Filter, ScalarCondition, ScalarFilter};
-use mongodb::bson::{de::Result, doc, Bson, Document};
+use mongodb::bson::{doc, Bson, Document};
 use prisma_models::PrismaValue;
 
 use crate::IntoBson;

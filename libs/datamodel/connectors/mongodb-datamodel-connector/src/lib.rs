@@ -12,6 +12,7 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::MultipleIndexesWithSameName,
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::CreateMany,
+            ConnectorCapability::CreateSkipDuplicates,
         ];
 
         Self { capabilities }

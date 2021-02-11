@@ -60,7 +60,8 @@ impl WriteOperations for MongoDbTransaction {
         args: Vec<connector_interface::WriteArgs>,
         skip_duplicates: bool,
     ) -> connector_interface::Result<usize> {
-        todo!()
+        self.catch(async move { write::create_records(&self.database, model, args, skip_duplicates).await })
+            .await
     }
 
     async fn update_records(

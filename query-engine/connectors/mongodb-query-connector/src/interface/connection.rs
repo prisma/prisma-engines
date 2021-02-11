@@ -4,7 +4,7 @@ use crate::{
     MongoDbTransaction,
 };
 use async_trait::async_trait;
-use connector_interface::{Connection, ReadOperations, Transaction, WriteOperations};
+use connector_interface::{Connection, ReadOperations, Transaction, WriteArgs, WriteOperations};
 use mongodb::Database;
 use prisma_models::prelude::*;
 use std::future::Future;
@@ -38,11 +38,7 @@ impl MongoDbConnection {
 
 #[async_trait]
 impl WriteOperations for MongoDbConnection {
-    async fn create_record(
-        &self,
-        model: &ModelRef,
-        args: connector_interface::WriteArgs,
-    ) -> connector_interface::Result<RecordProjection> {
+    async fn create_record(&self, model: &ModelRef, args: WriteArgs) -> connector_interface::Result<RecordProjection> {
         self.catch(async move { write::create_record(&self.database, model, args).await })
             .await
     }
@@ -50,17 +46,18 @@ impl WriteOperations for MongoDbConnection {
     async fn create_records(
         &self,
         model: &ModelRef,
-        args: Vec<connector_interface::WriteArgs>,
+        args: Vec<WriteArgs>,
         skip_duplicates: bool,
     ) -> connector_interface::Result<usize> {
-        todo!()
+        self.catch(async move { write::create_records(&self.database, model, args, skip_duplicates).await })
+            .await
     }
 
     async fn update_records(
         &self,
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
-        args: connector_interface::WriteArgs,
+        args: WriteArgs,
     ) -> connector_interface::Result<Vec<RecordProjection>> {
         todo!()
     }

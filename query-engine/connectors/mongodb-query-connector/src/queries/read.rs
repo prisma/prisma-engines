@@ -20,7 +20,7 @@ pub async fn get_single_record(
         .build();
 
     let cursor = coll.find(Some(filter), Some(find_options)).await?;
-    let docs = dbg!(vacuum_cursor(cursor).await?);
+    let docs = vacuum_cursor(cursor).await?;
 
     if docs.len() == 0 {
         Ok(None)
@@ -62,8 +62,8 @@ pub async fn get_many_records(
         .projection(selected_fields.clone().into_bson()?.into_document()?)
         .build();
 
-    let cursor = coll.find(dbg!(filter), Some(dbg!(find_options))).await?;
-    let docs = dbg!(vacuum_cursor(cursor).await?);
+    let cursor = coll.find(filter, Some(find_options)).await?;
+    let docs = vacuum_cursor(cursor).await?;
 
     for doc in docs {
         let record = document_to_record(doc, &field_names)?;
