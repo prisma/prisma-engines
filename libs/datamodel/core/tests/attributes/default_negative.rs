@@ -258,7 +258,7 @@ fn must_error_if_non_string_expression_in_function_default() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `[Function(\"cuid\", [], Span { start: 86, end: 92 })]`",
+        "Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `[Function(\"cuid\", [], Span { start: 86, end: 92 })]`. You can read about the available functions here: https://pris.ly/d/attribute-functions",
         "default",
         Span::new(72, 93),
     ));
@@ -276,7 +276,7 @@ fn must_error_if_non_string_expression_in_function_default_2() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_attribute_validation_error(
-        "Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `[NumericValue(\"5\", Span { start: 84, end: 85 })]`",
+        "Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `[NumericValue(\"5\", Span { start: 84, end: 85 })]`. You can read about the available functions here: https://pris.ly/d/attribute-functions",
         "default",
         Span::new(72, 86),
     ));

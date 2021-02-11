@@ -199,7 +199,7 @@ impl ValueValidator {
                         vec![x]
                     }
                     [] => vec![],
-                    _ => return Err(DatamodelError::new_validation_error(&format!("DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{:?}`", args), self.span())),
+                    _ => return Err(DatamodelError::new_validation_error(&format!("DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{:?}`. You can read about the available functions here: https://pris.ly/d/attribute-functions", args), self.span())),
                 };
                 let generator = self.get_value_generator(&name, prisma_args)?;
                 generator
