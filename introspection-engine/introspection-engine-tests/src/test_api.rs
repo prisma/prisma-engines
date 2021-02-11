@@ -30,20 +30,15 @@ impl TestApi {
         };
 
         let url = (args.url_fn)(db_name);
-        let url = if tags.contains(Tags::Mssql) {
-            format!("{};schema={}", url, db_name)
-        } else {
-            url
-        };
 
         let conn = if tags.contains(Tags::Mysql) {
             create_mysql_database(&url.parse().unwrap()).await.unwrap()
         } else if tags.contains(Tags::Postgres) {
             create_postgres_database(&url.parse().unwrap()).await.unwrap()
         } else if tags.contains(Tags::Mssql) {
-            let conn = create_mssql_database(&url).await.unwrap();
+            let conn = Quaint::new(&url).await.unwrap();
 
-            test_setup::connectors::mssql::reset_schema(&conn, db_name)
+            test_setup::connectors::mssql::reset_schema(&conn, args.test_function_name)
                 .await
                 .unwrap();
 

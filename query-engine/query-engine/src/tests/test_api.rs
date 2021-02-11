@@ -8,25 +8,18 @@ use migration_core::{api::GenericApi, commands::SchemaPushInput};
 use quaint::{
     ast::*,
     connector::ConnectionInfo,
+    single::Quaint,
     visitor::{self, Visitor},
 };
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
-use test_setup::{
-    connectors::Tags, create_mssql_database, create_mysql_database, create_postgres_database, sqlite_test_url,
-    TestApiArgs,
-};
+use test_setup::{connectors::Tags, create_mysql_database, create_postgres_database, sqlite_test_url, TestApiArgs};
 
 pub struct QueryEngine {
     context: Arc<PrismaContext>,
 }
 
 impl QueryEngine {
-    #[allow(dead_code)]
-    pub fn new(ctx: PrismaContext) -> Self {
-        QueryEngine { context: Arc::new(ctx) }
-    }
-
     pub async fn request(&self, body: impl Into<SingleQuery>) -> serde_json::Value {
         let body = GraphQlBody::Single(body.into());
         let cx = self.context.clone();
@@ -52,9 +45,9 @@ impl TestApi {
         } else if tags.contains(Tags::Postgres) {
             postgres_migration_connector(&connection_string).await
         } else if tags.contains(Tags::Sqlite) {
-            sqlite_migration_connector(&connection_string).await
+            sqlite_migration_connector(args.test_function_name).await
         } else if tags.contains(Tags::Mssql) {
-            mssql_migration_connector(&connection_string).await
+            mssql_migration_connector(&connection_string, &args).await
         } else {
             unreachable!()
         };
@@ -103,6 +96,13 @@ impl TestApi {
             ConnectionInfo::Mssql(_) => visitor::Mssql::build(query),
         }
     }
+
+    pub fn table_name<'a>(&'a self, name: &'a str) -> quaint::ast::Table<'a> {
+        match self.connection_info() {
+            ConnectionInfo::Mssql(url) => (url.schema(), name).into(),
+            _ => name.into(),
+        }
+    }
 }
 
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
@@ -110,8 +110,11 @@ pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConn
     SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
 }
 
-pub(super) async fn mssql_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    create_mssql_database(url_str).await.unwrap();
+pub(super) async fn mssql_migration_connector(url_str: &str, args: &TestApiArgs) -> SqlMigrationConnector {
+    let conn = Quaint::new(url_str).await.unwrap();
+    test_setup::connectors::mssql::reset_schema(&conn, args.test_function_name)
+        .await
+        .unwrap();
     SqlMigrationConnector::new(url_str, BitFlags::all()).await.unwrap()
 }
 

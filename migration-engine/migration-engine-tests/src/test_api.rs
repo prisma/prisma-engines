@@ -34,7 +34,7 @@ use sql_migration_connector::SqlMigrationConnector;
 use sql_schema_describer::SqlSchema;
 use std::fmt::Write as _;
 use tempfile::TempDir;
-use test_setup::{create_mssql_database, create_mysql_database, create_postgres_database, Features, TestApiArgs};
+use test_setup::{create_mysql_database, create_postgres_database, Features, TestApiArgs};
 
 /// A handle to all the context needed for end-to-end testing of the migration engine across
 /// connectors.
@@ -49,18 +49,13 @@ impl TestApi {
         let features = preview_features(args.test_features);
         let tags = args.connector_tags;
 
-        let db_name = if args.connector_tags.contains(Tags::Mysql) {
+        let db_name = if tags.contains(Tags::Mysql) {
             test_setup::mysql_safe_identifier(args.test_function_name)
         } else {
             args.test_function_name
         };
 
         let connection_string = (args.url_fn)(db_name);
-        let connection_string = if tags.contains(Tags::Mssql) {
-            format!("{};schema={}", connection_string, db_name)
-        } else {
-            connection_string
-        };
 
         if tags.contains(Tags::Mysql) {
             create_mysql_database(&connection_string.parse().unwrap())
@@ -71,7 +66,7 @@ impl TestApi {
                 .await
                 .unwrap();
         } else if tags.contains(Tags::Mssql) {
-            let conn = create_mssql_database(&connection_string).await.unwrap();
+            let conn = Quaint::new(&connection_string).await.unwrap();
 
             test_setup::connectors::mssql::reset_schema(&conn, db_name)
                 .await

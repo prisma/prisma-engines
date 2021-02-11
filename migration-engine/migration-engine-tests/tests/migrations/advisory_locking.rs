@@ -2,6 +2,7 @@ use migration_core::{
     commands::{ApplyMigrationsInput, CreateMigrationInput},
     GenericApi,
 };
+use quaint::single::Quaint;
 use tempfile::TempDir;
 use test_macros::test_each_connector;
 use test_setup::{connectors::Tags, TestApiArgs};
@@ -41,7 +42,10 @@ impl TestApi {
         } else if self.args.connector_tags.contains(Tags::Mysql) {
             test_setup::create_mysql_database(&self.url.parse()?).await.unwrap();
         } else if self.args.connector_tags.contains(Tags::Mssql) {
-            test_setup::create_mssql_database(&self.url).await.unwrap();
+            let conn = Quaint::new(&self.url).await.unwrap();
+            test_setup::connectors::mssql::reset_schema(&conn, self.args.test_function_name)
+                .await
+                .unwrap();
         }
 
         Ok(())

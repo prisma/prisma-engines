@@ -135,7 +135,7 @@ async fn querying_model_tables(api: &TestApi) -> anyhow::Result<()> {
     let res = query_engine.request(mutation).await;
     let id = res["data"]["createOneTodo"]["id"].as_str().unwrap();
 
-    let (query, _) = api.to_sql_string(Select::from_table("Todo").value(asterisk()))?;
+    let (query, _) = api.to_sql_string(Select::from_table(api.table_name("Todo")).value(asterisk()))?;
 
     assert_eq!(
         json!({
@@ -159,7 +159,7 @@ async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
     let dt = DateTime::parse_from_rfc3339("1996-12-19T16:39:57+00:00")?;
     let dt: DateTime<Utc> = dt.into();
 
-    let insert = Insert::multi_into("Todo", &["id", "title", "dt"])
+    let insert = Insert::multi_into(api.table_name("Todo"), &["id", "title", "dt"])
         .values(("id1", "title1", dt))
         .values(("id2", "title2", dt));
 
@@ -174,7 +174,7 @@ async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
         query_engine.request(execute_raw(&query, params)).await,
     );
 
-    let (query, _) = api.to_sql_string(Select::from_table("Todo").value(asterisk()))?;
+    let (query, _) = api.to_sql_string(Select::from_table(api.table_name("Todo")).value(asterisk()))?;
 
     match api.connection_info().sql_family() {
         SqlFamily::Sqlite => {
@@ -221,8 +221,9 @@ async fn querying_model_tables_with_alias(api: &TestApi) -> anyhow::Result<()> {
 
     query_engine.request(mutation).await;
 
-    let (query, params) =
-        api.to_sql_string(Select::from_table("Todo").column(Column::from("title").alias("aliasedTitle")))?;
+    let (query, params) = api.to_sql_string(
+        Select::from_table(api.table_name("Todo")).column(Column::from("title").alias("aliasedTitle")),
+    )?;
 
     assert_eq!(
         json!({
@@ -249,7 +250,7 @@ async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> any
 
     query_engine.request(mutation).await;
 
-    let select = Select::from_table("Todo")
+    let select = Select::from_table(api.table_name("Todo"))
         .column(Column::from("title").alias("ALIASEDTITLE"))
         .column("title");
 
@@ -314,7 +315,9 @@ async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Res
     let result = query_engine.request(mutation).await;
     let id = result["data"]["createOneTodo"]["id"].as_str().unwrap();
 
-    let insert = Insert::single_into("Todo").value("id", id).value("title", "irrelevant");
+    let insert = Insert::single_into(api.table_name("Todo"))
+        .value("id", id)
+        .value("title", "irrelevant");
     let (query, params) = api.to_sql_string(insert)?;
 
     let result = query_engine.request(execute_raw(&query, params)).await;

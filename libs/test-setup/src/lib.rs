@@ -19,7 +19,6 @@ use crate::connectors::Tags;
 use enumflags2::BitFlags;
 use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
-use std::str::FromStr;
 use url::Url;
 
 type AnyError = Box<dyn std::error::Error + Send + Sync>;
@@ -230,23 +229,23 @@ pub fn mariadb_url(db_name: &str) -> String {
     )
 }
 
-pub fn mssql_2017_url(db_name: &str) -> String {
+pub fn mssql_2017_url(schema_name: &str) -> String {
     let (host, port) = db_host_mssql_2017();
 
     format!(
-        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
-        db_name = db_name,
+        "sqlserver://{host}:{port};database=master;schema={schema_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
+        schema_name = schema_name,
         host = host,
         port = port,
     )
 }
 
-pub fn mssql_2019_url(db_name: &str) -> String {
+pub fn mssql_2019_url(schema_name: &str) -> String {
     let (host, port) = db_host_and_port_mssql_2019();
 
     format!(
-        "sqlserver://{host}:{port};database={db_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
-        db_name = db_name,
+        "sqlserver://{host}:{port};database=master;schema={schema_name};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED",
+        schema_name = schema_name,
         host = host,
         port = port,
     )
@@ -419,28 +418,6 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
     let conn = Quaint::new(&original_url.to_string()).await?;
 
     conn.raw_cmd("CREATE SCHEMA \"prisma-tests\"").await?;
-
-    Ok(conn)
-}
-
-/// Create an MSSQL database from a JDBC connection string.
-pub async fn create_mssql_database(jdbc_string: &str) -> Result<Quaint, AnyError> {
-    let mut conn = connection_string::JdbcString::from_str(&format!("jdbc:{}", jdbc_string))?;
-
-    let params = conn.properties_mut();
-
-    match params.remove("database") {
-        Some(ref db_name) if db_name != "master" => {
-            params.insert("database".into(), "master".into());
-            let conn = Quaint::new(&conn.to_string()).await?;
-            conn.raw_cmd(&format!("DROP DATABASE IF EXISTS {}", db_name)).await?;
-            conn.raw_cmd(&format!("CREATE DATABASE {}", db_name)).await?;
-        }
-        _ => (),
-    }
-
-    let conn = Quaint::new(jdbc_string).await?;
-    conn.query_raw("SELECT db_name() AS name", &[]).await?;
 
     Ok(conn)
 }
