@@ -139,25 +139,25 @@ pub async fn update_records(
     }
 
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
-
-    let mut update_docs = vec![];
+    let mut update_doc = Document::new();
 
     for (field_name, write_expr) in args.args {
         let DatasourceFieldName(name) = field_name;
 
-        let update_doc = match write_expr {
+        let (op_key, val) = match write_expr {
             WriteExpression::Field(_) => unimplemented!(),
-            WriteExpression::Value(rhs) => doc! { "$set": { name: rhs.into_bson()? }},
-            WriteExpression::Add(rhs) => doc! { "$inc": { name: rhs.into_bson()? }},
-            WriteExpression::Substract(rhs) => doc! { "$inc":  { name: (rhs * PrismaValue::Int(-1)).into_bson()? }},
-            WriteExpression::Multiply(rhs) => doc! { "$mul":  { name: rhs.into_bson()? }},
-            WriteExpression::Divide(rhs) => doc! { "$mul":  { name: (PrismaValue::new_float(1.0) / rhs).into_bson()? }},
+            WriteExpression::Value(rhs) => ("$set", rhs.into_bson()?),
+            WriteExpression::Add(rhs) => ("$inc", rhs.into_bson()?),
+            WriteExpression::Substract(rhs) => ("$inc", (rhs * PrismaValue::Int(-1)).into_bson()?),
+            WriteExpression::Multiply(rhs) => ("$mul", rhs.into_bson()?),
+            WriteExpression::Divide(rhs) => ("$mul", (PrismaValue::new_float(1.0) / rhs).into_bson()?),
         };
 
-        update_docs.push(update_doc);
+        let entry = update_doc.entry(op_key.to_owned()).or_insert(Document::new().into());
+        entry.as_document_mut().unwrap().insert(name, val);
     }
 
-    let _update_result = coll.update_many(filter, update_docs, None).await?;
+    let _update_result = coll.update_many(filter, update_doc, None).await?;
     let ids = ids
         .into_iter()
         .map(|bson_id| Ok(RecordProjection::from((id_field.clone(), value_from_bson(bson_id)?))))

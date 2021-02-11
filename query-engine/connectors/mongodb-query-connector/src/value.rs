@@ -1,7 +1,7 @@
 use crate::{guess_is_object_id_field, IntoBson, MongoError};
-use bigdecimal::{BigDecimal, FromPrimitive};
+use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
-use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson};
+use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Decimal128};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 
 impl IntoBson for PrismaValue {
@@ -21,7 +21,7 @@ impl IntoBson for PrismaValue {
             PrismaValue::Xml(_) => Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
             PrismaValue::Null => Ok(Bson::Null),
             PrismaValue::DateTime(dt) => Ok(Bson::DateTime(dt.with_timezone(&Utc))),
-            PrismaValue::Float(_) => unimplemented!("Figure out decimal to bigdecimal crate conversion."),
+            PrismaValue::Float(dec) => Ok(Bson::Double(dec.to_f64().unwrap())),
             PrismaValue::BigInt(i) => Ok(Bson::Int64(i)),
             PrismaValue::Bytes(b) => Ok(Bson::Binary(Binary {
                 subtype: BinarySubtype::Generic,
