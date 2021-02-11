@@ -63,18 +63,18 @@ impl IntoBson for ScalarFilter {
         // let mode = self.mode;
 
         let filter = match self.condition {
-            ScalarCondition::Equals(val) => doc! { "$eq": val.into_bson()? },
-            ScalarCondition::NotEquals(val) => doc! { "$ne": val.into_bson()? },
+            ScalarCondition::Equals(val) => doc! { "$eq": (&field, val).into_bson()? },
+            ScalarCondition::NotEquals(val) => doc! { "$ne": (&field, val).into_bson()? },
             ScalarCondition::Contains(_val) => todo!(),
             ScalarCondition::NotContains(_val) => todo!(),
             ScalarCondition::StartsWith(_val) => todo!(),
             ScalarCondition::NotStartsWith(_val) => todo!(),
             ScalarCondition::EndsWith(_val) => todo!(),
             ScalarCondition::NotEndsWith(_val) => todo!(),
-            ScalarCondition::LessThan(val) => doc! { "$lt": val.into_bson()? },
-            ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": val.into_bson()? },
-            ScalarCondition::GreaterThan(val) => doc! { "$gt": val.into_bson()? },
-            ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": val.into_bson()? },
+            ScalarCondition::LessThan(val) => doc! { "$lt": (&field, val).into_bson()? },
+            ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": (&field, val).into_bson()? },
+            ScalarCondition::GreaterThan(val) => doc! { "$gt": (&field, val).into_bson()? },
+            ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": (&field, val).into_bson()? },
             // Todo: The nested list unpack looks like a bug somewhere.
             //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
             ScalarCondition::In(vals) => match vals.split_first() {
@@ -87,7 +87,7 @@ impl IntoBson for ScalarFilter {
                             bson_values.extend(
                                 inner
                                     .into_iter()
-                                    .map(|val| val.into_bson())
+                                    .map(|val| (&field, val).into_bson())
                                     .collect::<crate::Result<Vec<_>>>()?,
                             )
                         }
@@ -98,7 +98,7 @@ impl IntoBson for ScalarFilter {
                 _ => doc! { "$in": PrismaValue::List(vals).into_bson()? },
             },
             ScalarCondition::NotIn(vals) => {
-                doc! { "$nin": vals.into_iter().map(|val| val.into_bson()).collect::<crate::Result<Vec<_>>>()? }
+                doc! { "$nin": vals.into_iter().map(|val| (&field, val).into_bson()).collect::<crate::Result<Vec<_>>>()? }
             }
         };
 

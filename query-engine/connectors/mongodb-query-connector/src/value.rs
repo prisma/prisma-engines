@@ -1,10 +1,8 @@
-use std::unimplemented;
-
-use crate::{IntoBson, MongoError};
+use crate::{guess_is_object_id_field, IntoBson, MongoError};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{TimeZone, Utc};
-use mongodb::bson::{spec::BinarySubtype, Binary, Bson};
-use prisma_models::PrismaValue;
+use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson};
+use prisma_models::{PrismaValue, ScalarFieldRef};
 
 impl IntoBson for PrismaValue {
     fn into_bson(self) -> crate::Result<Bson> {
@@ -20,7 +18,7 @@ impl IntoBson for PrismaValue {
                     .collect::<crate::Result<Vec<_>>>()?,
             )),
             PrismaValue::Json(_) => unimplemented!("Figure out JSON => BSON conversion."),
-            PrismaValue::Xml(_) => Err(MongoError::Unsupported("Mongo doesn't support enums.".to_owned())),
+            PrismaValue::Xml(_) => Err(MongoError::Unsupported("Mongo doesn't support XML.".to_owned())),
             PrismaValue::Null => Ok(Bson::Null),
             PrismaValue::DateTime(dt) => Ok(Bson::DateTime(dt.with_timezone(&Utc))),
             PrismaValue::Float(_) => unimplemented!("Figure out decimal to bigdecimal crate conversion."),
@@ -29,6 +27,25 @@ impl IntoBson for PrismaValue {
                 subtype: BinarySubtype::Generic,
                 bytes: b,
             })),
+        }
+    }
+}
+
+impl<'a> IntoBson for (&'a ScalarFieldRef, PrismaValue) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (field, value) = self;
+        let is_object_id = guess_is_object_id_field(field);
+
+        match value {
+            PrismaValue::String(s) if is_object_id => {
+                Ok(Bson::ObjectId(ObjectId::with_string(&s).map_err(|_err| {
+                    MongoError::ConversionError {
+                        from: s,
+                        to: "ObjectID".to_owned(),
+                    }
+                })?))
+            }
+            val => val.into_bson(),
         }
     }
 }

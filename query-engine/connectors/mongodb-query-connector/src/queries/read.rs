@@ -41,7 +41,7 @@ pub async fn get_single_record(
 pub async fn get_many_records(
     database: &Database,
     model: &ModelRef,
-    mut query_arguments: QueryArguments,
+    query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
@@ -72,3 +72,5 @@ pub async fn get_many_records(
 
     Ok(records)
 }
+
+// fn fetch_documents() -> Vec<RecordProjection> {}

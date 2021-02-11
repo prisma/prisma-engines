@@ -20,7 +20,7 @@ impl From<DriverError> for MongoError {
             mongodb::error::ErrorKind::AuthenticationError { .. } => todo!(),
             mongodb::error::ErrorKind::BsonDecode(_) => todo!(),
             mongodb::error::ErrorKind::BsonEncode(_) => todo!(),
-            mongodb::error::ErrorKind::BulkWriteError(err) => {
+            mongodb::error::ErrorKind::BulkWriteError(_err) => {
                 //
                 todo!()
             }

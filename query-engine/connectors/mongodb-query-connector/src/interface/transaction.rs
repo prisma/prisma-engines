@@ -70,7 +70,8 @@ impl WriteOperations for MongoDbTransaction {
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
     ) -> connector_interface::Result<Vec<RecordProjection>> {
-        todo!()
+        self.catch(async move { write::update_records(&self.database, model, record_filter, args).await })
+            .await
     }
 
     async fn delete_records(

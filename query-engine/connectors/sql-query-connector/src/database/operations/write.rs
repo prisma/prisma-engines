@@ -4,7 +4,7 @@ use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::{collections::HashMap, convert::TryFrom, usize};
+use std::{convert::TryFrom, usize};
 use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -256,59 +256,4 @@ pub async fn query_raw(
 ) -> crate::Result<serde_json::Value> {
     let value = conn.raw_json(query, parameters).await?;
     Ok(value)
-}
-
-/// Picks all arguments out of `args` that are updating a value for a field
-/// contained in `projection`, as those need to be merged into the records later on.
-fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
-    let pairs: Vec<_> = projection
-        .scalar_fields()
-        .into_iter()
-        .filter_map(|field| {
-            args.get_field_value(field.db_name())
-                .map(|v| (DatasourceFieldName::from(&field), v.clone()))
-        })
-        .collect();
-
-    WriteArgs::from(pairs)
-}
-
-/// Merges the incoming write argument values into the given, already loaded, ids. Overwrites existing values.
-fn merge_write_args(loaded_ids: Vec<RecordProjection>, incoming_args: WriteArgs) -> Vec<RecordProjection> {
-    if loaded_ids.is_empty() || incoming_args.is_empty() {
-        return loaded_ids;
-    }
-
-    // Contains all positions that need to be updated with the given expression.
-    let positions: HashMap<usize, &WriteExpression> = loaded_ids
-        .first()
-        .unwrap()
-        .pairs
-        .iter()
-        .enumerate()
-        .filter_map(|(i, (field, _))| incoming_args.get_field_value(field.db_name()).map(|val| (i, val)))
-        .collect();
-
-    loaded_ids
-        .into_iter()
-        .map(|mut id| {
-            for (position, expr) in positions.iter() {
-                let current_val = id.pairs[position.to_owned()].1.clone();
-                id.pairs[position.to_owned()].1 = apply_expression(current_val, (*expr).clone());
-            }
-
-            id
-        })
-        .collect()
-}
-
-fn apply_expression(val: PrismaValue, expr: WriteExpression) -> PrismaValue {
-    match expr {
-        WriteExpression::Field(_) => unimplemented!(),
-        WriteExpression::Value(pv) => pv,
-        WriteExpression::Add(rhs) => val + rhs,
-        WriteExpression::Substract(rhs) => val - rhs,
-        WriteExpression::Multiply(rhs) => val * rhs,
-        WriteExpression::Divide(rhs) => val / rhs,
-    }
 }

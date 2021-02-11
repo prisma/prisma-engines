@@ -1,14 +1,14 @@
 use super::*;
-use crate::IntoBson;
-use connector_interface::WriteArgs;
+use crate::{BsonTransform, IntoBson};
+use connector_interface::*;
 use mongodb::{
-    bson::{de::Result, Document},
-    error::{BulkWriteError, Error as DriverError, ErrorKind},
-    options::InsertManyOptions,
+    bson::{doc, Document},
+    error::ErrorKind,
+    options::{FindOptions, InsertManyOptions},
     Database,
 };
 use prisma_models::{ModelRef, PrismaValue, RecordProjection};
-use std::{borrow::Borrow, convert::TryInto};
+use std::convert::TryInto;
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
@@ -98,4 +98,70 @@ pub async fn create_records(
 
         Err(err) => Err(err.into()),
     }
+}
+
+pub async fn update_records(
+    database: &Database,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+) -> crate::Result<Vec<RecordProjection>> {
+    let coll = database.collection(model.db_name());
+
+    // We need to load ids of documents to be updated first because Mongo doesn't
+    // return ids on update, requiring us to follow the same approach as the SQL
+    // connectors.
+    //
+    // Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don't
+    // need to merge back id changes into the result set as with SQL.
+    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
+    let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
+        selectors
+            .into_iter()
+            .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
+            .collect::<crate::Result<Vec<_>>>()?
+    } else {
+        let filter = record_filter.filter.into_bson()?.into_document()?;
+        let find_options = FindOptions::builder()
+            .projection(doc! { id_field.db_name(): 1 })
+            .build();
+
+        let cursor = coll.find(Some(filter), Some(find_options)).await?;
+        let docs = vacuum_cursor(cursor).await?;
+
+        docs.into_iter()
+            .map(|mut doc| doc.remove(id_field.db_name()).unwrap())
+            .collect()
+    };
+
+    if ids.is_empty() {
+        return Ok(vec![]);
+    }
+
+    let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
+
+    let mut update_docs = vec![];
+
+    for (field_name, write_expr) in args.args {
+        let DatasourceFieldName(name) = field_name;
+
+        let update_doc = match write_expr {
+            WriteExpression::Field(_) => unimplemented!(),
+            WriteExpression::Value(rhs) => doc! { "$set": { name: rhs.into_bson()? }},
+            WriteExpression::Add(rhs) => doc! { "$inc": { name: rhs.into_bson()? }},
+            WriteExpression::Substract(rhs) => doc! { "$inc":  { name: (rhs * PrismaValue::Int(-1)).into_bson()? }},
+            WriteExpression::Multiply(rhs) => doc! { "$mul":  { name: rhs.into_bson()? }},
+            WriteExpression::Divide(rhs) => doc! { "$mul":  { name: (PrismaValue::new_float(1.0) / rhs).into_bson()? }},
+        };
+
+        update_docs.push(update_doc);
+    }
+
+    let _update_result = coll.update_many(filter, update_docs, None).await?;
+    let ids = ids
+        .into_iter()
+        .map(|bson_id| Ok(RecordProjection::from((id_field.clone(), value_from_bson(bson_id)?))))
+        .collect::<crate::Result<Vec<_>>>()?;
+
+    Ok(ids)
 }
