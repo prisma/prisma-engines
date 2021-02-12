@@ -1,7 +1,4 @@
-use migration_core::{
-    commands::{ApplyMigrationsInput, CreateMigrationInput},
-    GenericApi,
-};
+use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput};
 use migration_engine_tests::{multi_engine_test_api::*, TestResult};
 use test_macros::test_each_connector;
 

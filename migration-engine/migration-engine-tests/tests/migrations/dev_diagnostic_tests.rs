@@ -588,7 +588,7 @@ async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(ap
     Ok(())
 }
 
-#[test_each_connector(tags("postgres_12"), log = "debug")]
+#[test_each_connector(tags("postgres_12"))]
 async fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: &TestApi) -> TestResult {
     let directory = api.create_migrations_directory()?;
 

@@ -13,6 +13,8 @@ use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlMigrationConnector {
     #[tracing::instrument(skip(self, database_migration))]
     async fn apply_migration(&self, database_migration: &SqlMigration) -> ConnectorResult<u32> {
+        tracing::debug!("{} steps to execute", database_migration.steps.len());
+
         for (index, step) in database_migration.steps.iter().enumerate() {
             for sql_string in render_raw_sql(
                 &step,

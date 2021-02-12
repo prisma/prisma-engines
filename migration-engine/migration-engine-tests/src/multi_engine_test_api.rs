@@ -12,7 +12,7 @@ use test_setup::{connectors::Tags, TestApiArgs};
 pub struct TestApi {
     args: TestApiArgs,
     source: String,
-    url: String,
+    connection_string: String,
 }
 
 impl TestApi {
@@ -23,9 +23,14 @@ impl TestApi {
 
         TestApi {
             args,
-            url: connection_string,
+            connection_string,
             source,
         }
+    }
+
+    /// The connection string for the database associated with the test.
+    pub fn connection_string(&self) -> &str {
+        &self.connection_string
     }
 
     /// Create a temporary directory to serve as a test migrations directory.
@@ -33,24 +38,45 @@ impl TestApi {
         Ok(tempfile::tempdir()?)
     }
 
-    /// Instantiate a new migration engine.
+    /// Instantiate a new migration engine for the current database.
     pub async fn new_engine(&self) -> anyhow::Result<Box<dyn GenericApi>> {
-        Ok(migration_core::migration_api(&self.source).await?)
+        self.new_engine_with_datasource(&self.source).await
+    }
+
+    /// Instantiate a new migration with the provided connection string.
+    pub async fn new_engine_with_connection_string(
+        &self,
+        connection_string: &str,
+    ) -> anyhow::Result<Box<dyn GenericApi>> {
+        self.new_engine_with_datasource(&self.args.datasource_block(connection_string))
+            .await
+    }
+
+    async fn new_engine_with_datasource(&self, datasource: &str) -> anyhow::Result<Box<dyn GenericApi>> {
+        Ok(migration_core::migration_api(&datasource).await?)
     }
 
     /// Initialize the database.
-    pub async fn initialize(&self) -> anyhow::Result<()> {
+    pub async fn initialize(&self) -> anyhow::Result<Quaint> {
         if self.args.connector_tags.contains(Tags::Postgres) {
-            test_setup::create_postgres_database(&self.url.parse()?).await.unwrap();
-        } else if self.args.connector_tags.contains(Tags::Mysql) {
-            test_setup::create_mysql_database(&self.url.parse()?).await.unwrap();
-        } else if self.args.connector_tags.contains(Tags::Mssql) {
-            let conn = Quaint::new(&self.url).await.unwrap();
-            test_setup::connectors::mssql::reset_schema(&conn, self.args.test_function_name)
+            Ok(test_setup::create_postgres_database(&self.connection_string.parse()?)
                 .await
-                .unwrap();
+                .unwrap())
+        } else if self.args.connector_tags.contains(Tags::Mysql) {
+            Ok(test_setup::create_mysql_database(&self.connection_string.parse()?)
+                .await
+                .unwrap())
+        } else if self.args.connector_tags.contains(Tags::Mssql) {
+            let conn = Quaint::new(&self.connection_string).await?;
+            test_setup::connectors::mssql::reset_schema(&conn, self.args.test_function_name).await?;
+            Ok(conn)
+        } else {
+            unreachable!()
         }
+    }
 
-        Ok(())
+    /// The name of the test function, as a string.
+    pub fn test_fn_name(&self) -> &str {
+        self.args.test_function_name
     }
 }

@@ -12,6 +12,7 @@ mod mysql;
 mod postgres;
 mod relations;
 mod reset_tests;
+mod soft_resets;
 mod sql;
 mod sqlite;
 mod squashing_tests;
