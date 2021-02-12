@@ -101,7 +101,7 @@ impl SqlFlavour for MysqlFlavour {
         Ok(db_name.to_owned())
     }
 
-    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+    async fn create_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = indoc! {r#"
             CREATE TABLE _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,

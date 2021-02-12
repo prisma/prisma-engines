@@ -67,7 +67,7 @@ pub(crate) trait SqlFlavour:
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
 
     /// Initialize the `_prisma_migrations` table.
-    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
+    async fn create_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
 
     /// Describe the SQL schema.
     async fn describe_schema<'a>(&'a self, conn: &Connection) -> ConnectorResult<SqlSchema>;
@@ -98,13 +98,13 @@ pub(crate) trait SqlFlavour:
     ) -> ConnectorResult<SqlSchema>;
 
     /// Table to store applied migrations, the name part.
-    fn imperative_migrations_table_name(&self) -> &'static str {
+    fn migrations_table_name(&self) -> &'static str {
         "_prisma_migrations"
     }
 
     /// Table to store applied migrations.
-    fn imperative_migrations_table(&self) -> Table<'_> {
-        self.imperative_migrations_table_name().into()
+    fn migrations_table(&self) -> Table<'_> {
+        self.migrations_table_name().into()
     }
 
     /// Feature flags for the flavor
