@@ -1,4 +1,4 @@
-#![allow(clippy::clippy::trivial_regex)]
+#![allow(clippy::trivial_regex)]
 
 use once_cell::sync::Lazy;
 use regex::Regex;

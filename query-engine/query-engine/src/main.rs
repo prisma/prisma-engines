@@ -1,3 +1,5 @@
+#![allow(clippy::wrong_self_convention)]
+
 #[macro_use]
 extern crate tracing;
 

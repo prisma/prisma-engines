@@ -71,7 +71,7 @@
 //!</pre>
 //!
 
-#![allow(clippy::module_inception)]
+#![allow(clippy::module_inception, clippy::suspicious_operation_groupings)]
 
 #[macro_use]
 extern crate tracing;

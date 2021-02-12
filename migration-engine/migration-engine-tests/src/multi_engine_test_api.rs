@@ -113,7 +113,7 @@ impl EngineTestApi {
     }
 
     /// Plan a `schemaPush` command
-    pub fn schema_push<'a>(&'a self, dm: impl Into<String>) -> SchemaPush<'a> {
+    pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
         SchemaPush::new(&self.0, dm.into())
     }
 }

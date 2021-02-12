@@ -1,3 +1,5 @@
+#![allow(clippy::print_literal)] // it is just wrong in this case
+
 use anyhow::Context;
 use colored::Colorize;
 use migration_core::commands::SchemaPushInput;

@@ -147,16 +147,16 @@ impl ValueGeneratorFn {
 
     fn invoke(&self) -> Option<PrismaValue> {
         match self {
-            Self::UUID => Self::generate_uuid(),
-            Self::CUID => Self::generate_cuid(),
-            Self::Now => Self::generate_now(),
+            Self::UUID => Some(Self::generate_uuid()),
+            Self::CUID => Some(Self::generate_cuid()),
+            Self::Now => Some(Self::generate_now()),
             Self::Autoincrement => None,
             Self::DbGenerated => None,
         }
     }
 
     fn can_handle(&self, scalar_type: ScalarType) -> bool {
-        #[allow(clippy::clippy::match_like_matches_macro)]
+        #[allow(clippy::match_like_matches_macro)]
         match (self, scalar_type) {
             (Self::UUID, ScalarType::String) => true,
             (Self::CUID, ScalarType::String) => true,
@@ -168,16 +168,16 @@ impl ValueGeneratorFn {
         }
     }
 
-    fn generate_cuid() -> Option<PrismaValue> {
-        Some(PrismaValue::String(cuid::cuid().unwrap()))
+    fn generate_cuid() -> PrismaValue {
+        PrismaValue::String(cuid::cuid().unwrap())
     }
 
-    fn generate_uuid() -> Option<PrismaValue> {
-        Some(PrismaValue::Uuid(Uuid::new_v4()))
+    fn generate_uuid() -> PrismaValue {
+        PrismaValue::Uuid(Uuid::new_v4())
     }
 
-    fn generate_now() -> Option<PrismaValue> {
-        Some(PrismaValue::DateTime(Utc::now().into()))
+    fn generate_now() -> PrismaValue {
+        PrismaValue::DateTime(Utc::now().into())
     }
 }
 
