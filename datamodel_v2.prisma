@@ -11,9 +11,18 @@ model User {
 }
 
 model Post {
-  id        Int      @id @map("_id")
-  title     String
-  author_id String
-  author    User     @relation(fields: [author_id], references: [id])
-  createdAt DateTime @default(now())
+  id           Int        @id @map("_id")
+  title        String
+  author_id    String
+  author       User       @relation(fields: [author_id], references: [id])
+  category_ids String[]
+  categories   Category[] @relation(fields: [category_ids])
+  createdAt    DateTime   @default(now())
+}
+
+model Category {
+  id       String @id @default(dbgenerated()) @map("_id")
+  name     String
+  post_ids Int[]
+  posts    Post[] @relation(fields: [post_ids])
 }

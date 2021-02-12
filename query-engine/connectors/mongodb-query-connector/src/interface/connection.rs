@@ -134,7 +134,8 @@ impl ReadOperations for MongoDbConnection {
         from_field: &RelationFieldRef,
         from_record_ids: &[RecordProjection],
     ) -> connector_interface::Result<Vec<(RecordProjection, RecordProjection)>> {
-        todo!()
+        self.catch(async move { read::get_related_m2m_record_ids(&self.database, from_field, from_record_ids).await })
+            .await
     }
 
     async fn aggregate_records(

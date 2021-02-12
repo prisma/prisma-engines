@@ -103,18 +103,18 @@ impl WriteOperations for MongoDbTransaction {
 
     async fn execute_raw(
         &self,
-        query: String,
-        parameters: Vec<prisma_value::PrismaValue>,
+        _query: String,
+        _parameters: Vec<prisma_value::PrismaValue>,
     ) -> connector_interface::Result<usize> {
-        todo!()
+        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
     }
 
     async fn query_raw(
         &self,
-        query: String,
-        parameters: Vec<prisma_value::PrismaValue>,
+        _query: String,
+        _parameters: Vec<prisma_value::PrismaValue>,
     ) -> connector_interface::Result<serde_json::Value> {
-        todo!()
+        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
     }
 }
 
@@ -145,17 +145,18 @@ impl ReadOperations for MongoDbTransaction {
         from_field: &RelationFieldRef,
         from_record_ids: &[RecordProjection],
     ) -> connector_interface::Result<Vec<(RecordProjection, RecordProjection)>> {
-        todo!()
+        self.catch(async move { read::get_related_m2m_record_ids(&self.database, from_field, from_record_ids).await })
+            .await
     }
 
     async fn aggregate_records(
         &self,
-        model: &ModelRef,
-        query_arguments: connector_interface::QueryArguments,
-        selections: Vec<connector_interface::AggregationSelection>,
-        group_by: Vec<ScalarFieldRef>,
-        having: Option<connector_interface::Filter>,
+        _model: &ModelRef,
+        _query_arguments: connector_interface::QueryArguments,
+        _selections: Vec<connector_interface::AggregationSelection>,
+        _group_by: Vec<ScalarFieldRef>,
+        _having: Option<connector_interface::Filter>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
-        todo!()
+        Err(MongoError::Unsupported("Aggregations".to_owned()).into_connector_error())
     }
 }

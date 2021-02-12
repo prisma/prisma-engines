@@ -1,7 +1,7 @@
 use crate::{guess_is_object_id_field, IntoBson, MongoError};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
-use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Decimal128};
+use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 
 impl IntoBson for PrismaValue {

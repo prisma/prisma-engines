@@ -1,8 +1,8 @@
 use super::*;
 use crate::{BsonTransform, IntoBson};
 use connector_interface::{Filter, QueryArguments};
-use mongodb::options::FindOptions;
 use mongodb::Database;
+use mongodb::{bson::doc, options::FindOptions};
 use prisma_models::*;
 
 pub async fn get_single_record(
@@ -73,4 +73,59 @@ pub async fn get_many_records(
     Ok(records)
 }
 
-// fn fetch_documents() -> Vec<RecordProjection> {}
+pub async fn get_related_m2m_record_ids(
+    database: &Database,
+    from_field: &RelationFieldRef,
+    from_record_ids: &[RecordProjection],
+) -> crate::Result<Vec<(RecordProjection, RecordProjection)>> {
+    if from_record_ids.is_empty() {
+        return Ok(vec![]);
+    }
+
+    let model = from_field.model();
+    let coll = database.collection(model.db_name());
+
+    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
+    let ids = from_record_ids
+        .into_iter()
+        .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
+        .collect::<crate::Result<Vec<_>>>()?;
+
+    let filter = doc! { id_field.db_name(): { "$in": ids } };
+
+    // Scalar field name where the relation ids list is on `model`.
+    let relation_ids_field_name = from_field.relation_info.fields.iter().next().unwrap();
+
+    let find_options = FindOptions::builder()
+        .projection(doc! { id_field.db_name(): 1, relation_ids_field_name: 1 })
+        .build();
+
+    let cursor = coll.find(filter, Some(find_options)).await?;
+    let docs = vacuum_cursor(cursor).await?;
+
+    let child_id_field = from_field
+        .related_model()
+        .primary_identifier()
+        .scalar_fields()
+        .next()
+        .unwrap();
+
+    let mut id_pairs = vec![];
+    for mut doc in docs {
+        let parent_id = value_from_bson(doc.remove(id_field.db_name()).unwrap())?;
+        let child_ids: Vec<PrismaValue> =
+            match value_from_bson(doc.remove(relation_ids_field_name).unwrap_or(Bson::Array(vec![])))? {
+                PrismaValue::List(vals) => vals,
+                val => vec![val],
+            };
+
+        let parent_projection = RecordProjection::from((id_field.clone(), parent_id));
+
+        for child_id in child_ids {
+            let child_projection = RecordProjection::from((child_id_field.clone(), child_id));
+            id_pairs.push((parent_projection.clone(), child_projection));
+        }
+    }
+
+    Ok(id_pairs)
+}

@@ -13,6 +13,7 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::RelationFieldsInArbitraryOrder,
             ConnectorCapability::CreateMany,
             ConnectorCapability::CreateSkipDuplicates,
+            ConnectorCapability::ScalarLists,
         ];
 
         Self { capabilities }
