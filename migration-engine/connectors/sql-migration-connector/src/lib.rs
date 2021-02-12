@@ -25,7 +25,7 @@ use migration_connector::*;
 use pair::Pair;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
 use sql_migration::SqlMigration;
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{walkers::SqlSchemaExt, SqlSchema};
 use user_facing_errors::{common::InvalidDatabaseString, KnownError};
 
 /// The top-level SQL migration connector.
@@ -109,7 +109,10 @@ impl SqlMigrationConnector {
         };
 
         self.apply_migration(&migration).await?;
-        self.flavour.drop_migrations_table(self.conn()).await?;
+
+        if migration.before.table_walker("_prisma_migrations").is_some() {
+            self.flavour.drop_migrations_table(self.conn()).await?;
+        }
 
         Ok(())
     }
