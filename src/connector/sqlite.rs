@@ -10,19 +10,15 @@ use crate::{
     visitor::{self, Visitor},
 };
 use async_trait::async_trait;
-use rusqlite::NO_PARAMS;
-use std::{collections::HashSet, convert::TryFrom, path::Path, time::Duration};
+use std::{convert::TryFrom, path::Path, time::Duration};
 use tokio::sync::Mutex;
 
-pub(crate) const DEFAULT_SQLITE_SCHEMA_NAME: &str = "quaint";
+pub(crate) const DEFAULT_SQLITE_SCHEMA_NAME: &str = "main";
 
 /// A connector interface for the SQLite database
 #[cfg_attr(feature = "docs", doc(cfg(feature = "sqlite")))]
 pub struct Sqlite {
     pub(crate) client: Mutex<rusqlite::Connection>,
-    /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
-    /// only be done with UTF-8 paths. This is `None` for purely in-memory databases.
-    pub(crate) file_path: Option<String>,
 }
 
 /// Wraps a connection url and exposes the parsing logic used by Quaint,
@@ -56,7 +52,6 @@ impl TryFrom<&str> for SqliteParams {
             Err(Error::builder(ErrorKind::DatabaseUrlIsInvalid(path.to_str().unwrap().to_string())).build())
         } else {
             let mut connection_limit = None;
-            let mut db_name = None;
             let mut socket_timeout = None;
 
             if path_parts.len() > 1 {
@@ -73,9 +68,6 @@ impl TryFrom<&str> for SqliteParams {
                                 .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
 
                             connection_limit = Some(as_int);
-                        }
-                        "db_name" => {
-                            db_name = Some(v.to_string());
                         }
                         "socket_timeout" => {
                             let as_int = v
@@ -97,7 +89,7 @@ impl TryFrom<&str> for SqliteParams {
             Ok(Self {
                 connection_limit,
                 file_path: path_str.to_owned(),
-                db_name: db_name.unwrap_or_else(|| DEFAULT_SQLITE_SCHEMA_NAME.to_owned()),
+                db_name: DEFAULT_SQLITE_SCHEMA_NAME.to_owned(),
                 socket_timeout,
             })
         }
@@ -121,7 +113,6 @@ impl TryFrom<&str> for Sqlite {
 
         Ok(Sqlite {
             client,
-            file_path: Some(file_path),
         })
     }
 }
@@ -138,30 +129,7 @@ impl Sqlite {
 
         Ok(Sqlite {
             client: Mutex::new(client),
-            file_path: None,
         })
-    }
-
-    pub async fn attach_database(&mut self, db_name: &str) -> crate::Result<()> {
-        let client = self.client.lock().await;
-        let mut stmt = client.prepare("PRAGMA database_list")?;
-
-        let databases: HashSet<String> = stmt
-            .query_map(NO_PARAMS, |row| {
-                let name: String = row.get(1)?;
-
-                Ok(name)
-            })?
-            .map(|res| res.unwrap())
-            .collect();
-
-        if let (true, Some(file_path)) = (!databases.contains(db_name), &self.file_path) {
-            rusqlite::Connection::execute(&client, "ATTACH DATABASE ? AS ?", &[file_path.as_str(), db_name])?;
-        }
-
-        rusqlite::Connection::execute(&client, "PRAGMA foreign_keys = ON", NO_PARAMS)?;
-
-        Ok(())
     }
 }
 
