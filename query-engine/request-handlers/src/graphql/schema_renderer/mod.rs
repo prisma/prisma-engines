@@ -62,14 +62,20 @@ pub struct RenderContext {
     indent_str: &'static str,
 }
 
-impl RenderContext {
-    pub fn new() -> RenderContext {
-        RenderContext {
+impl Default for RenderContext {
+    fn default() -> Self {
+        Self {
             output_queue: vec![],
             rendered: HashMap::new(),
             indent: 2,
             indent_str: " ",
         }
+    }
+}
+
+impl RenderContext {
+    pub fn new() -> RenderContext {
+        Self::default()
     }
 
     pub fn format(self) -> String {
@@ -119,52 +125,61 @@ impl<'a> Renderer for GqlRenderer<'a> {
 }
 
 trait IntoRenderer<'a> {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&'a self) -> GqlRenderer<'a>;
 }
 
 impl<'a> IntoRenderer<'a> for QuerySchemaRef {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Schema(GqlSchemaRenderer::new(Arc::clone(self)))
     }
 }
 
 impl<'a> IntoRenderer<'a> for &'a InputType {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Type(GqlTypeRenderer::Input(self))
     }
 }
 
 impl<'a> IntoRenderer<'a> for OutputType {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&'a self) -> GqlRenderer<'a> {
         GqlRenderer::Type(GqlTypeRenderer::Output(self))
     }
 }
 
 impl<'a> IntoRenderer<'a> for InputFieldRef {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Field(GqlFieldRenderer::Input(Arc::clone(self)))
     }
 }
 
 impl<'a> IntoRenderer<'a> for OutputFieldRef {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Field(GqlFieldRenderer::Output(Arc::clone(self)))
     }
 }
 
 impl<'a> IntoRenderer<'a> for EnumType {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&'a self) -> GqlRenderer<'a> {
         GqlRenderer::Enum(GqlEnumRenderer::new(self))
     }
 }
 
 impl<'a> IntoRenderer<'a> for &'a InputObjectTypeWeakRef {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Object(GqlObjectRenderer::Input(Weak::clone(self)))
     }
 }
 
 impl<'a> IntoRenderer<'a> for &'a ObjectTypeWeakRef {
+    #[allow(clippy::wrong_self_convention)]
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Object(GqlObjectRenderer::Output(Weak::clone(self)))
     }

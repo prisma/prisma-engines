@@ -1,13 +1,12 @@
 #![deny(missing_docs)]
 
 use crate::context::PrismaContext;
-use crate::dmmf;
 use crate::opt::PrismaOpt;
-use crate::request_handlers::graphql::{self, GraphQLSchemaRenderer, GraphQlBody};
 use crate::PrismaResult;
-use elapsed_middleware::ElapsedMiddleware;
 
+use elapsed_middleware::ElapsedMiddleware;
 use query_core::schema::QuerySchemaRenderer;
+use request_handlers::{dmmf, GraphQLSchemaRenderer, GraphQlBody, GraphQlHandler};
 use serde_json::json;
 use tide::http::{mime, StatusCode};
 use tide::{prelude::*, Body, Request, Response};
@@ -96,9 +95,13 @@ async fn graphql_handler(mut req: Request<State>) -> tide::Result {
 
     let body: GraphQlBody = req.body_json().await?;
     let cx = req.state().cx.clone();
-    let result = graphql::handle(body, cx).await;
+
+    let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
+    let result = handler.handle(body).await;
+
     let mut res = Response::new(StatusCode::Ok);
     res.set_body(Body::from_json(&result)?);
+
     Ok(res)
 }
 

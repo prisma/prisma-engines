@@ -94,7 +94,11 @@ impl PrismaError {
 
 impl From<CoreError> for PrismaError {
     fn from(e: CoreError) -> Self {
-        PrismaError::CoreError(Box::new(e))
+        match e {
+            CoreError::ConnectorError(e) => Self::ConnectorError(Box::new(e)),
+            CoreError::ConfigurationError(message) => Self::ConfigurationError(message),
+            _ => PrismaError::CoreError(Box::new(e)),
+        }
     }
 }
 

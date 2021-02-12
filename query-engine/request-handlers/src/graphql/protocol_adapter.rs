@@ -1,4 +1,4 @@
-use crate::{error::PrismaError, PrismaResult};
+use crate::HandlerError;
 use bigdecimal::{BigDecimal, FromPrimitive};
 use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
@@ -23,41 +23,39 @@ use query_core::query_document::*;
 pub struct GraphQLProtocolAdapter;
 
 impl GraphQLProtocolAdapter {
-    pub fn convert(gql_doc: Document<String>, operation: Option<String>) -> PrismaResult<Operation> {
+    pub fn convert(gql_doc: Document<String>, operation: Option<String>) -> crate::Result<Operation> {
         let mut operations: Vec<Operation> = match operation {
             Some(ref op) => gql_doc
                 .definitions
                 .into_iter()
                 .find(|def| Self::matches_operation(def, op))
-                .ok_or_else(|| {
-                    PrismaError::QueryConversionError(format!("Operation '{}' does not match any query.", op))
-                })
+                .ok_or_else(|| HandlerError::query_conversion(format!("Operation '{}' does not match any query.", op)))
                 .and_then(Self::convert_definition),
 
             None => gql_doc
                 .definitions
                 .into_iter()
                 .map(Self::convert_definition)
-                .collect::<PrismaResult<Vec<Vec<Operation>>>>()
+                .collect::<crate::Result<Vec<Vec<Operation>>>>()
                 .map(|r| r.into_iter().flatten().collect::<Vec<Operation>>()),
         }?;
 
         let operation = operations
             .pop()
-            .ok_or_else(|| PrismaError::QueryConversionError("Document contained no operations.".into()))?
+            .ok_or_else(|| HandlerError::query_conversion("Document contained no operations."))?
             .dedup_selections();
 
         Ok(operation)
     }
 
-    fn convert_definition(def: Definition<String>) -> PrismaResult<Vec<Operation>> {
+    fn convert_definition(def: Definition<String>) -> crate::Result<Vec<Operation>> {
         match def {
-            Definition::Fragment(f) => Err(PrismaError::UnsupportedFeatureError(
+            Definition::Fragment(f) => Err(HandlerError::unsupported_feature(
                 "Fragment definition",
                 format!("Fragment '{}', at position {}.", f.name, f.position),
             )),
             Definition::Operation(op) => match op {
-                OperationDefinition::Subscription(s) => Err(PrismaError::UnsupportedFeatureError(
+                OperationDefinition::Subscription(s) => Err(HandlerError::unsupported_feature(
                     "Subscription query",
                     format!("At position {}.", s.position),
                 )),
@@ -68,15 +66,15 @@ impl GraphQLProtocolAdapter {
         }
     }
 
-    fn convert_query(selection_set: SelectionSet<String>) -> PrismaResult<Vec<Operation>> {
+    fn convert_query(selection_set: SelectionSet<String>) -> crate::Result<Vec<Operation>> {
         Self::convert_selection_set(selection_set).map(|fields| fields.into_iter().map(Operation::Read).collect())
     }
 
-    fn convert_mutation(selection_set: SelectionSet<String>) -> PrismaResult<Vec<Operation>> {
+    fn convert_mutation(selection_set: SelectionSet<String>) -> crate::Result<Vec<Operation>> {
         Self::convert_selection_set(selection_set).map(|fields| fields.into_iter().map(Operation::Write).collect())
     }
 
-    fn convert_selection_set(selection_set: SelectionSet<String>) -> PrismaResult<Vec<Selection>> {
+    fn convert_selection_set(selection_set: SelectionSet<String>) -> crate::Result<Vec<Selection>> {
         selection_set
             .items
             .into_iter()
@@ -86,7 +84,7 @@ impl GraphQLProtocolAdapter {
                         .arguments
                         .into_iter()
                         .map(|(k, v)| Ok((k, Self::convert_value(v)?)))
-                        .collect::<PrismaResult<Vec<_>>>()?;
+                        .collect::<crate::Result<Vec<_>>>()?;
 
                     let mut builder = Selection::builder(f.name);
                     builder.set_arguments(arguments);
@@ -99,12 +97,12 @@ impl GraphQLProtocolAdapter {
                     Ok(builder.build())
                 }
 
-                GqlSelection::FragmentSpread(fs) => Err(PrismaError::UnsupportedFeatureError(
+                GqlSelection::FragmentSpread(fs) => Err(HandlerError::unsupported_feature(
                     "Fragment spread",
                     format!("Fragment '{}', at position {}.", fs.fragment_name, fs.position),
                 )),
 
-                GqlSelection::InlineFragment(i) => Err(PrismaError::UnsupportedFeatureError(
+                GqlSelection::InlineFragment(i) => Err(HandlerError::unsupported_feature(
                     "Inline fragment",
                     format!("At position {}.", i.position),
                 )),
@@ -126,25 +124,22 @@ impl GraphQLProtocolAdapter {
         }
     }
 
-    fn convert_value(value: Value<String>) -> PrismaResult<QueryValue> {
+    fn convert_value(value: Value<String>) -> crate::Result<QueryValue> {
         match value {
-            Value::Variable(name) => Err(PrismaError::UnsupportedFeatureError(
+            Value::Variable(name) => Err(HandlerError::unsupported_feature(
                 "Variable usage",
                 format!("Variable '{}'.", name),
             )),
             Value::Int(i) => match i.as_i64() {
                 Some(i) => Ok(QueryValue::Int(i)),
-                None => Err(PrismaError::QueryConversionError(format!(
+                None => Err(HandlerError::query_conversion(format!(
                     "Invalid 64 bit integer: {:?}",
                     i
                 ))),
             },
             Value::Float(f) => match BigDecimal::from_f64(f) {
                 Some(dec) => Ok(QueryValue::Float(dec)),
-                None => Err(PrismaError::QueryConversionError(format!(
-                    "invalid 64-bit float: {:?}",
-                    f
-                ))),
+                None => Err(HandlerError::query_conversion(format!("invalid 64-bit float: {:?}", f))),
             },
             Value::String(s) => Ok(QueryValue::String(s)),
             Value::Boolean(b) => Ok(QueryValue::Boolean(b)),
@@ -154,7 +149,7 @@ impl GraphQLProtocolAdapter {
                 let values: Vec<QueryValue> = values
                     .into_iter()
                     .map(Self::convert_value)
-                    .collect::<PrismaResult<Vec<QueryValue>>>()?;
+                    .collect::<crate::Result<Vec<QueryValue>>>()?;
 
                 Ok(QueryValue::List(values))
             }
@@ -162,7 +157,7 @@ impl GraphQLProtocolAdapter {
                 let values = map
                     .into_iter()
                     .map(|(k, v)| Self::convert_value(v).map(|v| (k, v)))
-                    .collect::<PrismaResult<IndexMap<String, QueryValue>>>()?;
+                    .collect::<crate::Result<IndexMap<String, QueryValue>>>()?;
 
                 Ok(QueryValue::Object(values))
             }

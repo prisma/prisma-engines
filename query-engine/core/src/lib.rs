@@ -5,6 +5,7 @@
 extern crate tracing;
 
 pub mod error;
+pub mod exec_loader;
 pub mod executor;
 pub mod interpreter;
 pub mod query_ast;

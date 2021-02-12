@@ -27,5 +27,5 @@ pub trait QueryExecutor {
         query_schema: QuerySchemaRef,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
 
-    fn primary_connector(&self) -> &dyn Connector;
+    fn primary_connector(&self) -> &(dyn Connector + Send + Sync);
 }

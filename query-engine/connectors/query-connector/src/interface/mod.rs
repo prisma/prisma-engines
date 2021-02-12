@@ -10,7 +10,7 @@ use prisma_value::PrismaValue;
 #[async_trait]
 pub trait Connector {
     /// Returns a connection to a data source.
-    async fn get_connection(&self) -> crate::Result<Box<dyn Connection>>;
+    async fn get_connection(&self) -> crate::Result<Box<dyn Connection + Send + Sync>>;
 
     /// Returns name of the connector.
     fn name(&self) -> String;
