@@ -361,7 +361,7 @@ fn microsoft_sql_server_preview_feature_must_work() {
         }
 
         generator client {
-          provider = "prisma-client-js"
+            provider = "prisma-client-js"
             previewFeatures = ["microsoftSqlServer"]
         }
 
@@ -378,4 +378,23 @@ fn assert_eq_json(a: &str, b: &str) {
     let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");
 
     assert_eq!(json_a, json_b);
+}
+
+#[test]
+fn must_error_when_both_url_and_shadow_database_url_are_the_same() {
+    let schema = r#"
+        datasource redmond {
+            provider = "postgres"
+            url = "postgresql://abcd"
+            shadowDatabaseUrl = "postgresql://abcd"
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let diagnostics = config.err().expect("This must error");
+    diagnostics.assert_is(DatamodelError::new_shadow_database_is_same_as_main_url_error(
+        "redmond".into(),
+        Span::new(134, 153),
+    ));
 }

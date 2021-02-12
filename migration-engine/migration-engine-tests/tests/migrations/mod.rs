@@ -12,6 +12,7 @@ mod mysql;
 mod postgres;
 mod relations;
 mod reset_tests;
+mod shadow_database_url_configuration;
 mod soft_resets;
 mod sql;
 mod sqlite;

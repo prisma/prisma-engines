@@ -55,7 +55,7 @@ async fn soft_resets_work_on_postgres(api: &TestApi) -> TestResult {
     // Check that the soft reset works with migrations, then with schema push.
     {
         let engine = api
-            .new_engine_with_connection_string(&test_user_connection_string)
+            .new_engine_with_connection_strings(&test_user_connection_string, None)
             .await?;
 
         engine

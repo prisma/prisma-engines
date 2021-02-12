@@ -73,7 +73,9 @@ impl TestApi {
                 .unwrap();
         };
 
-        let api = SqlMigrationConnector::new(&connection_string, features).await.unwrap();
+        let api = SqlMigrationConnector::new(&connection_string, features, None)
+            .await
+            .unwrap();
 
         TestApi {
             api,
