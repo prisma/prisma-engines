@@ -14,6 +14,7 @@ impl MongoDbDatamodelConnector {
             ConnectorCapability::CreateMany,
             ConnectorCapability::CreateSkipDuplicates,
             ConnectorCapability::ScalarLists,
+            ConnectorCapability::InsensitiveFilters,
         ];
 
         Self { capabilities }

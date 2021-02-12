@@ -1,7 +1,7 @@
 use std::unimplemented;
 
 use connector_interface::{Filter, QueryMode, ScalarCondition, ScalarFilter};
-use mongodb::bson::{doc, Bson, Document};
+use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
 
 use crate::IntoBson;
@@ -110,5 +110,53 @@ fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> 
 }
 
 fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
-    todo!()
+    Ok(match condition {
+        ScalarCondition::Equals(val) => doc! { "$regex": format!("{}", (field, val).into_bson()?), "$options": "i" },
+        ScalarCondition::NotEquals(val) => {
+            doc! { "$not": { "$regex": format!("{}", (field, val).into_bson()?), "$options": "i" }}
+        }
+
+        ScalarCondition::Contains(val) => doc! { "$regex": format!(".*{}.*", val), "$options": "i" },
+        ScalarCondition::NotContains(val) => doc! { "$not": { "$regex": format!(".*{}.*", val), "$options": "i" }},
+        ScalarCondition::StartsWith(val) => doc! { "$regex": format!("^{}", val), "$options": "i" },
+        ScalarCondition::NotStartsWith(val) => doc! { "$not": { "$regex": format!("^{}", val), "$options": "i" }},
+        ScalarCondition::EndsWith(val) => doc! { "$regex": format!("{}$", val), "$options": "i" },
+        ScalarCondition::NotEndsWith(val) => doc! { "$not": { "$regex": format!("{}$", val), "$options": "i" }},
+        ScalarCondition::LessThan(val) => doc! { "$lt": (field, val).into_bson()? },
+        ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": (field, val).into_bson()? },
+        ScalarCondition::GreaterThan(val) => doc! { "$gt": (field, val).into_bson()? },
+        ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": (field, val).into_bson()? },
+        // Todo: The nested list unpack looks like a bug somewhere.
+        //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
+        ScalarCondition::In(vals) => match vals.split_first() {
+            // List is list of lists, we need to flatten.
+            Some((PrismaValue::List(_), _)) => {
+                let mut bson_values = Vec::with_capacity(vals.len());
+
+                for pv in vals {
+                    if let PrismaValue::List(inner) = pv {
+                        bson_values.extend(
+                            inner
+                                .into_iter()
+                                .map(|val| {
+                                    Ok(Bson::RegularExpression(Regex {
+                                        pattern: format!("{}", (field, val).into_bson()?),
+                                        options: "i".to_owned(),
+                                    }))
+                                })
+                                .collect::<crate::Result<Vec<_>>>()?,
+                        )
+                    }
+                }
+
+                doc! { "$in": bson_values }
+            }
+
+            _ => doc! { "$in": PrismaValue::List(vals).into_bson()? }, // todo
+        },
+        ScalarCondition::NotIn(vals) => {
+            // todo
+            doc! { "$nin": vals.into_iter().map(|val| (field, val).into_bson()).collect::<crate::Result<Vec<_>>>()? }
+        }
+    })
 }
