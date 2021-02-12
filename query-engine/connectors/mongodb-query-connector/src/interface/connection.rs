@@ -72,7 +72,7 @@ impl WriteOperations for MongoDbConnection {
             .await
     }
 
-    async fn connect(
+    async fn m2m_connect(
         &self,
         _field: &RelationFieldRef,
         _parent_id: &RecordProjection,
@@ -81,7 +81,7 @@ impl WriteOperations for MongoDbConnection {
         todo!()
     }
 
-    async fn disconnect(
+    async fn m2m_disconnect(
         &self,
         _field: &RelationFieldRef,
         _parent_id: &RecordProjection,

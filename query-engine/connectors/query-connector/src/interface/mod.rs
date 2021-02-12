@@ -241,16 +241,16 @@ pub trait WriteOperations {
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 
-    /// Connect the children to the parent.
-    async fn connect(
+    /// Connect the children to the parent (m2m relation only).
+    async fn m2m_connect(
         &self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
     ) -> crate::Result<()>;
 
-    /// Disconnect the children from the parent.
-    async fn disconnect(
+    /// Disconnect the children from the parent (m2m relation only).
+    async fn m2m_disconnect(
         &self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,

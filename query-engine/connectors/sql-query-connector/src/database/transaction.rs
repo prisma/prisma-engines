@@ -134,7 +134,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
             .await
     }
 
-    async fn connect(
+    async fn m2m_connect(
         &self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
@@ -144,7 +144,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
             .await
     }
 
-    async fn disconnect(
+    async fn m2m_disconnect(
         &self,
         field: &RelationFieldRef,
         parent_id: &RecordProjection,
