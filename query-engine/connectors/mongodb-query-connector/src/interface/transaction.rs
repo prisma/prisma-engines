@@ -79,7 +79,8 @@ impl WriteOperations for MongoDbTransaction {
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
     ) -> connector_interface::Result<usize> {
-        todo!()
+        self.catch(async move { write::delete_records(&self.database, model, record_filter).await })
+            .await
     }
 
     async fn connect(

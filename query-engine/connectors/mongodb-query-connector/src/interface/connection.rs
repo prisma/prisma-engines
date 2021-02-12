@@ -59,7 +59,8 @@ impl WriteOperations for MongoDbConnection {
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
     ) -> connector_interface::Result<Vec<RecordProjection>> {
-        todo!()
+        self.catch(async move { write::update_records(&self.database, model, record_filter, args).await })
+            .await
     }
 
     async fn delete_records(
@@ -67,41 +68,42 @@ impl WriteOperations for MongoDbConnection {
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
     ) -> connector_interface::Result<usize> {
-        todo!()
+        self.catch(async move { write::delete_records(&self.database, model, record_filter).await })
+            .await
     }
 
     async fn connect(
         &self,
-        field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        _field: &RelationFieldRef,
+        _parent_id: &RecordProjection,
+        _child_ids: &[RecordProjection],
     ) -> connector_interface::Result<()> {
         todo!()
     }
 
     async fn disconnect(
         &self,
-        field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        _field: &RelationFieldRef,
+        _parent_id: &RecordProjection,
+        _child_ids: &[RecordProjection],
     ) -> connector_interface::Result<()> {
         todo!()
     }
 
     async fn execute_raw(
         &self,
-        query: String,
-        parameters: Vec<prisma_value::PrismaValue>,
+        _query: String,
+        _parameters: Vec<prisma_value::PrismaValue>,
     ) -> connector_interface::Result<usize> {
-        todo!()
+        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
     }
 
     async fn query_raw(
         &self,
-        query: String,
-        parameters: Vec<prisma_value::PrismaValue>,
+        _query: String,
+        _parameters: Vec<prisma_value::PrismaValue>,
     ) -> connector_interface::Result<serde_json::Value> {
-        todo!()
+        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
     }
 }
 
@@ -137,12 +139,12 @@ impl ReadOperations for MongoDbConnection {
 
     async fn aggregate_records(
         &self,
-        model: &ModelRef,
-        query_arguments: connector_interface::QueryArguments,
-        selections: Vec<connector_interface::AggregationSelection>,
-        group_by: Vec<ScalarFieldRef>,
-        having: Option<connector_interface::Filter>,
+        _model: &ModelRef,
+        _query_arguments: connector_interface::QueryArguments,
+        _selections: Vec<connector_interface::AggregationSelection>,
+        _group_by: Vec<ScalarFieldRef>,
+        _having: Option<connector_interface::Filter>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
-        todo!()
+        Err(MongoError::Unsupported("Aggregations".to_owned()).into_connector_error())
     }
 }

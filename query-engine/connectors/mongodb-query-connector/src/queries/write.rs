@@ -165,3 +165,26 @@ pub async fn update_records(
 
     Ok(ids)
 }
+
+pub async fn delete_records(
+    database: &Database,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+) -> crate::Result<usize> {
+    let coll = database.collection(model.db_name());
+
+    let filter = if let Some(selectors) = record_filter.selectors {
+        let id_field = model.primary_identifier().scalar_fields().next().unwrap();
+        let ids = selectors
+            .into_iter()
+            .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
+            .collect::<crate::Result<Vec<_>>>()?;
+
+        doc! { id_field.db_name(): { "$in": ids.clone() } }
+    } else {
+        record_filter.filter.into_bson()?.into_document()?
+    };
+
+    let delete_result = coll.delete_many(filter, None).await?;
+    Ok(delete_result.deleted_count as usize)
+}
