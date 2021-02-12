@@ -223,7 +223,6 @@ pub async fn m2m_connect(
     let parent_update = doc! { "$addToSet": { parent_ids_scalar_field_name: { "$each": child_ids.clone() } } };
 
     // First update the parent and add all child IDs to the m:n scalar field.
-    dbg!("1");
     parent_coll.update_one(parent_filter, parent_update, None).await?;
 
     // Then update all children and add the parent
@@ -237,23 +236,56 @@ pub async fn m2m_connect(
         .unwrap()
         .clone();
 
-    dbg!("2");
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
     child_coll.update_many(child_filter, child_update, None).await?;
 
     Ok(())
 }
 
-/// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
-/// The relation information is in the `RelationFieldRef`.
 pub async fn m2m_disconnect(
     database: &Database,
     field: &RelationFieldRef,
     parent_id: &RecordProjection,
     child_ids: &[RecordProjection],
 ) -> crate::Result<()> {
-    // let query = write::delete_relation_table_records(field, parent_id, child_ids);
-    // conn.delete(query).await?;
+    let parent_model = field.model();
+    let child_model = field.related_model();
+
+    let parent_coll = database.collection(parent_model.db_name());
+    let child_coll = database.collection(child_model.db_name());
+
+    let parent_id = parent_id.values().next().unwrap();
+    let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
+    let parent_ids_scalar_field_name = field.relation_info.fields.iter().next().unwrap();
+    let parent_id = (&parent_id_field, parent_id).into_bson()?;
+
+    let parent_filter = doc! { "_id": { "$eq": parent_id.clone() } };
+    let child_ids = child_ids
+        .iter()
+        .map(|child_id| {
+            let (field, value) = child_id.pairs.iter().next().unwrap();
+            (field, value.clone()).into_bson()
+        })
+        .collect::<crate::Result<Vec<_>>>()?;
+
+    let parent_update = doc! { "$pullAll": { parent_ids_scalar_field_name: child_ids.clone() } };
+
+    // First update the parent and remove all child IDs to the m:n scalar field.
+    parent_coll.update_one(parent_filter, parent_update, None).await?;
+
+    // Then update all children and add the parent
+    let child_filter = doc! { "_id": { "$in": child_ids } };
+    let child_ids_scalar_field_name = field
+        .related_field()
+        .relation_info
+        .fields
+        .iter()
+        .next()
+        .unwrap()
+        .clone();
+
+    let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
+    child_coll.update_many(child_filter, child_update, None).await?;
 
     Ok(())
 }
