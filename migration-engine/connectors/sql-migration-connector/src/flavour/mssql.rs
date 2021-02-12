@@ -46,8 +46,8 @@ impl SqlFlavour for MssqlFlavour {
             .await?)
     }
 
-    fn imperative_migrations_table(&self) -> Table<'_> {
-        (self.schema_name(), self.imperative_migrations_table_name()).into()
+    fn migrations_table(&self) -> Table<'_> {
+        (self.schema_name(), self.migrations_table_name()).into()
     }
 
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {
@@ -66,7 +66,7 @@ impl SqlFlavour for MssqlFlavour {
         Ok(db_name)
     }
 
-    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+    async fn create_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = formatdoc! { r#"
             CREATE TABLE [{}].[{}] (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -78,7 +78,7 @@ impl SqlFlavour for MssqlFlavour {
                 started_at              DATETIMEOFFSET NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 applied_steps_count     INT NOT NULL DEFAULT 0
             );
-        "#, self.schema_name(), self.imperative_migrations_table_name()};
+        "#, self.schema_name(), self.migrations_table_name()};
 
         Ok(connection.raw_cmd(&sql).await?)
     }
@@ -113,7 +113,7 @@ impl SqlFlavour for MssqlFlavour {
             .raw_cmd(&format!(
                 "DROP TABLE [{}].[{}]",
                 self.schema_name(),
-                self.imperative_migrations_table_name()
+                self.migrations_table_name()
             ))
             .await?;
 

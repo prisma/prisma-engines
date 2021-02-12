@@ -11,7 +11,7 @@ use uuid::Uuid;
 #[async_trait::async_trait]
 impl MigrationPersistence for SqlMigrationConnector {
     async fn baseline_initialize(&self) -> ConnectorResult<()> {
-        self.flavour.create_imperative_migrations_table(&self.conn()).await?;
+        self.flavour.create_migrations_table(&self.conn()).await?;
 
         Ok(())
     }
@@ -22,7 +22,7 @@ impl MigrationPersistence for SqlMigrationConnector {
         if schema
             .tables
             .iter()
-            .any(|table| table.name == self.flavour().imperative_migrations_table_name())
+            .any(|table| table.name == self.flavour().migrations_table_name())
         {
             return Ok(());
         }
@@ -39,7 +39,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             ));
         }
 
-        self.flavour.create_imperative_migrations_table(&self.conn()).await?;
+        self.flavour.create_migrations_table(&self.conn()).await?;
 
         Ok(())
     }
@@ -49,7 +49,7 @@ impl MigrationPersistence for SqlMigrationConnector {
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
 
-        let insert = Insert::single_into(self.flavour().imperative_migrations_table())
+        let insert = Insert::single_into(self.flavour().migrations_table())
             .value("id", id.as_str())
             .value("checksum", checksum)
             .value("logs", "")
@@ -65,7 +65,7 @@ impl MigrationPersistence for SqlMigrationConnector {
     async fn mark_migration_rolled_back_by_id(&self, migration_id: &str) -> ConnectorResult<()> {
         let conn = self.conn();
 
-        let update = Update::table(self.flavour().imperative_migrations_table())
+        let update = Update::table(self.flavour().migrations_table())
             .so_that(Column::from("id").equals(migration_id))
             .set("rolled_back_at", chrono::Utc::now());
 
@@ -79,7 +79,7 @@ impl MigrationPersistence for SqlMigrationConnector {
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
 
-        let insert = Insert::single_into(self.flavour().imperative_migrations_table())
+        let insert = Insert::single_into(self.flavour().migrations_table())
             .value("id", id.as_str())
             .value("checksum", checksum)
             .value("started_at", now)
@@ -93,7 +93,7 @@ impl MigrationPersistence for SqlMigrationConnector {
     async fn record_successful_step(&self, id: &str) -> ConnectorResult<()> {
         use quaint::ast::*;
 
-        let update = Update::table(self.flavour().imperative_migrations_table())
+        let update = Update::table(self.flavour().migrations_table())
             .so_that(Column::from("id").equals(id))
             .set(
                 "applied_steps_count",
@@ -106,7 +106,7 @@ impl MigrationPersistence for SqlMigrationConnector {
     }
 
     async fn record_failed_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
-        let update = Update::table(self.flavour().imperative_migrations_table())
+        let update = Update::table(self.flavour().migrations_table())
             .so_that(Column::from("id").equals(id))
             .set("logs", logs);
 
@@ -116,7 +116,7 @@ impl MigrationPersistence for SqlMigrationConnector {
     }
 
     async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()> {
-        let update = Update::table(self.flavour().imperative_migrations_table())
+        let update = Update::table(self.flavour().migrations_table())
             .so_that(Column::from("id").equals(id))
             .set("finished_at", chrono::Utc::now()); // TODO maybe use a database generated timestamp
 
@@ -127,7 +127,7 @@ impl MigrationPersistence for SqlMigrationConnector {
 
     #[tracing::instrument(skip(self))]
     async fn list_migrations(&self) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>> {
-        let select = Select::from_table(self.flavour().imperative_migrations_table())
+        let select = Select::from_table(self.flavour().migrations_table())
             .column("id")
             .column("checksum")
             .column("finished_at")
@@ -140,7 +140,7 @@ impl MigrationPersistence for SqlMigrationConnector {
 
         let result = match self.conn().query(select).await {
             Ok(result) => result,
-            Err(err) if matches!(err.kind(), QuaintKind::TableDoesNotExist { table: Name::Available(table) } if table.contains(self.flavour().imperative_migrations_table_name())) => {
+            Err(err) if matches!(err.kind(), QuaintKind::TableDoesNotExist { table: Name::Available(table) } if table.contains(self.flavour().migrations_table_name())) => {
                 return Ok(Err(PersistenceNotInitializedError))
             }
             err @ Err(_) => err?,

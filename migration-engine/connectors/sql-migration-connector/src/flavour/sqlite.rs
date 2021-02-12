@@ -42,7 +42,7 @@ impl SqlFlavour for SqliteFlavour {
         Ok(self.file_path.clone())
     }
 
-    async fn create_imperative_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+    async fn create_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
         let sql = indoc! {r#"
             CREATE TABLE "_prisma_migrations" (
                 "id"                    TEXT PRIMARY KEY NOT NULL,
