@@ -89,6 +89,12 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
+    async fn drop_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("DROP TABLE _prisma_migrations").await?;
+
+        Ok(())
+    }
+
     async fn ensure_connection_validity(&self, _connection: &Connection) -> ConnectorResult<()> {
         Ok(())
     }

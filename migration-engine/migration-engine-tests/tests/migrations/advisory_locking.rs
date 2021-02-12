@@ -1,56 +1,6 @@
-use migration_core::{
-    commands::{ApplyMigrationsInput, CreateMigrationInput},
-    GenericApi,
-};
-use quaint::single::Quaint;
-use tempfile::TempDir;
+use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput};
+use migration_engine_tests::{multi_engine_test_api::*, TestResult};
 use test_macros::test_each_connector;
-use test_setup::{connectors::Tags, TestApiArgs};
-
-type TestResult = Result<(), anyhow::Error>;
-
-struct TestApi {
-    args: TestApiArgs,
-    source: String,
-    url: String,
-}
-
-impl TestApi {
-    async fn new(args: TestApiArgs) -> Self {
-        let connection_string = (args.url_fn)(args.test_function_name);
-        let source = args.datasource_block(&connection_string);
-
-        TestApi {
-            args,
-            url: connection_string,
-            source,
-        }
-    }
-
-    /// Create a temporary directory to serve as a test migrations directory.
-    pub fn create_migrations_directory(&self) -> anyhow::Result<TempDir> {
-        Ok(tempfile::tempdir()?)
-    }
-
-    async fn new_engine(&self) -> anyhow::Result<Box<dyn GenericApi>> {
-        Ok(migration_core::migration_api(&self.source).await?)
-    }
-
-    async fn initialize(&self) -> anyhow::Result<()> {
-        if self.args.connector_tags.contains(Tags::Postgres) {
-            test_setup::create_postgres_database(&self.url.parse()?).await.unwrap();
-        } else if self.args.connector_tags.contains(Tags::Mysql) {
-            test_setup::create_mysql_database(&self.url.parse()?).await.unwrap();
-        } else if self.args.connector_tags.contains(Tags::Mssql) {
-            let conn = Quaint::new(&self.url).await.unwrap();
-            test_setup::connectors::mssql::reset_schema(&conn, self.args.test_function_name)
-                .await
-                .unwrap();
-        }
-
-        Ok(())
-    }
-}
 
 #[test_each_connector]
 async fn advisory_locking_works(api: &TestApi) -> TestResult {
@@ -68,6 +18,7 @@ async fn advisory_locking_works(api: &TestApi) -> TestResult {
     "#;
 
     let output = first_me
+        .generic_api()
         .create_migration(&CreateMigrationInput {
             migrations_directory_path: p.clone(),
             prisma_schema: dm.into(),
@@ -96,9 +47,9 @@ async fn advisory_locking_works(api: &TestApi) -> TestResult {
     let (result_1, result_2, result_3) = tokio::join!(
         // We move the engines into the async block so they get dropped when they
         // are done with the request, releasing the lock as a consequence.
-        async move { second_me.apply_migrations(&input_1).await },
-        async move { first_me.apply_migrations(&input_2).await },
-        async move { third_me.apply_migrations(&input_3).await },
+        async move { second_me.generic_api().apply_migrations(&input_1).await },
+        async move { first_me.generic_api().apply_migrations(&input_2).await },
+        async move { third_me.generic_api().apply_migrations(&input_3).await },
     );
 
     let results = [&result_1, &result_2, &result_3];

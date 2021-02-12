@@ -1,3 +1,5 @@
+#![allow(clippy::wrong_self_convention)]
+
 mod column_metadata;
 mod cursor_condition;
 mod database;

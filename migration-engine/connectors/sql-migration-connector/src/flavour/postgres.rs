@@ -141,6 +141,12 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    async fn drop_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("DROP TABLE _prisma_migrations").await?;
+
+        Ok(())
+    }
+
     #[tracing::instrument]
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         let schema_name = connection.connection_info().schema_name();

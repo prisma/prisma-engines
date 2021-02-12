@@ -21,7 +21,7 @@ use once_cell::sync::Lazy;
 use quaint::{prelude::Queryable, single::Quaint};
 use url::Url;
 
-type AnyError = Box<dyn std::error::Error + Send + Sync>;
+type AnyError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 const SCHEMA_NAME: &str = "prisma-tests";
 

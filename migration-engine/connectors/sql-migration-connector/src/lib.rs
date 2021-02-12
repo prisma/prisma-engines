@@ -109,6 +109,7 @@ impl SqlMigrationConnector {
         };
 
         self.apply_migration(&migration).await?;
+        self.flavour.drop_migrations_table(self.conn()).await?;
 
         Ok(())
     }
