@@ -50,6 +50,7 @@ impl From<DriverError> for MongoError {
 
 impl MongoError {
     pub fn into_connector_error(self) -> ConnectorError {
+        dbg!(self);
         todo!()
     }
 }

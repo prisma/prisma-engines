@@ -11,7 +11,7 @@ model User {
 }
 
 model Post {
-  id           Int        @id @map("_id")
+  id           String     @id @default(dbgenerated()) @map("_id")
   title        String
   author_id    String
   author       User       @relation(fields: [author_id], references: [id])
@@ -21,8 +21,8 @@ model Post {
 }
 
 model Category {
-  id       String @id @default(dbgenerated()) @map("_id")
+  id       String   @id @default(dbgenerated()) @map("_id")
   name     String
-  post_ids Int[]
-  posts    Post[] @relation(fields: [post_ids])
+  post_ids String[]
+  posts    Post[]   @relation(fields: [post_ids])
 }

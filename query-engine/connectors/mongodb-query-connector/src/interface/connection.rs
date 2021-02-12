@@ -74,20 +74,22 @@ impl WriteOperations for MongoDbConnection {
 
     async fn m2m_connect(
         &self,
-        _field: &RelationFieldRef,
-        _parent_id: &RecordProjection,
-        _child_ids: &[RecordProjection],
+        field: &RelationFieldRef,
+        parent_id: &RecordProjection,
+        child_ids: &[RecordProjection],
     ) -> connector_interface::Result<()> {
-        todo!()
+        self.catch(async move { write::m2m_connect(&self.database, field, parent_id, child_ids).await })
+            .await
     }
 
     async fn m2m_disconnect(
         &self,
-        _field: &RelationFieldRef,
-        _parent_id: &RecordProjection,
-        _child_ids: &[RecordProjection],
+        field: &RelationFieldRef,
+        parent_id: &RecordProjection,
+        child_ids: &[RecordProjection],
     ) -> connector_interface::Result<()> {
-        todo!()
+        self.catch(async move { write::m2m_disconnect(&self.database, field, parent_id, child_ids).await })
+            .await
     }
 
     async fn execute_raw(

@@ -140,7 +140,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
     ) -> connector::Result<()> {
-        self.catch(async move { write::connect(&self.inner, field, parent_id, child_ids).await })
+        self.catch(async move { write::m2m_connect(&self.inner, field, parent_id, child_ids).await })
             .await
     }
 
@@ -150,7 +150,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         parent_id: &RecordProjection,
         child_ids: &[RecordProjection],
     ) -> connector::Result<()> {
-        self.catch(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await })
+        self.catch(async move { write::m2m_disconnect(&self.inner, field, parent_id, child_ids).await })
             .await
     }
 

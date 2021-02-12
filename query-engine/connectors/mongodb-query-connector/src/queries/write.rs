@@ -157,7 +157,10 @@ pub async fn update_records(
         entry.as_document_mut().unwrap().insert(name, val);
     }
 
-    let _update_result = coll.update_many(filter, update_doc, None).await?;
+    if !update_doc.is_empty() {
+        coll.update_many(filter, update_doc, None).await?;
+    }
+
     let ids = ids
         .into_iter()
         .map(|bson_id| Ok(RecordProjection::from((id_field.clone(), value_from_bson(bson_id)?))))
@@ -187,4 +190,70 @@ pub async fn delete_records(
 
     let delete_result = coll.delete_many(filter, None).await?;
     Ok(delete_result.deleted_count as usize)
+}
+
+/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
+/// The relation information is in the `RelationFieldRef`.
+pub async fn m2m_connect(
+    database: &Database,
+    field: &RelationFieldRef,
+    parent_id: &RecordProjection,
+    child_ids: &[RecordProjection],
+) -> crate::Result<()> {
+    let parent_model = field.model();
+    let child_model = field.related_model();
+
+    let parent_coll = database.collection(parent_model.db_name());
+    let child_coll = database.collection(child_model.db_name());
+
+    let parent_id = parent_id.values().next().unwrap();
+    let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
+    let parent_ids_scalar_field_name = field.relation_info.fields.iter().next().unwrap();
+    let parent_id = (&parent_id_field, parent_id).into_bson()?;
+
+    let parent_filter = doc! { "_id": { "$eq": parent_id.clone() } };
+    let child_ids = child_ids
+        .iter()
+        .map(|child_id| {
+            let (field, value) = child_id.pairs.iter().next().unwrap();
+            (field, value.clone()).into_bson()
+        })
+        .collect::<crate::Result<Vec<_>>>()?;
+
+    let parent_update = doc! { "$addToSet": { parent_ids_scalar_field_name: { "$each": child_ids.clone() } } };
+
+    // First update the parent and add all child IDs to the m:n scalar field.
+    dbg!("1");
+    parent_coll.update_one(parent_filter, parent_update, None).await?;
+
+    // Then update all children and add the parent
+    let child_filter = doc! { "_id": { "$in": child_ids } };
+    let child_ids_scalar_field_name = field
+        .related_field()
+        .relation_info
+        .fields
+        .iter()
+        .next()
+        .unwrap()
+        .clone();
+
+    dbg!("2");
+    let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
+    child_coll.update_many(child_filter, child_update, None).await?;
+
+    Ok(())
+}
+
+/// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
+/// The relation information is in the `RelationFieldRef`.
+pub async fn m2m_disconnect(
+    database: &Database,
+    field: &RelationFieldRef,
+    parent_id: &RecordProjection,
+    child_ids: &[RecordProjection],
+) -> crate::Result<()> {
+    // let query = write::delete_relation_table_records(field, parent_id, child_ids);
+    // conn.delete(query).await?;
+
+    Ok(())
 }

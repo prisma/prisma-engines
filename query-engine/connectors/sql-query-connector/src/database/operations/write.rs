@@ -214,7 +214,7 @@ pub async fn delete_records(
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn connect(
+pub async fn m2m_connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &RecordProjection,
@@ -228,7 +228,7 @@ pub async fn connect(
 
 /// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn disconnect(
+pub async fn m2m_disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
     parent_id: &RecordProjection,
