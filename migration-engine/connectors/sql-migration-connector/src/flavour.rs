@@ -75,6 +75,9 @@ pub(crate) trait SqlFlavour:
     /// Drop the database for the provided URL on the server.
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()>;
 
+    /// Drop the migrations table
+    async fn drop_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
+
     /// Check a connection to make sure it is usable by the migration engine.
     /// This can include some set up on the database, like ensuring that the
     /// schema we connect to exists.

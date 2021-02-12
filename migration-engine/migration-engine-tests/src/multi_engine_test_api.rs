@@ -3,15 +3,17 @@
 //! A TestApi that is initialized without IO or async code and can instantiate
 //! multiple migration engines.
 
+use crate::{ApplyMigrations, CreateMigration, Reset, SchemaAssertion, SchemaPush};
+use enumflags2::BitFlags;
 use migration_core::GenericApi;
 use quaint::single::Quaint;
+use sql_migration_connector::SqlMigrationConnector;
 use tempfile::TempDir;
 use test_setup::{connectors::Tags, TestApiArgs};
 
 /// The multi-engine test API.
 pub struct TestApi {
     args: TestApiArgs,
-    source: String,
     connection_string: String,
 }
 
@@ -19,12 +21,10 @@ impl TestApi {
     /// Initializer, called by the test macros.
     pub async fn new(args: TestApiArgs) -> Self {
         let connection_string = (args.url_fn)(args.test_function_name);
-        let source = args.datasource_block(&connection_string);
 
         TestApi {
             args,
             connection_string,
-            source,
         }
     }
 
@@ -39,21 +39,15 @@ impl TestApi {
     }
 
     /// Instantiate a new migration engine for the current database.
-    pub async fn new_engine(&self) -> anyhow::Result<Box<dyn GenericApi>> {
-        self.new_engine_with_datasource(&self.source).await
+    pub async fn new_engine(&self) -> anyhow::Result<EngineTestApi> {
+        self.new_engine_with_connection_string(&self.connection_string).await
     }
 
     /// Instantiate a new migration with the provided connection string.
-    pub async fn new_engine_with_connection_string(
-        &self,
-        connection_string: &str,
-    ) -> anyhow::Result<Box<dyn GenericApi>> {
-        self.new_engine_with_datasource(&self.args.datasource_block(connection_string))
-            .await
-    }
+    pub async fn new_engine_with_connection_string(&self, connection_string: &str) -> anyhow::Result<EngineTestApi> {
+        let connector = SqlMigrationConnector::new(&connection_string, BitFlags::empty()).await?;
 
-    async fn new_engine_with_datasource(&self, datasource: &str) -> anyhow::Result<Box<dyn GenericApi>> {
-        Ok(migration_core::migration_api(&datasource).await?)
+        Ok(EngineTestApi(connector))
     }
 
     /// Initialize the database.
@@ -71,12 +65,55 @@ impl TestApi {
             test_setup::connectors::mssql::reset_schema(&conn, self.args.test_function_name).await?;
             Ok(conn)
         } else {
-            unreachable!()
+            Ok(Quaint::new(&self.connection_string).await?)
         }
     }
 
     /// The name of the test function, as a string.
     pub fn test_fn_name(&self) -> &str {
         self.args.test_function_name
+    }
+}
+
+/// A wrapper around a migration engine instance optimized for convenience in
+/// writing tests.
+pub struct EngineTestApi(SqlMigrationConnector);
+
+impl EngineTestApi {
+    /// Plan an `applyMigrations` command
+    pub fn apply_migrations<'a>(&'a self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
+        ApplyMigrations::new(&self.0, migrations_directory)
+    }
+
+    /// Plan a `createMigration` command
+    pub fn create_migration<'a>(
+        &'a self,
+        name: &'a str,
+        schema: &'a str,
+        migrations_directory: &'a TempDir,
+    ) -> CreateMigration<'a> {
+        CreateMigration::new(&self.0, name, schema, migrations_directory)
+    }
+
+    /// Assert facts about the database schema
+    pub async fn assert_schema(&self) -> Result<SchemaAssertion, anyhow::Error> {
+        let schema = self.0.describe_schema().await?;
+
+        Ok(SchemaAssertion(schema))
+    }
+
+    /// Expose the GenericApi impl.
+    pub fn generic_api(&self) -> &dyn GenericApi {
+        &self.0
+    }
+
+    /// Plan a `reset` command
+    pub fn reset(&self) -> Reset<'_> {
+        Reset::new(&self.0)
+    }
+
+    /// Plan a `schemaPush` command
+    pub fn schema_push<'a>(&'a self, dm: impl Into<String>) -> SchemaPush<'a> {
+        SchemaPush::new(&self.0, dm.into())
     }
 }

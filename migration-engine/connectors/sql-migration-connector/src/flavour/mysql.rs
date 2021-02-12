@@ -141,6 +141,12 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
+    async fn drop_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection.raw_cmd("DROP TABLE _prisma_migrations").await?;
+
+        Ok(())
+    }
+
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
             RegexSet::new(&[

@@ -18,6 +18,7 @@ async fn advisory_locking_works(api: &TestApi) -> TestResult {
     "#;
 
     let output = first_me
+        .generic_api()
         .create_migration(&CreateMigrationInput {
             migrations_directory_path: p.clone(),
             prisma_schema: dm.into(),
@@ -46,9 +47,9 @@ async fn advisory_locking_works(api: &TestApi) -> TestResult {
     let (result_1, result_2, result_3) = tokio::join!(
         // We move the engines into the async block so they get dropped when they
         // are done with the request, releasing the lock as a consequence.
-        async move { second_me.apply_migrations(&input_1).await },
-        async move { first_me.apply_migrations(&input_2).await },
-        async move { third_me.apply_migrations(&input_3).await },
+        async move { second_me.generic_api().apply_migrations(&input_1).await },
+        async move { first_me.generic_api().apply_migrations(&input_2).await },
+        async move { third_me.generic_api().apply_migrations(&input_3).await },
     );
 
     let results = [&result_1, &result_2, &result_3];

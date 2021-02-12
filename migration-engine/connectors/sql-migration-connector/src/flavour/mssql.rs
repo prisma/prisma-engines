@@ -108,6 +108,18 @@ impl SqlFlavour for MssqlFlavour {
         ));
     }
 
+    async fn drop_migrations_table(&self, connection: &Connection) -> ConnectorResult<()> {
+        connection
+            .raw_cmd(&format!(
+                "DROP TABLE [{}].[{}]",
+                self.schema_name(),
+                self.imperative_migrations_table_name()
+            ))
+            .await?;
+
+        Ok(())
+    }
+
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let schema_name = connection.connection_info().schema_name();
         let drop_fks = format!(
